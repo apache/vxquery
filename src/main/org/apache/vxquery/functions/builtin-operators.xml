@@ -1,0 +1,715 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<operators>
+    <!-- op:add-dayTimeDuration-to-date( $arg1 as xs:date, $arg2 as xs:dayTimeDuration)  as xs:date -->
+    <operator name="op:add-dayTimeDuration-to-date">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:date"/>
+    </operator>
+
+    <!-- op:add-dayTimeDuration-to-dateTime( $arg1 as xs:dateTime, $arg2 as xs:dayTimeDuration)  as xs:dateTime -->
+    <operator name="op:add-dayTimeDuration-to-dateTime">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:dateTime"/>
+    </operator>
+
+    <!-- op:add-dayTimeDuration-to-time( $arg1 as xs:time, $arg2 as xs:dayTimeDuration)  as xs:time -->
+    <operator name="op:add-dayTimeDuration-to-time">
+        <param name="arg1" type="xs:time"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:time"/>
+    </operator>
+
+    <!-- op:add-dayTimeDurations( $arg1 as xs:dayTimeDuration, $arg2 as xs:dayTimeDuration)  as xs:dayTimeDuration -->
+    <operator name="op:add-dayTimeDurations">
+        <param name="arg1" type="xs:dayTimeDuration"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:dayTimeDuration"/>
+    </operator>
+
+    <!-- op:add-yearMonthDuration-to-date( $arg1 as xs:date, $arg2 as xs:yearMonthDuration)  as xs:date -->
+    <operator name="op:add-yearMonthDuration-to-date">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:date"/>
+    </operator>
+
+    <!-- op:add-yearMonthDuration-to-dateTime( $arg1 as xs:dateTime, $arg2 as xs:yearMonthDuration)  as xs:dateTime -->
+    <operator name="op:add-yearMonthDuration-to-dateTime">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:dateTime"/>
+    </operator>
+
+    <!-- op:add-yearMonthDurations( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:yearMonthDuration -->
+    <operator name="op:add-yearMonthDurations">
+        <param name="arg1" type="xs:yearMonthDuration"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:yearMonthDuration"/>
+    </operator>
+
+    <!-- op:base64Binary-equal( $value1 as xs:base64Binary, $value2 as xs:base64Binary)  as xs:boolean -->
+    <operator name="op:base64Binary-equal">
+        <param name="value1" type="xs:base64Binary"/>
+        <param name="value2" type="xs:base64Binary"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:boolean-equal($value1  as xs:boolean, $value2 as xs:boolean)  as xs:boolean -->
+    <operator name="op:boolean-equal">
+        <param name="value1" type="xs:boolean"/>
+        <param name="value2" type="xs:boolean"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:boolean-greater-than( $arg1 as xs:boolean, $arg2 as xs:boolean)  as xs:boolean -->
+    <operator name="op:boolean-greater-than">
+        <param name="value1" type="xs:boolean"/>
+        <param name="value2" type="xs:boolean"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:boolean-less-than( $arg1 as xs:boolean, $arg2 as xs:boolean)  as xs:boolean -->
+    <operator name="op:boolean-less-than">
+        <param name="value1" type="xs:boolean"/>
+        <param name="value2" type="xs:boolean"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:concatenate($arg as item()*)  as item()* -->
+    <operator name="op:concatenate" varargs="true">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ConcatenateIterator"/>
+    </operator>
+
+    <!-- op:date-equal($arg1  as xs:date, $arg2 as xs:date)  as xs:boolean -->
+    <operator name="op:date-equal">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:date"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:date-greater-than( $arg1 as xs:date, $arg2 as xs:date)  as xs:boolean -->
+    <operator name="op:date-greater-than">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:date"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:date-less-than($arg1  as xs:date, $arg2 as xs:date)  as xs:boolean -->
+    <operator name="op:date-less-than">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:date"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:dateTime-equal($arg1  as xs:dateTime, $arg2 as xs:dateTime)  as xs:boolean -->
+    <operator name="op:dateTime-equal">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:dateTime"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:dateTime-greater-than( $arg1 as xs:dateTime, $arg2 as xs:dateTime)  as xs:boolean -->
+    <operator name="op:dateTime-greater-than">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:dateTime"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:dateTime-less-than( $arg1 as xs:dateTime, $arg2 as xs:dateTime)  as xs:boolean -->
+    <operator name="op:dateTime-less-than">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:dateTime"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:dayTimeDuration-greater-than( $arg1 as xs:dayTimeDuration, $arg2 as xs:dayTimeDuration)  as xs:boolean -->
+    <operator name="op:dayTimeDuration-greater-than">
+        <param name="arg1" type="xs:dayTimeDuration"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:dayTimeDuration-less-than( $arg1 as xs:dayTimeDuration, $arg2 as xs:dayTimeDuration)  as xs:boolean -->
+    <operator name="op:dayTimeDuration-less-than">
+        <param name="arg1" type="xs:dayTimeDuration"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:divide-dayTimeDuration( $arg1 as xs:dayTimeDuration, $arg2 as xs:double)  as xs:dayTimeDuration -->
+    <operator name="op:divide-dayTimeDuration">
+        <param name="arg1" type="xs:dayTimeDuration"/>
+        <param name="arg2" type="xs:double"/>
+        <return type="xs:dayTimeDuration"/>
+    </operator>
+
+    <!-- op:divide-dayTimeDuration-by-dayTimeDuration( $arg1 as xs:dayTimeDuration, $arg2 as xs:dayTimeDuration)  as xs:decimal -->
+    <operator name="op:divide-dayTimeDuration-by-dayTimeDuration">
+        <param name="arg1" type="xs:dayTimeDuration"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:decimal"/>
+    </operator>
+
+    <!-- op:divide-yearMonthDuration( $arg1 as xs:yearMonthDuration, $arg2 as xs:double)  as xs:yearMonthDuration -->
+    <operator name="op:divide-yearMonthDuration">
+        <param name="arg1" type="xs:yearMonthDuration"/>
+        <param name="arg2" type="xs:double"/>
+        <return type="xs:yearMonthDuration"/>
+    </operator>
+
+    <!-- op:divide-yearMonthDuration-by-yearMonthDuration( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:decimal -->
+    <operator name="op:divide-yearMonthDuration-by-yearMonthDuration">
+        <param name="arg1" type="xs:yearMonthDuration"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:decimal"/>
+    </operator>
+
+    <!-- op:duration-equal($arg1  as xs:duration, $arg2 as xs:duration)  as xs:boolean -->
+    <operator name="op:duration-equal">
+        <param name="arg1" type="xs:duration"/>
+        <param name="arg2" type="xs:duration"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:except($parameter1  as node()*, $parameter2 as node()*)  as node()* -->
+    <operator name="op:except">
+        <param name="parameter1" type="node()*"/>
+        <param name="parameter2" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- op:gDay-equal($arg1  as xs:gDay, $arg2 as xs:gDay)  as xs:boolean -->
+    <operator name="op:gDay-equal">
+        <param name="arg1" type="xs:gDay"/>
+        <param name="arg2" type="xs:gDay"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:gMonth-equal($arg1  as xs:gMonth, $arg2 as xs:gMonth)  as xs:boolean -->
+    <operator name="op:gMonth-equal">
+        <param name="arg1" type="xs:gMonth"/>
+        <param name="arg2" type="xs:gMonth"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:gMonthDay-equal($arg1  as xs:gMonthDay, $arg2 as xs:gMonthDay)  as xs:boolean -->
+    <operator name="op:gMonthDay-equal">
+        <param name="arg1" type="xs:gMonthDay"/>
+        <param name="arg2" type="xs:gMonthDay"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:gYear-equal($arg1  as xs:gYear, $arg2 as xs:gYear)  as xs:boolean -->
+    <operator name="op:gYear-equal">
+        <param name="arg1" type="xs:gYear"/>
+        <param name="arg2" type="xs:gYear"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:gYearMonth-equal( $arg1 as xs:gYearMonth, $arg2 as xs:gYearMonth)  as xs:boolean -->
+    <operator name="op:gYearMonth-equal">
+        <param name="arg1" type="xs:gYearMonth"/>
+        <param name="arg2" type="xs:gYearMonth"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:hexBinary-equal($value1  as xs:hexBinary, $value2 as xs:hexBinary)  as xs:boolean -->
+    <operator name="op:hexBinary-equal">
+        <param name="arg1" type="xs:hexBinary"/>
+        <param name="arg2" type="xs:hexBinary"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:intersect($parameter1  as node()*, $parameter2 as node()*)  as node()* -->
+    <operator name="op:intersect">
+        <param name="parameter1" type="node()*"/>
+        <param name="parameter2" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- op:is-same-node($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
+    <operator name="op:is-same-node">
+        <param name="parameter1" type="node()"/>
+        <param name="parameter2" type="node()"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:multiply-dayTimeDuration( $arg1 as xs:dayTimeDuration, $arg2 as xs:double)  as xs:dayTimeDuration -->
+    <operator name="op:multiply-dayTimeDuration">
+        <param name="arg1" type="xs:dayTimeDuration"/>
+        <param name="arg2" type="xs:double"/>
+        <return type="xs:dayTimeDuration"/>
+    </operator>
+
+    <!-- op:multiply-yearMonthDuration( $arg1 as xs:yearMonthDuration, $arg2 as xs:double)  as xs:yearMonthDuration -->
+    <operator name="op:multiply-yearMonthDuration">
+        <param name="arg1" type="xs:yearMonthDuration"/>
+        <param name="arg2" type="xs:double"/>
+        <return type="xs:yearMonthDuration"/>
+    </operator>
+
+    <!-- op:node-after($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
+    <operator name="op:node-after">
+        <param name="parameter1" type="node()"/>
+        <param name="parameter2" type="node()"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:node-before($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
+    <operator name="op:node-before">
+        <param name="parameter1" type="node()"/>
+        <param name="parameter2" type="node()"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:NOTATION-equal($arg1  as xs:NOTATION, $arg2 as xs:NOTATION)  as xs:boolean -->
+    <operator name="op:NOTATION-equal">
+        <param name="arg1" type="xs:NOTATION"/>
+        <param name="arg2" type="xs:NOTATION"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:numeric-add($arg1  as numeric, $arg2 as numeric)  as numeric -->
+    <operator name="op:numeric-add">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xsext:numeric"/>
+    </operator>
+
+    <!-- op:numeric-divide($arg1  as numeric, $arg2 as numeric)  as numeric -->
+    <operator name="op:numeric-divide">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xsext:numeric"/>
+    </operator>
+
+    <!-- op:numeric-equal($arg1  as numeric, $arg2 as numeric)  as xs:boolean -->
+    <operator name="op:numeric-equal">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:numeric-greater-than( $arg1 as numeric, $arg2 as numeric)  as xs:boolean -->
+    <operator name="op:numeric-greater-than">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:numeric-integer-divide( $arg1 as numeric, $arg2 as numeric)  as xs:integer -->
+    <operator name="op:numeric-integer-divide">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xs:integer"/>
+    </operator>
+
+    <!-- op:numeric-less-than( $arg1 as numeric, $arg2 as numeric)  as xs:boolean -->
+    <operator name="op:numeric-less-than">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:numeric-mod($arg1  as numeric, $arg2 as numeric)  as numeric -->
+    <operator name="op:numeric-mod">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xsext:numeric"/>
+    </operator>
+
+    <!-- op:numeric-multiply( $arg1 as numeric, $arg2 as numeric)  as numeric -->
+    <operator name="op:numeric-multiply">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xsext:numeric"/>
+    </operator>
+
+    <!-- op:numeric-subtract( $arg1 as numeric, $arg2 as numeric)  as numeric -->
+    <operator name="op:numeric-subtract">
+        <param name="arg1" type="xsext:numeric"/>
+        <param name="arg2" type="xsext:numeric"/>
+        <return type="xsext:numeric"/>
+    </operator>
+
+    <!-- op:numeric-unary-minus( $arg as numeric) as  numeric -->
+    <operator name="op:numeric-unary-minus">
+        <param name="arg1" type="xsext:numeric"/>
+        <return type="xsext:numeric"/>
+        <runtime class="org.apache.vxquery.runtime.functions.NumericUnaryMinusIterator"/>
+    </operator>
+
+    <!-- op:numeric-unary-plus( $arg as numeric) as  numeric -->
+    <operator name="op:numeric-unary-plus">
+        <param name="arg1" type="xsext:numeric"/>
+        <return type="xsext:numeric"/>
+    </operator>
+
+    <!-- op:QName-equal($arg1  as xs:QName, $arg2 as xs:QName)  as xs:boolean -->
+    <operator name="op:QName-equal">
+        <param name="arg1" type="xs:QName"/>
+        <param name="arg2" type="xs:QName"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:subtract-dates($arg1  as xs:date, $arg2 as xs:date)  as xs:dayTimeDuration? -->
+    <operator name="op:subtract-dates">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:date"/>
+        <return type="xs:dayTimeDuration?"/>
+    </operator>
+
+    <!-- op:subtract-dateTimes( $arg1 as xs:dateTime, $arg2 as xs:dateTime)  as xs:dayTimeDuration? -->
+    <operator name="op:subtract-dateTimes">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:dateTime"/>
+        <return type="xs:dayTimeDuration?"/>
+    </operator>
+
+    <!-- op:subtract-dayTimeDuration-from-date( $arg1 as xs:date, $arg2 as xs:dayTimeDuration)  as xs:date -->
+    <operator name="op:subtract-dayTimeDuration-from-date">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:date"/>
+    </operator>
+
+    <!-- op:subtract-dayTimeDuration-from-dateTime( $arg1 as xs:dateTime, $arg2 as xs:dayTimeDuration)  as xs:dateTime -->
+    <operator name="op:subtract-dayTimeDuration-from-dateTime">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:dateTime"/>
+    </operator>
+
+    <!-- op:subtract-dayTimeDuration-from-time( $arg1 as xs:time, $arg2 as xs:dayTimeDuration)  as xs:time -->
+    <operator name="op:subtract-dayTimeDuration-from-time">
+        <param name="arg1" type="xs:time"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:time"/>
+    </operator>
+
+    <!-- op:subtract-dayTimeDurations( $arg1 as xs:dayTimeDuration, $arg2 as xs:dayTimeDuration)  as xs:dayTimeDuration -->
+    <operator name="op:subtract-dayTimeDurations">
+        <param name="arg1" type="xs:dayTimeDuration"/>
+        <param name="arg2" type="xs:dayTimeDuration"/>
+        <return type="xs:dayTimeDuration"/>
+    </operator>
+
+    <!-- op:subtract-times($arg1  as xs:time, $arg2 as xs:time)  as xs:dayTimeDuration -->
+    <operator name="op:subtract-times">
+        <param name="arg1" type="xs:time"/>
+        <param name="arg2" type="xs:time"/>
+        <return type="xs:dayTimeDuration"/>
+    </operator>
+
+    <!-- op:subtract-yearMonthDuration-from-date( $arg1 as xs:date, $arg2 as xs:yearMonthDuration)  as xs:date -->
+    <operator name="op:subtract-yearMonthDuration-from-date">
+        <param name="arg1" type="xs:date"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:date"/>
+    </operator>
+
+    <!-- op:subtract-yearMonthDuration-from-dateTime( $arg1 as xs:dateTime, $arg2 as xs:yearMonthDuration)  as xs:dateTime -->
+    <operator name="op:subtract-yearMonthDuration-from-dateTime">
+        <param name="arg1" type="xs:dateTime"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:dateTime"/>
+    </operator>
+
+    <!-- op:subtract-yearMonthDurations( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:yearMonthDuration -->
+    <operator name="op:subtract-yearMonthDurations">
+        <param name="arg1" type="xs:yearMonthDuration"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:yearMonthDuration"/>
+    </operator>
+
+    <!-- op:time-equal($arg1  as xs:time, $arg2 as xs:time)  as xs:boolean -->
+    <operator name="op:time-equal">
+        <param name="arg1" type="xs:time"/>
+        <param name="arg2" type="xs:time"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:time-greater-than( $arg1 as xs:time, $arg2 as xs:time)  as xs:boolean -->
+    <operator name="op:time-greater-than">
+        <param name="arg1" type="xs:time"/>
+        <param name="arg2" type="xs:time"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:time-less-than($arg1  as xs:time, $arg2 as xs:time)  as xs:boolean -->
+    <operator name="op:time-less-than">
+        <param name="arg1" type="xs:time"/>
+        <param name="arg2" type="xs:time"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:to($firstval as  xs:integer, $lastval as xs:integer)  as xs:integer* -->
+    <operator name="op:to">
+        <param name="firstval" type="xs:integer"/>
+        <param name="lastval" type="xs:integer"/>
+        <return type="xs:integer*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpToIterator"/>
+    </operator>
+
+    <!-- op:union($parameter1  as node()*, $parameter2 as node()*)  as node()* -->
+    <operator name="op:union">
+        <param name="parameter1" type="node()*"/>
+        <param name="parameter2" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- op:yearMonthDuration-greater-than( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:boolean -->
+    <operator name="op:yearMonthDuration-greater-than">
+        <param name="arg1" type="xs:yearMonthDuration"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- op:yearMonthDuration-less-than( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:boolean -->
+    <operator name="op:yearMonthDuration-less-than">
+        <param name="arg1" type="xs:yearMonthDuration"/>
+        <param name="arg2" type="xs:yearMonthDuration"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- opext:ordered($arg as item()*) as item()* -->
+    <operator name="opext:ordered">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:unordered($arg as item()*) as item()* -->
+    <operator name="opext:unordered">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:value-eq($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
+    <operator name="opext:value-eq">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ValueEqComparisonIterator"/>
+    </operator>
+
+    <!-- opext:value-ne($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
+    <operator name="opext:value-ne">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ValueNeComparisonIterator"/>
+    </operator>
+
+    <!-- opext:value-lt($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
+    <operator name="opext:value-lt">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ValueLtComparisonIterator"/>
+    </operator>
+
+    <!-- opext:value-le($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
+    <operator name="opext:value-le">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ValueLeComparisonIterator"/>
+    </operator>
+
+    <!-- opext:value-gt($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
+    <operator name="opext:value-gt">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ValueGtComparisonIterator"/>
+    </operator>
+
+    <!-- opext:value-ge($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
+    <operator name="opext:value-ge">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ValueGeComparisonIterator"/>
+    </operator>
+
+    <!-- opext:general-eq($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
+    <operator name="opext:general-eq">
+        <param name="arg1" type="item()*"/>
+        <param name="arg2" type="item()*"/>
+        <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.GeneralEqComparisonIterator"/>
+    </operator>
+
+    <!-- opext:general-ne($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
+    <operator name="opext:general-ne">
+        <param name="arg1" type="item()*"/>
+        <param name="arg2" type="item()*"/>
+        <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.GeneralNeComparisonIterator"/>
+    </operator>
+
+    <!-- opext:general-lt($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
+    <operator name="opext:general-lt">
+        <param name="arg1" type="item()*"/>
+        <param name="arg2" type="item()*"/>
+        <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.GeneralLtComparisonIterator"/>
+    </operator>
+
+    <!-- opext:general-le($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
+    <operator name="opext:general-le">
+        <param name="arg1" type="item()*"/>
+        <param name="arg2" type="item()*"/>
+        <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.GeneralLeComparisonIterator"/>
+    </operator>
+
+    <!-- opext:general-gt($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
+    <operator name="opext:general-gt">
+        <param name="arg1" type="item()*"/>
+        <param name="arg2" type="item()*"/>
+        <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.GeneralGtComparisonIterator"/>
+    </operator>
+
+    <!-- opext:general-ge($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
+    <operator name="opext:general-ge">
+        <param name="arg1" type="item()*"/>
+        <param name="arg2" type="item()*"/>
+        <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.GeneralGeComparisonIterator"/>
+    </operator>
+
+    <!-- opext:add($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
+    <operator name="opext:add">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:anyAtomicType?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.AddArithmeticOperationIterator"/>
+    </operator>
+
+    <!-- opext:subtract($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
+    <operator name="opext:subtract">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:anyAtomicType?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.SubtractArithmeticOperationIterator"/>
+    </operator>
+
+    <!-- opext:multiply($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
+    <operator name="opext:multiply">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:anyAtomicType?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.MultiplyArithmeticOperationIterator"/>
+    </operator>
+
+    <!-- opext:divide($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
+    <operator name="opext:divide">
+        <param name="arg1" type="xs:anyAtomicType?"/>
+        <param name="arg2" type="xs:anyAtomicType?"/>
+        <return type="xs:anyAtomicType?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.DivideArithmeticOperationIterator"/>
+    </operator>
+
+    <!-- opext:idiv($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
+    <operator name="opext:idiv">
+        <param name="arg1" type="xsext:numeric?"/>
+        <param name="arg2" type="xsext:numeric?"/>
+        <return type="xs:integer?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.IntegerDivideArithmeticOperationIterator"/>
+    </operator>
+
+    <!-- opext:mod($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
+    <operator name="opext:mod">
+        <param name="arg1" type="xsext:numeric?"/>
+        <param name="arg2" type="xsext:numeric?"/>
+        <return type="xs:integer?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.ModArithmeticOperationIterator"/>
+    </operator>
+
+    <!-- opext:and($arg1 as xs:boolean?, $arg2 as xs:boolean?) as xs:boolean? -->
+    <operator name="opext:and">
+        <param name="arg1" type="xs:boolean?"/>
+        <param name="arg2" type="xs:boolean?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.BooleanAndIterator"/>
+    </operator>
+
+    <!-- opext:or($arg1 as xs:boolean?, $arg2 as xs:boolean?) as xs:boolean? -->
+    <operator name="opext:or">
+        <param name="arg1" type="xs:boolean?"/>
+        <param name="arg2" type="xs:boolean?"/>
+        <return type="xs:boolean?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.BooleanOrIterator"/>
+    </operator>
+
+    <!-- opext:precedes($arg1 as node()?, $arg2 as node()?) as xs:boolean? -->
+    <operator name="opext:precedes">
+        <param name="arg1" type="node()?"/>
+        <param name="arg2" type="node()?"/>
+        <return type="xs:boolean?"/>
+    </operator>
+
+    <!-- opext:follows($arg1 as node()?, $arg2 as node()?) as xs:boolean? -->
+    <operator name="opext:follows">
+        <param name="arg1" type="node()?"/>
+        <param name="arg2" type="node()?"/>
+        <return type="xs:boolean?"/>
+    </operator>
+
+    <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
+    <operator name="opext:sort-nodes-asc">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpExtSortNodesAscIterator"/>
+    </operator>
+
+    <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
+    <operator name="opext:sort-distinct-nodes-asc">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpExtSortAndDistinctNodesAscIterator"/>
+    </operator>
+
+    <!-- opext:sort-nodes-desc($arg as node()*) as node()* -->
+    <operator name="opext:sort-nodes-desc">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpExtSortNodesDescIterator"/>
+    </operator>
+
+    <!-- opext:sort-nodes-desc($arg as node()*) as node()* -->
+    <operator name="opext:sort-distinct-nodes-desc">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpExtSortAndDistinctNodesDescIterator"/>
+    </operator>
+
+    <!-- opext:deflate-sequences($arg as item()*) as item()* -->
+    <operator name="opext:deflate-sequences">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpExtDeflateSequencesIterator"/>
+    </operator>
+</operators>

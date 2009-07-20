@@ -1,0 +1,3992 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+options {
+    STATIC = false;
+	FORCE_LA_CHECK=false;
+}
+
+
+PARSER_BEGIN(XMLQuery)
+
+package org.apache.vxquery.xmlquery.query;
+
+import org.apache.vxquery.xmlquery.ast.*;
+import org.apache.vxquery.context.*;
+import org.apache.vxquery.util.*;
+
+import java.math.*;
+import java.util.*;
+
+public class XMLQuery {
+    boolean m_isMatchPattern = false;
+
+    private String sourceName;
+
+    Stack<String> _elementStack = new Stack<String>();
+
+    Stack<Token> binaryTokenStack = new Stack<Token>();
+
+    private SourceLocation createSourceLocation(Token t) {
+        return new SourceLocation(sourceName, t.beginLine, t.beginColumn);
+    }
+
+    private QNameNode createQName(Token t) {
+        QNameNode qname = new QNameNode(createSourceLocation(t));
+        int idx = t.image.indexOf(':');
+        String prefix = "";
+        String local = t.image;
+        if (idx >= 0) {
+            prefix = t.image.substring(0, idx);
+            local = t.image.substring(idx + 1);
+        }
+        qname.setPrefix(prefix);
+        qname.setLocalName(local);
+        return qname;
+    }
+
+    private NCNameNode createNCName(Token t) {
+        NCNameNode ncname = new NCNameNode(createSourceLocation(t));
+        ncname.setName(t.image);
+        return ncname;
+    }
+
+    private InfixExprNode createInfixExpr(Token t, ASTNode left, ASTNode right, InfixExprNode.InfixOperator op) {
+        InfixExprNode ie = new InfixExprNode(createSourceLocation(t));
+        ie.setLeftExpr(left);
+        ie.setRightExpr(right);
+        ie.setOperator(op);
+        return ie;
+    }
+
+    private TypeExprNode createTypeExpr(Token t, ASTNode expr, ASTNode type, TypeExprNode.TypeOperator op) {
+        TypeExprNode te = new TypeExprNode(createSourceLocation(t));
+        te.setExpr(expr);
+        te.setType(type);
+        te.setOperator(op);
+        return te;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+}
+
+PARSER_END(XMLQuery)
+
+	
+
+TOKEN_MGR_DECLS : {
+  public Stack<Integer> stateStack = new Stack<Integer>();
+  static final int PARENMARKER = 2000;
+  public int offset = 0;
+  
+  
+  void CommonTokenAction(Token t) {}	
+
+  
+  /**
+   * Push the current state onto the state stack.
+   */
+  private void pushState()
+  {
+      stateStack.addElement(curLexState);
+  }
+  
+  /**
+   * Push the given state onto the state stack.
+   * @param state Must be a valid state.
+   */
+  private void pushState(int state)
+  {
+      stateStack.push(state);
+  }
+  
+  /**
+   * Pop the state on the state stack, and switch to that state.
+   */
+  private void popState()
+  {
+    if (stateStack.size() == 0)
+    {
+      printLinePos();
+    }
+
+    int nextState = stateStack.pop();
+    
+    if(nextState == PARENMARKER)
+      printLinePos();
+    SwitchTo(nextState);
+  }
+  
+  /**
+   * Push the given state onto the state stack.
+   * @param state Must be a valid state.
+   */
+  private boolean isState(int state)
+  {
+	for (int i = 0; i < stateStack.size(); i++) {
+        if(stateStack.elementAt(i) == state)
+        {
+        	return true;
+        }
+	}
+	return false;
+  }
+
+  /**
+   * Push a parenthesis state.  This pushes, in addition to the 
+   * lexical state value, a special marker that lets 
+   * resetParenStateOrSwitch(int state)
+   * know if it should pop and switch.  Used for the comma operator.
+   */
+  private void pushParenState(int commaState, int rparState)
+  {
+    stateStack.push(rparState);
+    stateStack.push(commaState);
+    stateStack.push(PARENMARKER);
+    SwitchTo(commaState);
+  }
+
+
+  /**
+   * Print the current line position.
+   */
+  public void printLinePos()
+  {
+    System.err.println("Line: " + input_stream.getEndLine());
+  }
+}
+
+
+ModuleNode CUnit() :
+{
+    ModuleNode module;
+}
+{
+    module = Module() <EOF> {
+        return module;
+    }
+}
+
+ModuleNode Module()  :
+{
+    VersionDeclNode verDecl = null;
+    ModuleNode module;
+}
+{
+    [LOOKAHEAD(2) verDecl = VersionDecl()] (LOOKAHEAD(2) module = LibraryModule(verDecl) | module = MainModule(verDecl)) {
+        return module;
+    }
+}
+
+VersionDeclNode VersionDecl()  :
+{
+    Token ver;
+    Token enc = null;
+    Token start;
+}
+{
+    start = "xquery" "version" ver = <StringLiteral> ["encoding" enc = <StringLiteral>] Separator() {
+        VersionDeclNode result = new VersionDeclNode(createSourceLocation(start));
+        result.setVersion(ver.image);
+        result.setEncoding(enc == null ? null : enc.image);
+        return result;
+    }
+}
+
+ModuleNode MainModule(VersionDeclNode verDecl)  :
+{
+    SourceLocation srcLoc;
+    PrologNode prolog = null;
+    QueryBodyNode qBody = null;
+}
+{
+    prolog = Prolog() qBody = QueryBody() {
+        if (verDecl != null) {
+            srcLoc = verDecl.getSourceLocation();
+        } else if (prolog != null) {
+            srcLoc = prolog.getSourceLocation();
+        } else {
+            srcLoc = qBody.getSourceLocation();
+        }
+        MainModuleNode module = new MainModuleNode(srcLoc);
+        module.setProlog(prolog);
+        module.setQueryBody(qBody);
+        return module;
+    }
+}
+
+ModuleNode LibraryModule(VersionDeclNode verDecl)  :
+{
+    ModuleDeclNode moduleDecl;
+    PrologNode prolog;
+}
+{
+    moduleDecl = ModuleDecl() prolog = Prolog() {
+        LibraryModuleNode module = new LibraryModuleNode(moduleDecl.getSourceLocation());
+        module.setModuleDecl(moduleDecl);
+        module.setProlog(prolog);
+        return module;
+    }
+}
+
+ModuleDeclNode ModuleDecl()  :
+{
+    Token start;
+    NCNameNode prefix;
+    String uri;
+}
+{
+    start = "module" "namespace" prefix = NCName() "=" uri = URILiteral() Separator() {
+        ModuleDeclNode moduleDecl = new ModuleDeclNode(createSourceLocation(start));
+        moduleDecl.setPrefix(prefix.getName());
+        moduleDecl.setTargetNS(uri);
+        return moduleDecl;
+    }
+}
+
+PrologNode Prolog()  :
+{
+    List<ASTNode> decls = new ArrayList<ASTNode>();
+    ASTNode decl;
+}
+{
+    (
+        LOOKAHEAD(2) (
+            LOOKAHEAD(3) decl = DefaultNamespaceDecl() {
+                decls.add(decl);
+            }
+            | LOOKAHEAD(3) decl = Setter() {
+                decls.add(decl);
+            }
+            | LOOKAHEAD(2) decl = NamespaceDecl() {
+                decls.add(decl);
+            }
+            | decl = Import() {
+                decls.add(decl);
+            }
+        ) Separator()
+    )* (
+        LOOKAHEAD(2) (
+            LOOKAHEAD(2) decl = VarDecl() {
+                decls.add(decl);
+            }
+            | LOOKAHEAD(2) decl = FunctionDecl() {
+                decls.add(decl);
+            }
+            | LOOKAHEAD(2) decl = OptionDecl() {
+                decls.add(decl);
+            }
+            | LOOKAHEAD(2) FTOptionDecl() {
+            }
+        ) Separator()
+    )* {
+        if (decls.isEmpty()) {
+            return null;
+        }
+        PrologNode prolog = new PrologNode(decls.get(0).getSourceLocation());
+        prolog.setDecls(decls);
+        return prolog;
+    }
+}
+
+ASTNode Setter()  :
+{
+    ASTNode result;
+}
+{
+    (
+        LOOKAHEAD(2) result = BoundarySpaceDecl()
+        | LOOKAHEAD(3) result = DefaultCollationDecl()
+        | LOOKAHEAD(2) result = BaseURIDecl()
+        | LOOKAHEAD(2) result = ConstructionDecl()
+        | LOOKAHEAD(2) result = OrderingModeDecl()
+        | LOOKAHEAD(3) result = EmptyOrderDecl()
+        | result = CopyNamespacesDecl()
+    ) {
+        return result;
+    }
+}
+
+ASTNode Import():
+{
+    ASTNode result;
+}
+{
+    (LOOKAHEAD(2) result = SchemaImport() | result = ModuleImport()) {
+        return result;
+    }
+}
+
+void Separator():
+{}
+{
+    ";"
+}
+
+ASTNode NamespaceDecl()  :
+{
+    Token start;
+    NCNameNode prefix;
+    String uri;
+}
+{
+    start = "declare" "namespace" prefix = NCName() "=" uri = URILiteral() {
+        NamespaceDeclNode result = new NamespaceDeclNode(createSourceLocation(start));
+        result.setPrefix(prefix.getName());
+        result.setUri(uri);
+        return result;
+    }
+}
+
+ASTNode BoundarySpaceDecl()  :
+{
+    Token start;
+    Token p = null;
+}
+{
+    start = "declare" "boundary-space" (p = "preserve" | "strip") {
+        BoundarySpaceDeclNode result = new BoundarySpaceDeclNode(createSourceLocation(start));
+        result.setMode(p == null ? StaticContext.BoundarySpaceProperty.STRIP : StaticContext.BoundarySpaceProperty.PRESERVE);
+        return result;
+    }
+}
+
+ASTNode DefaultNamespaceDecl()  :
+{
+    Token start;
+    Token e = null;
+    String uri;
+}
+{
+    start = "declare" "default" (e = "element" | "function") "namespace" uri = URILiteral() {
+        if (e != null) {
+            DefaultElementNamespaceDeclNode result = new DefaultElementNamespaceDeclNode(createSourceLocation(start));
+            result.setUri(uri);
+            return result;
+        } else {
+            DefaultFunctionNamespaceDeclNode result = new DefaultFunctionNamespaceDeclNode(createSourceLocation(start));
+            result.setUri(uri);
+            return result;
+        }
+    }
+}
+
+ASTNode OptionDecl()  :
+{
+    Token start;
+    QNameNode qname;
+    Token value;
+}
+{
+    start = "declare" "option" qname = QName() value = <StringLiteral> {
+        OptionDeclNode option = new OptionDeclNode(createSourceLocation(start));
+        option.setName(qname);
+        option.setValue(value.image);
+        return option;
+    }
+}
+
+void FTOptionDecl()  :
+{}
+{
+    "declare" "ft-option" FTMatchOptions()
+}
+
+ASTNode OrderingModeDecl()  :
+{
+    Token o = null;
+    Token start;
+}
+{
+    start = "declare" "ordering" (o = "ordered" | "unordered") {
+        OrderingModeDeclNode oDecl = new OrderingModeDeclNode(createSourceLocation(start));
+        oDecl.setMode(o == null ? StaticContext.OrderingModeProperty.UNORDERED : StaticContext.OrderingModeProperty.ORDERED);
+        return oDecl;
+    }
+}
+
+ASTNode EmptyOrderDecl()  :
+{
+    Token start;
+    Token g = null;
+}
+{
+    start = "declare" "default" "order" "empty" (g = <Greatest> | <Least> ) {
+        EmptyOrderDeclNode eDecl = new EmptyOrderDeclNode(createSourceLocation(start));
+        eDecl.setMode(g == null ? StaticContext.EmptyOrderProperty.LEAST : StaticContext.EmptyOrderProperty.GREATEST);
+        return eDecl;
+    }
+}
+
+ASTNode CopyNamespacesDecl()  :
+{
+    boolean preserve;
+    boolean inherit;
+    Token start;
+}
+{
+    start = "declare" "copy-namespaces" preserve = PreserveMode() "," inherit = InheritMode() {
+        CopyNamespacesDeclNode cDecl = new CopyNamespacesDeclNode(createSourceLocation(start));
+        cDecl.setMode(preserve ? (
+            inherit ? StaticContext.CopyNamespacesModeProperty.PRESERVE_INHERIT : StaticContext.CopyNamespacesModeProperty.PRESERVE_NOINHERIT
+            ) : (
+                inherit ? StaticContext.CopyNamespacesModeProperty.NOPRESERVE_INHERIT : StaticContext.CopyNamespacesModeProperty.NOPRESERVE_NOINHERIT));
+        return cDecl;
+    }
+}
+
+boolean PreserveMode()  :
+{}
+{
+    "preserve" {
+        return true;
+    }
+    | "no-preserve" {
+        return false;
+    }
+}
+
+boolean InheritMode()  :
+{}
+{
+    "inherit" {
+        return true;
+    }
+    | "no-inherit" {
+        return false;
+    }
+}
+
+ASTNode DefaultCollationDecl()  :
+{
+    Token start;
+    String defaultCollation;
+}
+{
+    start = "declare" "default" "collation" defaultCollation = URILiteral() {
+        DefaultCollationDeclNode dDecl = new DefaultCollationDeclNode(createSourceLocation(start));
+        dDecl.setCollation(defaultCollation);
+        return dDecl;
+    }
+}
+
+ASTNode BaseURIDecl()  :
+{
+    Token start;
+    String uri;
+}
+{
+    start = "declare" "base-uri" uri = URILiteral() {
+        BaseUriDeclNode bDecl = new BaseUriDeclNode(createSourceLocation(start));
+        bDecl.setUri(uri);
+        return bDecl;
+    }
+}
+
+ASTNode SchemaImport()  :
+{
+    Token start;
+    String[] prefix = null;
+    String targetNS;
+    String location;
+    List<String> locations = new ArrayList<String>();
+}
+{
+    start = "import" "schema" [prefix = SchemaPrefix()] targetNS = URILiteral() [
+        "at" location = URILiteral() {
+            locations.add(location);
+        } (
+            "," location = URILiteral() {
+                locations.add(location);
+            }
+        )*
+    ] {
+        SchemaImportNode si = new SchemaImportNode(createSourceLocation(start));
+        if (prefix != null) {
+            si.setPrefix(prefix[0]);
+        } else {
+            si.setDefaultElementNamespace(true);
+        }
+        si.setTargetNS(targetNS);
+        si.setLocations(locations);
+        return si;
+    }
+}
+
+String[] SchemaPrefix()  :
+{
+    NCNameNode prefix = null;
+}
+{
+    (("namespace" prefix = NCName() "=") | ("default" "element" "namespace")) {
+        return new String[] { prefix == null ? null : prefix.getName() };
+    }
+}
+
+ASTNode ModuleImport()  :
+{
+    Token start;
+    NCNameNode prefix = null;
+    String targetNS;
+    List<String> locations = new ArrayList<String>();
+    String location;
+}
+{
+    start = "import" "module" ["namespace" prefix = NCName() "="] targetNS = URILiteral() [
+        "at" location = URILiteral() {
+            locations.add(location);
+        } (
+            "," location = URILiteral() {
+                locations.add(location);
+            }
+        )*
+    ] {
+        ModuleImportNode mi = new ModuleImportNode(createSourceLocation(start));
+        mi.setPrefix(prefix == null ? null : prefix.getName());
+        mi.setTargetNS(targetNS);
+        mi.setLocations(locations);
+        return mi;
+    }
+}
+
+ASTNode VarDecl()  :
+{
+    Token start;
+    QNameNode name;
+    TypeDeclNode type = null;
+    ASTNode expr = null;
+}
+{
+    start = "declare" "variable" "$" name = QName() [type = TypeDeclaration()] ( (":=" expr = ExprSingle()) | <External>) {
+        VarDeclNode vDecl = new VarDeclNode(createSourceLocation(start));
+        vDecl.setName(name);
+        vDecl.setType(type);
+        vDecl.setValue(expr);
+        return vDecl;
+    }
+}
+
+ASTNode ConstructionDecl()  :
+{
+    Token start;
+    Token s = null;
+}
+{
+    start = "declare" "construction" (s = "strip" | "preserve") {
+        ConstructionDeclNode cDecl = new ConstructionDeclNode(createSourceLocation(start));
+        cDecl.setMode(s == null ? StaticContext.ConstructionModeProperty.PRESERVE : StaticContext.ConstructionModeProperty.STRIP);
+        return cDecl;
+    }
+}
+
+ASTNode FunctionDecl()  :
+{
+    Token start;
+    QNameNode name;
+    List<ParamNode> params = new ArrayList<ParamNode>();
+    SequenceTypeNode rType = null;
+    ASTNode body = null;
+}
+{
+    start = "declare" "function" name = QName() "(" [ParamList(params)] ")" ["as" rType = SequenceType()] (body = EnclosedExpr() | <External>) {
+        FunctionDeclNode fDecl = new FunctionDeclNode(createSourceLocation(start));
+        fDecl.setName(name);
+        fDecl.setParameters(params);
+        fDecl.setReturnType(rType);
+        fDecl.setBody(body);
+        return fDecl;
+    }
+}
+
+void ParamList(List<ParamNode> params):
+{
+    ParamNode var = null;
+}
+{
+    var = Param() {
+        params.add(var);
+    } ("," var = Param() {
+        params.add(var);
+    })*
+}
+
+ParamNode Param()  :
+{
+    QNameNode qname;
+    TypeDeclNode type = null;
+    Token start;
+}
+{
+    start = "$" qname = QName() [type = TypeDeclaration()] {
+        ParamNode var = new ParamNode(createSourceLocation(start));
+        var.setName(qname);
+        var.setType(type);
+        return var;
+    }
+}
+
+ASTNode EnclosedExpr()  :
+{
+    ASTNode expr;
+    Token start;
+}
+{
+    (start = <Lbrace> | start = <LbraceExprEnclosure>) expr = Expr() <Rbrace> {
+        EnclosedExprNode ee = new EnclosedExprNode(createSourceLocation(start));
+        ee.setExpression(expr);
+        return ee;
+    }
+}
+
+QueryBodyNode QueryBody()  :
+{
+    ASTNode expr;
+}
+{
+    expr = Expr() {
+        QueryBodyNode qb = new QueryBodyNode(expr.getSourceLocation());
+        qb.setExpression(expr);
+        return qb;
+    }
+}
+
+ExprNode Expr()  :
+{
+    List<ASTNode> eList = new ArrayList<ASTNode>();
+    ASTNode e;
+}
+{
+    e = ExprSingle() {
+        eList.add(e);
+    } (
+        "," e = ExprSingle() {
+            eList.add(e);
+        }
+    )* {
+        ExprNode expr = new ExprNode(eList.get(0).getSourceLocation());
+        expr.setExpressions(eList);
+        return expr;
+    }
+}
+
+ASTNode ExprSingle():
+{
+    ASTNode expr;
+}
+{
+    (
+        LOOKAHEAD(2) expr = FLWORExpr()
+        | LOOKAHEAD(2) expr = QuantifiedExpr()
+        | LOOKAHEAD(2) expr = TypeswitchExpr()
+        | LOOKAHEAD(2) expr = IfExpr()
+        | expr = OrExpr()
+    ) {
+        return expr;
+    }
+}
+
+ASTNode FLWORExpr()  :
+{
+    List<FLWORClauseNode> clauses = new ArrayList<FLWORClauseNode>();
+    ASTNode rExpr;
+}
+{
+    ((ForClause(clauses) | LetClause(clauses)))+  [WhereClause(clauses)] [OrderByClause(clauses)] "return" rExpr = ExprSingle()
+    {
+        FLWORExprNode flwor = new FLWORExprNode(clauses.get(0).getSourceLocation());
+        flwor.setClauses(clauses);
+        flwor.setReturnExpr(rExpr);
+        return flwor;
+    }
+}
+
+void ForClause(List<FLWORClauseNode> clauses)  :
+{
+    QNameNode forVarName;
+    TypeDeclNode type = null;
+    QNameNode posVarName = null;
+    QNameNode scoreVarName = null;
+    ASTNode sequence;
+    List<ForVarDeclNode> fors = new ArrayList<ForVarDeclNode>();
+    Token start;
+}
+{
+    start = "for" "$" forVarName = VarName() [type = TypeDeclaration()] [posVarName = PositionalVar()] [scoreVarName = FTScoreVar()] "in" sequence = ExprSingle() {
+        ForVarDeclNode fvd = new ForVarDeclNode(createSourceLocation(start));
+        fvd.setForVar(forVarName);
+        fvd.setType(type);
+        fvd.setSequence(sequence);
+        fvd.setPosVar(posVarName);
+        fvd.setScoreVar(scoreVarName);
+        fors.add(fvd);
+    } (
+        {
+            type = null;
+            posVarName = null;
+            scoreVarName = null;
+        }
+        "," start = "$" forVarName = VarName() [type = TypeDeclaration()] [posVarName = PositionalVar()] [scoreVarName = FTScoreVar()] "in" sequence = ExprSingle() {
+            fvd = new ForVarDeclNode(createSourceLocation(start));
+            fvd.setForVar(forVarName);
+            fvd.setType(type);
+            fvd.setSequence(sequence);
+            fvd.setPosVar(posVarName);
+            fvd.setScoreVar(scoreVarName);
+            fors.add(fvd);
+        }
+    )* {
+        ForClauseNode fc = new ForClauseNode(fors.get(0).getSourceLocation());
+        fc.setVariables(fors);
+        clauses.add(fc);
+    }
+}
+
+QNameNode PositionalVar()  :
+{
+    QNameNode qname;
+}
+{
+    "at" "$" qname = VarName() {
+        return qname;
+    }
+}
+
+QNameNode FTScoreVar()  :
+{
+    QNameNode qname;
+}
+{
+    "score" "$" qname = VarName() {
+        return qname;
+    }
+}
+
+void LetClause(List<FLWORClauseNode> clauses)  :
+{
+    QNameNode letVarName = null;
+    QNameNode scoreVarName = null;
+    TypeDeclNode type = null;
+    ASTNode sequence;
+    Token start;
+    List<LetVarDeclNode> lets = new ArrayList<LetVarDeclNode>();
+}
+{
+    (
+        LOOKAHEAD(2) (
+            start = "let" "$" letVarName = VarName() [type = TypeDeclaration()]
+        )
+        | LOOKAHEAD(2) (
+            start = "let" "score" "$" scoreVarName = VarName()
+        )
+    ) ":=" sequence = ExprSingle() {
+        LetVarDeclNode lvd = new LetVarDeclNode(createSourceLocation(start));
+        lvd.setLetVar(letVarName);
+        lvd.setScoreVar(scoreVarName);
+        lvd.setType(type);
+        lvd.setSequence(sequence);
+        lets.add(lvd);
+    } (
+        {
+            letVarName = null;
+            scoreVarName = null;
+            type = null;
+            start = null;
+        }
+        "," (
+            (start = "$" letVarName = VarName() [type = TypeDeclaration()])
+            | scoreVarName = FTScoreVar()
+        ) ":=" sequence = ExprSingle() {
+            lvd = new LetVarDeclNode(start == null ? scoreVarName.getSourceLocation() : createSourceLocation(start));
+            lvd.setLetVar(letVarName);
+            lvd.setScoreVar(scoreVarName);
+            lvd.setType(type);
+            lvd.setSequence(sequence);
+            lets.add(lvd);
+        }
+    )* {
+        LetClauseNode lc = new LetClauseNode(lets.get(0).getSourceLocation());
+        lc.setVariables(lets);
+        clauses.add(lc);
+    }
+}
+
+void WhereClause(List<FLWORClauseNode> clauses)  :
+{
+    ASTNode expr;
+    Token start;
+}
+{
+    start = "where" expr = ExprSingle() {
+        WhereClauseNode wc = new WhereClauseNode(createSourceLocation(start));
+        wc.setCondition(expr);
+        clauses.add(wc);
+    }
+}
+
+void OrderByClause(List<FLWORClauseNode> clauses)  :
+{
+    Token stable = null;
+    List<OrderSpecNode> osList;
+    Token start = null;
+}
+{
+    ( (start = "order" "by") | (stable = "stable" "order" "by")) osList = OrderSpecList() {
+        if (start == null) {
+            start = stable;
+        }
+        OrderbyClauseNode oc = new OrderbyClauseNode(createSourceLocation(start));
+        oc.setStable(stable != null);
+        oc.setOrderSpec(osList);
+        clauses.add(oc);
+    }
+}
+
+List<OrderSpecNode> OrderSpecList()  :
+{
+    List<OrderSpecNode> osList = new ArrayList<OrderSpecNode>();
+    OrderSpecNode os;
+}
+{
+    os = OrderSpec() {
+        osList.add(os);
+    } (
+        "," os = OrderSpec() {
+            osList.add(os);
+        }
+    )* {
+        return osList;
+    }
+}
+
+OrderSpecNode OrderSpec()  :
+{
+    ASTNode expr;
+    OrderSpecNode os;
+}
+{
+    expr = ExprSingle() {
+        os = new OrderSpecNode(expr.getSourceLocation());
+        os.setExpression(expr);
+    } OrderModifier(os) {
+        return os;
+    }
+}
+
+void OrderModifier(OrderSpecNode os)  :
+{
+    Token desc = null;
+    Token greatest = null;
+    Token least = null;
+    String collation = null;
+}
+{
+    [(<Ascending> | desc = <Descending> )] ["empty" (greatest = <Greatest> | least = <Least>)] ["collation" collation = URILiteral()] {
+        os.setDirection(desc != null ? XQueryConstants.OrderDirection.DESCENDING : XQueryConstants.OrderDirection.ASCENDING);
+        os.setEmptyOrder(greatest != null ? StaticContext.EmptyOrderProperty.GREATEST : (least != null ? StaticContext.EmptyOrderProperty.LEAST : null));
+        os.setCollation(collation);
+    }
+}
+
+QuantifiedExprNode QuantifiedExpr() :
+{
+    Token some = null;
+    Token every = null;
+    Token start;
+    QNameNode varName;
+    TypeDeclNode type = null;
+    ASTNode expr;
+    ASTNode satExpr;
+    List<QuantifiedVarDeclNode> quantVars = new ArrayList<QuantifiedVarDeclNode>();
+}
+{
+    (some = "some" | every = "every") start = "$" varName = VarName() [type = TypeDeclaration()] "in" expr = ExprSingle() {
+        QuantifiedVarDeclNode qv = new QuantifiedVarDeclNode(createSourceLocation(start));
+        qv.setVariable(varName);
+        qv.setType(type);
+        qv.setSequence(expr);
+        quantVars.add(qv);
+    } (
+        {
+            type = null;
+        }
+        "," "$" varName = VarName() [type = TypeDeclaration()] "in" expr = ExprSingle() {
+            qv = new QuantifiedVarDeclNode(createSourceLocation(start));
+            qv.setVariable(varName);
+            qv.setType(type);
+            qv.setSequence(expr);
+            quantVars.add(qv);
+        }
+    )* "satisfies" satExpr = ExprSingle() {
+        QuantifiedExprNode qe = new QuantifiedExprNode(createSourceLocation(some != null ? some : every));
+        qe.setQuant(some != null ? QuantifiedExprNode.QuantifierType.SOME : QuantifiedExprNode.QuantifierType.EVERY);
+        qe.setVariables(quantVars);
+        qe.setSatisfiesExpr(satExpr);
+        return qe;
+    }
+}
+
+ASTNode TypeswitchExpr():
+{
+    QNameNode varName = null;
+    ASTNode switchExpr;
+    ASTNode defaultExpr;
+    List<CaseClauseNode> cases = new ArrayList<CaseClauseNode>();
+    Token start;
+}
+{
+    start = "typeswitch" "(" switchExpr = Expr() ")" (CaseClause(cases))+ "default" ["$" varName = VarName()] "return" defaultExpr = ExprSingle() {
+        TypeswitchExprNode te = new TypeswitchExprNode(createSourceLocation(start));
+        te.setSwitchExpr(switchExpr);
+        te.setCaseClauses(cases);
+        te.setDefaultVar(varName);
+        te.setDefaultClause(defaultExpr);
+        return te;
+    }
+}
+
+void CaseClause(List<CaseClauseNode> cases)  :
+{
+    QNameNode varName = null;
+    ASTNode expr;
+    SequenceTypeNode type;
+    Token start;
+}
+{
+    start = "case" ["$" varName = VarName() "as"] type = SequenceType() "return" expr = ExprSingle() {
+        CaseClauseNode cc = new CaseClauseNode(createSourceLocation(start));
+        cc.setCaseVar(varName);
+        cc.setType(type);
+        cc.setValueExpr(expr);
+        cases.add(cc);
+    }
+}
+
+ASTNode IfExpr()  :
+{
+    ASTNode cond;
+    ASTNode thenExpr;
+    ASTNode elseExpr;
+    Token start;
+}
+{
+    start = "if" "(" cond = Expr() ")" "then" thenExpr = ExprSingle() "else" elseExpr = ExprSingle() {
+        IfExprNode ie = new IfExprNode(createSourceLocation(start));
+        ie.setIfExpr(cond);
+        ie.setThenExpr(thenExpr);
+        ie.setElseExpr(elseExpr);
+        return ie;
+    }
+}
+
+ASTNode OrExpr() : 
+{
+    ASTNode result;
+    ASTNode temp;
+    Token start;
+}
+{
+    result = AndExpr() (
+        start = "or" {
+            binaryTokenStack.push(token);
+        } temp = AndExpr() {
+            result = createInfixExpr(start, result, temp, InfixExprNode.InfixOperator.OR);
+        }
+    )* {
+        return result;
+    }
+}
+
+ASTNode AndExpr(): 
+{
+    ASTNode result;
+    ASTNode temp;
+    Token start;
+}
+{
+    result = ComparisonExpr() (
+        start = "and" {
+            binaryTokenStack.push(token);
+        } temp = ComparisonExpr() {
+            result = createInfixExpr(start, result, temp, InfixExprNode.InfixOperator.AND);
+        }
+    )* {
+        return result;
+    }
+}
+
+ASTNode ComparisonExpr(): 
+{
+    ASTNode result;
+    ASTNode temp;
+    Pair<Token, InfixExprNode.InfixOperator> opPair;
+}
+{
+    result = FTContainsExpr() (
+        (
+            opPair = ValueComp()
+            | opPair = GeneralComp()
+            | opPair = NodeComp()
+        ) temp = FTContainsExpr() {
+            result = createInfixExpr(opPair.first, result, temp, opPair.second);
+        }
+    )? {
+        return result;
+    }
+}
+
+// TODO - Not yet implemented.
+ASTNode FTContainsExpr(): 
+{
+    ASTNode result;
+}
+{
+    result = RangeExpr()  (
+        "ftcontains" FTSelection() [FTIgnoreOption()]
+    )? {
+        return result;
+    }
+}
+
+ASTNode RangeExpr() : 
+{
+    ASTNode result;
+    ASTNode temp;
+    Token start;
+}
+{
+    result = AdditiveExpr() (
+        start = "to" {
+            binaryTokenStack.push(token);
+        } temp = AdditiveExpr() {
+            result = createInfixExpr(start, result, temp, InfixExprNode.InfixOperator.RANGE);
+        }
+    )? {
+        return result;
+    }
+}
+
+ASTNode AdditiveExpr(): 
+{
+    ASTNode result;
+    ASTNode temp;
+    InfixExprNode.InfixOperator op;
+    Token start;
+}
+{
+    result = MultiplicativeExpr() (
+        (
+            start = <Plus> {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.PLUS;
+            }
+            | start = <Minus> {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.MINUS;
+            }
+        ) temp = MultiplicativeExpr() {
+            result = createInfixExpr(start, result, temp, op);
+        }
+    )* {
+        return result;
+    }
+}
+
+ASTNode MultiplicativeExpr(): 
+{
+    ASTNode result = null;
+    ASTNode temp;
+    InfixExprNode.InfixOperator op;
+    Token start;
+}
+{
+    result = UnionExpr() (
+        (
+            start = "*" {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.MULTIPLY;
+            }
+            | start = "div" {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.DIV;
+            }
+            | start = "idiv" {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.IDIV;
+            }
+            | start = "mod" {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.MOD;
+            }
+        ) temp = UnionExpr() {
+            result = createInfixExpr(start, result, temp, op);
+        }
+    )* {
+        return result;
+    }
+}
+
+ASTNode UnionExpr(): 
+{
+    ASTNode result = null;
+    ASTNode temp;
+    Token start;
+}
+{
+    result = IntersectExceptExpr() (
+        (
+            start = "union" {
+                binaryTokenStack.push(token);
+            }
+            | start = "|" {
+                binaryTokenStack.push(token);
+            }
+        ) temp = IntersectExceptExpr() {
+            result = createInfixExpr(start, result, temp, InfixExprNode.InfixOperator.UNION);
+        }
+    )* {
+        return result;
+    }
+}
+
+ASTNode IntersectExceptExpr(): 
+{
+    ASTNode result = null;
+    ASTNode temp;
+    InfixExprNode.InfixOperator op;
+    Token start;
+}
+{
+    result = InstanceofExpr() (
+        (
+            start = "intersect" {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.INTERSECT;
+            }
+            | start = "except" {
+                binaryTokenStack.push(token);
+                op = InfixExprNode.InfixOperator.EXCEPT;
+            }
+        ) temp = InstanceofExpr() {
+            result = createInfixExpr(start, result, temp, op);
+        }
+    )* {
+        return result;
+    }
+}
+
+ASTNode InstanceofExpr(): 
+{
+    ASTNode result;
+    SequenceTypeNode type;
+    Token start;
+}
+{
+    result = TreatExpr() (
+        start = "instance" "of" type = SequenceType() {
+            result = createTypeExpr(start, result, type, TypeExprNode.TypeOperator.INSTANCEOF);
+        }
+    )? {
+        return result;
+    }
+}
+
+ASTNode TreatExpr(): 
+{
+    ASTNode result;
+    SequenceTypeNode type;
+    Token start;
+}
+{
+    result = CastableExpr() (
+        start = "treat" "as" type = SequenceType() {
+            result = createTypeExpr(start, result, type, TypeExprNode.TypeOperator.TREAT);
+        }
+    )? {
+        return result;
+    }
+}
+
+ASTNode CastableExpr(): 
+{
+    ASTNode result;
+    SingleTypeNode type;
+    Token start;
+}
+{
+    result = CastExpr()  (
+        start = "castable" "as" type = SingleType() {
+            result = createTypeExpr(start, result, type, TypeExprNode.TypeOperator.CASTABLE);
+        }
+    )? {
+        return result;
+    }
+}
+
+ASTNode CastExpr(): 
+{
+    ASTNode result;
+    SingleTypeNode type;
+    Token start;
+}
+{
+    result = UnaryExpr() (
+        start = "cast" "as" type = SingleType() {
+            result = createTypeExpr(start, result, type, TypeExprNode.TypeOperator.CAST);
+        }
+    )? {
+        return result;
+    }
+}
+
+ASTNode UnaryExpr(): 
+{
+    ASTNode expr;
+    List<UnaryExprNode.Sign> signs = new ArrayList<UnaryExprNode.Sign>();
+    Token start = null;
+}
+{
+    (
+        start = <Minus> {
+            signs.add(UnaryExprNode.Sign.MINUS);
+        }
+        | start = <Plus> {
+            signs.add(UnaryExprNode.Sign.PLUS);
+        }
+    )* expr = ValueExpr() {
+        if (start != null) {
+            UnaryExprNode ue = new UnaryExprNode(createSourceLocation(start));
+            ue.setSigns(signs);
+            ue.setExpr(expr);
+            expr = ue;
+        }
+        return expr;
+    }
+}
+
+ASTNode ValueExpr(): 
+{
+    ASTNode expr;
+}
+{
+    (
+        LOOKAHEAD(2) expr = ValidateExpr()
+        | expr = PathExpr()
+        | expr = ExtensionExpr()
+    ) {
+        return expr;
+    }
+}
+
+Pair<Token, InfixExprNode.InfixOperator> GeneralComp():
+{
+    Token start;
+    InfixExprNode.InfixOperator op;
+}
+{
+    (
+        start = "=" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.GENERAL_EQ;
+        }
+        | start = "!=" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.GENERAL_NE;
+        }
+        | start = <LessThanOpOrTagO> {
+            /* Careful! */
+            token_source.SwitchTo(DEFAULT); token_source.stateStack.pop();
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.GENERAL_LT;
+        }
+        | start = "<=" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.GENERAL_LE;
+        }
+        | start = ">" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.GENERAL_GT;
+        }
+        | start = ">=" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.GENERAL_GE;
+        }
+    ) {
+        return new Pair<Token, InfixExprNode.InfixOperator>(start, op);
+    }
+}
+
+Pair<Token, InfixExprNode.InfixOperator> ValueComp():
+{
+    Token start;
+    InfixExprNode.InfixOperator op;
+}
+{
+    (
+        start = "eq" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.VALUE_EQ;
+        }
+        | start = "ne" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.VALUE_NE;
+        }
+        | start = "lt" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.VALUE_LT;
+        }
+        | start = "le" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.VALUE_LE;
+        }
+        | start = "gt" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.VALUE_GT;
+        }
+        | start = "ge" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.VALUE_GE;
+        }
+    ) {
+        return new Pair<Token, InfixExprNode.InfixOperator>(start, op);
+    }
+}
+
+Pair<Token, InfixExprNode.InfixOperator> NodeComp():
+{
+    Token start;
+    InfixExprNode.InfixOperator op;
+}
+{
+    (
+        start = "is" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.IS;
+        }
+        | start = "<<" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.PRECEDES;
+        }
+        | start = ">>" {
+            binaryTokenStack.push(token);
+            op = InfixExprNode.InfixOperator.FOLLOWS;
+        }
+    ) {
+        return new Pair<Token, InfixExprNode.InfixOperator>(start, op);
+    }
+}
+
+ASTNode ValidateExpr()  :
+{
+    ASTNode expr;
+    XQueryConstants.ValidationMode mode = null;
+    Token start;
+}
+{
+    start = "validate" [mode = ValidationMode()] <LbraceExprEnclosure> expr = Expr() <Rbrace> {
+        ValidateExprNode ve = new ValidateExprNode(createSourceLocation(start));
+        ve.setMode(mode);
+        ve.setExpr(expr);
+        return ve;
+    }
+}
+
+XQueryConstants.ValidationMode ValidationMode()  :
+{
+    Token l = null;
+}
+{
+    (l = "lax" | "strict") {
+        return l != null ? XQueryConstants.ValidationMode.LAX : XQueryConstants.ValidationMode.STRICT;
+    }
+}
+
+ASTNode ExtensionExpr()  :
+{
+    ASTNode expr = null;
+    PragmaNode pragma;
+    List<PragmaNode> pragmas = new ArrayList<PragmaNode>();
+}
+{
+    (
+        pragma = Pragma() {
+            pragmas.add(pragma);
+        }
+    )+  <LbraceExprEnclosure> [expr = Expr()] <Rbrace> {
+        ExtensionExprNode ee = new ExtensionExprNode(pragmas.get(0).getSourceLocation());
+        ee.setPragmas(pragmas);
+        ee.setExpr(expr);
+        return ee;
+    }
+}
+
+PragmaNode Pragma()  :
+{
+    Token qTok;
+    String str = null;
+    Token start;
+}
+{
+    start = <PragmaOpen> [<S>] qTok = <QNameForPragma> [<SForPragma> str = PragmaContents()] <PragmaClose> {
+        PragmaNode p = new PragmaNode(createSourceLocation(start));
+        p.setQname(createQName(qTok));
+        p.setPragmaValue(str);
+        return p;
+    }
+}
+
+String PragmaContents()  :
+{
+    StringBuilder buffer = new StringBuilder();
+    Token t;
+}
+{
+    (
+        t = <ExtensionContentChar> {
+            buffer.append(t.image);
+        }
+    )* {
+        return buffer.toString();
+    }
+}
+
+ASTNode PathExpr():
+{
+    List<RelativePathExprNode> paths = null;
+    Token s = null;
+    Token ss = null;
+}
+{
+    (
+        s = <Slash> [LOOKAHEAD(1) paths = RelativePathExpr()]
+        | ss = <SlashSlash> paths = RelativePathExpr()
+        | paths = RelativePathExpr()
+    ) {
+        SourceLocation loc = null;
+        XQueryConstants.PathType pType;
+        if (s != null) {
+            loc = createSourceLocation(s);
+            pType = XQueryConstants.PathType.SLASH;
+        } else if (ss != null) {
+            loc = createSourceLocation(ss);
+            pType = XQueryConstants.PathType.SLASH_SLASH;
+        } else {
+            loc = paths.get(0).getSourceLocation();
+            pType = null;
+        }
+        PathExprNode pe = new PathExprNode(loc);
+        pe.setPathType(pType);
+        pe.setPaths(paths);
+        return pe;
+    }
+}
+
+List<RelativePathExprNode> RelativePathExpr():
+{
+    ASTNode expr;
+    Token start;
+    XQueryConstants.PathType sep;
+    List<RelativePathExprNode> paths = new ArrayList<RelativePathExprNode>();
+}
+{
+    expr = StepExpr() {
+        RelativePathExprNode rp = new RelativePathExprNode(expr.getSourceLocation());
+        rp.setPath(expr);
+        paths.add(rp);
+    } (
+        (
+            start = <Slash> {
+                sep = XQueryConstants.PathType.SLASH;
+            }
+            | start = <SlashSlash> {
+                sep = XQueryConstants.PathType.SLASH_SLASH;
+            }
+        ) expr = StepExpr() {
+            rp = new RelativePathExprNode(createSourceLocation(start));
+            rp.setPath(expr);
+            rp.setPathType(sep);
+            paths.add(rp);
+        }
+    )* {
+        return paths;
+    }
+}
+
+ASTNode StepExpr():
+{
+    ASTNode expr;
+}
+{
+    LOOKAHEAD(3) expr = FilterExpr() {
+        return expr;
+    }
+    | expr = AxisStep() {
+        return expr;
+    }
+}
+
+ASTNode AxisStep()   :
+{
+    AxisStepNode axis;
+    List<ASTNode> predicates;
+}
+{
+    (
+        LOOKAHEAD(2) axis = ReverseStep()
+        | axis = ForwardStep()
+    ) predicates = PredicateList() {
+        axis.setPredicates(predicates);
+        return axis;
+    }
+}
+
+AxisStepNode ForwardStep():
+{
+    Pair<Token, AxisStepNode.Axis> aPair;
+    AxisStepNode expr;
+    ASTNode nt;
+}
+{
+    LOOKAHEAD(2) aPair = ForwardAxis() nt = NodeTest() {
+        AxisStepNode as = new AxisStepNode(createSourceLocation(aPair.first));
+        as.setAxis(aPair.second);
+        as.setNodeTest(nt);
+        return as;
+    }
+    | expr = AbbrevForwardStep() {
+        return expr;
+    }
+}
+
+Pair<Token, AxisStepNode.Axis> ForwardAxis()  :
+{
+    AxisStepNode.Axis axis;
+    Token t;
+}
+{
+    (
+        t = "child" "::" {
+            axis = AxisStepNode.Axis.CHILD;
+        }
+        | t = "descendant" "::" {
+            axis = AxisStepNode.Axis.DESCENDANT;
+        }
+        | t = "attribute" "::" {
+            axis = AxisStepNode.Axis.ATTRIBUTE;
+        }
+        | t = "self" "::" {
+            axis = AxisStepNode.Axis.SELF;
+        }
+        | t = "descendant-or-self" "::" {
+            axis = AxisStepNode.Axis.DESCENDANT_OR_SELF;
+        }
+        | t = "following-sibling" "::" {
+            axis = AxisStepNode.Axis.FOLLOWING_SIBLING;
+        }
+        | t = "following" "::" {
+            axis = AxisStepNode.Axis.FOLLOWING;
+        }
+    ) {
+        return new Pair<Token, AxisStepNode.Axis>(t, axis);
+    }
+}
+
+AxisStepNode AbbrevForwardStep()  :
+{
+    Token t = null;
+    ASTNode nodeTest;
+}
+{
+    [t = "@"] nodeTest = NodeTest() {
+        AxisStepNode.Axis axis = t == null ? AxisStepNode.Axis.ABBREV : AxisStepNode.Axis.ABBREV_ATTRIBUTE;
+        AxisStepNode as = new AxisStepNode(t != null ? createSourceLocation(t) : nodeTest.getSourceLocation());
+        as.setAxis(axis);
+        as.setNodeTest(nodeTest);
+        return as;
+    }
+}
+
+AxisStepNode ReverseStep()   :
+{
+    Pair<Token, AxisStepNode.Axis> aPair;
+    ASTNode nt;
+    AxisStepNode expr;
+}
+{
+    aPair = ReverseAxis() nt = NodeTest() {
+        AxisStepNode as = new AxisStepNode(createSourceLocation(aPair.first));
+        as.setAxis(aPair.second);
+        as.setNodeTest(nt);
+        return as;
+    }
+    | expr = AbbrevReverseStep() {
+        return expr;
+    }
+}
+
+Pair<Token, AxisStepNode.Axis> ReverseAxis()  :
+{
+    AxisStepNode.Axis axis;
+    Token t;
+}
+{
+    (
+        t = "parent" "::" {
+            axis = AxisStepNode.Axis.PARENT;
+        }
+        | t = "ancestor" "::" {
+            axis = AxisStepNode.Axis.ANCESTOR;
+        }
+        | t = "preceding-sibling" "::" {
+            axis = AxisStepNode.Axis.PRECEDING_SIBLING;
+        }
+        | t = "preceding" "::" {
+            axis = AxisStepNode.Axis.PRECEDING;
+        }
+        | t = "ancestor-or-self" "::" {
+            axis = AxisStepNode.Axis.ANCESTOR_OR_SELF;
+        }
+    ) {
+        return new Pair<Token, AxisStepNode.Axis>(t, axis);
+    }
+}
+
+AxisStepNode AbbrevReverseStep()  :
+{
+    Token start;
+}
+{
+    start = ".." {
+        AxisStepNode as = new AxisStepNode(createSourceLocation(start));
+        as.setAxis(AxisStepNode.Axis.DOT_DOT);
+        return as;
+    }
+}
+
+ASTNode NodeTest():
+{
+    ASTNode test;
+}
+{
+    (
+        LOOKAHEAD(2) test = KindTest()
+        | test = NameTest() 
+    ) {
+        return test;
+    }
+}
+
+NameTestNode NameTest()  :
+{
+    QNameNode name;
+    NameTestNode nt;
+}
+{
+    (
+        name = QName() {
+            nt = new NameTestNode(name.getSourceLocation());
+            nt.setPrefix(name.getPrefix());
+            nt.setLocalName(name.getLocalName());
+        }
+        | nt = Wildcard()
+    ) {
+        return nt;
+    }
+}
+
+NameTestNode Wildcard():
+{
+    Token t;
+    String prefix = null;
+    String local = null;
+}
+{
+    (
+        t = "*"
+        | t = <NCNameColonStar> {
+            int idx = t.image.indexOf(':');
+            prefix = t.image.substring(0, idx);
+        }
+        | t = <StarColonNCName> {
+            idx = t.image.indexOf(':');
+            local = t.image.substring(idx + 1);
+        }
+    ) {
+        NameTestNode nt = new NameTestNode(createSourceLocation(t));
+        nt.setPrefix(prefix);
+        nt.setLocalName(local);
+        return nt;
+    }
+}
+
+ASTNode FilterExpr()   :
+{
+    ASTNode expr;
+    List<ASTNode> pList;
+}
+{
+    expr = PrimaryExpr() pList = PredicateList() {
+        FilterExprNode fe = new FilterExprNode(expr.getSourceLocation());
+        fe.setExpr(expr);
+        fe.setPredicates(pList);
+        return fe;
+    }
+}
+
+List<ASTNode> PredicateList()   :
+{
+    ASTNode predicate;
+    List<ASTNode> predicates = new ArrayList<ASTNode>();
+}
+{
+    (
+        predicate = Predicate() {
+            predicates.add(predicate);
+        }
+    )* {
+        return predicates;
+    }
+}
+
+ASTNode Predicate()   :
+{
+    ASTNode expr;
+}
+{
+    "[" expr = Expr() "]" {
+        return expr;
+    }
+}
+
+ASTNode PrimaryExpr():
+{
+    ASTNode expr;
+}
+{
+    (
+        expr = Literal()
+        | expr = VarRef()
+        | expr = ParenthesizedExpr()
+        | expr = ContextItemExpr()
+        | LOOKAHEAD(2) expr = FunctionCall()
+        | LOOKAHEAD(2) expr = OrderedExpr()
+        | LOOKAHEAD(2) expr = UnorderedExpr()
+        | expr = Constructor()
+    ) {
+        return expr;
+    }
+}
+
+ASTNode Literal()   :
+{
+    ASTNode expr;
+    Token t;
+}
+{
+    expr = NumericLiteral() {
+        return expr;
+    }
+    | t = <StringLiteral> {
+        LiteralNode l = new LiteralNode(createSourceLocation(t));
+        l.setImage(t.image);
+        l.setType(LiteralNode.LiteralType.STRING);
+        return l;
+    }
+}
+
+ASTNode NumericLiteral()   :
+{
+    Token t;
+    LiteralNode.LiteralType type;
+}
+{
+    (
+        t = <IntegerLiteral> {
+            type = LiteralNode.LiteralType.INTEGER;
+        }
+        | t = <DecimalLiteral> {
+            type = LiteralNode.LiteralType.DECIMAL;
+        }
+        | t = <DoubleLiteral> {
+            type = LiteralNode.LiteralType.DOUBLE;
+        }
+    ) {
+        LiteralNode l = new LiteralNode(createSourceLocation(t));
+        l.setImage(t.image);
+        l.setType(type);
+        return l;
+    }
+}
+
+ASTNode VarRef()   :
+{
+    QNameNode name;
+    Token start;
+}
+{
+    start = "$" name = VarName() {
+        VarRefNode vr = new VarRefNode(createSourceLocation(start));
+        vr.setVariable(name);
+        return vr;
+    }
+}
+
+QNameNode VarName()  :
+{
+    QNameNode qname;
+}
+{
+    qname = QName() {
+        return qname;
+    }
+}
+
+ASTNode ParenthesizedExpr()  :
+{
+    ASTNode expr = null;
+    Token start;
+}
+{
+    start = "(" [expr = Expr()] ")" {
+        ParenthesizedExprNode pe = new ParenthesizedExprNode(createSourceLocation(start));
+        pe.setExpr(expr);
+        return pe;
+    }
+}
+
+ASTNode ContextItemExpr()  :
+{
+    Token start;
+}
+{
+    start = "." {
+        return new ContextItemExprNode(createSourceLocation(start));
+    }
+}
+
+ASTNode OrderedExpr()  :
+{
+    ASTNode expr;
+    Token start;
+}
+{
+    start = "ordered" <LbraceExprEnclosure> expr = Expr() <Rbrace> {
+        OrderedExprNode ue = new OrderedExprNode(createSourceLocation(start));
+        ue.setExpr(expr);
+        return ue;
+    }
+}
+
+ASTNode UnorderedExpr()  :
+{
+    ASTNode expr;
+    Token start;
+}
+{
+    start = "unordered" <LbraceExprEnclosure>  expr = Expr() <Rbrace> {
+        UnorderedExprNode ue = new UnorderedExprNode(createSourceLocation(start));
+        ue.setExpr(expr);
+        return ue;
+    }
+}
+
+ASTNode FunctionCall()  :
+{
+    QNameNode qname;
+    List<ASTNode> args = new ArrayList<ASTNode>();
+    ASTNode expr;
+}
+{
+    qname = FunctionQName() "(" [
+        expr = ExprSingle() {
+            args.add(expr);
+        } (
+            "," expr = ExprSingle() {
+                args.add(expr);
+            }
+        )*
+    ] ")" {
+        FunctionExprNode fe = new FunctionExprNode(qname.getSourceLocation());
+        fe.setName(qname);
+        fe.setArguments(args);
+        return fe;
+    }
+}
+
+ASTNode Constructor()  :
+{
+    ASTNode result;
+}
+{
+    (
+        result = DirectConstructor()
+        | result = ComputedConstructor()
+    ) {
+        return result;
+    }
+}
+
+ASTNode DirectConstructor()  :
+{
+    ASTNode result;
+}
+{
+    (
+        result = DirElemConstructor()
+        | result = DirCommentConstructor()
+        | result = DirPIConstructor()
+    ) {
+        return result;
+    }
+}
+
+ASTNode DirElemConstructor()  :
+{
+    Token start;
+    Token startName;
+    Token endName = null;
+    List<DirectAttributeConstructorNode> attrs;
+    List<ASTNode> contents = new ArrayList<ASTNode>();
+    ASTNode content;
+    StringBuilder buffer = new StringBuilder();
+    Token bufferStart = null;
+    Token t;
+}
+{
+    (
+        start = <LessThanOpOrTagO>
+        | start = <StartTagOpen>
+    ) startName = <TagQName> attrs = DirAttributeList() (
+        <EmptyTagClose>
+        | (
+            <StartTagClose> (
+                (
+                    content = EnclosedExpr()
+                    | content = DirectConstructor()
+                    | content = CDataSection()
+                ) {
+                    if (bufferStart != null) {
+                        ContentCharsNode c = new ContentCharsNode(createSourceLocation(bufferStart));
+                        c.setContent(buffer.toString());
+                        contents.add(c);
+                        buffer = new StringBuilder();
+                        bufferStart = null;
+                    }
+                    contents.add(content);
+                }
+                | t = <PredefinedEntityRef> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    String ref = t.image;
+                    if ("&lt;".equals(ref)) {
+                        buffer.append('<');
+                    } else if ("&gt;".equals(ref)) {
+                        buffer.append('>');
+                    } else if ("&amp;".equals(ref)) {
+                        buffer.append('&');
+                    } else if ("&apos;".equals(ref)) {
+                        buffer.append('\'');
+                    } else if ("&quot;".equals(ref)) {
+                        buffer.append('"');
+                    }
+                }
+                | t = <CharRef> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    ref = t.image.substring(2, t.image.length() - 1);
+                    buffer.appendCodePoint(ref.charAt(0) == 'x' ? Integer.parseInt(ref.substring(1), 16) : Integer.parseInt(ref));
+                }
+                | t = <LCurlyBraceEscape> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append("{");
+                }
+                | t = <RCurlyBraceEscape> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append("}");
+                }
+                | t = <ElementContentChar> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append(t.image);
+                }
+            )* <EndTagOpen> endName = <EndTagQName> [<S>] <EndTagClose>
+        )
+    ) {
+        if (bufferStart != null) {
+            ContentCharsNode c = new ContentCharsNode(createSourceLocation(bufferStart));
+            c.setContent(buffer.toString());
+            contents.add(c);
+        }
+        DirectElementConstructorNode elem = new DirectElementConstructorNode(createSourceLocation(start));
+        elem.setStartTagName(createQName(startName));
+        elem.setEndTagName(endName == null ? null : createQName(endName));
+        elem.setAttributes(attrs);
+        elem.setContent(contents);
+        return elem;
+    }
+}
+
+List<DirectAttributeConstructorNode> DirAttributeList()  :
+{
+    List<DirectAttributeConstructorNode> attrs = new ArrayList<DirectAttributeConstructorNode>();
+    Token name;
+    List<ASTNode> value;
+}
+{
+    (
+        <S> [
+            name = <TagQName> [<S>] <ValueIndicator> [<S>] value = DirAttributeValue() {
+                DirectAttributeConstructorNode attr = new DirectAttributeConstructorNode(createSourceLocation(name));
+                attr.setName(createQName(name));
+                attr.setValue(value);
+                attrs.add(attr);
+            }
+        ]
+    )* {
+        return attrs;
+    }
+}
+
+List<ASTNode> DirAttributeValue():
+{
+    List<ASTNode> contents = new ArrayList<ASTNode>();
+    ASTNode content;
+    StringBuilder buffer = new StringBuilder();
+    Token bufferStart = null;
+    Token t;
+}
+{
+    (
+        (
+            <OpenQuot> (
+                t = <EscapeQuot> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append('"');
+                }
+                | t = <QuotAttrContentChar> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append(t.image);
+                }
+                | content = EnclosedExpr() {
+                    if (bufferStart != null) {
+                        ContentCharsNode c = new ContentCharsNode(createSourceLocation(bufferStart));
+                        c.setContent(buffer.toString());
+                        contents.add(c);
+                        buffer = new StringBuilder();
+                        bufferStart = null;
+                    }
+                    contents.add(content);
+                }
+                | t = <PredefinedEntityRef> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    String ref = t.image;
+                    if ("&lt;".equals(ref)) {
+                        buffer.append('<');
+                    } else if ("&gt;".equals(ref)) {
+                        buffer.append('>');
+                    } else if ("&amp;".equals(ref)) {
+                        buffer.append('&');
+                    } else if ("&apos;".equals(ref)) {
+                        buffer.append('\'');
+                    } else if ("&quot;".equals(ref)) {
+                        buffer.append('"');
+                    }
+                }
+                | t = <CharRef> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    ref = t.image.substring(2, t.image.length() - 1);
+                    buffer.appendCodePoint(ref.charAt(0) == 'x' ? Integer.parseInt(ref.substring(1), 16) : Integer.parseInt(ref));
+                }
+                | t = <LCurlyBraceEscape> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append("{");
+                }
+                | t = <RCurlyBraceEscape> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append("}");
+                }
+            )* <CloseQuot>
+        )
+        | (
+            <OpenApos> (
+                t = <EscapeApos> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append('\'');
+                }
+                | t = <AposAttrContentChar> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append(t.image);
+                }
+                | content = EnclosedExpr() {
+                    if (bufferStart != null) {
+                        ContentCharsNode c = new ContentCharsNode(createSourceLocation(bufferStart));
+                        c.setContent(buffer.toString());
+                        contents.add(c);
+                        buffer = new StringBuilder();
+                        bufferStart = null;
+                    }
+                    contents.add(content);
+                }
+                | t = <PredefinedEntityRef> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    String ref = t.image;
+                    if ("&lt;".equals(ref)) {
+                        buffer.append('<');
+                    } else if ("&gt;".equals(ref)) {
+                        buffer.append('>');
+                    } else if ("&amp;".equals(ref)) {
+                        buffer.append('&');
+                    } else if ("&apos;".equals(ref)) {
+                        buffer.append('\'');
+                    } else if ("&quot;".equals(ref)) {
+                        buffer.append('"');
+                    }
+                }
+                | t = <CharRef> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    ref = t.image.substring(2, t.image.length() - 1);
+                    buffer.appendCodePoint(ref.charAt(0) == 'x' ? Integer.parseInt(ref.substring(1), 16) : Integer.parseInt(ref));
+                }
+                | t = <LCurlyBraceEscape> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append("{");
+                }
+                | t = <RCurlyBraceEscape> {
+                    if (bufferStart == null) {
+                        bufferStart = t;
+                    }
+                    buffer.append("}");
+                }
+            )* <CloseApos> 
+        )
+    ) {
+        if (bufferStart != null) {
+            ContentCharsNode c = new ContentCharsNode(createSourceLocation(bufferStart));
+            c.setContent(buffer.toString());
+            contents.add(c);
+        }
+        return contents;
+    }
+}
+
+ASTNode DirCommentConstructor()  :
+{
+    String contents;
+    Token start;
+}
+{
+    (start = <XmlCommentStartForElementContent>  | start = <XmlCommentStart> ) contents = DirCommentContents() <XmlCommentEnd> {
+        DirectCommentConstructorNode c = new DirectCommentConstructorNode(createSourceLocation(start));
+        c.setContent(contents);
+        return c;
+    }
+}
+
+String DirCommentContents()  :
+{
+    StringBuilder buffer = new StringBuilder();
+    Token t;
+}
+{
+    (
+        (
+            t = <CommentContentChar>
+            | t = <CommentContentCharDash>
+        ) {
+            buffer.append(t.image);
+        }
+    )* {
+        return buffer.toString();
+    }
+}
+
+ASTNode DirPIConstructor()  :
+{
+    Token target;
+    String contents = null;
+    Token start;
+}
+{
+    (start = <ProcessingInstructionStartForElementContent>  | start = <ProcessingInstructionStart> ) target = <PITarget>  [<SForPI>  contents = DirPIContents()] <ProcessingInstructionEnd> {
+        DirectPIConstructorNode n = new DirectPIConstructorNode(createSourceLocation(start));
+        n.setTarget(target.image);
+        n.setContent(contents);
+        return n;
+    }
+}
+
+String DirPIContents()  :
+{
+    StringBuilder buffer = new StringBuilder();
+    Token t;
+}
+{
+    (
+        t = <PIContentChar> {
+            buffer.append(t.image);
+        }
+    )* {
+        return buffer.toString();
+    }
+}
+
+ASTNode CDataSection()  :
+{
+    String contents;
+    Token start;
+}
+{
+    (start = <CdataSectionStartForElementContent>  | start = <CdataSectionStart> ) contents = CDataSectionContents() <CdataSectionEnd> {
+        CDataSectionNode c = new CDataSectionNode(createSourceLocation(start));
+        c.setContent(contents);
+        return c;
+    }
+}
+
+String CDataSectionContents()  :
+{
+    StringBuilder buffer = new StringBuilder();
+    Token t;
+}
+{
+    (
+        t = <CDataSectionChar> {
+            buffer.append(t.image);
+        }
+    )* {
+        return buffer.toString();
+    }
+}
+
+ASTNode ComputedConstructor()  :
+{
+    ASTNode result;
+}
+{
+    (
+        result = CompDocConstructor()
+        | result = CompElemConstructor()
+        | result = CompAttrConstructor()
+        | result = CompTextConstructor()
+        | result = CompCommentConstructor()
+        | result = CompPIConstructor()
+    ) {
+        return result;
+    }
+}
+
+ASTNode CompDocConstructor()  :
+{
+    Token start;
+    ASTNode content;
+}
+{
+    start = "document" <LbraceExprEnclosure> content = Expr() <Rbrace> {
+        ComputedDocumentConstructorNode c = new ComputedDocumentConstructorNode(createSourceLocation(start));
+        c.setContent(content);
+        return c;
+    }
+}
+
+ASTNode CompElemConstructor()  :
+{
+    Token start;
+    ASTNode name;
+    ASTNode content = null;
+}
+{
+    start = "element" (
+        name = QName()
+        | (
+            <LbraceExprEnclosure> name = Expr() <Rbrace>
+        )
+    ) <LbraceExprEnclosure> [content = ContentExpr()] <Rbrace> {
+        ComputedElementConstructorNode c = new ComputedElementConstructorNode(createSourceLocation(start));
+        c.setName(name);
+        c.setContent(content);
+        return c;
+    }
+}
+
+ASTNode ContentExpr()  :
+{
+    ASTNode result;
+}
+{
+    result = Expr() {
+        return result;
+    }
+}
+
+ASTNode CompAttrConstructor()  :
+{
+    Token start;
+    ASTNode name;
+    ASTNode value = null;
+}
+{
+    start = "attribute" (
+        name = QName()
+        | (
+            <LbraceExprEnclosure> name = Expr() <Rbrace>
+        )
+    ) <LbraceExprEnclosure>  [value = Expr()] <Rbrace> {
+        ComputedAttributeConstructorNode c = new ComputedAttributeConstructorNode(createSourceLocation(start));
+        c.setName(name);
+        c.setContent(value);
+        return c;
+    }
+}
+
+ASTNode CompTextConstructor()  :
+{
+    Token start;
+    ASTNode value;
+}
+{
+    start = "text" <LbraceExprEnclosure> value = Expr() <Rbrace> {
+        ComputedTextConstructorNode c = new ComputedTextConstructorNode(createSourceLocation(start));
+        c.setContent(value);
+        return c;
+    }
+}
+
+ASTNode CompCommentConstructor()  :
+{
+    Token start;
+    ASTNode value;
+}
+{
+    start = "comment" <LbraceExprEnclosure> value = Expr() <Rbrace> {
+        ComputedCommentConstructorNode c = new ComputedCommentConstructorNode(createSourceLocation(start));
+        c.setContent(value);
+        return c;
+    }
+}
+
+ASTNode CompPIConstructor()  :
+{
+    Token start;
+    ASTNode target;
+    ASTNode content = null;
+}
+{
+    start = "processing-instruction" (
+        target = NCName()
+        | (
+            <LbraceExprEnclosure>  target = Expr() <Rbrace> 
+        )
+    ) <LbraceExprEnclosure>  [content = Expr()] <Rbrace> {
+        ComputedPIConstructorNode pi = new ComputedPIConstructorNode(createSourceLocation(start));
+        pi.setTarget(target);
+        pi.setContent(content);
+        return pi;
+    }
+}
+
+SingleTypeNode SingleType()  :
+{
+    AtomicTypeNode type;
+    Token opt = null;
+}
+{
+    type = AtomicType() [ opt = "?" ] {
+        SingleTypeNode st = new SingleTypeNode(type.getSourceLocation());
+        st.setAtomicType(type);
+        st.setOptional(opt != null);
+        return st;
+    }
+}
+
+TypeDeclNode TypeDeclaration()  :
+{
+    SequenceTypeNode type;
+    Token start;
+}
+{
+    start = "as" type = SequenceType() {
+        TypeDeclNode td = new TypeDeclNode(createSourceLocation(start));
+        td.setType(type);
+        return td;
+    }
+}
+
+SequenceTypeNode SequenceType()  :
+{
+    ASTNode type;
+    XQueryConstants.TypeQuantifier quant = null;
+    Token start;
+}
+{
+    (
+        LOOKAHEAD(2)  (start = "empty-sequence" "(" ")") {
+            type = new EmptySequenceTypeNode(createSourceLocation(start));
+        }
+        | (type = ItemType() [LOOKAHEAD(1) quant = OccurrenceIndicator()])
+    ) {
+        SequenceTypeNode st = new SequenceTypeNode(type.getSourceLocation());
+        st.setItemType(type);
+        st.setQuantifier(quant);
+        return st;
+    }
+}
+
+XQueryConstants.TypeQuantifier OccurrenceIndicator()  :
+{}
+{
+    (
+        "?" {
+            return XQueryConstants.TypeQuantifier.QUANT_QUESTION;
+        }
+        | "*" {
+            return XQueryConstants.TypeQuantifier.QUANT_STAR;
+        }
+        | <Plus> {
+            return XQueryConstants.TypeQuantifier.QUANT_PLUS;
+        }
+    )
+}
+
+ASTNode ItemType()  :
+{
+    ASTNode type;
+    Token start;
+}
+{
+    (
+        LOOKAHEAD(2) type = KindTest()
+        | LOOKAHEAD(2)  (start = "item" "(" ")") {
+            type = new ItemTypeNode(createSourceLocation(start));
+        }
+        | type = AtomicType()
+    ) {
+        return type;
+    }
+}
+
+AtomicTypeNode AtomicType():
+{
+    QNameNode typeName;
+}
+{
+    typeName = QName() {
+        AtomicTypeNode at = new AtomicTypeNode(typeName.getSourceLocation());
+        at.setName(typeName);
+        return at;
+    }
+}
+
+ASTNode KindTest()   :
+{
+    ASTNode type;
+}
+{
+    (
+        type = DocumentTest()
+        | type = ElementTest()
+        | type = AttributeTest()
+        | type = SchemaElementTest()
+        | type = SchemaAttributeTest()
+        | type = PITest()
+        | type = CommentTest()
+        | type = TextTest()
+        | type = AnyKindTest()
+    ) {
+        return type;
+    }
+}
+
+ASTNode AnyKindTest()  :
+{
+    Token start;
+}
+{
+    start = "node" "(" ")" {
+        return new AnyNodeTestNode(createSourceLocation(start));
+    }
+}
+
+DocumentTestNode DocumentTest()  :
+{
+    Token start;
+    ASTNode elementType = null;
+}
+{
+    start = "document-node" "(" [(elementType = ElementTest() | elementType = SchemaElementTest())] ")" {
+        DocumentTestNode dt = new DocumentTestNode(createSourceLocation(start));
+        dt.setElementTest(elementType);
+        return dt;
+    }
+}
+
+TextTestNode TextTest()  :
+{
+    Token start;
+}
+{
+    start = "text" "(" ")" {
+        return new TextTestNode(createSourceLocation(start));
+    }
+}
+
+CommentTestNode CommentTest()  :
+{
+    Token start;
+}
+{
+    start = "comment" "(" ")" {
+        return new CommentTestNode(createSourceLocation(start));
+    }
+}
+
+PITestNode PITest()  :
+{
+    NCNameNode tName;
+    String target = null;
+    Token t;
+    Token start;
+}
+{
+    start = "processing-instruction" "(" [
+        (
+            tName = NCName() {
+                target = tName.getName();
+            }
+            | t = <StringLiteral> {
+                target = t.image;
+            }
+        )
+    ] ")" {
+        PITestNode pit = new PITestNode(createSourceLocation(start));
+        pit.setTarget(target);
+        return pit;
+    }
+}
+
+AttributeTestNode AttributeTest()  :
+{
+    NameTestNode nt = null;
+    QNameNode contentTypeName = null;
+    Token start;
+}
+{
+    start = "attribute" "(" [
+        (
+            nt = AttribNameOrWildcard() [
+                "," contentTypeName = TypeName()
+            ]
+        )
+    ] ")" {
+        AttributeTestNode at = new AttributeTestNode(createSourceLocation(start));
+        at.setNameTest(nt);
+        at.setTypeName(contentTypeName);
+        return at;
+    }
+}
+
+NameTestNode AttribNameOrWildcard()  :
+{
+    QNameNode name;
+    Token start;
+}
+{
+    (
+        name = AttributeName() {
+            NameTestNode nt = new NameTestNode(name.getSourceLocation());
+            nt.setPrefix(name.getPrefix());
+            nt.setLocalName(name.getLocalName());
+            return nt;
+        }
+        | start = "*" {
+            return new NameTestNode(createSourceLocation(start));
+        }
+    )
+}
+
+SchemaAttributeTestNode SchemaAttributeTest():
+{
+    QNameNode name;
+    Token start;
+}
+{
+    start = "schema-attribute" "(" name = AttributeDeclaration() ")" {
+        SchemaAttributeTestNode sat = new SchemaAttributeTestNode(createSourceLocation(start));
+        sat.setName(name);
+        return sat;
+    }
+}
+
+QNameNode AttributeDeclaration()  :
+{
+    QNameNode name;
+}
+{
+    name = AttributeName() {
+        return name;
+    }
+}
+
+ElementTestNode ElementTest()  :
+{
+    NameTestNode nt = null;
+    QNameNode contentTypeName = null;
+    Token nilled = null;
+    Token start;
+}
+{
+    start = "element" "(" [
+        (
+            nt = ElementNameOrWildcard() [
+                "," contentTypeName = TypeName() [
+                    nilled = "?"
+                ]
+            ]
+        )
+    ] ")" {
+        ElementTestNode et = new ElementTestNode(createSourceLocation(start));
+        et.setNameTest(nt);
+        et.setTypeName(contentTypeName);
+        et.setNillable(nilled != null);
+        return et;
+    }
+}
+
+NameTestNode ElementNameOrWildcard():
+{
+    QNameNode name;
+    Token start;
+}
+{
+    (
+        name = ElementName() {
+            NameTestNode nt = new NameTestNode(name.getSourceLocation());
+            nt.setPrefix(name.getPrefix());
+            nt.setLocalName(name.getLocalName());
+            return nt;
+        }
+        | start = "*" {
+            return new NameTestNode(createSourceLocation(start));
+        }
+    )
+}
+
+SchemaElementTestNode SchemaElementTest()  :
+{
+    QNameNode name;
+    Token start;
+}
+{
+    start = "schema-element" "(" name = ElementDeclaration() ")" {
+        SchemaElementTestNode set = new SchemaElementTestNode(createSourceLocation(start));
+        set.setName(name);
+        return set;
+    }
+}
+
+QNameNode ElementDeclaration()  :
+{
+    QNameNode qname;
+}
+{
+    qname = ElementName() {
+        return qname;
+    }
+}
+
+QNameNode AttributeName()  :
+{
+    QNameNode qname;
+}
+{
+    qname = QName() {
+        return qname;
+    }
+}
+
+QNameNode ElementName()  :
+{
+    QNameNode qname;
+}
+{
+    qname = QName() {
+        return qname;
+    }
+}
+
+QNameNode TypeName():
+{
+    QNameNode qname;
+}
+{
+    qname = QName() {
+        return qname;
+    }
+}
+
+String URILiteral()  :
+{
+    Token t;
+}
+{
+    t = <StringLiteral> {
+        return t.image;
+    }
+}
+
+void FTSelection()  :
+{}
+{
+    FTOr() (FTPosFilter())* ["weight" RangeExpr()]
+}
+
+void FTOrExpr()  : 
+{}
+{
+	FTOr()
+}
+
+void FTOr()  : 
+{}
+{
+    FTAnd() ("ftor"{ binaryTokenStack.push(token); } FTAnd())*
+}
+
+void FTAnd()  : 
+{}
+{
+    FTMildNot() ("ftand"{ binaryTokenStack.push(token); } FTMildNot())*
+}
+
+void FTMildNot()  : 
+{}
+{
+    FTUnaryNot() ( ( "not"{ binaryTokenStack.push(token); } "in"{ binaryTokenStack.push(token); }) FTUnaryNot())*
+}
+
+void FTUnaryNot()  : 
+{boolean keepUnary=false;}
+{
+   (
+"ftnot"{keepUnary=true;})? FTPrimaryWithOptions()
+}
+
+void FTPrimaryWithOptions(): 
+{}
+{
+   (
+FTPrimary() [LOOKAHEAD(2) FTMatchOptions()])
+}
+
+void FTPrimary()  :
+{}
+{
+    ( ( FTWords() [FTTimes()]) |  ( "(" FTSelection() ")") | FTExtensionSelection())
+}
+
+void FTWords()  :
+{}
+{
+    FTWordsValue() [FTAnyallOption()]
+}
+
+void FTWordsValue()  :
+{}
+{
+    (Literal() |  ( <LbraceExprEnclosure>  Expr() <Rbrace> ))
+}
+
+void FTExtensionSelection()  :
+{}
+{
+    (Pragma())+  <LbraceExprEnclosure>  [FTSelection()] <Rbrace> 
+}
+
+void FTAnyallOption()  :
+{}
+{
+  ( (
+"any" ["word"]) |  (
+"all" ["words"]) | "phrase")
+}
+
+void FTTimes()  :
+{}
+{
+  "occurs" FTRange() "times"
+}
+
+void FTRange()  :
+{}
+{
+  ( (
+"exactly" AdditiveExpr()) | LOOKAHEAD(2)  (
+"at" <Least> AdditiveExpr()) | LOOKAHEAD(2)  (
+"at" "most" AdditiveExpr()) |  (
+"from" AdditiveExpr() "to" AdditiveExpr()))
+}
+
+void FTPosFilter()  :
+{}
+{
+    (FTOrder() | FTWindow() | FTDistance() | FTScope() | FTContent())
+}
+
+void FTOrder()  :
+{}
+{
+    "ordered"
+}
+
+void FTWindow()  :
+{}
+{
+    "window" AdditiveExpr() FTUnit()
+}
+
+void FTDistance()  :
+{}
+{
+    "distance" FTRange() FTUnit()
+}
+
+void FTUnit()  :
+{}
+{
+    ("words" | "sentences" | "paragraphs")
+}
+
+void FTScope()  :
+{}
+{
+    ("same" | "different") FTBigUnit()
+}
+
+void FTBigUnit()  :
+{}
+{
+    ("sentence" | "paragraph")
+}
+
+void FTContent()  :
+{}
+{
+    (LOOKAHEAD(2)  ( "at" "start") | LOOKAHEAD(2)  ( "at" "end") |  ( "entire" "content"))
+}
+
+void FTMatchOptions()  :
+{}
+{
+    (LOOKAHEAD(2) FTMatchOption())+ 
+}
+
+void FTMatchOption()  :
+{}
+{
+    LOOKAHEAD(2) FTLanguageOption() 
+    | LOOKAHEAD(2) FTWildCardOption() 
+    | LOOKAHEAD(2) FTThesaurusOption() 
+    | LOOKAHEAD(2) FTStemOption() 
+    | LOOKAHEAD(2) FTCaseOption() 
+    | LOOKAHEAD(2) FTDiacriticsOption() 
+    | LOOKAHEAD(2) FTStopwordOption() 
+    | LOOKAHEAD(2) FTExtensionOption()
+}
+
+void FTCaseOption()  :
+{}
+{
+    (LOOKAHEAD(2)  ( "case" "insensitive") | LOOKAHEAD(2)  ( "case" "sensitive") | "lowercase" | "uppercase")
+}
+
+void FTDiacriticsOption()  :
+{}
+{
+    (LOOKAHEAD(2)  ( "diacritics" "insensitive") | LOOKAHEAD(2)  ( "diacritics" "sensitive"))
+}
+
+void FTStemOption()  :
+{}
+{
+    ( ( "with" "stemming") |  ( "without" "stemming"))
+}
+
+void FTThesaurusOption()  :
+{}
+{
+    (LOOKAHEAD(3)  ( "with" "thesaurus" (FTThesaurusID() | "default")) | LOOKAHEAD(3)  ( "with" "thesaurus" "(" (FTThesaurusID() | "default") ("," FTThesaurusID())* ")") |  ( "without" "thesaurus"))
+}
+
+void FTThesaurusID()  :
+{}
+{
+    "at" URILiteral() ["relationship" <StringLiteral> ] [LOOKAHEAD(2) FTRange() "levels"]
+}
+
+void FTStopwordOption()  :
+{}
+{
+    (LOOKAHEAD(2)  ( "with" "stop" "words" FTRefOrList() (FTInclExclStringLiteral())*) |  ( "without" "stop" "words") | LOOKAHEAD(2)  ( "with" "default" "stop" "words" (FTInclExclStringLiteral())*))
+}
+
+void FTRefOrList()   :
+{}
+{
+    ( ( "at"{ binaryTokenStack.push(token); } URILiteral()) |  ( "("{ binaryTokenStack.push(token); } <StringLiteral> {binaryTokenStack.push(token);} (","{ binaryTokenStack.push(token); } <StringLiteral> {binaryTokenStack.push(token);})* ")"{ binaryTokenStack.push(token); }))
+}
+
+void FTInclExclStringLiteral()  :
+{}
+{
+    ("union" | "except") FTRefOrList()
+}
+
+void FTLanguageOption()  :
+{}
+{
+    "language" <StringLiteral> 
+}
+
+void FTWildCardOption()  :
+{}
+{
+    ( ( "with" "wildcards") |  ( "without" "wildcards"))
+}
+
+void FTExtensionOption()  :
+{}
+{
+    "option" QName() <StringLiteral> 
+}
+
+void FTIgnoreOption()  :
+{}
+{
+    "without" "content" UnionExpr()
+}
+
+NCNameNode NCName()  :
+{
+    QNameNode qname;
+}
+{
+    qname = QName() {
+        if (!"".equals(qname.getPrefix())) {
+            throw new ParseException(token, new int[][] { }, new String[] { });
+        }
+        NCNameNode n = new NCNameNode(qname.getSourceLocation());
+        n.setName(qname.getLocalName());
+        return n;
+    }
+}
+
+QNameNode QName()  :
+{
+    QNameNode qname = null;
+    Token t;
+}
+{
+    qname = FunctionQName() {
+        return qname;
+    }
+    | t = "attribute" {
+        return createQName(t);
+    }
+    | t = "comment" {
+        return createQName(t);
+    }
+    | t = "document-node" {
+        return createQName(t);
+    }
+    | t = "element" {
+        return createQName(t);
+    }
+    | t = "if" {
+        return createQName(t);
+    }
+    | t = "item" {
+        return createQName(t);
+    }
+    | t = "node" {
+        return createQName(t);
+    }
+    | t = "processing-instruction" {
+        return createQName(t);
+    }
+    | t = "schema-attribute" {
+        return createQName(t);
+    }
+    | t = "schema-element" {
+        return createQName(t);
+    }
+    | t = "text" {
+        return createQName(t);
+    }
+    | t = "typeswitch" {
+        return createQName(t);
+    }
+    | t = "empty-sequence" {
+        return createQName(t);
+    }
+}
+
+QNameNode FunctionQName()  :
+{
+    Token t;
+}
+{
+    t = <QNameToken> {
+        return createQName(t);
+    }
+    | t = <External> {
+        return createQName(t);
+    }
+    | t = "xquery" {
+        return createQName(t);
+    }
+    | t = "version" {
+        return createQName(t);
+    }
+    | t = "encoding" {
+        return createQName(t);
+    }
+    | t = "module" {
+        return createQName(t);
+    }
+    | t = "namespace"  {
+        return createQName(t);
+    }
+    | t = "declare"  {
+        return createQName(t);
+    }
+    | t = "boundary-space"  {
+        return createQName(t);
+    }
+    | t = "preserve"  {
+        return createQName(t);
+    }
+    | t = "strip"  {
+        return createQName(t);
+    }
+    | t = "default"  {
+        return createQName(t);
+    }
+    | t = "function"  {
+        return createQName(t);
+    }
+    | t = "option"  {
+        return createQName(t);
+    }
+    | t = "ft-option"  {
+        return createQName(t);
+    }
+    | t = "ordering"  {
+        return createQName(t);
+    }
+    | t = "ordered"  {
+        return createQName(t);
+    }
+    | t = "unordered"  {
+        return createQName(t);
+    }
+    | t = "order"  {
+        return createQName(t);
+    }
+    | t = "empty"  {
+        return createQName(t);
+    }
+    | t = <Greatest>  {
+        return createQName(t);
+    }
+    | t = <Least>  {
+        return createQName(t);
+    }
+    | t = "copy-namespaces"  {
+        return createQName(t);
+    }
+    | t = "no-preserve"  {
+        return createQName(t);
+    }
+    | t = "inherit"  {
+        return createQName(t);
+    }
+    | t = "no-inherit"  {
+        return createQName(t);
+    }
+    | t = "collation"  {
+        return createQName(t);
+    }
+    | t = "base-uri"  {
+        return createQName(t);
+    }
+    | t = "import"  {
+        return createQName(t);
+    }
+    | t = "schema"  {
+        return createQName(t);
+    }
+    | t = "at"  {
+        return createQName(t);
+    }
+    | t = "variable"  {
+        return createQName(t);
+    }
+    | t = "construction"  {
+        return createQName(t);
+    }
+    | t = "as"  {
+        return createQName(t);
+    }
+    | t = "lax"  {
+        return createQName(t);
+    }
+    | t = "strict"  {
+        return createQName(t);
+    }
+    | t = "return"  {
+        return createQName(t);
+    }
+    | t = "for"  {
+        return createQName(t);
+    }
+    | t = "in"  {
+        return createQName(t);
+    }
+    | t = "score"  {
+        return createQName(t);
+    }
+    | t = "let"  {
+        return createQName(t);
+    }
+    | t = "where"  {
+        return createQName(t);
+    }
+    | t = "by"  {
+        return createQName(t);
+    }
+    | t = "stable"  {
+        return createQName(t);
+    }
+    | t = <Ascending>  {
+        return createQName(t);
+    }
+    | t = <Descending>  {
+        return createQName(t);
+    }
+    | t = "some"  {
+        return createQName(t);
+    }
+    | t = "every"  {
+        return createQName(t);
+    }
+    | t = "satisfies"  {
+        return createQName(t);
+    }
+    | t = "case"  {
+        return createQName(t);
+    }
+    | t = "then"  {
+        return createQName(t);
+    }
+    | t = "else"  {
+        return createQName(t);
+    }
+    | t = "or"  {
+        return createQName(t);
+    }
+    | t = "and"  {
+        return createQName(t);
+    }
+    | t = "ftcontains"  {
+        return createQName(t);
+    }
+    | t = "to"  {
+        return createQName(t);
+    }
+    | t = "div"  {
+        return createQName(t);
+    }
+    | t = "idiv"  {
+        return createQName(t);
+    }
+    | t = "mod"  {
+        return createQName(t);
+    }
+    | t = "union"  {
+        return createQName(t);
+    }
+    | t = "intersect"  {
+        return createQName(t);
+    }
+    | t = "except"  {
+        return createQName(t);
+    }
+    | t = "instance"  {
+        return createQName(t);
+    }
+    | t = "of"  {
+        return createQName(t);
+    }
+    | t = "treat"  {
+        return createQName(t);
+    }
+    | t = "castable"  {
+        return createQName(t);
+    }
+    | t = "cast"  {
+        return createQName(t);
+    }
+    | t = "eq"  {
+        return createQName(t);
+    }
+    | t = "ne"  {
+        return createQName(t);
+    }
+    | t = "lt"  {
+        return createQName(t);
+    }
+    | t = "le"  {
+        return createQName(t);
+    }
+    | t = "gt"  {
+        return createQName(t);
+    }
+    | t = "ge"  {
+        return createQName(t);
+    }
+    | t = "is"  {
+        return createQName(t);
+    }
+    | t = "validate"  {
+        return createQName(t);
+    }
+    | t = "child"  {
+        return createQName(t);
+    }
+    | t = "descendant"  {
+        return createQName(t);
+    }
+    | t = "self"  {
+        return createQName(t);
+    }
+    | t = "descendant-or-self"  {
+        return createQName(t);
+    }
+    | t = "following-sibling"  {
+        return createQName(t);
+    }
+    | t = "following"  {
+        return createQName(t);
+    }
+    | t = "parent"  {
+        return createQName(t);
+    }
+    | t = "ancestor"  {
+        return createQName(t);
+    }
+    | t = "preceding-sibling"  {
+        return createQName(t);
+    }
+    | t = "preceding"  {
+        return createQName(t);
+    }
+    | t = "ancestor-or-self"  {
+        return createQName(t);
+    }
+    | t = "document"  {
+        return createQName(t);
+    }
+    | t = "weight"  {
+        return createQName(t);
+    }
+    | t = "not"  {
+        return createQName(t);
+    }
+    | t = "lowercase"  {
+        return createQName(t);
+    }
+    | t = "uppercase"  {
+        return createQName(t);
+    }
+    | t = "sensitive"  {
+        return createQName(t);
+    }
+    | t = "insensitive"  {
+        return createQName(t);
+    }
+    | t = "with"  {
+        return createQName(t);
+    }
+    | t = "diacritics"  {
+        return createQName(t);
+    }
+    | t = "without"  {
+        return createQName(t);
+    }
+    | t = "stemming"  {
+        return createQName(t);
+    }
+    | t = "thesaurus"  {
+        return createQName(t);
+    }
+    | t = "relationship"  {
+        return createQName(t);
+    }
+    | t = "levels"  {
+        return createQName(t);
+    }
+    | t = "stop"  {
+        return createQName(t);
+    }
+    | t = "words"  {
+        return createQName(t);
+    }
+    | t = "language"  {
+        return createQName(t);
+    }
+    | t = "wildcards"  {
+        return createQName(t);
+    }
+    | t = "start"  {
+        return createQName(t);
+    }
+    | t = "end"  {
+        return createQName(t);
+    }
+    | t = "entire"  {
+        return createQName(t);
+    }
+    | t = "content"  {
+        return createQName(t);
+    }
+    | t = "any"  {
+        return createQName(t);
+    }
+    | t = "all"  {
+        return createQName(t);
+    }
+    | t = "phrase"  {
+        return createQName(t);
+    }
+    | t = "word"  {
+        return createQName(t);
+    }
+    | t = "exactly"  {
+        return createQName(t);
+    }
+    | t = "most"  {
+        return createQName(t);
+    }
+    | t = "from"  {
+        return createQName(t);
+    }
+    | t = "distance"  {
+        return createQName(t);
+    }
+    | t = "window"  {
+        return createQName(t);
+    }
+    | t = "occurs"  {
+        return createQName(t);
+    }
+    | t = "times"  {
+        return createQName(t);
+    }
+    | t = "same"  {
+        return createQName(t);
+    }
+    | t = "different"  {
+        return createQName(t);
+    }
+    | t = "sentences"  {
+        return createQName(t);
+    }
+    | t = "paragraphs"  {
+        return createQName(t);
+    }
+    | t = "sentence"  {
+        return createQName(t);
+    }
+    | t = "paragraph"  {
+        return createQName(t);
+    }
+    | t = "type" {
+        return createQName(t);
+    }
+}
+
+
+<DEFAULT>
+TOKEN :
+{
+ < IntegerLiteral : <Digits> >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < DecimalLiteral : ( (
+"." <Digits>) |  (
+<Digits> "." (["0" - "9"])*)) >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < DoubleLiteral : ( (
+"." <Digits>) |  (
+<Digits> ("." (["0" - "9"])*)?)) ["e", "E"] (["+", "-"])? <Digits> >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < StringLiteral : ( (
+"\"" ((<PredefinedEntityRef> | <CharRef> | <EscapeQuot> | ~["\"", "&"]))* "\"") |  (
+"'" ((<PredefinedEntityRef> | <CharRef> | <EscapeApos> | ~["'", "&"]))* "'")) >
+}
+<FTPOSFILTER, FTMATCHOPTION, PROLOG_SPECIAL, PROLOG_NCNAME, DECLAREORDERING, DEFAULT, PROLOG, OPERAND, OPERATOR, KINDTEST, NAMESPACEDECL, SINGLETYPE, ITEMTYPE, NAMESPACEKEYWORD, VARNAME, OCCURRENCEINDICATOR, CLOSEKINDTEST, XQUERYVERSION, PRAGMA, OPTION, URITOOPERATOR>
+SKIP:
+{
+  <DUMMYLABEL:<skip_>>
+}
+
+TOKEN :
+{
+  < #skip_ :  (
+(<WhitespaceChar>)+ ) >
+}
+
+
+<DEFAULT>
+TOKEN :
+{
+ < Minus : "-" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Plus : "+" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < External : "external" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Ascending : "ascending" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Descending : "descending" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Greatest : "greatest" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Least : "least" >
+}
+
+TOKEN :
+{
+ < #Prefix : <NCNameTok> >
+}
+
+TOKEN :
+{
+ < #LocalPart : <NCNameTok> >
+}
+
+TOKEN :
+{
+ < #Nmstart : (<Letter> | "_") >
+}
+
+TOKEN :
+{
+ < #Nmchar : (<Letter> | <CombiningChar> | <Extender> | <Digit> | "." | "-" | "_") >
+}
+
+<DEFAULT, ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < PredefinedEntityRef : "&" ("lt" | "gt" | "amp" | "quot" | "apos") ";" >
+}
+
+<QUOT_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < EscapeQuot : "\"\"" > : QUOT_ATTRIBUTE_CONTENT
+}
+
+<APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < EscapeApos : "''" > : APOS_ATTRIBUTE_CONTENT
+}
+
+TOKEN :
+{
+ < #HexDigits : (["0" - "9", "a" - "f", "A" - "F"])+  >
+}
+
+<ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < Lbrace : "{" > { pushState(); } : DEFAULT
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < LbraceExprEnclosure : "{" > { pushState(DEFAULT); } : DEFAULT
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Rbrace : "}" > { popState(); }
+}
+
+<ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < RbraceErrorInContent : "}" > { pushState(); } : DEFAULT
+}
+
+<ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < LCurlyBraceEscape : "{{" >
+}
+
+<ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < RCurlyBraceEscape : "}}" >
+}
+
+<ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < Amp : "&" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < LessThanOpOrTagO : "<" > { pushState(DEFAULT); } : START_TAG
+}
+
+<ELEMENT_CONTENT>
+TOKEN :
+{
+ < StartTagOpen : "<" > { pushState(); } : START_TAG
+}
+
+<QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < AttrLTCharError : "<" > { pushState(); } : DEFAULT
+}
+
+<START_TAG>
+TOKEN :
+{
+ < StartTagClose : ">" > : ELEMENT_CONTENT
+}
+
+<START_TAG>
+TOKEN :
+{
+ < OpenQuot : "\"" > : QUOT_ATTRIBUTE_CONTENT
+}
+
+<QUOT_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < CloseQuot : "\"" > : START_TAG
+}
+
+<START_TAG>
+TOKEN :
+{
+ < OpenApos : "'" > : APOS_ATTRIBUTE_CONTENT
+}
+
+<APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < CloseApos : "'" > : START_TAG
+}
+
+<PRAGMACONTENTS>
+TOKEN :
+{
+ < ExtensionContentChar : <Char> >
+}
+
+<ELEMENT_CONTENT>
+TOKEN :
+{
+ < ElementContentChar : <Char> > : ELEMENT_CONTENT
+}
+
+<QUOT_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < QuotAttrContentChar : <Char> > : QUOT_ATTRIBUTE_CONTENT
+}
+
+<APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < AposAttrContentChar : <Char> > : APOS_ATTRIBUTE_CONTENT
+}
+
+<XML_COMMENT>
+TOKEN :
+{
+ < CommentContentChar : <Char> > : XML_COMMENT
+}
+
+<START_TAG>
+TOKEN :
+{
+ < EmptyTagClose : "/>" > { popState(); }
+}
+
+<ELEMENT_CONTENT>
+TOKEN :
+{
+ < EndTagOpen : "</" > : END_TAG
+}
+
+<END_TAG>
+TOKEN :
+{
+ < EndTagClose : ">" > { popState(); }
+}
+
+<START_TAG>
+TOKEN :
+{
+ < ValueIndicator : "=" > : START_TAG
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < PragmaOpen : "(#" > : PRAGMA
+}
+
+<PRAGMACONTENTS, PRAGMACONTENTSSPACEDIVIDER>
+TOKEN :
+{
+ < PragmaClose : "#)" > : DEFAULT
+}
+
+<XML_COMMENT>
+TOKEN :
+{
+ < XMLCommentDoubleDashError : "-" "-" > : XML_COMMENT
+}
+
+<XML_COMMENT>
+TOKEN :
+{
+ < CommentContentCharDash : "-" <Char> > : XML_COMMENT
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < ProcessingInstructionStart : "<?" > { pushState(DEFAULT); } : PROCESSING_INSTRUCTION
+}
+
+<ELEMENT_CONTENT>
+TOKEN :
+{
+ < ProcessingInstructionStartForElementContent : "<?" > { pushState(); } : PROCESSING_INSTRUCTION
+}
+
+<PROCESSING_INSTRUCTION, PROCESSING_INSTRUCTION_CONTENT>
+TOKEN :
+{
+ < ProcessingInstructionEnd : "?>" > { popState(); }
+}
+
+<PROCESSING_INSTRUCTION_CONTENT>
+TOKEN :
+{
+ < PIContentChar : ["\t", "\r", "\n", "\u0020" - "\uFFFD"] > : PROCESSING_INSTRUCTION_CONTENT
+}
+
+<CDATA_SECTION>
+TOKEN :
+{
+ < CDataSectionChar : ["\t", "\r", "\n", "\u0020" - "\uFFFD"] > : CDATA_SECTION
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < CdataSectionStart : "<![CDATA[" > { pushState(DEFAULT); } : CDATA_SECTION
+}
+
+<ELEMENT_CONTENT>
+TOKEN :
+{
+ < CdataSectionStartForElementContent : "<![CDATA[" > { pushState(); } : CDATA_SECTION
+}
+
+<CDATA_SECTION>
+TOKEN :
+{
+ < CdataSectionEnd : ("]" "]" ">") > { popState(); }
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < XmlCommentStart : "<!--" > { pushState(DEFAULT); } : XML_COMMENT
+}
+
+<ELEMENT_CONTENT>
+TOKEN :
+{
+ < XmlCommentStartForElementContent : "<!--" > { pushState(); } : XML_COMMENT
+}
+
+<XML_COMMENT>
+TOKEN :
+{
+ < XmlCommentEnd : "-->" > { popState(); }
+}
+
+SPECIAL_TOKEN :
+{
+ < #Comment : <CommentStart> ((<CommentContents>))* <CommentEnd> >
+}
+
+<DEFAULT, EXPR_COMMENT>
+SPECIAL_TOKEN :
+{
+ < CommentStart : "(:" > { pushState(); } : EXPR_COMMENT
+}
+
+<EXPR_COMMENT>
+SPECIAL_TOKEN :
+{
+ < CommentContent : <Char> >
+}
+
+<EXPR_COMMENT>
+SPECIAL_TOKEN :
+{
+ < CommentEnd : ":)" > { popState(); }
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Slash : "/" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < SlashSlash : "//" >
+}
+
+<PROCESSING_INSTRUCTION>
+TOKEN :
+{
+ < PITargetError : ("xml" | "Xml" | "xMl" | "xmL" | "XMl" | "xML" | "xMl" | "XML" | "XmL") > : PROCESSING_INSTRUCTION
+}
+
+<PROCESSING_INSTRUCTION>
+TOKEN :
+{
+ < PITarget : <NCNameTok> > : PROCESSING_INSTRUCTION
+}
+
+<DEFAULT, ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
+TOKEN :
+{
+ < CharRef : "&#" (<Digits> |  (
+"x" <HexDigits>)) ";" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < QNameToken : (<Prefix> ":")? <LocalPart> >
+}
+
+<PRAGMA>
+TOKEN :
+{
+ < QNameForPragma : <QNameToken> > : PRAGMACONTENTSSPACEDIVIDER
+}
+
+<START_TAG>
+TOKEN :
+{
+ < TagQName : <QNameToken> >
+}
+
+<END_TAG>
+TOKEN :
+{
+ < EndTagQName : <QNameToken> >
+}
+
+TOKEN :
+{
+ < #NCNameTok : <Nmstart> (<Nmchar>)* >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < NCNameColonStar : <NCNameTok> ":" "*" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < StarColonNCName : "*" ":" <NCNameTok> >
+}
+
+<DEFAULT, START_TAG, END_TAG>
+TOKEN :
+{
+ < S : (<WhitespaceChar>)+  >
+}
+
+<PRAGMACONTENTSSPACEDIVIDER>
+TOKEN :
+{
+ < SForPragma : (<WhitespaceChar>)+  > : PRAGMACONTENTS
+}
+
+<PROCESSING_INSTRUCTION>
+TOKEN :
+{
+ < SForPI : (<WhitespaceChar>)+  > : PROCESSING_INSTRUCTION_CONTENT
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < Char : ["\t", "\r", "\n", "\u0020" - "\uFFFD"] >
+}
+
+TOKEN :
+{
+ < #Digits : (["0" - "9"])+  >
+}
+
+SPECIAL_TOKEN :
+{
+ < #CommentContents : (<CommentContent>)+  >
+}
+
+TOKEN :
+{
+ < #WhitespaceChar : ["\t", "\r", "\n", " "] >
+}
+
+TOKEN :
+{
+ < #Letter : (<BaseChar> | <Ideographic>) >
+}
+
+TOKEN :
+{
+ < #BaseChar : ["\u0041" - "\u005a", "\u0061" - "\u007a", "\u00c0" - "\u00d6", "\u00d8" - "\u00f6", "\u00f8" - "\u00ff", "\u0100" - "\u0131", "\u0134" - "\u013e", "\u0141" - "\u0148", "\u014a" - "\u017e", "\u0180" - "\u01c3", "\u01cd" - "\u01f0", "\u01f4" - "\u01f5", "\u01fa" - "\u0217", "\u0250" - "\u02a8", "\u02bb" - "\u02c1", "\u0386", "\u0388" - "\u038a", "\u038c", "\u038e" - "\u03a1", "\u03a3" - "\u03ce", "\u03d0" - "\u03d6", "\u03da", "\u03dc", "\u03de", "\u03e0", "\u03e2" - "\u03f3", "\u0401" - "\u040c", "\u040e" - "\u044f", "\u0451" - "\u045c", "\u045e" - "\u0481", "\u0490" - "\u04c4", "\u04c7" - "\u04c8", "\u04cb" - "\u04cc", "\u04d0" - "\u04eb", "\u04ee" - "\u04f5", "\u04f8" - "\u04f9", "\u0531" - "\u0556", "\u0559", "\u0561" - "\u0586", "\u05d0" - "\u05ea", "\u05f0" - "\u05f2", "\u0621" - "\u063a", "\u0641" - "\u064a", "\u0671" - "\u06b7", "\u06ba" - "\u06be", "\u06c0" - "\u06ce", "\u06d0" - "\u06d3", "\u06d5", "\u06e5" - "\u06e6", "\u0905" - "\u0939", "\u093d", "\u0958" - "\u0961", "\u0985" - "\u098c", "\u098f" - "\u0990", "\u0993" - "\u09a8", "\u09aa" - "\u09b0", "\u09b2", "\u09b6" - "\u09b9", "\u09dc" - "\u09dd", "\u09df" - "\u09e1", "\u09f0" - "\u09f1", "\u0a05" - "\u0a0a", "\u0a0f" - "\u0a10", "\u0a13" - "\u0a28", "\u0a2a" - "\u0a30", "\u0a32" - "\u0a33", "\u0a35" - "\u0a36", "\u0a38" - "\u0a39", "\u0a59" - "\u0a5c", "\u0a5e", "\u0a72" - "\u0a74", "\u0a85" - "\u0a8b", "\u0a8d", "\u0a8f" - "\u0a91", "\u0a93" - "\u0aa8", "\u0aaa" - "\u0ab0", "\u0ab2" - "\u0ab3", "\u0ab5" - "\u0ab9", "\u0abd", "\u0ae0", "\u0b05" - "\u0b0c", "\u0b0f" - "\u0b10", "\u0b13" - "\u0b28", "\u0b2a" - "\u0b30", "\u0b32" - "\u0b33", "\u0b36" - "\u0b39", "\u0b3d", "\u0b5c" - "\u0b5d", "\u0b5f" - "\u0b61", "\u0b85" - "\u0b8a", "\u0b8e" - "\u0b90", "\u0b92" - "\u0b95", "\u0b99" - "\u0b9a", "\u0b9c", "\u0b9e" - "\u0b9f", "\u0ba3" - "\u0ba4", "\u0ba8" - "\u0baa", "\u0bae" - "\u0bb5", "\u0bb7" - "\u0bb9", "\u0c05" - "\u0c0c", "\u0c0e" - "\u0c10", "\u0c12" - "\u0c28", "\u0c2a" - "\u0c33", "\u0c35" - "\u0c39", "\u0c60" - "\u0c61", "\u0c85" - "\u0c8c", "\u0c8e" - "\u0c90", "\u0c92" - "\u0ca8", "\u0caa" - "\u0cb3", "\u0cb5" - "\u0cb9", "\u0cde", "\u0ce0" - "\u0ce1", "\u0d05" - "\u0d0c", "\u0d0e" - "\u0d10", "\u0d12" - "\u0d28", "\u0d2a" - "\u0d39", "\u0d60" - "\u0d61", "\u0e01" - "\u0e2e", "\u0e30", "\u0e32" - "\u0e33", "\u0e40" - "\u0e45", "\u0e81" - "\u0e82", "\u0e84", "\u0e87" - "\u0e88", "\u0e8a", "\u0e8d", "\u0e94" - "\u0e97", "\u0e99" - "\u0e9f", "\u0ea1" - "\u0ea3", "\u0ea5", "\u0ea7", "\u0eaa" - "\u0eab", "\u0ead" - "\u0eae", "\u0eb0", "\u0eb2" - "\u0eb3", "\u0ebd", "\u0ec0" - "\u0ec4", "\u0f40" - "\u0f47", "\u0f49" - "\u0f69", "\u10a0" - "\u10c5", "\u10d0" - "\u10f6", "\u1100", "\u1102" - "\u1103", "\u1105" - "\u1107", "\u1109", "\u110b" - "\u110c", "\u110e" - "\u1112", "\u113c", "\u113e", "\u1140", "\u114c", "\u114e", "\u1150", "\u1154" - "\u1155", "\u1159", "\u115f" - "\u1161", "\u1163", "\u1165", "\u1167", "\u1169", "\u116d" - "\u116e", "\u1172" - "\u1173", "\u1175", "\u119e", "\u11a8", "\u11ab", "\u11ae" - "\u11af", "\u11b7" - "\u11b8", "\u11ba", "\u11bc" - "\u11c2", "\u11eb", "\u11f0", "\u11f9", "\u1e00" - "\u1e9b", "\u1ea0" - "\u1ef9", "\u1f00" - "\u1f15", "\u1f18" - "\u1f1d", "\u1f20" - "\u1f45", "\u1f48" - "\u1f4d", "\u1f50" - "\u1f57", "\u1f59", "\u1f5b", "\u1f5d", "\u1f5f" - "\u1f7d", "\u1f80" - "\u1fb4", "\u1fb6" - "\u1fbc", "\u1fbe", "\u1fc2" - "\u1fc4", "\u1fc6" - "\u1fcc", "\u1fd0" - "\u1fd3", "\u1fd6" - "\u1fdb", "\u1fe0" - "\u1fec", "\u1ff2" - "\u1ff4", "\u1ff6" - "\u1ffc", "\u2126", "\u212a" - "\u212b", "\u212e", "\u2180" - "\u2182", "\u3041" - "\u3094", "\u30a1" - "\u30fa", "\u3105" - "\u312c", "\uac00" - "\ud7a3"] >
+}
+
+TOKEN :
+{
+ < #Ideographic : ["\u4e00" - "\u9fa5", "\u3007", "\u3021" - "\u3029"] >
+}
+
+TOKEN :
+{
+ < #CombiningChar : ["\u0300" - "\u0345", "\u0360" - "\u0361", "\u0483" - "\u0486", "\u0591" - "\u05a1", "\u05a3" - "\u05b9", "\u05bb" - "\u05bd", "\u05bf", "\u05c1" - "\u05c2", "\u05c4", "\u064b" - "\u0652", "\u0670", "\u06d6" - "\u06dc", "\u06dd" - "\u06df", "\u06e0" - "\u06e4", "\u06e7" - "\u06e8", "\u06ea" - "\u06ed", "\u0901" - "\u0903", "\u093c", "\u093e" - "\u094c", "\u094d", "\u0951" - "\u0954", "\u0962" - "\u0963", "\u0981" - "\u0983", "\u09bc", "\u09be", "\u09bf", "\u09c0" - "\u09c4", "\u09c7" - "\u09c8", "\u09cb" - "\u09cd", "\u09d7", "\u09e2" - "\u09e3", "\u0a02", "\u0a3c", "\u0a3e", "\u0a3f", "\u0a40" - "\u0a42", "\u0a47" - "\u0a48", "\u0a4b" - "\u0a4d", "\u0a70" - "\u0a71", "\u0a81" - "\u0a83", "\u0abc", "\u0abe" - "\u0ac5", "\u0ac7" - "\u0ac9", "\u0acb" - "\u0acd", "\u0b01" - "\u0b03", "\u0b3c", "\u0b3e" - "\u0b43", "\u0b47" - "\u0b48", "\u0b4b" - "\u0b4d", "\u0b56" - "\u0b57", "\u0b82" - "\u0b83", "\u0bbe" - "\u0bc2", "\u0bc6" - "\u0bc8", "\u0bca" - "\u0bcd", "\u0bd7", "\u0c01" - "\u0c03", "\u0c3e" - "\u0c44", "\u0c46" - "\u0c48", "\u0c4a" - "\u0c4d", "\u0c55" - "\u0c56", "\u0c82" - "\u0c83", "\u0cbe" - "\u0cc4", "\u0cc6" - "\u0cc8", "\u0cca" - "\u0ccd", "\u0cd5" - "\u0cd6", "\u0d02" - "\u0d03", "\u0d3e" - "\u0d43", "\u0d46" - "\u0d48", "\u0d4a" - "\u0d4d", "\u0d57", "\u0e31", "\u0e34" - "\u0e3a", "\u0e47" - "\u0e4e", "\u0eb1", "\u0eb4" - "\u0eb9", "\u0ebb" - "\u0ebc", "\u0ec8" - "\u0ecd", "\u0f18" - "\u0f19", "\u0f35", "\u0f37", "\u0f39", "\u0f3e", "\u0f3f", "\u0f71" - "\u0f84", "\u0f86" - "\u0f8b", "\u0f90" - "\u0f95", "\u0f97", "\u0f99" - "\u0fad", "\u0fb1" - "\u0fb7", "\u0fb9", "\u20d0" - "\u20dc", "\u20e1", "\u302a" - "\u302f", "\u3099", "\u309a"] >
+}
+
+TOKEN :
+{
+ < #Digit : ["\u0030" - "\u0039", "\u0660" - "\u0669", "\u06f0" - "\u06f9", "\u0966" - "\u096f", "\u09e6" - "\u09ef", "\u0a66" - "\u0a6f", "\u0ae6" - "\u0aef", "\u0b66" - "\u0b6f", "\u0be7" - "\u0bef", "\u0c66" - "\u0c6f", "\u0ce6" - "\u0cef", "\u0d66" - "\u0d6f", "\u0e50" - "\u0e59", "\u0ed0" - "\u0ed9", "\u0f20" - "\u0f29"] >
+}
+
+TOKEN :
+{
+ < #Extender : ["\u00b7", "\u02d0", "\u02d1", "\u0387", "\u0640", "\u0e46", "\u0ec6", "\u3005", "\u3031" - "\u3035", "\u309d" - "\u309e", "\u30fc" - "\u30fe"] >
+}
+
+<DEFAULT>
+TOKEN :
+{
+ < NotNumber : ( (
+"." <Digits>) |  (
+<Digits> ("." (["0" - "9"])*)?)) (["e", "E"] (["+", "-"])? <Digits>)? ["a" - "z", "A" - "Z"] (["0" - "9", "a" - "z", "A" - "Z"])* >
+}
