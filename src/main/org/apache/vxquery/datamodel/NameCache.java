@@ -1,60 +1,57 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.datamodel;
 
 import java.util.Arrays;
 
 public final class NameCache {
-    private static final int INITIAL_PREFIX_ARRAY_LENGTH = 100;
-
-    private static final int INITIAL_URI_ARRAY_LENGTH = 100;
-
     private static final int HASHTABLE_LENGTH = 1024;
 
     private static final int INITIAL_HASHTABLE_ENTRYLIST_LENGTH = 8;
 
-    private String[] prefixes;
-    private int prefixCount;
-
-    private String[] uris;
-    private int uriCount;
+    private StringCache prefixes;
+    private StringCache uris;
 
     private NameEntry[][] hashTable;
 
     public NameCache() {
-        prefixes = new String[INITIAL_PREFIX_ARRAY_LENGTH];
-        uris = new String[INITIAL_URI_ARRAY_LENGTH];
+        prefixes = new StringCache();
+        uris = new StringCache();
         hashTable = new NameEntry[HASHTABLE_LENGTH][];
         for (int i = 0; i < HASHTABLE_LENGTH; ++i) {
             hashTable[i] = new NameEntry[INITIAL_HASHTABLE_ENTRYLIST_LENGTH];
         }
-        prefixCount = 0;
-        uriCount = 0;
     }
 
     public NameCache(NameCache pool) {
-        prefixes = Arrays.copyOf(pool.prefixes, pool.prefixes.length);
-        uris = Arrays.copyOf(pool.uris, pool.uris.length);
+        prefixes = new StringCache(pool.prefixes);
+        uris = new StringCache(pool.uris);
         hashTable = new NameEntry[pool.hashTable.length][];
         for (int i = 0; i < hashTable.length; ++i) {
             hashTable[i] = Arrays.copyOf(pool.hashTable[i], pool.hashTable[i].length);
         }
-        prefixCount = pool.prefixCount;
-        uriCount = pool.uriCount;
+    }
+
+    public StringCache getPrexixCache() {
+        return prefixes;
+    }
+
+    public StringCache getUriCache() {
+        return uris;
     }
 
     private static class NameEntry {
@@ -68,8 +65,8 @@ public final class NameCache {
     }
 
     public int intern(String prefix, String uri, String localName) {
-        int prefixCode = internPrefix(prefix, true);
-        int uriCode = internUri(uri, true);
+        int prefixCode = prefixes.intern(prefix, true);
+        int uriCode = uris.intern(uri, true);
         int hash = Math.abs(hash(localName)) % HASHTABLE_LENGTH;
 
         int idx = 0;
@@ -98,11 +95,11 @@ public final class NameCache {
     }
 
     public int probe(String prefix, String uri, String localName) {
-        int prefixCode = internPrefix(prefix, false);
+        int prefixCode = prefixes.intern(prefix, false);
         if (prefixCode == -1) {
             return -1;
         }
-        int uriCode = internUri(uri, false);
+        int uriCode = uris.intern(uri, false);
         if (uriCode == -1) {
             return -1;
         }
@@ -123,55 +120,19 @@ public final class NameCache {
         return (prefixCode << 24) + (idx << 10) + hash;
     }
 
-    private int internPrefix(String prefix, boolean insert) {
-        for (int i = 0; i < prefixCount; ++i) {
-            if (prefixes[i].equals(prefix)) {
-                return i;
-            }
-        }
-        if (!insert) {
-            return -1;
-        }
-        if (prefixCount >= prefixes.length) {
-            String[] temp = new String[prefixes.length * 2];
-            System.arraycopy(prefixes, 0, temp, 0, prefixes.length);
-            prefixes = temp;
-        }
-        prefixes[prefixCount] = prefix;
-        return prefixCount++;
-    }
-
-    private int internUri(String uri, boolean insert) {
-        for (int i = 0; i < uriCount; ++i) {
-            if (uris[i].equals(uri)) {
-                return i;
-            }
-        }
-        if (!insert) {
-            return -1;
-        }
-        if (uriCount >= uris.length) {
-            String[] temp = new String[uris.length * 2];
-            System.arraycopy(uris, 0, temp, 0, uris.length);
-            uris = temp;
-        }
-        uris[uriCount] = uri;
-        return uriCount++;
-    }
-
     public String getPrefix(int code) {
         int prefixCode = code >> 24;
         if (prefixCode == -1) {
             return "";
         }
-        return prefixes[prefixCode];
+        return prefixes.get(prefixCode);
     }
 
     public String getUri(int code) {
         int hash = code & 0x000003ff;
         int idx = (code >> 10) & 0x00003fff;
         NameEntry entry = hashTable[hash][idx];
-        return uris[entry.uriCode];
+        return uris.get(entry.uriCode);
     }
 
     public String getLocalName(int code) {
@@ -192,7 +153,7 @@ public final class NameCache {
     }
 
     public int probeUriCode(String uri) {
-        return internUri(uri, false);
+        return uris.intern(uri, false);
     }
 
     public int translateCode(NameCache otherPool, int code) {
