@@ -1,0 +1,30 @@
+Apache VXQuery
+--------------
+
+
+
+Requiremnts:
+
+1. JDK >= 1.6
+2. Apache Ant >= 1.7
+
+Building:
+
+1. Type ant in the vxquery base folder.
+
+Running:
+
+There are two ways to run VXQuery:
+Note: shell scripts exist for running VXQuery for Un*x like systems.
+TODO: Add Windows batch files
+
+1. Command line client (vxq)
+
+Type build/scripts/vxq without any arguments for help on executing the command line client.
+
+
+2. XQTS test driver (xtest)
+
+The xtest test driver can be used to execute XQuery tests from the XQTS suite.
+
+Type build/scripts/xtest without any arguments for help on executing xtest.
