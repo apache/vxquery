@@ -17,17 +17,25 @@
 package org.apache.vxquery.xtest;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-public class TestConfiguration {
-    XTestOptions options;
+public class LineFileReporterImpl implements ResultReporter {
+    private PrintWriter out;
 
-    File testRoot;
+    public LineFileReporterImpl(File file) throws IOException {
+        out = new PrintWriter(file);
+    }
 
-    File resultOffsetPath;
+    @Override
+    public synchronized void reportResult(TestCaseResult result) {
+        out.print(result.testCase.getXQueryDisplayName());
+        out.print(", ");
+        out.println(result.state);
+    }
 
-    File xqueryQueryOffsetPath;
-
-    String xqueryFileExtension;
-
-    String xqueryxFileExtension;
+    @Override
+    public void close() {
+        out.close();
+    }
 }

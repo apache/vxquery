@@ -16,18 +16,8 @@
  */
 package org.apache.vxquery.xtest;
 
-import java.io.File;
+public interface ResultReporter {
+    public void reportResult(TestCaseResult result);
 
-public class TestConfiguration {
-    XTestOptions options;
-
-    File testRoot;
-
-    File resultOffsetPath;
-
-    File xqueryQueryOffsetPath;
-
-    String xqueryFileExtension;
-
-    String xqueryxFileExtension;
+    public void close();
 }
