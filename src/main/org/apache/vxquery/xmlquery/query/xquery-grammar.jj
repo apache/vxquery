@@ -16,7 +16,7 @@
 */
 options {
     STATIC = false;
-	FORCE_LA_CHECK=false;
+    FORCE_LA_CHECK=false;
 }
 
 
@@ -26,6 +26,7 @@ package org.apache.vxquery.xmlquery.query;
 
 import org.apache.vxquery.xmlquery.ast.*;
 import org.apache.vxquery.context.*;
+import org.apache.vxquery.exceptions.*;
 import org.apache.vxquery.util.*;
 
 import java.math.*;
@@ -39,6 +40,8 @@ public class XMLQuery {
     Stack<String> _elementStack = new Stack<String>();
 
     Stack<Token> binaryTokenStack = new Stack<Token>();
+
+    private List<SystemException> exceptions = new ArrayList<SystemException>();
 
     private SourceLocation createSourceLocation(Token t) {
         return new SourceLocation(sourceName, t.beginLine, t.beginColumn);
@@ -82,6 +85,10 @@ public class XMLQuery {
 
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    public List<SystemException> getExceptions() {
+        return exceptions;
     }
 }
 
@@ -2010,7 +2017,12 @@ ASTNode DirElemConstructor()  :
                         bufferStart = t;
                     }
                     ref = t.image.substring(2, t.image.length() - 1);
-                    buffer.appendCodePoint(ref.charAt(0) == 'x' ? Integer.parseInt(ref.substring(1), 16) : Integer.parseInt(ref));
+                    try {
+                        buffer.appendCodePoint(ref.charAt(0) == 'x' ? Integer.parseInt(ref.substring(1), 16) : Integer.parseInt(ref));
+                    } catch(NumberFormatException e) {
+                        exceptions.add(new SystemException(ErrorCode.XQST0090, createSourceLocation(t)));
+                        throw new ParseException();
+                    }
                 }
                 | t = <LCurlyBraceEscape> {
                     if (bufferStart == null) {

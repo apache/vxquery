@@ -17,6 +17,7 @@
 package org.apache.vxquery.xmlquery.query;
 
 import java.io.Reader;
+import java.util.List;
 
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -32,6 +33,10 @@ public class XMLQueryParser {
         } catch (TokenMgrError tme) {
             throw new SystemException(ErrorCode.XPST0003, tme);
         } catch (ParseException pe) {
+            List<SystemException> exceptions = parser.getExceptions();
+            if (!exceptions.isEmpty()) {
+                throw exceptions.get(0);
+            }
             throw new SystemException(ErrorCode.XPST0003, new SourceLocation(sourceName, pe.currentToken.beginLine,
                     pe.currentToken.beginColumn));
         }

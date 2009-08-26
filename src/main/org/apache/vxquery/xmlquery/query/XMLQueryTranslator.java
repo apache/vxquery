@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.xmlquery.query;
 
 import java.math.BigDecimal;
@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -172,6 +174,9 @@ import org.apache.vxquery.xmlquery.query.XQueryConstants.PathType;
 import org.apache.vxquery.xmlquery.query.XQueryConstants.TypeQuantifier;
 
 final class XMLQueryTranslator {
+    private static final Pattern UNQUOTER = Pattern
+            .compile("(&lt;)|(&gt;)|(&apos;)|(&amp;)|(&quot;)|(\"\")|('')|(&#\\d+;)|(&#x(?:[A-Fa-f0-9])+;)");
+
     private CompilerControlBlock ccb;
 
     private StaticContext rootCtx;
@@ -1224,13 +1229,51 @@ final class XMLQueryTranslator {
         }
     }
 
-    private String unquote(String image) {
-        if (image.startsWith("'")) {
-            image = image.substring(1, image.length() - 1).replaceAll("''", "'");
-        } else {
-            image = image.substring(1, image.length() - 1).replaceAll("\"\"", "\"");
+    private String unquote(String image) throws SystemException {
+        StringBuilder buffer = new StringBuilder();
+        char quoteChar = image.charAt(0);
+        image = image.substring(1, image.length() - 1);
+        Matcher m = UNQUOTER.matcher(image);
+        int i = 0;
+        while (m.find()) {
+            int start = m.start();
+            int end = m.end();
+            if (i < start) {
+                buffer.append(image, i, start);
+            }
+            if (m.start(1) >= 0) {
+                buffer.append('<');
+            } else if (m.start(2) >= 0) {
+                buffer.append('>');
+            } else if (m.start(3) >= 0) {
+                buffer.append('\'');
+            } else if (m.start(4) >= 0) {
+                buffer.append('&');
+            } else if (m.start(5) >= 0) {
+                buffer.append('"');
+            } else if (m.start(6) >= 0) {
+                buffer.append(quoteChar == '"' ? '"' : "\"\"");
+            } else if (m.start(7) >= 0) {
+                buffer.append(quoteChar == '\'' ? '\'' : "''");
+            } else if (m.start(8) >= 0) {
+                try {
+                    buffer.appendCodePoint(Integer.parseInt(image.substring(start + 2, end - 1)));
+                } catch (NumberFormatException e) {
+                    throw new SystemException(ErrorCode.XQST0090);
+                }
+            } else if (m.start(9) >= 0) {
+                try {
+                    buffer.appendCodePoint(Integer.parseInt(image.substring(start + 3, end - 1), 16));
+                } catch (NumberFormatException e) {
+                    throw new SystemException(ErrorCode.XQST0090);
+                }
+            }
+            i = m.end();
         }
-        return image;
+        if (i < image.length()) {
+            buffer.append(image, i, image.length());
+        }
+        return buffer.toString();
     }
 
     private static Expression deflate(StaticContext ctx, Expression expr) {
