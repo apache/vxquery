@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.xtest;
 
 import java.io.File;
@@ -44,17 +44,19 @@ public class TestCaseFactory {
     private ExecutorService eSvc;
     private TestCase tc;
     private Pattern filter;
-    private XTestCmdLineOptions opts;
+    private XTestOptions opts;
 
     private String nextVariable;
     private boolean expectedError;
     private boolean outputFile;
     private int currPathLen;
+    int count;
 
-    public TestCaseFactory(String xqtsBase, TestRunnerFactory trf, ExecutorService eSvc, XTestCmdLineOptions opts) {
+    public TestCaseFactory(String xqtsBase, TestRunnerFactory trf, ExecutorService eSvc, XTestOptions opts) {
         this.xqtsBase = xqtsBase;
         this.trf = trf;
-        this.tConfig = new TestConfiguration();
+        tConfig = new TestConfiguration();
+        tConfig.options = opts;
         this.eSvc = eSvc;
         this.opts = opts;
         if (opts.filter != null) {
@@ -68,20 +70,21 @@ public class TestCaseFactory {
         }
     }
 
-    public void process() throws Exception {
+    public int process() throws Exception {
+        count = 0;
         XMLReader parser = XMLReaderFactory.createXMLReader();
         nextVariable = null;
-        parser.setContentHandler(new Handler());
+        Handler handler = new Handler();
+        parser.setContentHandler(handler);
         parser.setEntityResolver(new EntityResolver() {
             @Override
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
                 URL url = new URL(systemId);
-                return new InputSource(xqtsBase
-                        + new File(url.getFile()).getCanonicalPath().substring(
-                                currPathLen));
+                return new InputSource(xqtsBase + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
             }
         });
         parser.parse(new InputSource(new FileReader(new File(xqtsBase, "XQTSCatalog.xml"))));
+        return count;
     }
 
     private void submit(TestCase tc) {
@@ -91,6 +94,7 @@ public class TestCaseFactory {
                 System.err.println(tc);
             }
             eSvc.submit(trf.createRunner(tc));
+            ++count;
         }
     }
 
@@ -120,7 +124,8 @@ public class TestCaseFactory {
             } else if (expectedError) {
                 tc.setExpectedError(str);
             } else if (outputFile) {
-                tc.setOutputFileName(str);
+                ExpectedResult er = new ExpectedResult(str);
+                tc.addExpectedResult(er);
             }
         }
 

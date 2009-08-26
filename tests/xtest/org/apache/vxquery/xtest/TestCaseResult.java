@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.xtest;
 
 import java.io.File;
@@ -79,20 +79,26 @@ public class TestCaseResult {
                 report = "Expected result, Got failure: " + error;
                 state = State.EXPECTED_RESULT_GOT_FAILURE;
             } else {
-                File resFile = testCase.getResultFile();
-                String expResult = slurpFile(resFile);
-                if (expResult == null) {
-                    report = "No result file found";
-                    state = State.NO_RESULT_FILE;
-                } else {
-                    expResult = expResult.trim();
-                    if (result != null) {
-                        int idx = result.indexOf("?>");
-                        result = result.substring(idx + 1).trim();
-                        Pair<Boolean, String> cmp = textCompare(expResult, result);
-                        report = cmp.second;
-                        state = cmp.first ? State.EXPECTED_RESULT_GOT_SAME_RESULT
-                                : State.EXPECTED_RESULT_GOT_DIFFERENT_RESULT;
+                File[] resFiles = testCase.getExpectedResultFiles();
+                for (int i = 0; i < resFiles.length; ++i) {
+                    File resFile = resFiles[i];
+                    String expResult = slurpFile(resFile);
+                    if (expResult == null) {
+                        report = "No result file found";
+                        state = State.NO_RESULT_FILE;
+                    } else {
+                        expResult = expResult.trim();
+                        if (result != null) {
+                            int idx = result.indexOf("?>");
+                            result = result.substring(idx + 1).trim();
+                            Pair<Boolean, String> cmp = textCompare(expResult, result);
+                            report = cmp.second;
+                            state = cmp.first ? State.EXPECTED_RESULT_GOT_SAME_RESULT
+                                    : State.EXPECTED_RESULT_GOT_DIFFERENT_RESULT;
+                            if (cmp.first) {
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -100,7 +106,14 @@ public class TestCaseResult {
     }
 
     private Pair<Boolean, String> textCompare(String expRes, String actRes) {
-        if (expRes.equals(actRes)) {
+        boolean cmp = expRes.equals(actRes);
+        if (testCase.getConfig().options.verbose) {
+            System.err.println("Comparing:");
+            System.err.println("Expected: ---" + expRes + "---");
+            System.err.println("Actual  : ---" + actRes + "---");
+            System.err.println("Result  : " + cmp);
+        }
+        if (cmp) {
             return new Pair<Boolean, String>(Boolean.TRUE, "Got expected result");
         } else {
             return new Pair<Boolean, String>(Boolean.FALSE, "Expected: " + truncate(expRes) + " Got: "

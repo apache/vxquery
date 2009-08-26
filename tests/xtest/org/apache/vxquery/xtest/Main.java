@@ -20,7 +20,7 @@ import org.kohsuke.args4j.CmdLineParser;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        XTestCmdLineOptions opts = new XTestCmdLineOptions();
+        XTestOptions opts = new XTestOptions();
         CmdLineParser parser = new CmdLineParser(opts);
         try {
             parser.parseArgument(args);
@@ -29,7 +29,7 @@ public class Main {
             return;
         }
 
-        XTestServer xts = new XTestServer(opts);
+        XTest xts = new XTest(opts);
         xts.init();
         xts.waitForCompletion();
     }
