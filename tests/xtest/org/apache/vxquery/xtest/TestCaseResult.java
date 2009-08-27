@@ -53,9 +53,11 @@ public class TestCaseResult {
 
     public void compare() {
         String eErr = testCase.getExpectedError();
+        report = "No result file found";
+        state = State.NO_RESULT_FILE;
         if (eErr != null) {
             if (userError()) {
-                String aErr = ((SystemException) error).getCode().toString();
+                String aErr = String.valueOf(((SystemException) error).getCode());
                 if (eErr.equals(aErr)) {
                     report = "Result matches expected error: " + eErr;
                     state = State.EXPECTED_ERROR_GOT_SAME_ERROR;
