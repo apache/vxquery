@@ -16,29 +16,47 @@
  */
 package org.apache.vxquery.runtime.functions;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 
 import org.apache.vxquery.context.StaticContext;
+import org.apache.vxquery.datamodel.DMOKind;
 import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.atomic.compare.ComparisonUtils;
 import org.apache.vxquery.functions.Function;
+import org.apache.vxquery.runtime.CallStackFrame;
+import org.apache.vxquery.runtime.LocalRegisterAccessor;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 
-public class OpExtSortAndDistinctNodesAscIterator extends AbstractItemSortingAndDistinctIterator {
-    public OpExtSortAndDistinctNodesAscIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,
-            StaticContext ctx) {
+abstract class AbstractSortAndDistinctNodesOrAtomicsIterator extends AbstractItemSortingAndDistinctIterator {
+    private final LocalRegisterAccessor<Boolean> atomics;
+
+    public AbstractSortAndDistinctNodesOrAtomicsIterator(RegisterAllocator rAllocator, Function fn,
+            RuntimeIterator[] arguments, StaticContext ctx) {
         super(rAllocator, fn, arguments, ctx);
+        atomics = new LocalRegisterAccessor<Boolean>(rAllocator.allocate(1));
+    }
+
+    @Override
+    protected boolean performSorting(CallStackFrame frame, ArrayList<XDMItem> buffer) {
+        Boolean a = atomics.get(frame);
+        if (a == null) {
+            a = true;
+            if (!buffer.isEmpty()) {
+                a = buffer.get(0).getDMOKind() == DMOKind.ATOMIC_VALUE;
+            }
+            atomics.set(frame, a);
+        }
+        return !a;
+    }
+
+    @Override
+    protected boolean performDistinct(CallStackFrame frame) {
+        return !atomics.get(frame);
     }
 
     @Override
     protected boolean itemsEqual(XDMItem i0, XDMItem i1) {
         return ((XDMNode) i0).isSameNode((XDMNode) i1);
-    }
-
-    @Override
-    protected Comparator<XDMItem> getComparator() {
-        return ComparisonUtils.SORT_NODE_ASC_COMPARATOR;
     }
 }

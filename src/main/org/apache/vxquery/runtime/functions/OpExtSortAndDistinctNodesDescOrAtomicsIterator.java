@@ -20,25 +20,19 @@ import java.util.Comparator;
 
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMNode;
 import org.apache.vxquery.datamodel.atomic.compare.ComparisonUtils;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 
-public class OpExtSortAndDistinctNodesAscIterator extends AbstractItemSortingAndDistinctIterator {
-    public OpExtSortAndDistinctNodesAscIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,
-            StaticContext ctx) {
+public class OpExtSortAndDistinctNodesDescOrAtomicsIterator extends AbstractSortAndDistinctNodesOrAtomicsIterator {
+    public OpExtSortAndDistinctNodesDescOrAtomicsIterator(RegisterAllocator rAllocator, Function fn,
+            RuntimeIterator[] arguments, StaticContext ctx) {
         super(rAllocator, fn, arguments, ctx);
     }
 
     @Override
-    protected boolean itemsEqual(XDMItem i0, XDMItem i1) {
-        return ((XDMNode) i0).isSameNode((XDMNode) i1);
-    }
-
-    @Override
     protected Comparator<XDMItem> getComparator() {
-        return ComparisonUtils.SORT_NODE_ASC_COMPARATOR;
+        return ComparisonUtils.SORT_NODE_DESC_COMPARATOR;
     }
 }

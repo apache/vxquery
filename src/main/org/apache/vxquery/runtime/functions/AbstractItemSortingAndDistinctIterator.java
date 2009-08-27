@@ -16,29 +16,45 @@
  */
 package org.apache.vxquery.runtime.functions;
 
-import java.util.Comparator;
-
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.atomic.compare.ComparisonUtils;
+import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
+import org.apache.vxquery.runtime.CallStackFrame;
+import org.apache.vxquery.runtime.LocalRegisterAccessor;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 
-public class OpExtSortAndDistinctNodesAscIterator extends AbstractItemSortingAndDistinctIterator {
-    public OpExtSortAndDistinctNodesAscIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,
-            StaticContext ctx) {
+abstract class AbstractItemSortingAndDistinctIterator extends AbstractItemSortingIterator {
+    private final LocalRegisterAccessor<XDMItem> node;
+
+    public AbstractItemSortingAndDistinctIterator(RegisterAllocator rAllocator, Function fn,
+            RuntimeIterator[] arguments, StaticContext ctx) {
         super(rAllocator, fn, arguments, ctx);
+        node = new LocalRegisterAccessor<XDMItem>(rAllocator.allocate(1));
     }
 
     @Override
-    protected boolean itemsEqual(XDMItem i0, XDMItem i1) {
-        return ((XDMNode) i0).isSameNode((XDMNode) i1);
+    public void open(CallStackFrame frame) {
+        super.open(frame);
+        node.set(frame, null);
     }
 
     @Override
-    protected Comparator<XDMItem> getComparator() {
-        return ComparisonUtils.SORT_NODE_ASC_COMPARATOR;
+    public Object next(CallStackFrame frame) throws SystemException {
+        while (true) {
+            XDMItem nv = (XDMItem) super.next(frame);
+            XDMItem n = node.get(frame);
+            if (!performDistinct(frame) || n == null || nv == null || !itemsEqual(n, nv)) {
+                node.set(frame, nv);
+                return nv;
+            }
+        }
     }
+
+    protected boolean performDistinct(CallStackFrame frame) {
+        return true;
+    }
+
+    protected abstract boolean itemsEqual(XDMItem i0, XDMItem i1);
 }
