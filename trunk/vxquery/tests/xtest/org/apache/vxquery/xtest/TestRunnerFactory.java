@@ -87,7 +87,6 @@ public class TestRunnerFactory {
                     }
                     try {
                         res.result = baos.toString("UTF-8");
-                        res.compare();
                     } catch (Exception e) {
                         System.err.println("Framework error");
                         e.printStackTrace();
@@ -95,6 +94,12 @@ public class TestRunnerFactory {
                 } catch (Throwable e) {
                     res.error = e;
                 } finally {
+                    try {
+                        res.compare();
+                    } catch (Exception e) {
+                        System.err.println("Framework error");
+                        e.printStackTrace();
+                    }
                     long end = System.currentTimeMillis();
                     res.time = end - start;
                     for (ResultReporter r : reporters) {
