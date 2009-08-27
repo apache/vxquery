@@ -55,9 +55,9 @@ public class IfThenElseIterator extends AbstractRuntimeIterator {
     public Object next(CallStackFrame frame) throws SystemException {
         Boolean c = condition.get(frame);
         if (c == null) {
-            boolean cond = getConditionResult(frame);
-            condition.set(frame, cond);
-            (cond ? ti : ci).open(frame);
+            c = getConditionResult(frame);
+            condition.set(frame, c);
+            (c ? ti : ei).open(frame);
         }
         return (c ? ti : ei).next(frame);
     }
