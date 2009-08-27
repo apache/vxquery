@@ -1452,7 +1452,7 @@ final class XMLQueryTranslator {
                 } else if (ASTTag.FILTER_EXPRESSION.equals(pathNode.getTag())) {
                     FilterExprNode filterNode = (FilterExprNode) pathNode;
                     predicates = filterNode.getPredicates();
-                    ctxExpr = translateExpression(filterNode.getExpr());
+                    ctxExpr = wrapSortAndDistinctNodesOrAtomics(translateExpression(filterNode.getExpr()), true);
                 } else {
                     throw new IllegalStateException("Unknown path node: " + pathNode.getTag());
                 }
@@ -1507,6 +1507,13 @@ final class XMLQueryTranslator {
         args.add(ctxExpr);
         return new FunctionCallExpression(currCtx, asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC
                 : BuiltinOperators.SORT_DISTINCT_NODES_DESC, args);
+    }
+
+    private Expression wrapSortAndDistinctNodesOrAtomics(Expression ctxExpr, boolean asc) {
+        List<Expression> args = new ArrayList<Expression>();
+        args.add(ctxExpr);
+        return new FunctionCallExpression(currCtx, asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS
+                : BuiltinOperators.SORT_DISTINCT_NODES_DESC_OR_ATOMICS, args);
     }
 
     private FLWORExpression createWrappingFLWOR(Expression seq) {

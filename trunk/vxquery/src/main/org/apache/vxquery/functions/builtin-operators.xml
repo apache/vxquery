@@ -692,6 +692,13 @@
         <runtime class="org.apache.vxquery.runtime.functions.OpExtSortAndDistinctNodesAscIterator"/>
     </operator>
 
+    <!-- opext:sort-nodes-asc-or-atomics($arg as item()*) as item()* -->
+    <operator name="opext:sort-distinct-nodes-asc-or-atomics">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpExtSortAndDistinctNodesAscOrAtomicsIterator"/>
+    </operator>
+
     <!-- opext:sort-nodes-desc($arg as node()*) as node()* -->
     <operator name="opext:sort-nodes-desc">
         <param name="arg" type="node()*"/>
@@ -704,6 +711,13 @@
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
         <runtime class="org.apache.vxquery.runtime.functions.OpExtSortAndDistinctNodesDescIterator"/>
+    </operator>
+
+    <!-- opext:sort-nodes-desc-or-atomics($arg as item()*) as item()* -->
+    <operator name="opext:sort-distinct-nodes-desc-or-atomics">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpExtSortAndDistinctNodesDescOrAtomicsIterator"/>
     </operator>
 
     <!-- opext:deflate-sequences($arg as item()*) as item()* -->

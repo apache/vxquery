@@ -1,40 +1,31 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.runtime.functions;
 
 import java.util.Comparator;
 
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMNode;
+import org.apache.vxquery.datamodel.atomic.compare.ComparisonUtils;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 
 public class OpExtSortNodesAscIterator extends AbstractItemSortingIterator {
-    private static final Comparator<XDMItem> SORT_NODE_ASC_COMPARATOR = new Comparator<XDMItem>() {
-        @Override
-        public int compare(XDMItem o1, XDMItem o2) {
-            XDMNode n1 = (XDMNode) o1;
-            XDMNode n2 = (XDMNode) o2;
-            return n1.compareDocumentOrder(n2);
-        }
-    };
-
     public OpExtSortNodesAscIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,
             StaticContext ctx) {
         super(rAllocator, fn, arguments, ctx);
@@ -42,6 +33,6 @@ public class OpExtSortNodesAscIterator extends AbstractItemSortingIterator {
 
     @Override
     protected Comparator<XDMItem> getComparator() {
-        return SORT_NODE_ASC_COMPARATOR;
+        return ComparisonUtils.SORT_NODE_ASC_COMPARATOR;
     }
 }
