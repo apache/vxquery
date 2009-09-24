@@ -18,6 +18,7 @@ package org.apache.vxquery.xtest;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -67,7 +68,10 @@ public class TestRunnerFactory {
                     for (PrologVariable pVar : module.getPrologVariables()) {
                         GlobalVariable var = pVar.getVariable();
                         QName varName = var.getName();
-                        iapi.bindExternalVariable(var, testCase.getExternalVariableBinding(varName));
+                        File binding = testCase.getExternalVariableBinding(varName);
+                        if (binding != null) {
+                            iapi.bindExternalVariable(var, testCase.getExternalVariableBinding(varName));
+                        }
                     }
                     OpenableCloseableIterator ri = iapi.execute(module);
                     ri.open();
