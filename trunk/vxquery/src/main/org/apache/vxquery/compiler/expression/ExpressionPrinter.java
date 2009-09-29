@@ -32,7 +32,7 @@ public class ExpressionPrinter {
 
         private StringBuilder indent(int level) {
             for (int i = 0; i < level; ++i) {
-                buffer.append(' ');
+                buffer.append("   ");
             }
             return buffer;
         }

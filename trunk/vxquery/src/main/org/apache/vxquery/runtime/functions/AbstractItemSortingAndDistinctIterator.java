@@ -56,5 +56,5 @@ abstract class AbstractItemSortingAndDistinctIterator extends AbstractItemSortin
         return true;
     }
 
-    protected abstract boolean itemsEqual(XDMItem i0, XDMItem i1);
+    protected abstract boolean itemsEqual(XDMItem i0, XDMItem i1) throws SystemException;
 }
