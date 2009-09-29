@@ -22,6 +22,8 @@ import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.DMOKind;
 import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.XDMNode;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.LocalRegisterAccessor;
@@ -56,7 +58,10 @@ abstract class AbstractSortAndDistinctNodesOrAtomicsIterator extends AbstractIte
     }
 
     @Override
-    protected boolean itemsEqual(XDMItem i0, XDMItem i1) {
+    protected boolean itemsEqual(XDMItem i0, XDMItem i1) throws SystemException {
+        if (!i0.getDMOKind().isNode() || !i1.getDMOKind().isNode()) {
+            throw new SystemException(ErrorCode.XPTY0018);
+        }
         return ((XDMNode) i0).isSameNode((XDMNode) i1);
     }
 }

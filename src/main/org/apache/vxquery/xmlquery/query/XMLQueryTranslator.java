@@ -255,6 +255,7 @@ final class XMLQueryTranslator {
         Module module = new Module();
 
         moduleCtx = new StaticContextImpl(rootCtx);
+        moduleCtx.registerVariable(new GlobalVariable(XMLQueryCompilerConstants.DOT_VAR_NAME));
         varScope = new VariableScope() {
             @Override
             public VariableScope getParentScope() {
@@ -1320,6 +1321,7 @@ final class XMLQueryTranslator {
 
         if (pe.getPaths() != null) {
             for (RelativePathExprNode rpen : pe.getPaths()) {
+                boolean asc = true;
                 if (PathType.SLASH_SLASH.equals(rpen.getPathType())) {
                     ctxExpr = new PathStepExpression(currCtx, treatAsNode(currCtx, ctxExpr),
                             AxisKind.DESCENDANT_OR_SELF, AnyNodeType.INSTANCE);
@@ -1334,179 +1336,179 @@ final class XMLQueryTranslator {
                 List<ASTNode> predicates = null;
 
                 ASTNode pathNode = rpen.getPath();
-                boolean fwdPath = true;
                 if (ASTTag.AXIS_STEP.equals(pathNode.getTag())) {
                     AxisStepNode axisNode = (AxisStepNode) pathNode;
                     predicates = axisNode.getPredicates();
                     AxisStepNode.Axis axis = axisNode.getAxis();
-                    AxisKind axisKind;
-                    boolean attribute = false;
-                    switch (axis) {
-                        case ABBREV:
-                        case CHILD:
-                            axisKind = AxisKind.CHILD;
-                            break;
-
-                        case ABBREV_ATTRIBUTE:
-                        case ATTRIBUTE:
-                            axisKind = AxisKind.ATTRIBUTE;
-                            attribute = true;
-                            break;
-
-                        case ANCESTOR:
-                            axisKind = AxisKind.ANCESTOR;
-                            fwdPath = false;
-                            break;
-
-                        case ANCESTOR_OR_SELF:
-                            axisKind = AxisKind.ANCESTOR_OR_SELF;
-                            fwdPath = false;
-                            break;
-
-                        case DESCENDANT:
-                            axisKind = AxisKind.DESCENDANT;
-                            break;
-
-                        case DESCENDANT_OR_SELF:
-                            axisKind = AxisKind.DESCENDANT_OR_SELF;
-                            break;
-
-                        case DOT_DOT:
-                        case PARENT:
-                            axisKind = AxisKind.PARENT;
-                            fwdPath = false;
-                            break;
-
-                        case FOLLOWING:
-                            axisKind = AxisKind.FOLLOWING;
-                            break;
-
-                        case FOLLOWING_SIBLING:
-                            axisKind = AxisKind.FOLLOWING_SIBLING;
-                            break;
-
-                        case PRECEDING:
-                            axisKind = AxisKind.PRECEDING;
-                            fwdPath = false;
-                            break;
-
-                        case PRECEDING_SIBLING:
-                            axisKind = AxisKind.PRECEDING_SIBLING;
-                            fwdPath = false;
-                            break;
-
-                        case SELF:
-                            axisKind = AxisKind.SELF;
-                            break;
-
-                        default:
-                            throw new IllegalStateException("Unknown axis: " + axis);
-                    }
                     if (ctxExpr == null) {
                         ctxExpr = new VariableReferenceExpression(currCtx, varScope
                                 .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME));
                     }
 
-                    ASTNode nodeTest = axisNode.getNodeTest();
-                    NodeType nt = AnyNodeType.INSTANCE;
-                    if (nodeTest != null) {
-                        switch (nodeTest.getTag()) {
-                            case NAME_TEST: {
-                                NameTestNode ntn = (NameTestNode) nodeTest;
-                                String uri;
-                                if (!"".equals(ntn.getPrefix())) {
-                                    uri = currCtx.lookupNamespaceUri(ntn.getPrefix());
-                                    if (uri == null) {
-                                        throw new SystemException(ErrorCode.XPST0081, ntn.getSourceLocation());
-                                    }
-                                } else {
-                                    uri = "";
-                                }
-                                NameTest nameTest = new NameTest(uri, ntn.getLocalName());
-                                if (attribute) {
-                                    nt = new AttributeType(nameTest, BuiltinTypeRegistry.XS_ANY_ATOMIC);
-                                } else {
-                                    nt = new ElementType(nameTest, AnyType.INSTANCE, true);
-                                }
-                                break;
-                            }
-
-                            case ANY_NODE_TEST:
-                            case DOCUMENT_TEST:
-                            case TEXT_TEST:
-                            case COMMENT_TEST:
-                            case PI_TEST:
-                            case ATTRIBUTE_TEST:
-                            case SCHEMA_ATTRIBUTE_TEST:
-                            case ELEMENT_TEST:
-                            case SCHEMA_ELEMENT_TEST:
-                                nt = (NodeType) createItemType(nodeTest);
-                                break;
-
-                            default:
-                                throw new IllegalStateException("Unknown node: " + nodeTest.getTag());
-                        }
-                    }
+                    AxisKind axisKind = translateAxis(axis);
+                    NodeType nt = translateNodeTest(axisKind, axisNode.getNodeTest());
                     ctxExpr = new PathStepExpression(currCtx, treatAsNode(currCtx, ctxExpr), axisKind, nt);
-                    ctxExpr = wrapSortAndDistinctNodes(ctxExpr, fwdPath);
+                    asc = axisKind.isForwardAxis();
                 } else if (ASTTag.FILTER_EXPRESSION.equals(pathNode.getTag())) {
                     FilterExprNode filterNode = (FilterExprNode) pathNode;
                     predicates = filterNode.getPredicates();
-                    ctxExpr = wrapSortAndDistinctNodesOrAtomics(translateExpression(filterNode.getExpr()), true);
+                    ctxExpr = translateExpression(filterNode.getExpr());
                 } else {
                     throw new IllegalStateException("Unknown path node: " + pathNode.getTag());
                 }
                 if (predicates != null && !predicates.isEmpty()) {
-                    for (ASTNode pn : predicates) {
-                        pushVariableScope();
-                        FLWORExpression innerFLWOR = createWrappingFLWOR(ctxExpr);
-                        List<FLWORExpression.Clause> clauses = innerFLWOR.getClauses();
-                        Expression pExpr = translateExpression(pn);
-
-                        ForLetVariable pVar = new ForLetVariable(VarTag.LET, createVarName(), pExpr);
-                        FLWORExpression.LetClause pLC = new FLWORExpression.LetClause(pVar);
-                        varScope.registerVariable(pVar);
-                        clauses.add(pLC);
-
-                        Expression typeTest = ExpressionBuilder.instanceOf(currCtx, new VariableReferenceExpression(
-                                currCtx, pVar), SequenceType.create(BuiltinTypeRegistry.XSEXT_NUMERIC,
-                                Quantifier.QUANT_ONE));
-                        Expression posTest = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.VALUE_EQ,
-                                deflate(currCtx, new VariableReferenceExpression(currCtx, pVar)),
-                                new VariableReferenceExpression(currCtx, varScope
-                                        .lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME)));
-                        Expression boolTest = ExpressionBuilder.functionCall(currCtx, BuiltinFunctions.FN_BOOLEAN_1,
-                                deflate(currCtx, new VariableReferenceExpression(currCtx, pVar)));
-
-                        clauses.add(new FLWORExpression.WhereClause(new IfThenElseExpression(currCtx, typeTest,
-                                posTest, boolTest)));
-
-                        innerFLWOR.setReturnExpression(new VariableReferenceExpression(currCtx, varScope
-                                .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)));
-                        ctxExpr = innerFLWOR;
-
-                        popVariableScope();
-                    }
+                    ctxExpr = wrapSortAndDistinctNodesOrAtomics(ctxExpr, asc);
+                    ctxExpr = translatePredicates(ctxExpr, predicates);
                 }
                 if (flwor != null) {
                     popVariableScope();
                     flwor.setReturnExpression(ctxExpr);
-                    ctxExpr = flwor;
+                    ctxExpr = wrapSortAndDistinctNodesOrAtomics(flwor, asc);
                 }
             }
         }
         return ctxExpr;
     }
 
-    private static Expression treatAsNode(StaticContext ctx, Expression expr) {
-        return new TreatExpression(ctx, expr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR));
+    private NodeType translateNodeTest(AxisKind axisKind, ASTNode nodeTest) throws SystemException {
+        NodeType nt = AnyNodeType.INSTANCE;
+        if (nodeTest != null) {
+            switch (nodeTest.getTag()) {
+                case NAME_TEST: {
+                    NameTestNode ntn = (NameTestNode) nodeTest;
+                    String uri = null;
+                    if (ntn.getPrefix() != null) {
+                        if (!"".equals(ntn.getPrefix())) {
+                            uri = currCtx.lookupNamespaceUri(ntn.getPrefix());
+                            if (uri == null) {
+                                throw new SystemException(ErrorCode.XPST0081, ntn.getSourceLocation());
+                            }
+                        } else {
+                            uri = "";
+                        }
+                    }
+                    NameTest nameTest = new NameTest(uri, ntn.getLocalName());
+                    if (axisKind == AxisKind.ATTRIBUTE) {
+                        nt = new AttributeType(nameTest, BuiltinTypeRegistry.XS_ANY_ATOMIC);
+                    } else {
+                        nt = new ElementType(nameTest, AnyType.INSTANCE, true);
+                    }
+                    break;
+                }
+
+                case ANY_NODE_TEST:
+                case DOCUMENT_TEST:
+                case TEXT_TEST:
+                case COMMENT_TEST:
+                case PI_TEST:
+                case ATTRIBUTE_TEST:
+                case SCHEMA_ATTRIBUTE_TEST:
+                case ELEMENT_TEST:
+                case SCHEMA_ELEMENT_TEST:
+                    nt = (NodeType) createItemType(nodeTest);
+                    break;
+
+                default:
+                    throw new IllegalStateException("Unknown node: " + nodeTest.getTag());
+            }
+        }
+        return nt;
     }
 
-    private Expression wrapSortAndDistinctNodes(Expression ctxExpr, boolean asc) {
-        List<Expression> args = new ArrayList<Expression>();
-        args.add(ctxExpr);
-        return new FunctionCallExpression(currCtx, asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC
-                : BuiltinOperators.SORT_DISTINCT_NODES_DESC, args);
+    private AxisKind translateAxis(AxisStepNode.Axis axis) {
+        AxisKind axisKind;
+        switch (axis) {
+            case ABBREV:
+            case CHILD:
+                axisKind = AxisKind.CHILD;
+                break;
+
+            case ABBREV_ATTRIBUTE:
+            case ATTRIBUTE:
+                axisKind = AxisKind.ATTRIBUTE;
+                break;
+
+            case ANCESTOR:
+                axisKind = AxisKind.ANCESTOR;
+                break;
+
+            case ANCESTOR_OR_SELF:
+                axisKind = AxisKind.ANCESTOR_OR_SELF;
+                break;
+
+            case DESCENDANT:
+                axisKind = AxisKind.DESCENDANT;
+                break;
+
+            case DESCENDANT_OR_SELF:
+                axisKind = AxisKind.DESCENDANT_OR_SELF;
+                break;
+
+            case DOT_DOT:
+            case PARENT:
+                axisKind = AxisKind.PARENT;
+                break;
+
+            case FOLLOWING:
+                axisKind = AxisKind.FOLLOWING;
+                break;
+
+            case FOLLOWING_SIBLING:
+                axisKind = AxisKind.FOLLOWING_SIBLING;
+                break;
+
+            case PRECEDING:
+                axisKind = AxisKind.PRECEDING;
+                break;
+
+            case PRECEDING_SIBLING:
+                axisKind = AxisKind.PRECEDING_SIBLING;
+                break;
+
+            case SELF:
+                axisKind = AxisKind.SELF;
+                break;
+
+            default:
+                throw new IllegalStateException("Unknown axis: " + axis);
+        }
+        return axisKind;
+    }
+
+    private Expression translatePredicates(Expression ctxExpr, List<ASTNode> predicates) throws SystemException {
+        for (ASTNode pn : predicates) {
+            pushVariableScope();
+            FLWORExpression innerFLWOR = createWrappingFLWOR(ctxExpr);
+            List<FLWORExpression.Clause> clauses = innerFLWOR.getClauses();
+            Expression pExpr = translateExpression(pn);
+
+            ForLetVariable pVar = new ForLetVariable(VarTag.LET, createVarName(), pExpr);
+            FLWORExpression.LetClause pLC = new FLWORExpression.LetClause(pVar);
+            varScope.registerVariable(pVar);
+            clauses.add(pLC);
+
+            Expression typeTest = ExpressionBuilder.instanceOf(currCtx, new VariableReferenceExpression(currCtx, pVar),
+                    SequenceType.create(BuiltinTypeRegistry.XSEXT_NUMERIC, Quantifier.QUANT_ONE));
+            Expression posTest = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.VALUE_EQ, deflate(currCtx,
+                    new VariableReferenceExpression(currCtx, pVar)), new VariableReferenceExpression(currCtx, varScope
+                    .lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME)));
+            Expression boolTest = ExpressionBuilder.functionCall(currCtx, BuiltinFunctions.FN_BOOLEAN_1, deflate(
+                    currCtx, new VariableReferenceExpression(currCtx, pVar)));
+
+            clauses
+                    .add(new FLWORExpression.WhereClause(new IfThenElseExpression(currCtx, typeTest, posTest, boolTest)));
+
+            innerFLWOR.setReturnExpression(new VariableReferenceExpression(currCtx, varScope
+                    .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)));
+            ctxExpr = innerFLWOR;
+
+            popVariableScope();
+        }
+        return ctxExpr;
+    }
+
+    private static Expression treatAsNode(StaticContext ctx, Expression expr) {
+        return new TreatExpression(ctx, expr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR));
     }
 
     private Expression wrapSortAndDistinctNodesOrAtomics(Expression ctxExpr, boolean asc) {

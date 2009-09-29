@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.datamodel.dtm;
 
 import java.nio.CharBuffer;
@@ -52,11 +52,19 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
     public void attribute(NameCache nameCache, int nameCode, CharSequence stringValue) throws SystemException {
         dtm.ensureCapacity(1);
         int aIndex = dtm.nNodes++;
+        int lastAttr = DTM.NULL;
+        int owningElement = DTM.NULL;
         if (!nodeStack.isEmpty()) {
-            nodeStack.peek().lastAttribute = aIndex;
+            NodeState owner = nodeStack.peek();
+            lastAttr = owner.lastAttribute;
+            owner.lastAttribute = aIndex;
+            owningElement = owner.index;
         }
         dtm.nodeKind[aIndex] = DTM.DTM_ATTRIBUTE;
-        dtm.next[aIndex] = aIndex + 1;
+        dtm.next[aIndex] = owningElement;
+        if (lastAttr != DTM.NULL) {
+            dtm.next[lastAttr] = aIndex;
+        }
         dtm.param0[aIndex] = auxContentBuffer.length();
         dtm.param1[aIndex] = stringValue.length();
         auxContentBuffer.append(stringValue);
