@@ -34,8 +34,8 @@
         <timezone></timezone>
       </developer>         
       <developer>
-        <id>sanjiva</id>
-        <name>Sanjiva Weerawarana</name>
+        <id>radup</id>
+        <name>Radu Preotiuc</name>
         <email></email>
         <roles>
             <role>Mentor</role>
@@ -44,8 +44,8 @@
         <timezone></timezone>
       </developer>         
       <developer>
-        <id>radup</id>
-        <name>Radu Preotiuc</name>
+        <id>sanjiva</id>
+        <name>Sanjiva Weerawarana</name>
         <email></email>
         <roles>
             <role>Mentor</role>
@@ -64,17 +64,6 @@
         <timezone></timezone>
       </developer>         
       <developer>
-        <id>vinayakb</id>
-        <name>Vinayak Borkar</name>
-        <email></email>
-        <roles>
-          <role>Project Manager</role>
-          <role>Architect</role>
-        </roles>
-        <organization></organization>
-        <timezone>-8</timezone>
-      </developer>         
-      <developer>
         <id>cezar</id>
         <name>Cezar Andrei</name>
         <email></email>
@@ -84,6 +73,17 @@
         </roles>
         <organization></organization>
         <timezone>-6</timezone>
+      </developer>         
+      <developer>
+        <id>vinayakb</id>
+        <name>Vinayak Borkar</name>
+        <email></email>
+        <roles>
+          <role>Project Manager</role>
+          <role>Architect</role>
+        </roles>
+        <organization></organization>
+        <timezone>-8</timezone>
       </developer>         
       <developer>
         <id>dtabass</id>
