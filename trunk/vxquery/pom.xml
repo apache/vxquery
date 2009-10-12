@@ -1,0 +1,191 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.vxquery</groupId>
+  <artifactId>vxquery</artifactId>
+  <packaging>jar</packaging>
+  <version>0.1</version>
+  <name>VXquery</name>
+  <url>http://incubator.apache.org/vxquery/</url>
+
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>Jira</system>
+    <url>https://issues.apache.org/jira/browse/VXQUERY</url>
+  </issueManagement>
+
+  <developers>
+      <developer>
+        <id>pzf</id>
+        <name>Paul Fremantle</name>
+        <email></email>
+        <roles>
+          <role>Mentor</role>
+        </roles>
+        <organization></organization>
+        <timezone></timezone>
+      </developer>         
+      <developer>
+        <id>sanjiva</id>
+        <name>Sanjiva Weerawarana</name>
+        <email></email>
+        <roles>
+            <role>Mentor</role>
+        </roles>
+        <organization></organization>
+        <timezone></timezone>
+      </developer>         
+      <developer>
+        <id>radup</id>
+        <name>Radu Preotiuc</name>
+        <email></email>
+        <roles>
+            <role>Mentor</role>
+        </roles>
+        <organization></organization>
+        <timezone></timezone>
+      </developer>         
+      <developer>
+        <id>jochen</id>
+        <name>Jochen Wiedmann</name>
+        <email></email>
+        <roles>
+            <role>Mentor</role>
+        </roles>
+        <organization></organization>
+        <timezone></timezone>
+      </developer>         
+      <developer>
+        <id>vinayakb</id>
+        <name>Vinayak Borkar</name>
+        <email></email>
+        <roles>
+          <role>Project Manager</role>
+          <role>Architect</role>
+        </roles>
+        <organization></organization>
+        <timezone>-8</timezone>
+      </developer>         
+      <developer>
+        <id>cezar</id>
+        <name>Cezar Andrei</name>
+        <email></email>
+        <roles>
+          <role>Project Manager</role>
+          <role>Architect</role>
+        </roles>
+        <organization></organization>
+        <timezone>-6</timezone>
+      </developer>         
+      <developer>
+        <id>dtabass</id>
+        <name>Michael J. Carey</name>
+        <email></email>
+        <roles>
+          <role>Architect</role>
+        </roles>
+        <organization></organization>
+        <timezone>-8</timezone>
+      </developer>         
+      <developer>
+        <id>tillw</id>
+        <name>Till Westmann</name>
+        <email></email>
+        <roles>
+          <role>Project Manager</role>
+        </roles>
+        <organization></organization>
+        <timezone>+1</timezone>
+      </developer>         
+  </developers>
+
+  <mailingLists>
+      <mailingList>
+        <name>VXQuery-dev</name>
+        <subscribe>vxquery-dev-subscribe@incubator.apache.org</subscribe>
+        <unsubscribe>vxquery-dev-unsubscribe@incubator.apache.org</unsubscribe>
+       <post>vxquery-dev@incubator.apache.org</post>
+       <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-dev/</archive>
+      </mailingList>
+      <mailingList>
+        <name>VXQuery-commits</name>
+        <subscribe>vxquery-commits-subscribe@incubator.apache.org</subscribe>
+        <unsubscribe>vxquery-commits-unsubscribe@incubator.apache.org</unsubscribe>
+       <post>vxquery-commits@incubator.apache.org</post>
+       <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-commits/</archive>
+      </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
+    <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
+  </scm> 
+
+  <distributionManagement>
+    <site>
+      <id>vxquery.website</id>
+      <name>VXQuery Website</name>
+      <url>file:../../site/</url>
+    </site>
+  </distributionManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>args4j</groupId>
+      <artifactId>args4j</artifactId>
+      <version>2.0.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>6.1.4</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>stax2-api</artifactId>
+        <version>3.0.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>wstx-asl</artifactId>
+        <version>4.0.0</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>serializer</artifactId>
+        <version>2.7.1</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.9.1</version>
+    </dependency>
+        
+    <dependency>
+        <groupId>activemq</groupId>
+        <artifactId>activemq-transport-xstream</artifactId>
+        <version>1.4</version>
+    </dependency>
+  </dependencies>
+</project>
