@@ -1,0 +1,21 @@
+<project name="VXQuery">
+
+    <bannerLeft>
+        <name>VXQuery</name>
+        <src>images/VXQuery.png</src>
+        <!--><href>http://incubator.apache.org/vxquery/</href>-->
+    </bannerLeft>
+
+    <bannerRight>
+        <name>Apache Incubator</name>
+        <src>images/apache-incubator-logo.png</src>
+        <!--><href>http://incubator.apache.org/</href>-->
+    </bannerRight>
+
+    <body>
+        <menu name="VXQuery">
+            <item name="Overview" href="index.html"/>      
+        </menu>
+        <menu ref="reports"/>
+    </body>
+</project>
