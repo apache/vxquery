@@ -42,7 +42,7 @@ public class DTMTest {
             GZIPInputStream in = null;
             try {
                 in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(new File(
-                        "../../testcases/documents/dblp.xml.gz"))));
+                        "src/test/resources/documents/dblp.xml.gz"))));
                 dtm.parse(new StreamSource(in), false);
             } catch (IOException e) {
                 throw new RuntimeException(e);

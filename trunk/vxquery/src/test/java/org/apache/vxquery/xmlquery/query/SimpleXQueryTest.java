@@ -107,7 +107,7 @@ public class SimpleXQueryTest {
 
     @Test
     public void simple016() {
-        runTest("simple016", "string-length(doc('../../testcases/documents/dblp.xml'))");
+        runTest("simple016", "string-length(doc('src/test/resources/documents/dblp.xml'))");
     }
 
     private static void runTest(String testName, String query) {
