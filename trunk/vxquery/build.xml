@@ -25,21 +25,19 @@
     <property name="buildlib.dir" value="${build-resources.dir}/lib"/>
 
     <property name="src.dir" value="${basedir}/src"/>
-    <property name="src.code.dir" value="${src.dir}/main"/>
-    <property name="src.resources.dir" value="${src.dir}/resources"/>
+    <property name="src.code.dir" value="${src.dir}/main/java"/>
+    <property name="src.resources.dir" value="${src.dir}/main/resources"/>
     <property name="src.java.version" value="1.6"/>
 
     <property name="scripts.dir" value="${basedir}/scripts"/>
 
-    <property name="tests.dir" value="${basedir}/tests"/>
-    <property name="tests.unit.dir" value="${tests.dir}/unit"/>
-    <property name="tests.xtest.dir" value="${tests.dir}/xtest"/>
+    <property name="tests.dir" value="${basedir}/src/test"/>
+    <property name="tests.code.dir" value="${tests.dir}/java"/>
 
     <property name="build.dir" value="${basedir}/build"/>
     <property name="build.class.dir" value="${build.dir}/class"/>
     <property name="build.tests.dir" value="${build.dir}/tests"/>
-    <property name="build.tests.unit.dir" value="${build.tests.dir}/unit"/>
-    <property name="build.tests.xtest.dir" value="${build.tests.dir}/xtest"/>
+    <property name="build.tests.class.dir" value="${build.tests.dir}/class"/>
     <property name="build.lib.dir" value="${build.dir}/lib"/>
     <property name="build.gen-src.dir" value="${build.dir}/gen-src"/>
     <property name="build.scripts.dir" value="${build.dir}/scripts"/>
@@ -54,7 +52,7 @@
 
     <property name="javacc.home.dir" value="${build-resources.dir}/tools/javacc-4.1"/>
 
-    <property name="xquery.jj.file" value="${src.code.dir}/org/apache/vxquery/xmlquery/query/xquery-grammar.jj"/>
+    <property name="xquery.jj.file" value="${src.dir}/main/javacc/xquery-grammar.jj"/>
     <property name="xquery.grammar.output.dir" value="${build.gen-src.dir}/org/apache/vxquery/xmlquery/query"/>
 
     <patternset id="lib.file.pattern">
@@ -85,8 +83,7 @@
 
     <path id="run.classpath">
         <path refid="test.build.classpath"/>
-        <pathelement location="${build.tests.unit.dir}"/>
-        <pathelement location="${build.tests.xtest.dir}"/>
+        <pathelement location="${build.tests.class.dir}"/>
     </path>
 
     <target name="init">
@@ -174,12 +171,8 @@
     <target name="buildall" depends="build, build.test"/>
 
     <target name="compile.test">
-        <mkdir dir="${build.tests.unit.dir}"/>
-        <javac srcdir="${tests.unit.dir}" destdir="${build.tests.unit.dir}" debug="${debug}">
-            <classpath refid="run.classpath"/>
-        </javac>
-        <mkdir dir="${build.tests.xtest.dir}"/>
-        <javac srcdir="${tests.xtest.dir}" destdir="${build.tests.xtest.dir}" debug="${debug}">
+        <mkdir dir="${build.tests.class.dir}"/>
+        <javac srcdir="${tests.code.dir}" destdir="${build.tests.class.dir}" debug="${debug}">
             <classpath refid="run.classpath"/>
         </javac>
     </target>
