@@ -16,7 +16,15 @@
 */
 package org.apache.vxquery.xmlquery.query;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
+import java.util.zip.GZIPInputStream;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -67,7 +75,7 @@ public class SimpleXQueryTest {
 
     @Test
     public void simple008() {
-        runTest("simple008", "fn:boolean((fn:false(), fn:false()))");
+        runNegTest("simple008", "fn:boolean((fn:false(), fn:false()))");
     }
 
     @Test
@@ -107,35 +115,71 @@ public class SimpleXQueryTest {
 
     @Test
     public void simple016() {
-        runTest("simple016", "string-length(doc('src/test/resources/documents/dblp.xml'))");
+        // TODO unzipping every time is a little slow ...
+        String temp = gunzip("src/test/resources/documents/", "dblp.xml"); 
+        runTest("simple016", "string-length(doc('" + temp + "'))");
+    }
+
+    private static String gunzip(String dir, String filename) {
+        try {
+            GZIPInputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(new File(
+                    dir + filename + ".gz"))));
+            File temp = File.createTempFile("vxquery", filename);
+            temp.deleteOnExit();
+            FileOutputStream out = new FileOutputStream(temp);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0){
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+            return temp.getPath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void runTest(String testName, String query) {
         try {
-            InternalAPI iapi = new InternalAPI();
-            OpenableCloseableIterator ri = iapi.execute(iapi.compile(null, iapi
-                    .parse(testName, new StringReader(query))));
-            ri.open();
-            System.err.println("--- Results begin");
-            XDMValue o;
-            try {
-                while ((o = (XDMValue) ri.next()) != null) {
-                    if (o.getDMOKind() == DMOKind.SEQUENCE) {
-                        CloseableIterator si = ((XDMSequence) o).createItemIterator();
-                        XDMItem item;
-                        while ((item = (XDMItem) si.next()) != null) {
-                            System.err.println(item.getStringValue());
-                        }
-                    } else {
-                        System.err.println(((XDMItem) o).getStringValue());
-                    }
-                }
-            } finally {
-                ri.close();
-            }
-            System.err.println("--- Results end");
+            runTestInternal(testName, query);
+        } catch (SystemException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    private static void runNegTest(String testName, String query) {
+        try {
+            runTestInternal(testName, query);
+            Assert.fail();
         } catch (SystemException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void runTestInternal(String testName, String query) throws SystemException {
+        InternalAPI iapi = new InternalAPI();
+        OpenableCloseableIterator ri = iapi.execute(iapi.compile(null, iapi
+                .parse(testName, new StringReader(query))));
+        ri.open();
+        System.err.println("--- Results begin");
+        XDMValue o;
+        try {
+            while ((o = (XDMValue) ri.next()) != null) {
+                if (o.getDMOKind() == DMOKind.SEQUENCE) {
+                    CloseableIterator si = ((XDMSequence) o).createItemIterator();
+                    XDMItem item;
+                    while ((item = (XDMItem) si.next()) != null) {
+                        System.err.println(item.getStringValue());
+                    }
+                } else {
+                    System.err.println(((XDMItem) o).getStringValue());
+                }
+            }
+        } finally {
+            ri.close();
+        }
+        System.err.println("--- Results end");
     }
 }
