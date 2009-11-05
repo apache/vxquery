@@ -5,12 +5,12 @@
   <artifactId>vxquery</artifactId>
   <packaging>jar</packaging>
   <version>0.1</version>
-  <name>VXquery</name>
+  <name>VXQuery</name>
   <url>http://incubator.apache.org/vxquery/</url>
 
   <licenses>
     <license>
-      <name>Apache 2</name>
+      <name>The Apache Software License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
       <comments>A business-friendly OSS license</comments>
