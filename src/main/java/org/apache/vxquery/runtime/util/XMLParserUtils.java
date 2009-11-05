@@ -42,7 +42,7 @@ public class XMLParserUtils {
             InputSource isrc = new InputSource(new FileInputStream(file));
             return parseInputSource(rcb, isrc);
         } catch (FileNotFoundException e) {
-            throw new SystemException(ErrorCode.FODC0002);
+            throw new SystemException(ErrorCode.FODC0002, file);
         }
     }
 
@@ -61,7 +61,7 @@ public class XMLParserUtils {
             acceptor.close();
             return acceptor.getConstructedNode();
         } catch (Exception e) {
-            throw new SystemException(ErrorCode.FODC0002);
+            throw new SystemException(ErrorCode.FODC0002, in.getSystemId());
         }
     }
 
