@@ -48,6 +48,11 @@ public class SystemException extends Exception {
         this.code = code;
     }
     
+    public SystemException(ErrorCode code, Throwable cause, Object... params) {
+        super(message(code, null, params), cause);
+        this.code = code;
+    }
+    
     public SystemException(ErrorCode code, SourceLocation loc) {
         super(message(code, loc));
         this.code = code;
