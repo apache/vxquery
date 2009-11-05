@@ -50,7 +50,7 @@ public class FnDocIterator extends AbstractEagerlyEvaluatedFunctionIterator {
         try {
             in = docUriResolver.resolveDocumentURI(uri, rcb.getDynamicContext().getStaticContext().getBaseUri());
         } catch (IOException e) {
-            throw new SystemException(ErrorCode.FODC0002);
+            throw new SystemException(ErrorCode.FODC0002, uri);
         }
         return XMLParserUtils.parseInputSource(rcb, new InputSource(in));
     }
