@@ -29,6 +29,8 @@ public class DefaultDocumentURIResolverImpl implements DocumentURIResolver {
 
     @Override
     public InputStream resolveDocumentURI(String href, String base) throws IOException {
-        return new FileInputStream(new File((href.startsWith("/") ? href : (base + "/" + href))));
+        File file = new File(href);
+        if (! file.isAbsolute()) file = new File(base + "/" + href);
+        return new FileInputStream(file);
     }
 }
