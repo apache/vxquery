@@ -134,7 +134,7 @@ public class SimpleXQueryTest {
             }
             in.close();
             out.close();
-            return temp.getPath();
+            return temp.getCanonicalPath();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
