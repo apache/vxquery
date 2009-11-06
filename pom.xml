@@ -175,8 +175,7 @@
                   <ant antfile="build-xslt.xml" target="build">
                       <property name="build.gen-src.dir" value="${project.build.directory}/generated-sources/main/java" />
                       <property name="src.code.dir" value="${basedir}/src/main/java" />
-                      <!-- TODO should be ${basedir}/src/main/xslt -->
-                      <property name="build-resources.dir" value="${basedir}/build-resources" />
+                      <property name="xslt.dir" value="${basedir}/src/main/xslt" />
                       <property name="classpath.xslt" refid="maven.compile.classpath" />
                   </ant>
                   <ant antfile="build-script.xml" target="build">
