@@ -2,15 +2,14 @@ Apache VXQuery
 --------------
 
 
-
-Requiremnts:
+Requirements:
 
 1. JDK >= 1.6
-2. Apache Ant >= 1.7
+2. Apache Maven >= 2.0
 
 Building:
 
-1. Type ant in the vxquery base folder.
+1. Type "mvn test" in the vxquery base folder.
 
 Running:
 
@@ -20,11 +19,11 @@ TODO: Add Windows batch files
 
 1. Command line client (vxq)
 
-Type build/scripts/vxq without any arguments for help on executing the command line client.
+Type target/scripts/vxq without any arguments for help on executing the command line client.
 
 
 2. XQTS test driver (xtest)
 
 The xtest test driver can be used to execute XQuery tests from the XQTS suite.
 
-Type build/scripts/xtest without any arguments for help on executing xtest.
+Type target/scripts/xtest without any arguments for help on executing xtest.
