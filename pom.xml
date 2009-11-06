@@ -179,6 +179,22 @@
                       <property name="build-resources.dir" value="${basedir}/build-resources" />
                       <property name="classpath.xslt" refid="maven.compile.classpath" />
                   </ant>
+                  <ant antfile="build-script.xml" target="build">
+                      <property name="main.class" value="org.apache.vxquery.drivers.VXQuery" />
+                      <property name="script.classpath" refid="maven.compile.classpath" />
+                      <property name="jvm.params" value="" />
+                      <property name="source" value="${basedir}/src/main/scripts/run.sh" />
+                      <property name="target.dir" value="${basedir}/target/scripts" />
+                      <property name="target" value="vxq" />
+                  </ant>
+                  <ant antfile="build-script.xml" target="build">
+                      <property name="main.class" value="org.apache.vxquery.xtest.Main" />
+                      <property name="script.classpath" refid="maven.test.classpath" />
+                      <property name="jvm.params" value="" />
+                      <property name="source" value="${basedir}/src/main/scripts/run.sh" />
+                      <property name="target.dir" value="${basedir}/target/scripts" />
+                      <property name="target" value="xtest" />
+                  </ant>
               </tasks>
               <sourceRoot>
                 ${project.build.directory}/generated-sources/main/java
