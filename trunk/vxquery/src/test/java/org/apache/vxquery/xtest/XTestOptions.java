@@ -42,4 +42,7 @@ public class XTestOptions {
 
     @Option(name = "-xmlreport", required = false, usage = "XML Report output file")
     String xmlReport;
+
+    @Option(name = "-htmlreport", required = false, usage = "HTML Report output file")
+    String htmlReport;
 }
