@@ -190,14 +190,14 @@ public class TestCaseResult {
     }
 
     public enum State {
-        EXPECTED_ERROR_GOT_SAME_ERROR("green"),
-        EXPECTED_ERROR_GOT_DIFFERENT_ERROR("orange"),
-        EXPECTED_ERROR_GOT_FAILURE("red"),
-        EXPECTED_ERROR_GOT_RESULT("orange"),
-        EXPECTED_RESULT_GOT_ERROR("orange"),
-        EXPECTED_RESULT_GOT_FAILURE("red"),
         EXPECTED_RESULT_GOT_SAME_RESULT("green"),
+        EXPECTED_ERROR_GOT_SAME_ERROR("green"),
         EXPECTED_RESULT_GOT_DIFFERENT_RESULT("orange"),
+        EXPECTED_RESULT_GOT_ERROR("orange"),
+        EXPECTED_ERROR_GOT_DIFFERENT_ERROR("orange"),
+        EXPECTED_ERROR_GOT_RESULT("orange"),
+        EXPECTED_RESULT_GOT_FAILURE("red"),
+        EXPECTED_ERROR_GOT_FAILURE("red"),
         NO_RESULT_FILE("red");
 
         private String color;

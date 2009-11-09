@@ -51,6 +51,9 @@ public class XTest {
             server.addHandler(servletHandler);
             server.start();
         }
+        if (opts.htmlReport != null) {
+            reporters.add(new HTMLFileReporterImpl(new File(opts.htmlReport)));
+        }
         if (opts.xmlReport != null) {
             reporters.add(new XMLFileReporterImpl(new File(opts.xmlReport)));
         }
