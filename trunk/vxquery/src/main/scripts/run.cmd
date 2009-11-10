@@ -53,9 +53,9 @@ SET MAIN_CLASS=@main.class@
 SET JVM_PARAMS=@jvm.params@
 
 :: Try to find java virtual machine
-IF NOT DEFINED %JAVA% (
-  IF NOT DEFINED %JAVA_HOME% SET JAVA=java.exe
-  IF DEFINED %JAVA_HOME% SET JAVA=%JAVA_HOME%\bin\java.exe
+IF NOT DEFINED JAVA (
+  IF NOT DEFINED JAVA_HOME SET JAVA="java.exe"
+  IF DEFINED JAVA_HOME SET JAVA="%JAVA_HOME%\bin\java.exe"
 )
 
 :: Run program
