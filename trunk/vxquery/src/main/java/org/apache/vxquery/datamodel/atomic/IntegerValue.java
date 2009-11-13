@@ -23,6 +23,10 @@ import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 public class IntegerValue extends NumericValue {
+    
+    public static IntegerValue ZERO = new IntegerValue(BigInteger.ZERO);
+    public static IntegerValue ONE = new IntegerValue(BigInteger.ONE);
+    
     IntegerValue(BigInteger value) {
         super(value, BuiltinTypeRegistry.XS_INTEGER);
     }
@@ -57,7 +61,7 @@ public class IntegerValue extends NumericValue {
     }
 
     @Override
-    public NumericValue roundHalfToEven() {
+    public NumericValue roundHalfToEven(IntegerValue precision) {
         return this;
     }
 

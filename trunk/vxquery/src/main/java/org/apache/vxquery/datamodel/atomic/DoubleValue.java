@@ -18,17 +18,36 @@ package org.apache.vxquery.datamodel.atomic;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 public class DoubleValue extends NumericValue {
+
+    private static final double LOWER = 0.000001d;
+    private static final double UPPER = 1000000d;
+
     DoubleValue(double value) {
         super(value, BuiltinTypeRegistry.XS_DOUBLE);
     }
 
     public DoubleValue(double value, AtomicType type) {
         super(value, type);
+    }
+
+    @Override
+    public CharSequence getStringValue() {
+        double d = (Double)value;
+        double ad = Math.abs(d);
+        if (LOWER <= ad && ad <= UPPER) {
+            // TODO is there a more efficient way?
+            return DecimalValue.stringValue(BigDecimal.valueOf(d));
+        }
+        if (ad == 0.0) {
+            return d == 0.0 ? "0" : "-0";
+        }
+        return String.valueOf(value);
     }
 
     @Override
@@ -73,10 +92,12 @@ public class DoubleValue extends NumericValue {
     }
 
     @Override
-    public NumericValue roundHalfToEven() {
+    public NumericValue roundHalfToEven(IntegerValue precision) {
         double dVal = ((Double) value).doubleValue();
-        double cdVal = Math.round(dVal);
-        return dVal == cdVal ? this : new DoubleValue(cdVal);
+        BigDecimal decVal = BigDecimal.valueOf(dVal);
+        int scale = (int) precision.getIntValue();
+        return decVal.scale() <= scale ? this 
+                : new DoubleValue(decVal.setScale(scale, RoundingMode.HALF_EVEN).doubleValue());
     }
 
     @Override

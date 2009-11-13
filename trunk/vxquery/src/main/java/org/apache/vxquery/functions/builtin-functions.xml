@@ -784,6 +784,7 @@
         <param name="arg" type="xsext:numeric?"/>
         <param name="precision" type="xs:integer"/>
         <return type="xsext:numeric?"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnRoundHalfToEvenIteratorWithPrecision"/>
     </function>
 
     <!-- fn:seconds-from-dateTime( $arg as xs:dateTime?)  as xs:decimal?  -->

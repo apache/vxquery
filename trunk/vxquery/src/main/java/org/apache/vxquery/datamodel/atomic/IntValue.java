@@ -60,7 +60,7 @@ public class IntValue extends NumericValue {
     }
 
     @Override
-    public NumericValue roundHalfToEven() {
+    public NumericValue roundHalfToEven(IntegerValue precision) {
         return this;
     }
 
