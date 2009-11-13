@@ -874,6 +874,7 @@
         <param name="sourceSeq" type="item()*"/>
         <param name="startingLoc" type="xs:double"/>
         <return type="item()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnSubsequenceIterator"/>
     </function>
 
     <!-- fn:subsequence($sourceSeq  as item()*, $startingLoc as xs:double, $length as xs:double)  as item()* -->
@@ -882,6 +883,7 @@
         <param name="startingLoc" type="xs:double"/>
         <param name="length" type="xs:double"/>
         <return type="item()*"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnSubsequenceIterator"/>
     </function>
 
     <!-- fn:substring($sourceString  as xs:string?, $startingLoc as xs:double)  as xs:string -->
