@@ -19,19 +19,27 @@ package org.apache.vxquery.runtime.functions;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.atomic.IntegerValue;
 import org.apache.vxquery.datamodel.atomic.NumericValue;
+import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
+import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
-import org.apache.vxquery.runtime.base.AbstractUnaryNumericFunctionIterator;
+import org.apache.vxquery.runtime.RuntimeUtils;
+import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 
-public class FnRoundHalfToEvenIterator extends AbstractUnaryNumericFunctionIterator {
-    public FnRoundHalfToEvenIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,
+public class FnRoundHalfToEvenIteratorWithPrecision extends AbstractEagerlyEvaluatedFunctionIterator {
+    public FnRoundHalfToEvenIteratorWithPrecision(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,
             StaticContext ctx) {
         super(rAllocator, fn, arguments, ctx);
     }
 
     @Override
-    protected Object numericTransformation(NumericValue value) {
-        return value.roundHalfToEven(IntegerValue.ZERO);
+    public final Object evaluateEagerly(CallStackFrame frame) throws SystemException {
+        NumericValue value = RuntimeUtils.fetchNumericItemEagerly(arguments[0], frame);
+        if (value == null) {
+            return null;
+        }
+        NumericValue precision = RuntimeUtils.fetchNumericItemEagerly(arguments[1], frame);
+        return value.roundHalfToEven((IntegerValue) precision);
     }
 }

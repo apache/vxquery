@@ -33,6 +33,16 @@ public class DecimalValue extends NumericValue {
     }
 
     @Override
+    public CharSequence getStringValue() {
+        return stringValue((BigDecimal) value);
+    }
+    
+    static final String stringValue(BigDecimal value) {
+        String str = String.valueOf(value);
+        return str.endsWith(".0") ? str.substring(0, str.length() - 2) : str;        
+    }
+
+    @Override
     public int sign() {
         return ((BigDecimal) value).signum();
     }
@@ -61,9 +71,10 @@ public class DecimalValue extends NumericValue {
     }
 
     @Override
-    public NumericValue roundHalfToEven() {
+    public NumericValue roundHalfToEven(IntegerValue precision) {
         BigDecimal dVal = (BigDecimal) value;
-        return dVal.scale() == 0 ? this : new DecimalValue(dVal.setScale(0, RoundingMode.HALF_EVEN));
+        int scale = (int) precision.getIntValue();
+        return dVal.scale() <= scale ? this : new DecimalValue(dVal.setScale(scale, RoundingMode.HALF_EVEN));
     }
 
     @Override

@@ -48,7 +48,7 @@ public abstract class NumericValue extends AtomicValue {
 
     public abstract NumericValue round();
 
-    public abstract NumericValue roundHalfToEven();
+    public abstract NumericValue roundHalfToEven(IntegerValue precision);
 
     public long getIntValue() {
         return value.longValue();

@@ -18,17 +18,36 @@ package org.apache.vxquery.datamodel.atomic;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 public class FloatValue extends NumericValue {
+    
+    private static final float LOWER = 0.000001f;
+    private static final float UPPER = 1000000f;
+    
     FloatValue(float value) {
         super(value, BuiltinTypeRegistry.XS_FLOAT);
     }
 
     public FloatValue(float value, AtomicType type) {
         super(value, type);
+    }
+
+    @Override
+    public CharSequence getStringValue() {
+        float f = (Float)value;
+        float af = Math.abs(f);
+        if (LOWER <= af && af <= UPPER) {
+            // TODO is there a more efficient way?
+            return DecimalValue.stringValue(BigDecimal.valueOf(f));
+        }
+        if (af == 0.0) {
+            return f == 0.0 ? "0" : "-0";
+        }
+        return String.valueOf(value);
     }
 
     @Override
@@ -73,10 +92,12 @@ public class FloatValue extends NumericValue {
     }
 
     @Override
-    public NumericValue roundHalfToEven() {
+    public NumericValue roundHalfToEven(IntegerValue precision) {
         float fVal = ((Float) value).floatValue();
-        float cfVal = Math.round(fVal);
-        return fVal == cfVal ? this : new FloatValue(cfVal);
+        BigDecimal decVal = BigDecimal.valueOf(fVal);
+        int scale = (int) precision.getIntValue();
+        return decVal.scale() <= scale ? this 
+                : new FloatValue(decVal.setScale(scale, RoundingMode.HALF_EVEN).floatValue());
     }
 
     @Override
