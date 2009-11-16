@@ -3881,8 +3881,7 @@ TOKEN :
 <DEFAULT, ELEMENT_CONTENT, QUOT_ATTRIBUTE_CONTENT, APOS_ATTRIBUTE_CONTENT>
 TOKEN :
 {
- < CharRef : "&#" (<Digits> |  (
-"x" <HexDigits>)) ";" >
+ < CharRef : "&#" (<Digits> |  ("x" <HexDigits>)) ";" >
 }
 
 <DEFAULT>
