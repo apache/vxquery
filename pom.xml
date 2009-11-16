@@ -6,7 +6,13 @@
   <packaging>jar</packaging>
   <version>0.1</version>
   <name>VXQuery</name>
+  <description>Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>
+
+  <organization>
+    <name>Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+  </organization>
 
   <licenses>
     <license>
