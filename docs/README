@@ -27,3 +27,24 @@ Type target/scripts/vxq without any arguments for help on executing the command 
 The xtest test driver can be used to execute XQuery tests from the XQTS suite.
 
 Type target/scripts/xtest without any arguments for help on executing xtest.
+
+Note: XQTS testsuite needs to be obtained through CVS
+Do NOT use the XQTS zip files avaialable from the XQTS web site. They are too old.
+
+
+Assume you are in $XQTS_HOME (location where you want to checkout XQTS).
+
+$ export CVSROOT=":pserver:anonymous@dev.w3.org:/sources/public"
+$ cvs login
+(Logging in to anonymous@dev.w3.org)
+CVS password: anonymous
+$ cvs get 2006/xquery-test-suite/TestSuiteStagingArea
+    ...
+
+
+Once the testsuite is checked out locally, xtest should be passed the -xqtsbase argument with the absolute path to the folder that contains XQTSCatalog.xml
+
+$ cd $VXQUERY_HOME
+$ target/scripts/xtest -xqtsbase $XQTS_HOME/2006/xquery-test-suite/TestSuiteStagingArea ...
+
+
