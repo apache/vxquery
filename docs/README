@@ -46,5 +46,3 @@ Once the testsuite is checked out locally, xtest should be passed the -xqtsbase 
 
 $ cd $VXQUERY_HOME
 $ target/scripts/xtest -xqtsbase $XQTS_HOME/2006/xquery-test-suite/TestSuiteStagingArea ...
-
-
