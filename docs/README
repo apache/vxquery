@@ -7,9 +7,11 @@ Requirements:
 1. JDK >= 1.6
 2. Apache Maven >= 2.0
 
+
 Building:
 
 1. Type "mvn test" in the vxquery base folder.
+
 
 Running:
 
@@ -31,7 +33,6 @@ Type target/scripts/xtest without any arguments for help on executing xtest.
 Note: XQTS testsuite needs to be obtained through CVS
 Do NOT use the XQTS zip files avaialable from the XQTS web site. They are too old.
 
-
 Assume you are in $XQTS_HOME (location where you want to checkout XQTS).
 
 $ export CVSROOT=":pserver:anonymous@dev.w3.org:/sources/public"
@@ -41,8 +42,15 @@ CVS password: anonymous
 $ cvs get 2006/xquery-test-suite/TestSuiteStagingArea
     ...
 
-
 Once the testsuite is checked out locally, xtest should be passed the -xqtsbase argument with the absolute path to the folder that contains XQTSCatalog.xml
 
 $ cd $VXQUERY_HOME
 $ target/scripts/xtest -xqtsbase $XQTS_HOME/2006/xquery-test-suite/TestSuiteStagingArea ...
+
+
+Eclipse "integration":
+
+The eclipse files in the project rely on the availability of the classpath variable M2_REPO that needs to point to the local maven repository.
+M2_REPO can be added to the eclipse workspace using the maven-eclispe-plugin:
+
+$ mvn -Declipse.workspace=<path-to-eclipse-workspace> eclipse:add-maven-repo
