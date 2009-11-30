@@ -30,8 +30,12 @@ The xtest test driver can be used to execute XQuery tests from the XQTS suite.
 
 Type target/scripts/xtest without any arguments for help on executing xtest.
 
-Note: XQTS testsuite needs to be obtained through CVS
-Do NOT use the XQTS zip files avaialable from the XQTS web site. They are too old.
+Note: XQTS test suite needs to be obtained through CVS
+Do NOT use the XQTS zip files available from the XQTS web site. They are too old.
+
+There are 2 way to get a current version of the files:
+
+a) via regular CVS
 
 Assume you are in $XQTS_HOME (location where you want to checkout XQTS).
 
@@ -47,6 +51,12 @@ Once the testsuite is checked out locally, xtest should be passed the -xqtsbase 
 $ cd $VXQUERY_HOME
 $ target/scripts/xtest -xqtsbase $XQTS_HOME/2006/xquery-test-suite/TestSuiteStagingArea ...
 
+b) via CVS web access
+
+Version history:
+http://dev.w3.org/cvsweb/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_current.zip
+Latest Version:
+http://dev.w3.org/cvsweb/~checkout~/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_current.zip 
 
 Eclipse "integration":
 
