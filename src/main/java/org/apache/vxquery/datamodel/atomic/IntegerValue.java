@@ -24,8 +24,8 @@ import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 public class IntegerValue extends NumericValue {
     
-    public static IntegerValue ZERO = new IntegerValue(BigInteger.ZERO);
-    public static IntegerValue ONE = new IntegerValue(BigInteger.ONE);
+    public static final IntegerValue ZERO = new IntegerValue(BigInteger.ZERO);
+    public static final IntegerValue ONE = new IntegerValue(BigInteger.ONE);
     
     IntegerValue(BigInteger value) {
         super(value, BuiltinTypeRegistry.XS_INTEGER);
