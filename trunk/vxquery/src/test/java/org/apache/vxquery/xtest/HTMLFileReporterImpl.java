@@ -178,9 +178,11 @@ public class HTMLFileReporterImpl implements ResultReporter {
             out.println(res.state.getColor());
             out.println(";\"><td>");
             out.print(i + 1);
-            out.print("</td><td>");
+            out.print("</td><td><a href=\"");
+            out.print(res.testCase.getXQueryFile().toURI());
+            out.print("\">");
             out.print(res.testCase.getXQueryDisplayName());
-            out.print("</td><td>");
+            out.print("</a></td><td>");
             out.print(res.time);
             out.print("</td><td>");
             out.print(res.report);
