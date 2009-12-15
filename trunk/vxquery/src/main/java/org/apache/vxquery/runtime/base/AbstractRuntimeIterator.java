@@ -18,7 +18,15 @@ package org.apache.vxquery.runtime.base;
 
 import org.apache.vxquery.runtime.RegisterAllocator;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
+
 public abstract class AbstractRuntimeIterator implements RuntimeIterator {
     public AbstractRuntimeIterator(RegisterAllocator rAllocator) {
+    }
+    
+    public String toString() {
+        XStream xstream = new XStream(new JsonHierarchicalStreamDriver());
+        return xstream.toXML(this);
     }
 }

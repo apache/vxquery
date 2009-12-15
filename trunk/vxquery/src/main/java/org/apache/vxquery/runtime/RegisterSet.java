@@ -16,6 +16,8 @@
 */
 package org.apache.vxquery.runtime;
 
+import java.util.Arrays;
+
 public final class RegisterSet {
     private final Object[] regs;
 
@@ -29,5 +31,9 @@ public final class RegisterSet {
 
     public void setValue(int reg, Object value) {
         regs[reg] = value;
+    }
+    
+    public String toString() {
+        return Arrays.toString(regs);
     }
 }
