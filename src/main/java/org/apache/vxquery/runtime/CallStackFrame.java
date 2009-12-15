@@ -49,4 +49,8 @@ public final class CallStackFrame {
     public void setLocalRegisters(RegisterSet localRegisters) {
         this.localRegisters = localRegisters;
     }
+    
+    public String toString() {
+        return "G: " + globalRegisters + " L: " + localRegisters;
+    }
 }

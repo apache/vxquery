@@ -40,4 +40,8 @@ public final class GlobalRegisterAccessor<T> {
     public void set(RegisterSet regs, T value) {
         regs.setValue(register, value);
     }
+    
+    public String toString() {
+        return "G@" + register;
+    }
 }
