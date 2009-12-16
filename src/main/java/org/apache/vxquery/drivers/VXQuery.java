@@ -98,7 +98,7 @@ public class VXQuery {
                 String fName = opts.bindings.get(pVar.getVariable().getName().getLocalPart());
                 if (fName != null) {
                     File f = new File(fName);
-                    System.err.println("Binding: " + pVar.getVariable().getName());
+                    System.err.println("Binding: " + pVar.getVariable().getName() + " to " + f.getAbsolutePath());
                     iapi.bindExternalVariable(pVar.getVariable(), f);
                 }
             }
