@@ -81,7 +81,7 @@ public class InternalAPI {
             GlobalVariable gVar = pVar.getVariable();
             RuntimePlan rPlan = pVar.getRuntimePlan();
             XDMValue vValue = rPlan == null ? dCtx.lookupVariable(gVar) : evaluateInitializer(gRegs, rPlan);
-            gRegs.setValue(i, vValue);
+            gRegs.setValue(i++, vValue);
         }
         RuntimePlan plan = module.getBodyRuntimePlan();
         RegisterSet lRegs = plan.createLocalRegisterSet();
