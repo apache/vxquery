@@ -14,36 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.types;
+package org.apache.vxquery.datamodel.dtm;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.datamodel.DatamodelStaticInterface;
+import org.apache.vxquery.datamodel.NameCache;
+import org.apache.vxquery.datamodel.NodeFactory;
+import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
 
-public final class TextType extends AbstractNodeType {
-    public static final TextType INSTANCE = new TextType();
+public class DTMDatamodelStaticInterfaceImpl implements DatamodelStaticInterface {
+    private final NameCache nameCache;
+    private final AtomicValueFactory avf;
+    private final DTMNodeFactory nf;
 
-    private static final Filter<XDMValue> TEXT_FILTER = new Filter<XDMValue>() {
-        @Override
-        public boolean accept(XDMValue value) throws SystemException {
-            if (value == null) {
-                return false;
-            }
-            return value.getDMOKind() == DMOKind.TEXT_NODE;
-        }
-    };
-
-    private TextType() {
+    public DTMDatamodelStaticInterfaceImpl() {
+        this.nameCache = new NameCache();
+        avf = new AtomicValueFactory(nameCache);
+        nf = new DTMNodeFactory(nameCache, avf);
     }
 
     @Override
-    public NodeKind getNodeKind() {
-        return NodeKind.TEXT;
+    public AtomicValueFactory getAtomicValueFactory() {
+        return avf;
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return TEXT_FILTER;
+    public NodeFactory getNodeFactory() {
+        return nf;
     }
 }

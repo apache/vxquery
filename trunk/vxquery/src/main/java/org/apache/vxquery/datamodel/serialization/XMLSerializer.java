@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Stack;
 
-import org.apache.vxquery.datamodel.NameCache;
 import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.XDMNode;
+import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.base.CloseableIterator;
@@ -52,9 +52,10 @@ public class XMLSerializer implements EventAcceptor {
     }
 
     @Override
-    public void attribute(NameCache nameCache, int nameCode, CharSequence stringValue) throws SystemException {
+    public void attribute(CharSequence uri, CharSequence localName, CharSequence prefix, CharSequence stringValue)
+            throws SystemException {
         write(" ");
-        writeQName(nameCache, nameCode);
+        write(localName);
         write("=\"");
         write(stringValue);
         write("\"");
@@ -101,10 +102,12 @@ public class XMLSerializer implements EventAcceptor {
                 text(item.getStringValue());
                 break;
 
-            case ATTRIBUTE_NODE:
+            case ATTRIBUTE_NODE: {
                 XDMNode aNode = (XDMNode) item;
-                attribute(aNode.getNameCache(), aNode.getNodeNameCode(), aNode.getStringValue());
+                QNameValue name = aNode.getNodeName();
+                attribute(name.getUri(), name.getLocalName(), name.getPrefix(), aNode.getStringValue());
                 break;
+            }
 
             case COMMENT_NODE:
                 XDMNode cNode = (XDMNode) item;
@@ -118,18 +121,22 @@ public class XMLSerializer implements EventAcceptor {
                 endDocument();
                 break;
 
-            case ELEMENT_NODE:
+            case ELEMENT_NODE: {
                 XDMNode eNode = (XDMNode) item;
-                startElement(eNode.getNameCache(), eNode.getNodeNameCode());
+                QNameValue name = eNode.getNodeName();
+                startElement(name.getUri(), name.getLocalName(), name.getPrefix());
                 writeAttributes(eNode.getAttributes());
                 writeItems(eNode.getChildren());
                 endElement();
                 break;
+            }
 
-            case PI_NODE:
+            case PI_NODE: {
                 XDMNode pNode = (XDMNode) item;
-                pi(pNode.getNameCache(), pNode.getNodeNameCode(), pNode.getStringValue());
+                QNameValue name = pNode.getNodeName();
+                pi(name.getLocalName(), pNode.getStringValue());
                 break;
+            }
 
             case TEXT_NODE:
                 XDMNode tNode = (XDMNode) item;
@@ -144,7 +151,8 @@ public class XMLSerializer implements EventAcceptor {
     private void writeAttributes(CloseableIterator attributes) throws SystemException {
         XDMNode attr;
         while ((attr = (XDMNode) attributes.next()) != null) {
-            attribute(attr.getNameCache(), attr.getNodeNameCode(), attr.getStringValue());
+            QNameValue name = attr.getNodeName();
+            attribute(name.getUri(), name.getLocalName(), name.getPrefix(), attr.getStringValue());
         }
         attributes.close();
     }
@@ -158,17 +166,17 @@ public class XMLSerializer implements EventAcceptor {
     }
 
     @Override
-    public void namespace(NameCache nameCache, int prefixCode, int uriCode) throws SystemException {
+    public void namespace(CharSequence prefix, CharSequence uri) throws SystemException {
         lastItemText = false;
     }
 
     @Override
-    public void pi(NameCache nameCache, int nameCode, CharSequence content) throws SystemException {
+    public void pi(CharSequence target, CharSequence content) throws SystemException {
         if (elementTagOpen) {
             closeElementTag();
         }
         write("<?");
-        writeQName(nameCache, nameCode);
+        write(target);
         if (content.length() > 0) {
             write(" ");
             write(content);
@@ -183,14 +191,13 @@ public class XMLSerializer implements EventAcceptor {
     }
 
     @Override
-    public void startElement(NameCache nameCache, int nameCode) throws SystemException {
+    public void startElement(CharSequence uri, CharSequence localName, CharSequence prefix) throws SystemException {
         if (elementTagOpen) {
             closeElementTag();
         }
         write("<");
-        CharSequence name = getQName(nameCache, nameCode);
-        tagStack.push(name);
-        write(name);
+        tagStack.push(localName);
+        write(localName);
         elementTagOpen = true;
         lastItemText = false;
     }
@@ -220,14 +227,5 @@ public class XMLSerializer implements EventAcceptor {
             e.printStackTrace();
             throw new SystemException(ErrorCode.SYSE0001);
         }
-    }
-
-    private void writeQName(NameCache nameCache, int nameCode) throws SystemException {
-        write(getQName(nameCache, nameCode));
-    }
-
-    private CharSequence getQName(NameCache nameCache, int nameCode) {
-        CharSequence local = nameCache.getLocalName(nameCode);
-        return local;
     }
 }

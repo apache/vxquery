@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 import org.apache.vxquery.api.InternalAPI;
 import org.apache.vxquery.compiler.expression.GlobalVariable;
 import org.apache.vxquery.datamodel.XDMItem;
+import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
 import org.apache.vxquery.datamodel.serialization.XMLSerializer;
 import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
 import org.apache.vxquery.runtime.core.Deflater;
@@ -56,7 +57,7 @@ public class TestRunnerFactory {
                 TestCaseResult res = new TestCaseResult(testCase);
                 long start = System.currentTimeMillis();
                 try {
-                    InternalAPI iapi = new InternalAPI();
+                    InternalAPI iapi = new InternalAPI(new DTMDatamodelStaticInterfaceImpl());
                     FileReader in = new FileReader(testCase.getXQueryFile());
                     ModuleNode ast;
                     try {

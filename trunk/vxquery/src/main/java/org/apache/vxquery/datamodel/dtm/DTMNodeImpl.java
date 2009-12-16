@@ -23,6 +23,7 @@ import org.apache.vxquery.datamodel.NameCache;
 import org.apache.vxquery.datamodel.XDMNode;
 import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.datamodel.atomic.AnyUriValue;
+import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
 import org.apache.vxquery.runtime.core.SingletonCloseableIterator;
@@ -84,13 +85,8 @@ final class DTMNodeImpl implements XDMNode {
     }
 
     @Override
-    public NameCache getNameCache() {
-        return dtm.nameCache;
-    }
-
-    @Override
-    public int getNodeNameCode() {
-        return dtm.nameCode[index];
+    public QNameValue getNodeName() {
+        return dtm.getAtomicValueFactory().createQName(dtm.nameCache, dtm.nameCode[index]);
     }
 
     @Override
@@ -100,11 +96,6 @@ final class DTMNodeImpl implements XDMNode {
             idx = dtm.next[idx];
         }
         return idx == DTM.NULL ? null : new DTMNodeImpl(dtm, idx);
-    }
-
-    @Override
-    public int getTypeNameCode() {
-        return 0;
     }
 
     @Override

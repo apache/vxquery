@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.api;
 
 import java.io.File;
@@ -26,10 +26,8 @@ import org.apache.vxquery.context.DataspaceContextImpl;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.NameCache;
+import org.apache.vxquery.datamodel.DatamodelStaticInterface;
 import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
-import org.apache.vxquery.datamodel.dtm.DTMNodeFactory;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterSet;
@@ -47,20 +45,16 @@ import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
 
 public class InternalAPI {
     private StaticContext sCtx;
-    private NameCache nameCache;
-    private AtomicValueFactory avf;
     private CompilerControlBlock ccb;
     private DynamicContext dCtx;
     private RuntimeControlBlock rcb;
 
-    public InternalAPI() {
+    public InternalAPI(DatamodelStaticInterface dmStaticInterface) {
         sCtx = new DataspaceContextImpl();
-        nameCache = new NameCache();
-        avf = new AtomicValueFactory(nameCache);
-        ccb = new CompilerControlBlock(sCtx, nameCache, avf);
+        ccb = new CompilerControlBlock(sCtx, dmStaticInterface);
         dCtx = new DynamicContextImpl(sCtx);
-        dCtx.setCurrentDateTime(avf.createDateTime(new GregorianCalendar()));
-        rcb = new RuntimeControlBlock(dCtx, nameCache, avf, new DTMNodeFactory(nameCache, avf));
+        dCtx.setCurrentDateTime(dmStaticInterface.getAtomicValueFactory().createDateTime(new GregorianCalendar()));
+        rcb = new RuntimeControlBlock(dCtx, dmStaticInterface);
     }
 
     public ModuleNode parse(String name, Reader query) throws SystemException {

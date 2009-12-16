@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.expression.AttributeNodeConstructorExpression;
 import org.apache.vxquery.compiler.expression.CastExpression;
 import org.apache.vxquery.compiler.expression.CastableExpression;
@@ -100,7 +99,7 @@ import org.apache.vxquery.types.processors.CastProcessor;
 import org.apache.vxquery.util.Filter;
 
 class XMLQueryCodeGenerator {
-    public static void codegenModule(CompilerControlBlock ccb, Module module) {
+    public static void codegenModule(Module module) {
         StaticContext sCtx = module.getModuleContext();
         List<PrologVariable> prologVars = new ArrayList<PrologVariable>();
         Map<Variable, Integer> gVarMap = new HashMap<Variable, Integer>();
@@ -116,7 +115,7 @@ class XMLQueryCodeGenerator {
             if (initExpr != null) {
                 RegisterAllocator varPlanRegAllocator = new RegisterAllocator(0);
                 Map<Variable, Integer> varPlanVarMap = new HashMap<Variable, Integer>(gVarMap);
-                varPlan = createPlan(initExpr, varPlanRegAllocator, varPlanVarMap, ccb);
+                varPlan = createPlan(initExpr, varPlanRegAllocator, varPlanVarMap);
             }
             PrologVariable gVar = new PrologVariable(v, varPlan);
             prologVars.add(gVar);
@@ -133,7 +132,7 @@ class XMLQueryCodeGenerator {
                 for (ParameterVariable pVar : udf.getParameters()) {
                     fnPlanVarMap.put(pVar, fnPlanRegAllocator.allocate(1));
                 }
-                RuntimePlan fnPlan = createPlan(fnExpr, fnPlanRegAllocator, fnPlanVarMap, ccb);
+                RuntimePlan fnPlan = createPlan(fnExpr, fnPlanRegAllocator, fnPlanVarMap);
                 udf.setRuntimePlan(fnPlan);
             }
         }
@@ -141,14 +140,13 @@ class XMLQueryCodeGenerator {
         if (body != null) {
             RegisterAllocator planRegAllocator = new RegisterAllocator(0);
             Map<Variable, Integer> planVarMap = new HashMap<Variable, Integer>(gVarMap);
-            RuntimePlan bodyPlan = createPlan(body, planRegAllocator, planVarMap, ccb);
+            RuntimePlan bodyPlan = createPlan(body, planRegAllocator, planVarMap);
             module.setBodyRuntimePlan(bodyPlan);
         }
     }
 
-    private static RuntimePlan createPlan(Expression expr, RegisterAllocator rAllocator, Map<Variable, Integer> varMap,
-            CompilerControlBlock ccb) {
-        ExpressionCodeGenerator ecg = new ExpressionCodeGenerator(rAllocator, varMap, ccb);
+    private static RuntimePlan createPlan(Expression expr, RegisterAllocator rAllocator, Map<Variable, Integer> varMap) {
+        ExpressionCodeGenerator ecg = new ExpressionCodeGenerator(rAllocator, varMap);
         RuntimeIterator ri = expr.accept(ecg);
         return new RuntimePlan(ri, rAllocator.getAllocatedRegisterCount());
     }
@@ -156,12 +154,10 @@ class XMLQueryCodeGenerator {
     private static final class ExpressionCodeGenerator implements ExpressionVisitor<RuntimeIterator> {
         private final RegisterAllocator rAllocator;
         private final Map<Variable, Integer> varRegMap;
-        private final CompilerControlBlock ccb;
 
-        ExpressionCodeGenerator(RegisterAllocator rAllocator, Map<Variable, Integer> varRegMap, CompilerControlBlock ccb) {
+        ExpressionCodeGenerator(RegisterAllocator rAllocator, Map<Variable, Integer> varRegMap) {
             this.rAllocator = rAllocator;
             this.varRegMap = varRegMap;
-            this.ccb = ccb;
         }
 
         @Override
@@ -290,7 +286,7 @@ class XMLQueryCodeGenerator {
 
         @Override
         public RuntimeIterator visitInstanceofExpression(InstanceofExpression expr) {
-            Filter<XDMValue> filter = expr.getType().toXQType().createInstanceOfFilter(ccb.getNameCache());
+            Filter<XDMValue> filter = expr.getType().toXQType().createInstanceOfFilter();
             RuntimeIterator ii = expr.getInput().accept(this);
             return new InstanceOfIterator(rAllocator, ii, filter);
         }
@@ -369,7 +365,7 @@ class XMLQueryCodeGenerator {
         @Override
         public RuntimeIterator visitPathStepExpression(PathStepExpression expr) {
             RuntimeIterator in = expr.getInput().accept(this);
-            Filter<XDMValue> typeFilter = expr.getNodeType().createInstanceOfFilter(ccb.getNameCache());
+            Filter<XDMValue> typeFilter = expr.getNodeType().createInstanceOfFilter();
             switch (expr.getAxis()) {
                 case ANCESTOR:
                     return new AncestorAxisIterator(rAllocator, in, typeFilter);

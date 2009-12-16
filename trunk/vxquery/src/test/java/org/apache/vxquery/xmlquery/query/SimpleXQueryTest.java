@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.xmlquery.query;
 
 import java.io.BufferedInputStream;
@@ -26,16 +26,16 @@ import java.util.zip.GZIPInputStream;
 
 import junit.framework.Assert;
 
-import org.junit.Test;
-
 import org.apache.vxquery.api.InternalAPI;
 import org.apache.vxquery.datamodel.DMOKind;
 import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.XDMSequence;
 import org.apache.vxquery.datamodel.XDMValue;
+import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
+import org.junit.Test;
 
 public class SimpleXQueryTest {
     @Test
@@ -116,20 +116,20 @@ public class SimpleXQueryTest {
     @Test
     public void simple016() {
         // TODO unzipping every time is a little slow ...
-        String temp = gunzip("src/test/resources/documents/", "dblp.xml"); 
+        String temp = gunzip("src/test/resources/documents/", "dblp.xml");
         runTest("simple016", "string-length(doc('" + temp + "'))");
     }
 
     private static String gunzip(String dir, String filename) {
         try {
-            GZIPInputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(new File(
-                    dir + filename + ".gz"))));
+            GZIPInputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(new File(dir
+                    + filename + ".gz"))));
             File temp = File.createTempFile("vxquery", filename);
             temp.deleteOnExit();
             FileOutputStream out = new FileOutputStream(temp);
             byte[] buf = new byte[1024];
             int len;
-            while ((len = in.read(buf)) > 0){
+            while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
             in.close();
@@ -159,9 +159,8 @@ public class SimpleXQueryTest {
     }
 
     private static void runTestInternal(String testName, String query) throws SystemException {
-        InternalAPI iapi = new InternalAPI();
-        OpenableCloseableIterator ri = iapi.execute(iapi.compile(null, iapi
-                .parse(testName, new StringReader(query))));
+        InternalAPI iapi = new InternalAPI(new DTMDatamodelStaticInterfaceImpl());
+        OpenableCloseableIterator ri = iapi.execute(iapi.compile(null, iapi.parse(testName, new StringReader(query))));
         ri.open();
         System.err.println("--- Results begin");
         XDMValue o;
