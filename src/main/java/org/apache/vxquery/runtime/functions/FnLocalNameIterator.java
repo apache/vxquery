@@ -1,23 +1,24 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.XDMNode;
+import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.datamodel.atomic.StringValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
@@ -27,8 +28,7 @@ import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 
 public class FnLocalNameIterator extends AbstractEagerlyEvaluatedFunctionIterator {
-    public FnLocalNameIterator(RegisterAllocator allocator, Function fn, RuntimeIterator[] arguments,
-            StaticContext ctx) {
+    public FnLocalNameIterator(RegisterAllocator allocator, Function fn, RuntimeIterator[] arguments, StaticContext ctx) {
         super(allocator, fn, arguments, ctx);
     }
 
@@ -38,8 +38,9 @@ public class FnLocalNameIterator extends AbstractEagerlyEvaluatedFunctionIterato
         if (n == null) {
             return StringValue.EMPTY_STRING;
         }
-        final int nc = n.getNodeNameCode();
+        QNameValue nodeName = n.getNodeName();
+        final int nc = nodeName.getCode();
         return nc < 0 ? StringValue.EMPTY_STRING : frame.getRuntimeControlBlock().getAtomicValueFactory().createString(
-                n.getNameCache().getLocalName(nc));
+                nodeName.getNameCache().getLocalName(nc));
     }
 }

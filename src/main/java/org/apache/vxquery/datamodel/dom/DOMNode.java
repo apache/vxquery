@@ -1,46 +1,45 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.datamodel.dom;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.NameCache;
 import org.apache.vxquery.datamodel.Wrapper;
 import org.apache.vxquery.datamodel.XDMNode;
 import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.datamodel.atomic.AnyUriValue;
+import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
 import org.apache.vxquery.runtime.core.SingletonCloseableIterator;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 final class DOMNode implements XDMNode, Wrapper<Node> {
     private DOMDocumentManager manager;
     private Node node;
     private DOMNode parent;
-    private int nameCode;
+    private QNameValue name;
 
     DOMNode(DOMDocumentManager manager, Node node, DOMNode parent) {
         this.manager = manager;
         this.node = node;
         this.parent = parent;
-        nameCode = -1;
+        name = null;
     }
 
     @Override
@@ -85,13 +84,9 @@ final class DOMNode implements XDMNode, Wrapper<Node> {
     }
 
     @Override
-    public NameCache getNameCache() {
-        return manager.getNameCache();
-    }
-
-    @Override
-    public int getNodeNameCode() {
-        if (nameCode == -1) {
+    public QNameValue getNodeName() {
+        if (name == null) {
+            int nameCode = -1;
             switch (node.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
                 case Node.ELEMENT_NODE:
@@ -106,8 +101,9 @@ final class DOMNode implements XDMNode, Wrapper<Node> {
                     nameCode = manager.getNameCache().intern("", "", getLocalName());
                     break;
             }
+            name = manager.getAtomizedValueFactory().createQName(manager.getNameCache(), nameCode);
         }
-        return nameCode;
+        return name;
     }
 
     private String getUri() {
@@ -154,11 +150,6 @@ final class DOMNode implements XDMNode, Wrapper<Node> {
             }
         }
         return parent;
-    }
-
-    @Override
-    public int getTypeNameCode() {
-        return 0;
     }
 
     @Override

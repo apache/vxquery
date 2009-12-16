@@ -24,6 +24,7 @@ import org.apache.vxquery.datamodel.NodeConstructingEventAcceptor;
 import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.XDMNode;
 import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
+import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.exceptions.SystemException;
 
 public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcceptor {
@@ -49,7 +50,8 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
     }
 
     @Override
-    public void attribute(NameCache nameCache, int nameCode, CharSequence stringValue) throws SystemException {
+    public void attribute(CharSequence uri, CharSequence localName, CharSequence prefix, CharSequence stringValue)
+            throws SystemException {
         dtm.ensureCapacity(1);
         int aIndex = dtm.nNodes++;
         int lastAttr = DTM.NULL;
@@ -68,7 +70,7 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
         dtm.param0[aIndex] = auxContentBuffer.length();
         dtm.param1[aIndex] = stringValue.length();
         auxContentBuffer.append(stringValue);
-        dtm.nameCode[aIndex] = dtm.nameCache.translateCode(nameCache, nameCode);
+        dtm.nameCode[aIndex] = dtm.nameCache.intern(prefix.toString(), uri.toString(), localName.toString());
     }
 
     @Override
@@ -88,10 +90,14 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
                 text(item.getStringValue());
                 break;
 
-            case ATTRIBUTE_NODE:
+            case ATTRIBUTE_NODE: {
                 XDMNode aNode = (XDMNode) item;
-                attribute(aNode.getNameCache(), aNode.getNodeNameCode(), aNode.getStringValue());
+                QNameValue name = aNode.getNodeName();
+                NameCache cache = name.getNameCache();
+                int code = name.getCode();
+                attribute(cache.getUri(code), cache.getLocalName(code), cache.getPrefix(code), aNode.getStringValue());
                 break;
+            }
 
             case COMMENT_NODE:
                 XDMNode cNode = (XDMNode) item;
@@ -100,7 +106,10 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
 
             case PI_NODE:
                 XDMNode pNode = (XDMNode) item;
-                pi(pNode.getNameCache(), pNode.getNodeNameCode(), pNode.getStringValue());
+                QNameValue name = pNode.getNodeName();
+                NameCache cache = name.getNameCache();
+                int code = name.getCode();
+                pi(cache.getLocalName(code), pNode.getStringValue());
                 break;
 
             case TEXT_NODE:
@@ -133,7 +142,7 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
     }
 
     @Override
-    public void namespace(NameCache nameCache, int prefixCode, int uriCode) throws SystemException {
+    public void namespace(CharSequence prefix, CharSequence uri) throws SystemException {
     }
 
     @Override
@@ -151,7 +160,7 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
     }
 
     @Override
-    public void startElement(NameCache nameCache, int nameCode) throws SystemException {
+    public void startElement(CharSequence uri, CharSequence localName, CharSequence prefix) throws SystemException {
         dtm.ensureCapacity(1);
         int nIndex = dtm.nNodes++;
         NodeState nodeState = new NodeState(nIndex);
@@ -172,7 +181,7 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
             dtm.param1[parentNodeState.index] = nIndex;
         }
         dtm.param1[nIndex] = DTM.NULL;
-        dtm.nameCode[nIndex] = dtm.nameCache.translateCode(nameCache, nameCode);
+        dtm.nameCode[nIndex] = dtm.nameCache.intern(prefix.toString(), uri.toString(), localName.toString());
     }
 
     @Override
@@ -200,7 +209,7 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
     }
 
     @Override
-    public void pi(NameCache nameCache, int nameCode, CharSequence content) throws SystemException {
+    public void pi(CharSequence target, CharSequence content) throws SystemException {
         dtm.ensureCapacity(1);
         int nIndex = dtm.nNodes++;
         NodeState parentNodeState = null;
@@ -220,7 +229,7 @@ public final class DTMBuildingEventAcceptor implements NodeConstructingEventAcce
         dtm.param0[nIndex] = auxContentBuffer.length();
         dtm.param1[nIndex] = content.length();
         auxContentBuffer.append(content);
-        dtm.nameCode[nIndex] = dtm.nameCache.translateCode(nameCache, nameCode);
+        dtm.nameCode[nIndex] = dtm.nameCache.intern("", "", target.toString());
     }
 
     @Override

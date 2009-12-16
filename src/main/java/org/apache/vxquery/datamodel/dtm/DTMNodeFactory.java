@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.datamodel.dtm;
 
 import org.apache.vxquery.datamodel.DatamodelHelper;
@@ -44,8 +44,10 @@ public final class DTMNodeFactory implements NodeFactory {
             throws SystemException {
         DTMBuildingEventAcceptor ea = new DTMBuildingEventAcceptor(nameCache, avf);
         ea.open();
+        NameCache cache = name.getNameCache();
+        int nameCode = name.getCode();
         CharSequence strValue = DatamodelHelper.serialize(content);
-        ea.attribute(name.getNameCache(), name.getCode(), strValue);
+        ea.attribute(cache.getUri(nameCode), cache.getLocalName(nameCode), cache.getPrefix(nameCode), strValue);
         ea.close();
         return ea.getConstructedNode();
     }
@@ -98,7 +100,9 @@ public final class DTMNodeFactory implements NodeFactory {
             throws SystemException {
         DTMBuildingEventAcceptor ea = new DTMBuildingEventAcceptor(nameCache, avf);
         ea.open();
-        ea.startElement(name.getNameCache(), name.getCode());
+        NameCache cache = name.getNameCache();
+        int nameCode = name.getCode();
+        ea.startElement(cache.getUri(nameCode), cache.getLocalName(nameCode), cache.getPrefix(nameCode));
         try {
             XDMItem item;
             while ((item = (XDMItem) content.next()) != null) {
@@ -121,7 +125,7 @@ public final class DTMNodeFactory implements NodeFactory {
     public XDMNode createProcessingInstruction(CharSequence target, CharSequence content) throws SystemException {
         DTMBuildingEventAcceptor ea = new DTMBuildingEventAcceptor(nameCache, avf);
         ea.open();
-        ea.pi(nameCache, nameCache.intern("", "", target.toString()), content);
+        ea.pi(target, content);
         ea.close();
         return ea.getConstructedNode();
     }
@@ -130,7 +134,7 @@ public final class DTMNodeFactory implements NodeFactory {
     public XDMNode createProcessingInstruction(QNameValue target, StringValue content) throws SystemException {
         DTMBuildingEventAcceptor ea = new DTMBuildingEventAcceptor(nameCache, avf);
         ea.open();
-        ea.pi(target.getNameCache(), target.getCode(), content.getStringValue());
+        ea.pi(target.getNameCache().getLocalName(target.getCode()), content.getStringValue());
         ea.close();
         return ea.getConstructedNode();
     }

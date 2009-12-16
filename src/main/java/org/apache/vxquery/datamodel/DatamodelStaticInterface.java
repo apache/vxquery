@@ -14,31 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.types;
+package org.apache.vxquery.datamodel;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
 
-public final class DocumentType extends AbstractNodeType {
-    public static final DocumentType ANYDOCUMENT = new DocumentType(ElementType.ANYELEMENT);
+public interface DatamodelStaticInterface {
+    public AtomicValueFactory getAtomicValueFactory();
 
-    private ElementType elementType;
-
-    public DocumentType(ElementType elementType) {
-        this.elementType = elementType;
-    }
-
-    @Override
-    public NodeKind getNodeKind() {
-        return NodeKind.DOCUMENT;
-    }
-
-    public ElementType getElementType() {
-        return elementType;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return null;
-    }
+    public NodeFactory getNodeFactory();
 }

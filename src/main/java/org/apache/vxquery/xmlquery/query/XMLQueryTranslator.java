@@ -699,7 +699,7 @@ final class XMLQueryTranslator {
     }
 
     private Expression translateExpression(ASTNode value) throws SystemException {
-        final AtomicValueFactory avf = ccb.getAtomicValueFactory();
+        final AtomicValueFactory avf = ccb.getDatamodelStaticInterface().getAtomicValueFactory();
         switch (value.getTag()) {
             case EXPRESSION: {
                 ExprNode node = (ExprNode) value;
