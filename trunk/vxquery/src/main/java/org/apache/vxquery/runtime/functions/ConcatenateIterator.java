@@ -44,16 +44,15 @@ public class ConcatenateIterator extends AbstractLazilyEvaluatedFunctionIterator
 
     @Override
     public Object next(CallStackFrame frame) throws SystemException {
-        while (true) {
-            if (index.get(frame) >= arguments.length) {
-                return null;
-            }
-            Object o = arguments[index.get(frame)].next(frame);
+        int i = index.get(frame);
+        while (i < arguments.length) {
+            Object o = arguments[i].next(frame);
             if (o != null) {
                 return o;
             }
-            index.set(frame, index.get(frame) + 1);
+            index.set(frame, ++i);
         }
+        return null;
     }
 
     @Override
