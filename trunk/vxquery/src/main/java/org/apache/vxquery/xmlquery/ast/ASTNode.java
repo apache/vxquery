@@ -16,6 +16,7 @@
 */
 package org.apache.vxquery.xmlquery.ast;
 
+import org.apache.vxquery.util.Debug;
 import org.apache.vxquery.util.SourceLocation;
 
 public abstract class ASTNode {
@@ -29,5 +30,9 @@ public abstract class ASTNode {
     
     public SourceLocation getSourceLocation() {
         return loc;
+    }
+    
+    public String toString() {
+        return Debug.toString(this);
     }
 }

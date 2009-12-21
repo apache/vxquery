@@ -17,6 +17,7 @@
 package org.apache.vxquery.compiler.expression;
 
 import org.apache.vxquery.context.StaticContext;
+import org.apache.vxquery.util.Debug;
 
 public abstract class Expression {
     protected final StaticContext ctx;
@@ -31,5 +32,9 @@ public abstract class Expression {
 
     public final StaticContext getStaticContext() {
         return ctx;
+    }
+        
+    public String toString(Object o) {
+        return Debug.toString(o);
     }
 }
