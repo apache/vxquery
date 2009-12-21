@@ -476,6 +476,9 @@
         <param name="parameter1" type="node()*"/>
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
+        <!-- as we do the doc-order-sort and the duplicate elimination -->
+        <!-- after the concatenation, we can reuse the concat iterator -->
+        <runtime class="org.apache.vxquery.runtime.functions.ConcatenateIterator"/>
     </operator>
 
     <!-- op:yearMonthDuration-greater-than( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:boolean -->
