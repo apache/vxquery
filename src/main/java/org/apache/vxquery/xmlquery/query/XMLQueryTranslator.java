@@ -732,7 +732,11 @@ final class XMLQueryTranslator {
                 Signature sign = operator.getSignature();
                 Expression arg1 = normalize(currCtx, translateExpression(ie.getLeftExpr()), sign.getParameterType(0));
                 Expression arg2 = normalize(currCtx, translateExpression(ie.getRightExpr()), sign.getParameterType(1));
-                return ExpressionBuilder.functionCall(currCtx, operator, arg1, arg2);
+                Expression result = ExpressionBuilder.functionCall(currCtx, operator, arg1, arg2);
+                if (BuiltinOperators.UNION.equals(operator)) {
+                    result = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.SORT_DISTINCT_NODES_ASC, result);
+                }
+                return result;
             }
 
             case ENCLOSED_EXPRESSION: {
