@@ -19,7 +19,6 @@ package org.apache.vxquery.datamodel.dtm;
 import java.nio.CharBuffer;
 
 import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.NameCache;
 import org.apache.vxquery.datamodel.XDMNode;
 import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.datamodel.atomic.AnyUriValue;
@@ -50,6 +49,8 @@ final class DTMNodeImpl implements XDMNode {
             DTMNodeImpl o = (DTMNodeImpl) other;
             if (dtm == o.dtm) {
                 return index == o.index ? 0 : (index < o.index ? -1 : 1);
+            } else {
+                return dtm.getId() < o.dtm.getId() ? -1 : 1;
             }
         }
         int hc = iid.hashCode();

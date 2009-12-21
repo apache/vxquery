@@ -18,6 +18,7 @@ package org.apache.vxquery.datamodel.dtm;
 
 import java.util.Arrays;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -46,6 +47,11 @@ public final class DTM {
 
     static final int NULL = -1;
 
+    /* used to create unique ids for DTMs */
+    private static AtomicLong counter = new AtomicLong(-1);
+    
+    private final long id;
+    
     int nNodes;
 
     /**
@@ -114,6 +120,7 @@ public final class DTM {
     }
 
     public DTM(int initialSize, AtomicValueFactory avf, NameCache nameCache) {
+        id = counter.incrementAndGet();
         nNodes = 0;
         nodeKind = new byte[initialSize];
         next = new int[initialSize];
@@ -122,6 +129,10 @@ public final class DTM {
         nameCode = new int[initialSize];
         this.avf = avf;
         this.nameCache = nameCache;
+    }
+    
+    public final long getId() {
+        return id;
     }
 
     public DTMNodeImpl parse(Source source, boolean preserveWhitespace) throws SystemException {
