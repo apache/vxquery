@@ -46,7 +46,7 @@ public class FnCodepointsToStringIterator extends AbstractEagerlyEvaluatedFuncti
             return StringValue.EMPTY_STRING;
         }
         if (value.getDMOKind() != DMOKind.ATOMIC_VALUE && value.getDMOKind() != DMOKind.SEQUENCE) {
-            value = ((XDMNode) value).getAtomizedValue();
+            value = ((XDMNode) value).getTypedValue();
         }
         if (value.getDMOKind() == DMOKind.ATOMIC_VALUE) {
             return frame.getRuntimeControlBlock().getAtomicValueFactory().createString(
