@@ -24,8 +24,6 @@ import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.datamodel.atomic.AnyUriValue;
 import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.runtime.base.CloseableIterator;
-import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
-import org.apache.vxquery.runtime.core.SingletonCloseableIterator;
 
 final class DTMNodeImpl implements XDMNode {
     private DTM dtm;
@@ -59,7 +57,7 @@ final class DTMNodeImpl implements XDMNode {
     }
 
     @Override
-    public XDMValue getAtomizedValue() {
+    public XDMValue getTypedValue() {
         switch (dtm.nodeKind[index]) {
             case DTM.DTM_ATTRIBUTE:
             case DTM.DTM_ELEMENT:
@@ -97,11 +95,6 @@ final class DTMNodeImpl implements XDMNode {
             idx = dtm.next[idx];
         }
         return idx == DTM.NULL ? null : new DTMNodeImpl(dtm, idx);
-    }
-
-    @Override
-    public OpenableCloseableIterator getTypedValue() {
-        return new SingletonCloseableIterator(getAtomizedValue());
     }
 
     @Override

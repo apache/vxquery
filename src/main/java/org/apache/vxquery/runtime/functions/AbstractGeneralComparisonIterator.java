@@ -104,7 +104,7 @@ public abstract class AbstractGeneralComparisonIterator extends AbstractEagerlyE
 
             default:
                 XDMNode node = (XDMNode) v;
-                XDMValue av = node.getAtomizedValue();
+                XDMValue av = node.getTypedValue();
                 if (av != null) {
                     atomize(av, aList);
                 }

@@ -53,7 +53,7 @@ public class FnDataIterator extends AbstractLazilyEvaluatedFunctionIterator {
                     return v;
 
                 default:
-                    return ((XDMNode) v).getAtomizedValue();
+                    return ((XDMNode) v).getTypedValue();
             }
         }
     }

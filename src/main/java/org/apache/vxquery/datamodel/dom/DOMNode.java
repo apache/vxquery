@@ -23,8 +23,6 @@ import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.datamodel.atomic.AnyUriValue;
 import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.runtime.base.CloseableIterator;
-import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
-import org.apache.vxquery.runtime.core.SingletonCloseableIterator;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -152,12 +150,7 @@ final class DOMNode implements XDMNode, Wrapper<Node> {
         return parent;
     }
 
-    @Override
-    public OpenableCloseableIterator getTypedValue() {
-        return new SingletonCloseableIterator(getAtomizedValue());
-    }
-
-    public XDMValue getAtomizedValue() {
+    public XDMValue getTypedValue() {
         switch (node.getNodeType()) {
             case Node.COMMENT_NODE:
             case Node.PROCESSING_INSTRUCTION_NODE:
