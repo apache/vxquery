@@ -16,10 +16,12 @@
  */
 package org.apache.vxquery.xtest;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,7 +51,7 @@ public class HTMLFileReporterImpl implements ResultReporter {
 
     private PrintWriter out;
     
-    private File resultsDir;
+    private File resultsFile;
 
     public HTMLFileReporterImpl(File file) throws IOException {
         results = new ArrayList<TestCaseResult>();
@@ -63,11 +65,10 @@ public class HTMLFileReporterImpl implements ResultReporter {
             out = new PrintWriter(file);
             String fileName = file.getName();
             int dot = file.getName().lastIndexOf('.');
-            String dirName = (dot < 0 ? fileName : fileName.substring(0, dot)) + "_results";
-            resultsDir = file.getParent() != null 
-                ? new File(file.getParent() + File.separator + dirName)
-                : new File(dirName);
-            ensureDir(resultsDir);
+            String resultsFileName = (dot < 0 ? fileName : fileName.substring(0, dot)) + "_results.html";
+            resultsFile = file.getParent() != null 
+                ? new File(file.getParent() + File.separator + resultsFileName)
+                : new File(resultsFileName);
         }
     }
 
@@ -103,12 +104,36 @@ public class HTMLFileReporterImpl implements ResultReporter {
     @Override
     public void close() {
         if (out != null) {
-            writeHTML(out);
+            if (resultsFile != null) {
+                try {
+                    FileWriter resultsWriter = new FileWriter(resultsFile);
+                    PrintWriter resultsReport = new PrintWriter(new BufferedWriter(resultsWriter));
+                    writeHTML(out, resultsReport, resultsFile.toURI());
+                    resultsReport.flush();
+                    resultsWriter.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            } else {
+                writeHTML(out);
+            }
             out.flush();
         }
     }
     
     public void writeHTML(PrintWriter out) {
+        writeHTML(out, null, null);
+    }
+        
+    private void writeHTML(PrintWriter out, PrintWriter resOut, URI resURI) {
+        //long start = System.currentTimeMillis();
+        if (resOut != null) {
+            resOut.println("<html><head><title>results</title>");
+            resOut.println("<style type=\"text/css\">");
+            resOut.println("pre {background: #F0F0F0}");
+            resOut.println("</style></head><body>");
+        }
         out.println("<html><body>");
         writeSummary(out, count, userErrors, internalErrors, startTime, endTime);
         out.println("<hl>");
@@ -116,8 +141,12 @@ public class HTMLFileReporterImpl implements ResultReporter {
         out.println("<hl>");
         writeExceptionDistribution(out, exDistribution);
         out.println("<hl>");
-        writeResults(out, results, resultsDir);
+        writeResults(out, resOut, resURI, results);
         out.println("</body></html>");
+        if (resOut != null) {
+            resOut.println("</body></html>");
+        }
+        //System.err.println("HTML generation time: " + (System.currentTimeMillis() - start));
     }
 
     private static void writeSummary(PrintWriter out, int count, int userErrors, 
@@ -181,7 +210,7 @@ public class HTMLFileReporterImpl implements ResultReporter {
         out.println("</table>");
     }
 
-    private static void writeResults(PrintWriter out, List<TestCaseResult> results, File resultsDir) {
+    private static void writeResults(PrintWriter out, PrintWriter resOut, URI resURI, List<TestCaseResult> results) {
         out.println("<table>");
         int len = results.size();
         for (int i = 0; i < len; ++i) {
@@ -198,10 +227,10 @@ public class HTMLFileReporterImpl implements ResultReporter {
             out.print("</a></td><td>");
             out.print(res.time);
             out.print("</td><td>");
-            File resultFile = createResultFile(resultsDir, res, queryDisplayName);
-            if (resultFile != null) {
+            String name = appendResult(resOut, res, queryDisplayName);
+            if (name != null) {
                 out.print("<a href=\"");
-                out.print(resultFile.toURI());
+                out.print(resURI + "#" + name);
                 out.print("\">");
                 out.print(res.report);
                 out.print("</a>");
@@ -213,31 +242,23 @@ public class HTMLFileReporterImpl implements ResultReporter {
         out.println("</table>");
     }
 
-    private static File createResultFile(File resultsDir, TestCaseResult res, String queryDisplayName) {
-        if (resultsDir == null) {
+    private static String appendResult(PrintWriter resOut, TestCaseResult res, String queryDisplayName) {
+        if (resOut == null) {
             return null;
         }
-        try {
-            File resultFile = new File(resultsDir + File.separator + queryDisplayName + ".res");
-            ensureDir(resultFile.getParentFile());
-            FileWriter fw = new FileWriter(resultFile);
-            if (res.result != null) {
-                fw.write(res.result);
-            } else {
-                PrintWriter pw = new PrintWriter(fw);
-                res.error.printStackTrace(pw);
-            }
-            fw.close();
-            return resultFile;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        resOut.println(
+                "<a style=\"background: " + res.state.getColor() 
+                + "\" name=\"" + queryDisplayName 
+                + "\">&nbsp;&nbsp;&nbsp;</a>");
+        resOut.println(queryDisplayName);
+        resOut.println("<pre>");
+        // TODO need to escape HTML entities
+        if (res.result != null) {
+            resOut.println(res.result);
+        } else {
+            res.error.printStackTrace(resOut);
         }
-    }
-    
-    private static void ensureDir(File dir) throws IOException {
-        if (!dir.isDirectory() && !dir.mkdirs()) {
-            throw new IOException("could not create dir " + dir);
-        }
+        resOut.println("</pre>");
+        return queryDisplayName;
     }
 }
