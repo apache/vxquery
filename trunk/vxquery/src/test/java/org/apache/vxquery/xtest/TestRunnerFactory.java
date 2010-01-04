@@ -41,9 +41,11 @@ import org.apache.vxquery.xmlquery.query.PrologVariable;
 
 public class TestRunnerFactory {
     private List<ResultReporter> reporters;
+    private XTestOptions opts;
 
-    public TestRunnerFactory() {
+    public TestRunnerFactory(XTestOptions opts) {
         reporters = new ArrayList<ResultReporter>();
+        this.opts = opts;
     }
 
     public void registerReporter(ResultReporter reporter) {
@@ -55,6 +57,9 @@ public class TestRunnerFactory {
             @Override
             public void run() {
                 TestCaseResult res = new TestCaseResult(testCase);
+                if (opts.verbose) {
+                    System.err.println("Starting " + testCase.getXQueryDisplayName());
+                }
                 long start = System.currentTimeMillis();
                 try {
                     InternalAPI iapi = new InternalAPI(new DTMDatamodelStaticInterfaceImpl());
