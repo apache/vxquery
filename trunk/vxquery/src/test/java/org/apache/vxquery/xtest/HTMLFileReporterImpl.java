@@ -252,13 +252,42 @@ public class HTMLFileReporterImpl implements ResultReporter {
                 + "\">&nbsp;&nbsp;&nbsp;</a>");
         resOut.println(queryDisplayName);
         resOut.println("<pre>");
-        // TODO need to escape HTML entities
         if (res.result != null) {
-            resOut.println(res.result);
+            resOut.println(escape(res.result));
         } else {
             res.error.printStackTrace(resOut);
         }
         resOut.println("</pre>");
         return queryDisplayName;
+    }
+    
+    /* this should not be necessary anymore, when the XQuery serialization 
+     * works right
+     */
+    private static String escape(String s) {
+        final char[] ca = s.toCharArray();
+        final int l = ca.length;
+        int start = 0;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < l; ++i) {
+            switch (ca[i]) {
+                case '<':
+                    sb.append(ca, start, i - start);
+                    sb.append("&lt;");
+                    start = i + 1;
+                    break;
+                case '>':
+                    sb.append(ca, start, i - start);
+                    sb.append("&gt;");
+                    start = i + 1;
+                    break;                    
+                case '&':
+                    sb.append(ca, start, i - start);
+                    sb.append("&amp;");
+                    start = i + 1;
+                    break;                
+            }
+        }
+        return start > 0 ? sb.toString() : s;   
     }
 }
