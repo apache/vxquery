@@ -1,13 +1,11 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -759,8 +757,8 @@ final class XMLQueryTranslator {
                     if (!type.isAtomicType()) {
                         throw new SystemException(ErrorCode.XPST0051, fnNode.getName().getSourceLocation());
                     }
-                    Expression arg = args.isEmpty() ? deflate(currCtx, new VariableReferenceExpression(currCtx,
-                            varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME))) : args.get(0);
+                    Expression arg = args.isEmpty() ? new VariableReferenceExpression(currCtx, varScope
+                            .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)) : args.get(0);
                     return new CastExpression(currCtx, arg, SequenceType.create((ItemType) type,
                             Quantifier.QUANT_QUESTION));
                 }
@@ -776,8 +774,8 @@ final class XMLQueryTranslator {
                 int nArgs = fnNode.getArguments().size();
                 Function fn = moduleCtx.lookupFunction(fName, nArgs);
                 if (fn != null && fn.useContextImplicitly()) {
-                    args.add(deflate(currCtx, new VariableReferenceExpression(currCtx, varScope
-                            .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME))));
+                    args.add(new VariableReferenceExpression(currCtx, varScope
+                            .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)));
                     nArgs = fnNode.getArguments().size();
                     fn = moduleCtx.lookupFunction(fName, nArgs);
                 }
@@ -980,8 +978,8 @@ final class XMLQueryTranslator {
                 if (var == null) {
                     throw new SystemException(ErrorCode.XPST0008, vrNode.getSourceLocation());
                 }
-                return new TreatExpression(currCtx, deflate(currCtx, new VariableReferenceExpression(currCtx, var)),
-                        var.getDeclaredStaticType());
+                return new TreatExpression(currCtx, new VariableReferenceExpression(currCtx, var), var
+                        .getDeclaredStaticType());
             }
 
             case FLWOR_EXPRESSION: {
@@ -1118,7 +1116,8 @@ final class XMLQueryTranslator {
                     varScope.registerVariable(var);
                     ++pushCount;
                 }
-                Expression sExpr = translateExpression(qeNode.getSatisfiesExpr());
+                Expression sExpr = ExpressionBuilder.functionCall(currCtx, BuiltinFunctions.FN_BOOLEAN_1,
+                        translateExpression(qeNode.getSatisfiesExpr()));
                 for (int i = 0; i < pushCount; ++i) {
                     popVariableScope();
                 }
@@ -1279,10 +1278,6 @@ final class XMLQueryTranslator {
             buffer.append(image, i, image.length());
         }
         return buffer.toString();
-    }
-
-    private static Expression deflate(StaticContext ctx, Expression expr) {
-        return ExpressionBuilder.functionCall(ctx, BuiltinOperators.DEFLATE_SEQUENCES, expr);
     }
 
     private static Expression normalize(StaticContext ctx, Expression e, SequenceType type) {
@@ -1493,11 +1488,11 @@ final class XMLQueryTranslator {
 
             Expression typeTest = ExpressionBuilder.instanceOf(currCtx, new VariableReferenceExpression(currCtx, pVar),
                     SequenceType.create(BuiltinTypeRegistry.XSEXT_NUMERIC, Quantifier.QUANT_ONE));
-            Expression posTest = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.VALUE_EQ, deflate(currCtx,
-                    new VariableReferenceExpression(currCtx, pVar)), new VariableReferenceExpression(currCtx, varScope
-                    .lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME)));
-            Expression boolTest = ExpressionBuilder.functionCall(currCtx, BuiltinFunctions.FN_BOOLEAN_1, deflate(
-                    currCtx, new VariableReferenceExpression(currCtx, pVar)));
+            Expression posTest = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.VALUE_EQ,
+                    new VariableReferenceExpression(currCtx, pVar), new VariableReferenceExpression(currCtx, varScope
+                            .lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME)));
+            Expression boolTest = ExpressionBuilder.functionCall(currCtx, BuiltinFunctions.FN_BOOLEAN_1,
+                    new VariableReferenceExpression(currCtx, pVar));
 
             clauses
                     .add(new FLWORExpression.WhereClause(new IfThenElseExpression(currCtx, typeTest, posTest, boolTest)));
@@ -1531,15 +1526,15 @@ final class XMLQueryTranslator {
         clauses.add(seqLC);
 
         List<Expression> cArgs = new ArrayList<Expression>();
-        cArgs.add(deflate(currCtx, new VariableReferenceExpression(currCtx, seqVar)));
+        cArgs.add(new VariableReferenceExpression(currCtx, seqVar));
         ForLetVariable cVar = new ForLetVariable(VarTag.LET, XMLQueryCompilerConstants.LAST_VAR_NAME,
                 new FunctionCallExpression(currCtx, BuiltinFunctions.FN_COUNT_1, cArgs));
         FLWORExpression.LetClause cLC = new FLWORExpression.LetClause(cVar);
         varScope.registerVariable(cVar);
         clauses.add(cLC);
 
-        ForLetVariable dotVar = new ForLetVariable(VarTag.FOR, XMLQueryCompilerConstants.DOT_VAR_NAME, deflate(currCtx,
-                new VariableReferenceExpression(currCtx, seqVar)));
+        ForLetVariable dotVar = new ForLetVariable(VarTag.FOR, XMLQueryCompilerConstants.DOT_VAR_NAME,
+                new VariableReferenceExpression(currCtx, seqVar));
         PositionVariable posVar = new PositionVariable(XMLQueryCompilerConstants.POS_VAR_NAME);
         FLWORExpression.ForClause dotFC = new FLWORExpression.ForClause(dotVar, posVar, null);
         varScope.registerVariable(dotVar);

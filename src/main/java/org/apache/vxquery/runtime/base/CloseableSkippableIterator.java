@@ -12,23 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.runtime.core;
+package org.apache.vxquery.runtime.base;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.CallStackFrame;
-import org.apache.vxquery.runtime.RegisterAllocator;
-import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedIterator;
-
-public class SingletonRuntimeIterator extends AbstractEagerlyEvaluatedIterator {
-    private final Object value;
-
-    public SingletonRuntimeIterator(RegisterAllocator rAllocator, Object value) {
-        super(rAllocator);
-        this.value = value;
-    }
-
-    @Override
-    public Object evaluateEagerly(CallStackFrame frame) throws SystemException {
-        return value;
-    }
+public interface CloseableSkippableIterator extends CloseableIterator {
+    public int skip(int len);
 }
