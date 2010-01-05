@@ -341,12 +341,12 @@ class XMLQueryCodeGenerator {
 
         @Override
         public RuntimeIterator visitTypeswitchExpression(TypeswitchExpression expr) {
-            return null;
+            throw new UnsupportedOperationException("no code generation for typeswitch expressions");
         }
 
         @Override
         public RuntimeIterator visitValidateExpression(ValidateExpression expr) {
-            return null;
+            throw new UnsupportedOperationException("no code generation for validate expressions");
         }
 
         @Override
@@ -386,7 +386,7 @@ class XMLQueryCodeGenerator {
                     return new DescendantOrSelfAxisIterator(rAllocator, in, typeFilter);
 
                 case FOLLOWING:
-                    throw new UnsupportedOperationException();
+                    throw new UnsupportedOperationException("no code generation for the following axis");
 
                 case FOLLOWING_SIBLING:
                     return new FollowingSiblingAxisIterator(rAllocator, in, typeFilter);
@@ -395,7 +395,7 @@ class XMLQueryCodeGenerator {
                     return new ParentAxisIterator(rAllocator, in, typeFilter);
 
                 case PRECEDING:
-                    throw new UnsupportedOperationException();
+                    throw new UnsupportedOperationException("no code generation for the preceding axis");
 
                 case PRECEDING_SIBLING:
                     return new PrecedingSiblingAxisIterator(rAllocator, in, typeFilter);
