@@ -51,9 +51,10 @@ public class HTMLFileReporterImpl implements ResultReporter {
 
     private PrintWriter out;
     
-    private File resultsFile;
+    private File reportFile;
+    private File resultDir;
 
-    public HTMLFileReporterImpl(File file) throws IOException {
+    public HTMLFileReporterImpl(File file) {
         results = new ArrayList<TestCaseResult>();
         count = 0;
         userErrors = 0;
@@ -61,15 +62,7 @@ public class HTMLFileReporterImpl implements ResultReporter {
         startTime = -1;
         exDistribution = new HashMap<Class<?>, Integer>();
         stDistribution = new HashMap<TestCaseResult.State, Integer>();
-        if (file != null) {
-            out = new PrintWriter(file);
-            String fileName = file.getName();
-            int dot = file.getName().lastIndexOf('.');
-            String resultsFileName = (dot < 0 ? fileName : fileName.substring(0, dot)) + "_results.html";
-            resultsFile = file.getParent() != null 
-                ? new File(file.getParent() + File.separator + resultsFileName)
-                : new File(resultsFileName);
-        }
+        reportFile = file;
     }
 
     @Override
@@ -103,25 +96,40 @@ public class HTMLFileReporterImpl implements ResultReporter {
 
     @Override
     public void close() {
-        if (out != null) {
-            if (resultsFile != null) {
-                try {
-                    FileWriter resultsWriter = new FileWriter(resultsFile);
-                    PrintWriter resultsReport = new PrintWriter(new BufferedWriter(resultsWriter));
-                    writeHTML(out, resultsReport, resultsFile.toURI());
-                    resultsReport.flush();
-                    resultsWriter.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } else {
-                writeHTML(out);
+        if (reportFile != null) {
+            try {
+                out = new PrintWriter(reportFile);
+                resultDir = createResultDir(reportFile);
+                ensureDir(resultDir);
+                File resultFile = new File(resultDir.getAbsolutePath() + File.separator + "index.html");
+                FileWriter resultWriter = new FileWriter(resultFile);
+                PrintWriter resultReport = new PrintWriter(new BufferedWriter(resultWriter));
+                writeHTML(out, resultReport, resultFile.toURI());
+                resultReport.flush();
+                resultWriter.close();
+                out.flush();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-            out.flush();
         }
     }
     
+    private static File createResultDir(File file) {
+        String fileName = file.getName();
+        int dot = file.getName().lastIndexOf('.');
+        String resultDirName = (dot < 0 ? fileName : fileName.substring(0, dot)) + "_results";
+        return file.getParent() != null 
+            ? new File(file.getParent() + File.separator + resultDirName)
+            : new File(resultDirName);
+    }
+    
+    private static void ensureDir(File dir) throws IOException {
+        if (!dir.isDirectory() && !dir.mkdirs()) {
+            throw new IOException("could not create dir " + dir);
+        }
+    }
+
     public void writeHTML(PrintWriter out) {
         writeHTML(out, null, null);
     }
