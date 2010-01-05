@@ -1,19 +1,17 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
@@ -46,13 +44,13 @@ public class FnSubsequenceIterator extends AbstractLazilyEvaluatedFunctionIterat
     public Object next(CallStackFrame frame) throws SystemException {
         if (remaining.get(frame) == null) {
             int start = (int) Math.round(RuntimeUtils.fetchNumericItemEagerly(arguments[1], frame).getDoubleValue());
-            while (start > 1) {
-                arguments[0].next(frame);
-                start--;
+            if (start > 1) {
+                arguments[0].skip(frame, start - 1);
             }
-        
+
             if (arguments.length > 2) {
-                int length = (int) Math.round(RuntimeUtils.fetchNumericItemEagerly(arguments[2], frame).getDoubleValue());
+                int length = (int) Math.round(RuntimeUtils.fetchNumericItemEagerly(arguments[2], frame)
+                        .getDoubleValue());
                 remaining.set(frame, length < 0 ? 0 : length);
             } else {
                 remaining.set(frame, -1);
@@ -67,7 +65,7 @@ public class FnSubsequenceIterator extends AbstractLazilyEvaluatedFunctionIterat
         if (o == null) {
             remain = 0;
         } else {
-            --remain;                
+            --remain;
         }
         remaining.set(frame, remain);
         return o;

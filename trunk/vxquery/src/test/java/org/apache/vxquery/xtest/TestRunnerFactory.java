@@ -1,13 +1,11 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +32,6 @@ import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
 import org.apache.vxquery.datamodel.serialization.XMLSerializer;
 import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
-import org.apache.vxquery.runtime.core.Deflater;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.PrologVariable;
@@ -82,18 +79,16 @@ public class TestRunnerFactory {
                     OpenableCloseableIterator ri = iapi.execute(module);
                     ri.open();
                     XDMItem o;
-                    Deflater deflater = new Deflater();
-                    deflater.reset(ri);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(baos)), true);
                     XMLSerializer s = new XMLSerializer(out, false);
                     try {
-                        while ((o = (XDMItem) deflater.next()) != null) {
+                        while ((o = (XDMItem) ri.next()) != null) {
                             s.item(o);
                         }
                     } finally {
                         out.flush();
-                        deflater.close();
+                        ri.close();
                     }
                     try {
                         res.result = baos.toString("UTF-8");
