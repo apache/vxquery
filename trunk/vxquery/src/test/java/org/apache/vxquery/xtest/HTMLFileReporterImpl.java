@@ -52,7 +52,6 @@ public class HTMLFileReporterImpl implements ResultReporter {
     private PrintWriter out;
     
     private File reportFile;
-    private File resultDir;
 
     public HTMLFileReporterImpl(File file) {
         results = new ArrayList<TestCaseResult>();
@@ -99,14 +98,7 @@ public class HTMLFileReporterImpl implements ResultReporter {
         if (reportFile != null) {
             try {
                 out = new PrintWriter(reportFile);
-                resultDir = createResultDir(reportFile);
-                ensureDir(resultDir);
-                File resultFile = new File(resultDir.getAbsolutePath() + File.separator + "index.html");
-                FileWriter resultWriter = new FileWriter(resultFile);
-                PrintWriter resultReport = new PrintWriter(new BufferedWriter(resultWriter));
-                writeHTML(out, resultReport, resultFile.toURI());
-                resultReport.flush();
-                resultWriter.close();
+                writeHTML(out, createResultDir(reportFile));
                 out.flush();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -124,24 +116,12 @@ public class HTMLFileReporterImpl implements ResultReporter {
             : new File(resultDirName);
     }
     
-    private static void ensureDir(File dir) throws IOException {
-        if (!dir.isDirectory() && !dir.mkdirs()) {
-            throw new IOException("could not create dir " + dir);
-        }
-    }
-
     public void writeHTML(PrintWriter out) {
-        writeHTML(out, null, null);
+        writeHTML(out, null);
     }
         
-    private void writeHTML(PrintWriter out, PrintWriter resOut, URI resURI) {
-        //long start = System.currentTimeMillis();
-        if (resOut != null) {
-            resOut.println("<html><head><title>results</title>");
-            resOut.println("<style type=\"text/css\">");
-            resOut.println("pre {background: #F0F0F0}");
-            resOut.println("</style></head><body>");
-        }
+    public void writeHTML(PrintWriter out, File resultDir) {
+        long start = System.currentTimeMillis();
         out.println("<html><body>");
         writeSummary(out, count, userErrors, internalErrors, startTime, endTime);
         out.println("<hl>");
@@ -149,12 +129,9 @@ public class HTMLFileReporterImpl implements ResultReporter {
         out.println("<hl>");
         writeExceptionDistribution(out, exDistribution);
         out.println("<hl>");
-        writeResults(out, resOut, resURI, results);
+        writeResults(out, resultDir, results);
         out.println("</body></html>");
-        if (resOut != null) {
-            resOut.println("</body></html>");
-        }
-        //System.err.println("HTML generation time: " + (System.currentTimeMillis() - start));
+        System.err.println("HTML generation time: " + (System.currentTimeMillis() - start));
     }
 
     private static void writeSummary(PrintWriter out, int count, int userErrors, 
@@ -218,7 +195,8 @@ public class HTMLFileReporterImpl implements ResultReporter {
         out.println("</table>");
     }
 
-    private static void writeResults(PrintWriter out, PrintWriter resOut, URI resURI, List<TestCaseResult> results) {
+    private static void writeResults(PrintWriter out, File resultDir, List<TestCaseResult> results) {
+        ResultManager rfw = new ResultManager(resultDir);
         out.println("<table>");
         int len = results.size();
         for (int i = 0; i < len; ++i) {
@@ -235,10 +213,10 @@ public class HTMLFileReporterImpl implements ResultReporter {
             out.print("</a></td><td>");
             out.print(res.time);
             out.print("</td><td>");
-            String name = appendResult(resOut, res, queryDisplayName);
-            if (name != null) {
+            String uri = rfw.writeResult(res, queryDisplayName);
+            if (uri != null) {
                 out.print("<a href=\"");
-                out.print(resURI + "#" + name);
+                out.print(uri);
                 out.print("\">");
                 out.print(res.report);
                 out.print("</a>");
@@ -248,27 +226,109 @@ public class HTMLFileReporterImpl implements ResultReporter {
             out.println("</td></tr>");
         }
         out.println("</table>");
-    }
-
-    private static String appendResult(PrintWriter resOut, TestCaseResult res, String queryDisplayName) {
-        if (resOut == null) {
-            return null;
-        }
-        resOut.println(
-                "<a style=\"background: " + res.state.getColor() 
-                + "\" name=\"" + queryDisplayName 
-                + "\">&nbsp;&nbsp;&nbsp;</a>");
-        resOut.println(queryDisplayName);
-        resOut.println("<pre>");
-        if (res.result != null) {
-            resOut.println(escape(res.result));
-        } else {
-            res.error.printStackTrace(resOut);
-        }
-        resOut.println("</pre>");
-        return queryDisplayName;
+        rfw.close();
     }
     
+}
+
+/** 
+ * writes results into several HTML files of manageable size 
+ */
+class ResultManager {
+    
+    /** 
+     * if the length of a file passes this length, a new file will be used
+     * for the next result 
+     */
+    private static final long MAX_LEN = 1000000;
+    
+    private final File dir;
+    
+    private File curFile;
+    private URI curURI;
+    private FileWriter curFileWriter;
+    private PrintWriter curPrintWriter;
+
+    ResultManager(File dir) {
+        this.dir = dir;
+    }
+    
+    /**
+     * writes an HTML serialization of a test result into a temp HTML file
+     * inside the given directory 
+     * @param res the result data for 1 test case
+     * @param linkName the name of the (internal) HTML link that points to 
+     *        the test result inside the HTML file
+     * @return the full URI that references the test result in the HTML file
+     */
+    String writeResult(TestCaseResult res, String linkName) {
+        if (dir == null) {
+            return null;
+        }
+        try {
+            if (curFile == null || curFile.length() > MAX_LEN) {
+                if (curFile != null) {
+                    writeDocFooter(curPrintWriter);
+                    curPrintWriter.flush();
+                    curFileWriter.close();
+                } else {
+                    ensureDir(dir);
+                }
+                curFile = File.createTempFile("res", ".html", dir);
+                curFileWriter = new FileWriter(curFile);
+                curPrintWriter = new PrintWriter(new BufferedWriter(curFileWriter));
+                curURI = curFile.toURI();
+                writeDocHeader(curPrintWriter);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        curPrintWriter.println(
+                "<a style=\"background: " + res.state.getColor() 
+                + "\" name=\"" + linkName 
+                + "\">&nbsp;&nbsp;&nbsp;</a>");
+        curPrintWriter.println(linkName);
+        curPrintWriter.println("<pre>");
+        if (res.result != null) {
+            curPrintWriter.println(escape(res.result));
+        } else {
+            res.error.printStackTrace(curPrintWriter);
+        }
+        curPrintWriter.println("</pre>");
+        return curURI + "#" + linkName;
+    }
+
+    void close() {
+        try {
+            if (curFile != null) {
+                writeDocFooter(curPrintWriter);
+                curPrintWriter.flush();
+                curFileWriter.close();
+            }        
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static void ensureDir(File dir) throws IOException {
+        if (!dir.isDirectory() && !dir.mkdirs()) {
+            throw new IOException("could not create dir " + dir);
+        }
+    }
+
+    private static void writeDocHeader(PrintWriter resOut) {
+        resOut.println("<html><head><title>results</title>");
+        resOut.println("<style type=\"text/css\">");
+        resOut.println("pre {background: #F0F0F0}");
+        resOut.println("</style></head><body>");
+    }
+
+    private static void writeDocFooter(PrintWriter resOut) {
+        resOut.println("</body></html>");
+    }
+
     /* this should not be necessary anymore, when the XQuery serialization 
      * works right
      */
@@ -298,4 +358,5 @@ public class HTMLFileReporterImpl implements ResultReporter {
         }
         return start > 0 ? sb.toString() : s;   
     }
+
 }
