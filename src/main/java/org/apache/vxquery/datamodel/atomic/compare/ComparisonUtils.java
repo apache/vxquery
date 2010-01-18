@@ -41,7 +41,6 @@ import org.apache.vxquery.datamodel.atomic.TimeValue;
 import org.apache.vxquery.datamodel.atomic.UntypedAtomicValue;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RuntimeControlBlock;
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.BuiltinTypeConstants;
@@ -100,13 +99,12 @@ public class ComparisonUtils {
         }
     }
 
-    public static Boolean valueCompare(CallStackFrame frame, final XDMAtomicValue v1, final XDMAtomicValue v2,
+    public static Boolean valueCompare(RuntimeControlBlock rcb, final XDMAtomicValue v1, final XDMAtomicValue v2,
             ValueComparator vComp, Collation collation) throws SystemException {
         final AtomicType t1 = v1.getAtomicType();
         final AtomicType t2 = v2.getAtomicType();
         final int tid1 = ComparisonUtils.getBaseTypeForValueComparison(t1.getTypeId());
         final int tid2 = ComparisonUtils.getBaseTypeForValueComparison(t2.getTypeId());
-        final RuntimeControlBlock rcb = frame.getRuntimeControlBlock();
         final AtomicValueFactory avf = rcb.getAtomicValueFactory();
         switch (tid1) {
             case BuiltinTypeConstants.XS_UNTYPED_ATOMIC_TYPE_ID:

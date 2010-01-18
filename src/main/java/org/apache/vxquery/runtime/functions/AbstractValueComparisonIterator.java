@@ -25,6 +25,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
+import org.apache.vxquery.runtime.RuntimeControlBlock;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 
@@ -44,12 +45,13 @@ public abstract class AbstractValueComparisonIterator extends AbstractEagerlyEva
         if (v2 == null) {
             return null;
         }
-        Boolean res = ComparisonUtils.valueCompare(frame, v1, v2, getComparator(), frame.getRuntimeControlBlock()
+        final RuntimeControlBlock rcb = frame.getRuntimeControlBlock();
+        Boolean res = ComparisonUtils.valueCompare(rcb, v1, v2, getComparator(), rcb
                 .getDefaultCollation());
         if (res == null) {
             throw new SystemException(ErrorCode.XPTY0004);
         }
-        return frame.getRuntimeControlBlock().getAtomicValueFactory().createBoolean(res);
+        return rcb.getAtomicValueFactory().createBoolean(res);
     }
 
     protected abstract ValueComparator getComparator();
