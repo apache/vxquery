@@ -30,6 +30,7 @@ import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.LocalRegisterAccessor;
 import org.apache.vxquery.runtime.RegisterAllocator;
+import org.apache.vxquery.runtime.RuntimeControlBlock;
 import org.apache.vxquery.runtime.RuntimeUtils;
 import org.apache.vxquery.runtime.base.AbstractLazilyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
@@ -54,19 +55,19 @@ public class FnIndexOfIterator extends AbstractLazilyEvaluatedFunctionIterator {
 
     @Override
     public Object next(CallStackFrame frame) throws SystemException {
+        final RuntimeControlBlock rcb = frame.getRuntimeControlBlock();
         if (value.get(frame) == null) {
             value.set(frame, (XDMAtomicValue) arguments[1].next(frame));
             Collation c;
             if (arguments.length > 2) {
                 XDMItem cv = RuntimeUtils.fetchItemEagerly(arguments[2], frame);
                 String collationName = cv.getStringValue().toString();
-                c = frame.getRuntimeControlBlock().getDynamicContext().getStaticContext()
-                        .lookupCollation(collationName);
+                c = rcb.getDynamicContext().getStaticContext().lookupCollation(collationName);
                 if (c == null) {
                     throw new SystemException(ErrorCode.FOCH0002);
                 }
             } else {
-                c = frame.getRuntimeControlBlock().getDefaultCollation();
+                c = rcb.getDefaultCollation();
             }
             collation.set(frame, c);
         }
@@ -77,10 +78,10 @@ public class FnIndexOfIterator extends AbstractLazilyEvaluatedFunctionIterator {
             }
             BigInteger idx = index.get(frame).add(BigInteger.ONE);
             index.set(frame, idx);
-            Boolean res = ComparisonUtils.valueCompare(frame, v, value.get(frame), ValueEqComparator.INSTANCE,
+            Boolean res = ComparisonUtils.valueCompare(rcb, v, value.get(frame), ValueEqComparator.INSTANCE,
                     collation.get(frame));
             if (res != null && res) {
-                return frame.getRuntimeControlBlock().getAtomicValueFactory().createInteger(idx);
+                return rcb.getAtomicValueFactory().createInteger(idx);
             }
         }
     }
