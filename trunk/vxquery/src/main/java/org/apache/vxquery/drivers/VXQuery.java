@@ -78,7 +78,7 @@ public class VXQuery {
                 public void notifyTranslationResult(Module module) {
                     if (opts.showTET) {
                         StringBuilder tet = new StringBuilder();
-                        ExpressionPrinter.prettyPrint(module.getBody(), 0, tet);
+                        ExpressionPrinter.prettyPrint(module.getBody().get(), 0, tet);
                         System.err.println(tet);
                     }
                 }
@@ -86,8 +86,17 @@ public class VXQuery {
                 @Override
                 public void notifyTypecheckResult(Module module) {
                 }
+
+                @Override
+                public void notifyOptimizedResult(Module module) {
+                    if (opts.showOET) {
+                        StringBuilder tet = new StringBuilder();
+                        ExpressionPrinter.prettyPrint(module.getBody().get(), 0, tet);
+                        System.err.println(tet);
+                    }
+                }
             };
-            Module module = iapi.compile(listener, ast);
+            Module module = iapi.compile(listener, ast, opts.optimizationLevel);
             if (opts.compileOnly) {
                 continue;
             }
@@ -131,6 +140,9 @@ public class VXQuery {
     }
 
     private static class CmdLineOptions {
+        @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
+        private int optimizationLevel = Integer.MAX_VALUE;
+
         @Option(name = "-showquery", usage = "Show query string")
         private boolean showQuery;
 
@@ -139,6 +151,9 @@ public class VXQuery {
 
         @Option(name = "-showtet", usage = "Show translated expression tree")
         private boolean showTET;
+
+        @Option(name = "-showoet", usage = "Show optimized expression tree")
+        private boolean showOET;
 
         @Option(name = "-showri", usage = "Show Runtime plan")
         private boolean showRI;

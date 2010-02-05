@@ -12,27 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.xmlquery.query;
+package org.apache.vxquery.compiler.rewriter.framework;
 
-public class NoopXQueryCompilationListener implements XQueryCompilationListener {
-    public static final XQueryCompilationListener INSTANCE = new NoopXQueryCompilationListener();
+import org.apache.vxquery.compiler.expression.ExpressionHandle;
 
-    private NoopXQueryCompilationListener() {
+public abstract class AbstractRewriteRule implements RewriteRule {
+    private final int minOptimizationLevel;
+
+    public AbstractRewriteRule(int minOptimizationLevel) {
+        this.minOptimizationLevel = minOptimizationLevel;
     }
 
     @Override
-    public void notifyCodegenResult(Module module) {
+    public int getMinOptimizationLevel() {
+        return minOptimizationLevel;
     }
 
     @Override
-    public void notifyTranslationResult(Module module) {
+    public boolean rewritePost(ExpressionHandle exprHandle) {
+        return false;
     }
 
     @Override
-    public void notifyTypecheckResult(Module module) {
-    }
-
-    @Override
-    public void notifyOptimizedResult(Module module) {
+    public boolean rewritePre(ExpressionHandle exprHandle) {
+        return false;
     }
 }

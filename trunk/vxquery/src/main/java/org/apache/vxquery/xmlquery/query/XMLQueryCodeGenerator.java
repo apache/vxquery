@@ -1,13 +1,11 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -126,7 +124,7 @@ class XMLQueryCodeGenerator {
             Function f = i.next();
             if (Function.FunctionTag.UDXQUERY.equals(f.getTag())) {
                 UserDefinedXQueryFunction udf = (UserDefinedXQueryFunction) f;
-                Expression fnExpr = udf.getBody();
+                Expression fnExpr = udf.getBody().get();
                 RegisterAllocator fnPlanRegAllocator = new RegisterAllocator(0);
                 Map<Variable, Integer> fnPlanVarMap = new HashMap<Variable, Integer>(gVarMap);
                 for (ParameterVariable pVar : udf.getParameters()) {
@@ -136,7 +134,7 @@ class XMLQueryCodeGenerator {
                 udf.setRuntimePlan(fnPlan);
             }
         }
-        Expression body = module.getBody();
+        Expression body = module.getBody().get();
         if (body != null) {
             RegisterAllocator planRegAllocator = new RegisterAllocator(0);
             Map<Variable, Integer> planVarMap = new HashMap<Variable, Integer>(gVarMap);
@@ -312,7 +310,7 @@ class XMLQueryCodeGenerator {
                 varRegMap.put(fv, rAddr);
                 ti = new ForTupleIterator(rAllocator, ti, si, rAddr, -1);
             }
-            Expression satExpr = expr.getSatisfiesExpression();
+            Expression satExpr = expr.getSatisfiesExpression().get();
             RuntimeIterator ci = satExpr.accept(this);
             if (expr.getQuantification() == Quantification.EVERY) {
                 ci = BuiltinFunctions.FN_NOT_1.getIteratorFactory().createIterator(rAllocator,

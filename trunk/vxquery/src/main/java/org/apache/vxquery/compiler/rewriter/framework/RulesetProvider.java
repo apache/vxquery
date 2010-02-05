@@ -12,27 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.xmlquery.query;
+package org.apache.vxquery.compiler.rewriter.framework;
 
-public class NoopXQueryCompilationListener implements XQueryCompilationListener {
-    public static final XQueryCompilationListener INSTANCE = new NoopXQueryCompilationListener();
+import java.util.List;
 
-    private NoopXQueryCompilationListener() {
-    }
-
-    @Override
-    public void notifyCodegenResult(Module module) {
-    }
-
-    @Override
-    public void notifyTranslationResult(Module module) {
-    }
-
-    @Override
-    public void notifyTypecheckResult(Module module) {
-    }
-
-    @Override
-    public void notifyOptimizedResult(Module module) {
-    }
+public interface RulesetProvider {
+    public List<RewriteRule> createRuleset();
 }

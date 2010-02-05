@@ -17,6 +17,9 @@ package org.apache.vxquery.xtest;
 import org.kohsuke.args4j.Option;
 
 public class XTestOptions {
+    @Option(name = "-O", required = false, usage = "Optimization Level")
+    int optimizationLevel = Integer.MAX_VALUE;
+
     @Option(name = "-port", required = false, usage = "Port for web server to listen on")
     int port;
 
