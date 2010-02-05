@@ -1,24 +1,24 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.compiler.expression;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.vxquery.compiler.tools.ExpressionUtils;
 import org.apache.vxquery.context.StaticContext;
 
 public class FLWORExpression extends Expression {
@@ -40,20 +40,21 @@ public class FLWORExpression extends Expression {
         return clauses;
     }
 
-    public Expression getReturnExpression() {
-        return rExpr.get();
-    }
-
-    public void setReturnExpression(Expression rExpr) {
-        this.rExpr.set(rExpr);
+    public ExpressionHandle getReturnExpression() {
+        return rExpr;
     }
 
     public enum ClauseTag {
-        FOR, LET, WHERE, ORDERBY,
+        FOR,
+        LET,
+        WHERE,
+        ORDERBY,
     }
 
     public static abstract class Clause {
         public abstract ClauseTag getTag();
+
+        public abstract Clause copy(StaticContext ctx, Map<Variable, Expression> substitution);
     }
 
     public static final class ForClause extends Clause {
@@ -95,6 +96,25 @@ public class FLWORExpression extends Expression {
         public void setScoreVariable(ScoreVariable scoreVar) {
             this.scoreVar = scoreVar;
         }
+
+        @Override
+        public Clause copy(StaticContext ctx, Map<Variable, Expression> substitution) {
+            ForLetVariable fv = new ForLetVariable(Variable.VarTag.FOR, ExpressionUtils.createVariableCopyName(forVar
+                    .getName()), forVar.getSequence().get().copy(substitution));
+            substitution.put(forVar, new VariableReferenceExpression(ctx, fv));
+            PositionVariable pv = null;
+            if (posVar != null) {
+                pv = new PositionVariable(ExpressionUtils.createVariableCopyName(posVar.getName()));
+                substitution.put(posVar, new VariableReferenceExpression(ctx, pv));
+            }
+            ScoreVariable sv = null;
+            if (scoreVar != null) {
+                sv = new ScoreVariable(scoreVar.getName());
+                substitution.put(scoreVar, new VariableReferenceExpression(ctx, sv));
+            }
+            return new ForClause(fv, pv, sv);
+        }
+
     }
 
     public static final class LetClause extends Clause {
@@ -116,6 +136,14 @@ public class FLWORExpression extends Expression {
         public void setLetVariable(ForLetVariable letVar) {
             this.letVar = letVar;
         }
+
+        @Override
+        public Clause copy(StaticContext ctx, Map<Variable, Expression> substitution) {
+            ForLetVariable lv = new ForLetVariable(Variable.VarTag.LET, ExpressionUtils.createVariableCopyName(letVar
+                    .getName()), letVar.getSequence().get().copy(substitution));
+            substitution.put(letVar, new VariableReferenceExpression(ctx, lv));
+            return new LetClause(lv);
+        }
     }
 
     public static final class WhereClause extends Clause {
@@ -130,21 +158,25 @@ public class FLWORExpression extends Expression {
             return ClauseTag.WHERE;
         }
 
-        public Expression getCondition() {
-            return condition.get();
+        public ExpressionHandle getCondition() {
+            return condition;
         }
 
-        public void setCondition(Expression condition) {
-            this.condition.set(condition);
+        @Override
+        public Clause copy(StaticContext ctx, Map<Variable, Expression> substitution) {
+            return new WhereClause(condition.get().copy(substitution));
         }
     }
 
     public enum OrderDirection {
-        ASCENDING, DESCENDING,
+        ASCENDING,
+        DESCENDING,
     }
 
     public enum EmptyOrder {
-        GREATEST, LEAST, DEFAULT,
+        GREATEST,
+        LEAST,
+        DEFAULT,
     }
 
     public static final class OrderbyClause extends Clause {
@@ -206,10 +238,34 @@ public class FLWORExpression extends Expression {
         public void setStability(boolean stable) {
             this.stable = stable;
         }
+
+        @Override
+        public Clause copy(StaticContext ctx, Map<Variable, Expression> substitution) {
+            List<Expression> oe = new ArrayList<Expression>();
+            for (ExpressionHandle h : orderingExpressions) {
+                oe.add(h.get().copy(substitution));
+            }
+            return new OrderbyClause(oe, new ArrayList<OrderDirection>(orderingDirections), new ArrayList<EmptyOrder>(
+                    emptyOrders), new ArrayList<String>(collations), stable);
+        }
     }
 
     @Override
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visitFLWORExpression(this);
+    }
+
+    @Override
+    public <T> T accept(MutableExpressionVisitor<T> visitor, ExpressionHandle handle) {
+        return visitor.visitFLWORExpression(handle);
+    }
+
+    @Override
+    public Expression copy(Map<Variable, Expression> substitution) {
+        List<Clause> clausesCopy = new ArrayList<Clause>();
+        for (Clause c : clauses) {
+            clausesCopy.add(c.copy(ctx, substitution));
+        }
+        return new FLWORExpression(ctx, clausesCopy, rExpr.get().copy(substitution));
     }
 }

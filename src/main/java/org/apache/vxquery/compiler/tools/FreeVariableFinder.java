@@ -1,19 +1,17 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.compiler.tools;
 
 import java.util.List;
@@ -106,7 +104,7 @@ class FreeVariableFinder implements ExpressionVisitor<Void> {
         expr.getReturnExpression().accept(this);
         List<FLWORExpression.Clause> clauses = expr.getClauses();
         int len = clauses.size();
-        for (int i = len; i >= 0; --i) {
+        for (int i = len - 1; i >= 0; --i) {
             FLWORExpression.Clause clause = clauses.get(i);
             switch (clause.getTag()) {
                 case FOR: {
@@ -122,14 +120,21 @@ class FreeVariableFinder implements ExpressionVisitor<Void> {
                     FLWORExpression.LetClause lc = (FLWORExpression.LetClause) clause;
                     lc.getLetVariable().getSequence().accept(this);
                     vars.remove(lc.getLetVariable());
+                    break;
                 }
 
                 case WHERE: {
                     FLWORExpression.WhereClause wc = (FLWORExpression.WhereClause) clause;
                     wc.getCondition().accept(this);
+                    break;
                 }
 
                 case ORDERBY: {
+                    FLWORExpression.OrderbyClause oc = (FLWORExpression.OrderbyClause) clause;
+                    for (ExpressionHandle h : oc.getOrderingExpressions()) {
+                        h.accept(this);
+                    }
+                    break;
                 }
             }
         }
@@ -182,7 +187,7 @@ class FreeVariableFinder implements ExpressionVisitor<Void> {
         expr.getSatisfiesExpression().accept(this);
         List<ForLetVariable> fVars = expr.getQuantifiedVariables();
         int len = fVars.size();
-        for (int i = len; i >= 0; --i) {
+        for (int i = len - 1; i >= 0; --i) {
             ForLetVariable fv = fVars.get(i);
             vars.remove(fv);
             fv.getSequence().accept(this);
@@ -207,7 +212,7 @@ class FreeVariableFinder implements ExpressionVisitor<Void> {
         expr.getDefaultExpression().accept(this);
         List<TypeswitchExpression.Case> cases = expr.getCases();
         int len = cases.size();
-        for (int i = len; i >= 0; --i) {
+        for (int i = len - 1; i >= 0; --i) {
             TypeswitchExpression.Case c = cases.get(i);
             c.getReturnExpression().accept(this);
             vars.remove(c.getCaseVariable());

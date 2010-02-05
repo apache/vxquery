@@ -67,7 +67,7 @@ public class TestRunnerFactory {
                     } finally {
                         in.close();
                     }
-                    Module module = iapi.compile(null, ast);
+                    Module module = iapi.compile(null, ast, opts.optimizationLevel);
                     for (PrologVariable pVar : module.getPrologVariables()) {
                         GlobalVariable var = pVar.getVariable();
                         QName varName = var.getName();

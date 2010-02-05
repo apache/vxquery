@@ -315,7 +315,7 @@ final class XMLQueryTranslator {
             case MAIN_MODULE: {
                 MainModuleNode mmNode = (MainModuleNode) moduleNode;
                 QueryBodyNode qbNode = mmNode.getQueryBody();
-                module.setBody(translateExpression(qbNode.getExpression()));
+                module.getBody().set(translateExpression(qbNode.getExpression()));
                 break;
             }
 
@@ -515,7 +515,7 @@ final class XMLQueryTranslator {
                             Expression bodyExpr = translateExpression(node.getBody());
                             bodyExpr = new TreatExpression(currCtx, bodyExpr, sign.getReturnType());
                             popVariableScope();
-                            f.setBody(bodyExpr);
+                            f.getBody().set(bodyExpr);
                         }
                         break;
                     }
@@ -1361,7 +1361,7 @@ final class XMLQueryTranslator {
                 }
                 if (flwor != null) {
                     popVariableScope();
-                    flwor.setReturnExpression(ctxExpr);
+                    flwor.getReturnExpression().set(ctxExpr);
                     ctxExpr = wrapSortAndDistinctNodesOrAtomics(flwor, asc);
                 }
             }
@@ -1497,8 +1497,9 @@ final class XMLQueryTranslator {
             clauses
                     .add(new FLWORExpression.WhereClause(new IfThenElseExpression(currCtx, typeTest, posTest, boolTest)));
 
-            innerFLWOR.setReturnExpression(new VariableReferenceExpression(currCtx, varScope
-                    .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)));
+            innerFLWOR.getReturnExpression().set(
+                    new VariableReferenceExpression(currCtx, varScope
+                            .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)));
             ctxExpr = innerFLWOR;
 
             popVariableScope();
