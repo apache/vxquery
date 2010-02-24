@@ -176,6 +176,7 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
+            <id>generate-code</id>
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
@@ -205,6 +206,28 @@
               <sourceRoot>
                 ${project.build.directory}/generated-sources/main/java
               </sourceRoot>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-site</id>
+            <phase>pre-site</phase>
+            <configuration>
+              <tasks>
+                  <ant antfile="build-site.xml" target="build">
+                      <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
+                      <property name="src.code.dir" value="${basedir}/src/main/java" />
+                      <property name="xslt.dir" value="${basedir}/src/main/xslt" />
+                      <property name="classpath.xslt" refid="maven.compile.classpath" />
+                  </ant>
+              </tasks>
             </configuration>
             <goals>
               <goal>run</goal>

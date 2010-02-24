@@ -13,9 +13,11 @@
     </bannerRight>
 
     <body>
-        <menu name="VXQuery">
-            <item name="Overview" href="index.html"/>      
-        </menu>
         <menu ref="reports"/>
+        <menu name="Open Items">
+            <item name="Missing Functions" href="missing-functions.html"/>
+            <item name="Missing Operators" href="missing-operators.html"/>
+        </menu>
     </body>
 </project>
+
