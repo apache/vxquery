@@ -219,6 +219,24 @@
             </goals>
           </execution>
           <execution>
+            <id>get-xqts</id>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <tasks>
+                  <ant antfile="build-xqts.xml" target="build">
+                      <property name="xqts.url" value="http://dev.w3.org/cvsweb/~checkout~/2006/xquery-test-suite/PublicPagesStagingArea" />
+                      <property name="xqts.zip.file" value="XQTS_current.zip" />
+                      <property name="testsuites.dir" value="${basedir}/testsuites" />
+                      <property name="xqts.dir" value="${basedir}/testsuites/XQTS" />
+                      <property name="xqts.catalog.file" value="XQTSCatalog.xml" />
+                  </ant>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <execution>
             <id>generate-site</id>
             <phase>pre-site</phase>
             <configuration>
