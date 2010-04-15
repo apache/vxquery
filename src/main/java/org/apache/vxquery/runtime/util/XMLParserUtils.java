@@ -1,13 +1,11 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,24 +62,25 @@ public class XMLParserUtils {
 
     private static class ParseHandler implements ContentHandler, LexicalHandler {
         private NodeConstructingEventAcceptor acceptor;
+        private StringBuilder buffer;
+        private boolean pendingText;
 
         public ParseHandler(NodeConstructingEventAcceptor acceptor) {
             this.acceptor = acceptor;
+            buffer = new StringBuilder();
+            pendingText = false;
         }
 
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
-            try {
-                acceptor.text(String.valueOf(ch, start, length));
-            } catch (SystemException e) {
-                e.printStackTrace();
-                throw new SAXException(e);
-            }
+            buffer.append(ch, start, length);
+            pendingText = true;
         }
 
         @Override
         public void endDocument() throws SAXException {
             try {
+                flushText();
                 acceptor.endDocument();
             } catch (SystemException e) {
                 e.printStackTrace();
@@ -92,6 +91,7 @@ public class XMLParserUtils {
         @Override
         public void endElement(String uri, String localName, String name) throws SAXException {
             try {
+                flushText();
                 acceptor.endElement();
             } catch (SystemException e) {
                 e.printStackTrace();
@@ -110,6 +110,7 @@ public class XMLParserUtils {
         @Override
         public void processingInstruction(String target, String data) throws SAXException {
             try {
+                flushText();
                 acceptor.pi(target, data);
             } catch (SystemException e) {
                 e.printStackTrace();
@@ -128,6 +129,7 @@ public class XMLParserUtils {
         @Override
         public void startDocument() throws SAXException {
             try {
+                flushText();
                 acceptor.startDocument();
             } catch (SystemException e) {
                 e.printStackTrace();
@@ -137,9 +139,10 @@ public class XMLParserUtils {
 
         @Override
         public void startElement(String uri, String localName, String name, Attributes atts) throws SAXException {
-            int idx = name.indexOf(':');
-            String prefix = idx < 0 ? "" : name.substring(0, idx);
             try {
+                flushText();
+                int idx = name.indexOf(':');
+                String prefix = idx < 0 ? "" : name.substring(0, idx);
                 acceptor.startElement(uri, localName, prefix);
                 final int nAttrs = atts.getLength();
                 for (int i = 0; i < nAttrs; ++i) {
@@ -164,10 +167,19 @@ public class XMLParserUtils {
         @Override
         public void comment(char[] ch, int start, int length) throws SAXException {
             try {
+                flushText();
                 acceptor.comment(String.valueOf(ch, start, length));
             } catch (SystemException e) {
                 e.printStackTrace();
                 throw new SAXException(e);
+            }
+        }
+
+        private void flushText() throws SystemException {
+            if (pendingText) {
+                acceptor.text(buffer);
+                buffer.delete(0, buffer.length());
+                pendingText = false;
             }
         }
 
