@@ -91,7 +91,7 @@ public class TestCaseFactory {
 
     private void submit(TestCase tc) {
         boolean toSubmit = include == null || include.matcher(tc.getXQueryDisplayName()).find();
-        toSubmit = exclude == null || !exclude.matcher(tc.getXQueryDisplayName()).find();
+        toSubmit = toSubmit && (exclude == null || !exclude.matcher(tc.getXQueryDisplayName()).find());
         if (toSubmit) {
             if (opts.verbose) {
                 System.err.println(tc);
