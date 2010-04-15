@@ -5,4 +5,7 @@
     <Match>
       <Class name="org.apache.vxquery.exceptions.ErrorMessages" />
     </Match>
+    <Match>
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL,EI_EXPOSE_REP,EI_EXPOSE_REP2" />
+    </Match>
 </FindBugsFilter>
