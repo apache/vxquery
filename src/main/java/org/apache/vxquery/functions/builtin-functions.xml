@@ -224,14 +224,16 @@
         <param name="parameter1" type="item()*"/>
         <param name="parameter2" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnDeepEqualIterator"/>
     </function>
 
-    <!-- fn:deep-equal($parameter1  as item()*, $parameter2 as item()*, $collation as string)  as xs:boolean -->
+    <!-- fn:deep-equal($parameter1  as item()*, $parameter2 as item()*, $collation as xs:string) as xs:boolean -->
     <function name="fn:deep-equal">
         <param name="parameter1" type="item()*"/>
         <param name="parameter2" type="item()*"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnDeepEqualIterator"/>
     </function>
 
     <!-- fn:default-collation()  as xs:string -->
