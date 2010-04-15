@@ -25,7 +25,7 @@ import org.apache.vxquery.compiler.rewriter.rules.EliminateUnusedLetVariables;
 import org.apache.vxquery.compiler.rewriter.rules.EvaluateInvariantInstanceofExpressions;
 
 public class DefaultRulesetProviderImpl implements RulesetProvider {
-    public static RulesetProvider INSTANCE = new DefaultRulesetProviderImpl();
+    public static final RulesetProvider INSTANCE = new DefaultRulesetProviderImpl();
 
     List<RewriteRule> rules;
 
