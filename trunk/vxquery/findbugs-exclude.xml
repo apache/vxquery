@@ -1,0 +1,8 @@
+<FindBugsFilter>
+    <Match>
+      <Class name="~org.apache.vxquery.xmlquery.query.*" />
+    </Match>
+    <Match>
+      <Class name="org.apache.vxquery.exceptions.ErrorMessages" />
+    </Match>
+</FindBugsFilter>
