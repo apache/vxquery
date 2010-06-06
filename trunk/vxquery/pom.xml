@@ -145,6 +145,11 @@
     </site>
   </distributionManagement>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties> 
+
   <build>
     <plugins>
       <plugin>
@@ -159,9 +164,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <configuration>
-          <encoding>UTF-8</encoding>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -181,6 +183,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.4</version>
         <executions>
           <execution>
             <id>generate-code</id>
@@ -210,9 +213,6 @@
                       <property name="target" value="xtest" />
                   </ant>
               </tasks>
-              <sourceRoot>
-                ${project.build.directory}/generated-sources/main/java
-              </sourceRoot>
             </configuration>
             <goals>
               <goal>run</goal>
@@ -256,6 +256,27 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <directory>
+                  ${project.build.directory}/generated-sources/main/java
+                </directory>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.4.2</version>
@@ -275,12 +296,12 @@
   </build>
   
   <dependencies>
-      <dependency>
-          <groupId>ant</groupId>
-          <artifactId>ant-trax</artifactId>
-          <version>1.6.5</version>
-          <scope>provided</scope>
-      </dependency>
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant-trax</artifactId>
+      <version>1.6.5</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
