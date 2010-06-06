@@ -18,12 +18,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.util.Pair;
 
 public class TestCaseResult {
     private static final int DISPLAY_LEN = 1000;
+    private static Pattern XML_RES_PREFIX = Pattern.compile("<\\?[xX][mM][lL][^\\?]*\\?>");
 
     TestCase testCase;
 
@@ -89,8 +92,10 @@ public class TestCaseResult {
                     } else {
                         expResult = expResult.trim();
                         if (result != null) {
-                            int idx = result.indexOf("?>");
-                            result = result.substring(idx + 1).trim();
+                            Matcher m = XML_RES_PREFIX.matcher(result);
+                            if (m.find() && m.start() == 0) {
+                                result = result.substring(m.end()).trim();
+                            }
                             Pair<Boolean, String> cmp = textCompare(expResult, result);
                             report = cmp.second;
                             state = cmp.first ? State.EXPECTED_RESULT_GOT_SAME_RESULT
