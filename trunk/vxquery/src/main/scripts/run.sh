@@ -43,6 +43,9 @@ CLASSPATH="@classpath@"
 #
 # JVM_PARAMETERS=
 
+#REMOTE_DEBUG_PARAMS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+#JVM_PARAMETERS="${JVM_PARAMETERS} ${REMOTE_DEBUG_PARAMS}"
+
 #run with shared memory setup
 #if [ -n "${RUN_SHARED_MEM}"]; then
 #  JVM_PARAMETERS="${JVM_PARAMETERS} -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_shmem,server=n,address=javadebug,suspend=y"
