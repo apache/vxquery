@@ -1,13 +1,11 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -190,15 +188,15 @@ public class TestCaseResult {
     }
 
     public enum State {
-        EXPECTED_RESULT_GOT_SAME_RESULT("green"),
-        EXPECTED_ERROR_GOT_SAME_ERROR("green"),
-        EXPECTED_RESULT_GOT_DIFFERENT_RESULT("orange"),
-        EXPECTED_RESULT_GOT_ERROR("orange"),
-        EXPECTED_ERROR_GOT_DIFFERENT_ERROR("orange"),
-        EXPECTED_ERROR_GOT_RESULT("orange"),
-        EXPECTED_RESULT_GOT_FAILURE("red"),
-        EXPECTED_ERROR_GOT_FAILURE("red"),
-        NO_RESULT_FILE("red");
+        EXPECTED_RESULT_GOT_SAME_RESULT(GREEN),
+        EXPECTED_ERROR_GOT_SAME_ERROR(GREEN),
+        EXPECTED_RESULT_GOT_DIFFERENT_RESULT(ORANGE),
+        EXPECTED_RESULT_GOT_ERROR(ORANGE),
+        EXPECTED_ERROR_GOT_DIFFERENT_ERROR(ORANGE),
+        EXPECTED_ERROR_GOT_RESULT(ORANGE),
+        EXPECTED_RESULT_GOT_FAILURE(RED),
+        EXPECTED_ERROR_GOT_FAILURE(RED),
+        NO_RESULT_FILE(RED);
 
         private String color;
 
@@ -210,4 +208,8 @@ public class TestCaseResult {
             return color;
         }
     }
+
+    private static final String RED = "#FF9900";
+    private static final String ORANGE = "#FFCC00";
+    private static final String GREEN = "#99CC00";
 }
