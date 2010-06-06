@@ -44,6 +44,9 @@ SET CLASSPATH="@classpath@"
 ::
 :: JVM_PARAMETERS=
 
+:: SET REMOTE_DEBUG_PARAMS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+:: SET JVM_PARAMETERS="%JVM_PARAMETERS% %REMOTE_DEBUG_PARAMS%"
+
 :: ---------------------------------------------------------------------------
 :: Default configuration. Do not modify below this line.
 :: ---------------------------------------------------------------------------
