@@ -651,7 +651,7 @@ final class XMLQueryTranslator {
             }
 
             case SCHEMA_ATTRIBUTE_TEST: {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("schema-attribute(...) is not supported");
             }
 
             case ELEMENT_TEST: {
@@ -688,7 +688,7 @@ final class XMLQueryTranslator {
             }
 
             case SCHEMA_ELEMENT_TEST: {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("schema-element(...) is not supported");
             }
 
             default:
@@ -730,6 +730,10 @@ final class XMLQueryTranslator {
                 Signature sign = operator.getSignature();
                 Expression arg1 = normalize(currCtx, translateExpression(ie.getLeftExpr()), sign.getParameterType(0));
                 Expression arg2 = normalize(currCtx, translateExpression(ie.getRightExpr()), sign.getParameterType(1));
+                if (BuiltinOperators.EXCEPT.equals(operator) || BuiltinOperators.INTERSECT.equals(operator)) {
+                    arg1 = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg1);
+                    arg2 = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg2);
+                }
                 Expression result = ExpressionBuilder.functionCall(currCtx, operator, arg1, arg2);
                 if (BuiltinOperators.UNION.equals(operator)) {
                     result = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.SORT_DISTINCT_NODES_ASC, result);
