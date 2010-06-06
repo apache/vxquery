@@ -245,6 +245,8 @@
         <param name="parameter1" type="node()*"/>
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
+        <!-- implementation assumes input in document order -->
+        <runtime class="org.apache.vxquery.runtime.functions.OpIntersectIterator"/>
     </operator>
 
     <!-- op:is-same-node($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
