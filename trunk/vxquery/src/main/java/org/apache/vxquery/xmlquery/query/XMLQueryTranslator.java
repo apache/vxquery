@@ -1565,7 +1565,7 @@ final class XMLQueryTranslator {
                 return BuiltinOperators.EXCEPT;
 
             case FOLLOWS:
-                return BuiltinOperators.FOLLOWS;
+                return BuiltinOperators.NODE_AFTER;
 
             case GENERAL_EQ:
                 return BuiltinOperators.GENERAL_EQ;
@@ -1610,7 +1610,7 @@ final class XMLQueryTranslator {
                 return BuiltinOperators.ADD;
 
             case PRECEDES:
-                return BuiltinOperators.PRECEDES;
+                return BuiltinOperators.NODE_BEFORE;
 
             case RANGE:
                 return BuiltinOperators.TO;

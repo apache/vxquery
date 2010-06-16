@@ -233,14 +233,14 @@
         <return type="xs:boolean"/>
     </operator>
 
-    <!-- op:hexBinary-equal($value1  as xs:hexBinary, $value2 as xs:hexBinary)  as xs:boolean -->
+    <!-- op:hexBinary-equal($value1 as xs:hexBinary, $value2 as xs:hexBinary) as xs:boolean -->
     <operator name="op:hexBinary-equal">
         <param name="arg1" type="xs:hexBinary"/>
         <param name="arg2" type="xs:hexBinary"/>
         <return type="xs:boolean"/>
     </operator>
 
-    <!-- op:intersect($parameter1  as node()*, $parameter2 as node()*)  as node()* -->
+    <!-- op:intersect($parameter1 as node()*, $parameter2 as node()*) as node()* -->
     <operator name="op:intersect">
         <param name="parameter1" type="node()*"/>
         <param name="parameter2" type="node()*"/>
@@ -249,11 +249,12 @@
         <runtime class="org.apache.vxquery.runtime.functions.OpIntersectIterator"/>
     </operator>
 
-    <!-- op:is-same-node($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
+    <!-- op:is-same-node($parameter1 as node(), $parameter2 as node()) as xs:boolean -->
     <operator name="op:is-same-node">
-        <param name="parameter1" type="node()"/>
-        <param name="parameter2" type="node()"/>
+        <param name="parameter1" type="node()?"/>
+        <param name="parameter2" type="node()?"/>
         <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpIsSameNodeIterator"/>
     </operator>
 
     <!-- op:multiply-dayTimeDuration( $arg1 as xs:dayTimeDuration, $arg2 as xs:double)  as xs:dayTimeDuration -->
@@ -272,16 +273,18 @@
 
     <!-- op:node-after($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
     <operator name="op:node-after">
-        <param name="parameter1" type="node()"/>
-        <param name="parameter2" type="node()"/>
+        <param name="parameter1" type="node()?"/>
+        <param name="parameter2" type="node()?"/>
         <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpNodeAfterIterator"/>
     </operator>
 
     <!-- op:node-before($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
     <operator name="op:node-before">
-        <param name="parameter1" type="node()"/>
-        <param name="parameter2" type="node()"/>
+        <param name="parameter1" type="node()?"/>
+        <param name="parameter2" type="node()?"/>
         <return type="xs:boolean"/>
+        <runtime class="org.apache.vxquery.runtime.functions.OpNodeBeforeIterator"/>
     </operator>
 
     <!-- op:NOTATION-equal($arg1  as xs:NOTATION, $arg2 as xs:NOTATION)  as xs:boolean -->
@@ -667,20 +670,6 @@
         <param name="arg2" type="xs:boolean?"/>
         <return type="xs:boolean?"/>
         <runtime class="org.apache.vxquery.runtime.functions.BooleanOrIterator"/>
-    </operator>
-
-    <!-- opext:precedes($arg1 as node()?, $arg2 as node()?) as xs:boolean? -->
-    <operator name="opext:precedes">
-        <param name="arg1" type="node()?"/>
-        <param name="arg2" type="node()?"/>
-        <return type="xs:boolean?"/>
-    </operator>
-
-    <!-- opext:follows($arg1 as node()?, $arg2 as node()?) as xs:boolean? -->
-    <operator name="opext:follows">
-        <param name="arg1" type="node()?"/>
-        <param name="arg2" type="node()?"/>
-        <return type="xs:boolean?"/>
     </operator>
 
     <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
