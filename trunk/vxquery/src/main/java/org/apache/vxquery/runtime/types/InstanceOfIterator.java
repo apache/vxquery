@@ -17,6 +17,7 @@
 package org.apache.vxquery.runtime.types;
 
 import org.apache.vxquery.datamodel.XDMValue;
+import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
@@ -36,7 +37,8 @@ public class InstanceOfIterator extends AbstractEagerlyEvaluatedIterator {
 
     @Override
     public Object evaluateEagerly(CallStackFrame frame) throws SystemException {
-        return frame.getRuntimeControlBlock().getAtomicValueFactory().createBoolean(
-                filter.accept((XDMValue) input.evaluateEagerly(frame)));
+        final AtomicValueFactory atomicValueFactory = frame.getRuntimeControlBlock().getAtomicValueFactory();
+        final boolean accept = filter.accept((XDMValue) input.evaluateEagerly(frame));
+        return atomicValueFactory.createBoolean(accept);
     }
 }
