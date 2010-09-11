@@ -196,6 +196,8 @@
         <param name="parameter1" type="node()*"/>
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
+        <!-- implementation assumes input in document order -->
+        <runtime class="org.apache.vxquery.runtime.functions.OpExceptIterator"/>
     </operator>
 
     <!-- op:gDay-equal($arg1  as xs:gDay, $arg2 as xs:gDay)  as xs:boolean -->
