@@ -183,13 +183,13 @@
       </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
         <executions>
           <execution>
             <id>generate-code</id>
             <phase>generate-sources</phase>
             <configuration>
-              <tasks>
+              <target>
                   <ant antfile="build-xslt.xml" target="build">
                       <property name="build.gen-src.dir" value="${project.build.directory}/generated-sources/main/java" />
                       <property name="src.code.dir" value="${basedir}/src/main/java" />
@@ -212,7 +212,7 @@
                       <property name="target.dir" value="${basedir}/target/scripts" />
                       <property name="target" value="xtest" />
                   </ant>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
@@ -222,15 +222,15 @@
             <id>get-xqts</id>
             <phase>generate-test-resources</phase>
             <configuration>
-              <tasks>
+              <target>
                   <ant antfile="build-xqts.xml" target="build">
-                      <property name="xqts.url" value="http://dev.w3.org/cvsweb/~checkout~/2006/xquery-test-suite/PublicPagesStagingArea" />
-                      <property name="xqts.zip.file" value="XQTS_current.zip" />
+                      <property name="xqts.url" value="http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea" />
+                      <property name="xqts.zip.file" value="XQTS_1_0_3.zip" />
                       <property name="testsuites.dir" value="${basedir}/testsuites" />
                       <property name="xqts.dir" value="${basedir}/testsuites/XQTS" />
                       <property name="xqts.catalog.file" value="XQTSCatalog.xml" />
                   </ant>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
@@ -240,14 +240,14 @@
             <id>generate-site</id>
             <phase>pre-site</phase>
             <configuration>
-              <tasks>
+              <target>
                   <ant antfile="build-site.xml" target="build">
                       <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
                       <property name="src.code.dir" value="${basedir}/src/main/java" />
                       <property name="xslt.dir" value="${basedir}/src/main/xslt" />
                       <property name="classpath.xslt" refid="maven.compile.classpath" />
                   </ant>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
