@@ -19,13 +19,13 @@ limitations under the License.
     <bannerLeft>
         <name>VXQuery</name>
         <src>images/VXQuery.png</src>
-        <!--><href>http://incubator.apache.org/vxquery/</href>-->
+        <href>http://incubator.apache.org/vxquery/</href>
     </bannerLeft>
 
     <bannerRight>
         <name>Apache Incubator</name>
         <src>images/apache-incubator-logo.png</src>
-        <!--><href>http://incubator.apache.org/</href>-->
+        <href>http://incubator.apache.org/</href>
     </bannerRight>
 
     <body>
