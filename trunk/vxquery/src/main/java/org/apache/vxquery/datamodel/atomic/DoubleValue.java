@@ -47,6 +47,12 @@ public class DoubleValue extends NumericValue {
         if (ad == 0.0) {
             return d == 0.0 ? "0" : "-0";
         }
+        if (d == Double.NEGATIVE_INFINITY) {
+            return "-INF";
+        }
+        if (d == Double.POSITIVE_INFINITY) {
+            return "INF";
+        }
         return String.valueOf(value);
     }
 
