@@ -518,6 +518,7 @@
     <function name="fn:max">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnMaxIterator"/>
     </function>
 
     <!-- fn:max($arg as  xs:anyAtomicType*, $collation as string)  as xs:anyAtomicType?  -->
@@ -525,12 +526,14 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnMaxIterator"/>
     </function>
 
     <!-- fn:min($arg as  xs:anyAtomicType*) as xs:anyAtomicType?  -->
     <function name="fn:min">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnMinIterator"/>
     </function>
 
     <!-- fn:min($arg as  xs:anyAtomicType*, $collation as string)  as xs:anyAtomicType?  -->
@@ -538,6 +541,7 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType"/>
+        <runtime class="org.apache.vxquery.runtime.functions.FnMaxIterator"/>
     </function>
 
     <!-- fn:minutes-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
