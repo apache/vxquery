@@ -180,6 +180,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -274,7 +275,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
         <executions>
           <execution>
             <id>add-source</id>
@@ -295,7 +296,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.7.1</version>
+        <version>2.9</version>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <excludes>
@@ -306,11 +307,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>2.2</version>
+        <version>3.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
+        <version>0.7</version>
       </plugin>
     </plugins>
   </build>
@@ -402,12 +404,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.7.1</version>
+        <version>2.9</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.3.1</version>
+        <version>2.4</version>
         <configuration>
             <linkOnly>true</linkOnly>
         </configuration>            
@@ -415,7 +417,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.0.1</version>
+        <version>2.3.2</version>
         <configuration>
           <effort>Min</effort>
           <threshold>Normal</threshold>
@@ -425,6 +427,7 @@
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
+        <version>0.7</version>
         <configuration>
           <excludes>
             <exclude>findbugs-exclude.xml</exclude>
