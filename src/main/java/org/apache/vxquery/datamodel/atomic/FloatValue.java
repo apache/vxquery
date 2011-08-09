@@ -47,6 +47,12 @@ public class FloatValue extends NumericValue {
         if (af == 0.0) {
             return f == 0.0 ? "0" : "-0";
         }
+        if (f == Float.NEGATIVE_INFINITY) {
+            return "-INF";
+        }
+        if (f == Float.POSITIVE_INFINITY) {
+            return "INF";
+        }
         return String.valueOf(value);
     }
 
