@@ -18,20 +18,24 @@
 
 <project name="vxquery" default="build" basedir=".">
 
-	<target name="build">
-        <mkdir dir="${build.gen-site.dir}"/>
-        <xslt 
-        	classpath="${classpath.xslt}" 
-        	processor="trax" 
-        	in="${src.code.dir}/org/apache/vxquery/functions/builtin-functions.xml" 
-        	out="${build.gen-site.dir}/missing-functions.apt" 
-        	style="${xslt.dir}/generate-missing.xsl"/>
-        <xslt 
-        	classpath="${classpath.xslt}" 
-        	processor="trax" 
-        	in="${src.code.dir}/org/apache/vxquery/functions/builtin-operators.xml" 
-        	out="${build.gen-site.dir}/missing-operators.apt" 
-        	style="${xslt.dir}/generate-missing.xsl"/>
-    </target>
-    
+  <target name="build">
+    <mkdir dir="${build.gen-site.dir}"/>
+    <concat destfile="${build.gen-site.dir}/index.apt">
+      <fileset file="${basedir}/src/site/apt/index.apt"/>
+      <fileset file="${basedir}/DISCLAIMER"/>
+    </concat>
+    <xslt
+      classpath="${classpath.xslt}"
+      processor="trax"
+      in="${src.code.dir}/org/apache/vxquery/functions/builtin-functions.xml"
+      out="${build.gen-site.dir}/missing-functions.apt"
+      style="${xslt.dir}/generate-missing.xsl"/>
+    <xslt
+      classpath="${classpath.xslt}"
+      processor="trax"
+      in="${src.code.dir}/org/apache/vxquery/functions/builtin-operators.xml"
+      out="${build.gen-site.dir}/missing-operators.apt"
+      style="${xslt.dir}/generate-missing.xsl"/>
+  </target>
+
 </project>

@@ -15,16 +15,31 @@
 
 Apache VXQuery
 
-  Apache VXQuery (Versatile XQuery) will be a standards compliant XML Query processor implemented in Java. 
-  We believe that there exists a strong (and growing) need to process semi-structured data in many applications. 
+  Apache VXQuery (Versatile XQuery) will be a standards compliant XML Query 
+  processor implemented in Java. 
+  We believe that there exists a strong (and growing) need to process 
+  semi-structured data in many applications. 
   The W3C standardized v1.0 of the XML Query Language in early 2007. 
   Since then, a few processors have surfaced (both commercial and open source). 
   VXQuery will implement this standard.
 
-  VXQuery plans to be the glue that brings together imperative programming in Java and declarative programming in XQuery. 
-  The project would enable developers to use XQuery to navigate and transform application objects declaratively in Java applications with minimal overhead.
-  In the VXQuery project we plan to build an implementation that allows users to run declarative XQueries on arbitrary object models. 
-  Existing XQuery engines execute queries by translating the user data into some form of XML Object model. 
-  With VXQuery, we take the opposing view - Translate the query to work natively on the user's object model.
-  In addition, VXQuery works on top of different XML representations including DOM, Stax, and a space optimized model motivated by Xalan's DTM (Document Table Model).
-  VXQuery will also provide a library that allows application developers to express declarative queries without the need to learn a new syntax. We believe that this will speed up the adoption process.
+  VXQuery plans to be the glue that brings together imperative programming in 
+  Java and declarative programming in XQuery. 
+  The project would enable developers to use XQuery to navigate and transform 
+  application objects declaratively in Java applications with minimal overhead.
+  In the VXQuery project we plan to build an implementation that allows users 
+  to run declarative XQueries on arbitrary object models. 
+  Existing XQuery engines execute queries by translating the user data into 
+  some form of XML Object model. 
+  With VXQuery, we take the opposing view - Translate the query to work 
+  natively on the user's object model.
+  In addition, VXQuery works on top of different XML representations including 
+  DOM, Stax, and a space optimized model motivated by Xalan's DTM (Document 
+  Table Model).
+  VXQuery will also provide a library that allows application developers to 
+  express declarative queries without the need to learn a new syntax. 
+  We believe that this will speed up the adoption process.
+
+* Incubation Disclaimer
+  
+  
