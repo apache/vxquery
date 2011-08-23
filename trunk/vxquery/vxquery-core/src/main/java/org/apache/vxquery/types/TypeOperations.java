@@ -18,10 +18,20 @@ import java.util.Arrays;
 
 public class TypeOperations {
     public static Quantifier quantifier(XQType type) {
+        if (type instanceof QuantifiedType) {
+            return ((QuantifiedType) type).getQuantifier();
+        } else if (type instanceof ItemType) {
+            return Quantifier.QUANT_ONE;
+        }
         return Quantifier.QUANT_STAR;
     }
 
     public static XQType primeType(XQType type) {
+        if (type instanceof QuantifiedType) {
+            return ((QuantifiedType) type).getContentType();
+        } else if (type instanceof ItemType) {
+            return type;
+        }
         return AnyItemType.INSTANCE;
     }
 
@@ -56,7 +66,21 @@ public class TypeOperations {
                 }
                 temp = temp.getBaseType();
             }
+            return false;
+        } else if (supertype instanceof AnyItemType && subtype instanceof ItemType) {
+            return true;
+        } else if (subtype instanceof QuantifiedType || supertype instanceof QuantifiedType) {
+            XQType pSubType = primeType(subtype);
+            XQType pSupType = primeType(supertype);
+            Quantifier subQuant = quantifier(subtype);
+            Quantifier supQuant = quantifier(supertype);
+
+            boolean isSubtype = isSubtypeOf(pSubType, pSupType);
+            if (isSubtype) {
+                return supQuant.isSubQuantifier(subQuant);
+            }
         }
+
         return false;
     }
 }

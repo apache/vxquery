@@ -17,7 +17,11 @@
 package org.apache.vxquery.types;
 
 public enum Quantifier {
-    QUANT_ZERO, QUANT_ONE, QUANT_QUESTION, QUANT_STAR, QUANT_PLUS;
+    QUANT_ZERO,
+    QUANT_ONE,
+    QUANT_QUESTION,
+    QUANT_STAR,
+    QUANT_PLUS;
 
     private static final Quantifier[][] QPRODUCT = { { QUANT_ZERO, QUANT_ZERO, QUANT_ZERO, QUANT_ZERO, QUANT_ZERO },
             { QUANT_ZERO, QUANT_ONE, QUANT_QUESTION, QUANT_STAR, QUANT_PLUS },
@@ -27,6 +31,69 @@ public enum Quantifier {
 
     public static Quantifier product(Quantifier quant1, Quantifier quant2) {
         return QPRODUCT[quant1.ordinal()][quant2.ordinal()];
+    }
+
+    public boolean isSubQuantifier(Quantifier subQuant) {
+        switch (this) {
+            case QUANT_ONE:
+                switch (subQuant) {
+                    case QUANT_ONE:
+                        return true;
+
+                    case QUANT_PLUS:
+                    case QUANT_QUESTION:
+                    case QUANT_STAR:
+                    case QUANT_ZERO:
+                        return false;
+                }
+
+            case QUANT_PLUS:
+                switch (subQuant) {
+                    case QUANT_ONE:
+                    case QUANT_PLUS:
+                        return true;
+
+                    case QUANT_QUESTION:
+                    case QUANT_STAR:
+                    case QUANT_ZERO:
+                        return false;
+                }
+
+            case QUANT_QUESTION:
+                switch (subQuant) {
+                    case QUANT_ONE:
+                    case QUANT_QUESTION:
+                        return true;
+
+                    case QUANT_PLUS:
+                    case QUANT_STAR:
+                    case QUANT_ZERO:
+                        return false;
+                }
+
+            case QUANT_STAR:
+                switch (subQuant) {
+                    case QUANT_ONE:
+                    case QUANT_QUESTION:
+                    case QUANT_PLUS:
+                    case QUANT_STAR:
+                    case QUANT_ZERO:
+                        return true;
+                }
+
+            case QUANT_ZERO:
+                switch (subQuant) {
+                    case QUANT_ZERO:
+                        return true;
+
+                    case QUANT_ONE:
+                    case QUANT_QUESTION:
+                    case QUANT_PLUS:
+                    case QUANT_STAR:
+                        return false;
+                }
+        }
+        throw new IllegalArgumentException();
     }
 
     public boolean allowsEmptySequence() {

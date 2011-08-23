@@ -20,9 +20,12 @@ import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.framework.RewriteRule;
 import org.apache.vxquery.compiler.rewriter.framework.RulesetProvider;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateFnData;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateIfThenElseDeadCode;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnusedLetVariables;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateUselessTypeCoersionExpressions;
 import org.apache.vxquery.compiler.rewriter.rules.EvaluateInvariantInstanceofExpressions;
+import org.apache.vxquery.compiler.rewriter.rules.ReplaceWithSpecificOperators;
 
 public class DefaultRulesetProviderImpl implements RulesetProvider {
     public static final RulesetProvider INSTANCE = new DefaultRulesetProviderImpl();
@@ -33,6 +36,9 @@ public class DefaultRulesetProviderImpl implements RulesetProvider {
         List<RewriteRule> temp = new ArrayList<RewriteRule>();
         temp.add(new EliminateUnusedLetVariables(1));
         temp.add(new EvaluateInvariantInstanceofExpressions(1));
+        temp.add(new EliminateUselessTypeCoersionExpressions(1));
+        temp.add(new ReplaceWithSpecificOperators(1));
+        temp.add(new EliminateFnData(1));
         temp.add(new EliminateIfThenElseDeadCode(1));
 
         rules = Collections.unmodifiableList(temp);

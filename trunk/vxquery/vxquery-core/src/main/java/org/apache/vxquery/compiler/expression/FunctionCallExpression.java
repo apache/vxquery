@@ -48,6 +48,10 @@ public class FunctionCallExpression extends Expression {
         return function;
     }
 
+    public void setFunction(Function function) {
+        this.function = function;
+    }
+
     @Override
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visitFunctionCallExpression(this);
