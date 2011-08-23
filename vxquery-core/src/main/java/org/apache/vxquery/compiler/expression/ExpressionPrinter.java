@@ -19,6 +19,12 @@ public class ExpressionPrinter {
         e.accept(new PrettyPrinter(buffer, level));
     }
 
+    public static String prettyPrint(Expression e) {
+        StringBuilder buffer = new StringBuilder();
+        prettyPrint(e, 0, buffer);
+        return buffer.toString();
+    }
+
     private static final class PrettyPrinter implements ExpressionVisitor<Void> {
         private StringBuilder buffer;
         private int level;
@@ -188,8 +194,8 @@ public class ExpressionPrinter {
         @Override
         public Void visitFunctionCallExpression(FunctionCallExpression expr) {
             indent(level);
-            buffer.append("fn [").append(expr.getFunction().getName()).append('/').append(
-                    expr.getFunction().getSignature().getArity()).append("] [");
+            buffer.append("fn [").append(expr.getFunction().getName()).append('/')
+                    .append(expr.getFunction().getSignature().getArity()).append("] [");
             for (ExpressionHandle arg : expr.getArguments()) {
                 buffer.append("\n");
                 print(arg);

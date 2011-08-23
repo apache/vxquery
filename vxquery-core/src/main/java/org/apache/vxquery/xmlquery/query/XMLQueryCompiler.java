@@ -19,8 +19,8 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 
 public class XMLQueryCompiler {
-    public static Module compile(ModuleNode moduleNode, CompilerControlBlock ccb, int optimizationLevel)
-            throws SystemException {
+    public static Module compile(ModuleNode moduleNode, CompilerControlBlock ccb, int optimizationLevel,
+            boolean debugOptimizer) throws SystemException {
         return compile(NoopXQueryCompilationListener.INSTANCE, moduleNode, ccb, optimizationLevel);
     }
 

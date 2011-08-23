@@ -54,8 +54,8 @@ import org.apache.vxquery.compiler.expression.TreatExpression;
 import org.apache.vxquery.compiler.expression.TypeswitchExpression;
 import org.apache.vxquery.compiler.expression.ValidateExpression;
 import org.apache.vxquery.compiler.expression.Variable;
-import org.apache.vxquery.compiler.expression.VariableReferenceExpression;
 import org.apache.vxquery.compiler.expression.Variable.VarTag;
+import org.apache.vxquery.compiler.expression.VariableReferenceExpression;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.context.ThinStaticContextImpl;
@@ -129,6 +129,7 @@ import org.apache.vxquery.xmlquery.ast.FunctionDeclNode;
 import org.apache.vxquery.xmlquery.ast.FunctionExprNode;
 import org.apache.vxquery.xmlquery.ast.IfExprNode;
 import org.apache.vxquery.xmlquery.ast.InfixExprNode;
+import org.apache.vxquery.xmlquery.ast.InfixExprNode.InfixOperator;
 import org.apache.vxquery.xmlquery.ast.LetClauseNode;
 import org.apache.vxquery.xmlquery.ast.LetVarDeclNode;
 import org.apache.vxquery.xmlquery.ast.LibraryModuleNode;
@@ -167,7 +168,6 @@ import org.apache.vxquery.xmlquery.ast.VarDeclNode;
 import org.apache.vxquery.xmlquery.ast.VarRefNode;
 import org.apache.vxquery.xmlquery.ast.VersionDeclNode;
 import org.apache.vxquery.xmlquery.ast.WhereClauseNode;
-import org.apache.vxquery.xmlquery.ast.InfixExprNode.InfixOperator;
 import org.apache.vxquery.xmlquery.query.XQueryConstants.PathType;
 import org.apache.vxquery.xmlquery.query.XQueryConstants.TypeQuantifier;
 
@@ -718,8 +718,11 @@ final class XMLQueryTranslator {
                 }
                 Expression e = translateExpression(ueNode.getExpr());
                 if (neg) {
-                    e = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.NUMERIC_UNARY_MINUS, normalize(
-                            currCtx, e, BuiltinOperators.NUMERIC_UNARY_MINUS.getSignature().getParameterType(0)));
+                    e = ExpressionBuilder.functionCall(
+                            currCtx,
+                            BuiltinOperators.NUMERIC_UNARY_MINUS,
+                            normalize(currCtx, e,
+                                    BuiltinOperators.NUMERIC_UNARY_MINUS.getSignature().getParameterType(0)));
                 }
                 return e;
             }
@@ -761,8 +764,8 @@ final class XMLQueryTranslator {
                     if (!type.isAtomicType()) {
                         throw new SystemException(ErrorCode.XPST0051, fnNode.getName().getSourceLocation());
                     }
-                    Expression arg = args.isEmpty() ? new VariableReferenceExpression(currCtx, varScope
-                            .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)) : args.get(0);
+                    Expression arg = args.isEmpty() ? new VariableReferenceExpression(currCtx,
+                            varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)) : args.get(0);
                     return new CastExpression(currCtx, arg, SequenceType.create((ItemType) type,
                             Quantifier.QUANT_QUESTION));
                 }
@@ -780,8 +783,7 @@ final class XMLQueryTranslator {
                 if (fn != null && fn.useContextImplicitly()) {
                     args.add(new VariableReferenceExpression(currCtx, varScope
                             .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)));
-                    nArgs = fnNode.getArguments().size();
-                    fn = moduleCtx.lookupFunction(fName, nArgs);
+                    fn = moduleCtx.lookupFunction(fName, nArgs + 1);
                 }
                 if (fn == null) {
                     Function[] fns = moduleCtx.lookupFunctions(fName);
@@ -878,17 +880,16 @@ final class XMLQueryTranslator {
                 DirectPIConstructorNode dpicNode = (DirectPIConstructorNode) value;
                 String target = dpicNode.getTarget();
                 String content = dpicNode.getContent();
-                return new PINodeConstructorExpression(currCtx,
-                        new ConstantExpression(currCtx, avf.createString(target), SequenceType.create(
-                                BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)), new ConstantExpression(currCtx,
-                                avf.createString(content), SequenceType.create(BuiltinTypeRegistry.XS_STRING,
-                                        Quantifier.QUANT_ONE)));
+                return new PINodeConstructorExpression(currCtx, new ConstantExpression(currCtx,
+                        avf.createString(target), SequenceType.create(BuiltinTypeRegistry.XS_STRING,
+                                Quantifier.QUANT_ONE)), new ConstantExpression(currCtx, avf.createString(content),
+                        SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)));
             }
 
             case DIRECT_COMMENT_CONSTRUCTOR:
-                return new CommentNodeConstructorExpression(currCtx, new ConstantExpression(currCtx, avf
-                        .createString(((DirectCommentConstructorNode) value).getContent()), SequenceType.create(
-                        BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)));
+                return new CommentNodeConstructorExpression(currCtx, new ConstantExpression(currCtx,
+                        avf.createString(((DirectCommentConstructorNode) value).getContent()), SequenceType.create(
+                                BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)));
 
             case DIRECT_ELEMENT_CONSTRUCTOR: {
                 DirectElementConstructorNode decNode = (DirectElementConstructorNode) value;
@@ -908,8 +909,8 @@ final class XMLQueryTranslator {
                             throw new SystemException(ErrorCode.XQST0022, acNode.getSourceLocation());
                         }
 
-                        currCtx.registerNamespaceUri(aName.getLocalName(), unquote(((ContentCharsNode) values.get(0))
-                                .getContent()));
+                        currCtx.registerNamespaceUri(aName.getLocalName(),
+                                unquote(((ContentCharsNode) values.get(0)).getContent()));
                     }
                 }
                 List<Expression> content = new ArrayList<Expression>();
@@ -919,8 +920,8 @@ final class XMLQueryTranslator {
                         content.add(translateExpression(acNode));
                     }
                 }
-                Expression name = new ConstantExpression(currCtx, avf.createQName(createQName(startName, moduleCtx
-                        .getDefaultElementNamespaceUri())), SequenceType.create(BuiltinTypeRegistry.XS_QNAME,
+                Expression name = new ConstantExpression(currCtx, avf.createQName(createQName(startName,
+                        moduleCtx.getDefaultElementNamespaceUri())), SequenceType.create(BuiltinTypeRegistry.XS_QNAME,
                         Quantifier.QUANT_ONE));
                 for (ASTNode cVal : decNode.getContent()) {
                     switch (cVal.getTag()) {
@@ -957,14 +958,14 @@ final class XMLQueryTranslator {
                     }
                 }
                 Expression content = attrContent.size() == 1 ? attrContent.get(0) : createConcatenation(attrContent);
-                return new AttributeNodeConstructorExpression(currCtx, new ConstantExpression(currCtx, avf
-                        .createQName(aQName), SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE)),
-                        content);
+                return new AttributeNodeConstructorExpression(currCtx, new ConstantExpression(currCtx,
+                        avf.createQName(aQName),
+                        SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE)), content);
             }
 
             case CONTEXT_ITEM:
-                return new VariableReferenceExpression(currCtx, varScope
-                        .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME));
+                return new VariableReferenceExpression(currCtx,
+                        varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME));
 
             case IF_EXPRESSION: {
                 IfExprNode ieNode = (IfExprNode) value;
@@ -982,8 +983,8 @@ final class XMLQueryTranslator {
                 if (var == null) {
                     throw new SystemException(ErrorCode.XPST0008, vrNode.getSourceLocation());
                 }
-                return new TreatExpression(currCtx, new VariableReferenceExpression(currCtx, var), var
-                        .getDeclaredStaticType());
+                return new TreatExpression(currCtx, new VariableReferenceExpression(currCtx, var),
+                        var.getDeclaredStaticType());
             }
 
             case FLWOR_EXPRESSION: {
@@ -1185,8 +1186,8 @@ final class XMLQueryTranslator {
 
             case COMPUTED_ELEMENT_CONSTRUCTOR: {
                 ComputedElementConstructorNode cNode = (ComputedElementConstructorNode) value;
-                Expression eName = new CastExpression(currCtx, translateExpression(cNode.getName()), SequenceType
-                        .create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
+                Expression eName = new CastExpression(currCtx, translateExpression(cNode.getName()),
+                        SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
                 Expression content = cNode.getContent() == null ? ExpressionBuilder.functionCall(currCtx,
                         BuiltinOperators.CONCATENATE) : translateExpression(cNode.getContent());
                 return new ElementNodeConstructorExpression(currCtx, eName, content);
@@ -1194,25 +1195,25 @@ final class XMLQueryTranslator {
 
             case COMPUTED_ATTRIBUTE_CONSTRUCTOR: {
                 ComputedAttributeConstructorNode cNode = (ComputedAttributeConstructorNode) value;
-                Expression aName = new CastExpression(currCtx, translateExpression(cNode.getName()), SequenceType
-                        .create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
+                Expression aName = new CastExpression(currCtx, translateExpression(cNode.getName()),
+                        SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
                 Expression content = cNode.getContent() == null ? ExpressionBuilder.functionCall(currCtx,
                         BuiltinOperators.CONCATENATE) : translateExpression(cNode.getContent());
                 return new AttributeNodeConstructorExpression(currCtx, aName, content);
             }
 
             case QNAME:
-                return new ConstantExpression(currCtx, avf.createQName(createQName((QNameNode) value)), SequenceType
-                        .create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
+                return new ConstantExpression(currCtx, avf.createQName(createQName((QNameNode) value)),
+                        SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
 
             case NCNAME:
-                return new ConstantExpression(currCtx, avf.createString(((NCNameNode) value).getName()), SequenceType
-                        .create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE));
+                return new ConstantExpression(currCtx, avf.createString(((NCNameNode) value).getName()),
+                        SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE));
 
             case CDATA_SECTION:
-                return new TextNodeConstructorExpression(currCtx, new ConstantExpression(currCtx, avf
-                        .createString(((CDataSectionNode) value).getContent()), SequenceType.create(
-                        BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)));
+                return new TextNodeConstructorExpression(currCtx, new ConstantExpression(currCtx,
+                        avf.createString(((CDataSectionNode) value).getContent()), SequenceType.create(
+                                BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)));
 
             case ORDERED_EXPRESSION:
                 return ExpressionBuilder.functionCall(currCtx, BuiltinOperators.ORDERED,
@@ -1344,8 +1345,8 @@ final class XMLQueryTranslator {
                     predicates = axisNode.getPredicates();
                     AxisStepNode.Axis axis = axisNode.getAxis();
                     if (ctxExpr == null) {
-                        ctxExpr = new VariableReferenceExpression(currCtx, varScope
-                                .lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME));
+                        ctxExpr = new VariableReferenceExpression(currCtx,
+                                varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME));
                     }
 
                     AxisKind axisKind = translateAxis(axis);
@@ -1492,14 +1493,16 @@ final class XMLQueryTranslator {
 
             Expression typeTest = ExpressionBuilder.instanceOf(currCtx, new VariableReferenceExpression(currCtx, pVar),
                     SequenceType.create(BuiltinTypeRegistry.XSEXT_NUMERIC, Quantifier.QUANT_ONE));
-            Expression posTest = ExpressionBuilder.functionCall(currCtx, BuiltinOperators.VALUE_EQ,
-                    new VariableReferenceExpression(currCtx, pVar), new VariableReferenceExpression(currCtx, varScope
+            Expression posTest = ExpressionBuilder.functionCall(
+                    currCtx,
+                    BuiltinOperators.VALUE_EQ,
+                    new VariableReferenceExpression(currCtx, pVar),
+                    new VariableReferenceExpression(currCtx, varScope
                             .lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME)));
             Expression boolTest = ExpressionBuilder.functionCall(currCtx, BuiltinFunctions.FN_BOOLEAN_1,
                     new VariableReferenceExpression(currCtx, pVar));
 
-            clauses
-                    .add(new FLWORExpression.WhereClause(new IfThenElseExpression(currCtx, typeTest, posTest, boolTest)));
+            clauses.add(new FLWORExpression.WhereClause(new IfThenElseExpression(currCtx, typeTest, posTest, boolTest)));
 
             innerFLWOR.getReturnExpression().set(
                     new VariableReferenceExpression(currCtx, varScope

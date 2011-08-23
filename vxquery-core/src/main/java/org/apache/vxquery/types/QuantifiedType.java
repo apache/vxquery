@@ -89,4 +89,9 @@ public class QuantifiedType implements XQType {
         }
         return NotCastableCastProcessor.INSTANCE_XPST0051;
     }
+
+    @Override
+    public String toString() {
+        return "QuantifiedType[" + contentType + ":" + quantifier + "]";
+    }
 }

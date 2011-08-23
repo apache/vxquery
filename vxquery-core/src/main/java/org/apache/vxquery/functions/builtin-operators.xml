@@ -329,6 +329,7 @@
         <param name="arg1" type="xsext:numeric"/>
         <param name="arg2" type="xsext:numeric"/>
         <return type="xs:integer"/>
+        <runtime class="org.apache.vxquery.runtime.functions.IntegerDivideArithmeticOperationIterator"/>
     </operator>
 
     <!-- op:numeric-less-than( $arg1 as numeric, $arg2 as numeric)  as xs:boolean -->
