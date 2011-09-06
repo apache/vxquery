@@ -22,6 +22,15 @@
   <packaging>jar</packaging>
   <version>0.1-SNAPSHOT</version>
   <name>VXQuery XTest</name>
+  <description>Apache VXQuery Test Driver</description>
+
+  <distributionManagement>
+    <site>
+      <id>vxquery.website</id>
+      <name>VXQuery Website</name>
+      <url>file:../../site/vxquery-xtest/</url>
+    </site>
+  </distributionManagement>
 
   <build>
     <plugins>
@@ -37,6 +46,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>appassembler-maven-plugin</artifactId>
+        <version>1.1.1</version>
         <executions>
           <execution>
             <configuration>
@@ -55,6 +65,11 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.0</version>
       </plugin>
     </plugins>
   </build>
@@ -81,4 +96,33 @@
     </dependency>
   </dependencies>
  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.4</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>dependencies</report>
+              <report>plugins</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+        <configuration>
+            <linkOnly>true</linkOnly>
+        </configuration>            
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.7</version>
+        <configuration>
+          <numUnapprovedLicenses>0</numUnapprovedLicenses>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
