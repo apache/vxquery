@@ -286,7 +286,6 @@
             <linkOnly>true</linkOnly>
         </configuration>            
       </plugin>
-      <!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
@@ -297,7 +296,6 @@
           <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
         </configuration>
       </plugin>
-      -->
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
