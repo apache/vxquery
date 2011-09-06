@@ -28,3 +28,7 @@ Apache VXQuery
   With VXQuery, we take the opposing view - Translate the query to work natively on the user's object model.
   In addition, VXQuery works on top of different XML representations including DOM, Stax, and a space optimized model motivated by Xalan's DTM (Document Table Model).
   VXQuery will also provide a library that allows application developers to express declarative queries without the need to learn a new syntax. We believe that this will speed up the adoption process.
+
+* Incubation Disclaimer
+
+  
