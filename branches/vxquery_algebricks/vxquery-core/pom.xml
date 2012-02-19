@@ -32,6 +32,23 @@
     </site>
   </distributionManagement>
 
+  <repositories>
+    <repository>
+      <id>hyracks-snapshots</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
+      <snapshots>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>hyracks-releases</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
+      <releases>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+    </repository>
+  </repositories>
+
   <build>
     <plugins>
       <plugin>
@@ -185,6 +202,39 @@
         <version>0.7</version>
       </plugin>
     </plugins>
+    <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>
+    									org.apache.maven.plugins
+    								</groupId>
+    								<artifactId>
+    									maven-antrun-plugin
+    								</artifactId>
+    								<versionRange>[1.6,)</versionRange>
+    								<goals>
+    									<goal>run</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement>
   </build>
   
   <dependencies>
@@ -247,6 +297,12 @@
       <groupId>args4j</groupId>
       <artifactId>args4j</artifactId>
       <version>2.0.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-algebricks-compiler</artifactId>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
