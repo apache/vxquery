@@ -16,7 +16,6 @@
 */
 package org.apache.vxquery.context;
 
-import org.apache.vxquery.compiler.expression.GlobalVariable;
 import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.datamodel.atomic.DateTimeValue;
 
@@ -27,7 +26,7 @@ public interface DynamicContext {
 
     public void setCurrentDateTime(DateTimeValue currentDateTime);
 
-    public void bindVariable(GlobalVariable var, XDMValue value);
+    public void bindVariable(XQueryVariable var, XDMValue value);
 
-    public XDMValue lookupVariable(GlobalVariable var);
+    public XDMValue lookupVariable(XQueryVariable var);
 }

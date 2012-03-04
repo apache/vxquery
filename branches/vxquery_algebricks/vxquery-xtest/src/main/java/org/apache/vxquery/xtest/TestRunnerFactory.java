@@ -27,7 +27,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.vxquery.api.InternalAPI;
-import org.apache.vxquery.compiler.expression.GlobalVariable;
+import org.apache.vxquery.context.XQueryVariable;
 import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
 import org.apache.vxquery.datamodel.serialization.XMLSerializer;
@@ -69,7 +69,7 @@ public class TestRunnerFactory {
                     }
                     Module module = iapi.compile(null, ast, opts.optimizationLevel);
                     for (PrologVariable pVar : module.getPrologVariables()) {
-                        GlobalVariable var = pVar.getVariable();
+                        XQueryVariable var = pVar.getVariable();
                         QName varName = var.getName();
                         File binding = testCase.getExternalVariableBinding(varName);
                         if (binding != null) {

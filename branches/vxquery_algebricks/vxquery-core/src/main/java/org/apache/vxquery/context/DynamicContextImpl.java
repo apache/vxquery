@@ -19,7 +19,6 @@ package org.apache.vxquery.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.vxquery.compiler.expression.GlobalVariable;
 import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.datamodel.atomic.DateTimeValue;
 
@@ -28,11 +27,11 @@ public class DynamicContextImpl implements DynamicContext {
 
     private DateTimeValue currentDateTime;
 
-    private Map<GlobalVariable, XDMValue> externalBindings;
+    private Map<XQueryVariable, XDMValue> externalBindings;
 
     public DynamicContextImpl(StaticContext sCtx) {
         this.sCtx = sCtx;
-        externalBindings = new HashMap<GlobalVariable, XDMValue>();
+        externalBindings = new HashMap<XQueryVariable, XDMValue>();
     }
 
     @Override
@@ -51,12 +50,12 @@ public class DynamicContextImpl implements DynamicContext {
     }
 
     @Override
-    public void bindVariable(GlobalVariable var, XDMValue value) {
+    public void bindVariable(XQueryVariable var, XDMValue value) {
         externalBindings.put(var, value);
     }
 
     @Override
-    public XDMValue lookupVariable(GlobalVariable var) {
+    public XDMValue lookupVariable(XQueryVariable var) {
         return externalBindings.get(var);
     }
 }
