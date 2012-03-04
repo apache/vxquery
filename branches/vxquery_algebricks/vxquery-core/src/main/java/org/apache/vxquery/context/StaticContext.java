@@ -21,13 +21,13 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.vxquery.collations.Collation;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.util.Pair;
 
 public interface StaticContext {
     public abstract DataspaceContext getDataspaceContext();

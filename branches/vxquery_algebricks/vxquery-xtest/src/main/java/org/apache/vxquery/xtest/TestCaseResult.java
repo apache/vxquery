@@ -21,8 +21,8 @@ import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Pair;
 
 public class TestCaseResult {
     private static final int DISPLAY_LEN = 1000;
@@ -97,10 +97,10 @@ public class TestCaseResult {
                                 result = result.substring(m.end()).trim();
                             }
                             Pair<Boolean, String> cmp = textCompare(expResult, result);
-                            report = cmp.second;
-                            state = cmp.first ? State.EXPECTED_RESULT_GOT_SAME_RESULT
+                            report = cmp.getRight();
+                            state = cmp.getLeft() ? State.EXPECTED_RESULT_GOT_SAME_RESULT
                                     : State.EXPECTED_RESULT_GOT_DIFFERENT_RESULT;
-                            if (cmp.first) {
+                            if (cmp.getLeft()) {
                                 break;
                             }
                         }
@@ -119,9 +119,9 @@ public class TestCaseResult {
             System.err.println("Result  : " + cmp);
         }
         if (cmp) {
-            return new Pair<Boolean, String>(Boolean.TRUE, "Got expected result");
+            return Pair.<Boolean, String> of(Boolean.TRUE, "Got expected result");
         } else {
-            return new Pair<Boolean, String>(Boolean.FALSE, "Expected: " + truncate(expRes) + " Got: "
+            return Pair.<Boolean, String> of(Boolean.FALSE, "Expected: " + truncate(expRes) + " Got: "
                     + truncate(actRes));
         }
     }

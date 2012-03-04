@@ -854,4 +854,16 @@
         <param name="arg" type="item()*"/>
         <return type="item()"/>
     </operator>
+
+    <!-- opext:validate-lax($arg as item()*) as item()* -->
+    <operator name="opext:validate-lax">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:validate-strict($arg as item()*) as item()* -->
+    <operator name="opext:validate-strict">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+    </operator>
 </operators>
