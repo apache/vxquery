@@ -116,6 +116,7 @@ import org.apache.vxquery.xmlquery.ast.TypeDeclNode;
 import org.apache.vxquery.xmlquery.ast.TypeExprNode;
 import org.apache.vxquery.xmlquery.ast.UnaryExprNode;
 import org.apache.vxquery.xmlquery.ast.UnorderedExprNode;
+import org.apache.vxquery.xmlquery.ast.ValidateExprNode;
 import org.apache.vxquery.xmlquery.ast.VarDeclNode;
 import org.apache.vxquery.xmlquery.ast.VarRefNode;
 import org.apache.vxquery.xmlquery.ast.VersionDeclNode;
@@ -922,7 +923,8 @@ public class XMLQueryTranslator {
                                 tCtx.pushVariableScope();
                                 LogicalVariable forLVar = newLogicalVariable();
                                 LogicalVariable posLVar = newLogicalVariable();
-                                UnnestOperator unnest = new UnnestOperator(forLVar, mutable(seq), posLVar, null);
+                                UnnestOperator unnest = new UnnestOperator(forLVar, mutable(ufce(
+                                        BuiltinOperators.ITERATE, seq)), posLVar, null);
                                 SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE,
                                         Quantifier.QUANT_ONE);
                                 if (fvdNode.getType() != null) {
@@ -1158,17 +1160,13 @@ public class XMLQueryTranslator {
                         sfce(BuiltinOperators.UNORDERED,
                                 vre(translateExpression(((UnorderedExprNode) value).getExpr(), tCtx))), tCtx);
 
-                /*
-                            case VALIDATE_EXPRESSION: {
-                                ValidateExprNode vNode = (ValidateExprNode) value;
-                                ValidateExpression.Mode mode = ValidateExpression.Mode.DEFAULT;
-                                if (vNode.getMode() != null) {
-                                    mode = XQueryConstants.ValidationMode.LAX.equals(vNode.getMode()) ? ValidateExpression.Mode.LAX
-                                            : ValidateExpression.Mode.STRICT;
-                                }
-                                return new ValidateExpression(currCtx, translateExpression(vNode.getExpr()), mode);
-                            }
-                */
+            case VALIDATE_EXPRESSION: {
+                ValidateExprNode vNode = (ValidateExprNode) value;
+                XQueryConstants.ValidationMode mode = vNode.getMode();
+                Function fn = mode == null || XQueryConstants.ValidationMode.STRICT.equals(mode) ? BuiltinOperators.VALIDATE_STRICT
+                        : BuiltinOperators.VALIDATE_LAX;
+                return createAssignment(sfce(fn, vre(translateExpression(vNode.getExpr(), tCtx))), tCtx);
+            }
             default:
                 throw new IllegalStateException("Unknown node: " + value.getTag());
 
@@ -1262,6 +1260,8 @@ public class XMLQueryTranslator {
                     vars.add(var);
                     exprs.add(mutable(afce(BuiltinOperators.SEQUENCE, false, ctxExpr)));
                     AggregateOperator aop = new AggregateOperator(vars, exprs);
+                    aop.getInputs().add(mutable(tCtx.op));
+                    tCtx.op = aop;
                     tCtx = tCtx.popContext();
                     ctxExpr = vre(var);
                     ctxExpr = sfce(asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS
@@ -1279,7 +1279,8 @@ public class XMLQueryTranslator {
                 BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE), lastLVar));
         LogicalVariable forLVar = newLogicalVariable();
         LogicalVariable posLVar = newLogicalVariable();
-        UnnestOperator unnest = new UnnestOperator(forLVar, mutable(vre(seqLVar)), posLVar, null);
+        UnnestOperator unnest = new UnnestOperator(forLVar, mutable(ufce(BuiltinOperators.ITERATE, vre(seqLVar))),
+                posLVar, null);
         SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
         XQueryVariable forVar = new XQueryVariable(XMLQueryCompilerConstants.DOT_VAR_NAME, forVarType, forLVar);
         tCtx.varScope.registerVariable(forVar);
@@ -1734,16 +1735,6 @@ public class XMLQueryTranslator {
 
         void popVariableScope() {
             varScope = varScope.getParentScope();
-        }
-    }
-
-    private static class ExpressionTranslationResult {
-        private ILogicalOperator op;
-        private LogicalVariable var;
-
-        public ExpressionTranslationResult(ILogicalOperator op, LogicalVariable var) {
-            this.op = op;
-            this.var = var;
         }
     }
 

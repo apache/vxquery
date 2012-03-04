@@ -26,13 +26,13 @@ import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.vxquery.collations.Collation;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.util.Pair;
 
 public class StaticContextImpl implements StaticContext {
     private final StaticContext parent;
@@ -303,7 +303,7 @@ public class StaticContextImpl implements StaticContext {
 
     @Override
     public void registerModuleImport(String uri, List<String> locations) {
-        moduleImports.add(new Pair<String, List<String>>(uri, locations));
+        moduleImports.add(Pair.<String, List<String>> of(uri, locations));
     }
 
     @Override
@@ -326,7 +326,7 @@ public class StaticContextImpl implements StaticContext {
 
     @Override
     public void registerSchemaImport(String uri, List<String> locations) {
-        schemaImports.add(new Pair<String, List<String>>(uri, locations));
+        schemaImports.add(Pair.<String, List<String>> of(uri, locations));
     }
 
     @Override
