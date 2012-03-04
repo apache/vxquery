@@ -22,7 +22,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.vxquery.collations.Collation;
-import org.apache.vxquery.compiler.expression.Variable;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
@@ -55,11 +54,11 @@ public interface StaticContext {
 
     public abstract void registerDocumentType(String docUri, SequenceType type);
 
-    public abstract Variable lookupVariable(QName name);
+    public abstract XQueryVariable lookupVariable(QName name);
 
-    public abstract void registerVariable(Variable var);
+    public abstract void registerVariable(XQueryVariable var);
 
-    public abstract Iterator<Variable> listVariables();
+    public abstract Iterator<XQueryVariable> listVariables();
 
     public abstract SequenceType lookupCollectionType(String collectionUri);
 
@@ -130,22 +129,29 @@ public interface StaticContext {
     public abstract String getOption(QName name);
 
     public enum BoundarySpaceProperty {
-        PRESERVE, STRIP
+        PRESERVE,
+        STRIP
     }
 
     public enum OrderingModeProperty {
-        ORDERED, UNORDERED
+        ORDERED,
+        UNORDERED
     }
 
     public enum ConstructionModeProperty {
-        PRESERVE, STRIP
+        PRESERVE,
+        STRIP
     }
 
     public enum EmptyOrderProperty {
-        GREATEST, LEAST
+        GREATEST,
+        LEAST
     }
 
     public enum CopyNamespacesModeProperty {
-        PRESERVE_INHERIT, PRESERVE_NOINHERIT, NOPRESERVE_INHERIT, NOPRESERVE_NOINHERIT
+        PRESERVE_INHERIT,
+        PRESERVE_NOINHERIT,
+        NOPRESERVE_INHERIT,
+        NOPRESERVE_NOINHERIT
     }
 }

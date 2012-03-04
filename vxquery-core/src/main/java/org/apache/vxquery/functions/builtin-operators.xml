@@ -723,4 +723,135 @@
         <return type="item()*"/>
         <runtime class="org.apache.vxquery.runtime.functions.OpExtDeflateSequencesIterator"/>
     </operator>
+
+    <!-- opext:pi-constructor($target as xs:sring, $content as xs:string) as node() -->
+    <operator name="opext:pi-constructor">
+        <param name="target" type="xs:string"/>
+        <param name="content" type="xs:string"/>
+        <return type="node()"/>
+    </operator>
+
+    <!-- opext:comment-constructor($content as xs:string) as node() -->
+    <operator name="opext:comment-constructor">
+        <param name="content" type="xs:string"/>
+        <return type="node()"/>
+    </operator>
+
+    <!-- opext:element-constructor($name as xs:QName, $content as item()*) as node() -->
+    <operator name="opext:element-constructor">
+        <param name="name" type="xs:QName"/>
+        <param name="content" type="item()*"/>
+        <return type="node()"/>
+    </operator>
+
+    <!-- opext:attribute-constructor($name as xs:QName, $content as xs:anyAtomicType*) as node() -->
+    <operator name="opext:attribute-constructor">
+        <param name="name" type="xs:QName"/>
+        <param name="content" type="xs:anyAtomicType*"/>
+        <return type="node()"/>
+    </operator>
+
+    <!-- opext:text-constructor($content as xs:anyAtomicType*) as node() -->
+    <operator name="opext:text-constructor">
+        <param name="content" type="xs:anyAtomicType*"/>
+        <return type="node()"/>
+    </operator>
+
+    <!-- opext:document-constructor($content as element()) as document() -->
+    <operator name="opext:document-constructor">
+        <param name="content" type="element()"/>
+        <return type="document()"/>
+    </operator>
+
+    <!-- opext:if-then-else($condition as xs:boolean, $then as item()*, $else as item()*) as item()* -->
+    <operator name="opext:if-then-else">
+        <param name="condition" type="xs:boolean"/>
+        <param name="then" type="item()*"/>
+        <param name="else" type="item()*"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:ancestor($arg as node()*) as node()* -->
+    <operator name="opext:ancestor">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:ancestor-or-self($arg as node()*) as node()* -->
+    <operator name="opext:ancestor-or-self">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:attribute($arg as node()*) as node()* -->
+    <operator name="opext:attribute">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:child($arg as node()*) as node()* -->
+    <operator name="opext:child">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:descendant($arg as node()*) as node()* -->
+    <operator name="opext:descendant">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:descendant-or-self($arg as node()*) as node()* -->
+    <operator name="opext:descendant-or-self">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:following($arg as node()*) as node()* -->
+    <operator name="opext:following">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:following-sibling($arg as node()*) as node()* -->
+    <operator name="opext:following-sibling">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:parent($arg as node()*) as node()* -->
+    <operator name="opext:parent">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:preceding($arg as node()*) as node()* -->
+    <operator name="opext:preceding">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:preceding-sibling($arg as node()*) as node()* -->
+    <operator name="opext:preceding-sibling">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:self($arg as node()*) as node()* -->
+    <operator name="opext:self">
+        <param name="arg" type="node()*"/>
+        <return type="node()*"/>
+    </operator>
+
+    <!-- opext:sequence($arg as item()*) as item()* -->
+    <operator name="opext:sequence">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:iterate($arg as item()*) as item() -->
+    <operator name="opext:iterate">
+        <param name="arg" type="item()*"/>
+        <return type="item()"/>
+    </operator>
 </operators>

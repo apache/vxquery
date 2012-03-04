@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.vxquery.api.InternalAPI;
-import org.apache.vxquery.compiler.expression.ExpressionPrinter;
 import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
 import org.apache.vxquery.datamodel.serialization.XMLSerializer;
@@ -40,6 +39,10 @@ import org.kohsuke.args4j.Option;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.PlanPrettyPrinter;
+import edu.uci.ics.hyracks.algebricks.core.api.exceptions.AlgebricksException;
 
 public class VXQuery {
     public static void main(String[] args) throws Exception {
@@ -68,18 +71,25 @@ public class VXQuery {
             XQueryCompilationListener listener = new XQueryCompilationListener() {
                 @Override
                 public void notifyCodegenResult(Module module) {
+                    /*
                     if (opts.showRI) {
                         System.err.println(new XStream(new DomDriver()).toXML(module.getBodyRuntimePlan()
                                 .getRuntimeIterator()));
                     }
+                    */
                 }
 
                 @Override
                 public void notifyTranslationResult(Module module) {
                     if (opts.showTET) {
-                        StringBuilder tet = new StringBuilder();
-                        ExpressionPrinter.prettyPrint(module.getBody().get(), 0, tet);
-                        System.err.println(tet);
+                        try {
+                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
+                            StringBuilder buffer = new StringBuilder();
+                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
+                            System.err.println(buffer.toString());
+                        } catch (AlgebricksException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -89,11 +99,6 @@ public class VXQuery {
 
                 @Override
                 public void notifyOptimizedResult(Module module) {
-                    if (opts.showOET) {
-                        StringBuilder tet = new StringBuilder();
-                        ExpressionPrinter.prettyPrint(module.getBody().get(), 0, tet);
-                        System.err.println(tet);
-                    }
                 }
             };
             Module module = iapi.compile(listener, ast, opts.optimizationLevel);

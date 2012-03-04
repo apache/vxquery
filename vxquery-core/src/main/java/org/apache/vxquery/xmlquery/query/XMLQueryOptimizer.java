@@ -14,42 +14,11 @@
  */
 package org.apache.vxquery.xmlquery.query;
 
-import java.util.Iterator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.vxquery.compiler.expression.ExpressionHandle;
-import org.apache.vxquery.compiler.rewriter.framework.RulesetDriver;
-import org.apache.vxquery.compiler.rewriter.framework.RulesetProvider;
-import org.apache.vxquery.compiler.rewriter.rulesets.DefaultRulesetProviderImpl;
-import org.apache.vxquery.compiler.rewriter.rulesets.LoggingRulesetProviderImpl;
-import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.functions.Function;
-import org.apache.vxquery.functions.UserDefinedXQueryFunction;
 
 public final class XMLQueryOptimizer {
     public static final Logger LOGGER = Logger.getLogger(XMLQueryOptimizer.class.getName());
 
     static void optimize(Module module, int optimizationLevel) {
-        StaticContext sCtx = module.getModuleContext();
-        for (Iterator<Function> i = sCtx.listFunctions(); i.hasNext();) {
-            Function f = i.next();
-            if (Function.FunctionTag.UDXQUERY.equals(f.getTag())) {
-                UserDefinedXQueryFunction udf = (UserDefinedXQueryFunction) f;
-                optimize(udf.getBody(), optimizationLevel);
-            }
-        }
-        if (module.getBody() != null) {
-            optimize(module.getBody(), optimizationLevel);
-        }
-    }
-
-    private static void optimize(ExpressionHandle handle, int optimizationLevel) {
-        RulesetDriver rd = new RulesetDriver();
-        RulesetProvider provider = DefaultRulesetProviderImpl.INSTANCE;
-        if (LOGGER.isLoggable(Level.FINE)) {
-            provider = new LoggingRulesetProviderImpl(provider);
-        }
-        rd.rewrite(handle, provider.createRuleset(), optimizationLevel);
     }
 }
