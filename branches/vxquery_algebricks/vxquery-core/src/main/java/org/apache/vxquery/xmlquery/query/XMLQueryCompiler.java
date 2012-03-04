@@ -17,6 +17,7 @@ package org.apache.vxquery.xmlquery.query;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
+import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
 
 public class XMLQueryCompiler {
     public static Module compile(ModuleNode moduleNode, CompilerControlBlock ccb, int optimizationLevel,

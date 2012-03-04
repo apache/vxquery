@@ -36,7 +36,6 @@ import org.apache.vxquery.runtime.base.RuntimeIterator;
 import org.apache.vxquery.runtime.util.XMLParserUtils;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
-import org.apache.vxquery.xmlquery.query.PrologVariable;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 import org.apache.vxquery.xmlquery.query.XMLQueryParser;
 import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
@@ -74,6 +73,7 @@ public class InternalAPI {
     }
 
     public OpenableCloseableIterator execute(Module module) throws SystemException {
+        /*
         RegisterSet gRegs = module.createGlobalRegisterSet();
         int i = 0;
         for (PrologVariable pVar : module.getPrologVariables()) {
@@ -105,6 +105,8 @@ public class InternalAPI {
                 return ri.next(frame);
             }
         };
+        */
+        return null;
     }
 
     private XDMValue evaluateInitializer(RegisterSet gRegs, RuntimePlan plan) throws SystemException {

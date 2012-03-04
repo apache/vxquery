@@ -22,7 +22,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.vxquery.collations.Collation;
-import org.apache.vxquery.compiler.expression.Variable;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
@@ -163,12 +162,12 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     }
 
     @Override
-    public Iterator<Variable> listVariables() {
+    public Iterator<XQueryVariable> listVariables() {
         return parent.listVariables();
     }
 
     @Override
-    public Variable lookupVariable(QName name) {
+    public XQueryVariable lookupVariable(QName name) {
         return parent.lookupVariable(name);
     }
 
@@ -223,7 +222,7 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     }
 
     @Override
-    public void registerVariable(Variable var) {
+    public void registerVariable(XQueryVariable var) {
         parent.registerVariable(var);
     }
 

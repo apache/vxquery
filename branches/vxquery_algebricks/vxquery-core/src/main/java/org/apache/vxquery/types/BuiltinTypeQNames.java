@@ -113,4 +113,6 @@ public class BuiltinTypeQNames {
             XQueryConstants.XS_PREFIX);
     public static final QName XS_NOTATION_TYPE_QNAME = new QName(XQueryConstants.XS_NSURI, "NOTATION",
             XQueryConstants.XS_PREFIX);
+    public static final QName XSEXT_TYPE_TYPE_QNAME = new QName(XQueryConstants.XSEXT_NSURI, "type",
+            XQueryConstants.XSEXT_PREFIX);
 }

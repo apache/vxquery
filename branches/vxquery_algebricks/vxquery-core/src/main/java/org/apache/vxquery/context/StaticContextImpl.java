@@ -27,7 +27,6 @@ import java.util.NoSuchElementException;
 import javax.xml.namespace.QName;
 
 import org.apache.vxquery.collations.Collation;
-import org.apache.vxquery.compiler.expression.Variable;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
@@ -40,7 +39,7 @@ public class StaticContextImpl implements StaticContext {
 
     private final Map<String, String> namespaceMap;
 
-    private final Map<QName, Variable> variableMap;
+    private final Map<QName, XQueryVariable> variableMap;
 
     protected final Map<String, Collation> collationMap;
 
@@ -85,7 +84,7 @@ public class StaticContextImpl implements StaticContext {
     public StaticContextImpl(StaticContext parent) {
         this.parent = parent;
         namespaceMap = new LinkedHashMap<String, String>();
-        variableMap = new LinkedHashMap<QName, Variable>();
+        variableMap = new LinkedHashMap<QName, XQueryVariable>();
         collationMap = new LinkedHashMap<String, Collation>();
         functionMap = new LinkedHashMap<QName, Function[]>();
         documentTypeMap = new LinkedHashMap<String, SequenceType>();
@@ -248,7 +247,7 @@ public class StaticContextImpl implements StaticContext {
     }
 
     @Override
-    public Variable lookupVariable(QName name) {
+    public XQueryVariable lookupVariable(QName name) {
         if (variableMap.containsKey(name)) {
             return variableMap.get(name);
         }
@@ -259,12 +258,12 @@ public class StaticContextImpl implements StaticContext {
     }
 
     @Override
-    public void registerVariable(Variable var) {
+    public void registerVariable(XQueryVariable var) {
         variableMap.put(var.getName(), var);
     }
 
     @Override
-    public Iterator<Variable> listVariables() {
+    public Iterator<XQueryVariable> listVariables() {
         return Collections.unmodifiableCollection(variableMap.values()).iterator();
     }
 

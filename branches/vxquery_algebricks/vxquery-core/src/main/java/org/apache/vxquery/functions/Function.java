@@ -20,14 +20,26 @@ import javax.xml.namespace.QName;
 
 import org.apache.vxquery.runtime.base.FunctionIteratorFactory;
 
-public abstract class Function {
-    protected QName name;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 
-    protected Signature signature;
+public abstract class Function implements IFunctionInfo {
+    private static final String VXQUERY = "vxquery";
+    protected final FunctionIdentifier fid;
 
-    public Function(QName name, Signature signature) {
-        this.name = name;
+    protected final QName qname;
+
+    protected final Signature signature;
+
+    public Function(QName qname, Signature signature) {
+        this.fid = new FunctionIdentifier(VXQUERY, "{" + qname.getNamespaceURI() + "}" + qname.getLocalPart(), false);
+        this.qname = qname;
         this.signature = signature;
+    }
+
+    @Override
+    public final FunctionIdentifier getFunctionIdentifier() {
+        return fid;
     }
 
     public abstract FunctionTag getTag();
@@ -37,7 +49,7 @@ public abstract class Function {
     public abstract FunctionIteratorFactory getIteratorFactory();
 
     public QName getName() {
-        return name;
+        return qname;
     }
 
     public Signature getSignature() {
@@ -45,6 +57,14 @@ public abstract class Function {
     }
 
     public enum FunctionTag {
-        BUILTIN, OPERATOR, EXTERNAL, UDXQUERY,
+        BUILTIN,
+        OPERATOR,
+        EXTERNAL,
+        UDXQUERY,
+    }
+
+    @Override
+    public Object getInfo() {
+        return null;
     }
 }

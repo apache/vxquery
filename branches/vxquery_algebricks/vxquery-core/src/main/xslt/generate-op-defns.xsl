@@ -29,7 +29,7 @@
                 </xsl:if>
                 <xsl:for-each select="param">
                     ,
-                    new org.apache.vxquery.util.Pair&lt;javax.xml.namespace.QName, org.apache.vxquery.types.SequenceType&gt;(
+                    org.apache.commons.lang3.tuple.Pair.&lt;javax.xml.namespace.QName, org.apache.vxquery.types.SequenceType&gt;of(
                         new javax.xml.namespace.QName("<xsl:value-of select="@name"/>"),
                         createSequenceType("<xsl:value-of select="@type"/>")
                     )

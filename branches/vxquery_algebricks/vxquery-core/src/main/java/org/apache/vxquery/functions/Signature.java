@@ -18,8 +18,8 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.util.Pair;
 
 public final class Signature {
     private QName[] parameterNames;
@@ -37,8 +37,8 @@ public final class Signature {
         parameterNames = new QName[len];
         parameterTypes = new SequenceType[len];
         for (int i = 0; i < parameters.length; ++i) {
-            parameterNames[i] = parameters[i].first;
-            parameterTypes[i] = parameters[i].second;
+            parameterNames[i] = parameters[i].getLeft();
+            parameterTypes[i] = parameters[i].getRight();
         }
         this.rType = rType;
     }

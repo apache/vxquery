@@ -89,12 +89,10 @@ public final class SequenceType {
     }
 
     private static void createBuiltinEntry(Map<ItemType, SequenceType[]> types, ItemType itemType) {
-        types
-                .put(itemType, new SequenceType[] { new SequenceType(itemType, Quantifier.QUANT_ZERO),
-                        new SequenceType(itemType, Quantifier.QUANT_ONE),
-                        new SequenceType(itemType, Quantifier.QUANT_QUESTION),
-                        new SequenceType(itemType, Quantifier.QUANT_STAR),
-                        new SequenceType(itemType, Quantifier.QUANT_PLUS), });
+        types.put(itemType, new SequenceType[] { new SequenceType(itemType, Quantifier.QUANT_ZERO),
+                new SequenceType(itemType, Quantifier.QUANT_ONE),
+                new SequenceType(itemType, Quantifier.QUANT_QUESTION),
+                new SequenceType(itemType, Quantifier.QUANT_STAR), new SequenceType(itemType, Quantifier.QUANT_PLUS), });
     }
 
     public static SequenceType create(ItemType itemType, Quantifier quantifier) {
