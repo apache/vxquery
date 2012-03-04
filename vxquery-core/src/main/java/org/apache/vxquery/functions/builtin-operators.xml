@@ -757,10 +757,10 @@
         <return type="node()"/>
     </operator>
 
-    <!-- opext:document-constructor($content as element()) as document() -->
+    <!-- opext:document-constructor($content as node()) as node() -->
     <operator name="opext:document-constructor">
-        <param name="content" type="element()"/>
-        <return type="document()"/>
+        <param name="content" type="node()"/>
+        <return type="node()"/>
     </operator>
 
     <!-- opext:if-then-else($condition as xs:boolean, $then as item()*, $else as item()*) as item()* -->

@@ -19,11 +19,11 @@ import java.io.Reader;
 import java.util.GregorianCalendar;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
-import org.apache.vxquery.compiler.expression.GlobalVariable;
 import org.apache.vxquery.context.DataspaceContextImpl;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.StaticContext;
+import org.apache.vxquery.context.XQueryVariable;
 import org.apache.vxquery.datamodel.DatamodelStaticInterface;
 import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
@@ -67,7 +67,7 @@ public class InternalAPI {
         return sCtx;
     }
 
-    public void bindExternalVariable(GlobalVariable var, File file) throws SystemException {
+    public void bindExternalVariable(XQueryVariable var, File file) throws SystemException {
         XDMValue value = XMLParserUtils.parseFile(rcb, file);
         dCtx.bindVariable(var, value);
     }
