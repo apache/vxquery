@@ -131,6 +131,7 @@ import org.apache.vxquery.xmlquery.query.XQueryConstants.TypeQuantifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
@@ -606,59 +607,25 @@ public class XMLQueryTranslator {
     }
 
     private LogicalVariable translateExpression(ASTNode value, TranslationContext tCtx) throws SystemException {
-        tCtx = tCtx.pushContext();
-        LogicalVariable var = translateExpressionSimple(value, tCtx);
-        tCtx.popContext();
-        return var;
-    }
-
-    private LogicalVariable translateExpressionSimple(ASTNode value, TranslationContext tCtx) throws SystemException {
         switch (value.getTag()) {
             case EXPRESSION: {
                 ExprNode node = (ExprNode) value;
-                return createConcatenation(translateExpressionList(node.getExpressions(), tCtx), tCtx);
+                return translateExprNode(tCtx, node);
             }
 
             case UNARY_EXPRESSION: {
                 UnaryExprNode ueNode = (UnaryExprNode) value;
-                boolean neg = false;
-                for (UnaryExprNode.Sign s : ueNode.getSigns()) {
-                    if (UnaryExprNode.Sign.MINUS.equals(s)) {
-                        neg = !neg;
-                    }
-                }
-                LogicalVariable var = translateExpressionSimple(ueNode.getExpr(), tCtx);
-                if (neg) {
-                    ILogicalExpression nExpr = normalize(vre(var), BuiltinOperators.NUMERIC_UNARY_MINUS.getSignature()
-                            .getParameterType(0));
-                    ILogicalExpression negExpr = sfce(BuiltinOperators.NUMERIC_UNARY_MINUS, nExpr);
-                    var = createAssignment(negExpr, tCtx);
-                }
-                return var;
+                return translateUnaryExprNode(tCtx, ueNode);
             }
 
             case INFIX_EXPRESSION: {
                 InfixExprNode ie = (InfixExprNode) value;
-                Function operator = getOperator(ie.getOperator());
-                Signature sign = operator.getSignature();
-                LogicalVariable varLeft = translateExpression(ie.getLeftExpr(), tCtx);
-                LogicalVariable varRight = translateExpression(ie.getRightExpr(), tCtx);
-                ILogicalExpression arg1 = normalize(vre(varLeft), sign.getParameterType(0));
-                ILogicalExpression arg2 = normalize(vre(varRight), sign.getParameterType(1));
-                if (BuiltinOperators.EXCEPT.equals(operator) || BuiltinOperators.INTERSECT.equals(operator)) {
-                    arg1 = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg1);
-                    arg2 = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg2);
-                }
-                ILogicalExpression result = sfce(operator, arg1, arg2);
-                if (BuiltinOperators.UNION.equals(operator)) {
-                    result = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, result);
-                }
-                return createAssignment(result, tCtx);
+                return translateInfixExprNode(tCtx, ie);
             }
 
             case ENCLOSED_EXPRESSION: {
                 EnclosedExprNode ee = (EnclosedExprNode) value;
-                return translateExpressionSimple(ee.getExpression(), tCtx);
+                return translateEnclosedExprNode(tCtx, ee);
             }
 
             case PATH_EXPRESSION:
@@ -666,226 +633,47 @@ public class XMLQueryTranslator {
 
             case FUNCTION_EXPRESSION: {
                 FunctionExprNode fnNode = (FunctionExprNode) value;
-                List<LogicalVariable> args = new ArrayList<LogicalVariable>();
-                for (ASTNode an : fnNode.getArguments()) {
-                    args.add(translateExpression(an, tCtx));
-                }
-                QName name = createQName(fnNode.getName());
-                SchemaType type = moduleCtx.lookupSchemaType(name);
-                if (type != null && args.size() < 2) {
-                    if (!type.isAtomicType()) {
-                        throw new SystemException(ErrorCode.XPST0051, fnNode.getName().getSourceLocation());
-                    }
-                    LogicalVariable var = args.isEmpty() ? tCtx.varScope.lookupVariable(
-                            XMLQueryCompilerConstants.DOT_VAR_NAME).getLogicalVariable() : args.get(0);
-                    ILogicalExpression expr = cast(vre(var),
-                            SequenceType.create((ItemType) type, Quantifier.QUANT_QUESTION));
-                    return createAssignment(expr, tCtx);
-                }
-                QName fName = createQName(fnNode.getName(), moduleCtx.getDefaultFunctionNamespaceUri());
-                if (BuiltinFunctions.FN_POSITION_QNAME.equals(fName)) {
-                    XQueryVariable var = tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME);
-                    return var.getLogicalVariable();
-                }
-                if (BuiltinFunctions.FN_LAST_QNAME.equals(fName)) {
-                    XQueryVariable var = tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.LAST_VAR_NAME);
-                    return var.getLogicalVariable();
-                }
-                int nArgs = fnNode.getArguments().size();
-                Function fn = moduleCtx.lookupFunction(fName, nArgs);
-                if (fn != null && fn.useContextImplicitly()) {
-                    args.add(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME).getLogicalVariable());
-                    fn = moduleCtx.lookupFunction(fName, nArgs + 1);
-                }
-                if (fn == null) {
-                    Function[] fns = moduleCtx.lookupFunctions(fName);
-                    if (fns != null) {
-                        for (int i = 0; i < fns.length && i <= nArgs; ++i) {
-                            if (fns[i] != null && fns[i].getSignature().isVarArgs()) {
-                                fn = fns[i];
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (fn == null) {
-                    throw new SystemException(ErrorCode.XPST0017, fnNode.getName().getSourceLocation());
-                }
-                Signature sign = fn.getSignature();
-                List<Mutable<ILogicalExpression>> argExprs = new ArrayList<Mutable<ILogicalExpression>>();
-                for (int i = 0; i < args.size(); ++i) {
-                    SequenceType argType = sign.getParameterType(i);
-                    argExprs.add(mutable(normalize(vre(args.get(i)), argType)));
-                }
-                return createAssignment(new ScalarFunctionCallExpression(fn, argExprs), tCtx);
+                return translateFunctionExprNode(tCtx, fnNode);
             }
 
             case TYPE_EXPRESSION: {
                 TypeExprNode teNode = (TypeExprNode) value;
-                LogicalVariable var = translateExpressionSimple(teNode.getExpr(), tCtx);
-                SequenceType type = createSequenceType(teNode.getType());
-                ILogicalExpression expr = null;
-                switch (teNode.getOperator()) {
-                    case CAST:
-                        expr = cast(vre(var), type);
-                        break;
-
-                    case CASTABLE:
-                        expr = castable(vre(var), type);
-                        break;
-
-                    case INSTANCEOF:
-                        expr = instanceOf(vre(var), type);
-                        break;
-
-                    case TREAT:
-                        expr = treat(vre(var), type);
-                        break;
-
-                    default:
-                        throw new IllegalStateException("Unknown type operator: " + teNode.getOperator());
-                }
-                return createAssignment(expr, tCtx);
+                return translateTypeExprNode(tCtx, teNode);
             }
 
             case EXTENSION_EXPRESSION: {
                 ExtensionExprNode eNode = (ExtensionExprNode) value;
-                if (eNode.getExpr() == null) {
-                    throw new SystemException(ErrorCode.XQST0079, eNode.getSourceLocation());
-                }
-                return translateExpressionSimple(eNode.getExpr(), tCtx);
+                return translateExtensionExprNode(tCtx, eNode);
             }
 
             case PARENTHESIZED_EXPRESSION: {
                 ParenthesizedExprNode peNode = (ParenthesizedExprNode) value;
-                ASTNode eNode = peNode.getExpr();
-                if (eNode == null) {
-                    return createConcatenation(Collections.<LogicalVariable> emptyList(), tCtx);
-                }
-                return translateExpressionSimple(((ParenthesizedExprNode) value).getExpr(), tCtx);
+                return translateParenthisizedExprNode(tCtx, peNode);
             }
 
             case LITERAL: {
                 LiteralNode lNode = (LiteralNode) value;
-                String image = lNode.getImage();
-                LiteralNode.LiteralType lType = lNode.getType();
-                SequenceType t = null;
-                switch (lType) {
-                    case DECIMAL:
-                        t = SequenceType.create(BuiltinTypeRegistry.XS_DECIMAL, Quantifier.QUANT_ONE);
-                        break;
-                    case DOUBLE:
-                        t = SequenceType.create(BuiltinTypeRegistry.XS_DOUBLE, Quantifier.QUANT_ONE);
-                        break;
-                    case INTEGER:
-                        t = SequenceType.create(BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE);
-                        break;
-                    case STRING:
-                        t = SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE);
-                        image = unquote(image);
-                        break;
-                    default:
-                        throw new IllegalStateException("Unknown type: " + lType);
-                }
-                return createAssignment(ce(t, image), tCtx);
+                return translateLiteralNode(tCtx, lNode);
             }
 
             case DIRECT_PI_CONSTRUCTOR: {
                 DirectPIConstructorNode dpicNode = (DirectPIConstructorNode) value;
-                String target = dpicNode.getTarget();
-                String content = dpicNode.getContent();
-                return createAssignment(
-                        sfce(BuiltinOperators.PI_CONSTRUCTOR,
-                                ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), target),
-                                ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), content)),
-                        tCtx);
+                return translateDirectPIConstructorNode(tCtx, dpicNode);
             }
 
             case DIRECT_COMMENT_CONSTRUCTOR: {
                 DirectCommentConstructorNode dccNode = (DirectCommentConstructorNode) value;
-                String content = dccNode.getContent();
-                return createAssignment(
-                        sfce(BuiltinOperators.COMMENT_CONSTRUCTOR,
-                                ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), content)),
-                        tCtx);
+                return translateDirectCommentConstructorNode(tCtx, dccNode);
             }
 
             case DIRECT_ELEMENT_CONSTRUCTOR: {
                 DirectElementConstructorNode decNode = (DirectElementConstructorNode) value;
-                QNameNode startName = decNode.getStartTagName();
-                QNameNode endName = decNode.getEndTagName();
-                if (endName != null
-                        && (!startName.getPrefix().equals(endName.getPrefix()) || !startName.getLocalName().equals(
-                                endName.getLocalName()))) {
-                    throw new SystemException(ErrorCode.XPST0003, endName.getSourceLocation());
-                }
-                pushContext();
-                for (DirectAttributeConstructorNode acNode : decNode.getAttributes()) {
-                    QNameNode aName = acNode.getName();
-                    if ("xmlns".equals(aName.getPrefix())) {
-                        List<ASTNode> values = acNode.getValue();
-                        if (values.size() != 1 || !ASTTag.CONTENT_CHARS.equals(values.get(0).getTag())) {
-                            throw new SystemException(ErrorCode.XQST0022, acNode.getSourceLocation());
-                        }
-
-                        currCtx.registerNamespaceUri(aName.getLocalName(),
-                                unquote(((ContentCharsNode) values.get(0)).getContent()));
-                    }
-                }
-                List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
-                for (DirectAttributeConstructorNode acNode : decNode.getAttributes()) {
-                    QNameNode aName = acNode.getName();
-                    if (!"xmlns".equals(aName.getPrefix())) {
-                        content.add(vre(translateExpression(acNode, tCtx)));
-                    }
-                }
-                ILogicalExpression name = ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE),
-                        createQName(startName, moduleCtx.getDefaultElementNamespaceUri()).toString());
-                for (ASTNode cVal : decNode.getContent()) {
-                    switch (cVal.getTag()) {
-                        case CONTENT_CHARS: {
-                            String contentChars = ((ContentCharsNode) cVal).getContent();
-                            ILogicalExpression cce = ce(
-                                    SequenceType.create(BuiltinTypeRegistry.XS_UNTYPED_ATOMIC, Quantifier.QUANT_ONE),
-                                    contentChars);
-                            content.add(sfce(BuiltinOperators.TEXT_CONSTRUCTOR, cce));
-                            break;
-                        }
-
-                        default:
-                            content.add(vre(translateExpression(cVal, tCtx)));
-                    }
-                }
-                popContext();
-                ILogicalExpression contentExpr = content.size() == 1 ? content.get(0) : sfce(
-                        BuiltinOperators.CONCATENATE, content.toArray(new ILogicalExpression[content.size()]));
-                return createAssignment(sfce(BuiltinOperators.ELEMENT_CONSTRUCTOR, name, contentExpr), tCtx);
+                return translateDirectElementConstructorNode(tCtx, decNode);
             }
 
             case DIRECT_ATTRIBUTE_CONSTRUCTOR: {
                 DirectAttributeConstructorNode dacNode = (DirectAttributeConstructorNode) value;
-                QName aQName = createQName(dacNode.getName());
-                ILogicalExpression name = ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE),
-                        aQName.toString());
-                List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
-                for (ASTNode aVal : dacNode.getValue()) {
-                    switch (aVal.getTag()) {
-                        case CONTENT_CHARS: {
-                            String contentChars = ((ContentCharsNode) aVal).getContent();
-                            ILogicalExpression cce = ce(
-                                    SequenceType.create(BuiltinTypeRegistry.XS_UNTYPED_ATOMIC, Quantifier.QUANT_ONE),
-                                    contentChars);
-                            content.add(cce);
-                            break;
-                        }
-
-                        default:
-                            content.add(vre(translateExpression(aVal, tCtx)));
-                    }
-                }
-                ILogicalExpression contentExpr = content.size() == 1 ? content.get(0) : sfce(
-                        BuiltinOperators.CONCATENATE, content.toArray(new ILogicalExpression[content.size()]));
-                return createAssignment(sfce(BuiltinOperators.ATTRIBUTE_CONSTRUCTOR, name, contentExpr), tCtx);
+                return translateDirectAttributeConstructorNode(tCtx, dacNode);
             }
 
             case CONTEXT_ITEM:
@@ -893,136 +681,17 @@ public class XMLQueryTranslator {
 
             case IF_EXPRESSION: {
                 IfExprNode ieNode = (IfExprNode) value;
-                ILogicalExpression cond = sfce(BuiltinFunctions.FN_BOOLEAN_1,
-                        vre(translateExpression(ieNode.getIfExpr(), tCtx)));
-                ILogicalExpression tExpr = vre(translateExpression(ieNode.getThenExpr(), tCtx));
-                ILogicalExpression eExpr = vre(translateExpression(ieNode.getElseExpr(), tCtx));
-                return createAssignment(sfce(BuiltinOperators.IF_THEN_ELSE, cond, tExpr, eExpr), tCtx);
+                return translateIfExprNode(tCtx, ieNode);
             }
 
             case VARIABLE_REFERENCE: {
                 VarRefNode vrNode = (VarRefNode) value;
-                QName vName = createQName(vrNode.getVariable());
-                XQueryVariable var = tCtx.varScope.lookupVariable(vName);
-                if (var == null) {
-                    throw new SystemException(ErrorCode.XPST0008, vrNode.getSourceLocation());
-                }
-                return createAssignment(treat(vre(var.getLogicalVariable()), var.getType()), tCtx);
+                return translateVarRefNode(tCtx, vrNode);
             }
 
             case FLWOR_EXPRESSION: {
                 FLWORExprNode fNode = (FLWORExprNode) value;
-                List<FLWORClauseNode> cNodes = fNode.getClauses();
-                int pushCount = 0;
-                for (FLWORClauseNode cNode : cNodes) {
-                    switch (cNode.getTag()) {
-                        case FOR_CLAUSE: {
-                            ForClauseNode fcNode = (ForClauseNode) cNode;
-                            for (ForVarDeclNode fvdNode : fcNode.getVariables()) {
-                                ILogicalExpression seq = vre(translateExpression(fvdNode.getSequence(), tCtx));
-                                tCtx.pushVariableScope();
-                                LogicalVariable forLVar = newLogicalVariable();
-                                LogicalVariable posLVar = newLogicalVariable();
-                                UnnestOperator unnest = new UnnestOperator(forLVar, mutable(ufce(
-                                        BuiltinOperators.ITERATE, seq)), posLVar, null);
-                                SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE,
-                                        Quantifier.QUANT_ONE);
-                                if (fvdNode.getType() != null) {
-                                    forVarType = createSequenceType(fvdNode.getType());
-                                }
-                                XQueryVariable forVar = new XQueryVariable(createQName(fvdNode.getForVar()),
-                                        forVarType, forLVar);
-                                tCtx.varScope.registerVariable(forVar);
-                                XQueryVariable posVar = null;
-                                if (fvdNode.getPosVar() != null) {
-                                    posVar = new XQueryVariable(createQName(fvdNode.getPosVar()), SequenceType.create(
-                                            BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE), posLVar);
-                                    tCtx.varScope.registerVariable(posVar);
-                                }
-                                assert fvdNode.getScoreVar() == null;
-                                unnest.getInputs().add(mutable(tCtx.op));
-                                tCtx.op = unnest;
-                                ++pushCount;
-                            }
-                            break;
-                        }
-                        case LET_CLAUSE: {
-                            LetClauseNode lcNode = (LetClauseNode) cNode;
-                            for (LetVarDeclNode lvdNode : lcNode.getVariables()) {
-                                LogicalVariable seqVar = translateExpression(lvdNode.getSequence(), tCtx);
-                                tCtx.pushVariableScope();
-                                SequenceType letVarType = SequenceType.create(AnyItemType.INSTANCE,
-                                        Quantifier.QUANT_ONE);
-                                if (lvdNode.getType() != null) {
-                                    letVarType = createSequenceType(lvdNode.getType());
-                                }
-                                XQueryVariable letVar = new XQueryVariable(createQName(lvdNode.getLetVar()),
-                                        letVarType, seqVar);
-                                tCtx.varScope.registerVariable(letVar);
-                                ++pushCount;
-                            }
-                            break;
-                        }
-                        case WHERE_CLAUSE: {
-                            WhereClauseNode wcNode = (WhereClauseNode) cNode;
-                            ILogicalExpression condExpr = sfce(BuiltinFunctions.FN_BOOLEAN_1,
-                                    vre(translateExpression(wcNode.getCondition(), tCtx)));
-                            SelectOperator select = new SelectOperator(mutable(condExpr));
-                            select.getInputs().add(mutable(tCtx.op));
-                            tCtx.op = select;
-                            break;
-                        }
-                        case ORDERBY_CLAUSE: {
-                            OrderbyClauseNode ocNode = (OrderbyClauseNode) cNode;
-                            List<edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>> oExprs = new ArrayList<edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>>();
-                            List<String> collations = new ArrayList<String>();
-                            for (OrderSpecNode osNode : ocNode.getOrderSpec()) {
-                                ILogicalExpression oExpr = vre(translateExpression(osNode.getExpression(), tCtx));
-                                OrderOperator.IOrder o = OrderOperator.ASC_ORDER;
-                                XQueryConstants.OrderDirection oDir = osNode.getDirection();
-                                if (oDir != null) {
-                                    switch (oDir) {
-                                        case ASCENDING:
-                                            o = OrderOperator.ASC_ORDER;
-                                            break;
-                                        case DESCENDING:
-                                            o = OrderOperator.DESC_ORDER;
-                                            break;
-                                    }
-                                }
-                                /*
-                                StaticContext.EmptyOrderProperty eoProp = osNode.getEmptyOrder();
-                                if (eoProp != null) {
-                                    switch (osNode.getEmptyOrder()) {
-                                        case GREATEST:
-                                            eOrders.add(FLWORExpression.EmptyOrder.GREATEST);
-                                            break;
-                                        case LEAST:
-                                            eOrders.add(FLWORExpression.EmptyOrder.LEAST);
-                                            break;
-                                    }
-                                } else {
-                                    eOrders.add(FLWORExpression.EmptyOrder.DEFAULT);
-                                }
-                                collations.add(osNode.getCollation());
-                                */
-                                oExprs.add(new edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>(
-                                        o, mutable(oExpr)));
-                            }
-                            OrderOperator order = new OrderOperator(oExprs);
-                            order.getInputs().add(mutable(tCtx.op));
-                            tCtx.op = order;
-                            break;
-                        }
-                        default:
-                            throw new IllegalStateException("Unknown clause: " + cNode.getTag());
-                    }
-                }
-                ILogicalExpression rExpr = vre(translateExpression(fNode.getReturnExpr(), tCtx));
-                for (int i = 0; i < pushCount; ++i) {
-                    tCtx.popVariableScope();
-                }
-                return createAssignment(rExpr, tCtx);
+                return translateFLWORExprNode(tCtx, fNode);
             }
 
             /*
@@ -1084,94 +753,580 @@ public class XMLQueryTranslator {
 
             case COMPUTED_TEXT_CONSTRUCTOR: {
                 ComputedTextConstructorNode cNode = (ComputedTextConstructorNode) value;
-                ASTNode content = cNode.getContent();
-                return createAssignment(
-                        sfce(BuiltinOperators.TEXT_CONSTRUCTOR, content == null ? sfce(BuiltinOperators.CONCATENATE)
-                                : vre(translateExpression(content, tCtx))), tCtx);
+                return translateComputedTextConstructorNode(tCtx, cNode);
             }
 
             case COMPUTED_PI_CONSTRUCTOR: {
                 ComputedPIConstructorNode cNode = (ComputedPIConstructorNode) value;
-                ASTNode content = cNode.getContent();
-                return createAssignment(
-                        sfce(BuiltinOperators.TEXT_CONSTRUCTOR,
-                                vre(translateExpression(cNode.getTarget(), tCtx)),
-                                content == null ? sfce(BuiltinOperators.CONCATENATE) : vre(translateExpression(content,
-                                        tCtx))), tCtx);
+                return translateComputedPIConstructorNode(tCtx, cNode);
             }
 
             case COMPUTED_COMMENT_CONSTRUCTOR: {
                 ComputedCommentConstructorNode cNode = (ComputedCommentConstructorNode) value;
-                ASTNode content = cNode.getContent();
-                return createAssignment(
-                        sfce(BuiltinOperators.COMMENT_CONSTRUCTOR, content == null ? sfce(BuiltinOperators.CONCATENATE)
-                                : vre(translateExpression(content, tCtx))), tCtx);
+                return translateComputedCommentConstructorNode(tCtx, cNode);
             }
 
-            case COMPUTED_DOCUMENT_CONSTRUCTOR:
-                return createAssignment(
-                        sfce(BuiltinOperators.DOCUMENT_CONSTRUCTOR,
-                                vre(translateExpression(((ComputedDocumentConstructorNode) value).getContent(), tCtx))),
-                        tCtx);
+            case COMPUTED_DOCUMENT_CONSTRUCTOR: {
+                ComputedDocumentConstructorNode cNode = (ComputedDocumentConstructorNode) value;
+                return translateComputedDocumentConstructorNode(tCtx, cNode);
+            }
 
             case COMPUTED_ELEMENT_CONSTRUCTOR: {
                 ComputedElementConstructorNode cNode = (ComputedElementConstructorNode) value;
-                ILogicalExpression name = cast(vre(translateExpression(cNode.getName(), tCtx)),
-                        SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
-                ASTNode content = cNode.getContent();
-                ILogicalExpression cExpr = content == null ? sfce(BuiltinOperators.CONCATENATE)
-                        : vre(translateExpression(content, tCtx));
-                return createAssignment(sfce(BuiltinOperators.ELEMENT_CONSTRUCTOR, name, cExpr), tCtx);
+                return translateComputedElementConstructorNode(tCtx, cNode);
             }
 
             case COMPUTED_ATTRIBUTE_CONSTRUCTOR: {
                 ComputedAttributeConstructorNode cNode = (ComputedAttributeConstructorNode) value;
-                ILogicalExpression name = cast(vre(translateExpression(cNode.getName(), tCtx)),
-                        SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
-                ASTNode content = cNode.getContent();
-                ILogicalExpression cExpr = content == null ? sfce(BuiltinOperators.CONCATENATE)
-                        : vre(translateExpression(content, tCtx));
-                return createAssignment(sfce(BuiltinOperators.ATTRIBUTE_CONSTRUCTOR, name, cExpr), tCtx);
+                return translateComputedAttributeConstructorNode(tCtx, cNode);
             }
 
-            case QNAME:
-                return createAssignment(
-                        ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE),
-                                createQName((QNameNode) value)), tCtx);
+            case QNAME: {
+                QNameNode qnNode = (QNameNode) value;
+                return translateQNameNode(tCtx, qnNode);
+            }
 
-            case NCNAME:
-                return createAssignment(
-                        ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
-                                ((NCNameNode) value).getName()), tCtx);
+            case NCNAME: {
+                NCNameNode ncnNode = (NCNameNode) value;
+                return translateNCNameNode(tCtx, ncnNode);
+            }
 
-            case CDATA_SECTION:
-                return createAssignment(
-                        sfce(BuiltinOperators.TEXT_CONSTRUCTOR,
-                                ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
-                                        ((CDataSectionNode) value).getContent())), tCtx);
+            case CDATA_SECTION: {
+                CDataSectionNode cdsNode = (CDataSectionNode) value;
+                return translateCDataSectionNode(tCtx, cdsNode);
+            }
 
-            case ORDERED_EXPRESSION:
-                return createAssignment(
-                        sfce(BuiltinOperators.ORDERED,
-                                vre(translateExpression(((OrderedExprNode) value).getExpr(), tCtx))), tCtx);
+            case ORDERED_EXPRESSION: {
+                OrderedExprNode oeNode = (OrderedExprNode) value;
+                return translateOrderedExprNode(tCtx, oeNode);
+            }
 
-            case UNORDERED_EXPRESSION:
-                return createAssignment(
-                        sfce(BuiltinOperators.UNORDERED,
-                                vre(translateExpression(((UnorderedExprNode) value).getExpr(), tCtx))), tCtx);
+            case UNORDERED_EXPRESSION: {
+                UnorderedExprNode ueNode = (UnorderedExprNode) value;
+                return translateUnorderedExprNode(tCtx, ueNode);
+            }
 
             case VALIDATE_EXPRESSION: {
                 ValidateExprNode vNode = (ValidateExprNode) value;
-                XQueryConstants.ValidationMode mode = vNode.getMode();
-                Function fn = mode == null || XQueryConstants.ValidationMode.STRICT.equals(mode) ? BuiltinOperators.VALIDATE_STRICT
-                        : BuiltinOperators.VALIDATE_LAX;
-                return createAssignment(sfce(fn, vre(translateExpression(vNode.getExpr(), tCtx))), tCtx);
+                return translateValidateExprNode(tCtx, vNode);
             }
+
             default:
                 throw new IllegalStateException("Unknown node: " + value.getTag());
 
         }
 
+    }
+
+    private LogicalVariable translateUnorderedExprNode(TranslationContext tCtx, UnorderedExprNode ueNode)
+            throws SystemException {
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.UNORDERED, vre(translateExpression(ueNode.getExpr(), tCtx))), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateOrderedExprNode(TranslationContext tCtx, OrderedExprNode oeNode)
+            throws SystemException {
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.ORDERED, vre(translateExpression(oeNode.getExpr(), tCtx))), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateCDataSectionNode(TranslationContext tCtx, CDataSectionNode cdsNode) {
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.TEXT_CONSTRUCTOR,
+                        ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
+                                cdsNode.getContent())), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateNCNameNode(TranslationContext tCtx, NCNameNode ncnNode) {
+        LogicalVariable lVar = createAssignment(
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), ncnNode.getName()), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateQNameNode(TranslationContext tCtx, QNameNode qnNode) throws SystemException {
+        LogicalVariable lVar = createAssignment(
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE), createQName(qnNode)), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateValidateExprNode(TranslationContext tCtx, ValidateExprNode vNode)
+            throws SystemException {
+        XQueryConstants.ValidationMode mode = vNode.getMode();
+        Function fn = mode == null || XQueryConstants.ValidationMode.STRICT.equals(mode) ? BuiltinOperators.VALIDATE_STRICT
+                : BuiltinOperators.VALIDATE_LAX;
+        LogicalVariable lVar = createAssignment(sfce(fn, vre(translateExpression(vNode.getExpr(), tCtx))), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateComputedAttributeConstructorNode(TranslationContext tCtx,
+            ComputedAttributeConstructorNode cNode) throws SystemException {
+        ILogicalExpression name = cast(vre(translateExpression(cNode.getName(), tCtx)),
+                SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
+        ASTNode content = cNode.getContent();
+        ILogicalExpression cExpr = content == null ? sfce(BuiltinOperators.CONCATENATE) : vre(translateExpression(
+                content, tCtx));
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ATTRIBUTE_CONSTRUCTOR, name, cExpr), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateComputedElementConstructorNode(TranslationContext tCtx,
+            ComputedElementConstructorNode cNode) throws SystemException {
+        ILogicalExpression name = cast(vre(translateExpression(cNode.getName(), tCtx)),
+                SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE));
+        ASTNode content = cNode.getContent();
+        ILogicalExpression cExpr = content == null ? sfce(BuiltinOperators.CONCATENATE) : vre(translateExpression(
+                content, tCtx));
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ELEMENT_CONSTRUCTOR, name, cExpr), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateComputedDocumentConstructorNode(TranslationContext tCtx,
+            ComputedDocumentConstructorNode cNode) throws SystemException {
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.DOCUMENT_CONSTRUCTOR, vre(translateExpression(cNode.getContent(), tCtx))), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateComputedCommentConstructorNode(TranslationContext tCtx,
+            ComputedCommentConstructorNode cNode) throws SystemException {
+        ASTNode content = cNode.getContent();
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.COMMENT_CONSTRUCTOR, content == null ? sfce(BuiltinOperators.CONCATENATE)
+                        : vre(translateExpression(content, tCtx))), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateComputedPIConstructorNode(TranslationContext tCtx, ComputedPIConstructorNode cNode)
+            throws SystemException {
+        ASTNode content = cNode.getContent();
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.TEXT_CONSTRUCTOR, vre(translateExpression(cNode.getTarget(), tCtx)),
+                        content == null ? sfce(BuiltinOperators.CONCATENATE) : vre(translateExpression(content, tCtx))),
+                tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateComputedTextConstructorNode(TranslationContext tCtx,
+            ComputedTextConstructorNode cNode) throws SystemException {
+        ASTNode content = cNode.getContent();
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.TEXT_CONSTRUCTOR, content == null ? sfce(BuiltinOperators.CONCATENATE)
+                        : vre(translateExpression(content, tCtx))), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateFLWORExprNode(TranslationContext tCtx, FLWORExprNode fNode) throws SystemException {
+        tCtx = tCtx.pushContext();
+        List<FLWORClauseNode> cNodes = fNode.getClauses();
+        int pushCount = 0;
+        for (FLWORClauseNode cNode : cNodes) {
+            switch (cNode.getTag()) {
+                case FOR_CLAUSE: {
+                    ForClauseNode fcNode = (ForClauseNode) cNode;
+                    for (ForVarDeclNode fvdNode : fcNode.getVariables()) {
+                        ILogicalExpression seq = vre(translateExpression(fvdNode.getSequence(), tCtx));
+                        tCtx.pushVariableScope();
+                        LogicalVariable forLVar = newLogicalVariable();
+                        LogicalVariable posLVar = newLogicalVariable();
+                        UnnestOperator unnest = new UnnestOperator(forLVar,
+                                mutable(ufce(BuiltinOperators.ITERATE, seq)), posLVar, null);
+                        SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
+                        if (fvdNode.getType() != null) {
+                            forVarType = createSequenceType(fvdNode.getType());
+                        }
+                        XQueryVariable forVar = new XQueryVariable(createQName(fvdNode.getForVar()), forVarType,
+                                forLVar);
+                        tCtx.varScope.registerVariable(forVar);
+                        XQueryVariable posVar = null;
+                        if (fvdNode.getPosVar() != null) {
+                            posVar = new XQueryVariable(createQName(fvdNode.getPosVar()), SequenceType.create(
+                                    BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE), posLVar);
+                            tCtx.varScope.registerVariable(posVar);
+                        }
+                        assert fvdNode.getScoreVar() == null;
+                        unnest.getInputs().add(mutable(tCtx.op));
+                        tCtx.op = unnest;
+                        ++pushCount;
+                    }
+                    break;
+                }
+                case LET_CLAUSE: {
+                    LetClauseNode lcNode = (LetClauseNode) cNode;
+                    for (LetVarDeclNode lvdNode : lcNode.getVariables()) {
+                        LogicalVariable seqVar = translateExpression(lvdNode.getSequence(), tCtx);
+                        tCtx.pushVariableScope();
+                        SequenceType letVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
+                        if (lvdNode.getType() != null) {
+                            letVarType = createSequenceType(lvdNode.getType());
+                        }
+                        XQueryVariable letVar = new XQueryVariable(createQName(lvdNode.getLetVar()), letVarType, seqVar);
+                        tCtx.varScope.registerVariable(letVar);
+                        ++pushCount;
+                    }
+                    break;
+                }
+                case WHERE_CLAUSE: {
+                    WhereClauseNode wcNode = (WhereClauseNode) cNode;
+                    ILogicalExpression condExpr = sfce(BuiltinFunctions.FN_BOOLEAN_1,
+                            vre(translateExpression(wcNode.getCondition(), tCtx)));
+                    SelectOperator select = new SelectOperator(mutable(condExpr));
+                    select.getInputs().add(mutable(tCtx.op));
+                    tCtx.op = select;
+                    break;
+                }
+                case ORDERBY_CLAUSE: {
+                    OrderbyClauseNode ocNode = (OrderbyClauseNode) cNode;
+                    List<edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>> oExprs = new ArrayList<edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>>();
+                    List<String> collations = new ArrayList<String>();
+                    for (OrderSpecNode osNode : ocNode.getOrderSpec()) {
+                        ILogicalExpression oExpr = vre(translateExpression(osNode.getExpression(), tCtx));
+                        OrderOperator.IOrder o = OrderOperator.ASC_ORDER;
+                        XQueryConstants.OrderDirection oDir = osNode.getDirection();
+                        if (oDir != null) {
+                            switch (oDir) {
+                                case ASCENDING:
+                                    o = OrderOperator.ASC_ORDER;
+                                    break;
+                                case DESCENDING:
+                                    o = OrderOperator.DESC_ORDER;
+                                    break;
+                            }
+                        }
+                        /*
+                        StaticContext.EmptyOrderProperty eoProp = osNode.getEmptyOrder();
+                        if (eoProp != null) {
+                            switch (osNode.getEmptyOrder()) {
+                                case GREATEST:
+                                    eOrders.add(FLWORExpression.EmptyOrder.GREATEST);
+                                    break;
+                                case LEAST:
+                                    eOrders.add(FLWORExpression.EmptyOrder.LEAST);
+                                    break;
+                            }
+                        } else {
+                            eOrders.add(FLWORExpression.EmptyOrder.DEFAULT);
+                        }
+                        collations.add(osNode.getCollation());
+                        */
+                        oExprs.add(new edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>(
+                                o, mutable(oExpr)));
+                    }
+                    OrderOperator order = new OrderOperator(oExprs);
+                    order.getInputs().add(mutable(tCtx.op));
+                    tCtx.op = order;
+                    break;
+                }
+                default:
+                    throw new IllegalStateException("Unknown clause: " + cNode.getTag());
+            }
+        }
+        ILogicalExpression rExpr = vre(translateExpression(fNode.getReturnExpr(), tCtx));
+        List<LogicalVariable> vars = new ArrayList<LogicalVariable>();
+        List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
+        LogicalVariable var = newLogicalVariable();
+        vars.add(var);
+        exprs.add(mutable(afce(BuiltinOperators.SEQUENCE, false, rExpr)));
+        AggregateOperator aop = new AggregateOperator(vars, exprs);
+        aop.getInputs().add(mutable(tCtx.op));
+        tCtx.op = aop;
+        for (int i = 0; i < pushCount; ++i) {
+            tCtx.popVariableScope();
+        }
+        tCtx = tCtx.popContext();
+        return var;
+    }
+
+    private LogicalVariable translateVarRefNode(TranslationContext tCtx, VarRefNode vrNode) throws SystemException {
+        QName vName = createQName(vrNode.getVariable());
+        XQueryVariable var = tCtx.varScope.lookupVariable(vName);
+        if (var == null) {
+            throw new SystemException(ErrorCode.XPST0008, vrNode.getSourceLocation());
+        }
+        LogicalVariable lVar = createAssignment(treat(vre(var.getLogicalVariable()), var.getType()), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateIfExprNode(TranslationContext tCtx, IfExprNode ieNode) throws SystemException {
+        ILogicalExpression cond = sfce(BuiltinFunctions.FN_BOOLEAN_1,
+                vre(translateExpression(ieNode.getIfExpr(), tCtx)));
+        ILogicalExpression tExpr = vre(translateExpression(ieNode.getThenExpr(), tCtx));
+        ILogicalExpression eExpr = vre(translateExpression(ieNode.getElseExpr(), tCtx));
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.IF_THEN_ELSE, cond, tExpr, eExpr), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateDirectAttributeConstructorNode(TranslationContext tCtx,
+            DirectAttributeConstructorNode dacNode) throws SystemException {
+        QName aQName = createQName(dacNode.getName());
+        ILogicalExpression name = ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE),
+                aQName.toString());
+        List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
+        for (ASTNode aVal : dacNode.getValue()) {
+            switch (aVal.getTag()) {
+                case CONTENT_CHARS: {
+                    String contentChars = ((ContentCharsNode) aVal).getContent();
+                    ILogicalExpression cce = ce(
+                            SequenceType.create(BuiltinTypeRegistry.XS_UNTYPED_ATOMIC, Quantifier.QUANT_ONE),
+                            contentChars);
+                    content.add(cce);
+                    break;
+                }
+
+                default:
+                    content.add(vre(translateExpression(aVal, tCtx)));
+            }
+        }
+        ILogicalExpression contentExpr = content.size() == 1 ? content.get(0) : sfce(BuiltinOperators.CONCATENATE,
+                content.toArray(new ILogicalExpression[content.size()]));
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ATTRIBUTE_CONSTRUCTOR, name, contentExpr), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateDirectElementConstructorNode(TranslationContext tCtx,
+            DirectElementConstructorNode decNode) throws SystemException {
+        QNameNode startName = decNode.getStartTagName();
+        QNameNode endName = decNode.getEndTagName();
+        if (endName != null
+                && (!startName.getPrefix().equals(endName.getPrefix()) || !startName.getLocalName().equals(
+                        endName.getLocalName()))) {
+            throw new SystemException(ErrorCode.XPST0003, endName.getSourceLocation());
+        }
+        pushContext();
+        for (DirectAttributeConstructorNode acNode : decNode.getAttributes()) {
+            QNameNode aName = acNode.getName();
+            if ("xmlns".equals(aName.getPrefix())) {
+                List<ASTNode> values = acNode.getValue();
+                if (values.size() != 1 || !ASTTag.CONTENT_CHARS.equals(values.get(0).getTag())) {
+                    throw new SystemException(ErrorCode.XQST0022, acNode.getSourceLocation());
+                }
+
+                currCtx.registerNamespaceUri(aName.getLocalName(),
+                        unquote(((ContentCharsNode) values.get(0)).getContent()));
+            }
+        }
+        List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
+        for (DirectAttributeConstructorNode acNode : decNode.getAttributes()) {
+            QNameNode aName = acNode.getName();
+            if (!"xmlns".equals(aName.getPrefix())) {
+                content.add(vre(translateExpression(acNode, tCtx)));
+            }
+        }
+        ILogicalExpression name = ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE),
+                createQName(startName, moduleCtx.getDefaultElementNamespaceUri()).toString());
+        for (ASTNode cVal : decNode.getContent()) {
+            switch (cVal.getTag()) {
+                case CONTENT_CHARS: {
+                    String contentChars = ((ContentCharsNode) cVal).getContent();
+                    ILogicalExpression cce = ce(
+                            SequenceType.create(BuiltinTypeRegistry.XS_UNTYPED_ATOMIC, Quantifier.QUANT_ONE),
+                            contentChars);
+                    content.add(sfce(BuiltinOperators.TEXT_CONSTRUCTOR, cce));
+                    break;
+                }
+
+                default:
+                    content.add(vre(translateExpression(cVal, tCtx)));
+            }
+        }
+        popContext();
+        ILogicalExpression contentExpr = content.size() == 1 ? content.get(0) : sfce(BuiltinOperators.CONCATENATE,
+                content.toArray(new ILogicalExpression[content.size()]));
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ELEMENT_CONSTRUCTOR, name, contentExpr), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateDirectCommentConstructorNode(TranslationContext tCtx,
+            DirectCommentConstructorNode dccNode) {
+        String content = dccNode.getContent();
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.COMMENT_CONSTRUCTOR,
+                        ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), content)), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateDirectPIConstructorNode(TranslationContext tCtx, DirectPIConstructorNode dpicNode) {
+        String target = dpicNode.getTarget();
+        String content = dpicNode.getContent();
+        LogicalVariable lVar = createAssignment(
+                sfce(BuiltinOperators.PI_CONSTRUCTOR,
+                        ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), target),
+                        ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), content)), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateLiteralNode(TranslationContext tCtx, LiteralNode lNode) throws SystemException {
+        String image = lNode.getImage();
+        LiteralNode.LiteralType lType = lNode.getType();
+        SequenceType t = null;
+        switch (lType) {
+            case DECIMAL:
+                t = SequenceType.create(BuiltinTypeRegistry.XS_DECIMAL, Quantifier.QUANT_ONE);
+                break;
+            case DOUBLE:
+                t = SequenceType.create(BuiltinTypeRegistry.XS_DOUBLE, Quantifier.QUANT_ONE);
+                break;
+            case INTEGER:
+                t = SequenceType.create(BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE);
+                break;
+            case STRING:
+                t = SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE);
+                image = unquote(image);
+                break;
+            default:
+                throw new IllegalStateException("Unknown type: " + lType);
+        }
+        LogicalVariable lVar = createAssignment(ce(t, image), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateParenthisizedExprNode(TranslationContext tCtx, ParenthesizedExprNode peNode)
+            throws SystemException {
+        ASTNode eNode = peNode.getExpr();
+        if (eNode == null) {
+            return createConcatenation(Collections.<LogicalVariable> emptyList(), tCtx);
+        }
+        return translateExpression(peNode.getExpr(), tCtx);
+    }
+
+    private LogicalVariable translateExtensionExprNode(TranslationContext tCtx, ExtensionExprNode eNode)
+            throws SystemException {
+        if (eNode.getExpr() == null) {
+            throw new SystemException(ErrorCode.XQST0079, eNode.getSourceLocation());
+        }
+        return translateExpression(eNode.getExpr(), tCtx);
+    }
+
+    private LogicalVariable translateTypeExprNode(TranslationContext tCtx, TypeExprNode teNode) throws SystemException {
+        LogicalVariable var = translateExpression(teNode.getExpr(), tCtx);
+        SequenceType type = createSequenceType(teNode.getType());
+        ILogicalExpression expr = null;
+        switch (teNode.getOperator()) {
+            case CAST:
+                expr = cast(vre(var), type);
+                break;
+
+            case CASTABLE:
+                expr = castable(vre(var), type);
+                break;
+
+            case INSTANCEOF:
+                expr = instanceOf(vre(var), type);
+                break;
+
+            case TREAT:
+                expr = treat(vre(var), type);
+                break;
+
+            default:
+                throw new IllegalStateException("Unknown type operator: " + teNode.getOperator());
+        }
+        LogicalVariable lVar = createAssignment(expr, tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateFunctionExprNode(TranslationContext tCtx, FunctionExprNode fnNode)
+            throws SystemException {
+        List<LogicalVariable> args = new ArrayList<LogicalVariable>();
+        for (ASTNode an : fnNode.getArguments()) {
+            args.add(translateExpression(an, tCtx));
+        }
+        QName name = createQName(fnNode.getName());
+        SchemaType type = moduleCtx.lookupSchemaType(name);
+        if (type != null && args.size() < 2) {
+            if (!type.isAtomicType()) {
+                throw new SystemException(ErrorCode.XPST0051, fnNode.getName().getSourceLocation());
+            }
+            LogicalVariable var = args.isEmpty() ? tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
+                    .getLogicalVariable() : args.get(0);
+            ILogicalExpression expr = cast(vre(var), SequenceType.create((ItemType) type, Quantifier.QUANT_QUESTION));
+            return createAssignment(expr, tCtx);
+        }
+        QName fName = createQName(fnNode.getName(), moduleCtx.getDefaultFunctionNamespaceUri());
+        if (BuiltinFunctions.FN_POSITION_QNAME.equals(fName)) {
+            XQueryVariable var = tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME);
+            return var.getLogicalVariable();
+        }
+        if (BuiltinFunctions.FN_LAST_QNAME.equals(fName)) {
+            XQueryVariable var = tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.LAST_VAR_NAME);
+            return var.getLogicalVariable();
+        }
+        int nArgs = fnNode.getArguments().size();
+        Function fn = moduleCtx.lookupFunction(fName, nArgs);
+        if (fn != null && fn.useContextImplicitly()) {
+            args.add(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME).getLogicalVariable());
+            fn = moduleCtx.lookupFunction(fName, nArgs + 1);
+        }
+        if (fn == null) {
+            Function[] fns = moduleCtx.lookupFunctions(fName);
+            if (fns != null) {
+                for (int i = 0; i < fns.length && i <= nArgs; ++i) {
+                    if (fns[i] != null && fns[i].getSignature().isVarArgs()) {
+                        fn = fns[i];
+                        break;
+                    }
+                }
+            }
+        }
+        if (fn == null) {
+            throw new SystemException(ErrorCode.XPST0017, fnNode.getName().getSourceLocation());
+        }
+        Signature sign = fn.getSignature();
+        List<Mutable<ILogicalExpression>> argExprs = new ArrayList<Mutable<ILogicalExpression>>();
+        for (int i = 0; i < args.size(); ++i) {
+            SequenceType argType = sign.getParameterType(i);
+            argExprs.add(mutable(normalize(vre(args.get(i)), argType)));
+        }
+        LogicalVariable lVar = createAssignment(new ScalarFunctionCallExpression(fn, argExprs), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateEnclosedExprNode(TranslationContext tCtx, EnclosedExprNode ee)
+            throws SystemException {
+        return translateExpression(ee.getExpression(), tCtx);
+    }
+
+    private LogicalVariable translateInfixExprNode(TranslationContext tCtx, InfixExprNode ie) throws SystemException {
+        Function operator = getOperator(ie.getOperator());
+        Signature sign = operator.getSignature();
+        LogicalVariable varLeft = translateExpression(ie.getLeftExpr(), tCtx);
+        LogicalVariable varRight = translateExpression(ie.getRightExpr(), tCtx);
+        ILogicalExpression arg1 = normalize(vre(varLeft), sign.getParameterType(0));
+        ILogicalExpression arg2 = normalize(vre(varRight), sign.getParameterType(1));
+        if (BuiltinOperators.EXCEPT.equals(operator) || BuiltinOperators.INTERSECT.equals(operator)) {
+            arg1 = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg1);
+            arg2 = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg2);
+        }
+        ILogicalExpression result = sfce(operator, arg1, arg2);
+        if (BuiltinOperators.UNION.equals(operator)) {
+            result = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, result);
+        }
+        LogicalVariable lVar = createAssignment(result, tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateUnaryExprNode(TranslationContext tCtx, UnaryExprNode ueNode)
+            throws SystemException {
+        boolean neg = false;
+        for (UnaryExprNode.Sign s : ueNode.getSigns()) {
+            if (UnaryExprNode.Sign.MINUS.equals(s)) {
+                neg = !neg;
+            }
+        }
+        LogicalVariable var = translateExpression(ueNode.getExpr(), tCtx);
+        if (neg) {
+            ILogicalExpression nExpr = normalize(vre(var), BuiltinOperators.NUMERIC_UNARY_MINUS.getSignature()
+                    .getParameterType(0));
+            ILogicalExpression negExpr = sfce(BuiltinOperators.NUMERIC_UNARY_MINUS, nExpr);
+            var = createAssignment(negExpr, tCtx);
+        }
+        return var;
+    }
+
+    private LogicalVariable translateExprNode(TranslationContext tCtx, ExprNode node) throws SystemException {
+        return createConcatenation(translateExpressionList(node.getExpressions(), tCtx), tCtx);
     }
 
     private LogicalVariable translatePathExpr(PathExprNode pe, TranslationContext tCtx) throws SystemException {
@@ -1269,7 +1424,8 @@ public class XMLQueryTranslator {
                 }
             }
         }
-        return createAssignment(ctxExpr, tCtx);
+        LogicalVariable lVar = createAssignment(ctxExpr, tCtx);
+        return lVar;
     }
 
     private void iterateOver(ILogicalExpression ctxExpr, TranslationContext tCtx) {
@@ -1608,6 +1764,9 @@ public class XMLQueryTranslator {
     }
 
     private LogicalVariable createAssignment(ILogicalExpression expr, TranslationContext tCtx) {
+        if (expr.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+            return ((VariableReferenceExpression) expr).getVariableReference();
+        }
         LogicalVariable result = newLogicalVariable();
         AssignOperator aOp = new AssignOperator(result, mutable(expr));
         aOp.getInputs().add(mutable(tCtx.op));
