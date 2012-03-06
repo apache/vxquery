@@ -866,4 +866,39 @@
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
     </operator>
+
+    <!-- opext:promote($arg as item()*, $type as xsext:type) as item()* -->
+    <operator name="opext:promote">
+        <param name="arg" type="item()*"/>
+        <param name="type" type="xsext:type"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:treat($arg as item()*, $type as xsext:type) as item()* -->
+    <operator name="opext:treat">
+        <param name="arg" type="item()*"/>
+        <param name="type" type="xsext:type"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:cast($arg as item()*, $type as xsext:type) as item()* -->
+    <operator name="opext:cast">
+        <param name="arg" type="item()*"/>
+        <param name="type" type="xsext:type"/>
+        <return type="item()*"/>
+    </operator>
+
+    <!-- opext:castable($arg as item()*, $type as xsext:type) as xs:boolean -->
+    <operator name="opext:castable">
+        <param name="arg" type="item()*"/>
+        <param name="type" type="xsext:type"/>
+        <return type="xs:boolean"/>
+    </operator>
+
+    <!-- opext:instance-of($arg as item()*, $type as xsext:type) as xs:boolean -->
+    <operator name="opext:instance-of">
+        <param name="arg" type="item()*"/>
+        <param name="type" type="xsext:type"/>
+        <return type="xs:boolean"/>
+    </operator>
 </operators>
