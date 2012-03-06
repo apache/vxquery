@@ -1827,28 +1827,43 @@ public class XMLQueryTranslator {
     }
 
     private static ILogicalExpression promote(ILogicalExpression expr, SequenceType type) {
-        // TODO Fix.
-        return expr;
+        return sfce(
+                BuiltinOperators.PROMOTE,
+                expr,
+                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
+                        Quantifier.QUANT_ONE), type)));
     }
 
     private static ILogicalExpression treat(ILogicalExpression expr, SequenceType type) {
-        // TODO Fix.
-        return expr;
+        return sfce(
+                BuiltinOperators.TREAT,
+                expr,
+                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
+                        Quantifier.QUANT_ONE), type)));
     }
 
     private static ILogicalExpression cast(ILogicalExpression expr, SequenceType type) {
-        // TODO Fix.
-        return expr;
+        return sfce(
+                BuiltinOperators.CAST,
+                expr,
+                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
+                        Quantifier.QUANT_ONE), type)));
     }
 
     private static ILogicalExpression castable(ILogicalExpression expr, SequenceType type) {
-        // TODO Fix.
-        return expr;
+        return sfce(
+                BuiltinOperators.CASTABLE,
+                expr,
+                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
+                        Quantifier.QUANT_ONE), type)));
     }
 
     private static ILogicalExpression instanceOf(ILogicalExpression expr, SequenceType type) {
-        // TODO Fix.
-        return expr;
+        return sfce(
+                BuiltinOperators.INSTANCE_OF,
+                expr,
+                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
+                        Quantifier.QUANT_ONE), type)));
     }
 
     private List<LogicalVariable> translateExpressionList(List<ASTNode> expressions, TranslationContext tCtx)
