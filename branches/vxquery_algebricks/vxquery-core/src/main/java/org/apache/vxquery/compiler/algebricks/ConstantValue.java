@@ -36,4 +36,9 @@ public class ConstantValue implements IAlgebricksConstantValue {
     public Object getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return type + "(" + value + ")";
+    }
 }
