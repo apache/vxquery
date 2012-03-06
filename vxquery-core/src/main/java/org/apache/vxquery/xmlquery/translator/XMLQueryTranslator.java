@@ -107,6 +107,9 @@ import org.apache.vxquery.xmlquery.ast.ParenthesizedExprNode;
 import org.apache.vxquery.xmlquery.ast.PathExprNode;
 import org.apache.vxquery.xmlquery.ast.PrologNode;
 import org.apache.vxquery.xmlquery.ast.QNameNode;
+import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode;
+import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode.QuantifierType;
+import org.apache.vxquery.xmlquery.ast.QuantifiedVarDeclNode;
 import org.apache.vxquery.xmlquery.ast.QueryBodyNode;
 import org.apache.vxquery.xmlquery.ast.RelativePathExprNode;
 import org.apache.vxquery.xmlquery.ast.SchemaImportNode;
@@ -694,34 +697,12 @@ public class XMLQueryTranslator {
                 return translateFLWORExprNode(tCtx, fNode);
             }
 
-            /*
-                        case QUANTIFIED_EXPRESSION: {
-                            QuantifiedExprNode qeNode = (QuantifiedExprNode) value;
-                            List<ForLetVariable> vars = new ArrayList<ForLetVariable>();
-                            int pushCount = 0;
-                            for (QuantifiedVarDeclNode qvdNode : qeNode.getVariables()) {
-                                Expression seq = translateExpression(qvdNode.getSequence());
-                                pushVariableScope();
-                                ForLetVariable var = new ForLetVariable(VarTag.FOR, createQName(qvdNode.getVariable()), seq);
-                                SequenceType varType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
-                                if (qvdNode.getType() != null) {
-                                    varType = createSequenceType(qvdNode.getType());
-                                }
-                                var.setDeclaredStaticType(varType);
-                                vars.add(var);
-                                varScope.registerVariable(var);
-                                ++pushCount;
-                            }
-                            Expression sExpr = ExpressionBuilder.functionCall(currCtx, BuiltinFunctions.FN_BOOLEAN_1,
-                                    translateExpression(qeNode.getSatisfiesExpr()));
-                            for (int i = 0; i < pushCount; ++i) {
-                                popVariableScope();
-                            }
-                            return new QuantifiedExpression(currCtx, QuantifiedExprNode.QuantifierType.SOME.equals(qeNode
-                                    .getQuant()) ? QuantifiedExpression.Quantification.SOME
-                                    : QuantifiedExpression.Quantification.EVERY, vars, sExpr);
-                        }
+            case QUANTIFIED_EXPRESSION: {
+                QuantifiedExprNode qeNode = (QuantifiedExprNode) value;
+                return translateQuantifiedExprNode(tCtx, qeNode);
+            }
 
+            /*
                         case TYPESWITCH_EXPRESSION: {
                             TypeswitchExprNode teNode = (TypeswitchExprNode) value;
                             Expression sExpr = translateExpression(teNode.getSwitchExpr());
@@ -815,7 +796,55 @@ public class XMLQueryTranslator {
                 throw new IllegalStateException("Unknown node: " + value.getTag());
 
         }
+    }
 
+    private LogicalVariable translateQuantifiedExprNode(TranslationContext tCtx, QuantifiedExprNode qeNode)
+            throws SystemException {
+        tCtx = tCtx.pushContext();
+        int pushCount = 0;
+        for (QuantifiedVarDeclNode qvdNode : qeNode.getVariables()) {
+            ILogicalExpression seq = vre(translateExpression(qvdNode.getSequence(), tCtx));
+            tCtx.pushVariableScope();
+            LogicalVariable forLVar = newLogicalVariable();
+            UnnestOperator unnest = new UnnestOperator(forLVar, mutable(ufce(BuiltinOperators.ITERATE, seq)));
+            SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
+            if (qvdNode.getType() != null) {
+                forVarType = createSequenceType(qvdNode.getType());
+            }
+            XQueryVariable forVar = new XQueryVariable(createQName(qvdNode.getVariable()), forVarType, forLVar);
+            tCtx.varScope.registerVariable(forVar);
+            unnest.getInputs().add(mutable(tCtx.op));
+            tCtx.op = unnest;
+            ++pushCount;
+        }
+        ILogicalExpression satExpr = sfce(BuiltinFunctions.FN_BOOLEAN_1,
+                vre(translateExpression(qeNode.getSatisfiesExpr(), tCtx)));
+        if (qeNode.getQuant() == QuantifierType.EVERY) {
+            satExpr = sfce(BuiltinFunctions.FN_NOT_1, satExpr);
+        }
+        SelectOperator select = new SelectOperator(mutable(satExpr));
+        select.getInputs().add(mutable(tCtx.op));
+        tCtx.op = select;
+        List<LogicalVariable> vars = new ArrayList<LogicalVariable>();
+        List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
+        LogicalVariable var = newLogicalVariable();
+        vars.add(var);
+        exprs.add(mutable(afce(
+                BuiltinOperators.SEQUENCE,
+                false,
+                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN,
+                        Quantifier.QUANT_ONE), Boolean.TRUE)))));
+        AggregateOperator aop = new AggregateOperator(vars, exprs);
+        aop.getInputs().add(mutable(tCtx.op));
+        tCtx.op = aop;
+        for (int i = 0; i < pushCount; ++i) {
+            tCtx.popVariableScope();
+        }
+        tCtx = tCtx.popContext();
+        LogicalVariable lVar = createAssignment(
+                sfce(qeNode.getQuant() == QuantifierType.EVERY ? BuiltinFunctions.FN_EMPTY_1
+                        : BuiltinFunctions.FN_EXISTS_1, vre(var)), tCtx);
+        return lVar;
     }
 
     private LogicalVariable translateUnorderedExprNode(TranslationContext tCtx, UnorderedExprNode ueNode)
