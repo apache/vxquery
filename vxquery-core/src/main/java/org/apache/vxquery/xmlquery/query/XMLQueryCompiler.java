@@ -34,7 +34,8 @@ public class XMLQueryCompiler {
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);
         listener.notifyTypecheckResult(module);
-        XMLQueryOptimizer.optimize(module, optimizationLevel);
+        XMLQueryOptimizer optimizer = new XMLQueryOptimizer();
+        optimizer.optimize(module, optimizationLevel);
         listener.notifyOptimizedResult(module);
         XMLQueryCodeGenerator.codegenModule(module);
         listener.notifyCodegenResult(module);

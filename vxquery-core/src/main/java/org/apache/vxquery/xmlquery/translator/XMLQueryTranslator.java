@@ -604,6 +604,8 @@ public class XMLQueryTranslator {
         ASTNode queryBody = qbn.getExpression();
         TranslationContext tCtx = new TranslationContext(null, new EmptyTupleSourceOperator());
         LogicalVariable lVar = translateExpression(queryBody, tCtx);
+        List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
+        exprs.add(mutable(vre(lVar)));
         ALogicalPlanImpl lp = new ALogicalPlanImpl(mutable(tCtx.op));
 
         return Pair.<ILogicalPlan, LogicalVariable> of(lp, lVar);
