@@ -99,6 +99,16 @@ public class VXQuery {
 
                 @Override
                 public void notifyOptimizedResult(Module module) {
+                    if (opts.showOET) {
+                        try {
+                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
+                            StringBuilder buffer = new StringBuilder();
+                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
+                            System.err.println(buffer.toString());
+                        } catch (AlgebricksException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             };
             Module module = iapi.compile(listener, ast, opts.optimizationLevel);
