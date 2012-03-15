@@ -17,14 +17,14 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractLazilyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public class FnDataIterator extends AbstractLazilyEvaluatedFunctionIterator {
     public FnDataIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments, StaticContext ctx) {

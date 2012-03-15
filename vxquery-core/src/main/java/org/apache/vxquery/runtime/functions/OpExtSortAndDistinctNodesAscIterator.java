@@ -19,12 +19,12 @@ package org.apache.vxquery.runtime.functions;
 import java.util.Comparator;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.atomic.compare.ComparisonUtils;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.atomic.compare.ComparisonUtils;
 
 public class OpExtSortAndDistinctNodesAscIterator extends AbstractItemSortingAndDistinctIterator {
     public OpExtSortAndDistinctNodesAscIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,

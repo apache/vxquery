@@ -17,7 +17,6 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
@@ -25,6 +24,7 @@ import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.RuntimeControlBlock;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
 
 public class FnStaticBaseUriIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public FnStaticBaseUriIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,

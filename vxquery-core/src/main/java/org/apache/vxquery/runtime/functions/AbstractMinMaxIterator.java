@@ -18,10 +18,6 @@ package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.collations.Collation;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMAtomicValue;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.atomic.compare.ComparisonUtils;
-import org.apache.vxquery.datamodel.atomic.compare.ValueComparator;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
@@ -31,6 +27,10 @@ import org.apache.vxquery.runtime.RuntimeControlBlock;
 import org.apache.vxquery.runtime.RuntimeUtils;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.XDMAtomicValue;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.atomic.compare.ComparisonUtils;
+import org.apache.vxquery.v0datamodel.atomic.compare.ValueComparator;
 
 public abstract class AbstractMinMaxIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public AbstractMinMaxIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,

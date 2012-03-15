@@ -28,10 +28,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.vxquery.api.InternalAPI;
 import org.apache.vxquery.context.XQueryVariable;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
-import org.apache.vxquery.datamodel.serialization.XMLSerializer;
 import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
+import org.apache.vxquery.v0datamodel.serialization.XMLSerializer;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.PrologVariable;

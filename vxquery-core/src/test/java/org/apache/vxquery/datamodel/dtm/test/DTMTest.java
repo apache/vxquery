@@ -24,10 +24,10 @@ import java.util.zip.GZIPInputStream;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.vxquery.datamodel.NameCache;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
-import org.apache.vxquery.datamodel.dtm.DTM;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.v0datamodel.NameCache;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
+import org.apache.vxquery.v0datamodel.dtm.DTM;
 import org.junit.Test;
 
 public class DTMTest {

@@ -16,10 +16,10 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.types.processors.CastProcessor;
 import org.apache.vxquery.types.processors.NotCastableCastProcessor;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public class NoneType implements ItemType {
     public static final NoneType INSTANCE = new NoneType();

@@ -25,14 +25,14 @@ import java.util.zip.GZIPInputStream;
 import junit.framework.Assert;
 
 import org.apache.vxquery.api.InternalAPI;
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMSequence;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.XDMSequence;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
 import org.junit.Test;
 
 public class SimpleXQueryTest {

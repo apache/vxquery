@@ -17,14 +17,14 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.atomic.StringValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.atomic.StringValue;
 
 public class FnStringJoinIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public FnStringJoinIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,

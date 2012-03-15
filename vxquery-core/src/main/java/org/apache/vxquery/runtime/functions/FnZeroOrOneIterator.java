@@ -17,7 +17,6 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
@@ -25,6 +24,7 @@ import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.XDMItem;
 
 public class FnZeroOrOneIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public FnZeroOrOneIterator(RegisterAllocator allocator, Function fn, RuntimeIterator[] arguments,

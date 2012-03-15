@@ -17,11 +17,11 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.atomic.arithmetics.ArithmeticOperation;
-import org.apache.vxquery.datamodel.atomic.arithmetics.ModArithmeticOperation;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.atomic.arithmetics.ArithmeticOperation;
+import org.apache.vxquery.v0datamodel.atomic.arithmetics.ModArithmeticOperation;
 
 public class ModArithmeticOperationIterator extends AbstractArithmeticOperationIterator {
     public ModArithmeticOperationIterator(RegisterAllocator allocator, Function fn, RuntimeIterator[] arguments,

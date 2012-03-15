@@ -16,8 +16,8 @@
  */
 package org.apache.vxquery.runtime.base;
 
-import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.v0datamodel.XDMItem;
 
 public interface EventAcceptor {
     public void open() throws SystemException;

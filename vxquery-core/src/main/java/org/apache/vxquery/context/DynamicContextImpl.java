@@ -19,8 +19,8 @@ package org.apache.vxquery.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.DateTimeValue;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.atomic.DateTimeValue;
 
 public class DynamicContextImpl implements DynamicContext {
     private StaticContext sCtx;

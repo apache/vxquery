@@ -16,11 +16,11 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public final class ProcessingInstructionType extends AbstractNodeType {
     public static final ProcessingInstructionType ANYPI = new ProcessingInstructionType(null);

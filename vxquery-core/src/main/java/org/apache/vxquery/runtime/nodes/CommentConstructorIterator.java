@@ -16,13 +16,13 @@
 */
 package org.apache.vxquery.runtime.nodes;
 
-import org.apache.vxquery.datamodel.NodeFactory;
-import org.apache.vxquery.datamodel.XDMItem;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.NodeFactory;
+import org.apache.vxquery.v0datamodel.XDMItem;
 
 public class CommentConstructorIterator extends AbstractEagerlyEvaluatedIterator {
     private final RuntimeIterator ci;

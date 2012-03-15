@@ -16,9 +16,9 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public final class AnyNodeType extends AbstractNodeType {
     public static final AnyNodeType INSTANCE = new AnyNodeType();

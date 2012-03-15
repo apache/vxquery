@@ -17,14 +17,14 @@
 package org.apache.vxquery.types;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.exceptions.SystemExceptionFactory;
 import org.apache.vxquery.types.processors.CastProcessor;
 import org.apache.vxquery.types.processors.NotCastableCastProcessor;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
 
 public class QuantifiedType implements XQType {
     private XQType contentType;

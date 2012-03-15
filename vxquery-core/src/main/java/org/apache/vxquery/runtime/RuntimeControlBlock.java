@@ -18,9 +18,9 @@ package org.apache.vxquery.runtime;
 
 import org.apache.vxquery.collations.Collation;
 import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.datamodel.DatamodelStaticInterface;
-import org.apache.vxquery.datamodel.NodeFactory;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
+import org.apache.vxquery.v0datamodel.DatamodelStaticInterface;
+import org.apache.vxquery.v0datamodel.NodeFactory;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
 
 public final class RuntimeControlBlock {
     private final DynamicContext dCtx;

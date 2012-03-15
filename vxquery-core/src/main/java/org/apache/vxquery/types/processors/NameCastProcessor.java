@@ -17,12 +17,12 @@
 package org.apache.vxquery.types.processors;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.exceptions.SystemExceptionFactory;
 import org.apache.vxquery.types.XQType;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
 
 public class NameCastProcessor implements CastProcessor {
     public static final CastProcessor INSTANCE = new NameCastProcessor();

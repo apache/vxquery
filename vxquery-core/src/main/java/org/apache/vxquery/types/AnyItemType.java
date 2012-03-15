@@ -16,11 +16,11 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.types.processors.CastProcessor;
 import org.apache.vxquery.types.processors.NotCastableCastProcessor;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public final class AnyItemType implements ItemType {
     public static final AnyItemType INSTANCE = new AnyItemType();

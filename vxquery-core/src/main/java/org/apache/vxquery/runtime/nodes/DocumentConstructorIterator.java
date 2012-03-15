@@ -14,17 +14,17 @@
  */
 package org.apache.vxquery.runtime.nodes;
 
-import org.apache.vxquery.datamodel.NodeConstructingEventAcceptor;
-import org.apache.vxquery.datamodel.NodeFactory;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMSequence;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedIterator;
 import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.NodeConstructingEventAcceptor;
+import org.apache.vxquery.v0datamodel.NodeFactory;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.XDMSequence;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public class DocumentConstructorIterator extends AbstractEagerlyEvaluatedIterator {
     private final RuntimeIterator ci;

@@ -19,19 +19,19 @@ package org.apache.vxquery.runtime.functions;
 import java.util.List;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.XDMSequence;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.NumericValue;
-import org.apache.vxquery.datamodel.atomic.StringValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.XDMSequence;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.atomic.NumericValue;
+import org.apache.vxquery.v0datamodel.atomic.StringValue;
 
 public class FnCodepointsToStringIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public FnCodepointsToStringIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,

@@ -17,12 +17,12 @@
 package org.apache.vxquery.runtime.base;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.atomic.NumericValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.RuntimeUtils;
+import org.apache.vxquery.v0datamodel.atomic.NumericValue;
 
 public abstract class AbstractUnaryNumericFunctionIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public AbstractUnaryNumericFunctionIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,

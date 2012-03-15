@@ -17,12 +17,12 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.atomic.IntegerValue;
-import org.apache.vxquery.datamodel.atomic.NumericValue;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractUnaryNumericFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.atomic.IntegerValue;
+import org.apache.vxquery.v0datamodel.atomic.NumericValue;
 
 public class FnRoundHalfToEvenIterator extends AbstractUnaryNumericFunctionIterator {
     public FnRoundHalfToEvenIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,
