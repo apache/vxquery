@@ -18,10 +18,10 @@ package org.apache.vxquery.types;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.atomic.QNameValue;
 
 public final class NameTest {
     public static final String WILDCARD = null;

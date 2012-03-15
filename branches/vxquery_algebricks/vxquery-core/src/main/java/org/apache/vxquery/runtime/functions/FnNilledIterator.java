@@ -17,15 +17,15 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.atomic.BooleanValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.atomic.BooleanValue;
 
 public class FnNilledIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public FnNilledIterator(RegisterAllocator rAllocator, Function fn, RuntimeIterator[] arguments,

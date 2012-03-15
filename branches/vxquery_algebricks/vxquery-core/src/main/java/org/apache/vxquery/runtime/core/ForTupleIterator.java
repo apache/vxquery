@@ -16,8 +16,6 @@
 */
 package org.apache.vxquery.runtime.core;
 
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.atomic.IntValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.LocalRegisterAccessor;
@@ -26,6 +24,8 @@ import org.apache.vxquery.runtime.RegisterSet;
 import org.apache.vxquery.runtime.base.AbstractUnaryTupleIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 import org.apache.vxquery.runtime.base.TupleIterator;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.atomic.IntValue;
 
 public class ForTupleIterator extends AbstractUnaryTupleIterator {
     private final RuntimeIterator sequence;

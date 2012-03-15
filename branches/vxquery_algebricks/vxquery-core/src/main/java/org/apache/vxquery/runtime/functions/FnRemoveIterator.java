@@ -19,8 +19,6 @@ package org.apache.vxquery.runtime.functions;
 import java.math.BigInteger;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.NumericValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
@@ -28,6 +26,8 @@ import org.apache.vxquery.runtime.LocalRegisterAccessor;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractLazilyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.atomic.NumericValue;
 
 public class FnRemoveIterator extends AbstractLazilyEvaluatedFunctionIterator {
     private final LocalRegisterAccessor<BigInteger> removePoint;

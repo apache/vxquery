@@ -16,11 +16,11 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public final class ElementType extends AbstractNodeType {
     public static final ElementType ANYELEMENT = new ElementType(NameTest.STAR_NAMETEST, AnyType.INSTANCE, true);

@@ -16,11 +16,11 @@
 */
 package org.apache.vxquery.runtime.core;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMSequence;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.base.CloseableIterator;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMSequence;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public final class Deflater implements CloseableIterator {
     private CloseableIterator input;

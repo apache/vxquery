@@ -17,7 +17,7 @@
 package org.apache.vxquery.compiler;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.DatamodelStaticInterface;
+import org.apache.vxquery.v0datamodel.DatamodelStaticInterface;
 
 public class CompilerControlBlock {
     private final StaticContext ctx;

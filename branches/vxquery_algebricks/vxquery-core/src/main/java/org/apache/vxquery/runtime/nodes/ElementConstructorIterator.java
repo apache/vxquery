@@ -16,14 +16,14 @@
 */
 package org.apache.vxquery.runtime.nodes;
 
-import org.apache.vxquery.datamodel.NodeFactory;
-import org.apache.vxquery.datamodel.atomic.QNameValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.RuntimeUtils;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.NodeFactory;
+import org.apache.vxquery.v0datamodel.atomic.QNameValue;
 
 public class ElementConstructorIterator extends AbstractEagerlyEvaluatedIterator {
     private final RuntimeIterator ni;

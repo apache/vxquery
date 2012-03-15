@@ -21,10 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMSequence;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.runtime.CallStackFrame;
@@ -33,6 +29,10 @@ import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.RegisterSet;
 import org.apache.vxquery.runtime.base.AbstractLazilyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.XDMSequence;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 abstract class AbstractItemSortingIterator extends AbstractLazilyEvaluatedFunctionIterator {
     private final LocalRegisterAccessor<Boolean> first;

@@ -14,13 +14,13 @@
  */
 package org.apache.vxquery.runtime.base;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMSequence;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.LocalRegisterAccessor;
 import org.apache.vxquery.runtime.RegisterAllocator;
+import org.apache.vxquery.v0datamodel.DMOKind;
+import org.apache.vxquery.v0datamodel.XDMSequence;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public abstract class AbstractEagerlyEvaluatedIterator extends AbstractRuntimeIterator {
     private final LocalRegisterAccessor<Boolean> done;

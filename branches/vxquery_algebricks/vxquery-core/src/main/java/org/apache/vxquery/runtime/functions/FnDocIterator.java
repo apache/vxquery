@@ -19,7 +19,6 @@ import java.io.InputStream;
 
 import org.apache.vxquery.context.DocumentURIResolver;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMAtomicValue;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
@@ -29,6 +28,7 @@ import org.apache.vxquery.runtime.RuntimeControlBlock;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedFunctionIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 import org.apache.vxquery.runtime.util.XMLParserUtils;
+import org.apache.vxquery.v0datamodel.XDMAtomicValue;
 import org.xml.sax.InputSource;
 
 public class FnDocIterator extends AbstractEagerlyEvaluatedFunctionIterator {

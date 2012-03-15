@@ -14,15 +14,15 @@
  */
 package org.apache.vxquery.runtime.nodes;
 
-import org.apache.vxquery.datamodel.NodeFactory;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
-import org.apache.vxquery.datamodel.atomic.QNameValue;
-import org.apache.vxquery.datamodel.atomic.StringValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.NodeFactory;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
+import org.apache.vxquery.v0datamodel.atomic.QNameValue;
+import org.apache.vxquery.v0datamodel.atomic.StringValue;
 
 public class PIConstructorIterator extends AbstractEagerlyEvaluatedIterator {
     private final RuntimeIterator ni;

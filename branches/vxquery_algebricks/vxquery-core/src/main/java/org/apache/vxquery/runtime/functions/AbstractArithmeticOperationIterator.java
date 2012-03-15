@@ -17,14 +17,6 @@
 package org.apache.vxquery.runtime.functions;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.XDMAtomicValue;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
-import org.apache.vxquery.datamodel.atomic.DateTimeValue;
-import org.apache.vxquery.datamodel.atomic.DateValue;
-import org.apache.vxquery.datamodel.atomic.DurationValue;
-import org.apache.vxquery.datamodel.atomic.NumericValue;
-import org.apache.vxquery.datamodel.atomic.TimeValue;
-import org.apache.vxquery.datamodel.atomic.arithmetics.ArithmeticOperation;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
@@ -35,6 +27,14 @@ import org.apache.vxquery.runtime.base.RuntimeIterator;
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.v0datamodel.XDMAtomicValue;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
+import org.apache.vxquery.v0datamodel.atomic.DateTimeValue;
+import org.apache.vxquery.v0datamodel.atomic.DateValue;
+import org.apache.vxquery.v0datamodel.atomic.DurationValue;
+import org.apache.vxquery.v0datamodel.atomic.NumericValue;
+import org.apache.vxquery.v0datamodel.atomic.TimeValue;
+import org.apache.vxquery.v0datamodel.atomic.arithmetics.ArithmeticOperation;
 
 public abstract class AbstractArithmeticOperationIterator extends AbstractEagerlyEvaluatedFunctionIterator {
     public AbstractArithmeticOperationIterator(RegisterAllocator allocator, Function fn, RuntimeIterator[] arguments,

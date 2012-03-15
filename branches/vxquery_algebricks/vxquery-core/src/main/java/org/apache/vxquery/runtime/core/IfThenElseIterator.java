@@ -16,13 +16,13 @@
  */
 package org.apache.vxquery.runtime.core;
 
-import org.apache.vxquery.datamodel.atomic.BooleanValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.LocalRegisterAccessor;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractRuntimeIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
+import org.apache.vxquery.v0datamodel.atomic.BooleanValue;
 
 public class IfThenElseIterator extends AbstractRuntimeIterator {
     private final RuntimeIterator ci;

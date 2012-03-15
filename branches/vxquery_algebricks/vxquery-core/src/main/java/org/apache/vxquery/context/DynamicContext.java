@@ -16,8 +16,8 @@
 */
 package org.apache.vxquery.context;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.DateTimeValue;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.atomic.DateTimeValue;
 
 public interface DynamicContext {
     public StaticContext getStaticContext();

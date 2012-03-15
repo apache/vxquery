@@ -16,16 +16,16 @@
 */
 package org.apache.vxquery.runtime;
 
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
-import org.apache.vxquery.datamodel.atomic.DoubleValue;
-import org.apache.vxquery.datamodel.atomic.NumericValue;
-import org.apache.vxquery.datamodel.atomic.UntypedAtomicValue;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 import org.apache.vxquery.runtime.core.CloseableIteratorAdapter;
+import org.apache.vxquery.v0datamodel.XDMItem;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
+import org.apache.vxquery.v0datamodel.atomic.DoubleValue;
+import org.apache.vxquery.v0datamodel.atomic.NumericValue;
+import org.apache.vxquery.v0datamodel.atomic.UntypedAtomicValue;
 
 public final class RuntimeUtils {
     private RuntimeUtils() {

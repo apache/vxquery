@@ -16,14 +16,14 @@
 */
 package org.apache.vxquery.runtime.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.AtomicValueFactory;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.base.AbstractEagerlyEvaluatedIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.XDMValue;
+import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
 
 public class InstanceOfIterator extends AbstractEagerlyEvaluatedIterator {
     private RuntimeIterator input;

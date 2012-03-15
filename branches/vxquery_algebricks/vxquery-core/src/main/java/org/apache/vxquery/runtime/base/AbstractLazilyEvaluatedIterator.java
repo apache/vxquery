@@ -16,11 +16,11 @@
 */
 package org.apache.vxquery.runtime.base;
 
-import org.apache.vxquery.datamodel.EagerlyMaterializedXDMSequenceImpl;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.RegisterAllocator;
 import org.apache.vxquery.runtime.RuntimeUtils;
+import org.apache.vxquery.v0datamodel.EagerlyMaterializedXDMSequenceImpl;
 
 public abstract class AbstractLazilyEvaluatedIterator extends AbstractRuntimeIterator {
     public AbstractLazilyEvaluatedIterator(RegisterAllocator rAllocator) {

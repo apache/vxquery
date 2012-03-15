@@ -16,8 +16,6 @@
 */
 package org.apache.vxquery.runtime.paths;
 
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.XDMValue;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.CallStackFrame;
 import org.apache.vxquery.runtime.LocalRegisterAccessor;
@@ -27,6 +25,8 @@ import org.apache.vxquery.runtime.base.AbstractLazilyEvaluatedIterator;
 import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.runtime.base.RuntimeIterator;
 import org.apache.vxquery.util.Filter;
+import org.apache.vxquery.v0datamodel.XDMNode;
+import org.apache.vxquery.v0datamodel.XDMValue;
 
 public class DescendantOrSelfAxisIterator extends AbstractLazilyEvaluatedIterator {
     private final RuntimeIterator input;

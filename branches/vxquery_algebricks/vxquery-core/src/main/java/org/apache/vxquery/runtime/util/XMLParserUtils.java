@@ -18,11 +18,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import org.apache.vxquery.datamodel.NodeConstructingEventAcceptor;
-import org.apache.vxquery.datamodel.XDMNode;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.RuntimeControlBlock;
+import org.apache.vxquery.v0datamodel.NodeConstructingEventAcceptor;
+import org.apache.vxquery.v0datamodel.XDMNode;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
