@@ -37,14 +37,12 @@
       <id>hyracks-snapshots</id>
       <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
       <snapshots>
-        <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
     <repository>
       <id>hyracks-releases</id>
       <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
       <releases>
-        <updatePolicy>always</updatePolicy>
       </releases>
     </repository>
   </repositories>
