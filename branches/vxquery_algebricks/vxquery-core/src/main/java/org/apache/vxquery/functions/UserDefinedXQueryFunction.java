@@ -17,8 +17,8 @@ package org.apache.vxquery.functions;
 import javax.xml.namespace.QName;
 
 import org.apache.vxquery.context.XQueryVariable;
-import org.apache.vxquery.runtime.RuntimePlan;
-import org.apache.vxquery.runtime.base.FunctionIteratorFactory;
+import org.apache.vxquery.v0runtime.RuntimePlan;
+import org.apache.vxquery.v0runtime.base.FunctionIteratorFactory;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 

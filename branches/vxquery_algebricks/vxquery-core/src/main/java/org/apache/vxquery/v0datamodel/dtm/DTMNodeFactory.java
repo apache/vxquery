@@ -17,7 +17,6 @@
 package org.apache.vxquery.v0datamodel.dtm;
 
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.v0datamodel.DatamodelHelper;
 import org.apache.vxquery.v0datamodel.NameCache;
 import org.apache.vxquery.v0datamodel.NodeConstructingEventAcceptor;
@@ -29,6 +28,7 @@ import org.apache.vxquery.v0datamodel.XDMValue;
 import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
 import org.apache.vxquery.v0datamodel.atomic.QNameValue;
 import org.apache.vxquery.v0datamodel.atomic.StringValue;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
 
 public final class DTMNodeFactory implements NodeFactory {
     private NameCache nameCache;

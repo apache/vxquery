@@ -16,7 +16,7 @@ package org.apache.vxquery.v0datamodel;
 
 import java.util.List;
 
-import org.apache.vxquery.runtime.base.CloseableSkippableIterator;
+import org.apache.vxquery.v0runtime.base.CloseableSkippableIterator;
 
 public interface XDMSequence extends XDMValue {
     public CloseableSkippableIterator createItemIterator();

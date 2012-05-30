@@ -18,7 +18,7 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.runtime.base.FunctionIteratorFactory;
+import org.apache.vxquery.v0runtime.base.FunctionIteratorFactory;
 
 public class ExternalFunction extends Function {
     public ExternalFunction(QName name, Signature signature) {

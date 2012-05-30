@@ -18,12 +18,12 @@ package org.apache.vxquery.v0datamodel.dtm;
 
 import java.nio.CharBuffer;
 
-import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.v0datamodel.DMOKind;
 import org.apache.vxquery.v0datamodel.XDMNode;
 import org.apache.vxquery.v0datamodel.XDMValue;
 import org.apache.vxquery.v0datamodel.atomic.AnyUriValue;
 import org.apache.vxquery.v0datamodel.atomic.QNameValue;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
 
 final class DTMNodeImpl implements XDMNode {
     private DTM dtm;

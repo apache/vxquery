@@ -22,11 +22,11 @@ import java.util.Stack;
 
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.base.CloseableIterator;
-import org.apache.vxquery.runtime.base.EventAcceptor;
 import org.apache.vxquery.v0datamodel.XDMItem;
 import org.apache.vxquery.v0datamodel.XDMNode;
 import org.apache.vxquery.v0datamodel.atomic.QNameValue;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
+import org.apache.vxquery.v0runtime.base.EventAcceptor;
 
 public class XMLSerializer implements EventAcceptor {
     private static final String XML_DOCUMENT_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";

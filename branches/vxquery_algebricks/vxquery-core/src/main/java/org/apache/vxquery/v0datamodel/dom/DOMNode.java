@@ -16,13 +16,13 @@
  */
 package org.apache.vxquery.v0datamodel.dom;
 
-import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.v0datamodel.DMOKind;
 import org.apache.vxquery.v0datamodel.Wrapper;
 import org.apache.vxquery.v0datamodel.XDMNode;
 import org.apache.vxquery.v0datamodel.XDMValue;
 import org.apache.vxquery.v0datamodel.atomic.AnyUriValue;
 import org.apache.vxquery.v0datamodel.atomic.QNameValue;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

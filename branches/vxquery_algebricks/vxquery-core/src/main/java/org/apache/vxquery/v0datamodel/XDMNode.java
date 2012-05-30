@@ -16,9 +16,9 @@
  */
 package org.apache.vxquery.v0datamodel;
 
-import org.apache.vxquery.runtime.base.CloseableIterator;
 import org.apache.vxquery.v0datamodel.atomic.AnyUriValue;
 import org.apache.vxquery.v0datamodel.atomic.QNameValue;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
 
 public interface XDMNode extends XDMItem {
     public Object getImplementationIdentifier();

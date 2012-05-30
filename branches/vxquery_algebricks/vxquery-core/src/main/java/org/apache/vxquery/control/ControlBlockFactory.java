@@ -17,7 +17,7 @@
 package org.apache.vxquery.control;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
-import org.apache.vxquery.runtime.RuntimeControlBlock;
+import org.apache.vxquery.v0runtime.RuntimeControlBlock;
 
 public interface ControlBlockFactory {
     public CompilerControlBlock createCompilerControlBlock();

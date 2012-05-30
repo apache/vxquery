@@ -19,7 +19,7 @@ package org.apache.vxquery.v0datamodel.dom;
 import org.w3c.dom.NamedNodeMap;
 
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.base.CloseableIterator;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
 
 final class DOMAttributeIterator implements CloseableIterator {
     private DOMNode element;

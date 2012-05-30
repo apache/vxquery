@@ -16,7 +16,7 @@
 */
 package org.apache.vxquery.v0datamodel;
 
-import org.apache.vxquery.runtime.base.EventAcceptor;
+import org.apache.vxquery.v0runtime.base.EventAcceptor;
 
 public interface NodeConstructingEventAcceptor extends EventAcceptor {
     public XDMNode getConstructedNode();
