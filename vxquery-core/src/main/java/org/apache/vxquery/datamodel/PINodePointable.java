@@ -2,28 +2,28 @@ package org.apache.vxquery.datamodel;
 
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 /*
  * PI {
  *  NodeId nodeId?;
- *  StringPtr target
- *  StringPtr content;
+ *  String target
+ *  String content;
  * }
  */
 public class PINodePointable extends AbstractPointable {
     private static final int LOCAL_NODE_ID_SIZE = 4;
-    private static final int TARGET_SIZE = 4;
 
     public int getLocalNodeId(NodeTreePointable nodeTree) {
         return nodeTree.nodeIdExists() ? IntegerPointable.getInteger(bytes, getLocalNodeIdOffset()) : -1;
     }
 
-    public int getTargetCode(NodeTreePointable nodeTree) {
-        return IntegerPointable.getInteger(bytes, getTargetOffset(nodeTree));
+    public void getTarget(NodeTreePointable nodeTree, UTF8StringPointable target) {
+        target.set(bytes, getTargetOffset(nodeTree), getTargetSize(nodeTree));
     }
 
-    public int getContentCode(NodeTreePointable nodeTree) {
-        return IntegerPointable.getInteger(bytes, getContentOffset(nodeTree));
+    public void getContentCode(NodeTreePointable nodeTree, UTF8StringPointable content) {
+        content.set(bytes, getContentOffset(nodeTree), getContentSize(nodeTree));
     }
 
     private int getLocalNodeIdOffset() {
@@ -38,11 +38,15 @@ public class PINodePointable extends AbstractPointable {
         return getLocalNodeIdOffset() + getLocalNodeIdSize(nodeTree);
     }
 
-    private int getTargetSize() {
-        return TARGET_SIZE;
+    private int getTargetSize(NodeTreePointable nodeTree) {
+        return UTF8StringPointable.getUTFLen(bytes, getTargetOffset(nodeTree)) + 2;
     }
 
     private int getContentOffset(NodeTreePointable nodeTree) {
-        return getTargetOffset(nodeTree) + getTargetSize();
+        return getTargetOffset(nodeTree) + getTargetSize(nodeTree);
+    }
+
+    private int getContentSize(NodeTreePointable nodeTree) {
+        return UTF8StringPointable.getUTFLen(bytes, getContentOffset(nodeTree)) + 2;
     }
 }

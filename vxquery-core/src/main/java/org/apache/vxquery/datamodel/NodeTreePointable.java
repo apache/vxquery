@@ -48,7 +48,7 @@ public class NodeTreePointable extends AbstractPointable {
         int dataAreaStart = getDictionaryDataAreaStartOffset();
         int idxSlotValue = IntegerPointable.getInteger(bytes, getDictionaryIndexPointerArrayOffset() + idx
                 * IDX_PTR_SLOT_SIZE);
-        int strLen = UTF8StringPointable.getStrLen(bytes, dataAreaStart + idxSlotValue);
+        int strLen = UTF8StringPointable.getUTFLen(bytes, dataAreaStart + idxSlotValue);
         string.set(bytes, dataAreaStart + idxSlotValue, strLen + 2);
     }
 
@@ -62,7 +62,7 @@ public class NodeTreePointable extends AbstractPointable {
             int mid = (left + right) / 2;
             int sortedSlotValue = IntegerPointable.getInteger(bytes, sortedPtrArrayStart + mid * SORTED_PTR_SLOT_SIZE);
             int strStart = dataAreaStart + sortedSlotValue;
-            int strLen = UTF8StringPointable.getStrLen(bytes, strStart);
+            int strLen = UTF8StringPointable.getUTFLen(bytes, strStart);
             int cmp = key.compareTo(bytes, strStart, strLen + 2);
             if (cmp > 0) {
                 left = mid + 1;
