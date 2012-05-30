@@ -83,4 +83,9 @@ public final class NameTest {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "NameTest(" + asQName() + ")";
+    }
 }

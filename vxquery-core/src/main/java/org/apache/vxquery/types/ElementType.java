@@ -68,4 +68,9 @@ public final class ElementType extends AbstractNodeType {
             }
         };
     }
+
+    @Override
+    public String toString() {
+        return "NodeTest(" + nameTest + ", " + contentType + ", nilled = " + nilled + ")";
+    }
 }
