@@ -17,7 +17,7 @@
 package org.apache.vxquery.v0datamodel.dtm;
 
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.base.CloseableIterator;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
 
 final class DTMChildrenIterator implements CloseableIterator {
     private DTMNodeImpl parent;

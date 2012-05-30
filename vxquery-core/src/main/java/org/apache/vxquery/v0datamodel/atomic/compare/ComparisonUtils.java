@@ -21,7 +21,6 @@ import java.util.Comparator;
 import org.apache.vxquery.collations.Collation;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.RuntimeControlBlock;
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
@@ -45,6 +44,7 @@ import org.apache.vxquery.v0datamodel.atomic.QNameValue;
 import org.apache.vxquery.v0datamodel.atomic.StringValue;
 import org.apache.vxquery.v0datamodel.atomic.TimeValue;
 import org.apache.vxquery.v0datamodel.atomic.UntypedAtomicValue;
+import org.apache.vxquery.v0runtime.RuntimeControlBlock;
 
 public class ComparisonUtils {
     public static final Comparator<XDMItem> SORT_NODE_ASC_COMPARATOR = new Comparator<XDMItem>() {

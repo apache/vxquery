@@ -16,7 +16,7 @@ package org.apache.vxquery.xmlquery.query;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.runtime.RegisterSet;
+import org.apache.vxquery.v0runtime.RegisterSet;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 

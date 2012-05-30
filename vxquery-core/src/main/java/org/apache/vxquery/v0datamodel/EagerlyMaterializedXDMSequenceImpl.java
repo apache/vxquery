@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.base.CloseableIterator;
-import org.apache.vxquery.runtime.base.CloseableSkippableIterator;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
+import org.apache.vxquery.v0runtime.base.CloseableSkippableIterator;
 
 public final class EagerlyMaterializedXDMSequenceImpl implements XDMSequence {
     private List<XDMItem> list;

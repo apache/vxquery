@@ -17,7 +17,7 @@
 package org.apache.vxquery.v0datamodel;
 
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.base.CloseableIterator;
+import org.apache.vxquery.v0runtime.base.CloseableIterator;
 
 public class DatamodelHelper {
     public static CharSequence serialize(CloseableIterator iter) throws SystemException {
