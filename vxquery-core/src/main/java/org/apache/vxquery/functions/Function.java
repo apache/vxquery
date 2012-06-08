@@ -62,9 +62,4 @@ public abstract class Function implements IFunctionInfo {
         EXTERNAL,
         UDXQUERY,
     }
-
-    @Override
-    public Object getInfo() {
-        return null;
-    }
 }

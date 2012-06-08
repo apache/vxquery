@@ -1010,7 +1010,7 @@ public class XMLQueryTranslator {
                 }
                 case ORDERBY_CLAUSE: {
                     OrderbyClauseNode ocNode = (OrderbyClauseNode) cNode;
-                    List<edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>> oExprs = new ArrayList<edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>>();
+                    List<edu.uci.ics.hyracks.algebricks.common.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>> oExprs = new ArrayList<edu.uci.ics.hyracks.algebricks.common.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>>();
                     List<String> collations = new ArrayList<String>();
                     for (OrderSpecNode osNode : ocNode.getOrderSpec()) {
                         ILogicalExpression oExpr = vre(translateExpression(osNode.getExpression(), tCtx));
@@ -1042,7 +1042,7 @@ public class XMLQueryTranslator {
                         }
                         collations.add(osNode.getCollation());
                         */
-                        oExprs.add(new edu.uci.ics.hyracks.algebricks.core.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>(
+                        oExprs.add(new edu.uci.ics.hyracks.algebricks.common.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>(
                                 o, mutable(oExpr)));
                     }
                     OrderOperator order = new OrderOperator(oExprs);

@@ -40,9 +40,9 @@ import org.kohsuke.args4j.Option;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.PlanPrettyPrinter;
-import edu.uci.ics.hyracks.algebricks.core.api.exceptions.AlgebricksException;
 
 public class VXQuery {
     public static void main(String[] args) throws Exception {
@@ -115,12 +115,15 @@ public class VXQuery {
             if (opts.compileOnly) {
                 continue;
             }
-            for (PrologVariable pVar : module.getPrologVariables()) {
-                String fName = opts.bindings.get(pVar.getVariable().getName().getLocalPart());
-                if (fName != null) {
-                    File f = new File(fName);
-                    System.err.println("Binding: " + pVar.getVariable().getName() + " to " + f.getAbsolutePath());
-                    iapi.bindExternalVariable(pVar.getVariable(), f);
+            PrologVariable[] prologVariables = module.getPrologVariables();
+            if (prologVariables != null) {
+                for (PrologVariable pVar : prologVariables) {
+                    String fName = opts.bindings.get(pVar.getVariable().getName().getLocalPart());
+                    if (fName != null) {
+                        File f = new File(fName);
+                        System.err.println("Binding: " + pVar.getVariable().getName() + " to " + f.getAbsolutePath());
+                        iapi.bindExternalVariable(pVar.getVariable(), f);
+                    }
                 }
             }
             OpenableCloseableIterator ri = iapi.execute(module);
