@@ -14,27 +14,15 @@
  */
 package org.apache.vxquery.xtest;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
-import org.apache.vxquery.api.InternalAPI;
-import org.apache.vxquery.context.XQueryVariable;
-import org.apache.vxquery.v0datamodel.XDMItem;
-import org.apache.vxquery.v0datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
-import org.apache.vxquery.v0datamodel.serialization.XMLSerializer;
-import org.apache.vxquery.v0runtime.base.OpenableCloseableIterator;
-import org.apache.vxquery.xmlquery.ast.ModuleNode;
-import org.apache.vxquery.xmlquery.query.Module;
-import org.apache.vxquery.xmlquery.query.PrologVariable;
+import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.context.RootStaticContextImpl;
+import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
 public class TestRunnerFactory {
     private List<ResultReporter> reporters;
@@ -59,43 +47,11 @@ public class TestRunnerFactory {
                 }
                 long start = System.currentTimeMillis();
                 try {
-                    InternalAPI iapi = new InternalAPI(new DTMDatamodelStaticInterfaceImpl());
+                    XMLQueryCompiler compiler = new XMLQueryCompiler(null);
                     FileReader in = new FileReader(testCase.getXQueryFile());
-                    ModuleNode ast;
-                    try {
-                        ast = iapi.parse(testCase.getXQueryDisplayName(), in);
-                    } finally {
-                        in.close();
-                    }
-                    Module module = iapi.compile(null, ast, opts.optimizationLevel);
-                    for (PrologVariable pVar : module.getPrologVariables()) {
-                        XQueryVariable var = pVar.getVariable();
-                        QName varName = var.getName();
-                        File binding = testCase.getExternalVariableBinding(varName);
-                        if (binding != null) {
-                            iapi.bindExternalVariable(var, testCase.getExternalVariableBinding(varName));
-                        }
-                    }
-                    OpenableCloseableIterator ri = iapi.execute(module);
-                    ri.open();
-                    XDMItem o;
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(baos)), true);
-                    XMLSerializer s = new XMLSerializer(out, false);
-                    try {
-                        while ((o = (XDMItem) ri.next()) != null) {
-                            s.item(o);
-                        }
-                    } finally {
-                        out.flush();
-                        ri.close();
-                    }
-                    try {
-                        res.result = baos.toString("UTF-8");
-                    } catch (Exception e) {
-                        System.err.println("Framework error");
-                        e.printStackTrace();
-                    }
+                    CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
+                            RootStaticContextImpl.INSTANCE));
+                    compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                 } catch (Throwable e) {
                     res.error = e;
                 } finally {

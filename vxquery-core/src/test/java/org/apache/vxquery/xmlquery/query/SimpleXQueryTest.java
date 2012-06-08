@@ -24,15 +24,10 @@ import java.util.zip.GZIPInputStream;
 
 import junit.framework.Assert;
 
-import org.apache.vxquery.api.InternalAPI;
+import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.context.RootStaticContextImpl;
+import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.v0datamodel.DMOKind;
-import org.apache.vxquery.v0datamodel.XDMItem;
-import org.apache.vxquery.v0datamodel.XDMSequence;
-import org.apache.vxquery.v0datamodel.XDMValue;
-import org.apache.vxquery.v0datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
-import org.apache.vxquery.v0runtime.base.CloseableIterator;
-import org.apache.vxquery.v0runtime.base.OpenableCloseableIterator;
 import org.junit.Test;
 
 public class SimpleXQueryTest {
@@ -157,27 +152,8 @@ public class SimpleXQueryTest {
     }
 
     private static void runTestInternal(String testName, String query) throws SystemException {
-        InternalAPI iapi = new InternalAPI(new DTMDatamodelStaticInterfaceImpl());
-        OpenableCloseableIterator ri = iapi.execute(iapi.compile(null, iapi.parse(testName, new StringReader(query)),
-                Integer.MAX_VALUE));
-        ri.open();
-        System.err.println("--- Results begin");
-        XDMValue o;
-        try {
-            while ((o = (XDMValue) ri.next()) != null) {
-                if (o.getDMOKind() == DMOKind.SEQUENCE) {
-                    CloseableIterator si = ((XDMSequence) o).createItemIterator();
-                    XDMItem item;
-                    while ((item = (XDMItem) si.next()) != null) {
-                        System.err.println(item.getStringValue());
-                    }
-                } else {
-                    System.err.println(((XDMItem) o).getStringValue());
-                }
-            }
-        } finally {
-            ri.close();
-        }
-        System.err.println("--- Results end");
+        XMLQueryCompiler compiler = new XMLQueryCompiler(null);
+        CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE));
+        compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE);
     }
 }

@@ -19,6 +19,7 @@ import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.v0runtime.RegisterSet;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
+import edu.uci.ics.hyracks.api.job.JobSpecification;
 
 public class Module {
     private ModuleType moduleType;
@@ -27,6 +28,7 @@ public class Module {
     private String namespaceUri;
     private PrologVariable[] gVariables;
     private ILogicalPlan body;
+    private JobSpecification jobSpec;
 
     public Module() {
     }
@@ -77,6 +79,14 @@ public class Module {
 
     public void setBody(ILogicalPlan body) {
         this.body = body;
+    }
+
+    public JobSpecification getHyracksJobSpecification() {
+        return jobSpec;
+    }
+
+    public void setHyracksJobSpecification(JobSpecification jobSpec) {
+        this.jobSpec = jobSpec;
     }
 
     public RegisterSet createGlobalRegisterSet() {

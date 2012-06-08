@@ -14,7 +14,11 @@
  */
 package org.apache.vxquery.xmlquery.query;
 
+import org.apache.vxquery.xmlquery.ast.ModuleNode;
+
 public interface XQueryCompilationListener {
+    public void notifyParseResult(ModuleNode moduleNode);
+
     public void notifyTranslationResult(Module module);
 
     public void notifyTypecheckResult(Module module);

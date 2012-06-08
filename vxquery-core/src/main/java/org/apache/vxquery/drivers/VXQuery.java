@@ -16,7 +16,6 @@ package org.apache.vxquery.drivers;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,14 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.vxquery.api.InternalAPI;
-import org.apache.vxquery.v0datamodel.XDMItem;
-import org.apache.vxquery.v0datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
-import org.apache.vxquery.v0datamodel.serialization.XMLSerializer;
-import org.apache.vxquery.v0runtime.base.OpenableCloseableIterator;
+import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.context.RootStaticContextImpl;
+import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
-import org.apache.vxquery.xmlquery.query.PrologVariable;
+import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
@@ -43,6 +40,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.PlanPrettyPrinter;
+import edu.uci.ics.hyracks.api.job.JobSpecification;
 
 public class VXQuery {
     public static void main(String[] args) throws Exception {
@@ -58,25 +56,18 @@ public class VXQuery {
             parser.printUsage(System.err);
             return;
         }
-        InternalAPI iapi = new InternalAPI(new DTMDatamodelStaticInterfaceImpl());
         for (String query : opts.arguments) {
             String qStr = slurp(query);
             if (opts.showQuery) {
                 System.err.println(qStr);
             }
-            ModuleNode ast = iapi.parse(query, new StringReader(qStr));
-            if (opts.showAST) {
-                System.err.println(new XStream(new DomDriver()).toXML(ast));
-            }
             XQueryCompilationListener listener = new XQueryCompilationListener() {
                 @Override
                 public void notifyCodegenResult(Module module) {
-                    /*
-                    if (opts.showRI) {
-                        System.err.println(new XStream(new DomDriver()).toXML(module.getBodyRuntimePlan()
-                                .getRuntimeIterator()));
+                    if (opts.showRP) {
+                        JobSpecification jobSpec = module.getHyracksJobSpecification();
+                        System.err.println(jobSpec.toString());
                     }
-                    */
                 }
 
                 @Override
@@ -110,45 +101,19 @@ public class VXQuery {
                         }
                     }
                 }
+
+                @Override
+                public void notifyParseResult(ModuleNode moduleNode) {
+                    if (opts.showAST) {
+                        System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
+                    }
+                }
             };
-            Module module = iapi.compile(listener, ast, opts.optimizationLevel);
+            XMLQueryCompiler compiler = new XMLQueryCompiler(listener);
+            CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE));
+            compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
             if (opts.compileOnly) {
                 continue;
-            }
-            PrologVariable[] prologVariables = module.getPrologVariables();
-            if (prologVariables != null) {
-                for (PrologVariable pVar : prologVariables) {
-                    String fName = opts.bindings.get(pVar.getVariable().getName().getLocalPart());
-                    if (fName != null) {
-                        File f = new File(fName);
-                        System.err.println("Binding: " + pVar.getVariable().getName() + " to " + f.getAbsolutePath());
-                        iapi.bindExternalVariable(pVar.getVariable(), f);
-                    }
-                }
-            }
-            OpenableCloseableIterator ri = iapi.execute(module);
-            for (int i = 0; i < opts.repeatExec; ++i) {
-                long start = System.currentTimeMillis();
-                ri.open();
-                System.err.println("--- Results begin");
-                XDMItem o;
-                PrintWriter out = new PrintWriter(System.out, true);
-                XMLSerializer s = new XMLSerializer(out, false);
-                s.open();
-                try {
-                    while ((o = (XDMItem) ri.next()) != null) {
-                        s.item(o);
-                    }
-                } finally {
-                    s.close();
-                    out.flush();
-                    ri.close();
-                }
-                System.err.println("--- Results end");
-                long end = System.currentTimeMillis();
-                if (opts.timing) {
-                    System.err.println("Run time: " + (end - start) + " ms");
-                }
             }
         }
     }
@@ -173,8 +138,8 @@ public class VXQuery {
         @Option(name = "-showoet", usage = "Show optimized expression tree")
         private boolean showOET;
 
-        @Option(name = "-showri", usage = "Show Runtime plan")
-        private boolean showRI;
+        @Option(name = "-showrp", usage = "Show Runtime plan")
+        private boolean showRP;
 
         @Option(name = "-compileonly", usage = "Compile the query and stop")
         private boolean compileOnly;

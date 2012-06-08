@@ -17,22 +17,15 @@
 package org.apache.vxquery.compiler;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.v0datamodel.DatamodelStaticInterface;
 
 public class CompilerControlBlock {
     private final StaticContext ctx;
-    private final DatamodelStaticInterface dmStaticInterface;
 
-    public CompilerControlBlock(StaticContext ctx, DatamodelStaticInterface dmStaticInterface) {
+    public CompilerControlBlock(StaticContext ctx) {
         this.ctx = ctx;
-        this.dmStaticInterface = dmStaticInterface;
     }
 
     public StaticContext getStaticContext() {
         return ctx;
-    }
-
-    public DatamodelStaticInterface getDatamodelStaticInterface() {
-        return dmStaticInterface;
     }
 }
