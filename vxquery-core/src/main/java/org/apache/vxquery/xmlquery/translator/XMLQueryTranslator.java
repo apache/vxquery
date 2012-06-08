@@ -27,6 +27,7 @@ import org.apache.vxquery.functions.ExternalFunction;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.functions.Signature;
 import org.apache.vxquery.functions.UserDefinedXQueryFunction;
+import org.apache.vxquery.metadata.QueryResultDataSink;
 import org.apache.vxquery.types.AnyItemType;
 import org.apache.vxquery.types.AnyNodeType;
 import org.apache.vxquery.types.AnyType;
@@ -149,6 +150,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.OrderOperat
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.WriteOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.plan.ALogicalPlanImpl;
 
 public class XMLQueryTranslator {
@@ -225,16 +227,16 @@ public class XMLQueryTranslator {
         parsePrologPass1(prologNode);
         parsePrologPass2(prologNode);
 
-        Pair<ILogicalPlan, LogicalVariable> planAndVar = null;
+        ILogicalPlan plan = null;
         switch (moduleNode.getTag()) {
             case LIBRARY_MODULE:
                 throw new SystemException(ErrorCode.TODO);
 
             case MAIN_MODULE:
-                planAndVar = translateMainModule((MainModuleNode) moduleNode);
+                plan = translateMainModule((MainModuleNode) moduleNode);
         }
 
-        module.setBody(planAndVar.getLeft());
+        module.setBody(plan);
         return module;
     }
 
@@ -599,16 +601,18 @@ public class XMLQueryTranslator {
         }
     }
 
-    private Pair<ILogicalPlan, LogicalVariable> translateMainModule(MainModuleNode moduleNode) throws SystemException {
+    private ILogicalPlan translateMainModule(MainModuleNode moduleNode) throws SystemException {
         QueryBodyNode qbn = moduleNode.getQueryBody();
         ASTNode queryBody = qbn.getExpression();
         TranslationContext tCtx = new TranslationContext(null, new EmptyTupleSourceOperator());
         LogicalVariable lVar = translateExpression(queryBody, tCtx);
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
         exprs.add(mutable(vre(lVar)));
-        ALogicalPlanImpl lp = new ALogicalPlanImpl(mutable(tCtx.op));
+        WriteOperator op = new WriteOperator(exprs, new QueryResultDataSink());
+        op.getInputs().add(mutable(tCtx.op));
+        ALogicalPlanImpl lp = new ALogicalPlanImpl(mutable(op));
 
-        return Pair.<ILogicalPlan, LogicalVariable> of(lp, lVar);
+        return lp;
     }
 
     private LogicalVariable translateExpression(ASTNode value, TranslationContext tCtx) throws SystemException {
