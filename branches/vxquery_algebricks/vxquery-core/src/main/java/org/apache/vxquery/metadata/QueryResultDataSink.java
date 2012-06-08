@@ -7,11 +7,12 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.properties.RandomPartitioning
 import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
 
 public class QueryResultDataSink implements IDataSink {
+    private final FileSplit[] fileSplits;
     private final IPartitioningProperty pProperty;
 
     public QueryResultDataSink() {
-        pProperty = new RandomPartitioningProperty(new FileSplitDomain(new FileSplit[] { new FileSplit("FOOnode",
-                "/tmp/junk") }));
+        fileSplits = new FileSplit[] { new FileSplit("FOOnode", "/tmp/junk") };
+        pProperty = new RandomPartitioningProperty(new FileSplitDomain(fileSplits));
     }
 
     @Override
@@ -27,5 +28,9 @@ public class QueryResultDataSink implements IDataSink {
     @Override
     public IPartitioningProperty getPartitioningProperty() {
         return pProperty;
+    }
+
+    public FileSplit[] getFileSplits() {
+        return fileSplits;
     }
 }
