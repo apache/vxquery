@@ -1,6 +1,8 @@
 package org.apache.vxquery.datamodel;
 
+import edu.uci.ics.hyracks.data.std.algorithms.BinarySearchAlgorithm;
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
+import edu.uci.ics.hyracks.data.std.collections.api.IValueReferenceVector;
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
@@ -19,6 +21,34 @@ public class NodeTreePointable extends AbstractPointable {
     private static final int DICTIONARY_NENTRIES_SIZE = 4;
     private static final int IDX_PTR_SLOT_SIZE = 4;
     private static final int SORTED_PTR_SLOT_SIZE = 4;
+
+    private final IValueReferenceVector sortedStringVector = new IValueReferenceVector() {
+        @Override
+        public int getSize() {
+            return getDictionaryEntryCount();
+        }
+
+        @Override
+        public byte[] getBytes(int index) {
+            return bytes;
+        }
+
+        @Override
+        public int getStart(int index) {
+            int dataAreaStart = getDictionaryDataAreaStartOffset();
+            int sortedPtrArrayStart = getDictionarySortedPointerArrayOffset();
+            int sortedSlotValue = IntegerPointable
+                    .getInteger(bytes, sortedPtrArrayStart + index * SORTED_PTR_SLOT_SIZE);
+            return dataAreaStart + sortedSlotValue;
+        }
+
+        @Override
+        public int getLength(int index) {
+            return UTF8StringPointable.getUTFLen(bytes, getStart(index)) + 2;
+        }
+    };
+
+    private final BinarySearchAlgorithm binSearch = new BinarySearchAlgorithm();
 
     public boolean nodeIdExists() {
         return (getHeader() & HEADER_NODEID_EXISTS_MASK) != 0;
@@ -53,26 +83,13 @@ public class NodeTreePointable extends AbstractPointable {
     }
 
     public int lookupString(UTF8StringPointable key) {
-        int nEntries = getDictionaryEntryCount();
-        int left = 0;
-        int right = nEntries - 1;
-        int sortedPtrArrayStart = getDictionarySortedPointerArrayOffset();
-        int dataAreaStart = getDictionaryDataAreaStartOffset();
-        while (left <= right) {
-            int mid = (left + right) / 2;
-            int sortedSlotValue = IntegerPointable.getInteger(bytes, sortedPtrArrayStart + mid * SORTED_PTR_SLOT_SIZE);
-            int strStart = dataAreaStart + sortedSlotValue;
-            int strLen = UTF8StringPointable.getUTFLen(bytes, strStart);
-            int cmp = key.compareTo(bytes, strStart, strLen + 2);
-            if (cmp > 0) {
-                left = mid + 1;
-            } else if (cmp < 0) {
-                right = mid - 1;
-            } else {
-                return IntegerPointable.getInteger(bytes, strStart + strLen + 2);
-            }
+        boolean found = binSearch.find(sortedStringVector, key);
+        if (!found) {
+            return -1;
         }
-        return -1;
+        int index = binSearch.getIndex();
+        return IntegerPointable.getInteger(bytes,
+                sortedStringVector.getStart(index) + sortedStringVector.getLength(index));
     }
 
     public void getRootNode(TaggedValuePointable node) {
