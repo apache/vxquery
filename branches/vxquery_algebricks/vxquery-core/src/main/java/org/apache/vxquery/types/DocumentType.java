@@ -16,9 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public final class DocumentType extends AbstractNodeType {
     public static final DocumentType ANYDOCUMENT = new DocumentType(ElementType.ANYELEMENT);
 
@@ -35,10 +32,5 @@ public final class DocumentType extends AbstractNodeType {
 
     public ElementType getElementType() {
         return elementType;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return null;
     }
 }

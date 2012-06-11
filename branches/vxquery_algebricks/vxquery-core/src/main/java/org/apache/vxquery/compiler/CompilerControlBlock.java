@@ -18,14 +18,23 @@ package org.apache.vxquery.compiler;
 
 import org.apache.vxquery.context.StaticContext;
 
+import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
+
 public class CompilerControlBlock {
     private final StaticContext ctx;
 
-    public CompilerControlBlock(StaticContext ctx) {
+    private final FileSplit[] resultFileSplits;
+
+    public CompilerControlBlock(StaticContext ctx, FileSplit[] resultFileSplits) {
         this.ctx = ctx;
+        this.resultFileSplits = resultFileSplits;
     }
 
     public StaticContext getStaticContext() {
         return ctx;
+    }
+
+    public FileSplit[] getResultFileSplits() {
+        return resultFileSplits;
     }
 }

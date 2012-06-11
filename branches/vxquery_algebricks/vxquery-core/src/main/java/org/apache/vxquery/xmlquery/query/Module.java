@@ -16,7 +16,6 @@ package org.apache.vxquery.xmlquery.query;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.v0runtime.RegisterSet;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.api.job.JobSpecification;
@@ -87,9 +86,5 @@ public class Module {
 
     public void setHyracksJobSpecification(JobSpecification jobSpec) {
         this.jobSpec = jobSpec;
-    }
-
-    public RegisterSet createGlobalRegisterSet() {
-        return new RegisterSet(new Object[gVariables.length]);
     }
 }

@@ -17,22 +17,15 @@
 package org.apache.vxquery.xmlquery.query;
 
 import org.apache.vxquery.context.XQueryVariable;
-import org.apache.vxquery.v0runtime.RuntimePlan;
 
 public class PrologVariable {
     private XQueryVariable variable;
-    private RuntimePlan plan;
 
-    public PrologVariable(XQueryVariable variable, RuntimePlan plan) {
+    public PrologVariable(XQueryVariable variable) {
         this.variable = variable;
-        this.plan = plan;
     }
 
     public XQueryVariable getVariable() {
         return variable;
-    }
-
-    public RuntimePlan getRuntimePlan() {
-        return plan;
     }
 }

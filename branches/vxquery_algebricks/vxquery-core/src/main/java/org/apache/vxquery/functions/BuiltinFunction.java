@@ -18,15 +18,11 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.v0runtime.base.FunctionIteratorFactory;
-
 public class BuiltinFunction extends Function {
-    private FunctionIteratorFactory fif;
     private boolean implicitContext;
 
-    public BuiltinFunction(QName name, Signature signature, FunctionIteratorFactory fif, boolean implicitContext) {
+    public BuiltinFunction(QName name, Signature signature, boolean implicitContext) {
         super(name, signature);
-        this.fif = fif;
         this.implicitContext = implicitContext;
     }
 
@@ -37,10 +33,5 @@ public class BuiltinFunction extends Function {
 
     public boolean useContextImplicitly() {
         return implicitContext;
-    }
-
-    @Override
-    public FunctionIteratorFactory getIteratorFactory() {
-        return fif;
     }
 }

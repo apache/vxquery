@@ -18,8 +18,6 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.v0runtime.base.FunctionIteratorFactory;
-
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 
@@ -45,8 +43,6 @@ public abstract class Function implements IFunctionInfo {
     public abstract FunctionTag getTag();
 
     public abstract boolean useContextImplicitly();
-
-    public abstract FunctionIteratorFactory getIteratorFactory();
 
     public QName getName() {
         return qname;

@@ -18,11 +18,6 @@ package org.apache.vxquery.types;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.XDMNode;
-import org.apache.vxquery.v0datamodel.atomic.QNameValue;
-
 public final class NameTest {
     public static final String WILDCARD = null;
 
@@ -49,39 +44,6 @@ public final class NameTest {
             throw new UnsupportedOperationException();
         }
         return new QName(uri, localName);
-    }
-
-    @SuppressWarnings("unchecked")
-    public Filter<XDMNode> createNameMatchFilter() {
-        if (uri == null) {
-            if (localName == null) {
-                return (Filter<XDMNode>) Filter.TRUE_FILTER;
-            } else {
-                return new Filter<XDMNode>() {
-                    @Override
-                    public boolean accept(XDMNode value) throws SystemException {
-                        return value.getNodeName().getLocalName().equals(localName);
-                    }
-                };
-            }
-        } else {
-            if (localName == null) {
-                return new Filter<XDMNode>() {
-                    @Override
-                    public boolean accept(XDMNode value) throws SystemException {
-                        return uri.equals(value.getNodeName().getUri());
-                    }
-                };
-            } else {
-                return new Filter<XDMNode>() {
-                    @Override
-                    public boolean accept(XDMNode value) throws SystemException {
-                        QNameValue nodeName = value.getNodeName();
-                        return uri.equals(nodeName.getUri()) && nodeName.getLocalName().equals(localName);
-                    }
-                };
-            }
-        }
     }
 
     @Override

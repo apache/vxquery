@@ -16,21 +16,8 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public final class AnyItemType implements ItemType {
     public static final AnyItemType INSTANCE = new AnyItemType();
-
-    private static final Filter<XDMValue> INSTANCE_OF_FILTER = new Filter<XDMValue>() {
-        @Override
-        public boolean accept(XDMValue value) throws SystemException {
-            return value != null && value.getDMOKind().isItem();
-        }
-    };
 
     private AnyItemType() {
     }
@@ -38,15 +25,5 @@ public final class AnyItemType implements ItemType {
     @Override
     public boolean isAtomicType() {
         return false;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return INSTANCE_OF_FILTER;
-    }
-
-    @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        return NotCastableCastProcessor.INSTANCE_XPST0051;
     }
 }

@@ -16,11 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public final class AnyType implements ComplexType {
     public static final SchemaType INSTANCE = new AnyType();
 
@@ -55,15 +50,5 @@ public final class AnyType implements ComplexType {
     @Override
     public boolean isSimpleType() {
         return false;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return null;
-    }
-
-    @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        return NotCastableCastProcessor.INSTANCE_XPST0051;
     }
 }

@@ -17,12 +17,11 @@ package org.apache.vxquery.xmlparser;
 import java.io.DataOutput;
 import java.util.ArrayList;
 
-import org.apache.vxquery.datamodel.builders.DictionaryBuilder;
-import org.apache.vxquery.datamodel.builders.ElementNodeBuilder;
 import org.apache.vxquery.datamodel.builders.base.IDMBuilderPool;
+import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.ElementNodeBuilder;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.types.BuiltinTypeQNames;
-import org.apache.vxquery.v0datamodel.XDMItem;
 import org.apache.vxquery.xmlquery.query.XQueryConstants;
 
 public class NodeTreeBuildingEventAcceptor implements IEventAcceptor {
@@ -105,11 +104,6 @@ public class NodeTreeBuildingEventAcceptor implements IEventAcceptor {
 
     @Override
     public void pi(String target, String content) throws SystemException {
-
-    }
-
-    @Override
-    public void item(XDMItem item) throws SystemException {
 
     }
 

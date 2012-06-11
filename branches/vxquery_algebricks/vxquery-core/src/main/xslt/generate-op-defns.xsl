@@ -34,20 +34,7 @@
                         createSequenceType("<xsl:value-of select="@type"/>")
                     )
                 </xsl:for-each>
-                ),
-                <xsl:choose>
-                    <xsl:when test="runtime/@class">
-                        new org.apache.vxquery.v0runtime.base.FunctionIteratorFactory() {
-                            @Override
-                            public org.apache.vxquery.v0runtime.base.RuntimeIterator createIterator(org.apache.vxquery.v0runtime.RegisterAllocator rAllocator, org.apache.vxquery.functions.Function fn, org.apache.vxquery.v0runtime.base.RuntimeIterator[] arguments, org.apache.vxquery.context.StaticContext ctx) {
-                                return new <xsl:value-of select="runtime/@class"/>(rAllocator, fn, arguments, ctx);
-                            }
-                        }
-                    </xsl:when>
-                    <xsl:otherwise>
-                        null
-                    </xsl:otherwise>
-                </xsl:choose>
+                )
                 );
         </xsl:for-each>
     </xsl:template>

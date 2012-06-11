@@ -18,14 +18,9 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.v0runtime.base.FunctionIteratorFactory;
-
 public class Operator extends Function {
-    private FunctionIteratorFactory fif;
-
-    public Operator(QName name, Signature signature, FunctionIteratorFactory fif) {
+    public Operator(QName name, Signature signature) {
         super(name, signature);
-        this.fif = fif;
     }
 
     @Override
@@ -36,10 +31,5 @@ public class Operator extends Function {
     @Override
     public boolean useContextImplicitly() {
         return false;
-    }
-
-    @Override
-    public FunctionIteratorFactory getIteratorFactory() {
-        return fif;
     }
 }

@@ -24,6 +24,8 @@ import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
+import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
+
 public class TestRunnerFactory {
     private List<ResultReporter> reporters;
     private XTestOptions opts;
@@ -50,7 +52,7 @@ public class TestRunnerFactory {
                     XMLQueryCompiler compiler = new XMLQueryCompiler(null);
                     FileReader in = new FileReader(testCase.getXQueryFile());
                     CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
-                            RootStaticContextImpl.INSTANCE));
+                            RootStaticContextImpl.INSTANCE), new FileSplit[] {});
                     compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                 } catch (Throwable e) {
                     res.error = e;

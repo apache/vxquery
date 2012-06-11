@@ -32,21 +32,6 @@
     </site>
   </distributionManagement>
 
-  <repositories>
-    <repository>
-      <id>hyracks-snapshots</id>
-      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
-      <snapshots>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>hyracks-releases</id>
-      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
-      <releases>
-      </releases>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
       <plugin>
@@ -155,29 +140,6 @@
                 </directory>
               </sources>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>appassembler-maven-plugin</artifactId>
-        <version>1.1.1</version>
-        <executions>
-          <execution>
-            <configuration>
-              <programs>
-                <program>
-                  <mainClass>org.apache.vxquery.drivers.VXQuery</mainClass>
-                  <name>vxq</name>
-                </program>
-              </programs>
-              <repositoryLayout>flat</repositoryLayout>
-              <repositoryName>lib</repositoryName>
-            </configuration>
-            <phase>package</phase>
-            <goals>
-              <goal>assemble</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
@@ -291,11 +253,6 @@
         <version>1.4</version>
     </dependency>
 
-    <dependency>
-      <groupId>args4j</groupId>
-      <artifactId>args4j</artifactId>
-      <version>2.0.9</version>
-    </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>

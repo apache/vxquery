@@ -27,8 +27,9 @@ import junit.framework.Assert;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
-import org.apache.vxquery.exceptions.SystemException;
 import org.junit.Test;
+
+import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
 
 public class SimpleXQueryTest {
     @Test
@@ -136,7 +137,7 @@ public class SimpleXQueryTest {
     private static void runTest(String testName, String query) {
         try {
             runTestInternal(testName, query);
-        } catch (SystemException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -146,14 +147,15 @@ public class SimpleXQueryTest {
         try {
             runTestInternal(testName, query);
             Assert.fail();
-        } catch (SystemException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void runTestInternal(String testName, String query) throws SystemException {
+    private static void runTestInternal(String testName, String query) throws Exception {
         XMLQueryCompiler compiler = new XMLQueryCompiler(null);
-        CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE));
+        CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
+                new FileSplit[] { new FileSplit("CHANGE_ME", File.createTempFile("foo", ".bar").getAbsolutePath()) });
         compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE);
     }
 }

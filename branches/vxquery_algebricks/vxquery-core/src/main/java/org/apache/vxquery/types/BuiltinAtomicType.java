@@ -16,36 +16,15 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.DMOKind;
-import org.apache.vxquery.v0datamodel.XDMAtomicValue;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 final class BuiltinAtomicType implements AtomicType {
     private final int id;
     private final SchemaType baseType;
     private final DerivationProcess derivationProcess;
-    private final CastProcessor castProcessor;
-    private final Filter<XDMValue> instanceFilter;
 
-    BuiltinAtomicType(int id, SimpleType baseType, DerivationProcess derivationProcess, CastProcessor castProcessor) {
+    BuiltinAtomicType(int id, SimpleType baseType, DerivationProcess derivationProcess) {
         this.id = id;
         this.baseType = baseType;
         this.derivationProcess = derivationProcess;
-        this.castProcessor = castProcessor;
-        instanceFilter = new Filter<XDMValue>() {
-            @Override
-            public boolean accept(XDMValue value) throws SystemException {
-                if (value.getDMOKind() != DMOKind.ATOMIC_VALUE) {
-                    return false;
-                }
-                XDMAtomicValue av = (XDMAtomicValue) value;
-                AtomicType at = av.getAtomicType();
-                return TypeUtils.isSubtypeTypeOf(at, BuiltinAtomicType.this);
-            }
-        };
     }
 
     @Override
@@ -76,16 +55,6 @@ final class BuiltinAtomicType implements AtomicType {
     @Override
     public boolean isSimpleType() {
         return true;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return instanceFilter;
-    }
-
-    @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        return castProcessor;
     }
 
     @Override
