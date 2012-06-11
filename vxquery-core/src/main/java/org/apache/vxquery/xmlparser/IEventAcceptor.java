@@ -17,7 +17,6 @@
 package org.apache.vxquery.xmlparser;
 
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.v0datamodel.XDMItem;
 
 public interface IEventAcceptor {
     public void open() throws SystemException;
@@ -39,8 +38,6 @@ public interface IEventAcceptor {
     public void comment(String content) throws SystemException;
 
     public void pi(String target, String content) throws SystemException;
-
-    public void item(XDMItem item) throws SystemException;
 
     public void close();
 }

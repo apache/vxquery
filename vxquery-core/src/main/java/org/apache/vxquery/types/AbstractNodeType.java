@@ -16,17 +16,9 @@
 */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-
 abstract class AbstractNodeType implements NodeType {
     @Override
     public final boolean isAtomicType() {
         return false;
-    }
-
-    @Override
-    public final CastProcessor getCastProcessor(XQType inputBaseType) {
-        return NotCastableCastProcessor.INSTANCE_XPST0051;
     }
 }

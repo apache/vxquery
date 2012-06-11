@@ -16,23 +16,8 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.DMOKind;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public final class CommentType extends AbstractNodeType {
     public static final CommentType INSTANCE = new CommentType();
-
-    private static final Filter<XDMValue> INSTANCE_OF_FILTER = new Filter<XDMValue>() {
-        @Override
-        public boolean accept(XDMValue value) throws SystemException {
-            if (value == null) {
-                return false;
-            }
-            return value.getDMOKind() == DMOKind.COMMENT_NODE;
-        }
-    };
 
     private CommentType() {
     }
@@ -40,10 +25,5 @@ public final class CommentType extends AbstractNodeType {
     @Override
     public NodeKind getNodeKind() {
         return NodeKind.COMMENT;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return INSTANCE_OF_FILTER;
     }
 }

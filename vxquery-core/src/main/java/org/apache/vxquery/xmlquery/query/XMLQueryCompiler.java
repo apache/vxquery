@@ -19,8 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
-import org.apache.vxquery.compiler.algebricks.PrinterFactoryProvider;
-import org.apache.vxquery.compiler.jobgen.ExpressionJobGen;
+import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.compiler.algebricks.VXQueryExpressionJobGen;
+import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
 import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -36,6 +37,8 @@ import edu.uci.ics.hyracks.algebricks.compiler.api.ICompilerFactory;
 import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialFixpointRuleController;
 import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialOnceRuleController;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
 import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
@@ -70,12 +73,17 @@ public class XMLQueryCompiler {
                 return null;
             }
         });
-        builder.setPrinterProvider(PrinterFactoryProvider.INSTANCE);
-        builder.setExprJobGen(new ExpressionJobGen());
+        builder.setPrinterProvider(VXQueryPrinterFactoryProvider.INSTANCE);
+        builder.setExprJobGen(new VXQueryExpressionJobGen());
         builder.setExpressionTypeComputer(new IExpressionTypeComputer() {
             @Override
             public Object getType(ILogicalExpression expr, IMetadataProvider<?, ?> metadataProvider,
                     IVariableTypeEnvironment env) throws AlgebricksException {
+                if (expr.getExpressionTag() == LogicalExpressionTag.CONSTANT) {
+                    ConstantExpression ce = (ConstantExpression) expr;
+                    VXQueryConstantValue cv = (VXQueryConstantValue) ce.getValue();
+                    return cv.getType();
+                }
                 return null;
             }
         });
@@ -106,6 +114,14 @@ public class XMLQueryCompiler {
         }
         module.setHyracksJobSpecification(jobSpec);
         listener.notifyCodegenResult(module);
+    }
+
+    public ModuleNode getModuleNode() {
+        return moduleNode;
+    }
+
+    public Module getModule() {
+        return module;
     }
 
     private static List<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>> buildDefaultLogicalRewrites() {

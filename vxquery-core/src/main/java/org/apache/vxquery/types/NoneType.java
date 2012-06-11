@@ -16,11 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public class NoneType implements ItemType {
     public static final NoneType INSTANCE = new NoneType();
 
@@ -30,16 +25,5 @@ public class NoneType implements ItemType {
     @Override
     public boolean isAtomicType() {
         return false;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return (Filter<XDMValue>) Filter.FALSE_FILTER;
-    }
-
-    @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        return NotCastableCastProcessor.INSTANCE_XPST0051;
     }
 }

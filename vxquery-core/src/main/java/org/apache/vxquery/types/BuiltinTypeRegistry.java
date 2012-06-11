@@ -22,208 +22,147 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.types.processors.AnyUriCastProcessor;
-import org.apache.vxquery.types.processors.Base64BinaryCastProcessor;
-import org.apache.vxquery.types.processors.BooleanCastProcessor;
-import org.apache.vxquery.types.processors.ByteCastProcessor;
-import org.apache.vxquery.types.processors.DateCastProcessor;
-import org.apache.vxquery.types.processors.DateTimeCastProcessor;
-import org.apache.vxquery.types.processors.DayTimeDurationCastProcessor;
-import org.apache.vxquery.types.processors.DecimalCastProcessor;
-import org.apache.vxquery.types.processors.DoubleCastProcessor;
-import org.apache.vxquery.types.processors.DurationCastProcessor;
-import org.apache.vxquery.types.processors.EntityCastProcessor;
-import org.apache.vxquery.types.processors.FloatCastProcessor;
-import org.apache.vxquery.types.processors.GDayCastProcessor;
-import org.apache.vxquery.types.processors.GMonthCastProcessor;
-import org.apache.vxquery.types.processors.GMonthDayCastProcessor;
-import org.apache.vxquery.types.processors.GYearCastProcessor;
-import org.apache.vxquery.types.processors.GYearMonthCastProcessor;
-import org.apache.vxquery.types.processors.HexBinaryCastProcessor;
-import org.apache.vxquery.types.processors.IntCastProcessor;
-import org.apache.vxquery.types.processors.IntegerCastProcessor;
-import org.apache.vxquery.types.processors.LanguageCastProcessor;
-import org.apache.vxquery.types.processors.LongCastProcessor;
-import org.apache.vxquery.types.processors.NCNameCastProcessor;
-import org.apache.vxquery.types.processors.NMTokenCastProcessor;
-import org.apache.vxquery.types.processors.NameCastProcessor;
-import org.apache.vxquery.types.processors.NegativeIntegerCastProcessor;
-import org.apache.vxquery.types.processors.NonNegativeIntegerCastProcessor;
-import org.apache.vxquery.types.processors.NonPositiveIntegerCastProcessor;
-import org.apache.vxquery.types.processors.NormalizedStringCastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-import org.apache.vxquery.types.processors.PositiveIntegerCastProcessor;
-import org.apache.vxquery.types.processors.QNameCastProcessor;
-import org.apache.vxquery.types.processors.ShortCastProcessor;
-import org.apache.vxquery.types.processors.StringCastProcessor;
-import org.apache.vxquery.types.processors.TimeCastProcessor;
-import org.apache.vxquery.types.processors.TokenCastProcessor;
-import org.apache.vxquery.types.processors.UnsignedByteCastProcessor;
-import org.apache.vxquery.types.processors.UnsignedIntCastProcessor;
-import org.apache.vxquery.types.processors.UnsignedLongCastProcessor;
-import org.apache.vxquery.types.processors.UnsignedShortCastProcessor;
-import org.apache.vxquery.types.processors.UntypedAtomicCastProcessor;
-import org.apache.vxquery.types.processors.YearMonthDurationCastProcessor;
-
 public final class BuiltinTypeRegistry {
     public static final BuiltinAtomicType XS_ANY_ATOMIC = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_ANY_ATOMIC_TYPE_ID, AnySimpleType.INSTANCE, DerivationProcess.RESTRICTION,
-            NotCastableCastProcessor.INSTANCE_XPST0080);
+            BuiltinTypeConstants.XS_ANY_ATOMIC_TYPE_ID, AnySimpleType.INSTANCE, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_STRING = new BuiltinAtomicType(BuiltinTypeConstants.XS_STRING_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, StringCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NORMALIZED_STRING = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_NORMALIZED_STRING_TYPE_ID, XS_STRING, DerivationProcess.RESTRICTION,
-            NormalizedStringCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_NORMALIZED_STRING_TYPE_ID, XS_STRING, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_TOKEN = new BuiltinAtomicType(BuiltinTypeConstants.XS_TOKEN_TYPE_ID,
-            XS_NORMALIZED_STRING, DerivationProcess.RESTRICTION, TokenCastProcessor.INSTANCE);
+            XS_NORMALIZED_STRING, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_LANGUAGE = new BuiltinAtomicType(BuiltinTypeConstants.XS_LANGUAGE_TYPE_ID,
-            XS_TOKEN, DerivationProcess.RESTRICTION, LanguageCastProcessor.INSTANCE);
+            XS_TOKEN, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NMTOKEN = new BuiltinAtomicType(BuiltinTypeConstants.XS_NMTOKEN_TYPE_ID,
-            XS_TOKEN, DerivationProcess.RESTRICTION, NMTokenCastProcessor.INSTANCE);
+            XS_TOKEN, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NAME = new BuiltinAtomicType(BuiltinTypeConstants.XS_NAME_TYPE_ID,
-            XS_TOKEN, DerivationProcess.RESTRICTION, NameCastProcessor.INSTANCE);
+            XS_TOKEN, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NCNAME = new BuiltinAtomicType(BuiltinTypeConstants.XS_NCNAME_TYPE_ID,
-            XS_NAME, DerivationProcess.RESTRICTION, NCNameCastProcessor.INSTANCE);
+            XS_NAME, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_ID = new BuiltinAtomicType(BuiltinTypeConstants.XS_ID_TYPE_ID, XS_NCNAME,
-            DerivationProcess.RESTRICTION, null);
+            DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_IDREF = new BuiltinAtomicType(BuiltinTypeConstants.XS_IDREF_TYPE_ID,
-            XS_NCNAME, DerivationProcess.RESTRICTION, null);
+            XS_NCNAME, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_ENTITY = new BuiltinAtomicType(BuiltinTypeConstants.XS_ENTITY_TYPE_ID,
-            XS_NCNAME, DerivationProcess.RESTRICTION, EntityCastProcessor.INSTANCE);
+            XS_NCNAME, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_UNTYPED_ATOMIC = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_UNTYPED_ATOMIC_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION,
-            UntypedAtomicCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_UNTYPED_ATOMIC_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_DATETIME = new BuiltinAtomicType(BuiltinTypeConstants.XS_DATETIME_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, DateTimeCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_DATE = new BuiltinAtomicType(BuiltinTypeConstants.XS_DATE_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, DateCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_TIME = new BuiltinAtomicType(BuiltinTypeConstants.XS_TIME_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, TimeCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_DURATION = new BuiltinAtomicType(BuiltinTypeConstants.XS_DURATION_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, DurationCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_YEAR_MONTH_DURATION = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID, XS_DURATION, DerivationProcess.RESTRICTION,
-            YearMonthDurationCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID, XS_DURATION, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_DAY_TIME_DURATION = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID, XS_DURATION, DerivationProcess.RESTRICTION,
-            DayTimeDurationCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID, XS_DURATION, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XSEXT_NUMERIC = new BuiltinAtomicType(
-            BuiltinTypeConstants.XSEXT_NUMERIC_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION,
-            DoubleCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XSEXT_NUMERIC_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_FLOAT = new BuiltinAtomicType(BuiltinTypeConstants.XS_FLOAT_TYPE_ID,
-            XSEXT_NUMERIC, DerivationProcess.RESTRICTION, FloatCastProcessor.INSTANCE);
+            XSEXT_NUMERIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_DOUBLE = new BuiltinAtomicType(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID,
-            XSEXT_NUMERIC, DerivationProcess.RESTRICTION, DoubleCastProcessor.INSTANCE);
+            XSEXT_NUMERIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_DECIMAL = new BuiltinAtomicType(BuiltinTypeConstants.XS_DECIMAL_TYPE_ID,
-            XSEXT_NUMERIC, DerivationProcess.RESTRICTION, DecimalCastProcessor.INSTANCE);
+            XSEXT_NUMERIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_INTEGER = new BuiltinAtomicType(BuiltinTypeConstants.XS_INTEGER_TYPE_ID,
-            XS_DECIMAL, DerivationProcess.RESTRICTION, IntegerCastProcessor.INSTANCE);
+            XS_DECIMAL, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NON_POSITIVE_INTEGER = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_NON_POSITIVE_INTEGER_TYPE_ID, XS_INTEGER, DerivationProcess.RESTRICTION,
-            NonPositiveIntegerCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_NON_POSITIVE_INTEGER_TYPE_ID, XS_INTEGER, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NEGATIVE_INTEGER = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_NEGATIVE_INTEGER_TYPE_ID, XS_NON_POSITIVE_INTEGER, DerivationProcess.RESTRICTION,
-            NegativeIntegerCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_NEGATIVE_INTEGER_TYPE_ID, XS_NON_POSITIVE_INTEGER, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_LONG = new BuiltinAtomicType(BuiltinTypeConstants.XS_LONG_TYPE_ID,
-            XS_INTEGER, DerivationProcess.RESTRICTION, LongCastProcessor.INSTANCE);
+            XS_INTEGER, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_INT = new BuiltinAtomicType(BuiltinTypeConstants.XS_INT_TYPE_ID, XS_LONG,
-            DerivationProcess.RESTRICTION, IntCastProcessor.INSTANCE);
+            DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_SHORT = new BuiltinAtomicType(BuiltinTypeConstants.XS_SHORT_TYPE_ID,
-            XS_INT, DerivationProcess.RESTRICTION, ShortCastProcessor.INSTANCE);
+            XS_INT, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_BYTE = new BuiltinAtomicType(BuiltinTypeConstants.XS_BYTE_TYPE_ID,
-            XS_SHORT, DerivationProcess.RESTRICTION, ByteCastProcessor.INSTANCE);
+            XS_SHORT, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NON_NEGATIVE_INTEGER = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_NON_NEGATIVE_INTEGER_TYPE_ID, XS_INTEGER, DerivationProcess.RESTRICTION,
-            NonNegativeIntegerCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_NON_NEGATIVE_INTEGER_TYPE_ID, XS_INTEGER, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_UNSIGNED_LONG = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_UNSIGNED_LONG_TYPE_ID, XS_NON_NEGATIVE_INTEGER, DerivationProcess.RESTRICTION,
-            UnsignedLongCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_UNSIGNED_LONG_TYPE_ID, XS_NON_NEGATIVE_INTEGER, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_UNSIGNED_INT = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_UNSIGNED_INT_TYPE_ID, XS_UNSIGNED_LONG, DerivationProcess.RESTRICTION,
-            UnsignedIntCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_UNSIGNED_INT_TYPE_ID, XS_UNSIGNED_LONG, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_UNSIGNED_SHORT = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_UNSIGNED_SHORT_TYPE_ID, XS_UNSIGNED_INT, DerivationProcess.RESTRICTION,
-            UnsignedShortCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_UNSIGNED_SHORT_TYPE_ID, XS_UNSIGNED_INT, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_UNSIGNED_BYTE = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_UNSIGNED_BYTE_TYPE_ID, XS_UNSIGNED_SHORT, DerivationProcess.RESTRICTION,
-            UnsignedByteCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_UNSIGNED_BYTE_TYPE_ID, XS_UNSIGNED_SHORT, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_POSITIVE_INTEGER = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_POSITIVE_INTEGER_TYPE_ID, XS_NON_NEGATIVE_INTEGER, DerivationProcess.RESTRICTION,
-            PositiveIntegerCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_POSITIVE_INTEGER_TYPE_ID, XS_NON_NEGATIVE_INTEGER, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_G_YEAR_MONTH = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_G_YEAR_MONTH_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION,
-            GYearMonthCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_G_YEAR_MONTH_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_G_YEAR = new BuiltinAtomicType(BuiltinTypeConstants.XS_G_YEAR_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, GYearCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_G_MONTH_DAY = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_G_MONTH_DAY_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION,
-            GMonthDayCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_G_MONTH_DAY_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_G_DAY = new BuiltinAtomicType(BuiltinTypeConstants.XS_G_DAY_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, GDayCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_G_MONTH = new BuiltinAtomicType(BuiltinTypeConstants.XS_G_MONTH_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, GMonthCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_BOOLEAN = new BuiltinAtomicType(BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, BooleanCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_BASE64_BINARY = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_BASE64_BINARY_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION,
-            Base64BinaryCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_BASE64_BINARY_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_HEX_BINARY = new BuiltinAtomicType(
-            BuiltinTypeConstants.XS_HEX_BINARY_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION,
-            HexBinaryCastProcessor.INSTANCE);
+            BuiltinTypeConstants.XS_HEX_BINARY_TYPE_ID, XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_ANY_URI = new BuiltinAtomicType(BuiltinTypeConstants.XS_ANY_URI_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, AnyUriCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_QNAME = new BuiltinAtomicType(BuiltinTypeConstants.XS_QNAME_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, QNameCastProcessor.INSTANCE);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XS_NOTATION = new BuiltinAtomicType(BuiltinTypeConstants.XS_NOTATION_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, null);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinAtomicType XSEXT_TYPE = new BuiltinAtomicType(BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION, null);
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
     public static final BuiltinTypeRegistry INSTANCE = new BuiltinTypeRegistry();
 

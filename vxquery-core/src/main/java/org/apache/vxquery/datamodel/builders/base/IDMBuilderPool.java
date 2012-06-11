@@ -1,11 +1,11 @@
 package org.apache.vxquery.datamodel.builders.base;
 
-import org.apache.vxquery.datamodel.builders.AttributeNodeBuilder;
-import org.apache.vxquery.datamodel.builders.CommentNodeBuilder;
-import org.apache.vxquery.datamodel.builders.DictionaryBuilder;
-import org.apache.vxquery.datamodel.builders.ElementNodeBuilder;
-import org.apache.vxquery.datamodel.builders.PINodeBuilder;
-import org.apache.vxquery.datamodel.builders.TextNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.CommentNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.ElementNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.PINodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
 
 public interface IDMBuilderPool {
     public DictionaryBuilder getDictionaryBuilder();

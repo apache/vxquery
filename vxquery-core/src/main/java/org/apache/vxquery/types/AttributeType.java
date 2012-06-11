@@ -16,12 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.DMOKind;
-import org.apache.vxquery.v0datamodel.XDMNode;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public final class AttributeType extends AbstractNodeType {
     public static final AttributeType ANYATTRIBUTE = new AttributeType(NameTest.STAR_NAMETEST,
             BuiltinTypeRegistry.XS_ANY_ATOMIC);
@@ -45,22 +39,5 @@ public final class AttributeType extends AbstractNodeType {
 
     public SchemaType getContentType() {
         return contentType;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        final Filter<XDMNode> nameTestMatchFilter = nameTest.createNameMatchFilter();
-        return new Filter<XDMValue>() {
-            @Override
-            public boolean accept(XDMValue value) throws SystemException {
-                if (value == null) {
-                    return false;
-                }
-                if (value.getDMOKind() != DMOKind.ATTRIBUTE_NODE) {
-                    return false;
-                }
-                return nameTestMatchFilter.accept((XDMNode) value);
-            }
-        };
     }
 }

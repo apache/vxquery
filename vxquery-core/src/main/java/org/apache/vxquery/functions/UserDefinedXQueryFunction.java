@@ -17,15 +17,12 @@ package org.apache.vxquery.functions;
 import javax.xml.namespace.QName;
 
 import org.apache.vxquery.context.XQueryVariable;
-import org.apache.vxquery.v0runtime.RuntimePlan;
-import org.apache.vxquery.v0runtime.base.FunctionIteratorFactory;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 
 public class UserDefinedXQueryFunction extends Function {
     private XQueryVariable[] params;
     private ILogicalPlan body;
-    private RuntimePlan plan;
 
     public UserDefinedXQueryFunction(QName name, Signature signature, ILogicalPlan body) {
         super(name, signature);
@@ -43,15 +40,6 @@ public class UserDefinedXQueryFunction extends Function {
     @Override
     public FunctionTag getTag() {
         return FunctionTag.UDXQUERY;
-    }
-
-    @Override
-    public FunctionIteratorFactory getIteratorFactory() {
-        return null;
-    }
-
-    public void setRuntimePlan(RuntimePlan plan) {
-        this.plan = plan;
     }
 
     public XQueryVariable[] getParameters() {

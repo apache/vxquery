@@ -16,22 +16,14 @@
 */
 package org.apache.vxquery.context;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.vxquery.v0datamodel.XDMValue;
-import org.apache.vxquery.v0datamodel.atomic.DateTimeValue;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.dataflow.common.data.accessors.IValueReference;
 
 public class DynamicContextImpl implements DynamicContext {
     private StaticContext sCtx;
 
-    private DateTimeValue currentDateTime;
-
-    private Map<XQueryVariable, XDMValue> externalBindings;
-
     public DynamicContextImpl(StaticContext sCtx) {
         this.sCtx = sCtx;
-        externalBindings = new HashMap<XQueryVariable, XDMValue>();
     }
 
     @Override
@@ -40,22 +32,18 @@ public class DynamicContextImpl implements DynamicContext {
     }
 
     @Override
-    public void setCurrentDateTime(DateTimeValue currentDateTime) {
-        this.currentDateTime = currentDateTime;
+    public void setCurrentDateTime(IValueReference value) {
     }
 
     @Override
-    public DateTimeValue getCurrentDateTime() {
-        return currentDateTime;
+    public void getCurrentDateTime(IPointable value) {
     }
 
     @Override
-    public void bindVariable(XQueryVariable var, XDMValue value) {
-        externalBindings.put(var, value);
+    public void bindVariable(XQueryVariable var, IValueReference value) {
     }
 
     @Override
-    public XDMValue lookupVariable(XQueryVariable var) {
-        return externalBindings.get(var);
+    public void lookupVariable(XQueryVariable var, IPointable value) {
     }
 }

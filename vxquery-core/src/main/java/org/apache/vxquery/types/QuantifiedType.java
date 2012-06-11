@@ -16,16 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.exceptions.SystemExceptionFactory;
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.XDMValue;
-import org.apache.vxquery.v0datamodel.atomic.AtomicValueFactory;
-
 public class QuantifiedType implements XQType {
     private XQType contentType;
     private Quantifier quantifier;
@@ -41,53 +31,6 @@ public class QuantifiedType implements XQType {
 
     public Quantifier getQuantifier() {
         return quantifier;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return null;
-    }
-
-    @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        final CastProcessor contentTypeProcessor = contentType.getCastProcessor(inputBaseType);
-        switch (quantifier) {
-            case QUANT_ONE:
-            case QUANT_PLUS:
-                return contentTypeProcessor;
-
-            case QUANT_QUESTION:
-            case QUANT_STAR:
-                return new CastProcessor() {
-                    @Override
-                    public XDMValue cast(AtomicValueFactory avf, XDMValue value, SystemExceptionFactory ieFactory,
-                            StaticContext ctx) throws SystemException {
-                        if (value == null) {
-                            return null;
-                        }
-                        return contentTypeProcessor.cast(avf, value, ieFactory, ctx);
-                    }
-
-                    @Override
-                    public boolean castable(XDMValue value, StaticContext ctx) {
-                        if (value == null) {
-                            return true;
-                        }
-                        return contentTypeProcessor.castable(value, ctx);
-                    }
-
-                    @Override
-                    public Boolean castable(XQType type) {
-                        return contentTypeProcessor.castable(type);
-                    }
-
-                    @Override
-                    public ErrorCode getCastFailureErrorCode(XQType type) {
-                        return contentTypeProcessor.getCastFailureErrorCode(type);
-                    }
-                };
-        }
-        return NotCastableCastProcessor.INSTANCE_XPST0051;
     }
 
     @Override

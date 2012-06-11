@@ -16,12 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.DMOKind;
-import org.apache.vxquery.v0datamodel.XDMNode;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public final class ElementType extends AbstractNodeType {
     public static final ElementType ANYELEMENT = new ElementType(NameTest.STAR_NAMETEST, AnyType.INSTANCE, true);
 
@@ -50,23 +44,6 @@ public final class ElementType extends AbstractNodeType {
 
     public boolean isNilled() {
         return nilled;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        final Filter<XDMNode> nameTestMatchFilter = nameTest.createNameMatchFilter();
-        return new Filter<XDMValue>() {
-            @Override
-            public boolean accept(XDMValue value) throws SystemException {
-                if (value == null) {
-                    return false;
-                }
-                if (value.getDMOKind() != DMOKind.ELEMENT_NODE) {
-                    return false;
-                }
-                return nameTestMatchFilter.accept((XDMNode) value);
-            }
-        };
     }
 
     @Override

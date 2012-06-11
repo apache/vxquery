@@ -1,6 +1,10 @@
 package org.apache.vxquery.xmlquery.translator;
 
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,11 +18,12 @@ import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.vxquery.compiler.CompilerControlBlock;
-import org.apache.vxquery.compiler.algebricks.ConstantValue;
+import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.context.ThinStaticContextImpl;
 import org.apache.vxquery.context.XQueryVariable;
+import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.BuiltinFunctions;
@@ -33,6 +38,7 @@ import org.apache.vxquery.types.AnyNodeType;
 import org.apache.vxquery.types.AnyType;
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.AttributeType;
+import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.CommentType;
 import org.apache.vxquery.types.DocumentType;
@@ -152,6 +158,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOper
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.WriteOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.plan.ALogicalPlanImpl;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.ByteArrayAccessibleOutputStream;
 
 public class XMLQueryTranslator {
     private static final Pattern UNQUOTER = Pattern
@@ -169,10 +176,20 @@ public class XMLQueryTranslator {
 
     private int varCounter;
 
+    private final ByteArrayAccessibleOutputStream baaos;
+
+    private final DataOutput dOut;
+
+    private final StringValueBuilder stringVB;
+
     public XMLQueryTranslator(CompilerControlBlock ccb) {
         this.ccb = ccb;
         varCounter = 0;
         rootCtx = ccb.getStaticContext();
+
+        baaos = new ByteArrayAccessibleOutputStream();
+        dOut = new DataOutputStream(baaos);
+        stringVB = new StringValueBuilder();
     }
 
     private void pushContext() {
@@ -608,7 +625,7 @@ public class XMLQueryTranslator {
         LogicalVariable lVar = translateExpression(queryBody, tCtx);
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
         exprs.add(mutable(vre(lVar)));
-        WriteOperator op = new WriteOperator(exprs, new QueryResultDataSink());
+        WriteOperator op = new WriteOperator(exprs, new QueryResultDataSink(ccb.getResultFileSplits()));
         op.getInputs().add(mutable(tCtx.op));
         ALogicalPlanImpl lp = new ALogicalPlanImpl(mutable(op));
 
@@ -835,11 +852,8 @@ public class XMLQueryTranslator {
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
         LogicalVariable var = newLogicalVariable();
         vars.add(var);
-        exprs.add(mutable(afce(
-                BuiltinOperators.SEQUENCE,
-                false,
-                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN,
-                        Quantifier.QUANT_ONE), Boolean.TRUE)))));
+        exprs.add(mutable(afce(BuiltinOperators.SEQUENCE, false,
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE), Boolean.TRUE))));
         AggregateOperator aop = new AggregateOperator(vars, exprs);
         aop.getInputs().add(mutable(tCtx.op));
         tCtx.op = aop;
@@ -867,7 +881,8 @@ public class XMLQueryTranslator {
         return lVar;
     }
 
-    private LogicalVariable translateCDataSectionNode(TranslationContext tCtx, CDataSectionNode cdsNode) {
+    private LogicalVariable translateCDataSectionNode(TranslationContext tCtx, CDataSectionNode cdsNode)
+            throws SystemException {
         LogicalVariable lVar = createAssignment(
                 sfce(BuiltinOperators.TEXT_CONSTRUCTOR,
                         ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
@@ -875,7 +890,7 @@ public class XMLQueryTranslator {
         return lVar;
     }
 
-    private LogicalVariable translateNCNameNode(TranslationContext tCtx, NCNameNode ncnNode) {
+    private LogicalVariable translateNCNameNode(TranslationContext tCtx, NCNameNode ncnNode) throws SystemException {
         LogicalVariable lVar = createAssignment(
                 ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE), ncnNode.getName()), tCtx);
         return lVar;
@@ -1174,7 +1189,7 @@ public class XMLQueryTranslator {
     }
 
     private LogicalVariable translateDirectCommentConstructorNode(TranslationContext tCtx,
-            DirectCommentConstructorNode dccNode) {
+            DirectCommentConstructorNode dccNode) throws SystemException {
         String content = dccNode.getContent();
         LogicalVariable lVar = createAssignment(
                 sfce(BuiltinOperators.COMMENT_CONSTRUCTOR,
@@ -1182,7 +1197,8 @@ public class XMLQueryTranslator {
         return lVar;
     }
 
-    private LogicalVariable translateDirectPIConstructorNode(TranslationContext tCtx, DirectPIConstructorNode dpicNode) {
+    private LogicalVariable translateDirectPIConstructorNode(TranslationContext tCtx, DirectPIConstructorNode dpicNode)
+            throws SystemException {
         String target = dpicNode.getTarget();
         String content = dpicNode.getContent();
         LogicalVariable lVar = createAssignment(
@@ -1196,24 +1212,27 @@ public class XMLQueryTranslator {
         String image = lNode.getImage();
         LiteralNode.LiteralType lType = lNode.getType();
         SequenceType t = null;
+        Object value = null;
         switch (lType) {
             case DECIMAL:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_DECIMAL, Quantifier.QUANT_ONE);
                 break;
             case DOUBLE:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_DOUBLE, Quantifier.QUANT_ONE);
+                Double.parseDouble(image);
                 break;
             case INTEGER:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE);
+                value = Long.parseLong(image);
                 break;
             case STRING:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE);
-                image = unquote(image);
+                value = unquote(image);
                 break;
             default:
                 throw new IllegalStateException("Unknown type: " + lType);
         }
-        LogicalVariable lVar = createAssignment(ce(t, image), tCtx);
+        LogicalVariable lVar = createAssignment(ce(t, value), tCtx);
         return lVar;
     }
 
@@ -1776,8 +1795,62 @@ public class XMLQueryTranslator {
         throw new IllegalStateException("Unknown operator: " + operator);
     }
 
-    private static ILogicalExpression ce(SequenceType type, Object value) {
-        return new ConstantExpression(new ConstantValue(type, value));
+    private ILogicalExpression ce(SequenceType type, Object value) throws SystemException {
+        ItemType it = type.getItemType();
+        if (it.isAtomicType()) {
+            AtomicType at = (AtomicType) it;
+            byte[] bytes = null;
+            switch (at.getTypeId()) {
+                case BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID: {
+                    baaos.reset();
+                    try {
+                        dOut.write((byte) BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID);
+                        dOut.writeByte(((Boolean) value).booleanValue() ? 1 : 0);
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    break;
+                }
+                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID: {
+                    baaos.reset();
+                    try {
+                        dOut.write((byte) BuiltinTypeConstants.XS_INTEGER_TYPE_ID);
+                        dOut.writeLong(((Long) value).longValue());
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    break;
+                }
+                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID: {
+                    baaos.reset();
+                    try {
+                        dOut.write((byte) BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
+                        dOut.writeDouble(((Double) value).doubleValue());
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    break;
+                }
+                case BuiltinTypeConstants.XS_STRING_TYPE_ID: {
+                    baaos.reset();
+                    try {
+                        dOut.write((byte) BuiltinTypeConstants.XS_STRING_TYPE_ID);
+                        stringVB.write((CharSequence) value, dOut);
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    break;
+                }
+                case BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID: {
+                    throw new UnsupportedOperationException();
+                }
+                default:
+                    throw new SystemException(ErrorCode.SYSE0001);
+            }
+            bytes = Arrays.copyOf(baaos.getByteArray(), baaos.size());
+            return new ConstantExpression(new VXQueryConstantValue(type, bytes));
+        }
+        throw new UnsupportedOperationException();
     }
 
     private static ILogicalExpression vre(LogicalVariable var) {
@@ -1817,7 +1890,7 @@ public class XMLQueryTranslator {
         return new ScalarFunctionCallExpression(fn, args);
     }
 
-    private static ILogicalExpression normalize(ILogicalExpression expr, SequenceType type) {
+    private ILogicalExpression normalize(ILogicalExpression expr, SequenceType type) throws SystemException {
         if (type.getItemType().isAtomicType()) {
             ILogicalExpression atomizedExpr = new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1,
                     Collections.singletonList(mutable(expr)));
@@ -1832,44 +1905,29 @@ public class XMLQueryTranslator {
         }
     }
 
-    private static ILogicalExpression promote(ILogicalExpression expr, SequenceType type) {
-        return sfce(
-                BuiltinOperators.PROMOTE,
-                expr,
-                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
-                        Quantifier.QUANT_ONE), type)));
+    private ILogicalExpression promote(ILogicalExpression expr, SequenceType type) throws SystemException {
+        return sfce(BuiltinOperators.PROMOTE, expr,
+                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
     }
 
-    private static ILogicalExpression treat(ILogicalExpression expr, SequenceType type) {
-        return sfce(
-                BuiltinOperators.TREAT,
-                expr,
-                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
-                        Quantifier.QUANT_ONE), type)));
+    private ILogicalExpression treat(ILogicalExpression expr, SequenceType type) throws SystemException {
+        return sfce(BuiltinOperators.TREAT, expr,
+                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
     }
 
-    private static ILogicalExpression cast(ILogicalExpression expr, SequenceType type) {
-        return sfce(
-                BuiltinOperators.CAST,
-                expr,
-                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
-                        Quantifier.QUANT_ONE), type)));
+    private ILogicalExpression cast(ILogicalExpression expr, SequenceType type) throws SystemException {
+        return sfce(BuiltinOperators.CAST, expr,
+                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
     }
 
-    private static ILogicalExpression castable(ILogicalExpression expr, SequenceType type) {
-        return sfce(
-                BuiltinOperators.CASTABLE,
-                expr,
-                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
-                        Quantifier.QUANT_ONE), type)));
+    private ILogicalExpression castable(ILogicalExpression expr, SequenceType type) throws SystemException {
+        return sfce(BuiltinOperators.CASTABLE, expr,
+                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
     }
 
-    private static ILogicalExpression instanceOf(ILogicalExpression expr, SequenceType type) {
-        return sfce(
-                BuiltinOperators.INSTANCE_OF,
-                expr,
-                new ConstantExpression(new ConstantValue(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE,
-                        Quantifier.QUANT_ONE), type)));
+    private ILogicalExpression instanceOf(ILogicalExpression expr, SequenceType type) throws SystemException {
+        return sfce(BuiltinOperators.INSTANCE_OF, expr,
+                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
     }
 
     private List<LogicalVariable> translateExpressionList(List<ASTNode> expressions, TranslationContext tCtx)

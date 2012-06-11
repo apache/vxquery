@@ -130,6 +130,21 @@
       </developer>         
   </developers>
 
+  <repositories>
+    <repository>
+      <id>hyracks-snapshots</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
+      <snapshots>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>hyracks-releases</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
+      <releases>
+      </releases>
+    </repository>
+  </repositories>
+
   <mailingLists>
       <mailingList>
         <name>VXQuery-dev</name>
@@ -225,6 +240,7 @@
   <modules>
     <module>vxquery-core</module>
     <module>vxquery-xtest</module>
+    <module>vxquery-cli</module>
   </modules>
  
 </project>

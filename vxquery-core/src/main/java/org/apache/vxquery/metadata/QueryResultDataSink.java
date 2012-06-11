@@ -10,8 +10,8 @@ public class QueryResultDataSink implements IDataSink {
     private final FileSplit[] fileSplits;
     private final IPartitioningProperty pProperty;
 
-    public QueryResultDataSink() {
-        fileSplits = new FileSplit[] { new FileSplit("FOOnode", "/tmp/junk") };
+    public QueryResultDataSink(FileSplit[] fileSplits) {
+        this.fileSplits = fileSplits;
         pProperty = new RandomPartitioningProperty(new FileSplitDomain(fileSplits));
     }
 

@@ -16,12 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-import org.apache.vxquery.v0datamodel.DMOKind;
-import org.apache.vxquery.v0datamodel.XDMNode;
-import org.apache.vxquery.v0datamodel.XDMValue;
-
 public final class ProcessingInstructionType extends AbstractNodeType {
     public static final ProcessingInstructionType ANYPI = new ProcessingInstructionType(null);
 
@@ -38,22 +32,5 @@ public final class ProcessingInstructionType extends AbstractNodeType {
 
     public String getTarget() {
         return target;
-    }
-
-    @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return new Filter<XDMValue>() {
-            @Override
-            public boolean accept(XDMValue value) throws SystemException {
-                if (value == null) {
-                    return false;
-                }
-                if (value.getDMOKind() != DMOKind.PI_NODE) {
-                    return false;
-                }
-                XDMNode node = (XDMNode) value;
-                return (target == null || target.equals(node.getNodeName().getLocalName()));
-            }
-        };
     }
 }
