@@ -17,7 +17,7 @@
 package org.apache.vxquery.context;
 
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.IValueReference;
+import edu.uci.ics.hyracks.data.std.api.IValueReference;
 
 public interface DynamicContext {
     public StaticContext getStaticContext();
