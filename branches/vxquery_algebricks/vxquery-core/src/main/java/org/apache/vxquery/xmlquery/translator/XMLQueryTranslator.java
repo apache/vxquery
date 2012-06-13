@@ -1842,7 +1842,14 @@ public class XMLQueryTranslator {
                     break;
                 }
                 case BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID: {
-                    throw new UnsupportedOperationException();
+                    SequenceType st = (SequenceType) value;
+                    baaos.reset();
+                    try {
+                        dOut.write((byte) BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID);
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    break;
                 }
                 default:
                     throw new SystemException(ErrorCode.SYSE0001);
