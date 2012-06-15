@@ -176,6 +176,7 @@
     <function name="fn:data">
         <param name="arg" type="item()*"/>
         <return type="xs:anyAtomicType*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.misc.FnDataScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:dateTime($arg1  as xs:date?, $arg2 as xs:time?)  as xs:dateTime?  -->
