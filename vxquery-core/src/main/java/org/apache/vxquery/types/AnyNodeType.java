@@ -26,4 +26,14 @@ public final class AnyNodeType extends AbstractNodeType {
     public NodeKind getNodeKind() {
         return NodeKind.ANY;
     }
+
+    @Override
+    public int hashCode() {
+        return AnyNodeType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof AnyNodeType;
+    }
 }

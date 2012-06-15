@@ -51,4 +51,14 @@ public final class AnySimpleType implements SimpleType {
     public boolean isSimpleType() {
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        return AnySimpleType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof AnySimpleType;
+    }
 }

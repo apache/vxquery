@@ -26,4 +26,14 @@ public final class AnyItemType implements ItemType {
     public boolean isAtomicType() {
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return AnyItemType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof AnyItemType;
+    }
 }

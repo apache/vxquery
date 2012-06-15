@@ -26,4 +26,14 @@ public final class CommentType extends AbstractNodeType {
     public NodeKind getNodeKind() {
         return NodeKind.COMMENT;
     }
+
+    @Override
+    public int hashCode() {
+        return CommentType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof CommentType;
+    }
 }

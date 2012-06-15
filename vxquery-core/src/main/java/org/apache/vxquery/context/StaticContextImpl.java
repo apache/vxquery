@@ -18,6 +18,7 @@ package org.apache.vxquery.context;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,6 +56,8 @@ public class StaticContextImpl implements StaticContext {
 
     protected final Map<QName, SchemaType> schemaTypeMap;
 
+    protected final Map<SequenceType, Integer> sequenceTypeMap;
+
     protected final Map<QName, AttributeType> attributeDeclarationMap;
 
     protected final Map<QName, ElementType> elementDeclarationMap;
@@ -81,6 +84,8 @@ public class StaticContextImpl implements StaticContext {
 
     private SequenceType defaultCollectionType;
 
+    private int typeCounter;
+
     public StaticContextImpl(StaticContext parent) {
         this.parent = parent;
         namespaceMap = new LinkedHashMap<String, String>();
@@ -92,9 +97,11 @@ public class StaticContextImpl implements StaticContext {
         moduleImports = new ArrayList<Pair<String, List<String>>>();
         schemaImports = new ArrayList<Pair<String, List<String>>>();
         schemaTypeMap = new LinkedHashMap<QName, SchemaType>();
+        sequenceTypeMap = new HashMap<SequenceType, Integer>();
         attributeDeclarationMap = new LinkedHashMap<QName, AttributeType>();
         elementDeclarationMap = new LinkedHashMap<QName, ElementType>();
         options = new LinkedHashMap<QName, String>();
+        typeCounter = parent == null ? 0 : parent.getMaxSequenceTypeCode();
     }
 
     @Override
@@ -343,6 +350,39 @@ public class StaticContextImpl implements StaticContext {
     @Override
     public void registerSchemaType(QName name, SchemaType type) {
         schemaTypeMap.put(name, type);
+    }
+
+    @Override
+    public int lookupSequenceType(SequenceType type) {
+        if (sequenceTypeMap.containsKey(type)) {
+            return sequenceTypeMap.get(type);
+        }
+        if (parent != null) {
+            return parent.lookupSequenceType(type);
+        }
+        return -1;
+    }
+
+    @Override
+    public int encodeSequenceType(SequenceType type) {
+        int code = lookupSequenceType(type);
+        if (code == -1) {
+            code = typeCounter++;
+            sequenceTypeMap.put(type, code);
+            return code;
+        }
+        if (sequenceTypeMap.containsKey(type)) {
+            return sequenceTypeMap.get(type);
+        }
+        if (parent != null) {
+            return parent.lookupSequenceType(type);
+        }
+        return -1;
+    }
+
+    @Override
+    public int getMaxSequenceTypeCode() {
+        return typeCounter;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.apache.vxquery.datamodel.accessors.nodes;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.QNamePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
@@ -17,11 +17,11 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 public class AttributeNodePointable extends AbstractPointable {
     private static final int LOCAL_NODE_ID_SIZE = 4;
 
-    public void getName(QNamePointable name) {
+    public void getName(CodedQNamePointable name) {
         name.set(bytes, getNameOffset(), getNameSize());
     }
 
-    public void getTypeName(NodeTreePointable nodeTree, QNamePointable typeName) {
+    public void getTypeName(NodeTreePointable nodeTree, CodedQNamePointable typeName) {
         if (nodeTree.typeExists()) {
             typeName.set(bytes, getTypeOffset(), getTypeSize(nodeTree));
         } else {
@@ -42,7 +42,7 @@ public class AttributeNodePointable extends AbstractPointable {
     }
 
     private int getNameSize() {
-        return QNamePointable.SIZE;
+        return CodedQNamePointable.SIZE;
     }
 
     private int getTypeOffset() {
@@ -50,7 +50,7 @@ public class AttributeNodePointable extends AbstractPointable {
     }
 
     private int getTypeSize(NodeTreePointable nodeTree) {
-        return nodeTree.typeExists() ? QNamePointable.SIZE : 0;
+        return nodeTree.typeExists() ? CodedQNamePointable.SIZE : 0;
     }
 
     private int getLocalNodeIdOffset(NodeTreePointable nodeTree) {

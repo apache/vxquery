@@ -17,7 +17,7 @@
 package org.apache.vxquery.types;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -161,9 +161,6 @@ public final class BuiltinTypeRegistry {
     public static final BuiltinAtomicType XS_NOTATION = new BuiltinAtomicType(BuiltinTypeConstants.XS_NOTATION_TYPE_ID,
             XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
-    public static final BuiltinAtomicType XSEXT_TYPE = new BuiltinAtomicType(BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID,
-            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
-
     public static final BuiltinTypeRegistry INSTANCE = new BuiltinTypeRegistry();
 
     private final SchemaType[] types;
@@ -219,7 +216,6 @@ public final class BuiltinTypeRegistry {
         types[BuiltinTypeConstants.XS_ANY_URI_TYPE_ID] = XS_ANY_URI;
         types[BuiltinTypeConstants.XS_QNAME_TYPE_ID] = XS_QNAME;
         types[BuiltinTypeConstants.XS_NOTATION_TYPE_ID] = XS_NOTATION;
-        types[BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID] = XSEXT_TYPE;
 
         typeNames = new QName[BuiltinTypeConstants.BUILTIN_TYPE_COUNT];
         typeNames[BuiltinTypeConstants.XS_ANY_SIMPLE_TYPE_ID] = BuiltinTypeQNames.XS_ANY_SIMPLE_TYPE_QNAME;
@@ -269,7 +265,6 @@ public final class BuiltinTypeRegistry {
         typeNames[BuiltinTypeConstants.XS_ANY_URI_TYPE_ID] = BuiltinTypeQNames.XS_ANY_URI_TYPE_QNAME;
         typeNames[BuiltinTypeConstants.XS_QNAME_TYPE_ID] = BuiltinTypeQNames.XS_QNAME_TYPE_QNAME;
         typeNames[BuiltinTypeConstants.XS_NOTATION_TYPE_ID] = BuiltinTypeQNames.XS_NOTATION_TYPE_QNAME;
-        typeNames[BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID] = BuiltinTypeQNames.XSEXT_TYPE_TYPE_QNAME;
     }
 
     public SchemaType getSchemaTypeById(int id) {
@@ -294,7 +289,7 @@ public final class BuiltinTypeRegistry {
     public static final Map<QName, SchemaType> TYPE_MAP;
 
     static {
-        Map<QName, SchemaType> typeMap = new HashMap<QName, SchemaType>();
+        Map<QName, SchemaType> typeMap = new LinkedHashMap<QName, SchemaType>();
         typeMap.put(BuiltinTypeQNames.XS_ANY_SIMPLE_TYPE_QNAME, AnySimpleType.INSTANCE);
         typeMap.put(BuiltinTypeQNames.XS_ANY_ATOMIC_TYPE_QNAME, XS_ANY_ATOMIC);
         typeMap.put(BuiltinTypeQNames.XS_STRING_TYPE_QNAME, XS_STRING);
@@ -342,7 +337,6 @@ public final class BuiltinTypeRegistry {
         typeMap.put(BuiltinTypeQNames.XS_ANY_URI_TYPE_QNAME, XS_ANY_URI);
         typeMap.put(BuiltinTypeQNames.XS_QNAME_TYPE_QNAME, XS_QNAME);
         typeMap.put(BuiltinTypeQNames.XS_NOTATION_TYPE_QNAME, XS_NOTATION);
-        typeMap.put(BuiltinTypeQNames.XSEXT_TYPE_TYPE_QNAME, XSEXT_TYPE);
         TYPE_MAP = Collections.unmodifiableMap(typeMap);
     }
 }

@@ -222,6 +222,21 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     }
 
     @Override
+    public int lookupSequenceType(SequenceType type) {
+        return parent.lookupSequenceType(type);
+    }
+
+    @Override
+    public int encodeSequenceType(SequenceType type) {
+        return parent.encodeSequenceType(type);
+    }
+
+    @Override
+    public int getMaxSequenceTypeCode() {
+        return parent.getMaxSequenceTypeCode();
+    }
+
+    @Override
     public void registerVariable(XQueryVariable var) {
         parent.registerVariable(var);
     }

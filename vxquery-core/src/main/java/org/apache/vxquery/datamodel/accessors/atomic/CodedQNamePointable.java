@@ -3,7 +3,7 @@ package org.apache.vxquery.datamodel.accessors.atomic;
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
-public class QNamePointable extends AbstractPointable {
+public class CodedQNamePointable extends AbstractPointable {
     public static final int SIZE = 12;
 
     private static final int OFF_PREFIX = 0;

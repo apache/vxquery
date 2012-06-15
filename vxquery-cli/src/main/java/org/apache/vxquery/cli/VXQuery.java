@@ -85,72 +85,76 @@ public class VXQuery {
         if (!opts.compileOnly) {
             startLocalHyracks();
         }
-        for (String query : opts.arguments) {
-            String qStr = slurp(query);
-            if (opts.showQuery) {
-                System.err.println(qStr);
-            }
-            XQueryCompilationListener listener = new XQueryCompilationListener() {
-                @Override
-                public void notifyCodegenResult(Module module) {
-                    if (opts.showRP) {
-                        JobSpecification jobSpec = module.getHyracksJobSpecification();
-                        System.err.println(jobSpec.toString());
-                    }
+        try {
+            for (String query : opts.arguments) {
+                String qStr = slurp(query);
+                if (opts.showQuery) {
+                    System.err.println(qStr);
                 }
-
-                @Override
-                public void notifyTranslationResult(Module module) {
-                    if (opts.showTET) {
-                        try {
-                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
-                            StringBuilder buffer = new StringBuilder();
-                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
-                            System.err.println(buffer.toString());
-                        } catch (AlgebricksException e) {
-                            e.printStackTrace();
+                XQueryCompilationListener listener = new XQueryCompilationListener() {
+                    @Override
+                    public void notifyCodegenResult(Module module) {
+                        if (opts.showRP) {
+                            JobSpecification jobSpec = module.getHyracksJobSpecification();
+                            System.err.println(jobSpec.toString());
                         }
                     }
-                }
 
-                @Override
-                public void notifyTypecheckResult(Module module) {
-                }
-
-                @Override
-                public void notifyOptimizedResult(Module module) {
-                    if (opts.showOET) {
-                        try {
-                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
-                            StringBuilder buffer = new StringBuilder();
-                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
-                            System.err.println(buffer.toString());
-                        } catch (AlgebricksException e) {
-                            e.printStackTrace();
+                    @Override
+                    public void notifyTranslationResult(Module module) {
+                        if (opts.showTET) {
+                            try {
+                                LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
+                                StringBuilder buffer = new StringBuilder();
+                                PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
+                                System.err.println(buffer.toString());
+                            } catch (AlgebricksException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void notifyParseResult(ModuleNode moduleNode) {
-                    if (opts.showAST) {
-                        System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
+                    @Override
+                    public void notifyTypecheckResult(Module module) {
                     }
-                }
-            };
-            File result = createTempFile("test");
-            XMLQueryCompiler compiler = new XMLQueryCompiler(listener);
-            CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
-                    new FileSplit[] { new FileSplit("nc1", result.getAbsolutePath()) });
-            compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
-            if (opts.compileOnly) {
-                continue;
-            }
 
-            runInProcess(compiler.getModule().getHyracksJobSpecification(), result);
-        }
-        if (!opts.compileOnly) {
-            stopLocalHyracks();
+                    @Override
+                    public void notifyOptimizedResult(Module module) {
+                        if (opts.showOET) {
+                            try {
+                                LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
+                                StringBuilder buffer = new StringBuilder();
+                                PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
+                                System.err.println(buffer.toString());
+                            } catch (AlgebricksException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void notifyParseResult(ModuleNode moduleNode) {
+                        if (opts.showAST) {
+                            System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
+                        }
+                    }
+                };
+                File result = createTempFile("test");
+                XMLQueryCompiler compiler = new XMLQueryCompiler(listener);
+                CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
+                        RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
+                        result.getAbsolutePath()) });
+                compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
+                if (opts.compileOnly) {
+                    continue;
+                }
+
+                runInProcess(compiler.getModule().getHyracksJobSpecification(), result);
+            }
+        } finally {
+            if (!opts.compileOnly) {
+                stopLocalHyracks();
+            }
         }
     }
 

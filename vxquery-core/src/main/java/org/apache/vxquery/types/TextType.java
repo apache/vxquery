@@ -26,4 +26,14 @@ public final class TextType extends AbstractNodeType {
     public NodeKind getNodeKind() {
         return NodeKind.TEXT;
     }
+
+    @Override
+    public int hashCode() {
+        return TextType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof TextType;
+    }
 }
