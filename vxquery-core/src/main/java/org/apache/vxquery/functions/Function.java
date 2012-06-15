@@ -18,8 +18,15 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
+import org.apache.vxquery.exceptions.DefaultSystemExceptionFactory;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory;
 
 public abstract class Function implements IFunctionInfo {
     private static final String VXQUERY = "vxquery";
@@ -43,6 +50,18 @@ public abstract class Function implements IFunctionInfo {
     public abstract FunctionTag getTag();
 
     public abstract boolean useContextImplicitly();
+
+    public IScalarEvaluatorFactory createScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) throws SystemException {
+        throw DefaultSystemExceptionFactory.INSTANCE.createException(ErrorCode.SYSE0001);
+    }
+
+    public IAggregateEvaluatorFactory createAggregateEvaluatorFactory(IScalarEvaluatorFactory[] args) throws SystemException {
+        throw DefaultSystemExceptionFactory.INSTANCE.createException(ErrorCode.SYSE0001);
+    }
+
+    public IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) throws SystemException {
+        throw DefaultSystemExceptionFactory.INSTANCE.createException(ErrorCode.SYSE0001);
+    }
 
     public QName getName() {
         return qname;

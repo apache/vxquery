@@ -1219,7 +1219,7 @@ public class XMLQueryTranslator {
                 break;
             case DOUBLE:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_DOUBLE, Quantifier.QUANT_ONE);
-                Double.parseDouble(image);
+                value = Double.parseDouble(image);
                 break;
             case INTEGER:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE);

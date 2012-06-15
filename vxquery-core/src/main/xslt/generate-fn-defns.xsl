@@ -43,7 +43,15 @@
                         false
                     </xsl:otherwise>
                 </xsl:choose>
-                );
+                ) {
+                <xsl:for-each select="runtime">
+                    <xsl:if test="@type = 'scalar'">
+                    public edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory createScalarEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
+                        return new <xsl:value-of select="@class"/>(args);
+                    }
+                    </xsl:if>
+                </xsl:for-each>
+                };
         </xsl:for-each>
     </xsl:template>
 </xsl:transform>
