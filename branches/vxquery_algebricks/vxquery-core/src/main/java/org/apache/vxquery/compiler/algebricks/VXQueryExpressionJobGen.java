@@ -11,47 +11,47 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.StatefulFunctionC
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.UnnestingFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.IOperatorSchema;
 import edu.uci.ics.hyracks.algebricks.core.jobgen.impl.JobGenContext;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateFunctionFactory;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IEvaluatorFactory;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IRunningAggregateFunctionFactory;
-import edu.uci.ics.hyracks.algebricks.runtime.base.ISerializableAggregateFunctionFactory;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingFunctionFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.ICopyAggregateFunctionFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.ICopyEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.ICopyRunningAggregateFunctionFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.ICopySerializableAggregateFunctionFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.ICopyUnnestingFunctionFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.evaluators.ConstantEvalFactory;
 
 public class VXQueryExpressionJobGen implements ILogicalExpressionJobGen {
     @Override
-    public IEvaluatorFactory createEvaluatorFactory(ILogicalExpression expr, IVariableTypeEnvironment env,
+    public ICopyEvaluatorFactory createEvaluatorFactory(ILogicalExpression expr, IVariableTypeEnvironment env,
             IOperatorSchema[] inputSchemas, JobGenContext context) throws AlgebricksException {
         if (expr.getExpressionTag() == LogicalExpressionTag.CONSTANT) {
             VXQueryConstantValue cv = (VXQueryConstantValue) ((ConstantExpression) expr).getValue();
             return new ConstantEvalFactory(cv.getValue());
         }
-        return null;
+        throw new UnsupportedOperationException("Cannot create runtime for " + expr.getExpressionTag());
     }
 
     @Override
-    public IAggregateFunctionFactory createAggregateFunctionFactory(AggregateFunctionCallExpression expr,
+    public ICopyAggregateFunctionFactory createAggregateFunctionFactory(AggregateFunctionCallExpression expr,
             IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas, JobGenContext context)
             throws AlgebricksException {
         return null;
     }
 
     @Override
-    public ISerializableAggregateFunctionFactory createSerializableAggregateFunctionFactory(
+    public ICopySerializableAggregateFunctionFactory createSerializableAggregateFunctionFactory(
             AggregateFunctionCallExpression expr, IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas,
             JobGenContext context) throws AlgebricksException {
         return null;
     }
 
     @Override
-    public IRunningAggregateFunctionFactory createRunningAggregateFunctionFactory(StatefulFunctionCallExpression expr,
-            IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas, JobGenContext context)
-            throws AlgebricksException {
+    public ICopyRunningAggregateFunctionFactory createRunningAggregateFunctionFactory(
+            StatefulFunctionCallExpression expr, IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas,
+            JobGenContext context) throws AlgebricksException {
         return null;
     }
 
     @Override
-    public IUnnestingFunctionFactory createUnnestingFunctionFactory(UnnestingFunctionCallExpression expr,
+    public ICopyUnnestingFunctionFactory createUnnestingFunctionFactory(UnnestingFunctionCallExpression expr,
             IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas, JobGenContext context)
             throws AlgebricksException {
         return null;

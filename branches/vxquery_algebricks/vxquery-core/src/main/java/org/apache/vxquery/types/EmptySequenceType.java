@@ -26,4 +26,14 @@ public final class EmptySequenceType implements ItemType {
     public boolean isAtomicType() {
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return EmptySequenceType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof EmptySequenceType;
+    }
 }

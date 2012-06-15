@@ -72,7 +72,5 @@ public class BuiltinTypeConstants {
     public static final int XS_NMTOKENS_TYPE_ID = 50;
     public static final int XS_ENTITIES_TYPE_ID = 51;
 
-    public static final int XSEXT_TYPE_TYPE_ID = 52;
-
-    public static final int BUILTIN_TYPE_COUNT = 53;
+    public static final int BUILTIN_TYPE_COUNT = 52;
 }

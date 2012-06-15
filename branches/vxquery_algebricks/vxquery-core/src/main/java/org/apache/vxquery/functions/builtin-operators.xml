@@ -97,7 +97,6 @@
     <operator name="op:concatenate" varargs="true">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ConcatenateIterator"/>
     </operator>
 
     <!-- op:date-equal($arg1  as xs:date, $arg2 as xs:date)  as xs:boolean -->
@@ -197,7 +196,6 @@
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
         <!-- implementation assumes input in document order -->
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExceptIterator"/>
     </operator>
 
     <!-- op:gDay-equal($arg1  as xs:gDay, $arg2 as xs:gDay)  as xs:boolean -->
@@ -248,7 +246,6 @@
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
         <!-- implementation assumes input in document order -->
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpIntersectIterator"/>
     </operator>
 
     <!-- op:is-same-node($parameter1 as node(), $parameter2 as node()) as xs:boolean -->
@@ -256,7 +253,6 @@
         <param name="parameter1" type="node()?"/>
         <param name="parameter2" type="node()?"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpIsSameNodeIterator"/>
     </operator>
 
     <!-- op:multiply-dayTimeDuration( $arg1 as xs:dayTimeDuration, $arg2 as xs:double)  as xs:dayTimeDuration -->
@@ -278,7 +274,6 @@
         <param name="parameter1" type="node()?"/>
         <param name="parameter2" type="node()?"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpNodeAfterIterator"/>
     </operator>
 
     <!-- op:node-before($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
@@ -286,7 +281,6 @@
         <param name="parameter1" type="node()?"/>
         <param name="parameter2" type="node()?"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpNodeBeforeIterator"/>
     </operator>
 
     <!-- op:NOTATION-equal($arg1  as xs:NOTATION, $arg2 as xs:NOTATION)  as xs:boolean -->
@@ -329,7 +323,6 @@
         <param name="arg1" type="xsext:numeric"/>
         <param name="arg2" type="xsext:numeric"/>
         <return type="xs:integer"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.IntegerDivideArithmeticOperationIterator"/>
     </operator>
 
     <!-- op:numeric-less-than( $arg1 as numeric, $arg2 as numeric)  as xs:boolean -->
@@ -364,7 +357,6 @@
     <operator name="op:numeric-unary-minus">
         <param name="arg1" type="xsext:numeric"/>
         <return type="xsext:numeric"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.NumericUnaryMinusIterator"/>
     </operator>
 
     <!-- op:numeric-unary-plus( $arg as numeric) as  numeric -->
@@ -476,7 +468,6 @@
         <param name="firstval" type="xs:integer"/>
         <param name="lastval" type="xs:integer"/>
         <return type="xs:integer*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpToIterator"/>
     </operator>
 
     <!-- op:union($parameter1  as node()*, $parameter2 as node()*)  as node()* -->
@@ -486,7 +477,6 @@
         <return type="node()*"/>
         <!-- as we do the doc-order-sort and the duplicate elimination -->
         <!-- after the concatenation, we can reuse the concat iterator -->
-        <runtime class="org.apache.vxquery.v0runtime.functions.ConcatenateIterator"/>
     </operator>
 
     <!-- op:yearMonthDuration-greater-than( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:boolean -->
@@ -520,7 +510,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ValueEqComparisonIterator"/>
     </operator>
 
     <!-- opext:value-ne($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
@@ -528,7 +517,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ValueNeComparisonIterator"/>
     </operator>
 
     <!-- opext:value-lt($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
@@ -536,7 +524,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ValueLtComparisonIterator"/>
     </operator>
 
     <!-- opext:value-le($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
@@ -544,7 +531,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ValueLeComparisonIterator"/>
     </operator>
 
     <!-- opext:value-gt($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
@@ -552,7 +538,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ValueGtComparisonIterator"/>
     </operator>
 
     <!-- opext:value-ge($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:boolean? -->
@@ -560,7 +545,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ValueGeComparisonIterator"/>
     </operator>
 
     <!-- opext:general-eq($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -568,7 +552,6 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.GeneralEqComparisonIterator"/>
     </operator>
 
     <!-- opext:general-ne($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -576,7 +559,6 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.GeneralNeComparisonIterator"/>
     </operator>
 
     <!-- opext:general-lt($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -584,7 +566,6 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.GeneralLtComparisonIterator"/>
     </operator>
 
     <!-- opext:general-le($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -592,7 +573,6 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.GeneralLeComparisonIterator"/>
     </operator>
 
     <!-- opext:general-gt($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -600,7 +580,6 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.GeneralGtComparisonIterator"/>
     </operator>
 
     <!-- opext:general-ge($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -608,7 +587,6 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.GeneralGeComparisonIterator"/>
     </operator>
 
     <!-- opext:add($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -616,7 +594,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.AddArithmeticOperationIterator"/>
     </operator>
 
     <!-- opext:subtract($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -624,7 +601,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.SubtractArithmeticOperationIterator"/>
     </operator>
 
     <!-- opext:multiply($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -632,7 +608,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.MultiplyArithmeticOperationIterator"/>
     </operator>
 
     <!-- opext:divide($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -640,7 +615,6 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.DivideArithmeticOperationIterator"/>
     </operator>
 
     <!-- opext:idiv($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -648,7 +622,6 @@
         <param name="arg1" type="xsext:numeric?"/>
         <param name="arg2" type="xsext:numeric?"/>
         <return type="xs:integer?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.IntegerDivideArithmeticOperationIterator"/>
     </operator>
 
     <!-- opext:mod($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -656,7 +629,6 @@
         <param name="arg1" type="xsext:numeric?"/>
         <param name="arg2" type="xsext:numeric?"/>
         <return type="xs:integer?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.ModArithmeticOperationIterator"/>
     </operator>
 
     <!-- opext:and($arg1 as xs:boolean?, $arg2 as xs:boolean?) as xs:boolean? -->
@@ -664,7 +636,6 @@
         <param name="arg1" type="xs:boolean?"/>
         <param name="arg2" type="xs:boolean?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.BooleanAndIterator"/>
     </operator>
 
     <!-- opext:or($arg1 as xs:boolean?, $arg2 as xs:boolean?) as xs:boolean? -->
@@ -672,56 +643,48 @@
         <param name="arg1" type="xs:boolean?"/>
         <param name="arg2" type="xs:boolean?"/>
         <return type="xs:boolean?"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.BooleanOrIterator"/>
     </operator>
 
     <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
     <operator name="opext:sort-nodes-asc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExtSortNodesAscIterator"/>
     </operator>
 
     <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
     <operator name="opext:sort-distinct-nodes-asc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExtSortAndDistinctNodesAscIterator"/>
     </operator>
 
     <!-- opext:sort-nodes-asc-or-atomics($arg as item()*) as item()* -->
     <operator name="opext:sort-distinct-nodes-asc-or-atomics">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExtSortAndDistinctNodesAscOrAtomicsIterator"/>
     </operator>
 
     <!-- opext:sort-nodes-desc($arg as node()*) as node()* -->
     <operator name="opext:sort-nodes-desc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExtSortNodesDescIterator"/>
     </operator>
 
     <!-- opext:sort-nodes-desc($arg as node()*) as node()* -->
     <operator name="opext:sort-distinct-nodes-desc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExtSortAndDistinctNodesDescIterator"/>
     </operator>
 
     <!-- opext:sort-nodes-desc-or-atomics($arg as item()*) as item()* -->
     <operator name="opext:sort-distinct-nodes-desc-or-atomics">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExtSortAndDistinctNodesDescOrAtomicsIterator"/>
     </operator>
 
     <!-- opext:deflate-sequences($arg as item()*) as item()* -->
     <operator name="opext:deflate-sequences">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
-        <runtime class="org.apache.vxquery.v0runtime.functions.OpExtDeflateSequencesIterator"/>
     </operator>
 
     <!-- opext:pi-constructor($target as xs:sring, $content as xs:string) as node() -->
@@ -870,35 +833,35 @@
     <!-- opext:promote($arg as item()*, $type as xsext:type) as item()* -->
     <operator name="opext:promote">
         <param name="arg" type="item()*"/>
-        <param name="type" type="xsext:type"/>
+        <param name="type" type="xs:int"/>
         <return type="item()*"/>
     </operator>
 
     <!-- opext:treat($arg as item()*, $type as xsext:type) as item()* -->
     <operator name="opext:treat">
         <param name="arg" type="item()*"/>
-        <param name="type" type="xsext:type"/>
+        <param name="type" type="xs:int"/>
         <return type="item()*"/>
     </operator>
 
     <!-- opext:cast($arg as item()*, $type as xsext:type) as item()* -->
     <operator name="opext:cast">
         <param name="arg" type="item()*"/>
-        <param name="type" type="xsext:type"/>
+        <param name="type" type="xs:int"/>
         <return type="item()*"/>
     </operator>
 
     <!-- opext:castable($arg as item()*, $type as xsext:type) as xs:boolean -->
     <operator name="opext:castable">
         <param name="arg" type="item()*"/>
-        <param name="type" type="xsext:type"/>
+        <param name="type" type="xs:int"/>
         <return type="xs:boolean"/>
     </operator>
 
     <!-- opext:instance-of($arg as item()*, $type as xsext:type) as xs:boolean -->
     <operator name="opext:instance-of">
         <param name="arg" type="item()*"/>
-        <param name="type" type="xsext:type"/>
+        <param name="type" type="xs:int"/>
         <return type="xs:boolean"/>
     </operator>
 </operators>

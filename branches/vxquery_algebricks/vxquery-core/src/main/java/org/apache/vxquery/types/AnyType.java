@@ -51,4 +51,14 @@ public final class AnyType implements ComplexType {
     public boolean isSimpleType() {
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return AnyType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof AnyType;
+    }
 }

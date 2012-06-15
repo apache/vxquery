@@ -50,4 +50,35 @@ public final class NameTest {
     public String toString() {
         return "NameTest(" + asQName() + ")";
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((localName == null) ? 0 : localName.hashCode());
+        result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        NameTest other = (NameTest) obj;
+        if (localName == null) {
+            if (other.localName != null)
+                return false;
+        } else if (!localName.equals(other.localName))
+            return false;
+        if (uri == null) {
+            if (other.uri != null)
+                return false;
+        } else if (!uri.equals(other.uri))
+            return false;
+        return true;
+    }
 }

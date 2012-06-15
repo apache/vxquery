@@ -17,17 +17,17 @@
 package org.apache.vxquery.types;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class SequenceType {
-    private static final Map<ItemType, SequenceType[]> BUILTIN_SEQ_TYPES;
+    public static final Map<ItemType, SequenceType[]> BUILTIN_SEQ_TYPES;
 
     private ItemType itemType;
     private Quantifier quantifier;
 
     static {
-        Map<ItemType, SequenceType[]> types = new HashMap<ItemType, SequenceType[]>();
+        Map<ItemType, SequenceType[]> types = new LinkedHashMap<ItemType, SequenceType[]>();
 
         createBuiltinEntry(types, BuiltinTypeRegistry.XS_ANY_ATOMIC);
         createBuiltinEntry(types, BuiltinTypeRegistry.XS_STRING);
@@ -116,8 +116,32 @@ public final class SequenceType {
         return quantifier;
     }
 
-    public XQType toXQType() {
-        return TypeOperations.quantified(itemType, quantifier);
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((itemType == null) ? 0 : itemType.hashCode());
+        result = prime * result + ((quantifier == null) ? 0 : quantifier.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SequenceType other = (SequenceType) obj;
+        if (itemType == null) {
+            if (other.itemType != null)
+                return false;
+        } else if (!itemType.equals(other.itemType))
+            return false;
+        if (quantifier != other.quantifier)
+            return false;
+        return true;
     }
 
     public String toString() {

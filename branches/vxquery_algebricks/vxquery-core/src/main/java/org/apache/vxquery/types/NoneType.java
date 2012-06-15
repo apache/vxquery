@@ -16,7 +16,7 @@
  */
 package org.apache.vxquery.types;
 
-public class NoneType implements ItemType {
+public final class NoneType implements ItemType {
     public static final NoneType INSTANCE = new NoneType();
 
     private NoneType() {
@@ -25,5 +25,15 @@ public class NoneType implements ItemType {
     @Override
     public boolean isAtomicType() {
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return NoneType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof NoneType;
     }
 }

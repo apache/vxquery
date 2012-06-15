@@ -28,6 +28,7 @@ import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.ElementType;
+import org.apache.vxquery.types.ItemType;
 import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.query.XQueryConstants;
@@ -51,17 +52,25 @@ public final class RootStaticContextImpl extends StaticContextImpl {
         INSTANCE.setDefaultFunctionNamespaceUri(XQueryConstants.FN_NSURI);
 
         // Types
-        for (Map.Entry<QName, SchemaType> type : BuiltinTypeRegistry.TYPE_MAP.entrySet()) {
-            INSTANCE.registerSchemaType(type.getKey(), type.getValue());
+        for (Map.Entry<QName, SchemaType> e : BuiltinTypeRegistry.TYPE_MAP.entrySet()) {
+            QName typeName = e.getKey();
+            SchemaType type = e.getValue();
+            INSTANCE.registerSchemaType(typeName, type);
+        }
+
+        for (Map.Entry<ItemType, SequenceType[]> e : SequenceType.BUILTIN_SEQ_TYPES.entrySet()) {
+            for (SequenceType st : e.getValue()) {
+                INSTANCE.encodeSequenceType(st);
+            }
         }
 
         // Functions
         for (Function fn : BuiltinFunctions.FUNCTION_COLLECTION) {
             INSTANCE.registerFunction(fn);
         }
-        
+
         INSTANCE.registerCollation(CodepointCollation.URI, CodepointCollation.INSTANCE);
-        
+
         INSTANCE.setDefaultCollation(CodepointCollation.URI);
 
         ((RootStaticContextImpl) INSTANCE).sealed = true;
@@ -137,6 +146,12 @@ public final class RootStaticContextImpl extends StaticContextImpl {
     public void registerSchemaType(QName name, SchemaType type) {
         checkSealed();
         super.registerSchemaType(name, type);
+    }
+
+    @Override
+    public int encodeSequenceType(SequenceType type) {
+        checkSealed();
+        return super.encodeSequenceType(type);
     }
 
     @Override

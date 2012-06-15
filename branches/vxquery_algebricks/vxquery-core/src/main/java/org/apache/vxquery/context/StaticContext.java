@@ -30,103 +30,109 @@ import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
 
 public interface StaticContext {
-    public abstract DataspaceContext getDataspaceContext();
+    public DataspaceContext getDataspaceContext();
 
-    public abstract StaticContext getParent();
+    public StaticContext getParent();
 
     public String lookupNamespaceUri(String prefix);
 
     public void registerNamespaceUri(String prefix, String uri);
 
-    public abstract Collation lookupCollation(String collationName);
+    public Collation lookupCollation(String collationName);
 
-    public abstract void registerCollation(String collationName, Collation collation);
+    public void registerCollation(String collationName, Collation collation);
 
-    public abstract Function lookupFunction(QName functionName, int arity);
+    public Function lookupFunction(QName functionName, int arity);
 
-    public abstract Function[] lookupFunctions(QName functionName);
+    public Function[] lookupFunctions(QName functionName);
 
-    public abstract void registerFunction(Function function);
+    public void registerFunction(Function function);
 
-    public abstract Iterator<Function> listFunctions();
+    public Iterator<Function> listFunctions();
 
-    public abstract SequenceType lookupDocumentType(String docUri);
+    public SequenceType lookupDocumentType(String docUri);
 
-    public abstract void registerDocumentType(String docUri, SequenceType type);
+    public void registerDocumentType(String docUri, SequenceType type);
 
-    public abstract XQueryVariable lookupVariable(QName name);
+    public XQueryVariable lookupVariable(QName name);
 
-    public abstract void registerVariable(XQueryVariable var);
+    public void registerVariable(XQueryVariable var);
 
-    public abstract Iterator<XQueryVariable> listVariables();
+    public Iterator<XQueryVariable> listVariables();
 
-    public abstract SequenceType lookupCollectionType(String collectionUri);
+    public SequenceType lookupCollectionType(String collectionUri);
 
-    public abstract void registerCollectionType(String collectionUri, SequenceType type);
+    public void registerCollectionType(String collectionUri, SequenceType type);
 
-    public abstract Iterator<Pair<String, List<String>>> listModules();
+    public Iterator<Pair<String, List<String>>> listModules();
 
-    public abstract void registerModuleImport(String uri, List<String> locations);
+    public void registerModuleImport(String uri, List<String> locations);
 
-    public abstract Iterator<Pair<String, List<String>>> listSchemas();
+    public Iterator<Pair<String, List<String>>> listSchemas();
 
-    public abstract void registerSchemaImport(String uri, List<String> locations);
+    public void registerSchemaImport(String uri, List<String> locations);
 
-    public abstract SchemaType lookupSchemaType(QName name);
+    public SchemaType lookupSchemaType(QName name);
 
-    public abstract void registerSchemaType(QName name, SchemaType type);
+    public void registerSchemaType(QName name, SchemaType type);
 
-    public abstract AttributeType lookupAttributeDeclaration(QName name);
+    public int lookupSequenceType(SequenceType type);
 
-    public abstract void registerAttributeDeclaration(QName name, AttributeType attrDecl);
+    public int encodeSequenceType(SequenceType type);
 
-    public abstract ElementType lookupElementDeclaration(QName name);
+    public int getMaxSequenceTypeCode();
 
-    public abstract void registerElementDeclaration(QName name, ElementType elemDecl);
+    public AttributeType lookupAttributeDeclaration(QName name);
 
-    public abstract BoundarySpaceProperty getBoundarySpaceProperty();
+    public void registerAttributeDeclaration(QName name, AttributeType attrDecl);
 
-    public abstract void setBoundarySpaceProperty(BoundarySpaceProperty boundarySpaceProperty);
+    public ElementType lookupElementDeclaration(QName name);
 
-    public abstract String getDefaultFunctionNamespaceUri();
+    public void registerElementDeclaration(QName name, ElementType elemDecl);
 
-    public abstract void setDefaultFunctionNamespaceUri(String uri);
+    public BoundarySpaceProperty getBoundarySpaceProperty();
 
-    public abstract String getDefaultElementNamespaceUri();
+    public void setBoundarySpaceProperty(BoundarySpaceProperty boundarySpaceProperty);
 
-    public abstract void setDefaultElementNamespaceUri(String uri);
+    public String getDefaultFunctionNamespaceUri();
 
-    public abstract OrderingModeProperty getOrderingModeProperty();
+    public void setDefaultFunctionNamespaceUri(String uri);
 
-    public abstract void setOrderingModeProperty(OrderingModeProperty orderingMode);
+    public String getDefaultElementNamespaceUri();
 
-    public abstract EmptyOrderProperty getEmptyOrderProperty();
+    public void setDefaultElementNamespaceUri(String uri);
 
-    public abstract void setEmptyOrderProperty(EmptyOrderProperty emptyOrder);
+    public OrderingModeProperty getOrderingModeProperty();
 
-    public abstract String getDefaultCollation();
+    public void setOrderingModeProperty(OrderingModeProperty orderingMode);
 
-    public abstract void setDefaultCollation(String defaultCollation);
+    public EmptyOrderProperty getEmptyOrderProperty();
 
-    public abstract String getBaseUri();
+    public void setEmptyOrderProperty(EmptyOrderProperty emptyOrder);
 
-    public abstract void setBaseUri(String baseUri);
+    public String getDefaultCollation();
 
-    public abstract ConstructionModeProperty getConstructionModeProperty();
+    public void setDefaultCollation(String defaultCollation);
 
-    public abstract void setConstructionModeProperty(ConstructionModeProperty constructionMode);
+    public String getBaseUri();
 
-    public abstract CopyNamespacesModeProperty getCopyNamespacesModeProperty();
+    public void setBaseUri(String baseUri);
 
-    public abstract void setCopyNamespacesModeProperty(CopyNamespacesModeProperty copyNamespacesMode);
+    public ConstructionModeProperty getConstructionModeProperty();
 
-    public abstract SequenceType getDefaultCollectionType();
+    public void setConstructionModeProperty(ConstructionModeProperty constructionMode);
 
-    public abstract void setDefaultCollectionType(SequenceType type);
+    public CopyNamespacesModeProperty getCopyNamespacesModeProperty();
 
-    public abstract void setOption(QName name, String value);
+    public void setCopyNamespacesModeProperty(CopyNamespacesModeProperty copyNamespacesMode);
 
-    public abstract String getOption(QName name);
+    public SequenceType getDefaultCollectionType();
+
+    public void setDefaultCollectionType(SequenceType type);
+
+    public void setOption(QName name, String value);
+
+    public String getOption(QName name);
 
     public enum BoundarySpaceProperty {
         PRESERVE,

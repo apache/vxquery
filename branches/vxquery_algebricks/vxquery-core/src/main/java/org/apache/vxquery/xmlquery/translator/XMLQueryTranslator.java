@@ -1426,9 +1426,10 @@ public class XMLQueryTranslator {
                     }
                     Function axisFn = translateAxis(axis);
                     NodeType nt = translateNodeTest(axis, axisNode.getNodeTest());
+                    int ntCode = currCtx.lookupSequenceType(SequenceType.create(nt, Quantifier.QUANT_ONE));
                     ctxExpr = sfce(axisFn,
                             treat(ctxExpr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR)),
-                            ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), nt));
+                            ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), ntCode));
                     asc = isForwardAxis(axis);
                 } else if (ASTTag.FILTER_EXPRESSION.equals(pathNode.getTag())) {
                     FilterExprNode filterNode = (FilterExprNode) pathNode;
@@ -1811,11 +1812,21 @@ public class XMLQueryTranslator {
                     }
                     break;
                 }
+                case BuiltinTypeConstants.XS_INT_TYPE_ID: {
+                    baaos.reset();
+                    try {
+                        dOut.write((byte) BuiltinTypeConstants.XS_INT_TYPE_ID);
+                        dOut.writeInt(((Number) value).intValue());
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    break;
+                }
                 case BuiltinTypeConstants.XS_INTEGER_TYPE_ID: {
                     baaos.reset();
                     try {
                         dOut.write((byte) BuiltinTypeConstants.XS_INTEGER_TYPE_ID);
-                        dOut.writeLong(((Long) value).longValue());
+                        dOut.writeLong(((Number) value).longValue());
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
@@ -1825,7 +1836,7 @@ public class XMLQueryTranslator {
                     baaos.reset();
                     try {
                         dOut.write((byte) BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
-                        dOut.writeDouble(((Double) value).doubleValue());
+                        dOut.writeDouble(((Number) value).doubleValue());
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
@@ -1836,16 +1847,6 @@ public class XMLQueryTranslator {
                     try {
                         dOut.write((byte) BuiltinTypeConstants.XS_STRING_TYPE_ID);
                         stringVB.write((CharSequence) value, dOut);
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
-                    }
-                    break;
-                }
-                case BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID: {
-                    SequenceType st = (SequenceType) value;
-                    baaos.reset();
-                    try {
-                        dOut.write((byte) BuiltinTypeConstants.XSEXT_TYPE_TYPE_ID);
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
@@ -1913,28 +1914,33 @@ public class XMLQueryTranslator {
     }
 
     private ILogicalExpression promote(ILogicalExpression expr, SequenceType type) throws SystemException {
+        int typeCode = currCtx.lookupSequenceType(type);
         return sfce(BuiltinOperators.PROMOTE, expr,
-                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), typeCode));
     }
 
     private ILogicalExpression treat(ILogicalExpression expr, SequenceType type) throws SystemException {
+        int typeCode = currCtx.lookupSequenceType(type);
         return sfce(BuiltinOperators.TREAT, expr,
-                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), typeCode));
     }
 
     private ILogicalExpression cast(ILogicalExpression expr, SequenceType type) throws SystemException {
+        int typeCode = currCtx.lookupSequenceType(type);
         return sfce(BuiltinOperators.CAST, expr,
-                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), typeCode));
     }
 
     private ILogicalExpression castable(ILogicalExpression expr, SequenceType type) throws SystemException {
+        int typeCode = currCtx.lookupSequenceType(type);
         return sfce(BuiltinOperators.CASTABLE, expr,
-                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), typeCode));
     }
 
     private ILogicalExpression instanceOf(ILogicalExpression expr, SequenceType type) throws SystemException {
+        int typeCode = currCtx.lookupSequenceType(type);
         return sfce(BuiltinOperators.INSTANCE_OF, expr,
-                ce(SequenceType.create(BuiltinTypeRegistry.XSEXT_TYPE, Quantifier.QUANT_ONE), type));
+                ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), typeCode));
     }
 
     private List<LogicalVariable> translateExpressionList(List<ASTNode> expressions, TranslationContext tCtx)

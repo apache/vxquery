@@ -47,6 +47,40 @@ public final class ElementType extends AbstractNodeType {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
+        result = prime * result + ((nameTest == null) ? 0 : nameTest.hashCode());
+        result = prime * result + (nilled ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ElementType other = (ElementType) obj;
+        if (contentType == null) {
+            if (other.contentType != null)
+                return false;
+        } else if (!contentType.equals(other.contentType))
+            return false;
+        if (nameTest == null) {
+            if (other.nameTest != null)
+                return false;
+        } else if (!nameTest.equals(other.nameTest))
+            return false;
+        if (nilled != other.nilled)
+            return false;
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "NodeTest(" + nameTest + ", " + contentType + ", nilled = " + nilled + ")";
     }
