@@ -13,12 +13,12 @@ import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 
-public class AddOperation extends AbstractArithmeticOperation {
+public class SubtractOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2, DataOutput dOut)
             throws Exception {
         double value = decp1.doubleValue();
-        value += decp2.doubleValue();
+        value -= decp2.doubleValue();
         dOut.write(BuiltinTypeConstants.XS_DECIMAL_TYPE_ID);
         dOut.writeDouble(value);
     }
@@ -26,7 +26,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalInteger(XSDecimalPointable decp, LongPointable longp, DataOutput dOut) throws Exception {
         double value = decp.doubleValue();
-        value += longp.doubleValue();
+        value -= longp.doubleValue();
         dOut.write(BuiltinTypeConstants.XS_DECIMAL_TYPE_ID);
         dOut.writeDouble(value);
     }
@@ -34,7 +34,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalFloat(XSDecimalPointable decp, FloatPointable floatp, DataOutput dOut) throws Exception {
         float value = decp.floatValue();
-        value += floatp.floatValue();
+        value -= floatp.floatValue();
         dOut.write(BuiltinTypeConstants.XS_FLOAT_TYPE_ID);
         dOut.writeFloat(value);
     }
@@ -43,7 +43,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateDecimalDouble(XSDecimalPointable decp, DoublePointable doublep, DataOutput dOut)
             throws Exception {
         double value = decp.doubleValue();
-        value += doublep.doubleValue();
+        value -= doublep.doubleValue();
         dOut.write(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
         dOut.writeDouble(value);
     }
@@ -52,7 +52,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateDecimalDTDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
             throws Exception {
         long value = decp.longValue();
-        value += intp.longValue();
+        value -= intp.longValue();
         dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
@@ -61,56 +61,71 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateDecimalYMDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
             throws Exception {
         long value = decp.longValue();
-        value += intp.longValue();
+        value -= intp.longValue();
         dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
 
     @Override
     public void operateIntegerDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut) throws Exception {
-        operateDecimalInteger(decp, longp, dOut);
+        double value = longp.doubleValue();
+        value -= decp.doubleValue();
+        dOut.write(BuiltinTypeConstants.XS_DECIMAL_TYPE_ID);
+        dOut.writeDouble(value);
     }
 
     @Override
     public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut) throws Exception {
         long value = longp.getLong();
-        value += longp2.getLong();
+        value -= longp2.getLong();
         dOut.write(BuiltinTypeConstants.XS_INTEGER_TYPE_ID);
         dOut.writeLong(value);
     }
 
     @Override
     public void operateIntegerFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut) throws Exception {
-        operateFloatInteger(floatp, longp, dOut);
+        float value = longp.floatValue();
+        value -= floatp.floatValue();
+        dOut.write(BuiltinTypeConstants.XS_FLOAT_TYPE_ID);
+        dOut.writeFloat(value);
     }
 
     @Override
     public void operateIntegerDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut) throws Exception {
-        operateDoubleInteger(doublep, longp, dOut);
+        double value = longp.doubleValue();
+        value -= doublep.doubleValue();
+        dOut.write(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
+        dOut.writeDouble(value);
     }
 
     @Override
     public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut) throws Exception {
-        operateDTDurationInteger(intp, longp, dOut);
+        long value = longp.longValue();
+        value -= intp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateIntegerYMDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut) throws Exception {
         long value = longp.longValue();
-        value += intp.longValue();
+        value -= intp.longValue();
         dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
 
     @Override
     public void operateFloatDecimal(FloatPointable floatp, XSDecimalPointable decp, DataOutput dOut) throws Exception {
-        operateDecimalFloat(decp, floatp, dOut);
+        float value = floatp.floatValue();
+        value -= decp.floatValue();
+        dOut.write(BuiltinTypeConstants.XS_FLOAT_TYPE_ID);
+        dOut.writeDouble(value);
     }
 
     @Override
     public void operateFloatInteger(FloatPointable floatp, LongPointable longp, DataOutput dOut) throws Exception {
         float value = floatp.floatValue();
-        value += longp.floatValue();
+        value -= longp.floatValue();
         dOut.write(BuiltinTypeConstants.XS_FLOAT_TYPE_ID);
         dOut.writeFloat(value);
     }
@@ -118,36 +133,48 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateFloatFloat(FloatPointable floatp, FloatPointable floatp2, DataOutput dOut) throws Exception {
         float value = floatp.floatValue();
-        value += floatp2.floatValue();
+        value -= floatp2.floatValue();
         dOut.write(BuiltinTypeConstants.XS_FLOAT_TYPE_ID);
         dOut.writeFloat(value);
     }
 
     @Override
     public void operateFloatDouble(FloatPointable floatp, DoublePointable doublep, DataOutput dOut) throws Exception {
-        operateDoubleFloat(doublep, floatp, dOut);
+        double value = floatp.doubleValue();
+        value -= doublep.doubleValue();
+        dOut.write(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
+        dOut.writeDouble(value);
     }
 
     @Override
     public void operateFloatDTDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut) throws Exception {
-        operateDTDurationFloat(intp, floatp, dOut);
+        long value = floatp.longValue();
+        value -= intp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateFloatYMDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut) throws Exception {
-        operateYMDurationFloat(intp, floatp, dOut);
+        long value = floatp.longValue();
+        value -= intp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateDoubleDecimal(DoublePointable doublep, XSDecimalPointable decp, DataOutput dOut)
             throws Exception {
-        operateDecimalDouble(decp, doublep, dOut);
+        double value = doublep.doubleValue();
+        value -= decp.doubleValue();
+        dOut.write(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
+        dOut.writeDouble(value);
     }
 
     @Override
     public void operateDoubleInteger(DoublePointable doublep, LongPointable longp, DataOutput dOut) throws Exception {
         double value = doublep.doubleValue();
-        value += longp.doubleValue();
+        value -= longp.doubleValue();
         dOut.write(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
         dOut.writeDouble(value);
     }
@@ -155,7 +182,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleFloat(DoublePointable doublep, FloatPointable floatp, DataOutput dOut) throws Exception {
         double value = doublep.doubleValue();
-        value += floatp.doubleValue();
+        value -= floatp.doubleValue();
         dOut.write(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
         dOut.writeDouble(value);
     }
@@ -164,7 +191,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateDoubleDouble(DoublePointable doublep, DoublePointable doublep2, DataOutput dOut)
             throws Exception {
         double value = doublep.doubleValue();
-        value += doublep2.doubleValue();
+        value -= doublep2.doubleValue();
         dOut.write(BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
         dOut.writeDouble(value);
     }
@@ -172,14 +199,17 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleDTDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
             throws Exception {
-        operateDTDurationDouble(intp, doublep, dOut);
+        long value = doublep.longValue();
+        value -= intp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateDoubleYMDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
             throws Exception {
         long value = doublep.longValue();
-        value += intp.longValue();
+        value -= intp.longValue();
         dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
@@ -235,13 +265,16 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
             throws Exception {
-        operateDecimalDTDuration(decp, intp, dOut);
+        long value = intp.longValue();
+        value -= decp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut) throws Exception {
         long value = intp.longValue();
-        value += longp.longValue();
+        value -= longp.longValue();
         dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
@@ -249,7 +282,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut) throws Exception {
         long value = intp.longValue();
-        value += floatp.longValue();
+        value -= floatp.longValue();
         dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
@@ -258,7 +291,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateDTDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
             throws Exception {
         long value = intp.longValue();
-        value += doublep.longValue();
+        value -= doublep.longValue();
         dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
@@ -283,7 +316,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateDTDurationDTDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
             throws Exception {
         long value = intp.longValue();
-        value += intp2.longValue();
+        value -= intp2.longValue();
         dOut.write(BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }
@@ -291,23 +324,35 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateYMDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
             throws Exception {
-        operateDecimalYMDuration(decp, intp, dOut);
+        long value = intp.longValue();
+        value -= decp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateYMDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut) throws Exception {
-        operateIntegerYMDuration(longp, intp, dOut);
+        long value = intp.longValue();
+        value -= longp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateYMDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut) throws Exception {
-        operateFloatYMDuration(floatp, intp, dOut);
+        long value = intp.longValue();
+        value -= floatp.longValue();
+        dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
     public void operateYMDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
             throws Exception {
-        operateDoubleYMDuration(doublep, intp, dOut);
+        long value = intp.longValue();
+        value -= doublep.longValue();
+        dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
+        dOut.writeLong(value);
     }
 
     @Override
@@ -330,7 +375,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateYMDurationYMDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
             throws Exception {
         long value = intp.longValue();
-        value += intp2.longValue();
+        value -= intp2.longValue();
         dOut.write(BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID);
         dOut.writeLong(value);
     }

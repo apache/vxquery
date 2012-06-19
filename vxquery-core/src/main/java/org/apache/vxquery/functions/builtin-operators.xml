@@ -602,6 +602,7 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.arithmetic.SubtractScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:multiply($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -609,6 +610,7 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.arithmetic.MultiplyScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:divide($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -616,6 +618,7 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.arithmetic.DivideScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:idiv($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
