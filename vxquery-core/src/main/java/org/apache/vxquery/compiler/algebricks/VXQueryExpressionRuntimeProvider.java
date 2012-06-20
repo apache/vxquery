@@ -20,8 +20,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.IOperatorSc
 import edu.uci.ics.hyracks.algebricks.core.jobgen.impl.JobGenContext;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.base.ICopySerializableAggregateFunctionFactory;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IRunningAggregateEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.evaluators.ConstantEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.evaluators.TupleFieldEvaluatorFactory;
@@ -37,7 +37,8 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
 
             case VARIABLE:
                 VariableReferenceExpression vrExpr = (VariableReferenceExpression) expr;
-                return new TupleFieldEvaluatorFactory(vrExpr.getTupleRef());
+                int tupleFieldIndex = inputSchemas[0].findVariable(vrExpr.getVariableReference());
+                return new TupleFieldEvaluatorFactory(tupleFieldIndex);
 
             case FUNCTION_CALL:
                 ScalarFunctionCallExpression fcExpr = (ScalarFunctionCallExpression) expr;
