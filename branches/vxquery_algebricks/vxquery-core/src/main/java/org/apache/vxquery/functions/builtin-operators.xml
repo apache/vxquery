@@ -97,6 +97,7 @@
     <operator name="op:concatenate" varargs="true">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.ConcatenateScalarEvaluatorFactory"/>
     </operator>
 
     <!-- op:date-equal($arg1  as xs:date, $arg2 as xs:date)  as xs:boolean -->
