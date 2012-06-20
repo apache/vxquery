@@ -18,7 +18,6 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.exceptions.DefaultSystemExceptionFactory;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
@@ -52,15 +51,17 @@ public abstract class Function implements IFunctionInfo {
     public abstract boolean useContextImplicitly();
 
     public IScalarEvaluatorFactory createScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) throws SystemException {
-        throw DefaultSystemExceptionFactory.INSTANCE.createException(ErrorCode.SYSE0001);
+        throw new SystemException(ErrorCode.SYSE0001, "No IScalarEvaluatorFactory runtime for " + fid.getName());
     }
 
-    public IAggregateEvaluatorFactory createAggregateEvaluatorFactory(IScalarEvaluatorFactory[] args) throws SystemException {
-        throw DefaultSystemExceptionFactory.INSTANCE.createException(ErrorCode.SYSE0001);
+    public IAggregateEvaluatorFactory createAggregateEvaluatorFactory(IScalarEvaluatorFactory[] args)
+            throws SystemException {
+        throw new SystemException(ErrorCode.SYSE0001, "No IAggregateEvaluatorFactory runtime for " + fid.getName());
     }
 
-    public IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) throws SystemException {
-        throw DefaultSystemExceptionFactory.INSTANCE.createException(ErrorCode.SYSE0001);
+    public IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args)
+            throws SystemException {
+        throw new SystemException(ErrorCode.SYSE0001, "No IUnnestingEvaluatorFactory runtime for " + fid.getName());
     }
 
     public QName getName() {

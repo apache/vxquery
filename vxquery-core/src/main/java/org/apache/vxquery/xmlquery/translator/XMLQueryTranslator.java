@@ -980,7 +980,7 @@ public class XMLQueryTranslator {
                         ILogicalExpression seq = vre(translateExpression(fvdNode.getSequence(), tCtx));
                         tCtx.pushVariableScope();
                         LogicalVariable forLVar = newLogicalVariable();
-                        LogicalVariable posLVar = newLogicalVariable();
+                        LogicalVariable posLVar = fvdNode.getPosVar() != null ? newLogicalVariable() : null;
                         UnnestOperator unnest = new UnnestOperator(forLVar,
                                 mutable(ufce(BuiltinOperators.ITERATE, seq)), posLVar, null);
                         SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
