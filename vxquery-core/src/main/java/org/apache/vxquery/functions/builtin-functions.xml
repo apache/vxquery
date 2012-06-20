@@ -329,6 +329,7 @@
     <!-- fn:false() as  xs:boolean -->
     <function name="fn:false">
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.bool.FnFalseScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:floor($arg as  numeric?) as numeric?  -->
@@ -928,6 +929,7 @@
     <!-- fn:true() as  xs:boolean -->
     <function name="fn:true">
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.bool.FnTrueScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:unordered($sourceSeq  as item()*) as  item()* -->

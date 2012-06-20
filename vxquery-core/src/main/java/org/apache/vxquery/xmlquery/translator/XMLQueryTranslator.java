@@ -24,6 +24,7 @@ import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.context.ThinStaticContextImpl;
 import org.apache.vxquery.context.XQueryVariable;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.BuiltinFunctions;
@@ -38,7 +39,6 @@ import org.apache.vxquery.types.AnyNodeType;
 import org.apache.vxquery.types.AnyType;
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.AttributeType;
-import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.CommentType;
 import org.apache.vxquery.types.DocumentType;
@@ -1802,50 +1802,50 @@ public class XMLQueryTranslator {
             AtomicType at = (AtomicType) it;
             byte[] bytes = null;
             switch (at.getTypeId()) {
-                case BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID: {
+                case ValueTag.XS_BOOLEAN_TAG: {
                     baaos.reset();
                     try {
-                        dOut.write((byte) BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID);
+                        dOut.write((byte) ValueTag.XS_BOOLEAN_TAG);
                         dOut.writeByte(((Boolean) value).booleanValue() ? 1 : 0);
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
                     break;
                 }
-                case BuiltinTypeConstants.XS_INT_TYPE_ID: {
+                case ValueTag.XS_INT_TAG: {
                     baaos.reset();
                     try {
-                        dOut.write((byte) BuiltinTypeConstants.XS_INT_TYPE_ID);
+                        dOut.write((byte) ValueTag.XS_INT_TAG);
                         dOut.writeInt(((Number) value).intValue());
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
                     break;
                 }
-                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID: {
+                case ValueTag.XS_INTEGER_TAG: {
                     baaos.reset();
                     try {
-                        dOut.write((byte) BuiltinTypeConstants.XS_INTEGER_TYPE_ID);
+                        dOut.write((byte) ValueTag.XS_INTEGER_TAG);
                         dOut.writeLong(((Number) value).longValue());
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
                     break;
                 }
-                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID: {
+                case ValueTag.XS_DOUBLE_TAG: {
                     baaos.reset();
                     try {
-                        dOut.write((byte) BuiltinTypeConstants.XS_DOUBLE_TYPE_ID);
+                        dOut.write((byte) ValueTag.XS_DOUBLE_TAG);
                         dOut.writeDouble(((Number) value).doubleValue());
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
                     break;
                 }
-                case BuiltinTypeConstants.XS_STRING_TYPE_ID: {
+                case ValueTag.XS_STRING_TAG: {
                     baaos.reset();
                     try {
-                        dOut.write((byte) BuiltinTypeConstants.XS_STRING_TYPE_ID);
+                        dOut.write((byte) ValueTag.XS_STRING_TAG);
                         stringVB.write((CharSequence) value, dOut);
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);

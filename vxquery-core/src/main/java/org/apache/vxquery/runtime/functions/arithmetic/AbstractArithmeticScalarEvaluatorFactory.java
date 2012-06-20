@@ -24,11 +24,11 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -67,53 +67,53 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                 TaggedValuePointable tvp2 = args[1];
                 int tid1 = getBaseTypeForArithmetics(tvp1.getTag());
                 int tid2 = getBaseTypeForArithmetics(tvp2.getTag());
-                if (tid1 == BuiltinTypeConstants.XS_UNTYPED_ATOMIC_TYPE_ID) {
+                if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                     // TODO Convert to double
-                    tid1 = BuiltinTypeConstants.XS_DOUBLE_TYPE_ID;
+                    tid1 = ValueTag.XS_DOUBLE_TAG;
                     throw new UnsupportedOperationException();
                 }
-                if (tid2 == BuiltinTypeConstants.XS_UNTYPED_ATOMIC_TYPE_ID) {
+                if (tid2 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                     // TODO Convert to double
-                    tid2 = BuiltinTypeConstants.XS_DOUBLE_TYPE_ID;
+                    tid2 = ValueTag.XS_DOUBLE_TAG;
                     throw new UnsupportedOperationException();
                 }
                 abvs.reset();
                 try {
                     switch (tid1) {
-                        case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
+                        case ValueTag.XS_DECIMAL_TAG:
                             tvp1.getValue(tp1.decp);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
+                                case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
                                     aOp.operateDecimalDecimal(tp1.decp, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
+                                case ValueTag.XS_INTEGER_TAG:
                                     tvp2.getValue(tp2.longp);
                                     aOp.operateDecimalInteger(tp1.decp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
+                                case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
                                     aOp.operateDecimalFloat(tp1.decp, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
+                                case ValueTag.XS_DOUBLE_TAG:
                                     tvp2.getValue(tp2.doublep);
                                     aOp.operateDecimalDouble(tp1.decp, tp2.doublep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDecimalDTDuration(tp1.decp, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDecimalYMDuration(tp1.decp, tp2.intp, dOut);
                                     result.set(abvs);
@@ -121,40 +121,40 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
+                        case ValueTag.XS_INTEGER_TAG:
                             tvp1.getValue(tp1.longp);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
+                                case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
                                     aOp.operateIntegerDecimal(tp1.longp, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
+                                case ValueTag.XS_INTEGER_TAG:
                                     tvp2.getValue(tp2.longp);
                                     aOp.operateIntegerInteger(tp1.longp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
+                                case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
                                     aOp.operateIntegerFloat(tp1.longp, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
+                                case ValueTag.XS_DOUBLE_TAG:
                                     tvp2.getValue(tp2.doublep);
                                     aOp.operateIntegerDouble(tp1.longp, tp2.doublep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateIntegerDTDuration(tp1.longp, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateIntegerYMDuration(tp1.longp, tp2.intp, dOut);
                                     result.set(abvs);
@@ -162,40 +162,40 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
+                        case ValueTag.XS_FLOAT_TAG:
                             tvp1.getValue(tp1.floatp);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
+                                case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
                                     aOp.operateFloatDecimal(tp1.floatp, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
+                                case ValueTag.XS_INTEGER_TAG:
                                     tvp2.getValue(tp2.longp);
                                     aOp.operateFloatInteger(tp1.floatp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
+                                case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
                                     aOp.operateFloatFloat(tp1.floatp, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
+                                case ValueTag.XS_DOUBLE_TAG:
                                     tvp2.getValue(tp2.doublep);
                                     aOp.operateFloatDouble(tp1.floatp, tp2.doublep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateFloatDTDuration(tp1.floatp, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateFloatYMDuration(tp1.floatp, tp2.intp, dOut);
                                     result.set(abvs);
@@ -203,40 +203,40 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
+                        case ValueTag.XS_DOUBLE_TAG:
                             tvp1.getValue(tp1.doublep);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
+                                case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
                                     aOp.operateDoubleDecimal(tp1.doublep, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
+                                case ValueTag.XS_INTEGER_TAG:
                                     tvp2.getValue(tp2.longp);
                                     aOp.operateDoubleInteger(tp1.doublep, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
+                                case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
                                     aOp.operateDoubleFloat(tp1.doublep, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
+                                case ValueTag.XS_DOUBLE_TAG:
                                     tvp2.getValue(tp2.doublep);
                                     aOp.operateDoubleDouble(tp1.doublep, tp2.doublep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDoubleDTDuration(tp1.doublep, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDoubleYMDuration(tp1.doublep, tp2.intp, dOut);
                                     result.set(abvs);
@@ -244,22 +244,22 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_DATE_TYPE_ID:
+                        case ValueTag.XS_DATE_TAG:
                             tvp1.getValue(tp1.datep);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DATE_TYPE_ID:
+                                case ValueTag.XS_DATE_TAG:
                                     tvp2.getValue(tp2.datep);
                                     aOp.operateDateDate(tp1.datep, tp2.datep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDateDTDuration(tp1.datep, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDateYMDuration(tp1.datep, tp2.intp, dOut);
                                     result.set(abvs);
@@ -267,22 +267,22 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_DATETIME_TYPE_ID:
+                        case ValueTag.XS_DATETIME_TAG:
                             tvp1.getValue(tp1.datetimep);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DATETIME_TYPE_ID:
+                                case ValueTag.XS_DATETIME_TAG:
                                     tvp2.getValue(tp2.datetimep);
                                     aOp.operateDatetimeDatetime(tp1.datetimep, tp2.datetimep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDatetimeDTDuration(tp1.datetimep, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDatetimeYMDuration(tp1.datetimep, tp2.intp, dOut);
                                     result.set(abvs);
@@ -290,22 +290,22 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_TIME_TYPE_ID:
+                        case ValueTag.XS_TIME_TAG:
                             tvp1.getValue(tp1.timep);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_TIME_TYPE_ID:
+                                case ValueTag.XS_TIME_TAG:
                                     tvp2.getValue(tp2.timep);
                                     aOp.operateTimeTime(tp1.timep, tp2.timep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateTimeDTDuration(tp1.timep, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateTimeYMDuration(tp1.timep, tp2.intp, dOut);
                                     result.set(abvs);
@@ -313,52 +313,52 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
                             tvp1.getValue(tp1.intp);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
+                                case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
                                     aOp.operateDTDurationDecimal(tp1.intp, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
+                                case ValueTag.XS_INTEGER_TAG:
                                     tvp2.getValue(tp2.longp);
                                     aOp.operateDTDurationInteger(tp1.intp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
+                                case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
                                     aOp.operateDTDurationFloat(tp1.intp, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
+                                case ValueTag.XS_DOUBLE_TAG:
                                     tvp2.getValue(tp2.doublep);
                                     aOp.operateDTDurationDouble(tp1.intp, tp2.doublep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DATE_TYPE_ID:
+                                case ValueTag.XS_DATE_TAG:
                                     tvp2.getValue(tp2.datep);
                                     aOp.operateDTDurationDate(tp1.intp, tp2.datep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_TIME_TYPE_ID:
+                                case ValueTag.XS_TIME_TAG:
                                     tvp2.getValue(tp2.timep);
                                     aOp.operateDTDurationTime(tp1.intp, tp2.timep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DATETIME_TYPE_ID:
+                                case ValueTag.XS_DATETIME_TAG:
                                     tvp2.getValue(tp2.datetimep);
                                     aOp.operateDTDurationDatetime(tp1.intp, tp2.datetimep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateDTDurationDTDuration(tp1.intp, tp2.intp, dOut);
                                     result.set(abvs);
@@ -366,52 +366,52 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             }
                             break;
 
-                        case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                             tvp1.getValue(tp1.intp);
                             switch (tid2) {
-                                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
+                                case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
                                     aOp.operateYMDurationDecimal(tp1.intp, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
+                                case ValueTag.XS_INTEGER_TAG:
                                     tvp2.getValue(tp2.longp);
                                     aOp.operateYMDurationInteger(tp1.intp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
+                                case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
                                     aOp.operateYMDurationFloat(tp1.intp, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
+                                case ValueTag.XS_DOUBLE_TAG:
                                     tvp2.getValue(tp2.doublep);
                                     aOp.operateYMDurationDouble(tp1.intp, tp2.doublep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DATE_TYPE_ID:
+                                case ValueTag.XS_DATE_TAG:
                                     tvp2.getValue(tp2.datep);
                                     aOp.operateYMDurationDate(tp1.intp, tp2.datep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_TIME_TYPE_ID:
+                                case ValueTag.XS_TIME_TAG:
                                     tvp2.getValue(tp2.timep);
                                     aOp.operateYMDurationTime(tp1.intp, tp2.timep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_DATETIME_TYPE_ID:
+                                case ValueTag.XS_DATETIME_TAG:
                                     tvp2.getValue(tp2.datetimep);
                                     aOp.operateYMDurationDatetime(tp1.intp, tp2.datetimep, dOut);
                                     result.set(abvs);
                                     return;
 
-                                case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
                                     aOp.operateYMDurationYMDuration(tp1.intp, tp2.intp, dOut);
                                     result.set(abvs);
@@ -430,30 +430,30 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
             private int getBaseTypeForArithmetics(int tid) throws SystemException {
                 while (true) {
                     switch (tid) {
-                        case BuiltinTypeConstants.XS_STRING_TYPE_ID:
-                        case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID:
-                        case BuiltinTypeConstants.XS_INTEGER_TYPE_ID:
-                        case BuiltinTypeConstants.XS_FLOAT_TYPE_ID:
-                        case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID:
-                        case BuiltinTypeConstants.XS_ANY_URI_TYPE_ID:
-                        case BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID:
-                        case BuiltinTypeConstants.XS_DATE_TYPE_ID:
-                        case BuiltinTypeConstants.XS_DATETIME_TYPE_ID:
-                        case BuiltinTypeConstants.XS_TIME_TYPE_ID:
-                        case BuiltinTypeConstants.XS_DAY_TIME_DURATION_TYPE_ID:
-                        case BuiltinTypeConstants.XS_YEAR_MONTH_DURATION_TYPE_ID:
-                        case BuiltinTypeConstants.XS_BASE64_BINARY_TYPE_ID:
-                        case BuiltinTypeConstants.XS_HEX_BINARY_TYPE_ID:
-                        case BuiltinTypeConstants.XS_QNAME_TYPE_ID:
-                        case BuiltinTypeConstants.XS_G_DAY_TYPE_ID:
-                        case BuiltinTypeConstants.XS_G_MONTH_DAY_TYPE_ID:
-                        case BuiltinTypeConstants.XS_G_MONTH_TYPE_ID:
-                        case BuiltinTypeConstants.XS_G_YEAR_MONTH_TYPE_ID:
-                        case BuiltinTypeConstants.XS_G_YEAR_TYPE_ID:
-                        case BuiltinTypeConstants.XS_UNTYPED_ATOMIC_TYPE_ID:
+                        case ValueTag.XS_STRING_TAG:
+                        case ValueTag.XS_DECIMAL_TAG:
+                        case ValueTag.XS_INTEGER_TAG:
+                        case ValueTag.XS_FLOAT_TAG:
+                        case ValueTag.XS_DOUBLE_TAG:
+                        case ValueTag.XS_ANY_URI_TAG:
+                        case ValueTag.XS_BOOLEAN_TAG:
+                        case ValueTag.XS_DATE_TAG:
+                        case ValueTag.XS_DATETIME_TAG:
+                        case ValueTag.XS_TIME_TAG:
+                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                        case ValueTag.XS_BASE64_BINARY_TAG:
+                        case ValueTag.XS_HEX_BINARY_TAG:
+                        case ValueTag.XS_QNAME_TAG:
+                        case ValueTag.XS_G_DAY_TAG:
+                        case ValueTag.XS_G_MONTH_DAY_TAG:
+                        case ValueTag.XS_G_MONTH_TAG:
+                        case ValueTag.XS_G_YEAR_MONTH_TAG:
+                        case ValueTag.XS_G_YEAR_TAG:
+                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                             return tid;
 
-                        case BuiltinTypeConstants.XS_ANY_ATOMIC_TYPE_ID:
+                        case ValueTag.XS_ANY_ATOMIC_TAG:
                             throw new SystemException(ErrorCode.XPTY0004);
 
                         default:
