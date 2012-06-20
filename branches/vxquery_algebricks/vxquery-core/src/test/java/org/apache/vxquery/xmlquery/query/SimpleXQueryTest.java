@@ -139,7 +139,7 @@ public class SimpleXQueryTest {
             runTestInternal(testName, query);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            Assert.fail(e.getMessage());
         }
     }
 
