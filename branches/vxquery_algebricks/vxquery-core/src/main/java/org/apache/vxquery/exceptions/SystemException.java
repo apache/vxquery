@@ -17,22 +17,26 @@
 package org.apache.vxquery.exceptions;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 import org.apache.vxquery.util.SourceLocation;
 
 public class SystemException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    private ErrorCode code;    
-    
+    private ErrorCode code;
+
     private static String message(ErrorCode code, SourceLocation loc) {
-        return code + ": " + (loc == null ? "" : loc + " ") + code.getDescription();
+        String description = code.getDescription();
+        return code + ": " + (loc == null ? "" : loc + " ") + (description != null ? description : "");
     }
-    
+
     private static String message(ErrorCode code, SourceLocation loc, Object... params) {
-        return code + ": " + (loc == null ? "" : loc + " ") + MessageFormat.format(code.getDescription(), params);
+        String description = code.getDescription();
+        return code + ": " + (loc == null ? "" : loc + " ")
+                + (description != null ? MessageFormat.format(description, params) : Arrays.deepToString(params));
     }
-    
+
     public SystemException(ErrorCode code) {
         super(message(code, null));
         this.code = code;
@@ -47,12 +51,12 @@ public class SystemException extends Exception {
         super(message(code, null), cause);
         this.code = code;
     }
-    
+
     public SystemException(ErrorCode code, Throwable cause, Object... params) {
         super(message(code, null, params), cause);
         this.code = code;
     }
-    
+
     public SystemException(ErrorCode code, SourceLocation loc) {
         super(message(code, loc));
         this.code = code;

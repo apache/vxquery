@@ -44,12 +44,8 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
                 ScalarFunctionCallExpression fcExpr = (ScalarFunctionCallExpression) expr;
                 Function fn = (Function) fcExpr.getFunctionInfo();
 
-                List<Mutable<ILogicalExpression>> args = fcExpr.getArguments();
-                IScalarEvaluatorFactory[] argFactories = new IScalarEvaluatorFactory[args.size()];
-                for (int i = 0; i < argFactories.length; ++i) {
-                    Mutable<ILogicalExpression> arg = args.get(i);
-                    argFactories[i] = createEvaluatorFactory(arg.getValue(), env, inputSchemas, context);
-                }
+                IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
+                        fcExpr.getArguments());
 
                 try {
                     return fn.createScalarEvaluatorFactory(argFactories);
@@ -60,11 +56,30 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
         throw new UnsupportedOperationException("Cannot create runtime for " + expr.getExpressionTag());
     }
 
+    private IScalarEvaluatorFactory[] createArgumentEvaluatorFactories(IVariableTypeEnvironment env,
+            IOperatorSchema[] inputSchemas, JobGenContext context, List<Mutable<ILogicalExpression>> args)
+            throws AlgebricksException {
+        IScalarEvaluatorFactory[] argFactories = new IScalarEvaluatorFactory[args.size()];
+        for (int i = 0; i < argFactories.length; ++i) {
+            Mutable<ILogicalExpression> arg = args.get(i);
+            argFactories[i] = createEvaluatorFactory(arg.getValue(), env, inputSchemas, context);
+        }
+        return argFactories;
+    }
+
     @Override
     public IAggregateEvaluatorFactory createAggregateFunctionFactory(AggregateFunctionCallExpression expr,
             IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas, JobGenContext context)
             throws AlgebricksException {
-        return null;
+        Function fn = (Function) expr.getFunctionInfo();
+
+        IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
+                expr.getArguments());
+        try {
+            return fn.createAggregateEvaluatorFactory(argFactories);
+        } catch (SystemException e) {
+            throw new AlgebricksException(e);
+        }
     }
 
     @Override
@@ -85,6 +100,14 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
     public IUnnestingEvaluatorFactory createUnnestingFunctionFactory(UnnestingFunctionCallExpression expr,
             IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas, JobGenContext context)
             throws AlgebricksException {
-        return null;
+        Function fn = (Function) expr.getFunctionInfo();
+
+        IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
+                expr.getArguments());
+        try {
+            return fn.createUnnestingEvaluatorFactory(argFactories);
+        } catch (SystemException e) {
+            throw new AlgebricksException(e);
+        }
     }
 }

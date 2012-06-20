@@ -815,12 +815,14 @@
     <operator name="opext:sequence">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.sequence.SequenceAggregateEvaluatorFactory"/>
     </operator>
 
     <!-- opext:iterate($arg as item()*) as item() -->
     <operator name="opext:iterate">
         <param name="arg" type="item()*"/>
         <return type="item()"/>
+        <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.sequence.IterateUnnestingEvaluatorFactory"/>
     </operator>
 
     <!-- opext:validate-lax($arg as item()*) as item()* -->
@@ -848,6 +850,7 @@
         <param name="arg" type="item()*"/>
         <param name="type" type="xs:int"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.type.TreatScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:cast($arg as item()*, $type as xsext:type) as item()* -->
