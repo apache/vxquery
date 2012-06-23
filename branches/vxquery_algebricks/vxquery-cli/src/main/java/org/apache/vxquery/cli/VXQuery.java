@@ -226,7 +226,7 @@ public class VXQuery {
     }
 
     private static String slurp(String query) throws IOException {
-        return FileUtils.readFileToString(new File(query));
+        return FileUtils.readFileToString(new File(query), "UTF-8");
     }
 
     private static class CmdLineOptions {
