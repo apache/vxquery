@@ -14,7 +14,9 @@
  */
 package org.apache.vxquery.xtest;
 
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,7 +52,7 @@ public class TestRunnerFactory {
                 long start = System.currentTimeMillis();
                 try {
                     XMLQueryCompiler compiler = new XMLQueryCompiler(null);
-                    FileReader in = new FileReader(testCase.getXQueryFile());
+                    Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                     CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
                             RootStaticContextImpl.INSTANCE), new FileSplit[] {});
                     compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
