@@ -23,6 +23,10 @@ public class FnFalseScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
         BooleanPointable.setBoolean(BOOLEAN_FALSE_CONSTANT, 1, false);
     }
 
+    public static void setFalse(IPointable p) {
+        p.set(BOOLEAN_FALSE_CONSTANT, 0, 2);
+    }
+
     public FnFalseScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }

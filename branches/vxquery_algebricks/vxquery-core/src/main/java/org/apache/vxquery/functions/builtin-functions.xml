@@ -82,6 +82,7 @@
     <function name="fn:boolean">
         <param name="arg" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.bool.FnBooleanScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:ceiling($arg as  numeric?) as numeric? -->
@@ -259,6 +260,7 @@
     <function name="fn:empty">
         <param name="arg" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnEmptyScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:encode-for-uri($uri-part  as xs:string?) as  xs:string -->
@@ -324,6 +326,7 @@
     <function name="fn:exists">
         <param name="arg" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnExistsScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:false() as  xs:boolean -->
