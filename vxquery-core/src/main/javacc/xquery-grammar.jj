@@ -17,6 +17,7 @@
 options {
     STATIC = false;
     FORCE_LA_CHECK=false;
+    UNICODE_INPUT=true;
 }
 
 
