@@ -40,7 +40,7 @@ public class DictionaryBuilder {
 
         @Override
         public int getLength(int index) {
-            return UTF8StringPointable.getUTFLen(dataBuffer.getByteArray(), getStart(index)) + 2;
+            return UTF8StringPointable.getUTFLength(dataBuffer.getByteArray(), getStart(index)) + 2;
         }
 
         @Override

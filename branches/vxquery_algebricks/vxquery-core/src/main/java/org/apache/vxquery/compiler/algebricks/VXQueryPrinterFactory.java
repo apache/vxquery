@@ -43,7 +43,7 @@ public class VXQueryPrinterFactory implements IPrinterFactory {
                 switch ((int) tag) {
                     case ValueTag.XS_STRING_TAG: {
                         tvp.getValue(utf8sp);
-                        int utfLen = utf8sp.getUTFLen();
+                        int utfLen = utf8sp.getUTFLength();
                         int offset = 2;
                         while (utfLen > 0) {
                             char c = utf8sp.charAt(offset);
