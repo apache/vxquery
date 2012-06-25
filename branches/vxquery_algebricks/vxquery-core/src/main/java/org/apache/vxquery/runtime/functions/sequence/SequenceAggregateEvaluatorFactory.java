@@ -43,11 +43,6 @@ public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgume
             }
 
             @Override
-            public void finishPartial() throws AlgebricksException {
-
-            }
-
-            @Override
             public void finish(IPointable result) throws AlgebricksException {
                 if (slots.getSize() != 1) {
                     try {
