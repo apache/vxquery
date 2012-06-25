@@ -623,10 +623,13 @@ public class XMLQueryTranslator {
         ASTNode queryBody = qbn.getExpression();
         TranslationContext tCtx = new TranslationContext(null, new EmptyTupleSourceOperator());
         LogicalVariable lVar = translateExpression(queryBody, tCtx);
+        LogicalVariable iLVar = newLogicalVariable();
+        UnnestOperator unnest = new UnnestOperator(iLVar, mutable(ufce(BuiltinOperators.ITERATE, vre(lVar))));
+        unnest.getInputs().add(mutable(tCtx.op));
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
-        exprs.add(mutable(vre(lVar)));
+        exprs.add(mutable(vre(iLVar)));
         WriteOperator op = new WriteOperator(exprs, new QueryResultDataSink(ccb.getResultFileSplits()));
-        op.getInputs().add(mutable(tCtx.op));
+        op.getInputs().add(mutable(unnest));
         ALogicalPlanImpl lp = new ALogicalPlanImpl(mutable(op));
 
         return lp;
