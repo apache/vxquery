@@ -46,7 +46,7 @@ public class NodeTreePointable extends AbstractPointable {
 
         @Override
         public int getLength(int index) {
-            return UTF8StringPointable.getUTFLen(bytes, getStart(index)) + 2;
+            return UTF8StringPointable.getUTFLength(bytes, getStart(index)) + 2;
         }
     };
 
@@ -80,7 +80,7 @@ public class NodeTreePointable extends AbstractPointable {
         int dataAreaStart = getDictionaryDataAreaStartOffset();
         int idxSlotValue = IntegerPointable.getInteger(bytes, getDictionaryIndexPointerArrayOffset() + idx
                 * IDX_PTR_SLOT_SIZE);
-        int strLen = UTF8StringPointable.getUTFLen(bytes, dataAreaStart + idxSlotValue);
+        int strLen = UTF8StringPointable.getUTFLength(bytes, dataAreaStart + idxSlotValue);
         string.set(bytes, dataAreaStart + idxSlotValue, strLen + 2);
     }
 

@@ -39,7 +39,7 @@ public class PINodePointable extends AbstractPointable {
     }
 
     private int getTargetSize(NodeTreePointable nodeTree) {
-        return UTF8StringPointable.getUTFLen(bytes, getTargetOffset(nodeTree)) + 2;
+        return UTF8StringPointable.getUTFLength(bytes, getTargetOffset(nodeTree)) + 2;
     }
 
     private int getContentOffset(NodeTreePointable nodeTree) {
@@ -47,6 +47,6 @@ public class PINodePointable extends AbstractPointable {
     }
 
     private int getContentSize(NodeTreePointable nodeTree) {
-        return UTF8StringPointable.getUTFLen(bytes, getContentOffset(nodeTree)) + 2;
+        return UTF8StringPointable.getUTFLength(bytes, getContentOffset(nodeTree)) + 2;
     }
 }
