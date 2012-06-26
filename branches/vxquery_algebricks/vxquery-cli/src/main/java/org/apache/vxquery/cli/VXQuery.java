@@ -149,7 +149,9 @@ public class VXQuery {
                     continue;
                 }
 
-                runInProcess(compiler.getModule().getHyracksJobSpecification(), result);
+                for (int i = 0; i < opts.repeatExec; ++i) {
+                    runInProcess(compiler.getModule().getHyracksJobSpecification(), result);
+                }
             }
         } finally {
             if (!opts.compileOnly) {
