@@ -135,6 +135,7 @@
         <param name="arg1" type="xs:anyAtomicType?"/>
         <param name="arg2" type="xs:anyAtomicType?"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnConcatEvaluatorFactory"/>
     </function>
  
     <!-- fn:contains($arg1  as xs:string?, $arg2 as xs:string?)  as xs:boolean -->
@@ -464,6 +465,7 @@
     <function name="fn:lower-case">
         <param name="arg" type="xs:string?"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnLowerCaseEvaluatorFactory"/>
     </function>
 
     <!-- fn:matches($input  as xs:string?, $pattern as xs:string)  as xs:boolean -->
@@ -789,6 +791,7 @@
         <param name="arg1" type="xs:string*"/>
         <param name="arg2" type="xs:string"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnStringJoinEvaluatorFactory"/>
     </function>
 
     <!-- fn:string-length() as  xs:integer -->
@@ -800,6 +803,7 @@
     <function name="fn:string-length">
         <param name="arg" type="xs:string?"/>
         <return type="xs:integer"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnStringLengthEvaluatorFactory"/>
     </function>
 
     <!-- fn:string-to-codepoints( $arg as xs:string?)  as xs:integer* -->
@@ -828,6 +832,7 @@
         <param name="sourceSeq" type="xs:string?"/>
         <param name="startingLoc" type="xs:double"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnSubstringEvaluatorFactory"/>
     </function>
 
     <!-- fn:substring($sourceString  as xs:string?, $startingLoc as xs:double, $length as xs:double)  as xs:string -->
@@ -836,6 +841,7 @@
         <param name="startingLoc" type="xs:double"/>
         <param name="length" type="xs:double"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnSubstringEvaluatorFactory"/>
     </function>
 
     <!-- fn:substring-after($arg1  as xs:string?, $arg2 as xs:string?)  as xs:string -->
@@ -945,6 +951,7 @@
     <function name="fn:upper-case">
         <param name="arg" type="xs:string?"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnUpperCaseEvaluatorFactory"/>
     </function>
 
     <!-- fn:year-from-date($arg  as xs:date?) as  xs:integer?  -->
