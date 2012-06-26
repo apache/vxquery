@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.compiler.algebricks.VXQueryBinaryBooleanInspectorFactory;
+import org.apache.vxquery.compiler.algebricks.VXQueryBinaryIntegerInspectorFactory;
 import org.apache.vxquery.compiler.algebricks.VXQueryComparatorFactoryProvider;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.compiler.algebricks.VXQueryExpressionRuntimeProvider;
@@ -77,6 +79,8 @@ public class XMLQueryCompiler {
         builder.setPrinterProvider(VXQueryPrinterFactoryProvider.INSTANCE);
         builder.setExpressionRuntimeProvider(new VXQueryExpressionRuntimeProvider());
         builder.setComparatorFactoryProvider(new VXQueryComparatorFactoryProvider());
+        builder.setBinaryBooleanInspectorFactory(new VXQueryBinaryBooleanInspectorFactory());
+        builder.setBinaryIntegerInspectorFactory(new VXQueryBinaryIntegerInspectorFactory());
         builder.setExpressionTypeComputer(new IExpressionTypeComputer() {
             @Override
             public Object getType(ILogicalExpression expr, IMetadataProvider<?, ?> metadataProvider,
