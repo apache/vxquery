@@ -24,7 +24,7 @@ public class FnStringLengthEvaluatorFactory extends AbstractTaggedValueArgumentS
     @Override
     protected IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
         final UTF8StringPointable stringp = new UTF8StringPointable();
-        final byte[] integerResult = new byte[9];
+        final byte[] integerResult = new byte[LongPointable.TYPE_TRAITS.getFixedLength() + 1];
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override

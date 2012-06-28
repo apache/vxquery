@@ -96,6 +96,7 @@
         <param name="comparand1" type="xs:string?"/>
         <param name="comparand2" type="xs:string?"/>
         <return type="xs:boolean?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCodepointEqualEvaluatorFactory"/>
     </function>
     
     <!-- fn:codepoints-to-string( $arg as xs:integer*)  as xs:string -->
@@ -120,6 +121,7 @@
         <param name="comparand1" type="xs:string?"/>
         <param name="comparand2" type="xs:string?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCompareEvaluatorFactory"/>
     </function>
     
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?, $collation as xs:string)  as xs:integer?  -->
@@ -128,6 +130,7 @@
         <param name="comparand2" type="xs:string?"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCompareEvaluatorFactory"/>
     </function>
     
     <!-- fn:concat($arg1 as  xs:anyAtomicType?, $arg2 as xs:anyAtomicType?, ...) as xs:string -->
@@ -760,6 +763,7 @@
         <param name="arg1" type="xs:string?"/>
         <param name="arg2" type="xs:string?"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnStartsWithEvaluatorFactory"/>
     </function>
 
     <!-- fn:starts-with($arg1  as xs:string?, $arg2 as xs:string?, $collation as xs:string)  as xs:boolean -->
@@ -768,6 +772,7 @@
         <param name="arg2" type="xs:string?"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnStartsWithEvaluatorFactory"/>
     </function>
 
     <!-- fn:static-base-uri() as  xs:anyURI?  -->
