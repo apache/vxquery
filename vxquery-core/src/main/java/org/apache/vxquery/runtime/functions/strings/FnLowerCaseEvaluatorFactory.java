@@ -1,12 +1,16 @@
 package org.apache.vxquery.runtime.functions.strings;
 
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
-public class FnLowerCaseEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class FnLowerCaseEvaluatorFactory extends AbstractCharacterIteratorCopyingEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
     public FnLowerCaseEvaluatorFactory(IScalarEvaluatorFactory[] args) {
@@ -15,9 +19,20 @@ public class FnLowerCaseEvaluatorFactory extends AbstractTaggedValueArgumentScal
 
     @Override
     protected IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
-        return new AbstractStringTranscodingFunction(args) {
-            protected char transcodeCharacter(char c) {
-                return Character.toLowerCase(c);
+        final UTF8StringPointable stringp = new UTF8StringPointable();
+        final ICharacterIterator charIterator = new LowerCaseCharacterIterator(new UTF8StringCharacterIterator(stringp));
+        return new AbstractCharacterIteratorCopyingEvaluator(args, charIterator) {
+            
+            @Override
+            protected void preEvaluate(TaggedValuePointable[] args) throws SystemException {
+                TaggedValuePointable tvp1 = args[0];
+
+                // Only accept strings as input.
+                if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
+                    throw new SystemException(ErrorCode.FORG0006);
+                }
+
+                tvp1.getValue(stringp);
             }
         };
     }
