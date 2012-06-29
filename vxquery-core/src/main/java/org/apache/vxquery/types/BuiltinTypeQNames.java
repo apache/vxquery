@@ -23,7 +23,7 @@ import org.apache.vxquery.xmlquery.query.XQueryConstants;
 public class BuiltinTypeQNames {
     public static final String UNTYPED_STR = "untyped";
 
-    public static final String UNTYPED_ATOMIC_STR = "untyped";
+    public static final String UNTYPED_ATOMIC_STR = "untypedAtomic";
 
     public static final String ANY_TYPE_STR = "anyType";
 
