@@ -20,17 +20,19 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+
 public class XMLParser {
-    public static void parseInputSource(InputSource in, IEventAcceptor acceptor) throws SystemException {
+    public static void parseInputSource(InputSource in, ArrayBackedValueStorage abvs, boolean attachTypes,
+            ITreeNodeIdProvider idProvider) throws SystemException {
         XMLReader parser;
         try {
             parser = XMLReaderFactory.createXMLReader();
-            SAXContentHandler handler = new SAXContentHandler(acceptor);
+            SAXContentHandler handler = new SAXContentHandler(attachTypes, idProvider);
             parser.setContentHandler(handler);
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
-            acceptor.open();
             parser.parse(in);
-            acceptor.close();
+            handler.write(abvs);
         } catch (Exception e) {
             throw new SystemException(ErrorCode.FODC0002, e, in.getSystemId());
         }

@@ -11,9 +11,9 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class NodeTreePointable extends AbstractPointable {
-    private static final int HEADER_NODEID_EXISTS_MASK = 0x01;
-    private static final int HEADER_DICTIONARY_EXISTS_MASK = 0x02;
-    private static final int HEADER_TYPE_EXISTS_MASK = 0x03;
+    public static final int HEADER_NODEID_EXISTS_MASK = 0x01;
+    public static final int HEADER_DICTIONARY_EXISTS_MASK = 0x02;
+    public static final int HEADER_TYPE_EXISTS_MASK = 0x03;
 
     private static final int HEADER_OFFSET = 0;
     private static final int HEADER_SIZE = 1;
