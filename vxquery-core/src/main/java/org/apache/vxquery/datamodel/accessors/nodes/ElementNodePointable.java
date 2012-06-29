@@ -38,9 +38,9 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  * }
  */
 public class ElementNodePointable extends AbstractPointable {
-    private static final byte NS_CHUNK_EXISTS_MASK = (0x1 << 0);
-    private static final byte ATTRIBUTES_CHUNK_EXISTS_MASK = (0x1 << 1);
-    private static final byte CHILDREN_CHUNK_EXISTS_MASK = (0x1 << 2);
+    public static final byte NS_CHUNK_EXISTS_MASK = (0x1 << 0);
+    public static final byte ATTRIBUTES_CHUNK_EXISTS_MASK = (0x1 << 1);
+    public static final byte CHILDREN_CHUNK_EXISTS_MASK = (0x1 << 2);
 
     private static final int HEADER_SIZE = 1;
     private static final int LOCAL_NODE_ID_SIZE = 4;

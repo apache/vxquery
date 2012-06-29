@@ -65,4 +65,5 @@ public class ValueTag {
     public static final int TEXT_NODE_TAG = 104;
     public static final int COMMENT_NODE_TAG = 105;
     public static final int PI_NODE_TAG = 106;
+    public static final int NODE_TREE_TAG = 107;
 }

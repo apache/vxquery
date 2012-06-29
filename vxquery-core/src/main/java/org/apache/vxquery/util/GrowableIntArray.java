@@ -49,10 +49,19 @@ public class GrowableIntArray {
     }
 
     public void insert(int index, int value) {
-        if (array.length <= size) {
-            grow(DEFAULT_GROWTH);
+        if (index >= size) {
+            if (index >= array.length) {
+                int increment = (((index + 1 - array.length) - 1) / DEFAULT_GROWTH + 1) * DEFAULT_GROWTH;
+                grow(increment);
+            }
+            size = index + 1;
+        } else {
+            if (size >= array.length) {
+                grow(DEFAULT_GROWTH);
+            }
+            System.arraycopy(array, index, array, index + 1, size - index);
+            ++size;
         }
-        System.arraycopy(array, index, array, index + 1, size - index);
         array[index] = value;
     }
 

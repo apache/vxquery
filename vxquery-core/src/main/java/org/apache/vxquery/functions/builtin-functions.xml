@@ -246,6 +246,7 @@
     <function name="fn:doc">
         <param name="uri" type="xs:string?"/>
         <return type="document-node()?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnDocScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:doc-available($uri  as xs:string?) as  xs:boolean -->

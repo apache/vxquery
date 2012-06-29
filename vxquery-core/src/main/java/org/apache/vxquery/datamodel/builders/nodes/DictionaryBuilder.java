@@ -8,8 +8,10 @@ import org.apache.vxquery.util.GrowableIntArray;
 
 import edu.uci.ics.hyracks.data.std.algorithms.BinarySearchAlgorithm;
 import edu.uci.ics.hyracks.data.std.collections.api.IValueReferenceVector;
+import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.dataflow.common.comm.io.ByteArrayAccessibleOutputStream;
+import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
 
 public class DictionaryBuilder {
     private final GrowableIntArray stringEndOffsets;
@@ -59,6 +61,24 @@ public class DictionaryBuilder {
         tempStringData = new ByteArrayAccessibleOutputStream();
         tempOut = new DataOutputStream(tempStringData);
         tempStringPointable = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+    }
+
+    public void write(ArrayBackedValueStorage abvs) throws IOException {
+        DataOutput out = abvs.getDataOutput();
+        int sizeOffset = abvs.getLength();
+        out.writeInt(0);
+        int entryCount = stringEndOffsets.getSize();
+        out.writeInt(entryCount);
+        int[] entryOffsets = stringEndOffsets.getArray();
+        for (int i = 0; i < entryCount; ++i) {
+            out.writeInt(entryOffsets[i]);
+        }
+        int[] sortedOffsets = sortedSlotIndexes.getArray();
+        for (int i = 0; i < entryCount; ++i) {
+            out.writeInt(sortedOffsets[i]);
+        }
+        out.write(dataBuffer.getByteArray(), 0, dataBuffer.size());
+        IntegerPointable.setInteger(abvs.getByteArray(), sizeOffset, abvs.getLength() - sizeOffset);
     }
 
     public int lookup(String str) {
