@@ -33,6 +33,7 @@ import edu.uci.ics.hyracks.api.client.HyracksConnection;
 import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
 import edu.uci.ics.hyracks.api.job.JobFlag;
 import edu.uci.ics.hyracks.api.job.JobId;
+import edu.uci.ics.hyracks.api.job.JobSpecification;
 import edu.uci.ics.hyracks.control.cc.ClusterControllerService;
 import edu.uci.ics.hyracks.control.common.controllers.CCConfig;
 import edu.uci.ics.hyracks.control.common.controllers.NCConfig;
@@ -110,11 +111,12 @@ public class TestRunnerFactory {
                             RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
                             tempFile.getAbsolutePath()) });
                     compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
-                    JobId jobId = hcc.createJob("test", compiler.getModule().getHyracksJobSpecification(),
-                            EnumSet.of(JobFlag.PROFILE_RUNTIME));
+                    JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
+                    spec.setMaxReattempts(0);
+                    JobId jobId = hcc.createJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
                     hcc.start(jobId);
                     hcc.waitForCompletion(jobId);
-                    res.result = FileUtils.readFileToString(tempFile, "UTF-8");
+                    res.result = FileUtils.readFileToString(tempFile, "UTF-8").trim();
                 } catch (Throwable e) {
                     res.error = e;
                 } finally {
