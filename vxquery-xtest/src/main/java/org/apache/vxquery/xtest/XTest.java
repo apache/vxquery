@@ -30,6 +30,7 @@ public class XTest {
     private Server server;
     private ExecutorService eSvc;
     private List<ResultReporter> reporters;
+    private TestRunnerFactory trf;
     private int count;
     private int finishCount;
 
@@ -75,7 +76,7 @@ public class XTest {
                 }
             }
         });
-        TestRunnerFactory trf = new TestRunnerFactory(opts);
+        trf = new TestRunnerFactory(opts);
         trf.registerReporters(reporters);
         TestCaseFactory tcf = new TestCaseFactory(opts.xqtsBase, trf, eSvc, opts);
         count = tcf.process();
@@ -99,6 +100,7 @@ public class XTest {
                 if (server != null) {
                     server.stop();
                 }
+                trf.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
