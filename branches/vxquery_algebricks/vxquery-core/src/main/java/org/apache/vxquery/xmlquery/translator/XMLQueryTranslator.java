@@ -408,7 +408,8 @@ public class XMLQueryTranslator {
                 switch (d.getTag()) {
                     case VARIABLE_DECLARATION: {
                         VarDeclNode node = (VarDeclNode) d;
-                        throw new SystemException(ErrorCode.TODO);
+                        // TODO Support Global variables
+                        break;
                     }
 
                     case FUNCTION_DECLARATION: {
