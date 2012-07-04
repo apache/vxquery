@@ -29,6 +29,9 @@ import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
 
@@ -42,6 +45,7 @@ import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.Sequenti
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
 import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
@@ -87,7 +91,11 @@ public class XMLQueryCompiler {
                     IVariableTypeEnvironment env) throws AlgebricksException {
                 if (expr.getExpressionTag() == LogicalExpressionTag.CONSTANT) {
                     ConstantExpression ce = (ConstantExpression) expr;
-                    VXQueryConstantValue cv = (VXQueryConstantValue) ce.getValue();
+                    IAlgebricksConstantValue acv = ce.getValue();
+                    if (acv == ConstantExpression.TRUE.getValue() || acv == ConstantExpression.FALSE.getValue()) {
+                        return SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE);
+                    }
+                    VXQueryConstantValue cv = (VXQueryConstantValue) acv;
                     return cv.getType();
                 }
                 return null;
