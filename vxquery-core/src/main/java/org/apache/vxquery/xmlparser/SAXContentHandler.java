@@ -186,7 +186,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
                 int aUriCode = db.lookup(atts.getURI(i));
                 String aValue = atts.getValue(i);
                 tempABVS.reset();
-                tempABVS.getDataOutput().writeUTF(aValue);
+                DataOutput tempOut = tempABVS.getDataOutput();
+                tempOut.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
+                tempOut.writeUTF(aValue);
                 enb.startAttribute(anb);
                 anb.setName(aUriCode, aLocalNameCode, aPrefixCode);
                 if (attachTypes) {
