@@ -161,8 +161,7 @@ public class VXQuery {
     }
 
     private void runInProcess(JobSpecification spec, File result) throws Exception {
-        JobId jobId = hcc.createJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
-        hcc.start(jobId);
+        JobId jobId = hcc.startJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
         hcc.waitForCompletion(jobId);
         dumpOutputFiles(result);
     }

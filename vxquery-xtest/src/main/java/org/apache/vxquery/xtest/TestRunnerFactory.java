@@ -113,8 +113,7 @@ public class TestRunnerFactory {
                     compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                     JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
                     spec.setMaxReattempts(0);
-                    JobId jobId = hcc.createJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
-                    hcc.start(jobId);
+                    JobId jobId = hcc.startJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
                     hcc.waitForCompletion(jobId);
                     res.result = FileUtils.readFileToString(tempFile, "UTF-8").trim();
                 } catch (Throwable e) {
