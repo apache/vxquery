@@ -1,12 +1,28 @@
 package org.apache.vxquery.datamodel.accessors;
 
+import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 public class SequencePointable extends AbstractPointable {
     private static final int ENTRY_COUNT_SIZE = 4;
     private static final int SLOT_SIZE = 4;
+    public static final IPointableFactory FACTORY = new IPointableFactory() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public ITypeTraits getTypeTraits() {
+            return VoidPointable.TYPE_TRAITS;
+        }
+
+        @Override
+        public IPointable createPointable() {
+            return new SequencePointable();
+        }
+    };
 
     public static int getSequenceLength(byte[] bytes, int start) {
         int entryCount = getEntryCount(bytes, start);

@@ -3,8 +3,12 @@ package org.apache.vxquery.datamodel.accessors.nodes;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 
+import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 /*
  * Attribute {
@@ -16,6 +20,19 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  */
 public class AttributeNodePointable extends AbstractPointable {
     private static final int LOCAL_NODE_ID_SIZE = 4;
+    public static final IPointableFactory FACTORY = new IPointableFactory() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public ITypeTraits getTypeTraits() {
+            return VoidPointable.TYPE_TRAITS;
+        }
+
+        @Override
+        public IPointable createPointable() {
+            return new AttributeNodePointable();
+        }
+    };
 
     public void getName(CodedQNamePointable name) {
         name.set(bytes, getNameOffset(), getNameSize());

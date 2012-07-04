@@ -45,8 +45,8 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
     public void reset(ArrayBackedValueStorage abvs) throws IOException {
         this.abvs = abvs;
         out = abvs.getDataOutput();
-        headerOffset = abvs.getLength();
         out.write(ValueTag.ELEMENT_NODE_TAG);
+        headerOffset = abvs.getLength();
         out.write(0);
     }
 

@@ -3,9 +3,13 @@ package org.apache.vxquery.datamodel.accessors.nodes;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 
+import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 /*
  * Element {
@@ -46,6 +50,19 @@ public class ElementNodePointable extends AbstractPointable {
     private static final int LOCAL_NODE_ID_SIZE = 4;
     private static final int NS_ENTRY_SIZE = 4 * 2;
     private static final int NS_CHUNK_SIZE_SIZE = 4;
+    public static final IPointableFactory FACTORY = new IPointableFactory() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public ITypeTraits getTypeTraits() {
+            return VoidPointable.TYPE_TRAITS;
+        }
+
+        @Override
+        public IPointable createPointable() {
+            return new ElementNodePointable();
+        }
+    };
 
     public boolean nsChunkExists() {
         return (getHeader() & NS_CHUNK_EXISTS_MASK) != 0;
