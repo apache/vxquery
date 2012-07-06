@@ -35,7 +35,8 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     @Override
     public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getScannerRuntime(IDataSource<String> dataSource,
             List<LogicalVariable> scanVariables, List<LogicalVariable> projectVariables, boolean projectPushed,
-            JobGenContext context, JobSpecification jobSpec) throws AlgebricksException {
+            IOperatorSchema opSchema, IVariableTypeEnvironment typeEnv, JobGenContext context, JobSpecification jobSpec)
+            throws AlgebricksException {
         return null;
     }
 
