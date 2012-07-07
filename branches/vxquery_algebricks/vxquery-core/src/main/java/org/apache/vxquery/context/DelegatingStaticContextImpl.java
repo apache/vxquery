@@ -57,11 +57,6 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     }
 
     @Override
-    public DataspaceContext getDataspaceContext() {
-        return parent.getDataspaceContext();
-    }
-
-    @Override
     public String getDefaultCollation() {
         return parent.getDefaultCollation();
     }
@@ -219,6 +214,11 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     @Override
     public void registerSchemaType(QName name, SchemaType type) {
         parent.registerSchemaType(name, type);
+    }
+
+    @Override
+    public SequenceType lookupSequenceType(int code) {
+        return parent.lookupSequenceType(code);
     }
 
     @Override

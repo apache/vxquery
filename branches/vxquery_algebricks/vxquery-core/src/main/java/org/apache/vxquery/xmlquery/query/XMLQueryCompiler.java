@@ -52,8 +52,11 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.AbstractRuleController;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import edu.uci.ics.hyracks.algebricks.data.ISerializerDeserializerProvider;
+import edu.uci.ics.hyracks.algebricks.data.ITypeTraitProvider;
 import edu.uci.ics.hyracks.api.dataflow.value.ISerializerDeserializer;
+import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
 import edu.uci.ics.hyracks.api.job.JobSpecification;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 public class XMLQueryCompiler {
     private final XQueryCompilationListener listener;
@@ -78,6 +81,12 @@ public class XMLQueryCompiler {
             @Override
             public ISerializerDeserializer getSerializerDeserializer(Object type) throws AlgebricksException {
                 return null;
+            }
+        });
+        builder.setTypeTraitProvider(new ITypeTraitProvider() {
+            @Override
+            public ITypeTraits getTypeTrait(Object type) {
+                return VoidPointable.TYPE_TRAITS;
             }
         });
         builder.setPrinterProvider(VXQueryPrinterFactoryProvider.INSTANCE);

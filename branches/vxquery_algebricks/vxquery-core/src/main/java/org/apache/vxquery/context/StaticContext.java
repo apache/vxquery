@@ -30,8 +30,6 @@ import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
 
 public interface StaticContext {
-    public DataspaceContext getDataspaceContext();
-
     public StaticContext getParent();
 
     public String lookupNamespaceUri(String prefix);
@@ -75,6 +73,8 @@ public interface StaticContext {
     public SchemaType lookupSchemaType(QName name);
 
     public void registerSchemaType(QName name, SchemaType type);
+
+    public SequenceType lookupSequenceType(int code);
 
     public int lookupSequenceType(SequenceType type);
 
@@ -160,4 +160,6 @@ public interface StaticContext {
         NOPRESERVE_INHERIT,
         NOPRESERVE_NOINHERIT
     }
+
+    public IStaticContextFactory createFactory();
 }

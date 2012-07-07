@@ -25,6 +25,9 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
+import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
@@ -149,8 +152,14 @@ public class VXQuery {
                     continue;
                 }
 
+                Module module = compiler.getModule();
+                JobSpecification js = module.getHyracksJobSpecification();
+
+                DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
+                js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
+
                 for (int i = 0; i < opts.repeatExec; ++i) {
-                    runInProcess(compiler.getModule().getHyracksJobSpecification(), result);
+                    runInProcess(js, result);
                 }
             }
         } finally {

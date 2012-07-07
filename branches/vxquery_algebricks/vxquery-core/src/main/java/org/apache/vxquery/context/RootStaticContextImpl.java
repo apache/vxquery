@@ -213,4 +213,9 @@ public final class RootStaticContextImpl extends StaticContextImpl {
         checkSealed();
         super.setOrderingModeProperty(orderingMode);
     }
+
+    @Override
+    public IStaticContextFactory createFactory() {
+        return RootStaticContextFactory.INSTANCE;
+    }
 }
