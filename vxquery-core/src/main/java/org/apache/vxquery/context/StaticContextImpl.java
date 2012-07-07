@@ -58,6 +58,8 @@ public class StaticContextImpl implements StaticContext {
 
     protected final Map<SequenceType, Integer> sequenceTypeMap;
 
+    protected final List<SequenceType> sequenceTypeList;
+
     protected final Map<QName, AttributeType> attributeDeclarationMap;
 
     protected final Map<QName, ElementType> elementDeclarationMap;
@@ -98,6 +100,7 @@ public class StaticContextImpl implements StaticContext {
         schemaImports = new ArrayList<Pair<String, List<String>>>();
         schemaTypeMap = new LinkedHashMap<QName, SchemaType>();
         sequenceTypeMap = new HashMap<SequenceType, Integer>();
+        sequenceTypeList = new ArrayList<SequenceType>();
         attributeDeclarationMap = new LinkedHashMap<QName, AttributeType>();
         elementDeclarationMap = new LinkedHashMap<QName, ElementType>();
         options = new LinkedHashMap<QName, String>();
@@ -107,11 +110,6 @@ public class StaticContextImpl implements StaticContext {
     @Override
     public StaticContext getParent() {
         return parent;
-    }
-
-    @Override
-    public DataspaceContext getDataspaceContext() {
-        return parent.getDataspaceContext();
     }
 
     @Override
@@ -364,11 +362,21 @@ public class StaticContextImpl implements StaticContext {
     }
 
     @Override
+    public SequenceType lookupSequenceType(int code) {
+        int maxParentTypeCode = parent == null ? 0 : parent.getMaxSequenceTypeCode();
+        if (code >= maxParentTypeCode) {
+            return sequenceTypeList.get(code - maxParentTypeCode);
+        }
+        return parent.lookupSequenceType(code);
+    }
+
+    @Override
     public int encodeSequenceType(SequenceType type) {
         int code = lookupSequenceType(type);
         if (code == -1) {
             code = typeCounter++;
             sequenceTypeMap.put(type, code);
+            sequenceTypeList.add(type);
             return code;
         }
         if (sequenceTypeMap.containsKey(type)) {
@@ -591,6 +599,10 @@ public class StaticContextImpl implements StaticContext {
             return parent.getOption(name);
         }
         return null;
+    }
+
+    public IStaticContextFactory createFactory() {
+        return StaticContextImplFactory.createInstance(this);
     }
 
     private abstract class ConcatenatingIterator<T> implements Iterator<T> {

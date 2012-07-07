@@ -42,4 +42,9 @@ public class ThinStaticContextImpl extends DelegatingStaticContextImpl {
     public void registerNamespaceUri(String prefix, String uri) {
         namespaceMap.put(prefix, uri);
     }
+
+    @Override
+    public IStaticContextFactory createFactory() {
+        return ThinStaticContextImplFactory.createInstance(this);
+    }
 }
