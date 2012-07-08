@@ -11,6 +11,7 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
@@ -24,7 +25,8 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
     }
 
     @Override
-    protected IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
         final SequencePointable seqp = new SequencePointable();
         final LongPointable lp = (LongPointable) LongPointable.FACTORY.createPointable();
         final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();

@@ -20,8 +20,9 @@ public abstract class AbstractTaggedValueArgumentScalarEvaluatorFactory implemen
         for (int i = 0; i < es.length; ++i) {
             es[i] = args[i].createScalarEvaluator(ctx);
         }
-        return createEvaluator(es);
+        return createEvaluator(ctx, es);
     }
 
-    protected abstract IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException;
+    protected abstract IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException;
 }
