@@ -855,6 +855,7 @@
         <param name="arg1" type="xs:string?"/>
         <param name="arg2" type="xs:string?"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnSubstringAfterEvaluatorFactory"/>
     </function>
 
     <!-- fn:substring-after($arg1  as xs:string?, $arg2 as xs:string?, $collation as xs:string)  as xs:string -->
@@ -863,6 +864,7 @@
         <param name="arg2" type="xs:string?"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnSubstringAfterEvaluatorFactory"/>
     </function>
 
     <!-- fn:substring-before( $arg1 as xs:string?, $arg2 as xs:string?)  as xs:string -->
@@ -870,6 +872,7 @@
         <param name="arg1" type="xs:string?"/>
         <param name="arg2" type="xs:string?"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnSubstringBeforeEvaluatorFactory"/>
     </function>
 
     <!-- fn:substring-before( $arg1 as xs:string?, $arg2 as xs:string?, $collation as xs:string)  as xs:string -->
@@ -878,6 +881,7 @@
         <param name="arg2" type="xs:string?"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnSubstringBeforeEvaluatorFactory"/>
     </function>
 
     <!-- fn:sum($arg as  xs:anyAtomicType*) as xs:anyAtomicType -->
