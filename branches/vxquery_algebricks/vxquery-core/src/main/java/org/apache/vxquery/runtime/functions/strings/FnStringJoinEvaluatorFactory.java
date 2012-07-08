@@ -14,6 +14,7 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
@@ -26,7 +27,8 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
     }
 
     @Override
-    protected IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
         final TaggedValuePointable tvp = new TaggedValuePointable();
         final UTF8StringPointable stringp1 = new UTF8StringPointable();
         final UTF8StringPointable stringp2 = new UTF8StringPointable();

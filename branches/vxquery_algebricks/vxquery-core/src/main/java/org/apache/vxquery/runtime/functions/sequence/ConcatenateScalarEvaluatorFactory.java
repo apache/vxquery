@@ -15,6 +15,7 @@ import org.apache.vxquery.util.GrowableIntArray;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
@@ -27,7 +28,8 @@ public class ConcatenateScalarEvaluatorFactory extends AbstractTaggedValueArgume
     }
 
     @Override
-    protected IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final GrowableIntArray slots = new GrowableIntArray();
         final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();

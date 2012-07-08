@@ -8,6 +8,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class FnLowerCaseEvaluatorFactory extends AbstractCharacterIteratorCopyingEvaluatorFactory {
@@ -18,11 +19,12 @@ public class FnLowerCaseEvaluatorFactory extends AbstractCharacterIteratorCopyin
     }
 
     @Override
-    protected IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
         final UTF8StringPointable stringp = new UTF8StringPointable();
         final ICharacterIterator charIterator = new LowerCaseCharacterIterator(new UTF8StringCharacterIterator(stringp));
         return new AbstractCharacterIteratorCopyingEvaluator(args, charIterator) {
-            
+
             @Override
             protected void preEvaluate(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
