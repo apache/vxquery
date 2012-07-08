@@ -146,6 +146,7 @@
         <param name="arg1" type="xs:string?"/>
         <param name="arg2" type="xs:string?"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnContainsEvaluatorFactory"/>
     </function>
  
     <!-- fn:contains($arg1  as xs:string?, $arg2 as xs:string?, $collation as xs:string)  as xs:boolean -->
