@@ -1,8 +1,13 @@
 package org.apache.vxquery.runtime.functions.strings;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class UTF8StringCharacterIterator implements ICharacterIterator {
+    private static final Logger LOGGER = Logger.getLogger(UTF8StringCharacterIterator.class.getName());
+
     private int byteOffset;
     private final UTF8StringPointable stringp;
 
@@ -20,8 +25,10 @@ public class UTF8StringCharacterIterator implements ICharacterIterator {
         int c = 0;
         if (byteOffset < stringp.getLength()) {
             c = stringp.charAt(byteOffset);
-            System.err.println( "  UTF8StringCharacterIterator char[" + byteOffset + "] = " + c);
-                // Increment cursor
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("  UTF8StringCharacterIterator char[" + byteOffset + "] = " + c);
+            }
+            // Increment cursor
             if ((c >= 0x0001) && (c <= 0x007F)) {
                 ++byteOffset;
             } else if (c > 0x07FF) {
@@ -30,7 +37,9 @@ public class UTF8StringCharacterIterator implements ICharacterIterator {
                 byteOffset += 2;
             }
         }
-        System.err.println( "  END UTF8StringCharacterIterator char[" + byteOffset + "] = " + c);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("  END UTF8StringCharacterIterator char[" + byteOffset + "] = " + c);
+        }
         return (char) c;
     }
 
