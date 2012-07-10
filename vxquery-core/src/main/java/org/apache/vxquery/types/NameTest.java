@@ -16,47 +16,55 @@
  */
 package org.apache.vxquery.types;
 
-import javax.xml.namespace.QName;
+import java.util.Arrays;
+
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public final class NameTest {
     public static final String WILDCARD = null;
 
     public static final NameTest STAR_NAMETEST = new NameTest(null, null);
 
-    private String uri;
-    private String localName;
+    private byte[] uri;
+    private byte[] localName;
 
-    public NameTest(String uri, String localName) {
+    public NameTest(byte[] uri, byte[] localName) {
         this.uri = uri;
         this.localName = localName;
     }
 
-    public String getUri() {
+    public byte[] getUri() {
         return uri;
     }
 
-    public String getLocalName() {
+    public byte[] getLocalName() {
         return localName;
-    }
-
-    public QName asQName() {
-        if (uri == null || localName == null) {
-            throw new UnsupportedOperationException();
-        }
-        return new QName(uri, localName);
     }
 
     @Override
     public String toString() {
-        return "NameTest(" + asQName() + ")";
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("NameTest({");
+        if (uri != null) {
+            UTF8StringPointable.toString(buffer, uri, 0);
+        } else {
+            buffer.append('*');
+        }
+        buffer.append('}');
+        if (localName != null) {
+            UTF8StringPointable.toString(buffer, localName, 0);
+        } else {
+            buffer.append('*');
+        }
+        return buffer.toString();
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((localName == null) ? 0 : localName.hashCode());
-        result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+        result = prime * result + ((localName == null) ? 0 : Arrays.hashCode(localName));
+        result = prime * result + ((uri == null) ? 0 : Arrays.hashCode(uri));
         return result;
     }
 
@@ -72,12 +80,12 @@ public final class NameTest {
         if (localName == null) {
             if (other.localName != null)
                 return false;
-        } else if (!localName.equals(other.localName))
+        } else if (!Arrays.equals(localName, other.localName))
             return false;
         if (uri == null) {
             if (other.uri != null)
                 return false;
-        } else if (!uri.equals(other.uri))
+        } else if (!Arrays.equals(uri, other.uri))
             return false;
         return true;
     }

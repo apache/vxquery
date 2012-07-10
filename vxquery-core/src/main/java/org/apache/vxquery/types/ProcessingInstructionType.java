@@ -16,12 +16,14 @@
  */
 package org.apache.vxquery.types;
 
+import java.util.Arrays;
+
 public final class ProcessingInstructionType extends AbstractNodeType {
     public static final ProcessingInstructionType ANYPI = new ProcessingInstructionType(null);
 
-    private String target;
+    private byte[] target;
 
-    public ProcessingInstructionType(String target) {
+    public ProcessingInstructionType(byte[] target) {
         this.target = target;
     }
 
@@ -30,7 +32,7 @@ public final class ProcessingInstructionType extends AbstractNodeType {
         return NodeKind.PI;
     }
 
-    public String getTarget() {
+    public byte[] getTarget() {
         return target;
     }
 
@@ -38,7 +40,7 @@ public final class ProcessingInstructionType extends AbstractNodeType {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        result = prime * result + ((target == null) ? 0 : Arrays.hashCode(target));
         return result;
     }
 
@@ -54,7 +56,7 @@ public final class ProcessingInstructionType extends AbstractNodeType {
         if (target == null) {
             if (other.target != null)
                 return false;
-        } else if (!target.equals(other.target))
+        } else if (!Arrays.equals(target, other.target))
             return false;
         return true;
     }

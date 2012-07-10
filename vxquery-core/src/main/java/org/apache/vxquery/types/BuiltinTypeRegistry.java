@@ -271,8 +271,12 @@ public final class BuiltinTypeRegistry {
         return types[id];
     }
 
+    public boolean isBuiltinTypeId(int id) {
+        return id < BuiltinTypeConstants.BUILTIN_TYPE_COUNT;
+    }
+
     public boolean isBuiltinType(SchemaType type) {
-        return type.getTypeId() < BuiltinTypeConstants.BUILTIN_TYPE_COUNT;
+        return isBuiltinTypeId(type.getTypeId());
     }
 
     public SchemaType getBuiltinBaseType(SchemaType type) {

@@ -161,6 +161,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.WriteOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.plan.ALogicalPlanImpl;
 import edu.uci.ics.hyracks.dataflow.common.comm.io.ByteArrayAccessibleOutputStream;
+import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
 
 public class XMLQueryTranslator {
     private static final Pattern UNQUOTER = Pattern
@@ -539,7 +540,7 @@ public class XMLQueryTranslator {
                 if (pit.getTarget() == null) {
                     return ProcessingInstructionType.ANYPI;
                 }
-                return new ProcessingInstructionType(pit.getTarget());
+                return new ProcessingInstructionType(createUTF8String(pit.getTarget()));
             }
 
             case ATTRIBUTE_TEST: {
@@ -563,7 +564,8 @@ public class XMLQueryTranslator {
                     } else {
                         uri = "";
                     }
-                    nt = new NameTest(uri, ntNode.getLocalName());
+
+                    nt = new NameTest(createUTF8String(uri), createUTF8String(ntNode.getLocalName()));
                 }
                 SchemaType cType = BuiltinTypeRegistry.XS_ANY_ATOMIC;
                 if (at.getTypeName() != null) {
@@ -600,7 +602,7 @@ public class XMLQueryTranslator {
                     } else {
                         uri = "";
                     }
-                    nt = new NameTest(uri, ntNode.getLocalName());
+                    nt = new NameTest(createUTF8String(uri), createUTF8String(ntNode.getLocalName()));
                 }
                 SchemaType cType = AnyType.INSTANCE;
                 if (et.getTypeName() != null) {
@@ -619,6 +621,17 @@ public class XMLQueryTranslator {
             default:
                 throw new IllegalStateException("Unknown node: " + itemType.getTag());
         }
+    }
+
+    private byte[] createUTF8String(String str) {
+        ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+        StringValueBuilder svb = new StringValueBuilder();
+        try {
+            svb.write(str, abvs.getDataOutput());
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        return Arrays.copyOf(abvs.getByteArray(), abvs.getLength());
     }
 
     private ILogicalPlan translateMainModule(MainModuleNode moduleNode) throws SystemException {
@@ -1552,7 +1565,7 @@ public class XMLQueryTranslator {
                             uri = "";
                         }
                     }
-                    NameTest nameTest = new NameTest(uri, ntn.getLocalName());
+                    NameTest nameTest = new NameTest(createUTF8String(uri), createUTF8String(ntn.getLocalName()));
                     if (axis == AxisStepNode.Axis.ATTRIBUTE || axis == AxisStepNode.Axis.ABBREV_ATTRIBUTE) {
                         nt = new AttributeType(nameTest, BuiltinTypeRegistry.XS_ANY_ATOMIC);
                     } else {

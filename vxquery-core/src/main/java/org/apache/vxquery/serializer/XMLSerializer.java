@@ -7,6 +7,7 @@ import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
@@ -62,6 +63,10 @@ public class XMLSerializer implements IPrinter {
                 printDouble(ps, tvp);
                 break;
 
+            case ValueTag.XS_DECIMAL_TAG:
+                printDecimal(ps, tvp);
+                break;
+
             case ValueTag.XS_BOOLEAN_TAG:
                 printBoolean(ps, tvp);
                 break;
@@ -100,6 +105,36 @@ public class XMLSerializer implements IPrinter {
 
             default:
                 throw new UnsupportedOperationException("Encountered tag: " + tvp.getTag());
+        }
+    }
+
+    private void printDecimal(PrintStream ps, TaggedValuePointable tvp) {
+        XSDecimalPointable dp = pp.takeOne(XSDecimalPointable.class);
+        try {
+            tvp.getValue(dp);
+            byte decimalPlace = dp.getDecimalPlace();
+            long value = dp.getDecimalValue();
+            int nDigits = (int) Math.log10(value) + 1;
+            long pow10 = (long) Math.pow(10, nDigits - 1);
+            int start = Math.max(decimalPlace, nDigits - 1);
+            int end = Math.min(0, decimalPlace);
+            if (start > nDigits) {
+                ps.append("0.");
+            }
+            for (int i = start; i >= end; --i) {
+                if (i >= nDigits || i < 0) {
+                    ps.append('0');
+                } else {
+                    ps.append((char) ('0' + (value / pow10)));
+                    value %= pow10;
+                    pow10 /= 10;
+                }
+                if (i == decimalPlace) {
+                    ps.append('.');
+                }
+            }
+        } finally {
+            pp.giveBack(dp);
         }
     }
 
