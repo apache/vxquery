@@ -99,7 +99,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
                 pastDecimal = true;
             }
         }
-        
+
         BytePointable.setByte(bytes, start + DECIMAL_PLACE_OFFSET, decimalPlace);
         LongPointable.setLong(bytes, start + VALUE_OFFSET, value);
         normalize(bytes, start);
