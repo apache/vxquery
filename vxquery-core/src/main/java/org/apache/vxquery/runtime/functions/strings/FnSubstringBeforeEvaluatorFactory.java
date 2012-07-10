@@ -8,6 +8,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class FnSubstringBeforeEvaluatorFactory extends AbstractCharacterIteratorCopyingEvaluatorFactory {
@@ -18,7 +19,8 @@ public class FnSubstringBeforeEvaluatorFactory extends AbstractCharacterIterator
     }
 
     @Override
-    protected IScalarEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
         final UTF8StringPointable stringp1 = new UTF8StringPointable();
         final UTF8StringPointable stringp2 = new UTF8StringPointable();
         final UTF8StringPointable stringp3 = new UTF8StringPointable();
