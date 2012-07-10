@@ -37,7 +37,7 @@ public abstract class AbstractTypeScalarEvaluatorFactory extends AbstractTaggedV
 
         protected abstract void setSequenceType(SequenceType sType);
 
-        protected abstract void evaluate(TaggedValuePointable tvp, IPointable result);
+        protected abstract void evaluate(TaggedValuePointable tvp, IPointable result) throws SystemException;
 
         @Override
         protected final void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {

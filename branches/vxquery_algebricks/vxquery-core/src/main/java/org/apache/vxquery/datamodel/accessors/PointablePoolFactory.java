@@ -1,6 +1,7 @@
 package org.apache.vxquery.datamodel.accessors;
 
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
@@ -39,6 +40,7 @@ public class PointablePoolFactory {
         pp.register(SequencePointable.class, SequencePointable.FACTORY);
         pp.register(VoidPointable.class, VoidPointable.FACTORY);
         pp.register(CodedQNamePointable.class, CodedQNamePointable.FACTORY);
+        pp.register(XSDecimalPointable.class, XSDecimalPointable.FACTORY);
 
         pp.register(NodeTreePointable.class, NodeTreePointable.FACTORY);
         pp.register(DocumentNodePointable.class, DocumentNodePointable.FACTORY);

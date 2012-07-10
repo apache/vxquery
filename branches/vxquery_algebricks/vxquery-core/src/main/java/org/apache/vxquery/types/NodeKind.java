@@ -17,5 +17,11 @@
 package org.apache.vxquery.types;
 
 public enum NodeKind {
-    ANY, ATTRIBUTE, COMMENT, DOCUMENT, ELEMENT, PI, TEXT,
+    ANY,
+    ATTRIBUTE,
+    COMMENT,
+    DOCUMENT,
+    ELEMENT,
+    PI,
+    TEXT,
 }

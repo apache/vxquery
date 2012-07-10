@@ -76,7 +76,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
     public void setDecimal(double doubleValue) {
         setDecimal(doubleValue, bytes, start);
     }
-    
+
     public static void setDecimal(double doubleValue, byte[] bytes, int start) {
         byte decimalPlace = 0;
         long value = 0;
@@ -85,7 +85,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
         int c;
         Double doubleObject = new Double(doubleValue);
         String strTest = doubleObject.toString();
-        
+
         for (int i = 0; i < strTest.length() && count < PRECISION; ++i) {
             c = strTest.charAt(i);
             if (Character.isDigit(c)) {
@@ -94,8 +94,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
                     decimalPlace++;
                 }
                 count++;
-            }
-            else {
+            } else {
                 pastDecimal = true;
             }
         }
