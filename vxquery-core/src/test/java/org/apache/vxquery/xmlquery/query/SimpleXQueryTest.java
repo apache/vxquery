@@ -69,7 +69,7 @@ public class SimpleXQueryTest {
 
     @Test
     public void simple008() {
-        runNegTest("simple008", "fn:boolean((fn:false(), fn:false()))");
+        runTest("simple008", "fn:boolean((fn:false(), fn:false()))");
     }
 
     @Test

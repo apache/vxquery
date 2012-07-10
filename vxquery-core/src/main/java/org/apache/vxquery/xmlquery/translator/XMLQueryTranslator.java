@@ -23,6 +23,7 @@ import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.context.ThinStaticContextImpl;
 import org.apache.vxquery.context.XQueryVariable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -39,6 +40,7 @@ import org.apache.vxquery.types.AnyNodeType;
 import org.apache.vxquery.types.AnyType;
 import org.apache.vxquery.types.AtomicType;
 import org.apache.vxquery.types.AttributeType;
+import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.CommentType;
 import org.apache.vxquery.types.DocumentType;
@@ -1220,6 +1222,7 @@ public class XMLQueryTranslator {
         switch (lType) {
             case DECIMAL:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_DECIMAL, Quantifier.QUANT_ONE);
+                value = Double.parseDouble(image);
                 break;
             case DOUBLE:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_DOUBLE, Quantifier.QUANT_ONE);
@@ -1806,7 +1809,7 @@ public class XMLQueryTranslator {
             AtomicType at = (AtomicType) it;
             byte[] bytes = null;
             switch (at.getTypeId()) {
-                case ValueTag.XS_BOOLEAN_TAG: {
+                case BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID: {
                     baaos.reset();
                     try {
                         dOut.write((byte) ValueTag.XS_BOOLEAN_TAG);
@@ -1816,7 +1819,7 @@ public class XMLQueryTranslator {
                     }
                     break;
                 }
-                case ValueTag.XS_INT_TAG: {
+                case BuiltinTypeConstants.XS_INT_TYPE_ID: {
                     baaos.reset();
                     try {
                         dOut.write((byte) ValueTag.XS_INT_TAG);
@@ -1826,7 +1829,7 @@ public class XMLQueryTranslator {
                     }
                     break;
                 }
-                case ValueTag.XS_INTEGER_TAG: {
+                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID: {
                     baaos.reset();
                     try {
                         dOut.write((byte) ValueTag.XS_INTEGER_TAG);
@@ -1836,7 +1839,7 @@ public class XMLQueryTranslator {
                     }
                     break;
                 }
-                case ValueTag.XS_DOUBLE_TAG: {
+                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID: {
                     baaos.reset();
                     try {
                         dOut.write((byte) ValueTag.XS_DOUBLE_TAG);
@@ -1846,11 +1849,23 @@ public class XMLQueryTranslator {
                     }
                     break;
                 }
-                case ValueTag.XS_STRING_TAG: {
+                case BuiltinTypeConstants.XS_STRING_TYPE_ID: {
                     baaos.reset();
                     try {
                         dOut.write((byte) ValueTag.XS_STRING_TAG);
                         stringVB.write((CharSequence) value, dOut);
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    break;
+                }
+                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID: {
+                    baaos.reset();
+                    try {
+                        dOut.write((byte) ValueTag.XS_DECIMAL_TAG);
+                        byte[] dBytes = new byte[XSDecimalPointable.TYPE_TRAITS.getFixedLength()];
+                        XSDecimalPointable.setDecimal(((Number) value).doubleValue(), dBytes, 0);
+                        dOut.write(dBytes);
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
