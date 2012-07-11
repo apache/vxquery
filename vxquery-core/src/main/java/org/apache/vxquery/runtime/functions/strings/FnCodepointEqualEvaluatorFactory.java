@@ -26,8 +26,6 @@ public class FnCodepointEqualEvaluatorFactory extends AbstractTaggedValueArgumen
             throws AlgebricksException {
         final UTF8StringPointable stringp1 = new UTF8StringPointable();
         final UTF8StringPointable stringp2 = new UTF8StringPointable();
-        final ICharacterIterator charIterator1 = new UTF8StringCharacterIterator(stringp1);
-        final ICharacterIterator charIterator2 = new UTF8StringCharacterIterator(stringp2);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -49,23 +47,9 @@ public class FnCodepointEqualEvaluatorFactory extends AbstractTaggedValueArgumen
                 }
                 tvp1.getValue(stringp1);
                 tvp2.getValue(stringp2);
-                charIterator1.reset();
-                charIterator2.reset();
-
-                int c1;
-                int c2;
-                while (true) {
-                    c1 = charIterator1.next();
-                    c2 = charIterator2.next();
-                    if (ICharacterIterator.EOS_CHAR == c1 && ICharacterIterator.EOS_CHAR == c2) {
-                        // Checked the full length of search string.
-                        booleanResult[1] = 1;
-                        break;
-                    }
-                    if (c1 != c2) {
-                        // Characters do not match
-                        break;
-                    }
+                
+                if (stringp1.compareTo(stringp2) == 0) {
+                    booleanResult[1] = 1;
                 }
 
                 result.set(booleanResult, 0, 2);
