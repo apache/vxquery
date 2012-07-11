@@ -13,7 +13,7 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 public class XSDecimalPointable extends AbstractPointable implements IHashable, IComparable, INumeric {
     private final static int DECIMAL_PLACE_OFFSET = 0;
     private final static int VALUE_OFFSET = 1;
-    private final static int PRECISION = 18;
+    public final static int PRECISION = 18;
 
     public static final ITypeTraits TYPE_TRAITS = new ITypeTraits() {
         private static final long serialVersionUID = 1L;
@@ -73,37 +73,6 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
         normalize();
     }
 
-    public void setDecimal(double doubleValue) {
-        setDecimal(doubleValue, bytes, start);
-    }
-
-    public static void setDecimal(double doubleValue, byte[] bytes, int start) {
-        byte decimalPlace = 0;
-        long value = 0;
-        boolean pastDecimal = false;
-        int count = 0;
-        int c;
-        Double doubleObject = new Double(doubleValue);
-        String strTest = doubleObject.toString();
-
-        for (int i = 0; i < strTest.length() && count < PRECISION; ++i) {
-            c = strTest.charAt(i);
-            if (Character.isDigit(c)) {
-                value = value * 10 + Character.getNumericValue(c);
-                if (pastDecimal) {
-                    decimalPlace++;
-                }
-                count++;
-            } else {
-                pastDecimal = true;
-            }
-        }
-
-        BytePointable.setByte(bytes, start + DECIMAL_PLACE_OFFSET, decimalPlace);
-        LongPointable.setLong(bytes, start + VALUE_OFFSET, value);
-        normalize(bytes, start);
-    }
-
     public void normalize() {
         normalize(bytes, start);
     }
@@ -143,7 +112,19 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
     }
 
     public long getBeforeDecimalPlace() {
-        return Math.round(getDecimalValue() / Math.pow(10, getDecimalPlace()));
+        return getBeforeDecimalPlace(bytes, start);
+    }
+
+    public static long getBeforeDecimalPlace(byte[] bytes, int start) {
+        return Math.round(getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
+    }
+
+    public byte getDigitCount() {
+        return getDigitCount(bytes, start);
+    }
+
+    public static byte getDigitCount(byte[] bytes, int start) {
+        return (byte) (Math.log10((double) getDecimalValue(bytes, start)) + 1);
     }
 
     @Override
