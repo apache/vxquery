@@ -22,7 +22,7 @@ public class UTF8StringCharacterIterator implements ICharacterIterator {
     @Override
     public char next() {
         // Default - no character exists.
-        int c = 0;
+        int c = ICharacterIterator.EOS_CHAR;
         if (byteOffset < stringp.getLength()) {
             c = stringp.charAt(byteOffset);
             if (LOGGER.isLoggable(Level.FINE)) {
