@@ -9,7 +9,6 @@ public abstract class AbstractTranscodingCharacterIterator implements ICharacter
 
     final public char next() {
         int c = in.next();
-        System.err.println( "  AbstractTranscodingCharacterIterator  " + c);
         return c != ICharacterIterator.EOS_CHAR ? transcodeCharacter((char) c) : (char) ICharacterIterator.EOS_CHAR;
     }
 
