@@ -28,16 +28,11 @@ public class FnCompareEvaluatorFactory extends AbstractTaggedValueArgumentScalar
         final UTF8StringPointable stringp1 = new UTF8StringPointable();
         final UTF8StringPointable stringp2 = new UTF8StringPointable();
         final UTF8StringPointable stringp3 = new UTF8StringPointable();
-        final ICharacterIterator charIterator1 = new UTF8StringCharacterIterator(stringp1);
-        final ICharacterIterator charIterator2 = new UTF8StringCharacterIterator(stringp2);
         final byte[] integerResult = new byte[LongPointable.TYPE_TRAITS.getFixedLength() + 1];
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                // Default result is false.
-                int intResult;
-
                 TaggedValuePointable tvp1 = args[0];
                 TaggedValuePointable tvp2 = args[1];
 
@@ -50,8 +45,6 @@ public class FnCompareEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                 }
                 tvp1.getValue(stringp1);
                 tvp2.getValue(stringp2);
-                charIterator1.reset();
-                charIterator2.reset();
 
                 // Third parameter is optional.
                 if (args.length > 2) {
@@ -63,30 +56,8 @@ public class FnCompareEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                 }
                 // TODO use the third value as collation
 
-                int c1;
-                int c2;
-                while (true) {
-                    c1 = charIterator1.next();
-                    c2 = charIterator2.next();
-                    if (ICharacterIterator.EOS_CHAR == c1 && ICharacterIterator.EOS_CHAR == c2) {
-                        // Checked the full length of search string.
-                        intResult = 0;
-                        break;
-                    }
-                    if (c1 > c2) {
-                        // Character in string one is larger.
-                        intResult = -1;
-                        break;
-                    }
-                    if (c1 < c2) {
-                        // Character in string two is larger.
-                        intResult = 1;
-                        break;
-                    }
-                }
-
                 integerResult[0] = ValueTag.XS_INTEGER_TAG;
-                LongPointable.setLong(integerResult, 1, (long) intResult);
+                LongPointable.setLong(integerResult, 1, (long) stringp1.compareTo(stringp2));
                 result.set(integerResult, 0, LongPointable.TYPE_TRAITS.getFixedLength() + 1);
             }
         };
