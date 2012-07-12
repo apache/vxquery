@@ -36,7 +36,7 @@ public abstract class Function implements IFunctionInfo {
     protected final Signature signature;
 
     public Function(QName qname, Signature signature) {
-        this.fid = new FunctionIdentifier(VXQUERY, "{" + qname.getNamespaceURI() + "}" + qname.getLocalPart(), false);
+        this.fid = new FunctionIdentifier(VXQUERY, "{" + qname.getNamespaceURI() + "}" + qname.getLocalPart());
         this.qname = qname;
         this.signature = signature;
     }
