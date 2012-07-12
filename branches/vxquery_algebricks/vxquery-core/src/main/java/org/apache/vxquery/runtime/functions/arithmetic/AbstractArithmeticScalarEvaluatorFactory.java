@@ -18,6 +18,7 @@ package org.apache.vxquery.runtime.functions.arithmetic;
 
 import java.io.DataOutput;
 
+import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -62,6 +63,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         final DataOutput dOut = abvs.getDataOutput();
         final TypedPointables tp1 = new TypedPointables();
         final TypedPointables tp2 = new TypedPointables();
+        final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
+
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
@@ -251,7 +254,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             switch (tid2) {
                                 case ValueTag.XS_DATE_TAG:
                                     tvp2.getValue(tp2.datep);
-                                    aOp.operateDateDate(tp1.datep, tp2.datep, dOut);
+                                    aOp.operateDateDate(tp1.datep, tp2.datep, dCtx, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -274,7 +277,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             switch (tid2) {
                                 case ValueTag.XS_DATETIME_TAG:
                                     tvp2.getValue(tp2.datetimep);
-                                    aOp.operateDatetimeDatetime(tp1.datetimep, tp2.datetimep, dOut);
+                                    aOp.operateDatetimeDatetime(tp1.datetimep, tp2.datetimep, dCtx, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -297,7 +300,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             switch (tid2) {
                                 case ValueTag.XS_TIME_TAG:
                                     tvp2.getValue(tp2.timep);
-                                    aOp.operateTimeTime(tp1.timep, tp2.timep, dOut);
+                                    aOp.operateTimeTime(tp1.timep, tp2.timep, dCtx, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -307,11 +310,6 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     result.set(abvs);
                                     return;
 
-                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateTimeYMDuration(tp1.timep, tp2.intp, dOut);
-                                    result.set(abvs);
-                                    return;
                             }
                             break;
 
@@ -401,12 +399,6 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     result.set(abvs);
                                     return;
 
-                                case ValueTag.XS_TIME_TAG:
-                                    tvp2.getValue(tp2.timep);
-                                    aOp.operateYMDurationTime(tp1.intp, tp2.timep, dOut);
-                                    result.set(abvs);
-                                    return;
-
                                 case ValueTag.XS_DATETIME_TAG:
                                     tvp2.getValue(tp2.datetimep);
                                     aOp.operateYMDurationDatetime(tp1.intp, tp2.datetimep, dOut);
@@ -475,11 +467,11 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
         DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        XSDecimalPointable decp = new XSDecimalPointable();
-        XSDateTimePointable datetimep = new XSDateTimePointable();
-        XSDatePointable datep = new XSDatePointable();
-        XSTimePointable timep = new XSTimePointable();
-        XSDurationPointable durationp = new XSDurationPointable();
+        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
+        XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
+        XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
     }
 
     protected abstract AbstractArithmeticOperation createArithmeticOperation();
