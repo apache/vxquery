@@ -1,6 +1,13 @@
 package org.apache.vxquery.datamodel.util;
 
+import java.io.DataOutput;
+import java.io.IOException;
+
+import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
+import org.apache.vxquery.datamodel.api.ITimezone;
+import org.apache.vxquery.datamodel.values.ValueTag;
 
 public class DateTime {
     public static final long[] DAYS_OF_MONTH_ORDI = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -50,11 +57,8 @@ public class DateTime {
 
     /**
      * Return a normalized time.
-     * 
-     * @param year
-     * @return
      */
-    public static void normalizeDateTime(byte[] bytes, int start, long yearMonth, long dayTime) {
+    public static void normalizeDateTime(long yearMonth, long dayTime, DataOutput dOut) throws Exception {
         long[] monthDayLimits;
 
         long day = dayTime / CHRONON_OF_DAY;
@@ -92,7 +96,35 @@ public class DateTime {
             }
             monthDayLimits = (isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP : DateTime.DAYS_OF_MONTH_ORDI);
         }
-        XSDateTimePointable.setDateTime(bytes, 0, year, month, day, hour, minute, millisecond, 0, 0);
+        dOut.write(ValueTag.XS_DATETIME_TAG);
+        dOut.writeShort((short) year);
+        dOut.writeByte((byte) month);
+        dOut.writeByte((byte) day);
+        dOut.writeByte((byte) hour);
+        dOut.writeByte((byte) minute);
+        dOut.writeInt((int) millisecond);
+        dOut.writeByte((byte) DateTime.TIMEZONE_HOUR_NULL);
+        dOut.writeByte((byte) DateTime.TIMEZONE_MIN_NULL);
+    }
+
+    public static void getTimezoneDateTime(ITimezone timezonep, DynamicContext dCtx, DataOutput dOut)
+            throws Exception {
+        long timezoneHour;
+        long timezoneMinute;
+        // Consider time zones.
+        if (timezonep.getTimezoneHour() == DateTime.TIMEZONE_HOUR_NULL
+                || timezonep.getTimezoneMinute() == DateTime.TIMEZONE_MIN_NULL) {
+            XSDateTimePointable defaultTimezone = new XSDateTimePointable();
+            dCtx.getCurrentDateTime(defaultTimezone);
+            timezoneHour = defaultTimezone.getTimezoneHour();
+            timezoneMinute = defaultTimezone.getTimezoneMinute();
+        } else {
+            timezoneHour = timezonep.getTimezoneHour();
+            timezoneMinute = timezonep.getTimezoneMinute();
+        }
+        long dayTime = timezonep.getDayTime() + timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute
+                * DateTime.CHRONON_OF_HOUR;
+        DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, dOut);
     }
 
 }

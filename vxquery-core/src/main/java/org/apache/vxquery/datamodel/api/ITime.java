@@ -7,12 +7,6 @@ public interface ITime {
 
     public long getMilliSecond();
 
-    public long getTimezoneHour();
-
-    public long getTimezoneMinute();
-
-    public long getTimezone();
-
     public long getDayTime();
 
 }
