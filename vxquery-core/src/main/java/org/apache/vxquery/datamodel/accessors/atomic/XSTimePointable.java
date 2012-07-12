@@ -1,6 +1,7 @@
 package org.apache.vxquery.datamodel.accessors.atomic;
 
 import org.apache.vxquery.datamodel.api.ITime;
+import org.apache.vxquery.datamodel.api.ITimezone;
 
 import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
 import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
@@ -16,7 +17,7 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  * 
  * @author prestoncarman
  */
-public class XSTimePointable extends AbstractPointable implements ITime {
+public class XSTimePointable extends AbstractPointable implements ITime, ITimezone {
     public final static int HOUR_OFFSET = 0;
     public final static int MINUTE_OFFSET = 1;
     public final static int MILLISECOND_OFFSET = 2;
@@ -124,6 +125,15 @@ public class XSTimePointable extends AbstractPointable implements ITime {
 
     public static long getDayTime(byte[] bytes, int start) {
         return (((getHour(bytes, start)) * 60 + getMinute(bytes, start)) * 60 * 1000 + getMilliSecond(bytes, start));
+    }
+
+    @Override
+    public long getYearMonth() {
+        return getYearMonth(bytes, start);
+    }
+
+    public static long getYearMonth(byte[] bytes, int start) {
+        return 0;
     }
 
 }

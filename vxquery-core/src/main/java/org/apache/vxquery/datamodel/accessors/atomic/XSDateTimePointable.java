@@ -2,6 +2,7 @@ package org.apache.vxquery.datamodel.accessors.atomic;
 
 import org.apache.vxquery.datamodel.api.IDate;
 import org.apache.vxquery.datamodel.api.ITime;
+import org.apache.vxquery.datamodel.api.ITimezone;
 import org.apache.vxquery.datamodel.util.DateTime;
 
 import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
@@ -19,7 +20,7 @@ import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
  * 
  * @author prestoncarman
  */
-public class XSDateTimePointable extends AbstractPointable implements IDate, ITime {
+public class XSDateTimePointable extends AbstractPointable implements IDate, ITime, ITimezone {
     public final static int YEAR_OFFSET = 0;
     public final static int MONTH_OFFSET = 2;
     public final static int DAY_OFFSET = 3;
