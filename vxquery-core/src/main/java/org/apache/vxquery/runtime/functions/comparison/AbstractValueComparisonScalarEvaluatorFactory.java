@@ -38,12 +38,10 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
@@ -61,7 +59,7 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         final TypedPointables tp1 = new TypedPointables();
         final TypedPointables tp2 = new TypedPointables();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        
+
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
@@ -413,8 +411,6 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
 
     private static class TypedPointables {
         BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
         IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
