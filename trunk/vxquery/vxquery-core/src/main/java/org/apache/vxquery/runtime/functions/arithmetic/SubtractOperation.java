@@ -1,6 +1,7 @@
 package org.apache.vxquery.runtime.functions.arithmetic;
 
 import java.io.DataOutput;
+import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
@@ -23,7 +24,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     protected final DataOutput dataOutput = abvs.getDataOutput();
 
     public void operateDateDate(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         abvs.reset();
         DateTime.getTimezoneDateTime(datep1, dCtx, dataOutput);
         XSDateTimePointable datetimep1 = new XSDateTimePointable();
@@ -38,7 +39,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDateDTDuration(XSDatePointable datep1, IntegerPointable intp2, DataOutput dOut) throws Exception {
+    public void operateDateDTDuration(XSDatePointable datep1, IntegerPointable intp2, DataOutput dOut)
+            throws SystemException, IOException {
         // Add duration.
         abvs.reset();
         DateTime.normalizeDateTime(datep1.getYearMonth(), datep1.getDayTime() - intp2.getInteger(), dataOutput);
@@ -52,7 +54,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDatetimeDatetime(XSDateTimePointable datetimep1, XSDateTimePointable datetimep2,
-            DynamicContext dCtx, DataOutput dOut) throws Exception {
+            DynamicContext dCtx, DataOutput dOut) throws SystemException, IOException {
         abvs.reset();
         DateTime.getTimezoneDateTime(datetimep1, dCtx, dataOutput);
         byte[] bytes1 = abvs.getByteArray();
@@ -97,7 +99,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDatetimeDTDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         // Add duration.
         abvs.reset();
         DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() - intp.getInteger(), dataOutput);
@@ -107,7 +109,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDatetimeYMDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         // Add duration.
         abvs.reset();
         DateTime.normalizeDateTime(datetimep.getYearMonth() - intp.getInteger(), datetimep.getDayTime(), dataOutput);
@@ -116,7 +118,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDateYMDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateDateYMDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         // Add duration.
         abvs.reset();
         DateTime.normalizeDateTime(datep.getYearMonth() - intp.getInteger(), datep.getDayTime(), dataOutput);
@@ -130,7 +133,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         // Prepare
         long value1 = decp1.getDecimalValue();
         long value2 = decp2.getDecimalValue();
@@ -162,7 +165,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDecimalDouble(XSDecimalPointable decp, DoublePointable doublep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         double value = decp.doubleValue();
         value -= doublep.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -171,14 +174,15 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDecimalDTDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = operateDecimalInt(decp, intp.intValue());
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
         dOut.writeInt(value);
     }
 
     @Override
-    public void operateDecimalFloat(XSDecimalPointable decp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateDecimalFloat(XSDecimalPointable decp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         float value = decp.floatValue();
         value -= floatp.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -186,7 +190,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut) throws Exception {
+    public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
+            throws SystemException, IOException {
         XSDecimalPointable decp2 = new XSDecimalPointable();
         decp2.setDecimal(longp2.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -194,7 +199,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDecimalYMDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = operateDecimalInt(decp, intp.intValue());
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
         dOut.writeInt(value);
@@ -202,7 +207,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDoubleDecimal(DoublePointable doublep, XSDecimalPointable decp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         double value = doublep.doubleValue();
         value -= decp.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -211,7 +216,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDoubleDouble(DoublePointable doublep, DoublePointable doublep2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         double value = doublep.doubleValue();
         value -= doublep2.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -220,7 +225,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDoubleDTDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = doublep.intValue();
         value -= intp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -228,7 +233,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDoubleFloat(DoublePointable doublep, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateDoubleFloat(DoublePointable doublep, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         double value = doublep.doubleValue();
         value -= floatp.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -236,7 +242,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDoubleInteger(DoublePointable doublep, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateDoubleInteger(DoublePointable doublep, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         double value = doublep.doubleValue();
         value -= longp.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -245,7 +252,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDoubleYMDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = doublep.intValue();
         value -= intp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -253,19 +260,20 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut) throws Exception {
+    public void operateDTDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDTDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDTDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= decp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -274,7 +282,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDTDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= doublep.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -283,7 +291,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDTDurationDTDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= intp2.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -291,7 +299,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateDTDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= floatp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -299,7 +308,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= longp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -307,12 +317,14 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationTime(IntegerPointable intp, XSTimePointable timep, DataOutput dOut) throws Exception {
+    public void operateDTDurationTime(IntegerPointable intp, XSTimePointable timep, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void operateFloatDecimal(FloatPointable floatp, XSDecimalPointable decp, DataOutput dOut) throws Exception {
+    public void operateFloatDecimal(FloatPointable floatp, XSDecimalPointable decp, DataOutput dOut)
+            throws SystemException, IOException {
         float value = floatp.floatValue();
         value -= decp.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -320,7 +332,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatDouble(FloatPointable floatp, DoublePointable doublep, DataOutput dOut) throws Exception {
+    public void operateFloatDouble(FloatPointable floatp, DoublePointable doublep, DataOutput dOut)
+            throws SystemException, IOException {
         double value = floatp.doubleValue();
         value -= doublep.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -328,7 +341,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatDTDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateFloatDTDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = floatp.intValue();
         value -= intp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -336,7 +350,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatFloat(FloatPointable floatp, FloatPointable floatp2, DataOutput dOut) throws Exception {
+    public void operateFloatFloat(FloatPointable floatp, FloatPointable floatp2, DataOutput dOut)
+            throws SystemException, IOException {
         float value = floatp.floatValue();
         value -= floatp2.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -344,7 +359,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatInteger(FloatPointable floatp, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateFloatInteger(FloatPointable floatp, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         float value = floatp.floatValue();
         value -= longp.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -352,7 +368,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatYMDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateFloatYMDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = floatp.intValue();
         value -= intp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -360,7 +377,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut) throws Exception {
+    public void operateIntegerDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut)
+            throws SystemException, IOException {
         double value = longp.doubleValue();
         value -= decp.doubleValue();
         dOut.write(ValueTag.XS_DECIMAL_TAG);
@@ -368,7 +386,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut) throws Exception {
+    public void operateIntegerDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut)
+            throws SystemException, IOException {
         double value = longp.doubleValue();
         value -= doublep.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -376,7 +395,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = longp.intValue();
         value -= intp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -384,7 +404,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateIntegerFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         float value = longp.floatValue();
         value -= floatp.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -392,7 +413,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut) throws Exception {
+    public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut)
+            throws SystemException, IOException {
         long value = longp.getLong();
         value -= longp2.getLong();
         dOut.write(ValueTag.XS_INTEGER_TAG);
@@ -400,7 +422,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerYMDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateIntegerYMDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = longp.intValue();
         value -= intp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -408,7 +431,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateTimeDTDuration(XSTimePointable timep1, IntegerPointable intp2, DataOutput dOut) throws Exception {
+    public void operateTimeDTDuration(XSTimePointable timep1, IntegerPointable intp2, DataOutput dOut)
+            throws SystemException, IOException {
         // Add duration.
         abvs.reset();
         DateTime.normalizeDateTime(0, timep1.getDayTime() - intp2.getInteger(), dataOutput);
@@ -425,7 +449,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         abvs.reset();
         DateTime.getTimezoneDateTime(timep1, dCtx, dataOutput);
         XSDateTimePointable datetimep1 = new XSDateTimePointable();
@@ -440,19 +464,20 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateYMDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut) throws Exception {
+    public void operateYMDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateYMDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateYMDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= decp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -461,7 +486,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateYMDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= doublep.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -469,7 +494,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateYMDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateYMDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= floatp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -477,7 +503,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateYMDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateYMDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= longp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -486,14 +513,14 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateYMDurationYMDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value -= intp2.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
         dOut.writeInt(value);
     }
 
-    public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws Exception {
+    public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws SystemException, IOException {
         XSDecimalPointable decp1 = new XSDecimalPointable();
         decp1.setDecimal(intValue, (byte) 0);
         // Prepare
@@ -524,7 +551,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
         return decp2.intValue();
     }
 
-    public int operateDecimalInt(XSDecimalPointable decp1, int intValue) throws Exception {
+    public int operateDecimalInt(XSDecimalPointable decp1, int intValue) throws SystemException, IOException {
         XSDecimalPointable decp2 = new XSDecimalPointable();
         decp2.setDecimal(intValue, (byte) 0);
         // Prepare
