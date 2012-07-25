@@ -72,7 +72,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.vxquery</groupId>
-      <artifactId>vxquery-core</artifactId>
+      <artifactId>apache-vxquery-core-incubating</artifactId>
       <version>0.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
