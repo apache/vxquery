@@ -1,0 +1,51 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+package org.apache.vxquery.datamodel.atomic;
+
+import org.apache.vxquery.types.AtomicType;
+import org.apache.vxquery.types.BuiltinTypeRegistry;
+
+public class BooleanValue extends AtomicValue {
+    public static final BooleanValue TRUE = new BooleanValue(true);
+
+    public static final BooleanValue FALSE = new BooleanValue(false);
+
+    private boolean value;
+
+    private BooleanValue(boolean value) {
+        this(value, BuiltinTypeRegistry.XS_BOOLEAN);
+    }
+
+    private BooleanValue(boolean value, AtomicType type) {
+        super(type);
+        this.value = value;
+    }
+
+    @Override
+    public CharSequence getStringValue() {
+        return String.valueOf(value);
+    }
+
+    public boolean getBooleanValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "[BOOLEAN_VALUE " + value + "]";
+    }
+}
