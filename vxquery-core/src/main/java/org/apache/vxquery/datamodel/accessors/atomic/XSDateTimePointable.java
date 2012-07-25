@@ -171,9 +171,8 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
     }
 
     public static long getDayTime(byte[] bytes, int start) {
-        return (getDay(bytes, start) * DateTime.CHRONON_OF_DAY + getHour(bytes, start)
-                * DateTime.CHRONON_OF_HOUR + getMinute(bytes, start)
-                * DateTime.CHRONON_OF_MINUTE + getMilliSecond(bytes, start));
+        return (getDay(bytes, start) * DateTime.CHRONON_OF_DAY + getHour(bytes, start) * DateTime.CHRONON_OF_HOUR
+                + getMinute(bytes, start) * DateTime.CHRONON_OF_MINUTE + getMilliSecond(bytes, start));
     }
 
     public String toString() {

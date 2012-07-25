@@ -14,6 +14,7 @@ import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
  * The date is split up into five sections. Due to leap year, we have decided to keep the
  * storage simple by saving each date section separately. For calculations you can access
  * YearMonth (months) and DayTime (milliseconds) values.
+ * The date pointable is also used for GDay, GMonth, GYear, GDayMonth and GMonthYear.
  * 
  * @author prestoncarman
  */
@@ -58,7 +59,8 @@ public class XSDatePointable extends AbstractPointable implements IDate, ITimezo
         setDate(bytes, start, year, month, day, timezoneHour, timezoneMinute);
     }
 
-    public static void setDate(byte[] bytes, int start, long year, long month, long day, long timezoneHour, long timezoneMinute) {
+    public static void setDate(byte[] bytes, int start, long year, long month, long day, long timezoneHour,
+            long timezoneMinute) {
         System.out.println("  day1 = " + day);
         System.out.println("  month1 = " + month);
         System.out.println("  year1 = " + year);
