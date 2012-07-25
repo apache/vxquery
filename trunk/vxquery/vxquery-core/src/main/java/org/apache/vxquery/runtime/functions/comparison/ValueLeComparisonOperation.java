@@ -1,6 +1,5 @@
 package org.apache.vxquery.runtime.functions.comparison;
 
-
 public class ValueLeComparisonOperation extends AbstractDisjunctiveComparisonOperation {
 
     @Override
