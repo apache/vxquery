@@ -61,11 +61,6 @@ public class XSDatePointable extends AbstractPointable implements IDate, ITimezo
 
     public static void setDate(byte[] bytes, int start, long year, long month, long day, long timezoneHour,
             long timezoneMinute) {
-        System.out.println("  day1 = " + day);
-        System.out.println("  month1 = " + month);
-        System.out.println("  year1 = " + year);
-        System.out.println("  timezoneHour = " + timezoneHour);
-        System.out.println("  timezoneMinute = " + timezoneMinute);
         ShortPointable.setShort(bytes, start + YEAR_OFFSET, (short) year);
         BytePointable.setByte(bytes, start + MONTH_OFFSET, (byte) month);
         BytePointable.setByte(bytes, start + DAY_OFFSET, (byte) day);
