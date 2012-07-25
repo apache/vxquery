@@ -148,27 +148,6 @@ public enum ErrorCode {
     FORX0003(new QName(XQueryConstants.ERR_NSURI, "FORX0003"), ErrorMessages.ERR_FORX0003_DESCRIPTION),
     FORX0004(new QName(XQueryConstants.ERR_NSURI, "FORX0004"), ErrorMessages.ERR_FORX0004_DESCRIPTION),
     FOTY0012(new QName(XQueryConstants.ERR_NSURI, "FOTY0012"), ErrorMessages.ERR_FOTY0012_DESCRIPTION),
-    
-    SVRE0001(new QName(XQueryConstants.ERR_NSURI, "SVRE0001"), ErrorMessages.ERR_SVRE0001_DESCRIPTION),
-    
-    CMDL0001(new QName(XQueryConstants.ERR_NSURI, "CMDL0001"), ErrorMessages.ERR_CMDL0001_DESCRIPTION),
-    
-    RDBW0001(new QName(XQueryConstants.ERR_NSURI, "RDBW0001"), ErrorMessages.ERR_RDBW0001_DESCRIPTION),
-    RDBW0002(new QName(XQueryConstants.ERR_NSURI, "RDBW0002"), ErrorMessages.ERR_RDBW0002_DESCRIPTION),
-    RDBW0003(new QName(XQueryConstants.ERR_NSURI, "RDBW0003"), ErrorMessages.ERR_RDBW0003_DESCRIPTION),
-    
-    SQLC0001(new QName(XQueryConstants.ERR_NSURI, "SQLC0001"), ErrorMessages.ERR_SQLC0001_DESCRIPTION),
-    SQLC0002(new QName(XQueryConstants.ERR_NSURI, "SQLC0002"), ErrorMessages.ERR_SQLC0002_DESCRIPTION),
-    SQLC0003(new QName(XQueryConstants.ERR_NSURI, "SQLC0003"), ErrorMessages.ERR_SQLC0003_DESCRIPTION),
-    SQLC0004(new QName(XQueryConstants.ERR_NSURI, "SQLC0004"), ErrorMessages.ERR_SQLC0004_DESCRIPTION),
-    SQLC0005(new QName(XQueryConstants.ERR_NSURI, "SQLC0005"), ErrorMessages.ERR_SQLC0005_DESCRIPTION),
-    SQLC0006(new QName(XQueryConstants.ERR_NSURI, "SQLC0006"), ErrorMessages.ERR_SQLC0006_DESCRIPTION),
-    SQLC0007(new QName(XQueryConstants.ERR_NSURI, "SQLC0007"), ErrorMessages.ERR_SQLC0007_DESCRIPTION),
-    SQLC0008(new QName(XQueryConstants.ERR_NSURI, "SQLC0008"), ErrorMessages.ERR_SQLC0008_DESCRIPTION),
-    SQLC0009(new QName(XQueryConstants.ERR_NSURI, "SQLC0009"), ErrorMessages.ERR_SQLC0009_DESCRIPTION),
-    SQLC0010(new QName(XQueryConstants.ERR_NSURI, "SQLC0010"), ErrorMessages.ERR_SQLC0010_DESCRIPTION),
-    SQLC0011(new QName(XQueryConstants.ERR_NSURI, "SQLC0011"), ErrorMessages.ERR_SQLC0011_DESCRIPTION),
-    SQLC0012(new QName(XQueryConstants.ERR_NSURI, "SQLC0012"), ErrorMessages.ERR_SQLC0012_DESCRIPTION),
 
     SYSE0001(new QName(XQueryConstants.ERR_NSURI, "SYSE0001"), ErrorMessages.ERR_SYSE0001_DESCRIPTION),
     TODO(new QName(XQueryConstants.ERR_NSURI, "TODO"), ErrorMessages.ERR_TODO_DESCRIPTION),

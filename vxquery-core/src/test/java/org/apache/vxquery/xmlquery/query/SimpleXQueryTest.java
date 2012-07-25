@@ -24,16 +24,12 @@ import java.util.zip.GZIPInputStream;
 
 import junit.framework.Assert;
 
-import org.apache.vxquery.api.InternalAPI;
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMItem;
-import org.apache.vxquery.datamodel.XDMSequence;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.dtm.DTMDatamodelStaticInterfaceImpl;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.base.CloseableIterator;
-import org.apache.vxquery.runtime.base.OpenableCloseableIterator;
+import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.context.RootStaticContextImpl;
+import org.apache.vxquery.context.StaticContextImpl;
 import org.junit.Test;
+
+import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
 
 public class SimpleXQueryTest {
     @Test
@@ -73,7 +69,7 @@ public class SimpleXQueryTest {
 
     @Test
     public void simple008() {
-        runNegTest("simple008", "fn:boolean((fn:false(), fn:false()))");
+        runTest("simple008", "fn:boolean((fn:false(), fn:false()))");
     }
 
     @Test
@@ -141,9 +137,9 @@ public class SimpleXQueryTest {
     private static void runTest(String testName, String query) {
         try {
             runTestInternal(testName, query);
-        } catch (SystemException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -151,33 +147,15 @@ public class SimpleXQueryTest {
         try {
             runTestInternal(testName, query);
             Assert.fail();
-        } catch (SystemException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void runTestInternal(String testName, String query) throws SystemException {
-        InternalAPI iapi = new InternalAPI(new DTMDatamodelStaticInterfaceImpl());
-        OpenableCloseableIterator ri = iapi.execute(iapi.compile(null, iapi.parse(testName, new StringReader(query)),
-                Integer.MAX_VALUE));
-        ri.open();
-        System.err.println("--- Results begin");
-        XDMValue o;
-        try {
-            while ((o = (XDMValue) ri.next()) != null) {
-                if (o.getDMOKind() == DMOKind.SEQUENCE) {
-                    CloseableIterator si = ((XDMSequence) o).createItemIterator();
-                    XDMItem item;
-                    while ((item = (XDMItem) si.next()) != null) {
-                        System.err.println(item.getStringValue());
-                    }
-                } else {
-                    System.err.println(((XDMItem) o).getStringValue());
-                }
-            }
-        } finally {
-            ri.close();
-        }
-        System.err.println("--- Results end");
+    private static void runTestInternal(String testName, String query) throws Exception {
+        XMLQueryCompiler compiler = new XMLQueryCompiler(null);
+        CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
+                new FileSplit[] { new FileSplit("CHANGE_ME", File.createTempFile("foo", ".bar").getAbsolutePath()) });
+        compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE);
     }
 }

@@ -16,23 +16,8 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-
 public final class TextType extends AbstractNodeType {
     public static final TextType INSTANCE = new TextType();
-
-    private static final Filter<XDMValue> TEXT_FILTER = new Filter<XDMValue>() {
-        @Override
-        public boolean accept(XDMValue value) throws SystemException {
-            if (value == null) {
-                return false;
-            }
-            return value.getDMOKind() == DMOKind.TEXT_NODE;
-        }
-    };
 
     private TextType() {
     }
@@ -43,7 +28,12 @@ public final class TextType extends AbstractNodeType {
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return TEXT_FILTER;
+    public int hashCode() {
+        return TextType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof TextType;
     }
 }

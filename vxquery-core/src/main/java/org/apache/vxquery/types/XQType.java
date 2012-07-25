@@ -16,12 +16,5 @@
 */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.util.Filter;
-
 public interface XQType {
-    public Filter<XDMValue> createInstanceOfFilter();
-
-    public CastProcessor getCastProcessor(XQType inputBaseType);
 }

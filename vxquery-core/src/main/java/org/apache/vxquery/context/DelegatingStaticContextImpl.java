@@ -21,14 +21,13 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.vxquery.collations.Collation;
-import org.apache.vxquery.compiler.expression.Variable;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.util.Pair;
 
 public abstract class DelegatingStaticContextImpl implements StaticContext {
     protected final StaticContext parent;
@@ -55,11 +54,6 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     @Override
     public CopyNamespacesModeProperty getCopyNamespacesModeProperty() {
         return parent.getCopyNamespacesModeProperty();
-    }
-
-    @Override
-    public DataspaceContext getDataspaceContext() {
-        return parent.getDataspaceContext();
     }
 
     @Override
@@ -163,12 +157,12 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     }
 
     @Override
-    public Iterator<Variable> listVariables() {
+    public Iterator<XQueryVariable> listVariables() {
         return parent.listVariables();
     }
 
     @Override
-    public Variable lookupVariable(QName name) {
+    public XQueryVariable lookupVariable(QName name) {
         return parent.lookupVariable(name);
     }
 
@@ -223,7 +217,27 @@ public abstract class DelegatingStaticContextImpl implements StaticContext {
     }
 
     @Override
-    public void registerVariable(Variable var) {
+    public SequenceType lookupSequenceType(int code) {
+        return parent.lookupSequenceType(code);
+    }
+
+    @Override
+    public int lookupSequenceType(SequenceType type) {
+        return parent.lookupSequenceType(type);
+    }
+
+    @Override
+    public int encodeSequenceType(SequenceType type) {
+        return parent.encodeSequenceType(type);
+    }
+
+    @Override
+    public int getMaxSequenceTypeCode() {
+        return parent.getMaxSequenceTypeCode();
+    }
+
+    @Override
+    public void registerVariable(XQueryVariable var) {
         parent.registerVariable(var);
     }
 

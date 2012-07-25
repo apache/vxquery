@@ -16,21 +16,8 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-import org.apache.vxquery.util.Filter;
-
 public final class EmptySequenceType implements ItemType {
     public static final EmptySequenceType INSTANCE = new EmptySequenceType();
-
-    private static final Filter<XDMValue> INSTANCE_OF_FILTER = new Filter<XDMValue>() {
-        @Override
-        public boolean accept(XDMValue value) throws SystemException {
-            return value == null;
-        }
-    };
 
     private EmptySequenceType() {
     }
@@ -41,12 +28,12 @@ public final class EmptySequenceType implements ItemType {
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return INSTANCE_OF_FILTER;
+    public int hashCode() {
+        return EmptySequenceType.class.hashCode();
     }
 
     @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        return NotCastableCastProcessor.INSTANCE_XPST0051;
+    public boolean equals(Object other) {
+        return other instanceof EmptySequenceType;
     }
 }

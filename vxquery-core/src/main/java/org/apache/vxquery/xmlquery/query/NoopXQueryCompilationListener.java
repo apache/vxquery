@@ -14,6 +14,8 @@
  */
 package org.apache.vxquery.xmlquery.query;
 
+import org.apache.vxquery.xmlquery.ast.ModuleNode;
+
 public class NoopXQueryCompilationListener implements XQueryCompilationListener {
     public static final XQueryCompilationListener INSTANCE = new NoopXQueryCompilationListener();
 
@@ -34,5 +36,9 @@ public class NoopXQueryCompilationListener implements XQueryCompilationListener 
 
     @Override
     public void notifyOptimizedResult(Module module) {
+    }
+
+    @Override
+    public void notifyParseResult(ModuleNode moduleNode) {
     }
 }

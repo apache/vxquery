@@ -19,20 +19,27 @@ package org.apache.vxquery.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.vxquery.compiler.expression.GlobalVariable;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.DateTimeValue;
+import javax.xml.namespace.QName;
+
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IValueReference;
+import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
 
 public class DynamicContextImpl implements DynamicContext {
     private StaticContext sCtx;
 
-    private DateTimeValue currentDateTime;
+    private final Map<QName, ArrayBackedValueStorage> variables;
 
-    private Map<GlobalVariable, XDMValue> externalBindings;
+    private final ArrayBackedValueStorage currentDateTime;
 
     public DynamicContextImpl(StaticContext sCtx) {
         this.sCtx = sCtx;
-        externalBindings = new HashMap<GlobalVariable, XDMValue>();
+        currentDateTime = new ArrayBackedValueStorage();
+        variables = new HashMap<QName, ArrayBackedValueStorage>();
+    }
+
+    public IDynamicContextFactory createFactory() {
+        return DynamicContextImplFactory.createInstance(this);
     }
 
     @Override
@@ -41,22 +48,36 @@ public class DynamicContextImpl implements DynamicContext {
     }
 
     @Override
-    public void setCurrentDateTime(DateTimeValue currentDateTime) {
-        this.currentDateTime = currentDateTime;
+    public void setCurrentDateTime(IValueReference value) {
+        currentDateTime.assign(value);
     }
 
     @Override
-    public DateTimeValue getCurrentDateTime() {
-        return currentDateTime;
+    public void getCurrentDateTime(IPointable value) {
+        value.set(currentDateTime);
     }
 
     @Override
-    public void bindVariable(GlobalVariable var, XDMValue value) {
-        externalBindings.put(var, value);
+    public void bindVariable(QName var, IValueReference value) {
+        ArrayBackedValueStorage abvs = variables.get(var);
+        if (abvs == null) {
+            abvs = new ArrayBackedValueStorage();
+            variables.put(var, abvs);
+        }
+        abvs.assign(value);
     }
 
     @Override
-    public XDMValue lookupVariable(GlobalVariable var) {
-        return externalBindings.get(var);
+    public void lookupVariable(QName var, IPointable value) {
+        ArrayBackedValueStorage abvs = variables.get(var);
+        if (abvs == null) {
+            value.set(null, -1, -1);
+        } else {
+            value.set(abvs);
+        }
+    }
+
+    Map<QName, ArrayBackedValueStorage> getVariableMap() {
+        return variables;
     }
 }

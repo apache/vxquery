@@ -16,18 +16,21 @@
 */
 package org.apache.vxquery.context;
 
-import org.apache.vxquery.compiler.expression.GlobalVariable;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.datamodel.atomic.DateTimeValue;
+import javax.xml.namespace.QName;
+
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IValueReference;
 
 public interface DynamicContext {
+    public IDynamicContextFactory createFactory();
+
     public StaticContext getStaticContext();
 
-    public DateTimeValue getCurrentDateTime();
+    public void getCurrentDateTime(IPointable value);
 
-    public void setCurrentDateTime(DateTimeValue currentDateTime);
+    public void setCurrentDateTime(IValueReference value);
 
-    public void bindVariable(GlobalVariable var, XDMValue value);
+    public void bindVariable(QName var, IValueReference vReference);
 
-    public XDMValue lookupVariable(GlobalVariable var);
+    public void lookupVariable(QName var, IPointable value);
 }

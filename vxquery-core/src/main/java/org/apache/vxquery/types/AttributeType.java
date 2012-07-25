@@ -16,12 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-
 public final class AttributeType extends AbstractNodeType {
     public static final AttributeType ANYATTRIBUTE = new AttributeType(NameTest.STAR_NAMETEST,
             BuiltinTypeRegistry.XS_ANY_ATOMIC);
@@ -48,19 +42,33 @@ public final class AttributeType extends AbstractNodeType {
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        final Filter<XDMNode> nameTestMatchFilter = nameTest.createNameMatchFilter();
-        return new Filter<XDMValue>() {
-            @Override
-            public boolean accept(XDMValue value) throws SystemException {
-                if (value == null) {
-                    return false;
-                }
-                if (value.getDMOKind() != DMOKind.ATTRIBUTE_NODE) {
-                    return false;
-                }
-                return nameTestMatchFilter.accept((XDMNode) value);
-            }
-        };
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
+        result = prime * result + ((nameTest == null) ? 0 : nameTest.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        AttributeType other = (AttributeType) obj;
+        if (contentType == null) {
+            if (other.contentType != null)
+                return false;
+        } else if (!contentType.equals(other.contentType))
+            return false;
+        if (nameTest == null) {
+            if (other.nameTest != null)
+                return false;
+        } else if (!nameTest.equals(other.nameTest))
+            return false;
+        return true;
     }
 }

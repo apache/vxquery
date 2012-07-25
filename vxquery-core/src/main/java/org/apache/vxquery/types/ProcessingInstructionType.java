@@ -16,18 +16,14 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
+import java.util.Arrays;
 
 public final class ProcessingInstructionType extends AbstractNodeType {
     public static final ProcessingInstructionType ANYPI = new ProcessingInstructionType(null);
 
-    private String target;
+    private byte[] target;
 
-    public ProcessingInstructionType(String target) {
+    public ProcessingInstructionType(byte[] target) {
         this.target = target;
     }
 
@@ -36,24 +32,32 @@ public final class ProcessingInstructionType extends AbstractNodeType {
         return NodeKind.PI;
     }
 
-    public String getTarget() {
+    public byte[] getTarget() {
         return target;
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return new Filter<XDMValue>() {
-            @Override
-            public boolean accept(XDMValue value) throws SystemException {
-                if (value == null) {
-                    return false;
-                }
-                if (value.getDMOKind() != DMOKind.PI_NODE) {
-                    return false;
-                }
-                XDMNode node = (XDMNode) value;
-                return (target == null || target.equals(node.getNodeName().getLocalName()));
-            }
-        };
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((target == null) ? 0 : Arrays.hashCode(target));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ProcessingInstructionType other = (ProcessingInstructionType) obj;
+        if (target == null) {
+            if (other.target != null)
+                return false;
+        } else if (!Arrays.equals(target, other.target))
+            return false;
+        return true;
     }
 }

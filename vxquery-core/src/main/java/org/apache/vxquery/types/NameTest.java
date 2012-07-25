@@ -16,71 +16,77 @@
  */
 package org.apache.vxquery.types;
 
-import javax.xml.namespace.QName;
+import java.util.Arrays;
 
-import org.apache.vxquery.datamodel.XDMNode;
-import org.apache.vxquery.datamodel.atomic.QNameValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public final class NameTest {
     public static final String WILDCARD = null;
 
     public static final NameTest STAR_NAMETEST = new NameTest(null, null);
 
-    private String uri;
-    private String localName;
+    private byte[] uri;
+    private byte[] localName;
 
-    public NameTest(String uri, String localName) {
+    public NameTest(byte[] uri, byte[] localName) {
         this.uri = uri;
         this.localName = localName;
     }
 
-    public String getUri() {
+    public byte[] getUri() {
         return uri;
     }
 
-    public String getLocalName() {
+    public byte[] getLocalName() {
         return localName;
     }
 
-    public QName asQName() {
-        if (uri == null || localName == null) {
-            throw new UnsupportedOperationException();
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("NameTest({");
+        if (uri != null) {
+            UTF8StringPointable.toString(buffer, uri, 0);
+        } else {
+            buffer.append('*');
         }
-        return new QName(uri, localName);
+        buffer.append('}');
+        if (localName != null) {
+            UTF8StringPointable.toString(buffer, localName, 0);
+        } else {
+            buffer.append('*');
+        }
+        return buffer.toString();
     }
 
-    @SuppressWarnings("unchecked")
-    public Filter<XDMNode> createNameMatchFilter() {
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((localName == null) ? 0 : Arrays.hashCode(localName));
+        result = prime * result + ((uri == null) ? 0 : Arrays.hashCode(uri));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        NameTest other = (NameTest) obj;
+        if (localName == null) {
+            if (other.localName != null)
+                return false;
+        } else if (!Arrays.equals(localName, other.localName))
+            return false;
         if (uri == null) {
-            if (localName == null) {
-                return (Filter<XDMNode>) Filter.TRUE_FILTER;
-            } else {
-                return new Filter<XDMNode>() {
-                    @Override
-                    public boolean accept(XDMNode value) throws SystemException {
-                        return value.getNodeName().getLocalName().equals(localName);
-                    }
-                };
-            }
-        } else {
-            if (localName == null) {
-                return new Filter<XDMNode>() {
-                    @Override
-                    public boolean accept(XDMNode value) throws SystemException {
-                        return uri.equals(value.getNodeName().getUri());
-                    }
-                };
-            } else {
-                return new Filter<XDMNode>() {
-                    @Override
-                    public boolean accept(XDMNode value) throws SystemException {
-                        QNameValue nodeName = value.getNodeName();
-                        return uri.equals(nodeName.getUri()) && nodeName.getLocalName().equals(localName);
-                    }
-                };
-            }
-        }
+            if (other.uri != null)
+                return false;
+        } else if (!Arrays.equals(uri, other.uri))
+            return false;
+        return true;
     }
 }

@@ -21,6 +21,16 @@ import javax.xml.namespace.QName;
 import org.apache.vxquery.xmlquery.query.XQueryConstants;
 
 public class BuiltinTypeQNames {
+    public static final String UNTYPED_STR = "untyped";
+
+    public static final String UNTYPED_ATOMIC_STR = "untypedAtomic";
+
+    public static final String ANY_TYPE_STR = "anyType";
+
+    public static final QName XS_ANY_TYPE_QNAME = new QName(XQueryConstants.XS_NSURI, ANY_TYPE_STR,
+            XQueryConstants.XS_PREFIX);
+    public static final QName XS_UNTYPED_QNAME = new QName(XQueryConstants.XS_NSURI, UNTYPED_STR,
+            XQueryConstants.XS_PREFIX);
     public static final QName XS_ANY_ATOMIC_TYPE_QNAME = new QName(XQueryConstants.XS_NSURI, "anyAtomicType",
             XQueryConstants.XS_PREFIX);
     public static final QName XS_ANY_SIMPLE_TYPE_QNAME = new QName(XQueryConstants.XS_NSURI, "anySimpleType",
@@ -113,4 +123,6 @@ public class BuiltinTypeQNames {
             XQueryConstants.XS_PREFIX);
     public static final QName XS_NOTATION_TYPE_QNAME = new QName(XQueryConstants.XS_NSURI, "NOTATION",
             XQueryConstants.XS_PREFIX);
+    public static final QName XSEXT_TYPE_TYPE_QNAME = new QName(XQueryConstants.XSEXT_NSURI, "type",
+            XQueryConstants.XSEXT_PREFIX);
 }

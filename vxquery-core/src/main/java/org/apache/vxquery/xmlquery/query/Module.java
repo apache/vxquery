@@ -15,10 +15,10 @@
 package org.apache.vxquery.xmlquery.query;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
-import org.apache.vxquery.compiler.expression.ExpressionHandle;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.runtime.RegisterSet;
-import org.apache.vxquery.runtime.RuntimePlan;
+
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
+import edu.uci.ics.hyracks.api.job.JobSpecification;
 
 public class Module {
     private ModuleType moduleType;
@@ -26,11 +26,10 @@ public class Module {
     private CompilerControlBlock ccb;
     private String namespaceUri;
     private PrologVariable[] gVariables;
-    private ExpressionHandle body;
-    private RuntimePlan bodyPlan;
+    private ILogicalPlan body;
+    private JobSpecification jobSpec;
 
     public Module() {
-        body = new ExpressionHandle();
     }
 
     public ModuleType getModuleType() {
@@ -73,19 +72,19 @@ public class Module {
         return gVariables;
     }
 
-    public ExpressionHandle getBody() {
+    public ILogicalPlan getBody() {
         return body;
     }
 
-    public void setBodyRuntimePlan(RuntimePlan bodyPlan) {
-        this.bodyPlan = bodyPlan;
+    public void setBody(ILogicalPlan body) {
+        this.body = body;
     }
 
-    public RuntimePlan getBodyRuntimePlan() {
-        return bodyPlan;
+    public JobSpecification getHyracksJobSpecification() {
+        return jobSpec;
     }
 
-    public RegisterSet createGlobalRegisterSet() {
-        return new RegisterSet(new Object[gVariables.length]);
+    public void setHyracksJobSpecification(JobSpecification jobSpec) {
+        this.jobSpec = jobSpec;
     }
 }

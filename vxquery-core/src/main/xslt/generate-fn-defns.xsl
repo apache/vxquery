@@ -29,25 +29,12 @@
                 </xsl:if>
                 <xsl:for-each select="param">
                     ,
-                    new org.apache.vxquery.util.Pair&lt;javax.xml.namespace.QName, org.apache.vxquery.types.SequenceType&gt;(
+                    org.apache.commons.lang3.tuple.Pair.&lt;javax.xml.namespace.QName, org.apache.vxquery.types.SequenceType&gt;of(
                         new javax.xml.namespace.QName("<xsl:value-of select="@name"/>"),
                         createSequenceType("<xsl:value-of select="@type"/>")
                     )
                 </xsl:for-each>
                 ),
-                <xsl:choose>
-                    <xsl:when test="runtime/@class">
-                        new org.apache.vxquery.runtime.base.FunctionIteratorFactory() {
-                            @Override
-                            public org.apache.vxquery.runtime.base.RuntimeIterator createIterator(org.apache.vxquery.runtime.RegisterAllocator rAllocator, org.apache.vxquery.functions.Function fn, org.apache.vxquery.runtime.base.RuntimeIterator[] arguments, org.apache.vxquery.context.StaticContext ctx) {
-                                return new <xsl:value-of select="runtime/@class"/>(rAllocator, fn, arguments, ctx);
-                            }
-                        }
-                    </xsl:when>
-                    <xsl:otherwise>
-                        null
-                    </xsl:otherwise>
-                </xsl:choose>,
                 <xsl:choose>
                     <xsl:when test="@implicit-context = 'true'">
                         true
@@ -56,7 +43,25 @@
                         false
                     </xsl:otherwise>
                 </xsl:choose>
-                );
+                ) {
+                <xsl:for-each select="runtime">
+                    <xsl:if test="@type = 'scalar'">
+                    public edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory createScalarEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
+                        return new <xsl:value-of select="@class"/>(args);
+                    }
+                    </xsl:if>
+                    <xsl:if test="@type = 'aggregate'">
+                    public edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluatorFactory createAggregateEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
+                        return new <xsl:value-of select="@class"/>(args);
+                    }
+                    </xsl:if>
+                    <xsl:if test="@type = 'unnesting'">
+                    public edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
+                        return new <xsl:value-of select="@class"/>(args);
+                    }
+                    </xsl:if>
+                </xsl:for-each>
+                };
         </xsl:for-each>
     </xsl:template>
 </xsl:transform>

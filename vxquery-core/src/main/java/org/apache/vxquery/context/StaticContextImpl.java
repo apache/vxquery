@@ -18,6 +18,7 @@ package org.apache.vxquery.context;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,21 +27,20 @@ import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.vxquery.collations.Collation;
-import org.apache.vxquery.compiler.expression.Variable;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.util.Pair;
 
 public class StaticContextImpl implements StaticContext {
     private final StaticContext parent;
 
     private final Map<String, String> namespaceMap;
 
-    private final Map<QName, Variable> variableMap;
+    private final Map<QName, XQueryVariable> variableMap;
 
     protected final Map<String, Collation> collationMap;
 
@@ -55,6 +55,10 @@ public class StaticContextImpl implements StaticContext {
     protected final List<Pair<String, List<String>>> schemaImports;
 
     protected final Map<QName, SchemaType> schemaTypeMap;
+
+    protected final Map<SequenceType, Integer> sequenceTypeMap;
+
+    protected final List<SequenceType> sequenceTypeList;
 
     protected final Map<QName, AttributeType> attributeDeclarationMap;
 
@@ -82,10 +86,12 @@ public class StaticContextImpl implements StaticContext {
 
     private SequenceType defaultCollectionType;
 
+    private int typeCounter;
+
     public StaticContextImpl(StaticContext parent) {
         this.parent = parent;
         namespaceMap = new LinkedHashMap<String, String>();
-        variableMap = new LinkedHashMap<QName, Variable>();
+        variableMap = new LinkedHashMap<QName, XQueryVariable>();
         collationMap = new LinkedHashMap<String, Collation>();
         functionMap = new LinkedHashMap<QName, Function[]>();
         documentTypeMap = new LinkedHashMap<String, SequenceType>();
@@ -93,19 +99,17 @@ public class StaticContextImpl implements StaticContext {
         moduleImports = new ArrayList<Pair<String, List<String>>>();
         schemaImports = new ArrayList<Pair<String, List<String>>>();
         schemaTypeMap = new LinkedHashMap<QName, SchemaType>();
+        sequenceTypeMap = new HashMap<SequenceType, Integer>();
+        sequenceTypeList = new ArrayList<SequenceType>();
         attributeDeclarationMap = new LinkedHashMap<QName, AttributeType>();
         elementDeclarationMap = new LinkedHashMap<QName, ElementType>();
         options = new LinkedHashMap<QName, String>();
+        typeCounter = parent == null ? 0 : parent.getMaxSequenceTypeCode();
     }
 
     @Override
     public StaticContext getParent() {
         return parent;
-    }
-
-    @Override
-    public DataspaceContext getDataspaceContext() {
-        return parent.getDataspaceContext();
     }
 
     @Override
@@ -248,7 +252,7 @@ public class StaticContextImpl implements StaticContext {
     }
 
     @Override
-    public Variable lookupVariable(QName name) {
+    public XQueryVariable lookupVariable(QName name) {
         if (variableMap.containsKey(name)) {
             return variableMap.get(name);
         }
@@ -259,12 +263,12 @@ public class StaticContextImpl implements StaticContext {
     }
 
     @Override
-    public void registerVariable(Variable var) {
+    public void registerVariable(XQueryVariable var) {
         variableMap.put(var.getName(), var);
     }
 
     @Override
-    public Iterator<Variable> listVariables() {
+    public Iterator<XQueryVariable> listVariables() {
         return Collections.unmodifiableCollection(variableMap.values()).iterator();
     }
 
@@ -304,7 +308,7 @@ public class StaticContextImpl implements StaticContext {
 
     @Override
     public void registerModuleImport(String uri, List<String> locations) {
-        moduleImports.add(new Pair<String, List<String>>(uri, locations));
+        moduleImports.add(Pair.<String, List<String>> of(uri, locations));
     }
 
     @Override
@@ -327,7 +331,7 @@ public class StaticContextImpl implements StaticContext {
 
     @Override
     public void registerSchemaImport(String uri, List<String> locations) {
-        schemaImports.add(new Pair<String, List<String>>(uri, locations));
+        schemaImports.add(Pair.<String, List<String>> of(uri, locations));
     }
 
     @Override
@@ -344,6 +348,49 @@ public class StaticContextImpl implements StaticContext {
     @Override
     public void registerSchemaType(QName name, SchemaType type) {
         schemaTypeMap.put(name, type);
+    }
+
+    @Override
+    public int lookupSequenceType(SequenceType type) {
+        if (sequenceTypeMap.containsKey(type)) {
+            return sequenceTypeMap.get(type);
+        }
+        if (parent != null) {
+            return parent.lookupSequenceType(type);
+        }
+        return -1;
+    }
+
+    @Override
+    public SequenceType lookupSequenceType(int code) {
+        int maxParentTypeCode = parent == null ? 0 : parent.getMaxSequenceTypeCode();
+        if (code >= maxParentTypeCode) {
+            return sequenceTypeList.get(code - maxParentTypeCode);
+        }
+        return parent.lookupSequenceType(code);
+    }
+
+    @Override
+    public int encodeSequenceType(SequenceType type) {
+        int code = lookupSequenceType(type);
+        if (code == -1) {
+            code = typeCounter++;
+            sequenceTypeMap.put(type, code);
+            sequenceTypeList.add(type);
+            return code;
+        }
+        if (sequenceTypeMap.containsKey(type)) {
+            return sequenceTypeMap.get(type);
+        }
+        if (parent != null) {
+            return parent.lookupSequenceType(type);
+        }
+        return -1;
+    }
+
+    @Override
+    public int getMaxSequenceTypeCode() {
+        return typeCounter;
     }
 
     @Override
@@ -552,6 +599,10 @@ public class StaticContextImpl implements StaticContext {
             return parent.getOption(name);
         }
         return null;
+    }
+
+    public IStaticContextFactory createFactory() {
+        return StaticContextImplFactory.createInstance(this);
     }
 
     private abstract class ConcatenatingIterator<T> implements Iterator<T> {

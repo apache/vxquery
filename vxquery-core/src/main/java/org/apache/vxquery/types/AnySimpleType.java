@@ -16,24 +16,8 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.types.processors.NotCastableCastProcessor;
-import org.apache.vxquery.util.Filter;
-
 public final class AnySimpleType implements SimpleType {
     public static final SimpleType INSTANCE = new AnySimpleType();
-
-    private static final Filter<XDMValue> INSTANCE_OF_FILTER = new Filter<XDMValue>() {
-        @Override
-        public boolean accept(XDMValue value) throws SystemException {
-            if (value == null) {
-                return true;
-            }
-            throw new UnsupportedOperationException();
-        }
-    };
 
     private AnySimpleType() {
     }
@@ -69,12 +53,12 @@ public final class AnySimpleType implements SimpleType {
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return INSTANCE_OF_FILTER;
+    public int hashCode() {
+        return AnySimpleType.class.hashCode();
     }
 
     @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        return NotCastableCastProcessor.INSTANCE_XPST0051;
+    public boolean equals(Object other) {
+        return other instanceof AnySimpleType;
     }
 }

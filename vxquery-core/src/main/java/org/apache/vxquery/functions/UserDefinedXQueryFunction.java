@@ -16,23 +16,24 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.compiler.expression.Expression;
-import org.apache.vxquery.compiler.expression.ExpressionHandle;
-import org.apache.vxquery.compiler.expression.ParameterVariable;
-import org.apache.vxquery.runtime.RuntimePlan;
-import org.apache.vxquery.runtime.base.FunctionIteratorFactory;
+import org.apache.vxquery.context.XQueryVariable;
+
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 
 public class UserDefinedXQueryFunction extends Function {
-    private ParameterVariable[] params;
-    private ExpressionHandle body;
-    private RuntimePlan plan;
+    private XQueryVariable[] params;
+    private ILogicalPlan body;
 
-    public UserDefinedXQueryFunction(QName name, Signature signature, Expression body) {
+    public UserDefinedXQueryFunction(QName name, Signature signature, ILogicalPlan body) {
         super(name, signature);
-        this.body = new ExpressionHandle(body);
+        this.body = body;
     }
 
-    public ExpressionHandle getBody() {
+    public void setBody(ILogicalPlan body) {
+        this.body = body;
+    }
+
+    public ILogicalPlan getBody() {
         return body;
     }
 
@@ -41,20 +42,11 @@ public class UserDefinedXQueryFunction extends Function {
         return FunctionTag.UDXQUERY;
     }
 
-    @Override
-    public FunctionIteratorFactory getIteratorFactory() {
-        return null;
-    }
-
-    public void setRuntimePlan(RuntimePlan plan) {
-        this.plan = plan;
-    }
-
-    public ParameterVariable[] getParameters() {
+    public XQueryVariable[] getParameters() {
         return params;
     }
 
-    public void setParameters(ParameterVariable[] params) {
+    public void setParameters(XQueryVariable[] params) {
         this.params = params;
     }
 

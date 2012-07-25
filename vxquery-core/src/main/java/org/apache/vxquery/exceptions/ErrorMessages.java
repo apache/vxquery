@@ -181,27 +181,6 @@ public class ErrorMessages {
     public static String ERR_FORX0004_DESCRIPTION;
     public static String ERR_FOTY0012_DESCRIPTION;
 
-    public static String ERR_SVRE0001_DESCRIPTION;
-
-    public static String ERR_CMDL0001_DESCRIPTION;
-
-    public static String ERR_RDBW0001_DESCRIPTION;
-    public static String ERR_RDBW0002_DESCRIPTION;
-    public static String ERR_RDBW0003_DESCRIPTION;
-
-    public static String ERR_SQLC0001_DESCRIPTION;
-    public static String ERR_SQLC0002_DESCRIPTION;
-    public static String ERR_SQLC0003_DESCRIPTION;
-    public static String ERR_SQLC0004_DESCRIPTION;
-    public static String ERR_SQLC0005_DESCRIPTION;
-    public static String ERR_SQLC0006_DESCRIPTION;
-    public static String ERR_SQLC0007_DESCRIPTION;
-    public static String ERR_SQLC0008_DESCRIPTION;
-    public static String ERR_SQLC0009_DESCRIPTION;
-    public static String ERR_SQLC0010_DESCRIPTION;
-    public static String ERR_SQLC0011_DESCRIPTION;
-    public static String ERR_SQLC0012_DESCRIPTION;
-
     public static String ERR_SYSE0001_DESCRIPTION;
     public static String ERR_TODO_DESCRIPTION;
 }

@@ -18,8 +18,6 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
-import org.apache.vxquery.runtime.base.FunctionIteratorFactory;
-
 public class ExternalFunction extends Function {
     public ExternalFunction(QName name, Signature signature) {
         super(name, signature);
@@ -28,11 +26,6 @@ public class ExternalFunction extends Function {
     @Override
     public FunctionTag getTag() {
         return FunctionTag.EXTERNAL;
-    }
-
-    @Override
-    public FunctionIteratorFactory getIteratorFactory() {
-        return null;
     }
 
     @Override

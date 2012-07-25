@@ -17,6 +17,7 @@
 options {
     STATIC = false;
     FORCE_LA_CHECK=false;
+    UNICODE_INPUT=true;
 }
 
 
@@ -24,10 +25,12 @@ PARSER_BEGIN(XMLQuery)
 
 package org.apache.vxquery.xmlquery.query;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import org.apache.vxquery.xmlquery.ast.*;
 import org.apache.vxquery.context.*;
 import org.apache.vxquery.exceptions.*;
-import org.apache.vxquery.util.*;
+import org.apache.vxquery.util.SourceLocation;
 
 import java.math.*;
 import java.util.*;
@@ -1049,7 +1052,7 @@ ASTNode ComparisonExpr():
             | opPair = GeneralComp()
             | opPair = NodeComp()
         ) temp = FTContainsExpr() {
-            result = createInfixExpr(opPair.first, result, temp, opPair.second);
+            result = createInfixExpr(opPair.getLeft(), result, temp, opPair.getRight());
         }
     )? {
         return result;
@@ -1333,7 +1336,7 @@ Pair<Token, InfixExprNode.InfixOperator> GeneralComp():
             op = InfixExprNode.InfixOperator.GENERAL_GE;
         }
     ) {
-        return new Pair<Token, InfixExprNode.InfixOperator>(start, op);
+        return Pair.<Token, InfixExprNode.InfixOperator> of(start, op);
     }
 }
 
@@ -1369,7 +1372,7 @@ Pair<Token, InfixExprNode.InfixOperator> ValueComp():
             op = InfixExprNode.InfixOperator.VALUE_GE;
         }
     ) {
-        return new Pair<Token, InfixExprNode.InfixOperator>(start, op);
+        return Pair.<Token, InfixExprNode.InfixOperator> of(start, op);
     }
 }
 
@@ -1393,7 +1396,7 @@ Pair<Token, InfixExprNode.InfixOperator> NodeComp():
             op = InfixExprNode.InfixOperator.FOLLOWS;
         }
     ) {
-        return new Pair<Token, InfixExprNode.InfixOperator>(start, op);
+        return Pair.<Token, InfixExprNode.InfixOperator> of(start, op);
     }
 }
 
@@ -1569,8 +1572,8 @@ AxisStepNode ForwardStep():
 }
 {
     LOOKAHEAD(2) aPair = ForwardAxis() nt = NodeTest() {
-        AxisStepNode as = new AxisStepNode(createSourceLocation(aPair.first));
-        as.setAxis(aPair.second);
+        AxisStepNode as = new AxisStepNode(createSourceLocation(aPair.getLeft()));
+        as.setAxis(aPair.getRight());
         as.setNodeTest(nt);
         return as;
     }
@@ -1608,7 +1611,7 @@ Pair<Token, AxisStepNode.Axis> ForwardAxis()  :
             axis = AxisStepNode.Axis.FOLLOWING;
         }
     ) {
-        return new Pair<Token, AxisStepNode.Axis>(t, axis);
+        return Pair.<Token, AxisStepNode.Axis> of(t, axis);
     }
 }
 
@@ -1635,8 +1638,8 @@ AxisStepNode ReverseStep()   :
 }
 {
     aPair = ReverseAxis() nt = NodeTest() {
-        AxisStepNode as = new AxisStepNode(createSourceLocation(aPair.first));
-        as.setAxis(aPair.second);
+        AxisStepNode as = new AxisStepNode(createSourceLocation(aPair.getLeft()));
+        as.setAxis(aPair.getRight());
         as.setNodeTest(nt);
         return as;
     }
@@ -1668,7 +1671,7 @@ Pair<Token, AxisStepNode.Axis> ReverseAxis()  :
             axis = AxisStepNode.Axis.ANCESTOR_OR_SELF;
         }
     ) {
-        return new Pair<Token, AxisStepNode.Axis>(t, axis);
+        return Pair.<Token, AxisStepNode.Axis> of(t, axis);
     }
 }
 

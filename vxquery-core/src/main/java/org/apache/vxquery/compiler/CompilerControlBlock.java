@@ -17,22 +17,24 @@
 package org.apache.vxquery.compiler;
 
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.DatamodelStaticInterface;
+
+import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
 
 public class CompilerControlBlock {
     private final StaticContext ctx;
-    private final DatamodelStaticInterface dmStaticInterface;
 
-    public CompilerControlBlock(StaticContext ctx, DatamodelStaticInterface dmStaticInterface) {
+    private final FileSplit[] resultFileSplits;
+
+    public CompilerControlBlock(StaticContext ctx, FileSplit[] resultFileSplits) {
         this.ctx = ctx;
-        this.dmStaticInterface = dmStaticInterface;
+        this.resultFileSplits = resultFileSplits;
     }
 
     public StaticContext getStaticContext() {
         return ctx;
     }
 
-    public DatamodelStaticInterface getDatamodelStaticInterface() {
-        return dmStaticInterface;
+    public FileSplit[] getResultFileSplits() {
+        return resultFileSplits;
     }
 }

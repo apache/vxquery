@@ -16,36 +16,15 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.DMOKind;
-import org.apache.vxquery.datamodel.XDMAtomicValue;
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.types.processors.CastProcessor;
-import org.apache.vxquery.util.Filter;
-
 final class BuiltinAtomicType implements AtomicType {
     private final int id;
     private final SchemaType baseType;
     private final DerivationProcess derivationProcess;
-    private final CastProcessor castProcessor;
-    private final Filter<XDMValue> instanceFilter;
 
-    BuiltinAtomicType(int id, SimpleType baseType, DerivationProcess derivationProcess, CastProcessor castProcessor) {
+    BuiltinAtomicType(int id, SimpleType baseType, DerivationProcess derivationProcess) {
         this.id = id;
         this.baseType = baseType;
         this.derivationProcess = derivationProcess;
-        this.castProcessor = castProcessor;
-        instanceFilter = new Filter<XDMValue>() {
-            @Override
-            public boolean accept(XDMValue value) throws SystemException {
-                if (value.getDMOKind() != DMOKind.ATOMIC_VALUE) {
-                    return false;
-                }
-                XDMAtomicValue av = (XDMAtomicValue) value;
-                AtomicType at = av.getAtomicType();
-                return TypeUtils.isSubtypeTypeOf(at, BuiltinAtomicType.this);
-            }
-        };
     }
 
     @Override
@@ -79,17 +58,26 @@ final class BuiltinAtomicType implements AtomicType {
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return instanceFilter;
-    }
-
-    @Override
-    public CastProcessor getCastProcessor(XQType inputBaseType) {
-        return castProcessor;
-    }
-
-    @Override
     public String toString() {
         return String.valueOf(BuiltinTypeRegistry.INSTANCE.getTypeName(id));
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        BuiltinAtomicType other = (BuiltinAtomicType) obj;
+        if (id != other.id)
+            return false;
+        return true;
     }
 }

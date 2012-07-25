@@ -16,9 +16,6 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.util.Filter;
-
 public final class DocumentType extends AbstractNodeType {
     public static final DocumentType ANYDOCUMENT = new DocumentType(ElementType.ANYELEMENT);
 
@@ -38,7 +35,27 @@ public final class DocumentType extends AbstractNodeType {
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return null;
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((elementType == null) ? 0 : elementType.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DocumentType other = (DocumentType) obj;
+        if (elementType == null) {
+            if (other.elementType != null)
+                return false;
+        } else if (!elementType.equals(other.elementType))
+            return false;
+        return true;
     }
 }

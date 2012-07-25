@@ -16,22 +16,8 @@
  */
 package org.apache.vxquery.types;
 
-import org.apache.vxquery.datamodel.XDMValue;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.util.Filter;
-
 public final class AnyNodeType extends AbstractNodeType {
     public static final AnyNodeType INSTANCE = new AnyNodeType();
-
-    private static final Filter<XDMValue> INSTANCE_OF_FILTER = new Filter<XDMValue>() {
-        @Override
-        public boolean accept(XDMValue value) throws SystemException {
-            if (value == null) {
-                return false;
-            }
-            return value.getDMOKind().isNode();
-        }
-    };
 
     private AnyNodeType() {
     }
@@ -42,7 +28,12 @@ public final class AnyNodeType extends AbstractNodeType {
     }
 
     @Override
-    public Filter<XDMValue> createInstanceOfFilter() {
-        return INSTANCE_OF_FILTER;
+    public int hashCode() {
+        return AnyNodeType.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof AnyNodeType;
     }
 }
