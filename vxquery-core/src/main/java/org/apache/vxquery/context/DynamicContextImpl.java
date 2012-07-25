@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.api.IValueReference;
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DynamicContextImpl implements DynamicContext {
     private StaticContext sCtx;

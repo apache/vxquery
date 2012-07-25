@@ -10,8 +10,8 @@ import edu.uci.ics.hyracks.data.std.algorithms.BinarySearchAlgorithm;
 import edu.uci.ics.hyracks.data.std.collections.api.IValueReferenceVector;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.ByteArrayAccessibleOutputStream;
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class DictionaryBuilder {
     private final GrowableIntArray stringEndOffsets;

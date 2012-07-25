@@ -75,12 +75,6 @@
   </build>
   
   <dependencies>
-    <dependency>
-      <groupId>org.apache.vxquery</groupId>
-      <artifactId>vxquery-core</artifactId>
-      <version>0.1-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
 
     <dependency>
       <groupId>args4j</groupId>
@@ -105,6 +99,11 @@
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-control-nc</artifactId>
       <version>0.2.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.vxquery</groupId>
+    	<artifactId>apache-vxquery-core-incubating</artifactId>
+    	<version>0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
  

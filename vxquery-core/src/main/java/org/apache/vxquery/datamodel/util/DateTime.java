@@ -4,7 +4,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.api.ITimezone;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -58,7 +57,7 @@ public class DateTime {
     /**
      * Return a normalized time.
      */
-    public static void normalizeDateTime(long yearMonth, long dayTime, DataOutput dOut) throws Exception {
+    public static void normalizeDateTime(long yearMonth, long dayTime, DataOutput dOut) throws IOException {
         long[] monthDayLimits;
 
         long day = dayTime / CHRONON_OF_DAY;
@@ -108,7 +107,7 @@ public class DateTime {
     }
 
     public static void getTimezoneDateTime(ITimezone timezonep, DynamicContext dCtx, DataOutput dOut)
-            throws Exception {
+            throws IOException {
         long timezoneHour;
         long timezoneMinute;
         // Consider time zones.
