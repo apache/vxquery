@@ -18,7 +18,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.vxquery</groupId>
-  <artifactId>vxquery</artifactId>
+  <artifactId>apache-vxquery-incubating</artifactId>
   <packaging>pom</packaging>
   <version>0.1-SNAPSHOT</version>
   <name>VXQuery</name>
@@ -92,6 +92,7 @@
         <roles>
           <role>Project Manager</role>
           <role>Architect</role>
+          <role>Champion</role>
         </roles>
         <organization></organization>
         <timezone>-6</timezone>
@@ -118,6 +119,16 @@
         <timezone>-8</timezone>
       </developer>         
       <developer>
+        <id>prestonc</id>
+        <name>Preston Carman</name>
+        <email></email>
+        <roles>
+          <role>Developer</role>
+        </roles>
+        <organization></organization>
+        <timezone>-8</timezone>
+      </developer>         
+      <developer>
         <id>tillw</id>
         <name>Till Westmann</name>
         <email></email>
@@ -126,7 +137,7 @@
           <role>Architect</role>
         </roles>
         <organization></organization>
-        <timezone>+1</timezone>
+        <timezone>-8</timezone>
       </developer>         
   </developers>
 
