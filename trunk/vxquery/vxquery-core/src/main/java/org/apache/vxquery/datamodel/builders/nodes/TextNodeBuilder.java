@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
 import edu.uci.ics.hyracks.data.std.api.IValueReference;
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class TextNodeBuilder extends AbstractNodeBuilder {
     private DataOutput out;

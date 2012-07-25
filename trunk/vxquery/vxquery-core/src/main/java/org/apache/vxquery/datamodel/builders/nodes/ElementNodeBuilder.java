@@ -9,7 +9,7 @@ import org.apache.vxquery.util.GrowableIntArray;
 
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class ElementNodeBuilder extends AbstractNodeBuilder {
     private final GrowableIntArray attrSlots;

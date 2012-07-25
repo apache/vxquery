@@ -7,7 +7,7 @@ import javax.xml.namespace.QName;
 
 import edu.uci.ics.hyracks.api.context.IHyracksJobletContext;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 class DynamicContextImplFactory implements IDynamicContextFactory {
     private static final long serialVersionUID = 1L;

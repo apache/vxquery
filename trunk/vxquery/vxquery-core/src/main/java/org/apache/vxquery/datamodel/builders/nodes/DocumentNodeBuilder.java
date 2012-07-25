@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DocumentNodeBuilder extends AbstractNodeBuilder {
     private final GrowableIntArray childrenSlots;

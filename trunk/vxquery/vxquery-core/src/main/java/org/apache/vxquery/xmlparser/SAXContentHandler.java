@@ -34,7 +34,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class SAXContentHandler implements ContentHandler, LexicalHandler {
     private final ArrayBackedValueStorage docABVS;

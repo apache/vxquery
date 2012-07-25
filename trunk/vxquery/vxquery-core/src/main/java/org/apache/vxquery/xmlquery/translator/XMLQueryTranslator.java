@@ -160,8 +160,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOper
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.WriteOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.plan.ALogicalPlanImpl;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.ByteArrayAccessibleOutputStream;
-import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class XMLQueryTranslator {
     private static final Pattern UNQUOTER = Pattern
@@ -1446,7 +1446,7 @@ public class XMLQueryTranslator {
                     }
                     Function axisFn = translateAxis(axis);
                     NodeType nt = translateNodeTest(axis, axisNode.getNodeTest());
-                    int ntCode = currCtx.lookupSequenceType(SequenceType.create(nt, Quantifier.QUANT_ONE));
+                    int ntCode = currCtx.encodeSequenceType(SequenceType.create(nt, Quantifier.QUANT_ONE));
                     ctxExpr = sfce(axisFn,
                             treat(ctxExpr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR)),
                             ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), ntCode));

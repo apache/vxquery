@@ -382,9 +382,6 @@ public class StaticContextImpl implements StaticContext {
         if (sequenceTypeMap.containsKey(type)) {
             return sequenceTypeMap.get(type);
         }
-        if (parent != null) {
-            return parent.lookupSequenceType(type);
-        }
         return -1;
     }
 
