@@ -1,6 +1,7 @@
 package org.apache.vxquery.runtime.functions.arithmetic;
 
 import java.io.DataOutput;
+import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
@@ -19,41 +20,43 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 public class MultiplyOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void operateDateDTDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateDateDTDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDatetimeDatetime(XSDateTimePointable datetimep, XSDateTimePointable datetimep2,
-            DynamicContext dCtx, DataOutput dOut) throws Exception {
+            DynamicContext dCtx, DataOutput dOut) throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDatetimeDTDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDatetimeYMDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void operateDateYMDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateDateYMDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         long value1 = decp1.getDecimalValue();
         long value2 = decp2.getDecimalValue();
         byte place1 = decp1.getDecimalPlace();
@@ -70,7 +73,7 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDecimalDouble(XSDecimalPointable decp1, DoublePointable doublep2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         double value = decp1.doubleValue();
         value *= doublep2.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -79,14 +82,15 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDecimalDTDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = operateIntDecimal(intp.intValue(), decp);
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
         dOut.writeInt(value);
     }
 
     @Override
-    public void operateDecimalFloat(XSDecimalPointable decp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateDecimalFloat(XSDecimalPointable decp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         float value = decp.floatValue();
         value *= floatp.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -94,7 +98,8 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut) throws Exception {
+    public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
+            throws SystemException, IOException {
         XSDecimalPointable decp2 = new XSDecimalPointable();
         decp2.setDecimal(longp2.getLong(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -102,7 +107,7 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDecimalYMDuration(XSDecimalPointable decp1, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = operateIntDecimal(intp.intValue(), decp1);
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
         dOut.writeInt(value);
@@ -110,13 +115,13 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDoubleDecimal(DoublePointable doublep, XSDecimalPointable decp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         operateDecimalDouble(decp, doublep, dOut);
     }
 
     @Override
     public void operateDoubleDouble(DoublePointable doublep, DoublePointable doublep2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         double value = doublep.doubleValue();
         value *= doublep2.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -125,12 +130,13 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDoubleDTDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         operateDTDurationDouble(intp, doublep, dOut);
     }
 
     @Override
-    public void operateDoubleFloat(DoublePointable doublep, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateDoubleFloat(DoublePointable doublep, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         double value = doublep.doubleValue();
         value *= floatp.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -138,7 +144,8 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDoubleInteger(DoublePointable doublep, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateDoubleInteger(DoublePointable doublep, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         double value = doublep.doubleValue();
         value *= longp.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -147,7 +154,7 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDoubleYMDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = doublep.intValue();
         value *= intp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -155,25 +162,26 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut) throws Exception {
+    public void operateDTDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDTDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateDTDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         operateDecimalDTDuration(decp, intp, dOut);
     }
 
     @Override
     public void operateDTDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value *= doublep.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -182,7 +190,7 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
 
     @Override
     public void operateDTDurationDTDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value *= intp2.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -190,7 +198,8 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateDTDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = intp.intValue();
         value *= floatp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -198,7 +207,8 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = intp.intValue();
         value *= longp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -206,27 +216,32 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationTime(IntegerPointable intp, XSTimePointable timep, DataOutput dOut) throws Exception {
+    public void operateDTDurationTime(IntegerPointable intp, XSTimePointable timep, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void operateFloatDecimal(FloatPointable floatp, XSDecimalPointable decp, DataOutput dOut) throws Exception {
+    public void operateFloatDecimal(FloatPointable floatp, XSDecimalPointable decp, DataOutput dOut)
+            throws SystemException, IOException {
         operateDecimalFloat(decp, floatp, dOut);
     }
 
     @Override
-    public void operateFloatDouble(FloatPointable floatp, DoublePointable doublep, DataOutput dOut) throws Exception {
+    public void operateFloatDouble(FloatPointable floatp, DoublePointable doublep, DataOutput dOut)
+            throws SystemException, IOException {
         operateDoubleFloat(doublep, floatp, dOut);
     }
 
     @Override
-    public void operateFloatDTDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateFloatDTDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         operateDTDurationFloat(intp, floatp, dOut);
     }
 
     @Override
-    public void operateFloatFloat(FloatPointable floatp, FloatPointable floatp2, DataOutput dOut) throws Exception {
+    public void operateFloatFloat(FloatPointable floatp, FloatPointable floatp2, DataOutput dOut)
+            throws SystemException, IOException {
         float value = floatp.floatValue();
         value *= floatp2.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -234,7 +249,8 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatInteger(FloatPointable floatp, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateFloatInteger(FloatPointable floatp, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         float value = floatp.floatValue();
         value *= longp.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -242,32 +258,38 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatYMDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateFloatYMDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         operateYMDurationFloat(intp, floatp, dOut);
     }
 
     @Override
-    public void operateIntegerDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut) throws Exception {
+    public void operateIntegerDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut)
+            throws SystemException, IOException {
         operateDecimalInteger(decp, longp, dOut);
     }
 
     @Override
-    public void operateIntegerDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut) throws Exception {
+    public void operateIntegerDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut)
+            throws SystemException, IOException {
         operateDoubleInteger(doublep, longp, dOut);
     }
 
     @Override
-    public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         operateDTDurationInteger(intp, longp, dOut);
     }
 
     @Override
-    public void operateIntegerFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateIntegerFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         operateFloatInteger(floatp, longp, dOut);
     }
 
     @Override
-    public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut) throws Exception {
+    public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut)
+            throws SystemException, IOException {
         long value = longp.getLong();
         value *= longp2.getLong();
         dOut.write(ValueTag.XS_INTEGER_TAG);
@@ -275,7 +297,8 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerYMDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateIntegerYMDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         int value = longp.intValue();
         value *= intp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -283,59 +306,63 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateTimeDTDuration(XSTimePointable timep, IntegerPointable intp, DataOutput dOut) throws Exception {
+    public void operateTimeDTDuration(XSTimePointable timep, IntegerPointable intp, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateTimeTime(XSTimePointable timep, XSTimePointable timep2, DynamicContext dCtx, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void operateYMDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut) throws Exception {
+    public void operateYMDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateYMDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateYMDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         operateDecimalYMDuration(decp, intp, dOut);
     }
 
     @Override
     public void operateYMDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         operateDoubleYMDuration(doublep, intp, dOut);
     }
 
     @Override
-    public void operateYMDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut) throws Exception {
+    public void operateYMDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
+            throws SystemException, IOException {
         operateFloatYMDuration(floatp, intp, dOut);
     }
 
     @Override
-    public void operateYMDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut) throws Exception {
+    public void operateYMDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
+            throws SystemException, IOException {
         operateIntegerYMDuration(longp, intp, dOut);
     }
 
     @Override
     public void operateYMDurationYMDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
-            throws Exception {
+            throws SystemException, IOException {
         int value = intp.intValue();
         value *= intp2.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
         dOut.writeInt(value);
     }
 
-    public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws Exception {
+    public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws SystemException, IOException {
         XSDecimalPointable decp1 = new XSDecimalPointable();
         decp1.setDecimal(intValue, (byte) 0);
         // Prepare

@@ -23,7 +23,6 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -37,14 +36,10 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.dataflow.common.data.accessors.ArrayBackedValueStorage;
 
 public abstract class AbstractArithmeticScalarEvaluatorFactory extends
@@ -459,19 +454,14 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
     }
 
     private static class TypedPointables {
-        BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
         IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
         DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
         XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
         XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
-        XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
     }
 
     protected abstract AbstractArithmeticOperation createArithmeticOperation();
