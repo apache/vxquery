@@ -100,13 +100,15 @@
       <artifactId>hyracks-control-nc</artifactId>
       <version>0.2.1-SNAPSHOT</version>
     </dependency>
+
     <dependency>
-    	<groupId>org.apache.vxquery</groupId>
-    	<artifactId>apache-vxquery-core-incubating</artifactId>
-    	<version>0.1-SNAPSHOT</version>
+      <groupId>org.apache.vxquery</groupId>
+      <artifactId>apache-vxquery-core-incubating</artifactId>
+      <version>0.1-SNAPSHOT</version>
     </dependency>
+
   </dependencies>
- 
+
   <reporting>
     <plugins>
       <plugin>
