@@ -22,7 +22,7 @@
   <packaging>jar</packaging>
   <version>0.1-SNAPSHOT</version>
   <name>VXQuery CLI</name>
-  <description>Apache VXQuery Processor</description>
+  <description>Apache Command-Line Utility</description>
 
   <distributionManagement>
     <site>
