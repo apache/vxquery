@@ -25,6 +25,9 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
+import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
@@ -112,6 +115,10 @@ public class TestRunnerFactory {
                             tempFile.getAbsolutePath()) });
                     compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                     JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
+
+                    DynamicContext dCtx = new DynamicContextImpl(compiler.getModule().getModuleContext());
+                    spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
+
                     spec.setMaxReattempts(0);
                     JobId jobId = hcc.startJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
                     hcc.waitForCompletion(jobId);
