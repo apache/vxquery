@@ -71,6 +71,13 @@ public class CastToGYearOperation extends AbstractCastToOperation {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         }
+        // Final touches on timezone.
+        if (!positiveTimezone && date[1] != DateTime.TIMEZONE_HOUR_NULL) {
+            date[1] *= -1;
+        }
+        if (!positiveTimezone && date[2] != DateTime.TIMEZONE_MINUTE_NULL) {
+            date[2] *= -1;
+        }
         if (!DateTime.valid(date[0], 1, 1, 0, 0, 0, date[1], date[2])) {
             throw new SystemException(ErrorCode.FODT0001);
         }
@@ -79,8 +86,8 @@ public class CastToGYearOperation extends AbstractCastToOperation {
         dOut.writeShort((short) date[0]);
         dOut.write((byte) 1);
         dOut.write((byte) 1);
-        dOut.write((byte) ((positiveTimezone ? 1 : -1) * date[1]));
-        dOut.write((byte) ((positiveTimezone ? 1 : -1) * date[2]));
+        dOut.write((byte) date[1]);
+        dOut.write((byte) date[2]);
     }
 
     @Override
