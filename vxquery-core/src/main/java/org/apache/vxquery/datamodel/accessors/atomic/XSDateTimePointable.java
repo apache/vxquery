@@ -180,8 +180,21 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
     }
 
     public static String toString(byte[] bytes, int start) {
-        return getMonth(bytes, start) + "/" + getDay(bytes, start) + "/" + getYear(bytes, start) + "T"
-                + getHour(bytes, start) + ":" + getMinute(bytes, start) + ":" + getMilliSecond(bytes, start);
+        return getMonth(bytes, start)
+                + "-"
+                + getDay(bytes, start)
+                + "-"
+                + getYear(bytes, start)
+                + "T"
+                + getHour(bytes, start)
+                + ":"
+                + getMinute(bytes, start)
+                + ":"
+                + getMilliSecond(bytes, start)
+                + (getTimezoneHour(bytes, start) != DateTime.TIMEZONE_HOUR_NULL
+                        && getTimezoneMinute(bytes, start) != DateTime.TIMEZONE_MINUTE_NULL ? (getTimezoneHour(bytes,
+                        start) < 0 || getTimezoneMinute(bytes, start) < 0 ? "-" : "+")
+                        + getTimezoneHour(bytes, start) + ":" + getTimezoneMinute(bytes, start) : "");
     }
 
 }
