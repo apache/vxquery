@@ -20,8 +20,8 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class AddOperation extends AbstractArithmeticOperation {
-    protected final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-    protected final DataOutput dataOutput = abvs.getDataOutput();
+    protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
+    protected final DataOutput dOutInner = abvsInner.getDataOutput();
 
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
@@ -32,9 +32,10 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDateDTDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
+        abvsInner.reset();
         // Add duration.
-        DateTime.normalizeDateTime(datep.getYearMonth(), datep.getDayTime() + intp.getInteger(), dataOutput);
-        byte[] bytes = abvs.getByteArray();
+        DateTime.normalizeDateTime(datep.getYearMonth(), datep.getDayTime() + intp.getInteger(), dOutInner);
+        byte[] bytes = abvsInner.getByteArray();
         // Convert to date.
         bytes[XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
         bytes[XSDatePointable.TIMEZONE_MINUTE_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_MINUTE_OFFSET];
@@ -52,26 +53,29 @@ public class AddOperation extends AbstractArithmeticOperation {
     public void operateDatetimeDTDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
         // Add duration.
-        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() + intp.getInteger(), dataOutput);
+        abvsInner.reset();
+        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() + intp.getInteger(), dOutInner);
         dOut.write(ValueTag.XS_DATETIME_TAG);
-        dOut.write(abvs.getByteArray());
+        dOut.write(abvsInner.getByteArray());
     }
 
     @Override
     public void operateDatetimeYMDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
         // Add duration.
-        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() + intp.getInteger(), dataOutput);
+        abvsInner.reset();
+        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() + intp.getInteger(), dOutInner);
         dOut.write(ValueTag.XS_DATETIME_TAG);
-        dOut.write(abvs.getByteArray());
+        dOut.write(abvsInner.getByteArray());
     }
 
     @Override
     public void operateDateYMDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
+        abvsInner.reset();
         // Add duration.
-        DateTime.normalizeDateTime(datep.getYearMonth(), datep.getDayTime() + intp.getInteger(), dataOutput);
-        byte[] bytes = abvs.getByteArray();
+        DateTime.normalizeDateTime(datep.getYearMonth(), datep.getDayTime() + intp.getInteger(), dOutInner);
+        byte[] bytes = abvsInner.getByteArray();
         // Convert to date.
         bytes[XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
         bytes[XSDatePointable.TIMEZONE_MINUTE_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_MINUTE_OFFSET];
@@ -258,9 +262,10 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationTime(IntegerPointable intp1, XSTimePointable timep2, DataOutput dOut)
             throws SystemException, IOException {
+        abvsInner.reset();
         // Add duration.
-        DateTime.normalizeDateTime(timep2.getYearMonth(), timep2.getDayTime() + intp1.getInteger(), dataOutput);
-        byte[] bytes = abvs.getByteArray();
+        DateTime.normalizeDateTime(timep2.getYearMonth(), timep2.getDayTime() + intp1.getInteger(), dOutInner);
+        byte[] bytes = abvsInner.getByteArray();
         // Convert to time.
         bytes[XSTimePointable.HOUR_OFFSET] = bytes[XSDateTimePointable.HOUR_OFFSET];
         bytes[XSTimePointable.MINUTE_OFFSET] = bytes[XSDateTimePointable.MINUTE_OFFSET];
