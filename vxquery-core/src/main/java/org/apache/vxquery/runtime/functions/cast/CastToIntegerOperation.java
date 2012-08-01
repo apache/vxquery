@@ -32,7 +32,11 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
 
     @Override
     public void convertDouble(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
-        if (doublep.getDouble() > Long.MAX_VALUE || doublep.getDouble() < Long.MIN_VALUE) {
+        double doubleValue = doublep.getDouble();
+        if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
+            throw new SystemException(ErrorCode.FOCA0002);
+        }
+        if (doubleValue > Long.MAX_VALUE || doubleValue < Long.MIN_VALUE) {
             throw new SystemException(ErrorCode.FOCA0003);
         }
         dOut.write(ValueTag.XS_INTEGER_TAG);
@@ -41,7 +45,11 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
 
     @Override
     public void convertFloat(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
-        if (floatp.getFloat() > Long.MAX_VALUE || floatp.getFloat() < Long.MIN_VALUE) {
+        float floatValue = floatp.getFloat();
+        if (Float.isInfinite(floatValue) || Float.isNaN(floatValue)) {
+            throw new SystemException(ErrorCode.FOCA0002);
+        }
+        if (floatValue > Long.MAX_VALUE || floatValue < Long.MIN_VALUE) {
             throw new SystemException(ErrorCode.FOCA0003);
         }
         dOut.write(ValueTag.XS_INTEGER_TAG);
