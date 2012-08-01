@@ -36,10 +36,10 @@ public class DateTime {
             59999 // millisecond
     };
 
-    public static final int TIMEZONE_HOUR_MIN = -12, TIMEZONE_HOUR_MAX = 14, TIMEZONE_MIN_MIN = -60,
-            TIMEZONE_MIN_MAX = 60;
+    public static final int TIMEZONE_HOUR_MIN = -12, TIMEZONE_HOUR_MAX = 14, TIMEZONE_MINUTE_MIN = -60,
+            TIMEZONE_MINUTE_MAX = 60;
     // Used to store the timezone value when one does not exist.
-    public static final byte TIMEZONE_HOUR_NULL = 127, TIMEZONE_MIN_NULL = 127;
+    public static final byte TIMEZONE_HOUR_NULL = 127, TIMEZONE_MINUTE_NULL = 127;
 
     public static final int YEAR_FIELD_INDEX = 0, MONTH_FIELD_INDEX = 1, DAY_FIELD_INDEX = 2, HOUR_FIELD_INDEX = 3,
             MINUTE_FIELD_INDEX = 4, MILLISECOND_FIELD_INDEX = 5;
@@ -52,6 +52,48 @@ public class DateTime {
      */
     public static boolean isLeapYear(long year) {
         return ((year & 3) == 0) && ((year % 100) != 0 || (year % 400) == 0);
+    }
+
+    /**
+     * Check whether a given year is a leap year.
+     * 
+     * @param year
+     * @return
+     */
+    public static boolean valid(long year, long month, long day, long hour, long minute, long millisecond,
+            long timezoneHour, long timezoneMinute) {
+        if (year > FIELD_MAXS[DateTime.YEAR_FIELD_INDEX] || year < FIELD_MINS[DateTime.YEAR_FIELD_INDEX]) {
+            return false;
+        }
+        long[] monthCheck = DAYS_OF_MONTH_ORDI;
+        if (isLeapYear(year)) {
+            monthCheck = DAYS_OF_MONTH_LEAP;
+        }
+        if (month > FIELD_MAXS[DateTime.MONTH_FIELD_INDEX] || month < FIELD_MINS[DateTime.MONTH_FIELD_INDEX]) {
+            return false;
+        }
+        if (day > FIELD_MAXS[DateTime.DAY_FIELD_INDEX] || day < monthCheck[(int) (month - 1)]) {
+            return false;
+        }
+        if (hour > FIELD_MAXS[DateTime.HOUR_FIELD_INDEX] || hour < FIELD_MINS[DateTime.HOUR_FIELD_INDEX]) {
+            return false;
+        }
+        if (minute > FIELD_MAXS[DateTime.MINUTE_FIELD_INDEX] || minute < FIELD_MINS[DateTime.MINUTE_FIELD_INDEX]) {
+            return false;
+        }
+        if (millisecond > FIELD_MAXS[DateTime.MILLISECOND_FIELD_INDEX]
+                || millisecond < FIELD_MINS[DateTime.MILLISECOND_FIELD_INDEX]) {
+            return false;
+        }
+        if ((timezoneHour > FIELD_MAXS[DateTime.HOUR_FIELD_INDEX] && timezoneHour != TIMEZONE_HOUR_NULL)
+                || (timezoneHour < FIELD_MINS[DateTime.HOUR_FIELD_INDEX] && timezoneHour != TIMEZONE_HOUR_NULL)) {
+            return false;
+        }
+        if ((timezoneHour > FIELD_MAXS[DateTime.MINUTE_FIELD_INDEX] && timezoneHour != TIMEZONE_MINUTE_NULL)
+                || (timezoneHour < FIELD_MINS[DateTime.MINUTE_FIELD_INDEX] && timezoneHour != TIMEZONE_MINUTE_NULL)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -103,7 +145,7 @@ public class DateTime {
         dOut.writeByte((byte) minute);
         dOut.writeInt((int) millisecond);
         dOut.writeByte((byte) DateTime.TIMEZONE_HOUR_NULL);
-        dOut.writeByte((byte) DateTime.TIMEZONE_MIN_NULL);
+        dOut.writeByte((byte) DateTime.TIMEZONE_MINUTE_NULL);
     }
 
     public static void getTimezoneDateTime(ITimezone timezonep, DynamicContext dCtx, DataOutput dOut)
@@ -112,7 +154,7 @@ public class DateTime {
         long timezoneMinute;
         // Consider time zones.
         if (timezonep.getTimezoneHour() == DateTime.TIMEZONE_HOUR_NULL
-                || timezonep.getTimezoneMinute() == DateTime.TIMEZONE_MIN_NULL) {
+                || timezonep.getTimezoneMinute() == DateTime.TIMEZONE_MINUTE_NULL) {
             XSDateTimePointable defaultTimezone = new XSDateTimePointable();
             dCtx.getCurrentDateTime(defaultTimezone);
             timezoneHour = defaultTimezone.getTimezoneHour();
