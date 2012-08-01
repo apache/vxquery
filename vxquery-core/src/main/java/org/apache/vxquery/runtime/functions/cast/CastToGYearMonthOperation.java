@@ -79,6 +79,13 @@ public class CastToGYearMonthOperation extends AbstractCastToOperation {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         }
+        // Final touches on timezone.
+        if (!positiveTimezone && date[2] != DateTime.TIMEZONE_HOUR_NULL) {
+            date[2] *= -1;
+        }
+        if (!positiveTimezone && date[3] != DateTime.TIMEZONE_MINUTE_NULL) {
+            date[3] *= -1;
+        }
         long day;
         if (DateTime.isLeapYear(date[0])) {
             day = DateTime.DAYS_OF_MONTH_ORDI[(int) (date[1] - 1)];
@@ -93,8 +100,8 @@ public class CastToGYearMonthOperation extends AbstractCastToOperation {
         dOut.writeShort((short) date[0]);
         dOut.write((byte) date[1]);
         dOut.write((byte) day);
-        dOut.write((byte) ((positiveTimezone ? 1 : -1) * date[2]));
-        dOut.write((byte) ((positiveTimezone ? 1 : -1) * date[3]));
+        dOut.write((byte) date[2]);
+        dOut.write((byte) date[3]);
     }
 
     @Override
