@@ -113,7 +113,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
         long value = getDecimalValue(bytes, start);
         // Normalize the value and take off trailing zeros.
         while (value != 0 && value % 10 == 0) {
-            value -= 10;
+            value /= 10;
             --decimalPlace;
         }
         BytePointable.setByte(bytes, start + DECIMAL_PLACE_OFFSET, decimalPlace);
@@ -121,7 +121,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
     }
 
     public byte getDecimalPlace() {
-        return BytePointable.getByte(bytes, start + DECIMAL_PLACE_OFFSET);
+        return BytePointable.getByte(bytes, start);
     }
 
     public static byte getDecimalPlace(byte[] bytes, int start) {
@@ -129,7 +129,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
     }
 
     public long getDecimalValue() {
-        return LongPointable.getLong(bytes, start + VALUE_OFFSET);
+        return getDecimalValue(bytes, start);
     }
 
     public static long getDecimalValue(byte[] bytes, int start) {
