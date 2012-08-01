@@ -158,7 +158,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
                 value %= pow10;
                 pow10 /= 10;
             }
-            if (i == decimalPlace) {
+            if (i == decimalPlace && value > 0) {
                 dOutInner.writeChar('.');
             }
         }
@@ -171,42 +171,50 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         double value = doublep.getDouble();
 
-        if (value < 0) {
-            // Negative result, but the rest of the calculations can be based on a positive value.
-            dOutInner.writeChar('-');
-            value *= -1;
-        }
-        byte decimalPlace = 0;
-        // Move the decimal
-        while (value % 1 != 0) {
-            --decimalPlace;
-            value *= 10;
-        }
-        // Remove extra zeros
-        while (value != 0 && value % 10 == 0) {
-            value /= 10;
-            ++decimalPlace;
-        }
-        // Print out the value.
-        int nDigits = (int) Math.log10(value) + 1;
-        long pow10 = (long) Math.pow(10, nDigits - 1);
-        if (nDigits < 0) {
-            dOutInner.writeChars("0.0");
+        if (Double.isInfinite(value)) {
+            if (value == Double.NEGATIVE_INFINITY) {
+                dOutInner.writeChars("-");
+            }
+            dOutInner.writeChars("INF");
+        } else if (Double.isNaN(value)) {
+            dOutInner.writeChars("NaN");
         } else {
-            for (int i = nDigits - 1; i >= 0; --i) {
-                dOutInner.writeChar((char) ('0' + (value / pow10)));
-                value %= pow10;
-                pow10 /= 10;
-                if (i == nDigits - 1) {
-                    dOutInner.writeChar('.');
-                } else {
-                    ++decimalPlace;
+            if (value < 0) {
+                // Negative result, but the rest of the calculations can be based on a positive value.
+                dOutInner.writeChar('-');
+                value *= -1;
+            }
+            byte decimalPlace = 0;
+            // Move the decimal
+            while (value % 1 != 0) {
+                --decimalPlace;
+                value *= 10;
+            }
+            // Remove extra zeros
+            while (value != 0 && value % 10 == 0) {
+                value /= 10;
+                ++decimalPlace;
+            }
+            // Print out the value.
+            int nDigits = (int) Math.log10(value) + 1;
+            long pow10 = (long) Math.pow(10, nDigits - 1);
+            if (nDigits < 0) {
+                dOutInner.writeChars("0.0");
+            } else {
+                for (int i = nDigits - 1; i >= 0; --i) {
+                    dOutInner.writeChar((char) ('0' + (value / pow10)));
+                    value %= pow10;
+                    pow10 /= 10;
+                    if (i == nDigits - 1) {
+                        dOutInner.writeChar('.');
+                    } else {
+                        ++decimalPlace;
+                    }
                 }
             }
+            dOutInner.writeChar('E');
+            writeNumberWithPadding(decimalPlace, 1, dOutInner);
         }
-        dOutInner.writeChar('E');
-        writeNumberWithPadding(decimalPlace, 1, dOutInner);
-
         sendStringDataOutput(dOut);
     }
 
@@ -262,22 +270,25 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertDuration(XSDurationPointable durationp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
+        int yearMonth = durationp.getYearMonth();
         int dayTime = durationp.getDayTime();
 
-        if (durationp.getYearMonth() < 0 || dayTime < 0) {
+        if (yearMonth < 0 || dayTime < 0) {
             dOutInner.writeChar('-');
+            yearMonth *= -1;
+            dayTime *= -1;
         }
         dOutInner.writeChar('P');
 
         // Year
-        if (durationp.getYearMonth() > 12) {
-            dOutInner.writeChars(String.format("%01d", durationp.getYearMonth() / 12));
+        if (yearMonth > 12) {
+            dOutInner.writeChars(String.format("%01d", yearMonth / 12));
             dOutInner.writeChar('Y');
         }
 
         // Month
-        if (durationp.getYearMonth() % 12 > 0) {
-            dOutInner.writeChars(String.format("%01d", durationp.getYearMonth() % 12));
+        if (yearMonth % 12 > 0) {
+            dOutInner.writeChars(String.format("%01d", yearMonth % 12));
             dOutInner.writeChar('M');
         }
 
@@ -324,42 +335,50 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         float value = floatp.getFloat();
 
-        if (value < 0) {
-            // Negative result, but the rest of the calculations can be based on a positive value.
-            dOutInner.writeChar('-');
-            value *= -1;
-        }
-        byte decimalPlace = 0;
-        // Move the decimal
-        while (value % 1 != 0) {
-            --decimalPlace;
-            value *= 10;
-        }
-        // Remove extra zeros
-        while (value != 0 && value % 10 == 0) {
-            value /= 10;
-            ++decimalPlace;
-        }
-        // Print out the value.
-        int nDigits = (int) Math.log10(value) + 1;
-        long pow10 = (long) Math.pow(10, nDigits - 1);
-        if (nDigits < 0) {
-            dOutInner.writeChars("0.0");
+        if (Float.isInfinite(value)) {
+            if (value == Float.NEGATIVE_INFINITY) {
+                dOutInner.writeChars("-");
+            }
+            dOutInner.writeChars("INF");
+        } else if (Float.isNaN(value)) {
+            dOutInner.writeChars("NaN");
         } else {
-            for (int i = nDigits - 1; i >= 0; --i) {
-                dOutInner.writeChar((char) ('0' + (value / pow10)));
-                value %= pow10;
-                pow10 /= 10;
-                if (i == nDigits - 1) {
-                    dOutInner.writeChar('.');
-                } else {
-                    ++decimalPlace;
+            if (value < 0) {
+                // Negative result, but the rest of the calculations can be based on a positive value.
+                dOutInner.writeChar('-');
+                value *= -1;
+            }
+            byte decimalPlace = 0;
+            // Move the decimal
+            while (value % 1 != 0) {
+                --decimalPlace;
+                value *= 10;
+            }
+            // Remove extra zeros
+            while (value != 0 && value % 10 == 0) {
+                value /= 10;
+                ++decimalPlace;
+            }
+            // Print out the value.
+            int nDigits = (int) Math.log10(value) + 1;
+            long pow10 = (long) Math.pow(10, nDigits - 1);
+            if (nDigits < 0) {
+                dOutInner.writeChars("0.0");
+            } else {
+                for (int i = nDigits - 1; i >= 0; --i) {
+                    dOutInner.writeChar((char) ('0' + (value / pow10)));
+                    value %= pow10;
+                    pow10 /= 10;
+                    if (i == nDigits - 1) {
+                        dOutInner.writeChar('.');
+                    } else {
+                        ++decimalPlace;
+                    }
                 }
             }
+            dOutInner.writeChar('E');
+            writeNumberWithPadding(decimalPlace, 1, dOutInner);
         }
-        dOutInner.writeChar('E');
-        writeNumberWithPadding(decimalPlace, 1, dOutInner);
-
         sendStringDataOutput(dOut);
     }
 

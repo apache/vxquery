@@ -412,7 +412,13 @@ public class XMLSerializer implements IPrinter {
         DoublePointable dp = pp.takeOne(DoublePointable.class);
         try {
             tvp.getValue(dp);
-            ps.print(dp.doubleValue());
+            abvs.reset();
+            castToString.convertDouble(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             pp.giveBack(dp);
         }
@@ -486,7 +492,13 @@ public class XMLSerializer implements IPrinter {
         FloatPointable fp = pp.takeOne(FloatPointable.class);
         try {
             tvp.getValue(fp);
-            ps.print(fp.floatValue());
+            abvs.reset();
+            castToString.convertFloat(fp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             pp.giveBack(fp);
         }
