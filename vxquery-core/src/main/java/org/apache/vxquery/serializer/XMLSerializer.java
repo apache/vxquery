@@ -1,5 +1,7 @@
 package org.apache.vxquery.serializer;
 
+import java.io.DataOutput;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import org.apache.vxquery.datamodel.accessors.PointablePool;
@@ -7,7 +9,13 @@ import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
@@ -15,19 +23,28 @@ import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.data.IPrinter;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
+import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
+import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XMLSerializer implements IPrinter {
     private final PointablePool pp;
 
     private NodeTreePointable ntp;
+
+    private ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+    private DataOutput dOut = abvs.getDataOutput();
+    private CastToStringOperation castToString = new CastToStringOperation();
 
     public XMLSerializer() {
         pp = PointablePoolFactory.INSTANCE.createPointablePool();
@@ -47,28 +64,96 @@ public class XMLSerializer implements IPrinter {
     private void printTaggedValuePointable(PrintStream ps, TaggedValuePointable tvp) {
         byte tag = tvp.getTag();
         switch ((int) tag) {
-            case ValueTag.XS_STRING_TAG:
+            case ValueTag.XS_ANY_URI_TAG:
                 printString(ps, tvp);
                 break;
 
-            case ValueTag.XS_UNTYPED_ATOMIC_TAG:
-                printString(ps, tvp);
+            case ValueTag.XS_BASE64_BINARY_TAG:
+                printBase64Binary(ps, tvp);
                 break;
 
-            case ValueTag.XS_INTEGER_TAG:
-                printInteger(ps, tvp);
+            case ValueTag.XS_BOOLEAN_TAG:
+                printBoolean(ps, tvp);
                 break;
 
-            case ValueTag.XS_DOUBLE_TAG:
-                printDouble(ps, tvp);
+            case ValueTag.XS_DATE_TAG:
+                printDate(ps, tvp);
+                break;
+
+            case ValueTag.XS_DATETIME_TAG:
+                printDateTime(ps, tvp);
+                break;
+
+            case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                printDTDuration(ps, tvp);
                 break;
 
             case ValueTag.XS_DECIMAL_TAG:
                 printDecimal(ps, tvp);
                 break;
 
-            case ValueTag.XS_BOOLEAN_TAG:
-                printBoolean(ps, tvp);
+            case ValueTag.XS_DOUBLE_TAG:
+                printDouble(ps, tvp);
+                break;
+
+            case ValueTag.XS_DURATION_TAG:
+                printDuration(ps, tvp);
+                break;
+
+            case ValueTag.XS_FLOAT_TAG:
+                printFloat(ps, tvp);
+                break;
+
+            case ValueTag.XS_G_DAY_TAG:
+                printGDay(ps, tvp);
+                break;
+
+            case ValueTag.XS_G_MONTH_TAG:
+                printGMonth(ps, tvp);
+                break;
+
+            case ValueTag.XS_G_MONTH_DAY_TAG:
+                printGMonthDay(ps, tvp);
+                break;
+
+            case ValueTag.XS_G_YEAR_TAG:
+                printGYear(ps, tvp);
+                break;
+
+            case ValueTag.XS_G_YEAR_MONTH_TAG:
+                printGYearMonth(ps, tvp);
+                break;
+
+            case ValueTag.XS_HEX_BINARY_TAG:
+                printHexBinary(ps, tvp);
+                break;
+
+            case ValueTag.XS_INTEGER_TAG:
+                printInteger(ps, tvp);
+                break;
+
+            case ValueTag.XS_NOTATION_TAG:
+                printString(ps, tvp);
+                break;
+
+            case ValueTag.XS_QNAME_TAG:
+                printQName(ps, tvp);
+                break;
+
+            case ValueTag.XS_STRING_TAG:
+                printString(ps, tvp);
+                break;
+
+            case ValueTag.XS_TIME_TAG:
+                printTime(ps, tvp);
+                break;
+
+            case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                printString(ps, tvp);
+                break;
+
+            case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                printYMDuration(ps, tvp);
                 break;
 
             case ValueTag.SEQUENCE_TAG:
@@ -112,27 +197,13 @@ public class XMLSerializer implements IPrinter {
         XSDecimalPointable dp = pp.takeOne(XSDecimalPointable.class);
         try {
             tvp.getValue(dp);
-            byte decimalPlace = dp.getDecimalPlace();
-            long value = dp.getDecimalValue();
-            int nDigits = (int) Math.log10(value) + 1;
-            long pow10 = (long) Math.pow(10, nDigits - 1);
-            int start = Math.max(decimalPlace, nDigits - 1);
-            int end = Math.min(0, decimalPlace);
-            if (start > nDigits) {
-                ps.append("0.");
-            }
-            for (int i = start; i >= end; --i) {
-                if (i >= nDigits || i < 0) {
-                    ps.append('0');
-                } else {
-                    ps.append((char) ('0' + (value / pow10)));
-                    value %= pow10;
-                    pow10 /= 10;
-                }
-                if (i == decimalPlace) {
-                    ps.append('.');
-                }
-            }
+            abvs.reset();
+            castToString.convertDecimal(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             pp.giveBack(dp);
         }
@@ -311,6 +382,22 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
+    private void printBase64Binary(PrintStream ps, TaggedValuePointable tvp) {
+        XSBinaryPointable bp = pp.takeOne(XSBinaryPointable.class);
+        try {
+            tvp.getValue(bp);
+            abvs.reset();
+            castToString.convertBase64Binary(bp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(bp);
+        }
+    }
+
     private void printBoolean(PrintStream ps, TaggedValuePointable tvp) {
         BooleanPointable bp = pp.takeOne(BooleanPointable.class);
         try {
@@ -331,6 +418,176 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
+    private void printDate(PrintStream ps, TaggedValuePointable tvp) {
+        XSDatePointable dp = pp.takeOne(XSDatePointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertDate(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printDateTime(PrintStream ps, TaggedValuePointable tvp) {
+        XSDateTimePointable dtp = pp.takeOne(XSDateTimePointable.class);
+        try {
+            tvp.getValue(dtp);
+            abvs.reset();
+            castToString.convertDatetime(dtp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dtp);
+        }
+    }
+
+    private void printDTDuration(PrintStream ps, TaggedValuePointable tvp) {
+        IntegerPointable ip = pp.takeOne(IntegerPointable.class);
+        try {
+            tvp.getValue(ip);
+            abvs.reset();
+            castToString.convertDTDuration(ip, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(ip);
+        }
+    }
+
+    private void printDuration(PrintStream ps, TaggedValuePointable tvp) {
+        XSDurationPointable dp = pp.takeOne(XSDurationPointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertDuration(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printFloat(PrintStream ps, TaggedValuePointable tvp) {
+        FloatPointable fp = pp.takeOne(FloatPointable.class);
+        try {
+            tvp.getValue(fp);
+            ps.print(fp.floatValue());
+        } finally {
+            pp.giveBack(fp);
+        }
+    }
+
+    private void printGDay(PrintStream ps, TaggedValuePointable tvp) {
+        XSDatePointable dp = pp.takeOne(XSDatePointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertGDay(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printGMonth(PrintStream ps, TaggedValuePointable tvp) {
+        XSDatePointable dp = pp.takeOne(XSDatePointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertGMonth(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printGMonthDay(PrintStream ps, TaggedValuePointable tvp) {
+        XSDatePointable dp = pp.takeOne(XSDatePointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertGMonthDay(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printGYear(PrintStream ps, TaggedValuePointable tvp) {
+        XSDatePointable dp = pp.takeOne(XSDatePointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertGYear(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printGYearMonth(PrintStream ps, TaggedValuePointable tvp) {
+        XSDatePointable dp = pp.takeOne(XSDatePointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertGYearMonth(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printHexBinary(PrintStream ps, TaggedValuePointable tvp) {
+        XSBinaryPointable bp = pp.takeOne(XSBinaryPointable.class);
+        try {
+            tvp.getValue(bp);
+            abvs.reset();
+            castToString.convertHexBinary(bp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(bp);
+        }
+    }
+
     private void printInteger(PrintStream ps, TaggedValuePointable tvp) {
         LongPointable lp = pp.takeOne(LongPointable.class);
         try {
@@ -339,6 +596,28 @@ public class XMLSerializer implements IPrinter {
         } finally {
             pp.giveBack(lp);
         }
+    }
+
+    private void printQName(PrintStream ps, TaggedValuePointable tvp) {
+        XSQNamePointable dp = pp.takeOne(XSQNamePointable.class);
+        try {
+            tvp.getValue(dp);
+            abvs.reset();
+            castToString.convertQName(dp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(dp);
+        }
+    }
+
+    private void printStringAbvs(PrintStream ps) {
+        UTF8StringPointable stringp = new UTF8StringPointable();
+        stringp.set(abvs.getByteArray(), abvs.getStartOffset() + 1, abvs.getLength() - 1);
+        printString(ps, stringp);
     }
 
     private void printString(PrintStream ps, TaggedValuePointable tvp) {
@@ -384,6 +663,40 @@ public class XMLSerializer implements IPrinter {
             int cLen = UTF8StringPointable.getModifiedUTF8Len(c);
             offset += cLen;
             utfLen -= cLen;
+        }
+    }
+
+    private void printTime(PrintStream ps, TaggedValuePointable tvp) {
+        XSTimePointable tp = pp.takeOne(XSTimePointable.class);
+        try {
+            tvp.getValue(tp);
+            abvs.reset();
+            castToString.convertTime(tp, dOut);
+            printStringAbvs(ps);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(tp);
+        }
+    }
+
+    private void printYMDuration(PrintStream ps, TaggedValuePointable tvp) {
+        IntegerPointable ip = pp.takeOne(IntegerPointable.class);
+        try {
+            tvp.getValue(ip);
+            abvs.reset();
+            castToString.convertYMDuration(ip, dOut);
+            UTF8StringPointable stringp = new UTF8StringPointable();
+            stringp.set(abvs.getByteArray(), abvs.getStartOffset() + 1, abvs.getLength() - 1);
+            printString(ps, stringp);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(ip);
         }
     }
 
