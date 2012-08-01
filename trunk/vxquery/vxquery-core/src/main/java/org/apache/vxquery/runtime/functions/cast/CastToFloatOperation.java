@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
@@ -59,6 +60,9 @@ public class CastToFloatOperation extends AbstractCastToOperation {
         long value = 0;
         boolean pastDecimal = false, negativeValue = false;
         int c = ICharacterIterator.EOS_CHAR;
+        int c2 = ICharacterIterator.EOS_CHAR;
+        int c3 = ICharacterIterator.EOS_CHAR;
+
         while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
             if (Character.isDigit(c)) {
                 value = value * 10 + Character.getNumericValue(c);
@@ -67,29 +71,56 @@ public class CastToFloatOperation extends AbstractCastToOperation {
                 }
             } else if (c == Character.valueOf('-')) {
                 negativeValue = true;
-            } else if (c == Character.valueOf('E')) {
+            } else if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
+                break;
+            } else if (c == Character.valueOf('.')) {
+                pastDecimal = true;
+            } else if (c == Character.valueOf('I') || c == Character.valueOf('N') && value == 0) {
                 break;
             } else {
-                pastDecimal = true;
+                throw new SystemException(ErrorCode.FORG0001);
             }
         }
-        if (c == Character.valueOf('E')) {
+        if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
             int moveOffset = 0;
+            boolean offsetNegative = false;
             while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
                 if (Character.isDigit(c)) {
                     moveOffset = moveOffset * 10 + Character.getNumericValue(c);
                 } else if (c == Character.valueOf('-')) {
-                    moveOffset = moveOffset * -1;
+                    offsetNegative = true;
                 } else {
-                    break;
+                    throw new SystemException(ErrorCode.FORG0001);
                 }
+            }
+            if (offsetNegative) {
+                moveOffset *= -1;
             }
             decimalPlace += moveOffset;
         }
-        if (negativeValue) {
-            value *= -1;
+        float valueFloat;
+        if (c == Character.valueOf('I') || c == Character.valueOf('N')) {
+            c2 = charIterator.next();
+            c3 = charIterator.next();
+            if (charIterator.next() != ICharacterIterator.EOS_CHAR) {
+                throw new SystemException(ErrorCode.FORG0001);
+            } else if (c == Character.valueOf('I') && c2 == Character.valueOf('N') && c3 == Character.valueOf('F')) {
+                if (negativeValue) {
+                    valueFloat = Float.NEGATIVE_INFINITY;
+                } else {
+                    valueFloat = Float.POSITIVE_INFINITY;
+                }
+            } else if (c == Character.valueOf('N') && c2 == Character.valueOf('a') && c3 == Character.valueOf('N')) {
+                valueFloat = Float.NaN;
+            } else {
+                throw new SystemException(ErrorCode.FORG0001);
+            }
+        } else {
+            if (negativeValue) {
+                value *= -1;
+            }
+            valueFloat = (float) (value * Math.pow(10, decimalPlace));
         }
-        float valueFloat = (float) (value * Math.pow(10, decimalPlace));
 
         dOut.write(ValueTag.XS_FLOAT_TAG);
         dOut.writeFloat(valueFloat);
