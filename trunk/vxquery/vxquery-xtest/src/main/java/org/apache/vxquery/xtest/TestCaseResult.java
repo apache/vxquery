@@ -94,8 +94,9 @@ public class TestCaseResult {
                         if (result != null) {
                             Matcher m = XML_RES_PREFIX.matcher(result);
                             if (m.find() && m.start() == 0) {
-                                result = result.substring(m.end()).trim();
+                                result = result.substring(m.end());
                             }
+                            result = result.trim();
                             Pair<Boolean, String> cmp = textCompare(expResult, result);
                             report = cmp.getRight();
                             state = cmp.getLeft() ? State.EXPECTED_RESULT_GOT_SAME_RESULT
