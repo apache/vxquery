@@ -30,10 +30,12 @@ import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
 import edu.uci.ics.hyracks.api.client.HyracksConnection;
 import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
+import edu.uci.ics.hyracks.api.exceptions.HyracksException;
 import edu.uci.ics.hyracks.api.job.JobFlag;
 import edu.uci.ics.hyracks.api.job.JobId;
 import edu.uci.ics.hyracks.api.job.JobSpecification;
@@ -123,6 +125,10 @@ public class TestRunnerFactory {
                     JobId jobId = hcc.startJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
                     hcc.waitForCompletion(jobId);
                     res.result = FileUtils.readFileToString(tempFile, "UTF-8").trim();
+                } catch (SystemException e) {
+                    res.error = e;
+                } catch (HyracksException e) {
+                    res.error = e;
                 } catch (Throwable e) {
                     res.error = e;
                 } finally {
