@@ -12,7 +12,8 @@ import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class CastToBase64BinaryOperation extends AbstractCastToOperation {
-
+    private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
+    
     @Override
     public void convertBase64Binary(XSBinaryPointable binaryp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BASE64_BINARY_TAG);
@@ -27,14 +28,14 @@ public class CastToBase64BinaryOperation extends AbstractCastToOperation {
 
     @Override
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
-        ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
-        Base64OutputStream b64os = new Base64OutputStream(baaos, true);
-        b64os.write(stringp.getByteArray(), stringp.getStartOffset() + 2, stringp.getUTFLength());
+        baaos.reset();
+        Base64OutputStream b64os = new Base64OutputStream(baaos, false);
+        b64os.write(stringp.getByteArray(), stringp.getStartOffset() + 2, stringp.getLength() - 2);
 
-        dOut.write(ValueTag.XS_STRING_TAG);
+        dOut.write(ValueTag.XS_BASE64_BINARY_TAG);
         dOut.write((byte) ((baaos.size() >>> 8) & 0xFF));
         dOut.write((byte) ((baaos.size() >>> 0) & 0xFF));
-        dOut.write(baaos.getByteArray());
+        dOut.write(baaos.getByteArray(), 0, baaos.size());
     }
 
     @Override
