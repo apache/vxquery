@@ -11,9 +11,11 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.api.IDate;
+import org.apache.vxquery.datamodel.api.ITime;
+import org.apache.vxquery.datamodel.api.ITimezone;
 import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
@@ -26,9 +28,11 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class CastToStringOperation extends AbstractCastToOperation {
+    private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private DataOutput dOutInner = abvsInner.getDataOutput();
     int returnTag = ValueTag.XS_STRING_TAG;
+    private final char[] hex = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
     @Override
     public void convertAnyURI(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
@@ -38,23 +42,23 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
     @Override
     public void convertBase64Binary(XSBinaryPointable binaryp, DataOutput dOut) throws SystemException, IOException {
-        ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
-        Base64OutputStream b64os = new Base64OutputStream(baaos, false);
+        baaos.reset();
+        Base64OutputStream b64os = new Base64OutputStream(baaos, true);
         b64os.write(binaryp.getByteArray(), binaryp.getStartOffset() + 2, binaryp.getLength() - 2);
 
         dOut.write(returnTag);
         dOut.write((byte) ((baaos.size() >>> 8) & 0xFF));
         dOut.write((byte) ((baaos.size() >>> 0) & 0xFF));
-        dOut.write(baaos.getByteArray());
+        dOut.write(baaos.getByteArray(), 0, baaos.size());
     }
 
     @Override
     public void convertBoolean(BooleanPointable boolp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         if (boolp.getBoolean()) {
-            dOutInner.writeChars("true");
+            writeCharSequence("true", dOutInner);
         } else {
-            dOutInner.writeChars("false");
+            writeCharSequence("false", dOutInner);
         }
         sendStringDataOutput(dOut);
     }
@@ -62,29 +66,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertDate(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        // Year
-        dOutInner.writeChars(String.format("%04d", datep.getYear()));
-        dOutInner.writeChar('-');
-
-        // Month
-        dOutInner.writeChars(String.format("%02d", datep.getMonth()));
-        dOutInner.writeChar('-');
-
-        // Day
-        dOutInner.writeChars(String.format("%02d", datep.getDay()));
-
-        // Timezone
-        if (datep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && datep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (datep.getTimezoneMinute() >= 0 && datep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneHour()));
-            dOutInner.writeChar(':');
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneMinute()));
-        }
+        writeDate(datep, dOutInner);
+        writeTimezone(datep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -92,45 +75,10 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertDatetime(XSDateTimePointable datetimep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        // Year
-        writeNumberWithPadding(datetimep.getYear(), 4, dOutInner);
-        dOutInner.writeChar('-');
-
-        // Month
-        writeNumberWithPadding(datetimep.getMonth(), 2, dOutInner);
-        dOutInner.writeChar('-');
-
-        // Day
-        writeNumberWithPadding(datetimep.getDay(), 2, dOutInner);
-        dOutInner.writeChar('T');
-
-        // Hour
-        writeNumberWithPadding(datetimep.getHour(), 2, dOutInner);
-        dOutInner.writeChar(':');
-
-        // Minute
-        writeNumberWithPadding(datetimep.getMinute(), 2, dOutInner);
-        dOutInner.writeChar(':');
-
-        // Milliseconds
-        writeNumberWithPadding(datetimep.getMilliSecond(), 2, dOutInner);
-        if (datetimep.getMilliSecond() % DateTime.CHRONON_OF_SECOND != 0) {
-            dOutInner.writeChar('.');
-            writeNumberWithPadding(datetimep.getMilliSecond() % DateTime.CHRONON_OF_SECOND, 3, dOutInner);
-        }
-
-        // Timezone
-        if (datetimep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && datetimep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (datetimep.getTimezoneMinute() >= 0 && datetimep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            writeNumberWithPadding(datetimep.getTimezoneHour(), 2, dOutInner);
-            dOutInner.writeChar(':');
-            writeNumberWithPadding(datetimep.getTimezoneMinute(), 2, dOutInner);
-        }
+        writeDate(datetimep, dOutInner);
+        writeChar('T', dOutInner);
+        writeTime(datetimep, dOutInner);
+        writeTimezone(datetimep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -140,29 +88,33 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         byte decimalPlace = decp.getDecimalPlace();
         long value = decp.getDecimalValue();
-        if (value < 0) {
+        if (!isNumberPostive(value)) {
             // Negative result, but the rest of the calculations can be based on a positive value.
-            dOutInner.writeChar('-');
+            writeChar('-', dOutInner);
             value *= -1;
         }
-        int nDigits = (int) Math.log10(value) + 1;
-        long pow10 = (long) Math.pow(10, nDigits - 1);
-        int start = Math.max(decimalPlace, nDigits - 1);
-        int end = Math.min(0, decimalPlace);
 
-        for (int i = start; i >= end; --i) {
-            if (i >= nDigits || i < 0) {
-                dOutInner.writeChar('0');
-            } else {
-                dOutInner.writeChar((char) ('0' + (value / pow10)));
-                value %= pow10;
-                pow10 /= 10;
-            }
-            if (i == decimalPlace && value > 0) {
-                dOutInner.writeChar('.');
+        if (value == 0) {
+            writeChar('0', dOutInner);
+        } else {
+            int nDigits = (int) Math.log10(value) + 1;
+            long pow10 = (long) Math.pow(10, nDigits - 1);
+            int start = Math.max(decimalPlace, nDigits - 1);
+            int end = Math.min(0, decimalPlace);
+
+            for (int i = start; i >= end; --i) {
+                if (i >= nDigits || i < 0) {
+                    writeChar('0', dOutInner);
+                } else {
+                    writeChar((char) ('0' + (value / pow10)), dOutInner);
+                    value %= pow10;
+                    pow10 /= 10;
+                }
+                if (i == decimalPlace && value > 0) {
+                    writeChar('.', dOutInner);
+                }
             }
         }
-
         sendStringDataOutput(dOut);
     }
 
@@ -173,15 +125,21 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
         if (Double.isInfinite(value)) {
             if (value == Double.NEGATIVE_INFINITY) {
-                dOutInner.writeChars("-");
+                writeCharSequence("-", dOutInner);
             }
-            dOutInner.writeChars("INF");
+            writeCharSequence("INF", dOutInner);
         } else if (Double.isNaN(value)) {
-            dOutInner.writeChars("NaN");
+            writeCharSequence("NaN", dOutInner);
+        } else if (value <= 1000000 || value >= 0.000001) {
+            CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
+            castToDecimal.convertDouble(doublep, dOutInner);
+            XSDecimalPointable decp = new XSDecimalPointable();
+            decp.set(abvsInner);
+            convertDecimal(decp, dOut);
         } else {
-            if (value < 0) {
+            if (!isNumberPostive((long) value)) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
-                dOutInner.writeChar('-');
+                writeChar('-', dOutInner);
                 value *= -1;
             }
             byte decimalPlace = 0;
@@ -199,20 +157,23 @@ public class CastToStringOperation extends AbstractCastToOperation {
             int nDigits = (int) Math.log10(value) + 1;
             long pow10 = (long) Math.pow(10, nDigits - 1);
             if (nDigits < 0) {
-                dOutInner.writeChars("0.0");
+                writeCharSequence("0.0", dOutInner);
             } else {
                 for (int i = nDigits - 1; i >= 0; --i) {
-                    dOutInner.writeChar((char) ('0' + (value / pow10)));
+                    writeChar((char) ('0' + (value / pow10)), dOutInner);
                     value %= pow10;
                     pow10 /= 10;
                     if (i == nDigits - 1) {
-                        dOutInner.writeChar('.');
+                        writeChar('.', dOutInner);
                     } else {
                         ++decimalPlace;
                     }
                 }
+                if (nDigits == 1) {
+                    writeChar('0', dOutInner);
+                }
             }
-            dOutInner.writeChar('E');
+            writeChar('E', dOutInner);
             writeNumberWithPadding(decimalPlace, 1, dOutInner);
         }
         sendStringDataOutput(dOut);
@@ -223,47 +184,50 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         int dayTime = intp.getInteger();
 
-        if (dayTime < 0) {
-            dOutInner.writeChar('-');
-            dayTime *= -1;
-        }
-        dOutInner.writeChar('P');
-
-        // Day
-        if (dayTime > DateTime.CHRONON_OF_DAY) {
-            writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_DAY, 1, dOutInner);
-            dOutInner.writeChar('D');
-            dayTime %= DateTime.CHRONON_OF_DAY;
-        }
-
-        if (dayTime > 0) {
-            dOutInner.writeChar('T');
-        }
-
-        // Hour
-        if (dayTime > DateTime.CHRONON_OF_HOUR) {
-            writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_HOUR, 1, dOutInner);
-            dOutInner.writeChar('H');
-            dayTime %= DateTime.CHRONON_OF_HOUR;
-        }
-
-        // Minute
-        if (dayTime > DateTime.CHRONON_OF_MINUTE) {
-            writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_MINUTE, 1, dOutInner);
-            dOutInner.writeChar('M');
-            dayTime %= DateTime.CHRONON_OF_MINUTE;
-        }
-
-        // Milliseconds
-        if (dayTime > 0) {
-            writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_SECOND, 1, dOutInner);
-            if (dayTime % DateTime.CHRONON_OF_SECOND != 0) {
-                dOutInner.writeChar('.');
-                writeNumberWithPadding(dayTime % DateTime.CHRONON_OF_SECOND, 3, dOutInner);
+        if (dayTime == 0) {
+            writeCharSequence("PT0S", dOutInner);
+        } else {
+            if (dayTime < 0) {
+                writeChar('-', dOutInner);
+                dayTime *= -1;
             }
-            dOutInner.writeChar('S');
-        }
+            writeChar('P', dOutInner);
 
+            // Day
+            if (dayTime >= DateTime.CHRONON_OF_DAY) {
+                writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_DAY, 1, dOutInner);
+                writeChar('D', dOutInner);
+                dayTime %= DateTime.CHRONON_OF_DAY;
+            }
+
+            if (dayTime > 0) {
+                writeChar('T', dOutInner);
+            }
+
+            // Hour
+            if (dayTime >= DateTime.CHRONON_OF_HOUR) {
+                writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_HOUR, 1, dOutInner);
+                writeChar('H', dOutInner);
+                dayTime %= DateTime.CHRONON_OF_HOUR;
+            }
+
+            // Minute
+            if (dayTime >= DateTime.CHRONON_OF_MINUTE) {
+                writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_MINUTE, 1, dOutInner);
+                writeChar('M', dOutInner);
+                dayTime %= DateTime.CHRONON_OF_MINUTE;
+            }
+
+            // Milliseconds
+            if (dayTime > 0) {
+                writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_SECOND, 1, dOutInner);
+                if (dayTime % DateTime.CHRONON_OF_SECOND != 0) {
+                    writeChar('.', dOutInner);
+                    writeNumberWithPadding(dayTime % DateTime.CHRONON_OF_SECOND, 3, dOutInner);
+                }
+                writeChar('S', dOutInner);
+            }
+        }
         sendStringDataOutput(dOut);
     }
 
@@ -274,57 +238,57 @@ public class CastToStringOperation extends AbstractCastToOperation {
         int dayTime = durationp.getDayTime();
 
         if (yearMonth < 0 || dayTime < 0) {
-            dOutInner.writeChar('-');
+            writeChar('-', dOutInner);
             yearMonth *= -1;
             dayTime *= -1;
         }
-        dOutInner.writeChar('P');
+        writeChar('P', dOutInner);
 
         // Year
-        if (yearMonth > 12) {
-            dOutInner.writeChars(String.format("%01d", yearMonth / 12));
-            dOutInner.writeChar('Y');
+        if (yearMonth >= 12) {
+            writeNumberWithPadding(yearMonth / 12, 1, dOutInner);
+            writeChar('Y', dOutInner);
         }
 
         // Month
         if (yearMonth % 12 > 0) {
-            dOutInner.writeChars(String.format("%01d", yearMonth % 12));
-            dOutInner.writeChar('M');
+            writeNumberWithPadding(yearMonth % 12, 1, dOutInner);
+            writeChar('M', dOutInner);
         }
 
         // Day
-        if (dayTime > DateTime.CHRONON_OF_DAY) {
-            dOutInner.writeChars(String.format("%01d", dayTime / DateTime.CHRONON_OF_DAY));
-            dOutInner.writeChar('D');
+        if (dayTime >= DateTime.CHRONON_OF_DAY) {
+            writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_DAY, 1, dOutInner);
+            writeChar('D', dOutInner);
             dayTime %= DateTime.CHRONON_OF_DAY;
         }
 
         if (dayTime > 0) {
-            dOutInner.writeChar('T');
+            writeChar('T', dOutInner);
         }
 
         // Hour
-        if (dayTime > DateTime.CHRONON_OF_HOUR) {
-            dOutInner.writeChars(String.format("%01d", dayTime / DateTime.CHRONON_OF_HOUR));
-            dOutInner.writeChar('H');
+        if (dayTime >= DateTime.CHRONON_OF_HOUR) {
+            writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_HOUR, 1, dOutInner);
+            writeChar('H', dOutInner);
             dayTime %= DateTime.CHRONON_OF_HOUR;
         }
 
         // Minute
-        if (dayTime > DateTime.CHRONON_OF_MINUTE) {
+        if (dayTime >= DateTime.CHRONON_OF_MINUTE) {
             writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_MINUTE, 1, dOutInner);
-            dOutInner.writeChar('M');
+            writeChar('M', dOutInner);
             dayTime %= DateTime.CHRONON_OF_MINUTE;
         }
 
         // Milliseconds
         if (dayTime > 0) {
-            dOutInner.writeChars(String.format("%01d", dayTime / DateTime.CHRONON_OF_SECOND));
+            writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_SECOND, 1, dOutInner);
             if (dayTime % DateTime.CHRONON_OF_SECOND != 0) {
-                dOutInner.writeChar('.');
-                dOutInner.writeChars(String.format("%03d", dayTime % DateTime.CHRONON_OF_SECOND));
+                writeChar('.', dOutInner);
+                writeNumberWithPadding(dayTime % DateTime.CHRONON_OF_SECOND, 3, dOutInner);
             }
-            dOutInner.writeChar('S');
+            writeChar('S', dOutInner);
         }
 
         sendStringDataOutput(dOut);
@@ -337,15 +301,21 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
         if (Float.isInfinite(value)) {
             if (value == Float.NEGATIVE_INFINITY) {
-                dOutInner.writeChars("-");
+                writeCharSequence("-", dOutInner);
             }
-            dOutInner.writeChars("INF");
+            writeCharSequence("INF", dOutInner);
         } else if (Float.isNaN(value)) {
-            dOutInner.writeChars("NaN");
+            writeCharSequence("NaN", dOutInner);
+        } else if (value <= 1000000 || value >= 0.000001) {
+            CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
+            castToDecimal.convertFloat(floatp, dOutInner);
+            XSDecimalPointable decp = new XSDecimalPointable();
+            decp.set(abvsInner);
+            convertDecimal(decp, dOut);
         } else {
-            if (value < 0) {
+            if (!isNumberPostive((long) value)) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
-                dOutInner.writeChar('-');
+                writeChar('-', dOutInner);
                 value *= -1;
             }
             byte decimalPlace = 0;
@@ -363,20 +333,23 @@ public class CastToStringOperation extends AbstractCastToOperation {
             int nDigits = (int) Math.log10(value) + 1;
             long pow10 = (long) Math.pow(10, nDigits - 1);
             if (nDigits < 0) {
-                dOutInner.writeChars("0.0");
+                writeCharSequence("0.0", dOutInner);
             } else {
                 for (int i = nDigits - 1; i >= 0; --i) {
-                    dOutInner.writeChar((char) ('0' + (value / pow10)));
+                    writeChar((char) ('0' + (value / pow10)), dOutInner);
                     value %= pow10;
                     pow10 /= 10;
                     if (i == nDigits - 1) {
-                        dOutInner.writeChar('.');
+                        writeChar('.', dOutInner);
                     } else {
                         ++decimalPlace;
                     }
                 }
+                if (nDigits == 1) {
+                    writeChar('0', dOutInner);
+                }
             }
-            dOutInner.writeChar('E');
+            writeChar('E', dOutInner);
             writeNumberWithPadding(decimalPlace, 1, dOutInner);
         }
         sendStringDataOutput(dOut);
@@ -385,26 +358,20 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertGDay(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
+        // Default
+        writeChar('-', dOutInner);
 
-        dOutInner.writeChar('-');
-        dOutInner.writeChar('-');
-        dOutInner.writeChar('-');
+        // Year
+        writeChar('-', dOutInner);
+
+        // Month
+        writeChar('-', dOutInner);
 
         // Day
-        dOutInner.writeChars(String.format("%02d", datep.getDay()));
+        writeNumberWithPadding(datep.getDay(), 2, dOutInner);
 
         // Timezone
-        if (datep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && datep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (datep.getTimezoneMinute() >= 0 && datep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneHour()));
-            dOutInner.writeChar(':');
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneMinute()));
-        }
+        writeTimezone(datep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -412,25 +379,17 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertGMonth(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
+        // Default
+        writeChar('-', dOutInner);
 
-        dOutInner.writeChar('-');
-        dOutInner.writeChar('-');
+        // Year
+        writeChar('-', dOutInner);
 
         // Month
-        dOutInner.writeChars(String.format("%02d", datep.getMonth()));
+        writeNumberWithPadding(datep.getMonth(), 2, dOutInner);
 
         // Timezone
-        if (datep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && datep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (datep.getTimezoneMinute() >= 0 && datep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneHour()));
-            dOutInner.writeChar(':');
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneMinute()));
-        }
+        writeTimezone(datep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -438,28 +397,21 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertGMonthDay(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
+        // Default
+        writeChar('-', dOutInner);
+
         // Year
-        dOutInner.writeChar('-');
+        writeChar('-', dOutInner);
 
         // Month
-        dOutInner.writeChars(String.format("%02d", datep.getMonth()));
-        dOutInner.writeChar('-');
+        writeNumberWithPadding(datep.getMonth(), 2, dOutInner);
+        writeChar('-', dOutInner);
 
         // Day
-        dOutInner.writeChars(String.format("%02d", datep.getDay()));
+        writeNumberWithPadding(datep.getDay(), 2, dOutInner);
 
         // Timezone
-        if (datep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && datep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (datep.getTimezoneMinute() >= 0 && datep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneHour()));
-            dOutInner.writeChar(':');
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneMinute()));
-        }
+        writeTimezone(datep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -468,20 +420,10 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertGYear(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         // Year
-        dOutInner.writeChars(String.format("%04d", datep.getYear()));
+        writeNumberWithPadding(datep.getYear(), 4, dOutInner);
 
         // Timezone
-        if (datep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && datep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (datep.getTimezoneMinute() >= 0 && datep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneHour()));
-            dOutInner.writeChar(':');
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneMinute()));
-        }
+        writeTimezone(datep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -490,24 +432,14 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertGYearMonth(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         // Year
-        dOutInner.writeChars(String.format("%04d", datep.getYear()));
-        dOutInner.writeChar('-');
+        writeNumberWithPadding(datep.getYear(), 4, dOutInner);
+        writeChar('-', dOutInner);
 
         // Month
-        dOutInner.writeChars(String.format("%02d", datep.getMonth()));
+        writeNumberWithPadding(datep.getMonth(), 2, dOutInner);
 
         // Timezone
-        if (datep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && datep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (datep.getTimezoneMinute() >= 0 && datep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneHour()));
-            dOutInner.writeChar(':');
-            dOutInner.writeChars(String.format("%02d", datep.getTimezoneMinute()));
-        }
+        writeTimezone(datep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -515,12 +447,11 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertHexBinary(XSBinaryPointable binaryp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        //        int index = 0;
-        //        while (index < binaryp.getBinaryLength()) {
-        //            byte characterTuple = binaryp.getByteArray()[0];
-        //            writeHexCharacter(characterTuple & 0x0f, dOutInner);
-        //            writeHexCharacter((characterTuple & 0xf0) << 4, dOutInner);
-        //        }
+        for (int index = 0; index < binaryp.getBinaryLength(); ++index) {
+            int bi = binaryp.getByteArray()[binaryp.getBinaryStart() + index] & 0xff;
+            writeChar(hex[(bi >> 4)], dOutInner);
+            writeChar(hex[(bi & 0xf)], dOutInner);
+        }
         sendStringDataOutput(dOut);
     }
 
@@ -530,13 +461,13 @@ public class CastToStringOperation extends AbstractCastToOperation {
         long value = longp.getLong();
         if (value < 0) {
             // Negative result, but the rest of the calculations can be based on a positive value.
-            dOutInner.writeChar('-');
+            writeChar('-', dOutInner);
             value *= -1;
         }
         int nDigits = (int) Math.log10(value) + 1;
         long pow10 = (long) Math.pow(10, nDigits - 1);
         for (int i = nDigits - 1; i >= 0; --i) {
-            dOutInner.writeChar((char) ('0' + (value / pow10)));
+            writeChar((char) ('0' + (value / pow10)), dOutInner);
             value %= pow10;
             pow10 /= 10;
         }
@@ -554,7 +485,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         dOutInner.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength() + 4,
                 qnamep.getPrefixLength());
-        dOutInner.writeChar(':');
+        writeChar(':', dOutInner);
         dOutInner.write(qnamep.getByteArray(),
                 qnamep.getStartOffset() + qnamep.getUriLength() + qnamep.getPrefixLength() + 6,
                 qnamep.getLocalNameLength());
@@ -579,33 +510,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertTime(XSTimePointable timep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        // Hours
-        dOutInner.writeChars(String.format("%02d", timep.getHour()));
-        dOutInner.writeChar(':');
-
-        // Minute
-        dOutInner.writeChars(String.format("%02d", timep.getMinute()));
-        dOutInner.writeChar(':');
-
-        // Milliseconds
-        dOutInner.writeChars(String.format("%02d", timep.getMilliSecond() / DateTime.CHRONON_OF_SECOND));
-        if (timep.getMilliSecond() % DateTime.CHRONON_OF_SECOND != 0) {
-            dOutInner.writeChar('.');
-            dOutInner.writeChars(String.format("%03d", timep.getMilliSecond() % DateTime.CHRONON_OF_SECOND));
-        }
-
-        // Timezone
-        if (timep.getTimezoneHour() != DateTime.TIMEZONE_HOUR_NULL
-                && timep.getTimezoneMinute() != DateTime.TIMEZONE_MINUTE_NULL) {
-            if (timep.getTimezoneMinute() >= 0 && timep.getTimezoneMinute() >= 0) {
-                dOutInner.writeChar('+');
-            } else {
-                dOutInner.writeChar('-');
-            }
-            dOutInner.writeChars(String.format("%02d", timep.getTimezoneHour()));
-            dOutInner.writeChar(':');
-            dOutInner.writeChars(String.format("%02d", timep.getTimezoneMinute()));
-        }
+        writeTime(timep, dOutInner);
+        writeTimezone(timep, dOutInner);
 
         sendStringDataOutput(dOut);
     }
@@ -620,24 +526,27 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         int yearMonth = intp.getInteger();
 
-        if (yearMonth < 0) {
-            dOutInner.writeChar('-');
-            yearMonth *= -1;
-        }
-        dOutInner.writeChar('P');
+        if (yearMonth == 0) {
+            writeCharSequence("P0M", dOutInner);
+        } else {
+            if (yearMonth < 0) {
+                writeChar('-', dOutInner);
+                yearMonth *= -1;
+            }
+            writeChar('P', dOutInner);
 
-        // Year
-        if (yearMonth > 12) {
-            writeNumberWithPadding(yearMonth / 12, 1, dOutInner);
-            dOutInner.writeChar('Y');
-        }
+            // Year
+            if (yearMonth >= 12) {
+                writeNumberWithPadding(yearMonth / 12, 1, dOutInner);
+                writeChar('Y', dOutInner);
+            }
 
-        // Month
-        if (yearMonth % 12 > 0) {
-            writeNumberWithPadding(yearMonth % 12, 1, dOutInner);
-            dOutInner.writeChar('M');
+            // Month
+            if (yearMonth % 12 > 0) {
+                writeNumberWithPadding(yearMonth % 12, 1, dOutInner);
+                writeChar('M', dOutInner);
+            }
         }
-
         sendStringDataOutput(dOut);
     }
 
@@ -648,59 +557,50 @@ public class CastToStringOperation extends AbstractCastToOperation {
         dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset(), abvsInner.getLength());
     }
 
-    private void writeHexCharacter(int hexCharacter, DataOutput dOut) throws IOException {
-        switch (hexCharacter) {
-            case 0:
-                dOut.writeChar('0');
-                break;
-            case 1:
-                dOut.writeChar('1');
-                break;
-            case 2:
-                dOut.writeChar('2');
-                break;
-            case 3:
-                dOut.writeChar('3');
-                break;
-            case 4:
-                dOut.writeChar('4');
-                break;
-            case 5:
-                dOut.writeChar('5');
-                break;
-            case 6:
-                dOut.writeChar('6');
-                break;
-            case 7:
-                dOut.writeChar('7');
-                break;
-            case 8:
-                dOut.writeChar('8');
-                break;
-            case 9:
-                dOut.writeChar('9');
-                break;
-            case 10:
-                dOut.writeChar('a');
-                break;
-            case 11:
-                dOut.writeChar('b');
-                break;
-            case 12:
-                dOut.writeChar('c');
-                break;
-            case 13:
-                dOut.writeChar('d');
-                break;
-            case 14:
-                dOut.writeChar('e');
-                break;
-            case 15:
-                dOut.writeChar('f');
-                break;
-            default:
-                break;
+    /**
+     * Returns 0 if positive, nonzero if negative.
+     * 
+     * @param value
+     * @return
+     */
+    private boolean isNumberPostive(long value) {
+        return ((value & 0x8000000000000000L) == 0 ? true : false);
+    }
+
+    private void writeChar(char c, DataOutput dOut) {
+        try {
+            if ((c >= 0x0001) && (c <= 0x007F)) {
+                dOut.write((byte) c);
+            } else if (c > 0x07FF) {
+                dOut.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
+                dOut.write((byte) (0x80 | ((c >> 6) & 0x3F)));
+                dOut.write((byte) (0x80 | ((c >> 0) & 0x3F)));
+            } else {
+                dOut.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
+                dOut.write((byte) (0x80 | ((c >> 0) & 0x3F)));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void writeCharSequence(CharSequence charSequence, DataOutput dOut) {
+        for (int i = 0; i < charSequence.length(); ++i) {
+            writeChar(charSequence.charAt(i), dOut);
+        }
+    }
+
+    private void writeDate(IDate date, DataOutput dOut) {
+        // Year
+        writeNumberWithPadding(date.getYear(), 4, dOut);
+        writeChar('-', dOut);
+
+        // Month
+        writeNumberWithPadding(date.getMonth(), 2, dOut);
+        writeChar('-', dOut);
+
+        // Day
+        writeNumberWithPadding(date.getDay(), 2, dOut);
     }
 
     /**
@@ -711,23 +611,61 @@ public class CastToStringOperation extends AbstractCastToOperation {
      * @param dOut
      * @throws IOException
      */
-    private void writeNumberWithPadding(long value, int padding, DataOutput dOut) throws IOException {
+    private void writeNumberWithPadding(long value, int padding, DataOutput dOut) {
         if (value < 0) {
-            dOut.writeChar('-');
+            writeChar('-', dOut);
         }
         value = Math.abs(value);
         int nDigits = (value == 0 ? 0 : (int) Math.log10(value) + 1);
 
         while (padding > nDigits) {
-            dOut.writeChar('0');
+            writeChar('0', dOut);
             --padding;
         }
         int number;
         while (nDigits > 0) {
             number = (int) (value / Math.pow(10, nDigits - 1));
-            dOut.writeChar(Character.forDigit(number, 10));
+            writeChar(Character.forDigit(number, 10), dOut);
             value = (int) (value - number * Math.pow(10, nDigits - 1));
             --nDigits;
+        }
+    }
+
+    private void writeTime(ITime time, DataOutput dOut) {
+        // Hours
+        writeNumberWithPadding(time.getHour(), 2, dOut);
+        writeChar(':', dOut);
+
+        // Minute
+        writeNumberWithPadding(time.getMinute(), 2, dOut);
+        writeChar(':', dOut);
+
+        // Milliseconds
+        writeNumberWithPadding(time.getMilliSecond() / DateTime.CHRONON_OF_SECOND, 2, dOut);
+        if (time.getMilliSecond() % DateTime.CHRONON_OF_SECOND != 0) {
+            writeChar('.', dOut);
+            writeNumberWithPadding(time.getMilliSecond() % DateTime.CHRONON_OF_SECOND, 3, dOut);
+        }
+    }
+
+    private void writeTimezone(ITimezone timezone, DataOutput dOut) {
+        long timezoneHour = timezone.getTimezoneHour();
+        long timezoneMinute = timezone.getTimezoneMinute();
+        if (timezoneHour != DateTime.TIMEZONE_HOUR_NULL && timezoneMinute != DateTime.TIMEZONE_MINUTE_NULL) {
+            if (timezoneHour == 0 && timezoneMinute == 0) {
+                writeChar('Z', dOut);
+            } else {
+                if (timezoneHour >= 0 && timezoneMinute >= 0) {
+                    writeChar('+', dOut);
+                } else {
+                    writeChar('-', dOut);
+                    timezoneHour = Math.abs(timezoneHour);
+                    timezoneMinute = Math.abs(timezoneMinute);
+                }
+                writeNumberWithPadding(timezoneHour, 2, dOut);
+                writeChar(':', dOut);
+                writeNumberWithPadding(timezoneMinute, 2, dOut);
+            }
         }
     }
 
