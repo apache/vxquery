@@ -27,7 +27,7 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
     @Override
     public void convertDecimal(XSDecimalPointable decp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_INTEGER_TAG);
-        dOut.writeLong(decp.longValue());
+        dOut.writeLong(decp.getBeforeDecimalPlace());
     }
 
     @Override
@@ -81,7 +81,6 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         if (negative) {
             value *= -1;
         }
-        System.err.println("   int value = " + value);
 
         dOut.write(ValueTag.XS_INTEGER_TAG);
         dOut.writeLong(value);
