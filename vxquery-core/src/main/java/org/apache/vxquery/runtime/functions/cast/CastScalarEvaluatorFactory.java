@@ -76,7 +76,7 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     switch (tid) {
                         case ValueTag.XS_ANY_URI_TAG:
                             tvp.getValue(tp.utf8sp);
-                            aOp.convertString(tp.utf8sp, dOut);
+                            aOp.convertAnyURI(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
 
@@ -277,27 +277,28 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
             private int getBaseTypeForCasts(int tid) throws SystemException {
                 while (true) {
                     switch (tid) {
-                        case ValueTag.XS_STRING_TAG:
-                        case ValueTag.XS_DECIMAL_TAG:
-                        case ValueTag.XS_INTEGER_TAG:
-                        case ValueTag.XS_FLOAT_TAG:
-                        case ValueTag.XS_DOUBLE_TAG:
                         case ValueTag.XS_ANY_URI_TAG:
+                        case ValueTag.XS_BASE64_BINARY_TAG:
                         case ValueTag.XS_BOOLEAN_TAG:
                         case ValueTag.XS_DATE_TAG:
                         case ValueTag.XS_DATETIME_TAG:
-                        case ValueTag.XS_TIME_TAG:
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
-                        case ValueTag.XS_BASE64_BINARY_TAG:
-                        case ValueTag.XS_HEX_BINARY_TAG:
-                        case ValueTag.XS_QNAME_TAG:
+                        case ValueTag.XS_DECIMAL_TAG:
+                        case ValueTag.XS_DOUBLE_TAG:
+                        case ValueTag.XS_DURATION_TAG:
+                        case ValueTag.XS_FLOAT_TAG:
                         case ValueTag.XS_G_DAY_TAG:
                         case ValueTag.XS_G_MONTH_DAY_TAG:
                         case ValueTag.XS_G_MONTH_TAG:
                         case ValueTag.XS_G_YEAR_MONTH_TAG:
                         case ValueTag.XS_G_YEAR_TAG:
+                        case ValueTag.XS_HEX_BINARY_TAG:
+                        case ValueTag.XS_INTEGER_TAG:
+                        case ValueTag.XS_QNAME_TAG:
+                        case ValueTag.XS_STRING_TAG:
+                        case ValueTag.XS_TIME_TAG:
                         case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                             return tid;
 
                         case ValueTag.XS_ANY_ATOMIC_TAG:
