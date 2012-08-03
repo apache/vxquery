@@ -44,6 +44,7 @@ public class CastToDateTimeOperation extends AbstractCastToOperation {
         long[] date = new long[8];
         boolean positiveTimezone = false;
         boolean pastDecimal = false;
+        boolean negativeYear = false;
         byte decimalPlace = 3;
 
         // Set defaults
@@ -52,37 +53,55 @@ public class CastToDateTimeOperation extends AbstractCastToOperation {
 
         while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
             if (Character.isDigit(c)) {
+                // Add the digit to the current numbered index.
                 date[index] = date[index] * 10 + Character.getNumericValue(c);
                 if (pastDecimal) {
                     --decimalPlace;
                 }
+            } else if (c == Character.valueOf('-') && index == 0 && date[index] == 0) {
+                // If the first dash does not have a number in front, its a negative year.
+                negativeYear = true;
             } else if (c == Character.valueOf('-') || c == Character.valueOf(':') || c == Character.valueOf('T')) {
+                // The basic case for going to the next number in the series.
                 ++index;
                 pastDecimal = false;
+                date[index] = 0;
             } else if (c == Character.valueOf('+')) {
-                pastDecimal = false;
-                positiveTimezone = true;
+                // Moving to the next number and logging this is now a positive timezone offset.
                 ++index;
+                pastDecimal = false;
+                date[index] = 0;
+                positiveTimezone = true;
             } else if (c == Character.valueOf('.')) {
+                // Only used by the seconds attribute.
                 pastDecimal = true;
+            } else if (c == Character.valueOf('Z')) {
+                // Set the timezone to UTC.
+                date[6] = 0;
+                date[7] = 0;
             } else {
                 // Invalid date format.
                 throw new SystemException(ErrorCode.FORG0001);
             }
         }
-        // Final touches on seconds and timezone.
+
+        // Final touches on year, seconds and timezone.
         date[5] = (long) (date[5] * Math.pow(10, decimalPlace));
+        if (negativeYear) {
+            date[0] *= -1;
+        }
         if (!positiveTimezone && date[6] != DateTime.TIMEZONE_HOUR_NULL) {
             date[6] *= -1;
         }
         if (!positiveTimezone && date[7] != DateTime.TIMEZONE_MINUTE_NULL) {
             date[7] *= -1;
         }
+
         // Double check for a valid datetime
         if (!DateTime.valid(date[0], date[1], date[2], date[3], date[4], date[5], date[6], date[7])) {
             throw new SystemException(ErrorCode.FODT0001);
         }
-        
+
         dOut.write(ValueTag.XS_DATETIME_TAG);
         dOut.writeShort((short) date[0]);
         dOut.write((byte) date[1]);

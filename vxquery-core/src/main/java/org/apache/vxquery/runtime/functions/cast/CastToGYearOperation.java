@@ -22,8 +22,8 @@ public class CastToGYearOperation extends AbstractCastToOperation {
         dOut.writeShort((short) datep.getYear());
         dOut.write((byte) 1);
         dOut.write((byte) 1);
-        dOut.write((byte) DateTime.TIMEZONE_HOUR_NULL);
-        dOut.write((byte) DateTime.TIMEZONE_MINUTE_NULL);
+        dOut.write((byte) datep.getTimezoneHour());
+        dOut.write((byte) datep.getTimezoneMinute());
     }
 
     @Override
@@ -32,11 +32,8 @@ public class CastToGYearOperation extends AbstractCastToOperation {
         dOut.writeShort((short) datetimep.getYear());
         dOut.write((byte) 1);
         dOut.write((byte) 1);
-        dOut.write((byte) 0);
-        dOut.write((byte) 0);
-        dOut.writeInt((int) 0);
-        dOut.write((byte) DateTime.TIMEZONE_HOUR_NULL);
-        dOut.write((byte) DateTime.TIMEZONE_MINUTE_NULL);
+        dOut.write((byte) datetimep.getTimezoneHour());
+        dOut.write((byte) datetimep.getTimezoneMinute());
     }
 
     @Override
@@ -53,6 +50,7 @@ public class CastToGYearOperation extends AbstractCastToOperation {
         int index = 0;
         long[] date = new long[3];
         boolean positiveTimezone = false;
+        boolean negativeYear = false;
 
         // Set defaults
         date[1] = DateTime.TIMEZONE_HOUR_NULL;
@@ -60,18 +58,33 @@ public class CastToGYearOperation extends AbstractCastToOperation {
 
         while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
             if (Character.isDigit(c)) {
+                // Add the digit to the current numbered index.
                 date[index] = date[index] * 10 + Character.getNumericValue(c);
+            } else if (c == Character.valueOf('-') && index == 0 && date[index] == 0) {
+                // If the first dash does not have a number in front, its a negative year.
+                negativeYear = true;
             } else if (c == Character.valueOf('-') || c == Character.valueOf(':')) {
+                // The basic case for going to the next number in the series.
                 ++index;
+                date[index] = 0;
             } else if (c == Character.valueOf('+')) {
-                positiveTimezone = true;
+                // Moving to the next number and logging this is now a positive timezone offset.
                 ++index;
+                date[index] = 0;
+                positiveTimezone = true;
+            } else if (c == Character.valueOf('Z')) {
+                // Set the timezone to UTC.
+                date[1] = 0;
+                date[2] = 0;
             } else {
                 // Invalid date format.
                 throw new SystemException(ErrorCode.FORG0001);
             }
         }
-        // Final touches on timezone.
+        // Final touches on year and timezone.
+        if (negativeYear) {
+            date[0] *= -1;
+        }
         if (!positiveTimezone && date[1] != DateTime.TIMEZONE_HOUR_NULL) {
             date[1] *= -1;
         }
