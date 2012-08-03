@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.LowerCaseCharacterIterator;
@@ -27,77 +28,96 @@ public class CastToBooleanOperation extends AbstractCastToOperation {
     @Override
     public void convertDecimal(XSDecimalPointable decp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
-        if (decp.getDecimalValue() == 1 && decp.getBeforeDecimalPlace() == 0) {
-            dOut.write(1);
-        } else {
+        if (decp.getDecimalValue() == 0 && decp.getBeforeDecimalPlace() == 0) {
             dOut.write(0);
+        } else {
+            dOut.write(1);
         }
     }
 
     @Override
     public void convertDouble(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
-        if (doublep.getDouble() == 1) {
-            dOut.write(1);
-        } else {
+        if (Double.isNaN(doublep.getDouble()) || doublep.getDouble() == 0) {
             dOut.write(0);
+        } else {
+            dOut.write(1);
         }
     }
 
     @Override
     public void convertFloat(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
-        if (floatp.getFloat() == 1) {
-            dOut.write(1);
-        } else {
+        if (Float.isNaN(floatp.getFloat()) || floatp.getFloat() == 0) {
             dOut.write(0);
+        } else {
+            dOut.write(1);
         }
     }
 
     @Override
     public void convertInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
-        if (longp.getLong() == 1) {
-            dOut.write(1);
-        } else {
+        if (longp.getLong() == 0) {
             dOut.write(0);
+        } else {
+            dOut.write(1);
         }
     }
 
     @Override
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
-        byte result = 0;
+        byte result = 2;
         ICharacterIterator charIterator = new LowerCaseCharacterIterator(new UTF8StringCharacterIterator(stringp));
         charIterator.reset();
         int c;
+        int checkValue = 2;
         search: for (int index = 0; (c = charIterator.next()) != ICharacterIterator.EOS_CHAR; ++index) {
             switch (index) {
                 case 0:
                     if (c == Character.valueOf('1')) {
                         result = 1;
-                    } else if (c != Character.valueOf('t')) {
+                    } else if (c == Character.valueOf('0')) {
+                        result = 0;
+                    } else if (c == Character.valueOf('t')) {
+                        checkValue = 1;
+                    } else if (c != Character.valueOf('f')) {
+                        checkValue = 0;
+                    } else {
                         break search;
                     }
                     break;
                 case 1:
-                    if (c != Character.valueOf('r')) {
+                    if ((checkValue == 1 && c != Character.valueOf('r'))
+                            || (checkValue == 0 && c != Character.valueOf('a'))) {
                         break search;
                     }
                     break;
                 case 2:
-                    if (c != Character.valueOf('u')) {
+                    if ((checkValue == 1 && c != Character.valueOf('u'))
+                            || (checkValue == 0 && c != Character.valueOf('l'))) {
                         break search;
                     }
                     break;
                 case 3:
-                    if (c == Character.valueOf('e')) {
+                    if (checkValue == 1 && c == Character.valueOf('e')) {
                         result = 1;
+                    }
+                    if (checkValue == 0 && c != Character.valueOf('s')) {
+                        break search;
+                    }
+                    break;
+                case 4:
+                    if (checkValue == 0 && c == Character.valueOf('e')) {
+                        result = 0;
                     }
                     break;
                 default:
-                    result = 0;
                     break search;
             }
+        }
+        if (result == 2) {
+            throw new SystemException(ErrorCode.FORG0001);
         }
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write(result);
