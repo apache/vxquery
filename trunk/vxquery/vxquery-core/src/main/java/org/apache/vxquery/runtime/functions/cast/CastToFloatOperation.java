@@ -119,7 +119,16 @@ public class CastToFloatOperation extends AbstractCastToOperation {
             if (negativeValue) {
                 value *= -1;
             }
-            valueFloat = (float) (value * Math.pow(10, decimalPlace));
+            valueFloat = value;
+            while (decimalPlace != 0) {
+                if (decimalPlace > 0) {
+                    --decimalPlace;
+                    valueFloat *= 10;
+                } else {
+                    ++decimalPlace;
+                    valueFloat *= 0.1;
+                }
+            }
         }
 
         dOut.write(ValueTag.XS_FLOAT_TAG);
