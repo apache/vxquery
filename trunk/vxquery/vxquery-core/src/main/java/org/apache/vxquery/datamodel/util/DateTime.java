@@ -72,7 +72,7 @@ public class DateTime {
         if (month > FIELD_MAXS[DateTime.MONTH_FIELD_INDEX] || month < FIELD_MINS[DateTime.MONTH_FIELD_INDEX]) {
             return false;
         }
-        if (day > FIELD_MAXS[DateTime.DAY_FIELD_INDEX] || day < monthCheck[(int) (month - 1)]) {
+        if (day > monthCheck[(int) (month - 1)] || day < FIELD_MINS[DateTime.DAY_FIELD_INDEX]) {
             return false;
         }
         if (hour > FIELD_MAXS[DateTime.HOUR_FIELD_INDEX] || hour < FIELD_MINS[DateTime.HOUR_FIELD_INDEX]) {
@@ -85,12 +85,12 @@ public class DateTime {
                 || millisecond < FIELD_MINS[DateTime.MILLISECOND_FIELD_INDEX]) {
             return false;
         }
-        if ((timezoneHour > FIELD_MAXS[DateTime.HOUR_FIELD_INDEX] && timezoneHour != TIMEZONE_HOUR_NULL)
-                || (timezoneHour < FIELD_MINS[DateTime.HOUR_FIELD_INDEX] && timezoneHour != TIMEZONE_HOUR_NULL)) {
+        if ((timezoneHour > TIMEZONE_HOUR_MAX || timezoneHour < TIMEZONE_HOUR_MIN)
+                && (timezoneHour != TIMEZONE_HOUR_NULL)) {
             return false;
         }
-        if ((timezoneHour > FIELD_MAXS[DateTime.MINUTE_FIELD_INDEX] && timezoneHour != TIMEZONE_MINUTE_NULL)
-                || (timezoneHour < FIELD_MINS[DateTime.MINUTE_FIELD_INDEX] && timezoneHour != TIMEZONE_MINUTE_NULL)) {
+        if ((timezoneMinute > TIMEZONE_MINUTE_MAX || timezoneMinute < TIMEZONE_MINUTE_MIN)
+                && (timezoneMinute != TIMEZONE_MINUTE_NULL)) {
             return false;
         }
         return true;

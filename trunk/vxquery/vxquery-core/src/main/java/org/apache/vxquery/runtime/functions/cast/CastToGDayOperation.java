@@ -22,8 +22,8 @@ public class CastToGDayOperation extends AbstractCastToOperation {
         dOut.writeShort((short) 1972);
         dOut.write((byte) 12);
         dOut.write((byte) datep.getDay());
-        dOut.write((byte) DateTime.TIMEZONE_HOUR_NULL);
-        dOut.write((byte) DateTime.TIMEZONE_MINUTE_NULL);
+        dOut.write((byte) datep.getTimezoneHour());
+        dOut.write((byte) datep.getTimezoneMinute());
     }
 
     @Override
@@ -32,11 +32,8 @@ public class CastToGDayOperation extends AbstractCastToOperation {
         dOut.writeShort((short) 1972);
         dOut.write((byte) 12);
         dOut.write((byte) datetimep.getDay());
-        dOut.write((byte) 0);
-        dOut.write((byte) 0);
-        dOut.writeInt((int) 0);
-        dOut.write((byte) DateTime.TIMEZONE_HOUR_NULL);
-        dOut.write((byte) DateTime.TIMEZONE_MINUTE_NULL);
+        dOut.write((byte) datetimep.getTimezoneHour());
+        dOut.write((byte) datetimep.getTimezoneMinute());
     }
 
     @Override
@@ -60,12 +57,21 @@ public class CastToGDayOperation extends AbstractCastToOperation {
 
         while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
             if (Character.isDigit(c)) {
+                // Add the digit to the current numbered index.
                 date[index] = date[index] * 10 + Character.getNumericValue(c);
             } else if (c == Character.valueOf('-') || c == Character.valueOf(':')) {
+                // The basic case for going to the next number in the series.
                 ++index;
+                date[index] = 0;
             } else if (c == Character.valueOf('+')) {
-                positiveTimezone = true;
+                // Moving to the next number and logging this is now a positive timezone offset.
                 ++index;
+                date[index] = 0;
+                positiveTimezone = true;
+            } else if (c == Character.valueOf('Z')) {
+                // Set the timezone to UTC.
+                date[4] = 0;
+                date[5] = 0;
             } else {
                 // Invalid date format.
                 throw new SystemException(ErrorCode.FORG0001);
