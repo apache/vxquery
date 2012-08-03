@@ -91,12 +91,13 @@ public class CastToDurationOperation extends AbstractCastToOperation {
             }
         }
 
-        long yearMonth = year * 12 + month;
-        long dayTime = day * DateTime.CHRONON_OF_DAY + hour * DateTime.CHRONON_OF_HOUR + minute
-                * DateTime.CHRONON_OF_MINUTE + millisecond;
+        long yearMonth = negativeResult * (year * 12 + month);
+        long dayTime = negativeResult
+                * (day * DateTime.CHRONON_OF_DAY + hour * DateTime.CHRONON_OF_HOUR + minute
+                        * DateTime.CHRONON_OF_MINUTE + millisecond);
         dOut.write(ValueTag.XS_DURATION_TAG);
-        dOut.writeInt((int) (negativeResult * yearMonth));
-        dOut.writeInt((int) (negativeResult * dayTime));
+        dOut.writeInt((int) yearMonth);
+        dOut.writeInt((int) dayTime);
     }
 
     @Override
