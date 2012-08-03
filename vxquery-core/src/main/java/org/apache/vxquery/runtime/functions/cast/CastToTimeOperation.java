@@ -21,7 +21,7 @@ public class CastToTimeOperation extends AbstractCastToOperation {
         dOut.write(ValueTag.XS_TIME_TAG);
         dOut.write((byte) datetimep.getHour());
         dOut.write((byte) datetimep.getMinute());
-        dOut.writeLong(datetimep.getMilliSecond());
+        dOut.writeInt((int) datetimep.getMilliSecond());
         dOut.write((byte) datetimep.getTimezoneHour());
         dOut.write((byte) datetimep.getTimezoneMinute());
     }
@@ -43,19 +43,29 @@ public class CastToTimeOperation extends AbstractCastToOperation {
 
         while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
             if (Character.isDigit(c)) {
+                // Add the digit to the current numbered index.
                 date[index] = date[index] * 10 + Character.getNumericValue(c);
                 if (pastDecimal) {
                     --decimalPlace;
                 }
             } else if (c == Character.valueOf('-') || c == Character.valueOf(':')) {
+                // The basic case for going to the next number in the series.
                 ++index;
                 pastDecimal = false;
+                date[index] = 0;
             } else if (c == Character.valueOf('+')) {
-                pastDecimal = false;
-                positiveTimezone = true;
+                // Moving to the next number and logging this is now a positive timezone offset.
                 ++index;
+                pastDecimal = false;
+                date[index] = 0;
+                positiveTimezone = true;
             } else if (c == Character.valueOf('.')) {
+                // Only used by the seconds attribute.
                 pastDecimal = true;
+            } else if (c == Character.valueOf('Z')) {
+                // Set the timezone to UTC.
+                date[3] = 0;
+                date[4] = 0;
             } else {
                 // Invalid date format.
                 throw new SystemException(ErrorCode.FORG0001);
