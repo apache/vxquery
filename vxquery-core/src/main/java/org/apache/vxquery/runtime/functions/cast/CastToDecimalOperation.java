@@ -37,7 +37,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
         double doubleValue = doublep.getDouble();
         byte decimalPlace = 0;
         // Move the decimal
-        while (doubleValue % 1 != 0) {
+        while (doubleValue % 1 != 0 && (doubleValue != 0 || doubleValue != -0)) {
             if (decimalPlace + 1 > XSDecimalPointable.PRECISION) {
                 throw new SystemException(ErrorCode.FOCA0001);
             }
@@ -45,7 +45,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
             doubleValue *= 10;
         }
         // Remove extra zeros
-        while (doubleValue != 0 && doubleValue % 10 == 0) {
+        while (doubleValue % 10 == 0 && (doubleValue != 0 || doubleValue != -0)) {
             doubleValue /= 10;
             --decimalPlace;
         }
@@ -58,8 +58,9 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
     public void convertFloat(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
         float floatValue = floatp.getFloat();
         byte decimalPlace = 0;
+        
         // Move the decimal
-        while (floatValue % 1 != 0) {
+        while (floatValue % 1 != 0 && (floatValue != 0 || floatValue != -0)) {
             if (decimalPlace + 1 > XSDecimalPointable.PRECISION) {
                 throw new SystemException(ErrorCode.FOCA0001);
             }
@@ -67,7 +68,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
             floatValue *= 10;
         }
         // Remove extra zeros
-        while (floatValue != 0 && floatValue % 10 == 0) {
+        while (floatValue % 10 == 0 && (floatValue != 0 || floatValue != -0)) {
             floatValue /= 10;
             --decimalPlace;
         }
@@ -95,7 +96,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
 
         while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
             if (count + 1 > XSDecimalPointable.PRECISION) {
-                throw new SystemException(ErrorCode.FOCA0001);
+                throw new SystemException(ErrorCode.FOCA0006);
             } else if (Character.isDigit(c)) {
                 value = value * 10 + Character.getNumericValue(c);
                 if (pastDecimal) {
