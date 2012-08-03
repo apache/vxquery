@@ -13,7 +13,7 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 public class XSDecimalPointable extends AbstractPointable implements IHashable, IComparable, INumeric {
     private final static int DECIMAL_PLACE_OFFSET = 0;
     private final static int VALUE_OFFSET = 1;
-    public final static int PRECISION = 18;
+    public final static int PRECISION = 15;
 
     public static final ITypeTraits TYPE_TRAITS = new ITypeTraits() {
         private static final long serialVersionUID = 1L;
@@ -142,12 +142,20 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
         return (int) (v ^ (v >>> 32));
     }
 
+    public long getBeforeDecimalPlaceRounded() {
+        return getBeforeDecimalPlaceRounded(bytes, start);
+    }
+
+    public static long getBeforeDecimalPlaceRounded(byte[] bytes, int start) {
+        return Math.round(getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
+    }
+
     public long getBeforeDecimalPlace() {
         return getBeforeDecimalPlace(bytes, start);
     }
 
     public static long getBeforeDecimalPlace(byte[] bytes, int start) {
-        return Math.round(getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
+        return (long) (getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
     }
 
     public byte getDigitCount() {
@@ -175,7 +183,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
 
     @Override
     public long longValue() {
-        return getBeforeDecimalPlace();
+        return getBeforeDecimalPlaceRounded();
     }
 
     @Override
