@@ -160,7 +160,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
         // Save
         dOut.write(ValueTag.XS_DECIMAL_TAG);
         dOut.writeByte(place1);
-        dOut.writeDouble(value1);
+        dOut.writeLong(value1);
     }
 
     @Override
