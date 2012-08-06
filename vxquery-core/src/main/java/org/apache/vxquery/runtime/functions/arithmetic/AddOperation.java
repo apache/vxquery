@@ -109,10 +109,11 @@ public class AddOperation extends AbstractArithmeticOperation {
             throw new SystemException(ErrorCode.XPDY0002);
         }
         value1 += value2;
+
         // Save
         dOut.write(ValueTag.XS_DECIMAL_TAG);
         dOut.writeByte(place1);
-        dOut.writeDouble(value1);
+        dOut.writeLong(value1);
     }
 
     @Override
