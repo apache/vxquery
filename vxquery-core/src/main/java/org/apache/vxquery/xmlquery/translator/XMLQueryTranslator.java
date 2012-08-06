@@ -23,7 +23,6 @@ import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.context.ThinStaticContextImpl;
 import org.apache.vxquery.context.XQueryVariable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -35,6 +34,7 @@ import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.functions.Signature;
 import org.apache.vxquery.functions.UserDefinedXQueryFunction;
 import org.apache.vxquery.metadata.QueryResultDataSink;
+import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
 import org.apache.vxquery.types.AnyItemType;
 import org.apache.vxquery.types.AnyNodeType;
 import org.apache.vxquery.types.AnyType;
@@ -160,6 +160,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOper
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.WriteOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.plan.ALogicalPlanImpl;
+import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
@@ -1875,10 +1876,12 @@ public class XMLQueryTranslator {
                 case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID: {
                     baaos.reset();
                     try {
-                        dOut.write((byte) ValueTag.XS_DECIMAL_TAG);
-                        byte[] dBytes = new byte[XSDecimalPointable.TYPE_TRAITS.getFixedLength()];
-                        XSDecimalPointable.setDecimal(((Number) value).doubleValue(), dBytes, 0);
-                        dOut.write(dBytes);
+                        // TODO Remove the creation of the separate byte array.
+                        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
+                        doublep.set(new byte[DoublePointable.TYPE_TRAITS.getFixedLength()], 0, DoublePointable.TYPE_TRAITS.getFixedLength());
+                        doublep.setDouble(((Number) value).doubleValue());
+                        CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
+                        castToDecimal.convertDouble(doublep, dOut);
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
