@@ -13,7 +13,7 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 public class XSDecimalPointable extends AbstractPointable implements IHashable, IComparable, INumeric {
     private final static int DECIMAL_PLACE_OFFSET = 0;
     private final static int VALUE_OFFSET = 1;
-    public final static int PRECISION = 15;
+    public final static int PRECISION = 18;
 
     public static final ITypeTraits TYPE_TRAITS = new ITypeTraits() {
         private static final long serialVersionUID = 1L;
@@ -163,7 +163,17 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
     }
 
     public static byte getDigitCount(byte[] bytes, int start) {
-        return (byte) (Math.log10((double) getDecimalValue(bytes, start)) + 1);
+        long value = getDecimalValue(bytes, start);
+        if (value < 0) {
+            value *= -1;
+        }
+        long check = 10;
+        for (byte i = 1; i < PRECISION; i++) {
+            if (value < check)
+                return i;
+            check *= 10;
+        }
+        return PRECISION;
     }
 
     @Override
