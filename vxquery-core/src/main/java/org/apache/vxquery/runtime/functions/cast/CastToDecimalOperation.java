@@ -117,7 +117,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
 
         // Normalize the value and take off trailing zeros.
         while (value != 0 && value % 10 == 0) {
-            value -= 10;
+            value /= 10;
             --decimalPlace;
         }
         dOut.write(ValueTag.XS_DECIMAL_TAG);
