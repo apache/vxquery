@@ -69,21 +69,25 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         long value = 0;
         int c = 0;
         boolean negative = false;
-        while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
+
+        // Check the first character.
+        c = charIterator.next();
+        if (c == Character.valueOf('-')) {
+            negative = true;
+            c = charIterator.next();
+        }
+
+        // Read the numeric value.
+        do {
             if (Character.isDigit(c)) {
                 value = value * 10 + Character.getNumericValue(c);
-            } else if (c == Character.valueOf('-')) {
-                negative = true;
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
             }
-        }
-        if (negative) {
-            value *= -1;
-        }
+        } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
 
         dOut.write(ValueTag.XS_INTEGER_TAG);
-        dOut.writeLong(value);
+        dOut.writeLong((negative ? -value : value));
     }
 
     @Override

@@ -58,81 +58,83 @@ public class CastToFloatOperation extends AbstractCastToOperation {
         charIterator.reset();
         byte decimalPlace = 0;
         long value = 0;
+        float valueFloat;
         boolean pastDecimal = false, negativeValue = false;
         int c = ICharacterIterator.EOS_CHAR;
         int c2 = ICharacterIterator.EOS_CHAR;
         int c3 = ICharacterIterator.EOS_CHAR;
 
-        while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
-            if (Character.isDigit(c)) {
-                value = value * 10 + Character.getNumericValue(c);
-                if (pastDecimal) {
-                    decimalPlace--;
-                }
-            } else if (c == Character.valueOf('-')) {
-                negativeValue = true;
-            } else if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
-                break;
-            } else if (c == Character.valueOf('.')) {
-                pastDecimal = true;
-            } else if (c == Character.valueOf('I') || c == Character.valueOf('N') && value == 0) {
-                break;
-            } else {
-                throw new SystemException(ErrorCode.FORG0001);
-            }
+        // Check sign.
+        c = charIterator.next();
+        if (c == Character.valueOf('-')) {
+            negativeValue = true;
+            c = charIterator.next();
         }
-        if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
-            int moveOffset = 0;
-            boolean offsetNegative = false;
-            while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
-                if (Character.isDigit(c)) {
-                    moveOffset = moveOffset * 10 + Character.getNumericValue(c);
-                } else if (c == Character.valueOf('-')) {
-                    offsetNegative = true;
-                } else {
-                    throw new SystemException(ErrorCode.FORG0001);
-                }
-            }
-            if (offsetNegative) {
-                moveOffset *= -1;
-            }
-            decimalPlace += moveOffset;
-        }
-        float valueFloat;
+        // Check the special cases.
         if (c == Character.valueOf('I') || c == Character.valueOf('N')) {
             c2 = charIterator.next();
             c3 = charIterator.next();
             if (charIterator.next() != ICharacterIterator.EOS_CHAR) {
                 throw new SystemException(ErrorCode.FORG0001);
             } else if (c == Character.valueOf('I') && c2 == Character.valueOf('N') && c3 == Character.valueOf('F')) {
-                if (negativeValue) {
-                    valueFloat = Float.NEGATIVE_INFINITY;
-                } else {
-                    valueFloat = Float.POSITIVE_INFINITY;
-                }
+                valueFloat = (negativeValue ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY);
             } else if (c == Character.valueOf('N') && c2 == Character.valueOf('a') && c3 == Character.valueOf('N')) {
                 valueFloat = Float.NaN;
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         } else {
-            if (negativeValue) {
-                value *= -1;
+            // Read in the number.
+            do {
+                if (Character.isDigit(c)) {
+                    value = value * 10 + Character.getNumericValue(c);
+                    if (pastDecimal) {
+                        decimalPlace--;
+                    }
+                } else if (c == Character.valueOf('.') && pastDecimal == false) {
+                    pastDecimal = true;
+                } else if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
+                    break;
+                } else {
+                    throw new SystemException(ErrorCode.FORG0001);
+                }
+            } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
+
+            // Parse the exponent.
+            if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
+                int moveOffset = 0;
+                boolean negativeOffset = false;
+                // Check for the negative sign.
+                c = charIterator.next();
+                if (c == Character.valueOf('-')) {
+                    negativeOffset = true;
+                    c = charIterator.next();
+                }
+                // Process the numeric value.
+                do {
+                    if (Character.isDigit(c)) {
+                        moveOffset = moveOffset * 10 + Character.getNumericValue(c);
+                    } else {
+                        throw new SystemException(ErrorCode.FORG0001);
+                    }
+                } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
+                decimalPlace += (negativeOffset ? -moveOffset : moveOffset);
             }
-            valueFloat = value;
-            while (decimalPlace != 0) {
+
+            valueFloat = (float) value;
+            while (decimalPlace != 0 && valueFloat != 0) {
                 if (decimalPlace > 0) {
                     --decimalPlace;
                     valueFloat *= 10;
                 } else {
                     ++decimalPlace;
-                    valueFloat *= 0.1;
+                    valueFloat /= 10;
                 }
             }
         }
 
         dOut.write(ValueTag.XS_FLOAT_TAG);
-        dOut.writeFloat(valueFloat);
+        dOut.writeFloat((negativeValue ? -valueFloat : valueFloat));
     }
 
     @Override
