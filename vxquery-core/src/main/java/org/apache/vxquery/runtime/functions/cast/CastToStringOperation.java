@@ -88,6 +88,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         byte decimalPlace = decp.getDecimalPlace();
         long value = decp.getDecimalValue();
+        byte nDigits = decp.getDigitCount();
+
         if (!isNumberPostive(value)) {
             // Negative result, but the rest of the calculations can be based on a positive value.
             writeChar('-', dOutInner);
@@ -97,7 +99,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
         if (value == 0) {
             writeChar('0', dOutInner);
         } else {
-            int nDigits = (int) Math.log10(value) + 1;
             long pow10 = (long) Math.pow(10, nDigits - 1);
             int start = Math.max(decimalPlace, nDigits - 1);
             int end = Math.min(0, decimalPlace);
@@ -123,6 +124,22 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         double value = doublep.getDouble();
 
+        if (!Double.isInfinite(value) && !Double.isNaN(value)
+                && ((Math.abs(value) >= 0.000001 && Math.abs(value) <= 1000000) || value == 0)) {
+            CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
+            castToDecimal.convertDouble(doublep, dOutInner);
+            XSDecimalPointable decp = new XSDecimalPointable();
+            decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength());
+            convertDecimal(decp, dOut);
+        } else {
+            convertDoubleCanonical(doublep, dOut);
+        }
+    }
+
+    private void convertDoubleCanonical(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        double value = doublep.getDouble();
+
         if (Double.isInfinite(value)) {
             if (value == Double.NEGATIVE_INFINITY) {
                 writeCharSequence("-", dOutInner);
@@ -130,12 +147,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeCharSequence("INF", dOutInner);
         } else if (Double.isNaN(value)) {
             writeCharSequence("NaN", dOutInner);
-        } else if (value <= 1000000 || value >= 0.000001) {
-            CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
-            castToDecimal.convertDouble(doublep, dOutInner);
-            XSDecimalPointable decp = new XSDecimalPointable();
-            decp.set(abvsInner);
-            convertDecimal(decp, dOut);
         } else {
             if (!isNumberPostive((long) value)) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
@@ -299,6 +310,22 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         float value = floatp.getFloat();
 
+        if (!Float.isInfinite(value) && !Float.isNaN(value)
+                && ((Math.abs(value) >= 0.000001 && Math.abs(value) <= 1000000) || value == 0)) {
+            CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
+            castToDecimal.convertFloat(floatp, dOutInner);
+            XSDecimalPointable decp = new XSDecimalPointable();
+            decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength());
+            convertDecimal(decp, dOut);
+        } else {
+            convertFloatCononical(floatp, dOut);
+        }
+    }
+
+    private void convertFloatCononical(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        float value = floatp.getFloat();
+
         if (Float.isInfinite(value)) {
             if (value == Float.NEGATIVE_INFINITY) {
                 writeCharSequence("-", dOutInner);
@@ -306,12 +333,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeCharSequence("INF", dOutInner);
         } else if (Float.isNaN(value)) {
             writeCharSequence("NaN", dOutInner);
-        } else if (value <= 1000000 || value >= 0.000001) {
-            CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
-            castToDecimal.convertFloat(floatp, dOutInner);
-            XSDecimalPointable decp = new XSDecimalPointable();
-            decp.set(abvsInner);
-            convertDecimal(decp, dOut);
         } else {
             if (!isNumberPostive((long) value)) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
@@ -550,13 +571,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
         sendStringDataOutput(dOut);
     }
 
-    private void sendStringDataOutput(DataOutput dOut) throws SystemException, IOException {
-        dOut.write(returnTag);
-        dOut.write((byte) ((abvsInner.getLength() >>> 8) & 0xFF));
-        dOut.write((byte) ((abvsInner.getLength() >>> 0) & 0xFF));
-        dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset(), abvsInner.getLength());
-    }
-
     /**
      * Returns 0 if positive, nonzero if negative.
      * 
@@ -565,6 +579,13 @@ public class CastToStringOperation extends AbstractCastToOperation {
      */
     private boolean isNumberPostive(long value) {
         return ((value & 0x8000000000000000L) == 0 ? true : false);
+    }
+
+    private void sendStringDataOutput(DataOutput dOut) throws SystemException, IOException {
+        dOut.write(returnTag);
+        dOut.write((byte) ((abvsInner.getLength() >>> 8) & 0xFF));
+        dOut.write((byte) ((abvsInner.getLength() >>> 0) & 0xFF));
+        dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset(), abvsInner.getLength());
     }
 
     private void writeChar(char c, DataOutput dOut) {
