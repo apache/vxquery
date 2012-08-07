@@ -70,51 +70,24 @@ public class CastToBooleanOperation extends AbstractCastToOperation {
         byte result = 2;
         ICharacterIterator charIterator = new LowerCaseCharacterIterator(new UTF8StringCharacterIterator(stringp));
         charIterator.reset();
-        int c;
-        int checkValue = 2;
-        search: for (int index = 0; (c = charIterator.next()) != ICharacterIterator.EOS_CHAR; ++index) {
-            switch (index) {
-                case 0:
-                    if (c == Character.valueOf('1')) {
-                        result = 1;
-                    } else if (c == Character.valueOf('0')) {
-                        result = 0;
-                    } else if (c == Character.valueOf('t')) {
-                        checkValue = 1;
-                    } else if (c != Character.valueOf('f')) {
-                        checkValue = 0;
-                    } else {
-                        break search;
-                    }
-                    break;
-                case 1:
-                    if ((checkValue == 1 && c != Character.valueOf('r'))
-                            || (checkValue == 0 && c != Character.valueOf('a'))) {
-                        break search;
-                    }
-                    break;
-                case 2:
-                    if ((checkValue == 1 && c != Character.valueOf('u'))
-                            || (checkValue == 0 && c != Character.valueOf('l'))) {
-                        break search;
-                    }
-                    break;
-                case 3:
-                    if (checkValue == 1 && c == Character.valueOf('e')) {
-                        result = 1;
-                    }
-                    if (checkValue == 0 && c != Character.valueOf('s')) {
-                        break search;
-                    }
-                    break;
-                case 4:
-                    if (checkValue == 0 && c == Character.valueOf('e')) {
-                        result = 0;
-                    }
-                    break;
-                default:
-                    break search;
-            }
+
+        int c1 = charIterator.next();
+        int c2 = charIterator.next();
+        int c3 = charIterator.next();
+        int c4 = charIterator.next();
+        int c5 = charIterator.next();
+        int c6 = charIterator.next();
+
+        if (c1 == Character.valueOf('1') && c2 == ICharacterIterator.EOS_CHAR) {
+            result = 1;
+        } else if (c1 == Character.valueOf('0') && c2 == ICharacterIterator.EOS_CHAR) {
+            result = 0;
+        } else if (c1 == Character.valueOf('t') && c2 == Character.valueOf('r') && c3 == Character.valueOf('u')
+                && c4 == Character.valueOf('e') && c5 == ICharacterIterator.EOS_CHAR) {
+            result = 1;
+        } else if (c1 == Character.valueOf('f') && c2 == Character.valueOf('a') && c3 == Character.valueOf('l')
+                && c4 == Character.valueOf('s') && c5 == Character.valueOf('e') && c6 == ICharacterIterator.EOS_CHAR) {
+            result = 0;
         }
         if (result == 2) {
             throw new SystemException(ErrorCode.FORG0001);
