@@ -358,12 +358,14 @@
     <operator name="op:numeric-unary-minus">
         <param name="arg1" type="xsext:numeric"/>
         <return type="xsext:numeric"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.unary.NumericUnaryMinusScalarEvaluatorFactory"/>
     </operator>
 
     <!-- op:numeric-unary-plus( $arg as numeric) as  numeric -->
     <operator name="op:numeric-unary-plus">
         <param name="arg1" type="xsext:numeric"/>
         <return type="xsext:numeric"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.unary.NumericUnaryPlusScalarEvaluatorFactory"/>
     </operator>
 
     <!-- op:QName-equal($arg1  as xs:QName, $arg2 as xs:QName)  as xs:boolean -->
