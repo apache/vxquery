@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
@@ -34,8 +35,17 @@ public class CastToHexBinaryOperation extends AbstractCastToOperation {
         charIterator.reset();
         abvsInner.reset();
         int c1 = 0, c2 = 0;
-        while ((c1 = charIterator.next()) != ICharacterIterator.EOS_CHAR
-                && (c2 = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
+        while ((c1 = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
+            c2 = charIterator.next();
+            if (c2 == ICharacterIterator.EOS_CHAR) {
+                // Odd number of characters.
+                throw new SystemException(ErrorCode.FORG0001);
+            }
+            if (Character.digit(c1, 16) < 0 || Character.digit(c1, 16) > 15 || Character.digit(c2, 16) < 0
+                    || Character.digit(c2, 16) > 15) {
+                // Invalid of characters.
+                throw new SystemException(ErrorCode.FORG0001);
+            }
             dOutInner.write(((Character.digit(c1, 16) << 4) + Character.digit(c2, 16)));
         }
 
