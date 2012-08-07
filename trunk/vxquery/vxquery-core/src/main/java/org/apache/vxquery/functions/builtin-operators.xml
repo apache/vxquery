@@ -874,6 +874,7 @@
         <param name="arg" type="item()*"/>
         <param name="type" type="xs:int"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.castable.CastableScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:instance-of($arg as item()*, $type as xsext:type) as xs:boolean -->
