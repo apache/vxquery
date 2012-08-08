@@ -649,6 +649,7 @@
         <param name="arg1" type="xs:boolean?"/>
         <param name="arg2" type="xs:boolean?"/>
         <return type="xs:boolean?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.bool.AndScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:or($arg1 as xs:boolean?, $arg2 as xs:boolean?) as xs:boolean? -->
@@ -656,6 +657,7 @@
         <param name="arg1" type="xs:boolean?"/>
         <param name="arg2" type="xs:boolean?"/>
         <return type="xs:boolean?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.bool.OrScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
@@ -705,12 +707,14 @@
         <param name="target" type="xs:string"/>
         <param name="content" type="xs:string"/>
         <return type="node()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.PINodeConstructorScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:comment-constructor($content as xs:string) as node() -->
     <operator name="opext:comment-constructor">
         <param name="content" type="xs:string"/>
         <return type="node()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.CommentNodeConstructorScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:element-constructor($name as xs:QName, $content as item()*) as node() -->
@@ -718,6 +722,7 @@
         <param name="name" type="xs:QName"/>
         <param name="content" type="item()*"/>
         <return type="node()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.ElementNodeConstructorScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:attribute-constructor($name as xs:QName, $content as xs:anyAtomicType*) as node() -->
@@ -725,12 +730,14 @@
         <param name="name" type="xs:QName"/>
         <param name="content" type="xs:anyAtomicType*"/>
         <return type="node()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.AttributeNodeConstructorScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:text-constructor($content as xs:anyAtomicType*) as node() -->
     <operator name="opext:text-constructor">
         <param name="content" type="xs:anyAtomicType*"/>
         <return type="node()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.TextNodeConstructorScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:document-constructor($content as node()) as node() -->
@@ -882,5 +889,6 @@
         <param name="arg" type="item()*"/>
         <param name="type" type="xs:int"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.type.InstanceOfScalarEvaluatorFactory"/>
     </operator>
 </operators>

@@ -1,8 +1,9 @@
 package org.apache.vxquery.runtime.functions.type;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.bool.FnFalseScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.bool.FnTrueScalarEvaluatorFactory;
 import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -11,10 +12,10 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 
-public class TreatScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFactory {
+public class InstanceOfScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public TreatScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public InstanceOfScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
@@ -27,10 +28,11 @@ public class TreatScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFact
             @Override
             protected void evaluate(TaggedValuePointable tvp, IPointable result) throws SystemException {
                 boolean success = matcher.sequenceTypeMatch(tvp);
-                if (!success) {
-                    throw new SystemException(ErrorCode.XPDY0050);
+                if (success) {
+                    FnTrueScalarEvaluatorFactory.setTrue(result);
+                } else {
+                    FnFalseScalarEvaluatorFactory.setFalse(result);
                 }
-                result.set(tvp);
             }
 
             @Override

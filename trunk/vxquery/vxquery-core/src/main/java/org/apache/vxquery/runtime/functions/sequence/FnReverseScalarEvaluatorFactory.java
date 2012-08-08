@@ -19,10 +19,10 @@ import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public class ConcatenateScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class FnReverseScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public ConcatenateScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public FnReverseScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
@@ -37,23 +37,21 @@ public class ConcatenateScalarEvaluatorFactory extends AbstractTaggedValueArgume
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 try {
-                    abvs.reset();
-                    sb.reset(abvs);
-                    for (int i = 0; i < args.length; ++i) {
-                        TaggedValuePointable tvp = args[i];
-                        if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                            tvp.getValue(seq);
-                            int seqLen = seq.getEntryCount();
-                            for (int j = 0; j < seqLen; ++j) {
-                                seq.getEntry(j, p);
-                                sb.addItem(p);
-                            }
-                        } else {
-                            sb.addItem(tvp);
+                    TaggedValuePointable tvp = args[0];
+                    if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                        abvs.reset();
+                        sb.reset(abvs);
+                        tvp.getValue(seq);
+                        int seqLen = seq.getEntryCount();
+                        for (int j = 0; j < seqLen; ++j) {
+                            seq.getEntry(seqLen - j - 1, p);
+                            sb.addItem(p);
                         }
+                        sb.finish();
+                        result.set(abvs);
+                    } else {
+                        result.set(tvp);
                     }
-                    sb.finish();
-                    result.set(abvs);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001);
                 }

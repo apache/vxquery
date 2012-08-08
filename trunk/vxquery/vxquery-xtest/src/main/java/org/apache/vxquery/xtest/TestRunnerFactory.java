@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.vxquery.compiler.CompilerControlBlock;
@@ -30,6 +32,7 @@ import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
@@ -46,6 +49,9 @@ import edu.uci.ics.hyracks.control.nc.NodeControllerService;
 import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
 
 public class TestRunnerFactory {
+    private static final Pattern EMBEDDED_SYSERROR_PATTERN = Pattern
+            .compile("org\\.apache\\.vxquery\\.exceptions\\.SystemException: (\\p{javaUpperCase}{4}\\d{4})");
+
     private List<ResultReporter> reporters;
     private XTestOptions opts;
     private ClusterControllerService cc;
@@ -108,26 +114,37 @@ public class TestRunnerFactory {
                 }
                 long start = System.currentTimeMillis();
                 try {
-                    XMLQueryCompiler compiler = new XMLQueryCompiler(null);
-                    File tempFile = File.createTempFile(testCase.getXQueryFile().getName(), ".tmp");
-                    tempFile.deleteOnExit();
-                    Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
-                    CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
-                            RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
-                            tempFile.getAbsolutePath()) });
-                    compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
-                    JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
+                    try {
+                        XMLQueryCompiler compiler = new XMLQueryCompiler(null);
+                        File tempFile = File.createTempFile(testCase.getXQueryFile().getName(), ".tmp");
+                        tempFile.deleteOnExit();
+                        Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
+                        CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
+                                RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
+                                tempFile.getAbsolutePath()) });
+                        compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
+                        JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
 
-                    DynamicContext dCtx = new DynamicContextImpl(compiler.getModule().getModuleContext());
-                    spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
+                        DynamicContext dCtx = new DynamicContextImpl(compiler.getModule().getModuleContext());
+                        spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
-                    spec.setMaxReattempts(0);
-                    JobId jobId = hcc.startJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
-                    hcc.waitForCompletion(jobId);
-                    res.result = FileUtils.readFileToString(tempFile, "UTF-8").trim();
+                        spec.setMaxReattempts(0);
+                        JobId jobId = hcc.startJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
+                        hcc.waitForCompletion(jobId);
+                        res.result = FileUtils.readFileToString(tempFile, "UTF-8").trim();
+                    } catch (HyracksException e) {
+                        Throwable t = e;
+                        while (t.getCause() != null) {
+                            t = t.getCause();
+                        }
+                        Matcher m = EMBEDDED_SYSERROR_PATTERN.matcher(t.getMessage());
+                        if (m.find()) {
+                            String eCode = m.group(1);
+                            throw new SystemException(ErrorCode.valueOf(eCode), e);
+                        }
+                        throw e;
+                    }
                 } catch (SystemException e) {
-                    res.error = e;
-                } catch (HyracksException e) {
                     res.error = e;
                 } catch (Throwable e) {
                     res.error = e;

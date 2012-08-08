@@ -712,6 +712,7 @@
     <function name="fn:reverse">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnReverseScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:root() as  node() -->

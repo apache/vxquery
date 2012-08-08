@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
+import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DocumentNodeBuilder extends AbstractNodeBuilder {
@@ -23,8 +24,8 @@ public class DocumentNodeBuilder extends AbstractNodeBuilder {
     }
 
     @Override
-    public void reset(ArrayBackedValueStorage abvs) throws IOException {
-        out = abvs.getDataOutput();
+    public void reset(IMutableValueStorage mvs) throws IOException {
+        out = mvs.getDataOutput();
         out.write(ValueTag.DOCUMENT_NODE_TAG);
     }
 
