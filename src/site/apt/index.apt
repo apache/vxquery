@@ -16,19 +16,21 @@
 Apache VXQuery
 
   Apache VXQuery (Versatile XQuery) will be a standards compliant XML Query processor implemented in Java. 
-  We believe that there exists a strong (and growing) need to process semi-structured data in many applications. 
-  The W3C standardized v1.0 of the XML Query Language in early 2007. 
-  Since then, a few processors have surfaced (both commercial and open source). 
-  VXQuery will implement this standard.
+  The focus is on the evaluation of queries on large amounts of XML data.
+  Specifially the goal is to evaluate queries on large collections of relatively small XML documents.
+  To achieve this queries will be evaluated on a cluster of shared nothing machines.
 
-  VXQuery plans to be the glue that brings together imperative programming in Java and declarative programming in XQuery. 
-  The project would enable developers to use XQuery to navigate and transform application objects declaratively in Java applications with minimal overhead.
-  In the VXQuery project we plan to build an implementation that allows users to run declarative XQueries on arbitrary object models. 
-  Existing XQuery engines execute queries by translating the user data into some form of XML Object model. 
-  With VXQuery, we take the opposing view - Translate the query to work natively on the user's object model.
-  In addition, VXQuery works on top of different XML representations including DOM, Stax, and a space optimized model motivated by Xalan's DTM (Document Table Model).
-  VXQuery will also provide a library that allows application developers to express declarative queries without the need to learn a new syntax. We believe that this will speed up the adoption process.
+  There are lots of large colletions of relatively small documents like e.g. the EDGAR dataset [1] or the OpenStreetMap dataset.
+  However there are no XQuery processors available today that are capable of handling these datasets and making this contained information accessible.
 
 * Incubation Disclaimer
 
-  
+  Apache VXQuery is an effort undergoing incubation at The Apache Software 
+  Foundation (ASF), sponsored by the Apache XMLBeans PMC. 
+  Incubation is required of all newly accepted projects until a further review 
+  indicates that the infrastructure, communications, and decision making 
+  process have stabilized in a manner consistent with other successful ASF 
+  projects. 
+  While incubation status is not necessarily a reflection of the completeness 
+  or stability of the code, it does indicate that the project has yet to be 
+  fully endorsed by the ASF.

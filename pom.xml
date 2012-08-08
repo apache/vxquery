@@ -46,11 +46,11 @@
 
   <developers>
       <developer>
-        <id>pzf</id>
-        <name>Paul Fremantle</name>
+        <id>jochen</id>
+        <name>Jochen Wiedmann</name>
         <email></email>
         <roles>
-          <role>Mentor</role>
+            <role>Mentor</role>
         </roles>
         <organization></organization>
         <timezone></timezone>
@@ -68,16 +68,6 @@
       <developer>
         <id>sanjiva</id>
         <name>Sanjiva Weerawarana</name>
-        <email></email>
-        <roles>
-            <role>Mentor</role>
-        </roles>
-        <organization></organization>
-        <timezone></timezone>
-      </developer>         
-      <developer>
-        <id>jochen</id>
-        <name>Jochen Wiedmann</name>
         <email></email>
         <roles>
             <role>Mentor</role>
