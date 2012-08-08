@@ -15,7 +15,7 @@
 
 Apache VXQuery
 
-  Apache VXQuery (Versatile XQuery) will be a standards compliant XML Query processor implemented in Java. 
+  Apache VXQuery will be a standards compliant XML Query processor implemented in Java. 
   The focus is on the evaluation of queries on large amounts of XML data.
   Specifially the goal is to evaluate queries on large collections of relatively small XML documents.
   To achieve this queries will be evaluated on a cluster of shared nothing machines.
