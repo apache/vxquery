@@ -26,7 +26,7 @@ public abstract class AbstractTypeScalarEvaluatorFactory extends AbstractTaggedV
 
         private final IntegerPointable ip;
 
-        boolean first;
+        private boolean first;
 
         protected AbstractTypeScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
             super(args);

@@ -210,6 +210,9 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printNodeTree(PrintStream ps, TaggedValuePointable tvp) {
+        if (ntp != null) {
+            throw new IllegalStateException("Nested NodeTreePointable found");
+        }
         ntp = pp.takeOne(NodeTreePointable.class);
         TaggedValuePointable rootTVP = pp.takeOne(TaggedValuePointable.class);
         try {

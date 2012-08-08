@@ -7,6 +7,8 @@ import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
+import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
+import edu.uci.ics.hyracks.data.std.api.IValueReference;
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -14,13 +16,13 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 public class ElementNodeBuilder extends AbstractNodeBuilder {
     private final GrowableIntArray attrSlots;
 
-    private final ArrayBackedValueStorage attrDataArea;
+    private final IMutableValueStorage attrDataArea;
 
     private final GrowableIntArray childrenSlots;
 
-    private final ArrayBackedValueStorage childrenDataArea;
+    private final IMutableValueStorage childrenDataArea;
 
-    private ArrayBackedValueStorage abvs;
+    private IMutableValueStorage mvs;
 
     private DataOutput out;
 
@@ -42,11 +44,11 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
     }
 
     @Override
-    public void reset(ArrayBackedValueStorage abvs) throws IOException {
-        this.abvs = abvs;
-        out = abvs.getDataOutput();
+    public void reset(IMutableValueStorage mvs) throws IOException {
+        this.mvs = mvs;
+        out = mvs.getDataOutput();
         out.write(ValueTag.ELEMENT_NODE_TAG);
-        headerOffset = abvs.getLength();
+        headerOffset = mvs.getLength();
         out.write(0);
     }
 
@@ -62,7 +64,7 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
         if (childrenCount > 0) {
             header |= ElementNodePointable.CHILDREN_CHUNK_EXISTS_MASK;
         }
-        BytePointable.setByte(abvs.getByteArray(), headerOffset, header);
+        BytePointable.setByte(mvs.getByteArray(), headerOffset, header);
     }
 
     public void setName(int uriCode, int localNameCode, int prefixCode) throws IOException {
@@ -82,7 +84,7 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
     }
 
     public void startNamespaceChunk() {
-        nsChunkStart = abvs.getLength();
+        nsChunkStart = mvs.getLength();
         nsCount = 0;
     }
 
@@ -96,7 +98,7 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
     }
 
     public void endNamespaceChunk() {
-        byte[] bytes = abvs.getByteArray();
+        byte[] bytes = mvs.getByteArray();
         IntegerPointable.setInteger(bytes, nsChunkStart, nsCount);
     }
 
@@ -138,6 +140,11 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
 
     public void endChild(AbstractNodeBuilder nb) throws IOException {
         nb.finish();
+        childrenSlots.append(childrenDataArea.getLength());
+    }
+
+    public void addChild(IValueReference value) throws IOException {
+        childrenDataArea.getDataOutput().write(value.getByteArray(), value.getStartOffset(), value.getLength());
         childrenSlots.append(childrenDataArea.getLength());
     }
 

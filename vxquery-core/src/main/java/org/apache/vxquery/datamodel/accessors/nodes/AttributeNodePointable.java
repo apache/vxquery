@@ -1,6 +1,5 @@
 package org.apache.vxquery.datamodel.accessors.nodes;
 
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 
 import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
@@ -50,7 +49,7 @@ public class AttributeNodePointable extends AbstractPointable {
         return nodeTree.nodeIdExists() ? IntegerPointable.getInteger(bytes, getLocalNodeIdOffset(nodeTree)) : -1;
     }
 
-    public void getValue(NodeTreePointable nodeTree, TaggedValuePointable value) {
+    public void getValue(NodeTreePointable nodeTree, IPointable value) {
         value.set(bytes, getValueOffset(nodeTree), getValueSize(nodeTree));
     }
 

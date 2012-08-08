@@ -5,15 +5,15 @@ import java.io.IOException;
 
 import org.apache.vxquery.datamodel.values.ValueTag;
 
+import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
 import edu.uci.ics.hyracks.data.std.api.IValueReference;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class TextNodeBuilder extends AbstractNodeBuilder {
     private DataOutput out;
 
     @Override
-    public void reset(ArrayBackedValueStorage abvs) throws IOException {
-        out = abvs.getDataOutput();
+    public void reset(IMutableValueStorage mvs) throws IOException {
+        out = mvs.getDataOutput();
         out.write(ValueTag.TEXT_NODE_TAG);
     }
 

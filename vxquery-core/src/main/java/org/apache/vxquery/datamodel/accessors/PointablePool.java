@@ -11,12 +11,12 @@ public class PointablePool {
 
     private final Map<Class<? extends IPointable>, PointableCache<? extends IPointable>> pcMap;
 
-    public PointablePool() {
+    PointablePool() {
         pfMap = new HashMap<Class<? extends IPointable>, IPointableFactory>();
         pcMap = new HashMap<Class<? extends IPointable>, PointableCache<? extends IPointable>>();
     }
 
-    public <T extends IPointable> void register(Class<T> klass, IPointableFactory factory) {
+    <T extends IPointable> void register(Class<T> klass, IPointableFactory factory) {
         pfMap.put(klass, factory);
         pcMap.put(klass, new PointableCache<T>());
     }

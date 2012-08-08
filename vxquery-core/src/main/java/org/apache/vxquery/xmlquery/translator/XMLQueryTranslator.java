@@ -905,7 +905,7 @@ public class XMLQueryTranslator {
             throws SystemException {
         LogicalVariable lVar = createAssignment(
                 sfce(BuiltinOperators.TEXT_CONSTRUCTOR,
-                        ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
+                        ce(SequenceType.create(BuiltinTypeRegistry.XS_UNTYPED_ATOMIC, Quantifier.QUANT_ONE),
                                 cdsNode.getContent())), tCtx);
         return lVar;
     }
@@ -973,7 +973,7 @@ public class XMLQueryTranslator {
             throws SystemException {
         ASTNode content = cNode.getContent();
         LogicalVariable lVar = createAssignment(
-                sfce(BuiltinOperators.TEXT_CONSTRUCTOR, vre(translateExpression(cNode.getTarget(), tCtx)),
+                sfce(BuiltinOperators.PI_CONSTRUCTOR, vre(translateExpression(cNode.getTarget(), tCtx)),
                         content == null ? sfce(BuiltinOperators.CONCATENATE) : vre(translateExpression(content, tCtx))),
                 tCtx);
         return lVar;
@@ -983,8 +983,10 @@ public class XMLQueryTranslator {
             ComputedTextConstructorNode cNode) throws SystemException {
         ASTNode content = cNode.getContent();
         LogicalVariable lVar = createAssignment(
-                sfce(BuiltinOperators.TEXT_CONSTRUCTOR, content == null ? sfce(BuiltinOperators.CONCATENATE)
-                        : vre(translateExpression(content, tCtx))), tCtx);
+                sfce(BuiltinOperators.TEXT_CONSTRUCTOR,
+                        content == null ? ce(
+                                SequenceType.create(BuiltinTypeRegistry.XS_UNTYPED_ATOMIC, Quantifier.QUANT_ONE), "")
+                                : vre(translateExpression(content, tCtx))), tCtx);
         return lVar;
     }
 
@@ -1131,8 +1133,7 @@ public class XMLQueryTranslator {
     private LogicalVariable translateDirectAttributeConstructorNode(TranslationContext tCtx,
             DirectAttributeConstructorNode dacNode) throws SystemException {
         QName aQName = createQName(dacNode.getName());
-        ILogicalExpression name = ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE),
-                aQName.toString());
+        ILogicalExpression name = ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE), aQName);
         List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
         for (ASTNode aVal : dacNode.getValue()) {
             switch (aVal.getTag()) {
@@ -1185,7 +1186,7 @@ public class XMLQueryTranslator {
             }
         }
         ILogicalExpression name = ce(SequenceType.create(BuiltinTypeRegistry.XS_QNAME, Quantifier.QUANT_ONE),
-                createQName(startName, moduleCtx.getDefaultElementNamespaceUri()).toString());
+                createQName(startName, moduleCtx.getDefaultElementNamespaceUri()));
         for (ASTNode cVal : decNode.getContent()) {
             switch (cVal.getTag()) {
                 case CONTENT_CHARS: {
@@ -1566,7 +1567,9 @@ public class XMLQueryTranslator {
                             uri = "";
                         }
                     }
-                    NameTest nameTest = new NameTest(createUTF8String(uri), createUTF8String(ntn.getLocalName()));
+                    String localName = ntn.getLocalName();
+                    NameTest nameTest = new NameTest(uri == null ? null : createUTF8String(uri),
+                            localName == null ? null : createUTF8String(ntn.getLocalName()));
                     if (axis == AxisStepNode.Axis.ATTRIBUTE || axis == AxisStepNode.Axis.ABBREV_ATTRIBUTE) {
                         nt = new AttributeType(nameTest, BuiltinTypeRegistry.XS_ANY_ATOMIC);
                     } else {
@@ -1818,82 +1821,78 @@ public class XMLQueryTranslator {
     }
 
     private ILogicalExpression ce(SequenceType type, Object value) throws SystemException {
-        ItemType it = type.getItemType();
-        if (it.isAtomicType()) {
-            AtomicType at = (AtomicType) it;
-            byte[] bytes = null;
-            switch (at.getTypeId()) {
-                case BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID: {
-                    baaos.reset();
-                    try {
+        try {
+            ItemType it = type.getItemType();
+            if (it.isAtomicType()) {
+                AtomicType at = (AtomicType) it;
+                byte[] bytes = null;
+                switch (at.getTypeId()) {
+                    case BuiltinTypeConstants.XS_BOOLEAN_TYPE_ID: {
+                        baaos.reset();
                         dOut.write((byte) ValueTag.XS_BOOLEAN_TAG);
                         dOut.writeByte(((Boolean) value).booleanValue() ? 1 : 0);
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
+                        break;
                     }
-                    break;
-                }
-                case BuiltinTypeConstants.XS_INT_TYPE_ID: {
-                    baaos.reset();
-                    try {
+                    case BuiltinTypeConstants.XS_INT_TYPE_ID: {
+                        baaos.reset();
                         dOut.write((byte) ValueTag.XS_INT_TAG);
                         dOut.writeInt(((Number) value).intValue());
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
+                        break;
                     }
-                    break;
-                }
-                case BuiltinTypeConstants.XS_INTEGER_TYPE_ID: {
-                    baaos.reset();
-                    try {
+                    case BuiltinTypeConstants.XS_INTEGER_TYPE_ID: {
+                        baaos.reset();
                         dOut.write((byte) ValueTag.XS_INTEGER_TAG);
                         dOut.writeLong(((Number) value).longValue());
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
+                        break;
                     }
-                    break;
-                }
-                case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID: {
-                    baaos.reset();
-                    try {
+                    case BuiltinTypeConstants.XS_DOUBLE_TYPE_ID: {
+                        baaos.reset();
                         dOut.write((byte) ValueTag.XS_DOUBLE_TAG);
                         dOut.writeDouble(((Number) value).doubleValue());
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
+                        break;
                     }
-                    break;
-                }
-                case BuiltinTypeConstants.XS_STRING_TYPE_ID: {
-                    baaos.reset();
-                    try {
+                    case BuiltinTypeConstants.XS_STRING_TYPE_ID: {
+                        baaos.reset();
                         dOut.write((byte) ValueTag.XS_STRING_TAG);
                         stringVB.write((CharSequence) value, dOut);
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
+                        break;
                     }
-                    break;
-                }
-                case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID: {
-                    baaos.reset();
-                    try {
+                    case BuiltinTypeConstants.XS_DECIMAL_TYPE_ID: {
+                        baaos.reset();
                         // TODO Remove the creation of the separate byte array.
                         DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-                        doublep.set(new byte[DoublePointable.TYPE_TRAITS.getFixedLength()], 0, DoublePointable.TYPE_TRAITS.getFixedLength());
+                        doublep.set(new byte[DoublePointable.TYPE_TRAITS.getFixedLength()], 0,
+                                DoublePointable.TYPE_TRAITS.getFixedLength());
                         doublep.setDouble(((Number) value).doubleValue());
                         CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
                         castToDecimal.convertDouble(doublep, dOut);
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
+                        break;
                     }
-                    break;
+                    case BuiltinTypeConstants.XS_QNAME_TYPE_ID: {
+                        QName qname = (QName) value;
+                        baaos.reset();
+                        dOut.write((byte) ValueTag.XS_QNAME_TAG);
+                        stringVB.write(qname.getNamespaceURI(), dOut);
+                        stringVB.write(qname.getPrefix(), dOut);
+                        stringVB.write(qname.getLocalPart(), dOut);
+                        break;
+                    }
+                    case BuiltinTypeConstants.XS_UNTYPED_ATOMIC_TYPE_ID: {
+                        baaos.reset();
+                        dOut.write((byte) ValueTag.XS_UNTYPED_ATOMIC_TAG);
+                        stringVB.write((CharSequence) value, dOut);
+                        break;
+                    }
+                    default:
+                        throw new SystemException(ErrorCode.SYSE0001);
                 }
-                default:
-                    throw new SystemException(ErrorCode.SYSE0001);
+                bytes = Arrays.copyOf(baaos.getByteArray(), baaos.size());
+                return new ConstantExpression(new VXQueryConstantValue(type, bytes));
             }
-            bytes = Arrays.copyOf(baaos.getByteArray(), baaos.size());
-            return new ConstantExpression(new VXQueryConstantValue(type, bytes));
+            throw new UnsupportedOperationException();
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
         }
-        throw new UnsupportedOperationException();
     }
 
     private static ILogicalExpression vre(LogicalVariable var) {

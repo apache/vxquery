@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.arithmetic;
 import java.io.DataOutput;
 
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -29,6 +30,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -58,6 +60,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         final DataOutput dOut = abvs.getDataOutput();
         final TypedPointables tp1 = new TypedPointables();
         final TypedPointables tp2 = new TypedPointables();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
@@ -65,6 +68,22 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
                 TaggedValuePointable tvp2 = args[1];
+                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp1.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        result.set(tvp1);
+                        return;
+                    }
+                    throw new SystemException(ErrorCode.XPTY0004);
+                }
+                if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp2.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        result.set(tvp2);
+                        return;
+                    }
+                    throw new SystemException(ErrorCode.XPTY0004);
+                }
                 int tid1 = getBaseTypeForArithmetics(tvp1.getTag());
                 int tid2 = getBaseTypeForArithmetics(tvp2.getTag());
                 if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
@@ -417,6 +436,9 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
             }
 
             private int getBaseTypeForArithmetics(int tid) throws SystemException {
+                if (tid >= BuiltinTypeConstants.BUILTIN_TYPE_COUNT) {
+                    throw new SystemException(ErrorCode.XPTY0004);
+                }
                 while (true) {
                     switch (tid) {
                         case ValueTag.XS_STRING_TAG:
