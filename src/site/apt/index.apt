@@ -20,9 +20,9 @@ Apache VXQuery
   Specifially the goal is to evaluate queries on large collections of relatively small XML documents.
   To achieve this queries will be evaluated on a cluster of shared nothing machines.
 
-  There are lots of large colletions of relatively small documents like e.g. the EDGAR dataset [1] or the OpenStreetMap dataset.
-  However there are no XQuery processors available today that are capable of handling these datasets and making this contained information accessible.
-
+  There are lots of large colletions of relatively small documents like e.g. the {{{http://www.sec.gov/info/edgar/ednews/dissemin.htm}EDGAR dataset}} or the {{{http://wiki.openstreetmap.org/wiki/Download}OpenStreetMap dataset}}.
+  However there are no XQuery processors available today that are capable of processing these datasets in parallel and making the contained information accessible.
+  
 * Incubation Disclaimer
 
   Apache VXQuery is an effort undergoing incubation at The Apache Software 
