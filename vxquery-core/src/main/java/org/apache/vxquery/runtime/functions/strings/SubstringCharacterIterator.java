@@ -24,7 +24,7 @@ public class SubstringCharacterIterator implements ICharacterIterator {
         } else if (charOffset < start) {
             ++charOffset;
             return next();
-        } else if (charOffset < start + length) {
+        } else if (charOffset < start + length || length == Integer.MAX_VALUE) {
             ++charOffset;
             return c;
         }
@@ -34,7 +34,7 @@ public class SubstringCharacterIterator implements ICharacterIterator {
     @Override
     public void reset() {
         in.reset();
-        charOffset = 0;
+        charOffset = 1;
     }
 
 }

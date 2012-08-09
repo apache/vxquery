@@ -49,7 +49,7 @@ public class FnSubstringEvaluatorFactory extends AbstractCharacterIteratorCopyin
         return new AbstractCharacterIteratorCopyingEvaluator(args, charIterator) {
             @Override
             protected void preEvaluate(TaggedValuePointable[] args) throws SystemException {
-                int startingLocation = 0;
+                int startingLocation = 1;
                 int length = Integer.MAX_VALUE;
                 abvs.reset();
                 charIterator.reset();
