@@ -20,20 +20,19 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
-public class CastToIntegerOperation extends AbstractCastToOperation {
+public class CastToByteOperation extends AbstractCastToOperation {
     boolean negativeAllowed = true;
-    boolean negativeRequired = false;
-    int returnTag = ValueTag.XS_INTEGER_TAG;
+    int returnTag = ValueTag.XS_BYTE_TAG;
 
     @Override
     public void convertBoolean(BooleanPointable boolp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(returnTag);
-        dOut.writeLong((long) (boolp.getBoolean() ? 1 : 0));
+        dOut.write((byte) (boolp.getBoolean() ? 1 : 0));
     }
 
     @Override
     public void convertDecimal(XSDecimalPointable decp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(decp, dOut);
+        writeByteValue(decp, dOut);
     }
 
     @Override
@@ -42,14 +41,14 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
             throw new SystemException(ErrorCode.FOCA0002);
         }
-        if (doubleValue > Long.MAX_VALUE || doubleValue < Long.MIN_VALUE) {
+        if (doubleValue > Byte.MAX_VALUE || doubleValue < Byte.MIN_VALUE) {
             throw new SystemException(ErrorCode.FOCA0003);
         }
-        if ((doublep.longValue() < 0 && !negativeAllowed) || (doublep.longValue() > 0 && negativeRequired)) {
+        if (doublep.byteValue() < 0 && !negativeAllowed) {
             throw new SystemException(ErrorCode.FORG0001);
         }
         dOut.write(returnTag);
-        dOut.writeLong(doublep.longValue());
+        dOut.write(doublep.byteValue());
     }
 
     @Override
@@ -58,19 +57,19 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         if (Float.isInfinite(floatValue) || Float.isNaN(floatValue)) {
             throw new SystemException(ErrorCode.FOCA0002);
         }
-        if (floatValue > Long.MAX_VALUE || floatValue < Long.MIN_VALUE) {
+        if (floatValue > Byte.MAX_VALUE || floatValue < Byte.MIN_VALUE) {
             throw new SystemException(ErrorCode.FOCA0003);
         }
-        if ((floatp.longValue() < 0 && !negativeAllowed) || (floatp.longValue() > 0 && negativeRequired)) {
+        if (floatp.byteValue() < 0 && !negativeAllowed) {
             throw new SystemException(ErrorCode.FORG0001);
         }
         dOut.write(returnTag);
-        dOut.writeLong(floatp.longValue());
+        dOut.write(floatp.byteValue());
     }
 
     @Override
     public void convertInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(longp, dOut);
+        writeByteValue(longp, dOut);
     }
 
     @Override
@@ -86,24 +85,23 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         if (c == Character.valueOf('-') && negativeAllowed) {
             negative = true;
             c = charIterator.next();
-        } else if (negativeRequired) {
-            throw new SystemException(ErrorCode.FORG0001);
         }
 
         // Read the numeric value.
         do {
             if (Character.isDigit(c)) {
-                if (value > ((Long.MAX_VALUE - Character.getNumericValue(c)) / 10)) {
-                    throw new SystemException(ErrorCode.FOCA0001);
-                }
                 value = value * 10 + Character.getNumericValue(c);
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
 
+        if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
+            throw new SystemException(ErrorCode.FORG0001);
+        }
+
         dOut.write(returnTag);
-        dOut.writeLong((negative ? -value : value));
+        dOut.write((byte) (negative ? -value : value));
     }
 
     @Override
@@ -115,59 +113,62 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
      * Derived Datatypes
      */
     public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(bytep, dOut);
+        writeByteValue(bytep, dOut);
     }
 
     public void convertInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(intp, dOut);
+        writeByteValue(intp, dOut);
     }
 
     public void convertLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(longp, dOut);
+        writeByteValue(longp, dOut);
     }
 
     public void convertNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(longp, dOut);
+        writeByteValue(longp, dOut);
     }
 
     public void convertNonNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(longp, dOut);
+        writeByteValue(longp, dOut);
     }
 
     public void convertNonPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(longp, dOut);
+        writeByteValue(longp, dOut);
     }
 
     public void convertPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(longp, dOut);
+        writeByteValue(longp, dOut);
     }
 
     public void convertShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(shortp, dOut);
+        writeByteValue(shortp, dOut);
     }
 
     public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(bytep, dOut);
+        writeByteValue(bytep, dOut);
     }
 
     public void convertUnsignedInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(intp, dOut);
+        writeByteValue(intp, dOut);
     }
 
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(longp, dOut);
+        writeByteValue(longp, dOut);
     }
 
     public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(shortp, dOut);
+        writeByteValue(shortp, dOut);
     }
 
-    private void writeIntegerValue(INumeric numericp, DataOutput dOut) throws SystemException, IOException {
-        if ((numericp.longValue() < 0 && !negativeAllowed) || (numericp.longValue() > 0 && negativeRequired)) {
+    private void writeByteValue(INumeric numericp, DataOutput dOut) throws SystemException, IOException {
+        if (numericp.longValue() > Byte.MAX_VALUE || numericp.longValue() < Byte.MIN_VALUE) {
+            throw new SystemException(ErrorCode.FORG0001);
+        }
+        if (numericp.byteValue() < 0 && !negativeAllowed) {
             throw new SystemException(ErrorCode.FORG0001);
         }
 
         dOut.write(returnTag);
-        dOut.writeLong(numericp.longValue());
+        dOut.write(numericp.byteValue());
     }
 }

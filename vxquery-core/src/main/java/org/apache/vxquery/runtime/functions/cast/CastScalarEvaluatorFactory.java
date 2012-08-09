@@ -39,10 +39,12 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
@@ -74,6 +76,9 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                 abvs.reset();
                 try {
                     switch (tid) {
+                    /**
+                     * Primitive Datatypes (Alphabetical)
+                     */
                         case ValueTag.XS_ANY_URI_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertAnyURI(tp.utf8sp, dOut);
@@ -212,6 +217,81 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             result.set(abvs);
                             return;
 
+                            /**
+                             * Derived Datatypes (Alphabetical)
+                             */
+                        case ValueTag.XS_BYTE_TAG:
+                            tvp.getValue(tp.bytep);
+                            aOp.convertByte(tp.bytep, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_INT_TAG:
+                            tvp.getValue(tp.intp);
+                            aOp.convertInt(tp.intp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_LONG_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertLong(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertNegativeInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertNonNegativeInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertNonPositiveInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertPositiveInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_SHORT_TAG:
+                            tvp.getValue(tp.shortp);
+                            aOp.convertShort(tp.shortp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                            tvp.getValue(tp.bytep);
+                            aOp.convertUnsignedByte(tp.bytep, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_INT_TAG:
+                            tvp.getValue(tp.intp);
+                            aOp.convertUnsignedInt(tp.intp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_LONG_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertUnsignedLong(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                            tvp.getValue(tp.shortp);
+                            aOp.convertUnsignedShort(tp.shortp, dOut);
+                            result.set(abvs);
+                            return;
+
                     }
                 } catch (SystemException se) {
                     throw se;
@@ -269,6 +349,32 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToUntypedAtomicOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_YEAR_MONTH_DURATION) {
                     aOp = new CastToYMDurationOperation();
+
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_BYTE) {
+                    aOp = new CastToByteOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INT) {
+                    aOp = new CastToIntOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_LONG) {
+                    aOp = new CastToLongOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NEGATIVE_INTEGER) {
+                    aOp = new CastToNegativeIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NON_NEGATIVE_INTEGER) {
+                    aOp = new CastToNonNegativeIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NON_POSITIVE_INTEGER) {
+                    aOp = new CastToNonPositiveIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_POSITIVE_INTEGER) {
+                    aOp = new CastToPositiveIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_SHORT) {
+                    aOp = new CastToShortOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_BYTE) {
+                    aOp = new CastToUnsignedByteOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_INT) {
+                    aOp = new CastToUnsignedIntOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_LONG) {
+                    aOp = new CastToUnsignedLongOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_SHORT) {
+                    aOp = new CastToUnsignedShortOperation();
+
                 } else {
                     aOp = new CastToUntypedAtomicOperation();
                 }
@@ -277,6 +383,7 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
             private int getBaseTypeForCasts(int tid) throws SystemException {
                 while (true) {
                     switch (tid) {
+                    // Primitive Datatypes
                         case ValueTag.XS_ANY_URI_TAG:
                         case ValueTag.XS_BASE64_BINARY_TAG:
                         case ValueTag.XS_BOOLEAN_TAG:
@@ -299,6 +406,19 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                         case ValueTag.XS_TIME_TAG:
                         case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                         case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                            // Derived Datatypes
+                        case ValueTag.XS_BYTE_TAG:
+                        case ValueTag.XS_INT_TAG:
+                        case ValueTag.XS_LONG_TAG:
+                        case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                        case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                        case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                        case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                        case ValueTag.XS_SHORT_TAG:
+                        case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                        case ValueTag.XS_UNSIGNED_INT_TAG:
+                        case ValueTag.XS_UNSIGNED_LONG_TAG:
+                        case ValueTag.XS_UNSIGNED_SHORT_TAG:
                             return tid;
 
                         case ValueTag.XS_ANY_ATOMIC_TAG:
@@ -315,6 +435,8 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
 
     private static class TypedPointables {
         BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
+        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
+        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
         IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
