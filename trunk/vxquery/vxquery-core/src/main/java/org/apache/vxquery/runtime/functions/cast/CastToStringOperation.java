@@ -102,7 +102,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
             long pow10 = (long) Math.pow(10, nDigits - 1);
             int start = Math.max(decimalPlace, nDigits - 1);
             int end = Math.min(0, decimalPlace);
-
+            
             for (int i = start; i >= end; --i) {
                 if (i >= nDigits || i < 0) {
                     writeChar('0', dOutInner);
@@ -136,7 +136,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
         }
     }
 
-    private void convertDoubleCanonical(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
+    public void convertDoubleCanonical(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         double value = doublep.getDouble();
 
@@ -171,7 +171,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
                 writeCharSequence("0.0", dOutInner);
             } else {
                 for (int i = nDigits - 1; i >= 0; --i) {
-                    writeChar((char) ('0' + (value / pow10)), dOutInner);
+                    writeChar((char) ('0' + Math.floor(value / pow10)), dOutInner);
                     value %= pow10;
                     pow10 /= 10;
                     if (i == nDigits - 1) {
@@ -318,11 +318,11 @@ public class CastToStringOperation extends AbstractCastToOperation {
             decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength());
             convertDecimal(decp, dOut);
         } else {
-            convertFloatCononical(floatp, dOut);
+            convertFloatCanonical(floatp, dOut);
         }
     }
 
-    private void convertFloatCononical(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
+    public void convertFloatCanonical(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         float value = floatp.getFloat();
 
@@ -357,7 +357,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
                 writeCharSequence("0.0", dOutInner);
             } else {
                 for (int i = nDigits - 1; i >= 0; --i) {
-                    writeChar((char) ('0' + (value / pow10)), dOutInner);
+                    writeChar((char) ('0' + Math.floor(value / pow10)), dOutInner);
                     value %= pow10;
                     pow10 /= 10;
                     if (i == nDigits - 1) {
@@ -577,7 +577,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
      * @param value
      * @return
      */
-    private boolean isNumberPostive(long value) {
+    public static boolean isNumberPostive(long value) {
         return ((value & 0x8000000000000000L) == 0 ? true : false);
     }
 
