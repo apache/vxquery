@@ -80,12 +80,14 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         long value = 0;
         int c = 0;
         boolean negative = false;
+        long limit = -Long.MAX_VALUE;
 
         // Check the first character.
         c = charIterator.next();
         if (c == Character.valueOf('-') && negativeAllowed) {
             negative = true;
             c = charIterator.next();
+            limit = Long.MIN_VALUE;
         } else if (negativeRequired) {
             throw new SystemException(ErrorCode.FORG0001);
         }
@@ -93,17 +95,17 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         // Read the numeric value.
         do {
             if (Character.isDigit(c)) {
-                if (value > ((Long.MAX_VALUE - Character.getNumericValue(c)) / 10)) {
-                    throw new SystemException(ErrorCode.FOCA0001);
+                if (value < limit + Character.getNumericValue(c)) {
+                    throw new SystemException(ErrorCode.FORG0001);
                 }
-                value = value * 10 + Character.getNumericValue(c);
+                value = value * 10 - Character.getNumericValue(c);
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
 
         dOut.write(returnTag);
-        dOut.writeLong((negative ? -value : value));
+        dOut.writeLong((negative ? value : -value));
     }
 
     @Override

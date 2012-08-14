@@ -73,12 +73,14 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
         int c = ICharacterIterator.EOS_CHAR;
         int c2 = ICharacterIterator.EOS_CHAR;
         int c3 = ICharacterIterator.EOS_CHAR;
+        long limit = -Long.MAX_VALUE;
 
         // Check sign.
         c = charIterator.next();
         if (c == Character.valueOf('-')) {
             negativeValue = true;
             c = charIterator.next();
+            limit = Long.MIN_VALUE;
         }
         // Check the special cases.
         if (c == Character.valueOf('I') || c == Character.valueOf('N')) {
@@ -97,10 +99,10 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
             // Read in the number.
             do {
                 if (Character.isDigit(c)) {
-                    if (value > Long.MAX_VALUE / 10) {
+                    if (value < limit / 10 + Character.getNumericValue(c)) {
                         throw new SystemException(ErrorCode.FOCA0006);
                     }
-                    value = value * 10 + Character.getNumericValue(c);
+                    value = value * 10 - Character.getNumericValue(c);
                     if (pastDecimal) {
                         decimalPlace--;
                     }
@@ -131,10 +133,10 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
                         throw new SystemException(ErrorCode.FORG0001);
                     }
                 } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
-                decimalPlace += (negativeOffset ? -moveOffset : moveOffset);
-                if (decimalPlace > 324 || decimalPlace < -324) {
+                if (moveOffset > 324 || moveOffset < -324) {
                     throw new SystemException(ErrorCode.FOCA0006);
                 }
+                decimalPlace += (negativeOffset ? -moveOffset : moveOffset);
             }
 
             /*
@@ -205,7 +207,7 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
         }
 
         dOut.write(ValueTag.XS_DOUBLE_TAG);
-        dOut.writeDouble((negativeValue ? -valueDouble : valueDouble));
+        dOut.writeDouble((negativeValue ? valueDouble : -valueDouble));
     }
 
     @Override
