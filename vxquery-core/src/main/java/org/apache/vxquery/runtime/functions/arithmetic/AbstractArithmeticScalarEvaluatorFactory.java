@@ -480,33 +480,34 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                 long value;
                 switch (tvp.getTag()) {
                     case ValueTag.XS_INTEGER_TAG:
-                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
                     case ValueTag.XS_LONG_TAG:
+                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
                     case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_UNSIGNED_LONG_TAG:
                     case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                    case ValueTag.XS_UNSIGNED_INT_TAG:
+                    case ValueTag.XS_UNSIGNED_LONG_TAG:
                         tvp.getValue(tp.longp);
                         value = tp.longp.longValue();
                         break;
 
                     case ValueTag.XS_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_INT_TAG:
+                    case ValueTag.XS_UNSIGNED_SHORT_TAG:
                         tvp.getValue(tp.intp);
                         value = tp.intp.longValue();
                         break;
 
                     case ValueTag.XS_SHORT_TAG:
-                    case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                    case ValueTag.XS_UNSIGNED_BYTE_TAG:
                         tvp.getValue(tp.shortp);
                         value = tp.shortp.longValue();
                         break;
 
                     case ValueTag.XS_BYTE_TAG:
-                    case ValueTag.XS_UNSIGNED_BYTE_TAG:
                         tvp.getValue(tp.bytep);
                         value = tp.bytep.longValue();
                         break;
+
                     default:
                         value = 0;
                 }
