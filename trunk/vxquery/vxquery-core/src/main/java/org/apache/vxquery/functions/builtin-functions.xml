@@ -627,6 +627,7 @@
     <function name="fn:not">
         <param name="arg" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.bool.FnNotScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:number() as  xs:double -->
