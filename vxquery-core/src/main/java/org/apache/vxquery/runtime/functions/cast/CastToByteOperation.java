@@ -79,29 +79,30 @@ public class CastToByteOperation extends AbstractCastToOperation {
         long value = 0;
         int c = 0;
         boolean negative = false;
+        long limit = -Byte.MAX_VALUE;
 
         // Check the first character.
         c = charIterator.next();
         if (c == Character.valueOf('-') && negativeAllowed) {
             negative = true;
             c = charIterator.next();
+            limit = Byte.MIN_VALUE;
         }
 
         // Read the numeric value.
         do {
             if (Character.isDigit(c)) {
-                value = value * 10 + Character.getNumericValue(c);
+                if (value < limit + Character.getNumericValue(c)) {
+                    throw new SystemException(ErrorCode.FORG0001);
+                }
+                value = value * 10 - Character.getNumericValue(c);
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
 
-        if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
-            throw new SystemException(ErrorCode.FORG0001);
-        }
-
         dOut.write(returnTag);
-        dOut.write((byte) (negative ? -value : value));
+        dOut.write((byte) (negative ? value : -value));
     }
 
     @Override

@@ -98,7 +98,7 @@ public class CastToFloatOperation extends AbstractCastToOperation {
             // Read in the number.
             do {
                 if (Character.isDigit(c)) {
-                    value = value * 10 + Character.getNumericValue(c);
+                    value = value * 10 - Character.getNumericValue(c);
                     if (pastDecimal) {
                         decimalPlace--;
                     }
@@ -149,7 +149,7 @@ public class CastToFloatOperation extends AbstractCastToOperation {
                 } else if (decimalPlace <= 30) {
                     valueFloat *= powersOf10from20to30[decimalPlace];
                 } else if (decimalPlace <= 38) {
-                    valueFloat *= powersOf10from20to30[30];
+                    valueFloat *= powersOf10from20to30[10];
                     valueFloat *= powersOf10upTo10[decimalPlace - 30];
                 }
             } else {
@@ -161,17 +161,17 @@ public class CastToFloatOperation extends AbstractCastToOperation {
                 } else if (decimalPlace >= -30) {
                     valueFloat /= powersOf10from20to30[-decimalPlace];
                 } else if (decimalPlace >= -40) {
-                    valueFloat /= powersOf10from20to30[30];
+                    valueFloat /= powersOf10from20to30[10];
                     valueFloat /= powersOf10upTo10[-decimalPlace - 30];
                 } else if (decimalPlace >= -45) {
-                    valueFloat /= powersOf10from20to30[20];
+                    valueFloat /= powersOf10from20to30[0];
                     valueFloat /= powersOf10from20to30[-decimalPlace - 20];
                 }
             }
         }
 
         dOut.write(ValueTag.XS_FLOAT_TAG);
-        dOut.writeFloat((negativeValue ? -valueFloat : valueFloat));
+        dOut.writeFloat((negativeValue ? valueFloat : -valueFloat));
     }
 
     @Override
