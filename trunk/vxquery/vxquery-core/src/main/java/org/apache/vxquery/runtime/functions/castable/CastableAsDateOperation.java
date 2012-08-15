@@ -32,6 +32,7 @@ public class CastableAsDateOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToDateOperation castTo = new CastToDateOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {

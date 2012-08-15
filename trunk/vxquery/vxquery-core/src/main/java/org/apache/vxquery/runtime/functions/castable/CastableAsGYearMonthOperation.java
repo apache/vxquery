@@ -38,6 +38,7 @@ public class CastableAsGYearMonthOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToGYearMonthOperation castTo = new CastToGYearMonthOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {
