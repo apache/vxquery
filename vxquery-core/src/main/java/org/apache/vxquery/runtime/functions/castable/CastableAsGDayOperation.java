@@ -38,6 +38,7 @@ public class CastableAsGDayOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToGDayOperation castTo = new CastToGDayOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {

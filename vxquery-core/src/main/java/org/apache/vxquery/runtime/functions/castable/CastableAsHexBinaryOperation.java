@@ -31,6 +31,7 @@ public class CastableAsHexBinaryOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToHexBinaryOperation castTo = new CastToHexBinaryOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {

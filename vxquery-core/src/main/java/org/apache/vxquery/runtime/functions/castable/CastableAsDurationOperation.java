@@ -32,6 +32,7 @@ public class CastableAsDurationOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToDurationOperation castTo = new CastToDurationOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {

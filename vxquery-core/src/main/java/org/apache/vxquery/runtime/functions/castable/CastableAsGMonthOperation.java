@@ -38,6 +38,7 @@ public class CastableAsGMonthOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToGMonthOperation castTo = new CastToGMonthOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {

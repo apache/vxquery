@@ -31,6 +31,7 @@ public class CastableAsBase64BinaryOperation extends AbstractCastableAsOperation
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToBase64BinaryOperation castTo = new CastToBase64BinaryOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {

@@ -26,6 +26,7 @@ public class CastableAsTimeOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToTimeOperation castTo = new CastToTimeOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {

@@ -35,6 +35,7 @@ public class CastableAsDecimalOperation extends AbstractCastableAsOperation {
     public void convertDouble(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToDecimalOperation castTo = new CastToDecimalOperation();
             castTo.convertDouble(doublep, dOutInner);
         } catch (Exception e) {
@@ -48,6 +49,7 @@ public class CastableAsDecimalOperation extends AbstractCastableAsOperation {
     public void convertFloat(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToDecimalOperation castTo = new CastToDecimalOperation();
             castTo.convertFloat(floatp, dOutInner);
         } catch (Exception e) {
@@ -67,6 +69,7 @@ public class CastableAsDecimalOperation extends AbstractCastableAsOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         boolean castable = true;
         try {
+            abvsInner.reset();
             CastToDecimalOperation castTo = new CastToDecimalOperation();
             castTo.convertString(stringp, dOutInner);
         } catch (Exception e) {
