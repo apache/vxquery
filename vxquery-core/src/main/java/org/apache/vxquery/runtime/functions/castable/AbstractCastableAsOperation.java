@@ -14,10 +14,12 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public abstract class AbstractCastableAsOperation {
@@ -135,4 +137,68 @@ public abstract class AbstractCastableAsOperation {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 0);
     }
+
+    /**
+     * Derived Datatypes
+     */
+    public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertNonNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertNonPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertUnsignedInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
+    public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 0);
+    }
+
 }
