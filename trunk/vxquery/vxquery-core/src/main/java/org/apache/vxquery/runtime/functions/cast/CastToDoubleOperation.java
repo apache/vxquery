@@ -170,7 +170,7 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
                             if (Double.isInfinite(t)) {
                                 valueDouble = Double.POSITIVE_INFINITY;
                             }
-                            t = Double.MAX_VALUE;
+                            t = -Double.MAX_VALUE;
                         }
                         valueDouble = t;
                     }
