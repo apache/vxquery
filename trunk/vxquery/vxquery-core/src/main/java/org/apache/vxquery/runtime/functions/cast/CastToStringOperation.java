@@ -28,11 +28,39 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class CastToStringOperation extends AbstractCastToOperation {
+    private static long getPowerOf10(double value, long max, long min) {
+        for (long i = min; i < max; i++) {
+            if (Math.pow(10, i) > value)
+                return i;
+        }
+        return max;
+    }
+
+    /**
+     * Returns 0 if positive, nonzero if negative.
+     * 
+     * @param value
+     * @return
+     */
+    public static boolean isNumberPostive(long value) {
+        return ((value & 0x8000000000000000L) == 0 ? true : false);
+    }
+
     private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private DataOutput dOutInner = abvsInner.getDataOutput();
     int returnTag = ValueTag.XS_STRING_TAG;
     private final char[] hex = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    private static final int DOUBLE_MANTISSA_BITS = 52; // size of the mantissa in bits
+    private static final int DOUBLE_MANTISSA_OFFSET = -1075;
+    private static final int DOUBLE_EXPONENT_MAX = 1023;
+    private static final int DOUBLE_EXPONENT_MIN = -1022;
+    private static final int FLOAT_MANTISSA_BITS = 23; // size of the mantissa in bits
+    private static final int FLOAT_MANTISSA_OFFSET = -150;
+    private static final int FLOAT_EXPONENT_MAX = 127;
+    private static final int FLOAT_EXPONENT_MIN = -126;
+    private static final int b = 2; // base of stored value
+    private static final int B = 10; // base of printed value
 
     @Override
     public void convertAnyURI(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
@@ -102,7 +130,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
             long pow10 = (long) Math.pow(10, nDigits - 1);
             int start = Math.max(decimalPlace, nDigits - 1);
             int end = Math.min(0, decimalPlace);
-            
+
             for (int i = start; i >= end; --i) {
                 if (i >= nDigits || i < 0) {
                     writeChar('0', dOutInner);
@@ -129,7 +157,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
             CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
             castToDecimal.convertDouble(doublep, dOutInner);
             XSDecimalPointable decp = new XSDecimalPointable();
-            decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength());
+            decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
+                    XSDecimalPointable.TYPE_TRAITS.getFixedLength());
             convertDecimal(decp, dOut);
         } else {
             convertDoubleCanonical(doublep, dOut);
@@ -147,43 +176,101 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeCharSequence("INF", dOutInner);
         } else if (Double.isNaN(value)) {
             writeCharSequence("NaN", dOutInner);
+        } else if (value == 0) {
+            if (!isNumberPostive((long) value)) {
+                writeChar('-', dOutInner);
+            }
+            writeCharSequence("0.0", dOutInner);
         } else {
+            /*
+             * The double to string algorithm is based on a paper by Robert G Burger and 
+             * R Kent Dybvig titled "Print Floating-Point Numbers Quickly and Accurately".
+             */
+            long bits = Double.doubleToLongBits(value);
+            boolean decimalPlaced = false;
+
+            int e = (int) ((bits >> 52) & 0x7ffL);
+            long f = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
+            e = e + DOUBLE_MANTISSA_OFFSET;
+
+            // Initialize variables
+            double r, s, mPlus, mMinus;
+            if (e >= 0) {
+                if (f == Math.pow(b, DOUBLE_MANTISSA_BITS - 1)) {
+                    r = f * Math.pow(b, e) * 2;
+                    s = 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e + 1);
+                } else {
+                    r = f * Math.pow(b, e + 1) * 2;
+                    s = b * 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e);
+                }
+            } else {
+                if (e == DOUBLE_EXPONENT_MIN || f != Math.pow(b, DOUBLE_MANTISSA_BITS - 1)) {
+                    r = f * Math.pow(b, e) * 2;
+                    s = 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e + 1);
+                } else {
+                    r = f * Math.pow(b, e + 1) * 2;
+                    s = b * 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e);
+                }
+            }
+
+            double k = Math.ceil(Math.log10((r + mPlus) / s));
+            if (k >= 0) {
+                s = s * Math.pow(B, k);
+            } else {
+                r = r * Math.pow(B, -k);
+                mPlus = mPlus * Math.pow(B, -k);
+                mMinus = mMinus * Math.pow(B, -k);
+            }
+
             if (!isNumberPostive((long) value)) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
                 writeChar('-', dOutInner);
                 value *= -1;
             }
-            byte decimalPlace = 0;
-            // Move the decimal
-            while (value % 1 != 0) {
-                --decimalPlace;
-                value *= 10;
-            }
-            // Remove extra zeros
-            while (value != 0 && value % 10 == 0) {
-                value /= 10;
-                ++decimalPlace;
-            }
-            // Print out the value.
-            int nDigits = (int) Math.log10(value) + 1;
-            long pow10 = (long) Math.pow(10, nDigits - 1);
-            if (nDigits < 0) {
-                writeCharSequence("0.0", dOutInner);
-            } else {
-                for (int i = nDigits - 1; i >= 0; --i) {
-                    writeChar((char) ('0' + Math.floor(value / pow10)), dOutInner);
-                    value %= pow10;
-                    pow10 /= 10;
-                    if (i == nDigits - 1) {
-                        writeChar('.', dOutInner);
-                    } else {
-                        ++decimalPlace;
+
+            double d;
+            while (!Double.isInfinite(mPlus) && !Double.isNaN(mPlus) && !Double.isInfinite(mMinus)
+                    && !Double.isNaN(mMinus)) {
+                if (s == r) {
+                    // Special case where the value is off by a factor of ten.
+                    d = 1;
+                } else {
+                    d = Math.floor((r * B) / s);
+                }
+                r = r * B % s;
+                mPlus = mPlus * B;
+                mMinus = mMinus * B;
+
+                if (r < mMinus && r + mPlus > s) {
+                    if (r * 2 > s) {
+                        d = d + 1;
                     }
+                    writeChar((char) ('0' + d), dOutInner);
+                    break;
+                } else if (r + mPlus > s) {
+                    d = d + 1;
+                    writeChar((char) ('0' + d), dOutInner);
+                    break;
+                } else if (r < mMinus) {
+                    writeChar((char) ('0' + d), dOutInner);
+                    break;
                 }
-                if (nDigits == 1) {
-                    writeChar('0', dOutInner);
+                writeChar((char) ('0' + d), dOutInner);
+                if (!decimalPlaced) {
+                    decimalPlaced = true;
+                    writeChar('.', dOutInner);
                 }
             }
+
+            long decimalPlace = getPowerOf10(value, DOUBLE_EXPONENT_MAX, DOUBLE_EXPONENT_MIN) - 1;
             writeChar('E', dOutInner);
             writeNumberWithPadding(decimalPlace, 1, dOutInner);
         }
@@ -333,43 +420,101 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeCharSequence("INF", dOutInner);
         } else if (Float.isNaN(value)) {
             writeCharSequence("NaN", dOutInner);
+        } else if (value == 0) {
+            if (!isNumberPostive((long) value)) {
+                writeChar('-', dOutInner);
+            }
+            writeCharSequence("0.0", dOutInner);
         } else {
+            /*
+             * The double to string algorithm is based on a paper by Robert G Burger and 
+             * R Kent Dybvig titled "Print Floating-Point Numbers Quickly and Accurately".
+             */
+            long bits = Float.floatToIntBits(value);
+            boolean decimalPlaced = false;
+
+            int e = (int) ((bits >> 23) & 0xff);
+            int f = (int) ((e == 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000);
+            e = e + FLOAT_MANTISSA_OFFSET;
+
+            // Initialize variables
+            double r, s, mPlus, mMinus;
+            if (e >= 0) {
+                if (f == Math.pow(b, FLOAT_MANTISSA_BITS - 1)) {
+                    r = f * Math.pow(b, e) * 2;
+                    s = 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e + 1);
+                } else {
+                    r = f * Math.pow(b, e + 1) * 2;
+                    s = b * 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e);
+                }
+            } else {
+                if (e == FLOAT_EXPONENT_MIN || f != Math.pow(b, FLOAT_MANTISSA_BITS - 1)) {
+                    r = f * Math.pow(b, e) * 2;
+                    s = 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e + 1);
+                } else {
+                    r = f * Math.pow(b, e + 1) * 2;
+                    s = b * 2;
+                    mPlus = Math.pow(b, e);
+                    mMinus = Math.pow(b, e);
+                }
+            }
+
+            double k = Math.ceil(Math.log10((r + mPlus) / s));
+            if (k >= 0) {
+                s = s * Math.pow(B, k);
+            } else {
+                r = r * Math.pow(B, -k);
+                mPlus = mPlus * Math.pow(B, -k);
+                mMinus = mMinus * Math.pow(B, -k);
+            }
+
             if (!isNumberPostive((long) value)) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
                 writeChar('-', dOutInner);
                 value *= -1;
             }
-            byte decimalPlace = 0;
-            // Move the decimal
-            while (value % 1 != 0) {
-                --decimalPlace;
-                value *= 10;
-            }
-            // Remove extra zeros
-            while (value != 0 && value % 10 == 0) {
-                value /= 10;
-                ++decimalPlace;
-            }
-            // Print out the value.
-            int nDigits = (int) Math.log10(value) + 1;
-            long pow10 = (long) Math.pow(10, nDigits - 1);
-            if (nDigits < 0) {
-                writeCharSequence("0.0", dOutInner);
-            } else {
-                for (int i = nDigits - 1; i >= 0; --i) {
-                    writeChar((char) ('0' + Math.floor(value / pow10)), dOutInner);
-                    value %= pow10;
-                    pow10 /= 10;
-                    if (i == nDigits - 1) {
-                        writeChar('.', dOutInner);
-                    } else {
-                        ++decimalPlace;
+
+            double d;
+            while (!Double.isInfinite(mPlus) && !Double.isNaN(mPlus) && !Double.isInfinite(mMinus)
+                    && !Double.isNaN(mMinus)) {
+                if (s == r) {
+                    // Special case where the value is off by a factor of ten.
+                    d = 1;
+                } else {
+                    d = Math.floor((r * B) / s);
+                }
+                r = r * B % s;
+                mPlus = mPlus * B;
+                mMinus = mMinus * B;
+
+                if (r < mMinus && r + mPlus > s) {
+                    if (r * 2 > s) {
+                        d = d + 1;
                     }
+                    writeChar((char) ('0' + d), dOutInner);
+                    break;
+                } else if (r + mPlus > s) {
+                    d = d + 1;
+                    writeChar((char) ('0' + d), dOutInner);
+                    break;
+                } else if (r < mMinus) {
+                    writeChar((char) ('0' + d), dOutInner);
+                    break;
                 }
-                if (nDigits == 1) {
-                    writeChar('0', dOutInner);
+                writeChar((char) ('0' + d), dOutInner);
+                if (!decimalPlaced) {
+                    decimalPlaced = true;
+                    writeChar('.', dOutInner);
                 }
             }
+
+            long decimalPlace = getPowerOf10(value, FLOAT_EXPONENT_MAX, FLOAT_EXPONENT_MIN) - 1;
             writeChar('E', dOutInner);
             writeNumberWithPadding(decimalPlace, 1, dOutInner);
         }
@@ -569,16 +714,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
             }
         }
         sendStringDataOutput(dOut);
-    }
-
-    /**
-     * Returns 0 if positive, nonzero if negative.
-     * 
-     * @param value
-     * @return
-     */
-    public static boolean isNumberPostive(long value) {
-        return ((value & 0x8000000000000000L) == 0 ? true : false);
     }
 
     private void sendStringDataOutput(DataOutput dOut) throws SystemException, IOException {
