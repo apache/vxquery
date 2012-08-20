@@ -29,6 +29,7 @@ import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class CastToStringOperation extends AbstractCastToOperation {
     private static long getPowerOf10(double value, long max, long min) {
+        value = Math.abs(value);
         for (long i = min; i < max; i++) {
             if (Math.pow(10, i) > value)
                 return i;
@@ -168,7 +169,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertDoubleCanonical(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         double value = doublep.getDouble();
-
+        
         if (Double.isInfinite(value)) {
             if (value == Double.NEGATIVE_INFINITY) {
                 writeCharSequence("-", dOutInner);
@@ -176,11 +177,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeCharSequence("INF", dOutInner);
         } else if (Double.isNaN(value)) {
             writeCharSequence("NaN", dOutInner);
-        } else if (value == 0) {
-            if (!isNumberPostive((long) value)) {
-                writeChar('-', dOutInner);
-            }
-            writeCharSequence("0.0", dOutInner);
         } else {
             /*
              * The double to string algorithm is based on a paper by Robert G Burger and 
@@ -189,90 +185,93 @@ public class CastToStringOperation extends AbstractCastToOperation {
             long bits = Double.doubleToLongBits(value);
             boolean decimalPlaced = false;
 
+            boolean negative = ((bits >> 63) == 0) ? false : true;
             int e = (int) ((bits >> 52) & 0x7ffL);
             long f = (e == 0) ? (bits & 0xfffffffffffffL) << 1 : (bits & 0xfffffffffffffL) | 0x10000000000000L;
             e = e + DOUBLE_MANTISSA_OFFSET;
 
-            // Initialize variables
-            double r, s, mPlus, mMinus;
-            if (e >= 0) {
-                if (f == Math.pow(b, DOUBLE_MANTISSA_BITS - 1)) {
-                    r = f * Math.pow(b, e) * 2;
-                    s = 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e + 1);
-                } else {
-                    r = f * Math.pow(b, e + 1) * 2;
-                    s = b * 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e);
-                }
-            } else {
-                if (e == DOUBLE_EXPONENT_MIN || f != Math.pow(b, DOUBLE_MANTISSA_BITS - 1)) {
-                    r = f * Math.pow(b, e) * 2;
-                    s = 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e + 1);
-                } else {
-                    r = f * Math.pow(b, e + 1) * 2;
-                    s = b * 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e);
-                }
-            }
-
-            double k = Math.ceil(Math.log10((r + mPlus) / s));
-            if (k >= 0) {
-                s = s * Math.pow(B, k);
-            } else {
-                r = r * Math.pow(B, -k);
-                mPlus = mPlus * Math.pow(B, -k);
-                mMinus = mMinus * Math.pow(B, -k);
-            }
-
-            if (!isNumberPostive((long) value)) {
+            if (negative) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
                 writeChar('-', dOutInner);
-                value *= -1;
             }
-
-            double d;
-            while (!Double.isInfinite(mPlus) && !Double.isNaN(mPlus) && !Double.isInfinite(mMinus)
-                    && !Double.isNaN(mMinus)) {
-                if (s == r) {
-                    // Special case where the value is off by a factor of ten.
-                    d = 1;
+            if (value == 0) {
+                writeCharSequence("0.0", dOutInner);
+            } else {
+                // Initialize variables
+                double r, s, mPlus, mMinus;
+                if (e >= 0) {
+                    if (f == Math.pow(b, DOUBLE_MANTISSA_BITS - 1)) {
+                        r = f * Math.pow(b, e) * 2;
+                        s = 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e + 1);
+                    } else {
+                        r = f * Math.pow(b, e + 1) * 2;
+                        s = b * 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e);
+                    }
                 } else {
-                    d = Math.floor((r * B) / s);
+                    if (e == DOUBLE_EXPONENT_MIN || f != Math.pow(b, DOUBLE_MANTISSA_BITS - 1)) {
+                        r = f * Math.pow(b, e) * 2;
+                        s = 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e + 1);
+                    } else {
+                        r = f * Math.pow(b, e + 1) * 2;
+                        s = b * 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e);
+                    }
                 }
-                r = r * B % s;
-                mPlus = mPlus * B;
-                mMinus = mMinus * B;
 
-                if (r < mMinus && r + mPlus > s) {
-                    if (r * 2 > s) {
+                double k = Math.ceil(Math.log10((r + mPlus) / s));
+                if (k >= 0) {
+                    s = s * Math.pow(B, k);
+                } else {
+                    r = r * Math.pow(B, -k);
+                    mPlus = mPlus * Math.pow(B, -k);
+                    mMinus = mMinus * Math.pow(B, -k);
+                }
+
+                double d;
+                while (!Double.isInfinite(mPlus) && !Double.isNaN(mPlus) && !Double.isInfinite(mMinus)
+                        && !Double.isNaN(mMinus)) {
+                    if (s == r) {
+                        // Special case where the value is off by a factor of ten.
+                        d = 1;
+                    } else {
+                        d = Math.floor((r * B) / s);
+                    }
+                    r = r * B % s;
+                    mPlus = mPlus * B;
+                    mMinus = mMinus * B;
+
+                    if (r < mMinus && r + mPlus > s) {
+                        if (r * 2 > s) {
+                            d = d + 1;
+                        }
+                        writeChar((char) ('0' + d), dOutInner);
+                        break;
+                    } else if (r + mPlus > s) {
                         d = d + 1;
+                        writeChar((char) ('0' + d), dOutInner);
+                        break;
+                    } else if (r < mMinus) {
+                        writeChar((char) ('0' + d), dOutInner);
+                        break;
                     }
                     writeChar((char) ('0' + d), dOutInner);
-                    break;
-                } else if (r + mPlus > s) {
-                    d = d + 1;
-                    writeChar((char) ('0' + d), dOutInner);
-                    break;
-                } else if (r < mMinus) {
-                    writeChar((char) ('0' + d), dOutInner);
-                    break;
+                    if (!decimalPlaced) {
+                        decimalPlaced = true;
+                        writeChar('.', dOutInner);
+                    }
                 }
-                writeChar((char) ('0' + d), dOutInner);
-                if (!decimalPlaced) {
-                    decimalPlaced = true;
-                    writeChar('.', dOutInner);
-                }
-            }
 
-            long decimalPlace = getPowerOf10(value, DOUBLE_EXPONENT_MAX, DOUBLE_EXPONENT_MIN) - 1;
-            writeChar('E', dOutInner);
-            writeNumberWithPadding(decimalPlace, 1, dOutInner);
+                long decimalPlace = getPowerOf10(value, DOUBLE_EXPONENT_MAX, DOUBLE_EXPONENT_MIN) - 1;
+                writeChar('E', dOutInner);
+                writeNumberWithPadding(decimalPlace, 1, dOutInner);
+            }
         }
         sendStringDataOutput(dOut);
     }
@@ -420,11 +419,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeCharSequence("INF", dOutInner);
         } else if (Float.isNaN(value)) {
             writeCharSequence("NaN", dOutInner);
-        } else if (value == 0) {
-            if (!isNumberPostive((long) value)) {
-                writeChar('-', dOutInner);
-            }
-            writeCharSequence("0.0", dOutInner);
         } else {
             /*
              * The double to string algorithm is based on a paper by Robert G Burger and 
@@ -433,90 +427,93 @@ public class CastToStringOperation extends AbstractCastToOperation {
             long bits = Float.floatToIntBits(value);
             boolean decimalPlaced = false;
 
+            boolean negative = ((bits >> 31) == 0) ? false : true;
             int e = (int) ((bits >> 23) & 0xff);
             int f = (int) ((e == 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000);
             e = e + FLOAT_MANTISSA_OFFSET;
 
-            // Initialize variables
-            double r, s, mPlus, mMinus;
-            if (e >= 0) {
-                if (f == Math.pow(b, FLOAT_MANTISSA_BITS - 1)) {
-                    r = f * Math.pow(b, e) * 2;
-                    s = 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e + 1);
-                } else {
-                    r = f * Math.pow(b, e + 1) * 2;
-                    s = b * 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e);
-                }
-            } else {
-                if (e == FLOAT_EXPONENT_MIN || f != Math.pow(b, FLOAT_MANTISSA_BITS - 1)) {
-                    r = f * Math.pow(b, e) * 2;
-                    s = 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e + 1);
-                } else {
-                    r = f * Math.pow(b, e + 1) * 2;
-                    s = b * 2;
-                    mPlus = Math.pow(b, e);
-                    mMinus = Math.pow(b, e);
-                }
-            }
-
-            double k = Math.ceil(Math.log10((r + mPlus) / s));
-            if (k >= 0) {
-                s = s * Math.pow(B, k);
-            } else {
-                r = r * Math.pow(B, -k);
-                mPlus = mPlus * Math.pow(B, -k);
-                mMinus = mMinus * Math.pow(B, -k);
-            }
-
-            if (!isNumberPostive((long) value)) {
+            if (negative) {
                 // Negative result, but the rest of the calculations can be based on a positive value.
                 writeChar('-', dOutInner);
-                value *= -1;
             }
-
-            double d;
-            while (!Double.isInfinite(mPlus) && !Double.isNaN(mPlus) && !Double.isInfinite(mMinus)
-                    && !Double.isNaN(mMinus)) {
-                if (s == r) {
-                    // Special case where the value is off by a factor of ten.
-                    d = 1;
+            if (value == 0) {
+                writeCharSequence("0.0", dOutInner);
+            } else {
+                // Initialize variables
+                double r, s, mPlus, mMinus;
+                if (e >= 0) {
+                    if (f == Math.pow(b, FLOAT_MANTISSA_BITS - 1)) {
+                        r = f * Math.pow(b, e) * 2;
+                        s = 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e + 1);
+                    } else {
+                        r = f * Math.pow(b, e + 1) * 2;
+                        s = b * 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e);
+                    }
                 } else {
-                    d = Math.floor((r * B) / s);
+                    if (e == FLOAT_EXPONENT_MIN || f != Math.pow(b, FLOAT_MANTISSA_BITS - 1)) {
+                        r = f * Math.pow(b, e) * 2;
+                        s = 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e + 1);
+                    } else {
+                        r = f * Math.pow(b, e + 1) * 2;
+                        s = b * 2;
+                        mPlus = Math.pow(b, e);
+                        mMinus = Math.pow(b, e);
+                    }
                 }
-                r = r * B % s;
-                mPlus = mPlus * B;
-                mMinus = mMinus * B;
 
-                if (r < mMinus && r + mPlus > s) {
-                    if (r * 2 > s) {
+                double k = Math.ceil(Math.log10((r + mPlus) / s));
+                if (k >= 0) {
+                    s = s * Math.pow(B, k);
+                } else {
+                    r = r * Math.pow(B, -k);
+                    mPlus = mPlus * Math.pow(B, -k);
+                    mMinus = mMinus * Math.pow(B, -k);
+                }
+
+                double d;
+                while (!Double.isInfinite(mPlus) && !Double.isNaN(mPlus) && !Double.isInfinite(mMinus)
+                        && !Double.isNaN(mMinus)) {
+                    if (s == r) {
+                        // Special case where the value is off by a factor of ten.
+                        d = 1;
+                    } else {
+                        d = Math.floor((r * B) / s);
+                    }
+                    r = r * B % s;
+                    mPlus = mPlus * B;
+                    mMinus = mMinus * B;
+
+                    if (r < mMinus && r + mPlus > s) {
+                        if (r * 2 > s) {
+                            d = d + 1;
+                        }
+                        writeChar((char) ('0' + d), dOutInner);
+                        break;
+                    } else if (r + mPlus > s) {
                         d = d + 1;
+                        writeChar((char) ('0' + d), dOutInner);
+                        break;
+                    } else if (r < mMinus) {
+                        writeChar((char) ('0' + d), dOutInner);
+                        break;
                     }
                     writeChar((char) ('0' + d), dOutInner);
-                    break;
-                } else if (r + mPlus > s) {
-                    d = d + 1;
-                    writeChar((char) ('0' + d), dOutInner);
-                    break;
-                } else if (r < mMinus) {
-                    writeChar((char) ('0' + d), dOutInner);
-                    break;
+                    if (!decimalPlaced) {
+                        decimalPlaced = true;
+                        writeChar('.', dOutInner);
+                    }
                 }
-                writeChar((char) ('0' + d), dOutInner);
-                if (!decimalPlaced) {
-                    decimalPlaced = true;
-                    writeChar('.', dOutInner);
-                }
-            }
 
-            long decimalPlace = getPowerOf10(value, FLOAT_EXPONENT_MAX, FLOAT_EXPONENT_MIN) - 1;
-            writeChar('E', dOutInner);
-            writeNumberWithPadding(decimalPlace, 1, dOutInner);
+                long decimalPlace = getPowerOf10(value, FLOAT_EXPONENT_MAX, FLOAT_EXPONENT_MIN) - 1;
+                writeChar('E', dOutInner);
+                writeNumberWithPadding(decimalPlace, 1, dOutInner);
+            }
         }
         sendStringDataOutput(dOut);
     }
