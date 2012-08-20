@@ -169,7 +169,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertDoubleCanonical(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         double value = doublep.getDouble();
-        
+
         if (Double.isInfinite(value)) {
             if (value == Double.NEGATIVE_INFINITY) {
                 writeCharSequence("-", dOutInner);
@@ -627,12 +627,16 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeChar('-', dOutInner);
             value *= -1;
         }
-        int nDigits = (int) Math.log10(value) + 1;
-        long pow10 = (long) Math.pow(10, nDigits - 1);
-        for (int i = nDigits - 1; i >= 0; --i) {
-            writeChar((char) ('0' + (value / pow10)), dOutInner);
-            value %= pow10;
-            pow10 /= 10;
+        if (value == 0) {
+            writeChar((char) ('0'), dOutInner);
+        } else {
+            int nDigits = (int) Math.log10(value) + 1;
+            long pow10 = (long) Math.pow(10, nDigits - 1);
+            for (int i = nDigits - 1; i >= 0; --i) {
+                writeChar((char) ('0' + (value / pow10)), dOutInner);
+                value %= pow10;
+                pow10 /= 10;
+            }
         }
         sendStringDataOutput(dOut);
     }
