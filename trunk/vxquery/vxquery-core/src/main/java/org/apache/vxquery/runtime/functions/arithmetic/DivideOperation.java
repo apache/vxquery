@@ -11,13 +11,17 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
 
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DivideOperation extends AbstractArithmeticOperation {
+    protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
+
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
@@ -62,6 +66,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
         long value2 = decp2.getDecimalValue();
         byte place1 = decp1.getDecimalPlace();
         byte place2 = decp2.getDecimalPlace();
+        if (value2 == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         // Divide
         if (value1 > Long.MAX_VALUE * value2) {
             throw new SystemException(ErrorCode.XPDY0002);
@@ -86,9 +93,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalDTDuration(XSDecimalPointable decp1, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException {
-        int value = operateDecimalInt(decp1, intp2.intValue());
-        dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -103,8 +108,13 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
+        if (longp2.getLong() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         // Convert
+        abvsInner.reset();
         XSDecimalPointable decp2 = new XSDecimalPointable();
+        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
     }
@@ -120,6 +130,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleDecimal(DoublePointable doublep, XSDecimalPointable decp, DataOutput dOut)
             throws SystemException, IOException {
+        if (decp.getDecimalValue() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         double value = doublep.doubleValue();
         value /= decp.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -138,10 +151,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleDTDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        double value = doublep.doubleValue();
-        value /= intp.intValue();
-        dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt((int) value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -156,6 +166,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleInteger(DoublePointable doublep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
+        if (longp.getLong() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         double value = doublep.doubleValue();
         value /= longp.doubleValue();
         dOut.write(ValueTag.XS_DOUBLE_TAG);
@@ -165,10 +178,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleYMDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        double value = doublep.doubleValue();
-        value /= intp.intValue();
-        dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
-        dOut.writeInt((int) value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -186,6 +196,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
             throws SystemException, IOException {
+        if (decp.getDecimalValue() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         int value = intp.intValue();
         value /= decp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -204,10 +217,15 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationDTDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
+        double value = intp.intValue();
         value /= intp2.intValue();
-        dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+
+        abvsInner.reset();
+        DoublePointable doublep = new DoublePointable();
+        doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
+        doublep.setDouble(value);
+        CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
+        castToDecmial.convertDouble(doublep, dOut);
     }
 
     @Override
@@ -222,6 +240,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
+        if (longp.getLong() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         int value = intp.intValue();
         value /= longp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -237,6 +258,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2, DataOutput dOut)
             throws SystemException, IOException {
+        if (decp2.getDecimalValue() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         float value = floatp1.floatValue();
         value /= decp2.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -255,10 +279,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateFloatDTDuration(FloatPointable floatp1, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException {
-        int value = floatp1.intValue();
-        value /= intp2.intValue();
-        dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -273,6 +294,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateFloatInteger(FloatPointable floatp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
+        if (longp2.getLong() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         float value = floatp1.floatValue();
         value /= longp2.floatValue();
         dOut.write(ValueTag.XS_FLOAT_TAG);
@@ -282,16 +306,18 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateFloatYMDuration(FloatPointable floatp1, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException {
-        long value = floatp1.longValue();
-        value /= intp2.longValue();
-        dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
-        dOut.writeLong(value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2, DataOutput dOut)
             throws SystemException, IOException {
+        if (decp2.getDecimalValue() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
+        abvsInner.reset();
         XSDecimalPointable decp1 = new XSDecimalPointable();
+        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
     }
@@ -308,10 +334,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        int value = longp.intValue();
-        value /= intp.intValue();
-        dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -326,20 +349,25 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
+        if (longp.getLong() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         // This is an exception for integer integer operations. The divide operation returns a decimal.
         double value = longp.doubleValue();
         value /= longp2.doubleValue();
-        dOut.write(ValueTag.XS_DECIMAL_TAG);
-        dOut.writeDouble(value);
+
+        abvsInner.reset();
+        DoublePointable doublep = new DoublePointable();
+        doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
+        doublep.setDouble(value);
+        CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
+        castToDecmial.convertDouble(doublep, dOut);
     }
 
     @Override
     public void operateIntegerYMDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        int value = longp.intValue();
-        value /= intp.intValue();
-        dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
-        dOut.writeInt(value);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -395,6 +423,9 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateYMDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
+        if (longp.getLong() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         int value = intp.intValue();
         value /= longp.intValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
@@ -404,20 +435,33 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateYMDurationYMDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
+        if (intp2.getInteger() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
+        double value = intp.intValue();
         value /= intp2.intValue();
-        dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
-        dOut.writeInt(value);
+
+        abvsInner.reset();
+        DoublePointable doublep = new DoublePointable();
+        doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
+        doublep.setDouble(value);
+        CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
+        castToDecmial.convertDouble(doublep, dOut);
     }
 
     public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws SystemException, IOException {
+        abvsInner.reset();
         XSDecimalPointable decp1 = new XSDecimalPointable();
+        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(intValue, (byte) 0);
         // Prepare
         long value1 = decp1.getDecimalValue();
         long value2 = decp2.getDecimalValue();
         byte place1 = decp1.getDecimalPlace();
         byte place2 = decp2.getDecimalPlace();
+        if (value2 == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         // Divide
         if (value1 > Long.MAX_VALUE * value2) {
             throw new SystemException(ErrorCode.XPDY0002);
@@ -430,13 +474,18 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     public int operateDecimalInt(XSDecimalPointable decp1, int intValue) throws SystemException, IOException {
+        abvsInner.reset();
         XSDecimalPointable decp2 = new XSDecimalPointable();
+        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(intValue, (byte) 0);
         // Prepare
         long value1 = decp1.getDecimalValue();
         long value2 = decp2.getDecimalValue();
         byte place1 = decp1.getDecimalPlace();
         byte place2 = decp2.getDecimalPlace();
+        if (value2 == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         // Divide
         if (value1 > Long.MAX_VALUE * value2) {
             throw new SystemException(ErrorCode.XPDY0002);
