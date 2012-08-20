@@ -16,8 +16,11 @@ import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class MultiplyOperation extends AbstractArithmeticOperation {
+    protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
+
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
@@ -100,7 +103,9 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
+        abvsInner.reset();
         XSDecimalPointable decp2 = new XSDecimalPointable();
+        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.getLong(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
     }
@@ -363,7 +368,9 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws SystemException, IOException {
+        abvsInner.reset();
         XSDecimalPointable decp1 = new XSDecimalPointable();
+        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(intValue, (byte) 0);
         // Prepare
         long value1 = decp1.getDecimalValue();
