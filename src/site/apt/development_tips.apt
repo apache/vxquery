@@ -1,0 +1,156 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Developer Tips
+
+
+* Installation
+
+  Install instructions can be found in the {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/docs/README}README file}}.
+
+
+* Hyracks Data Mapping
+
+  Hyracks supports several basic data types stored in byte arrays. The byte arrays can be
+  accessed through objects referred to as pointables. The pointable helps with tracking the 
+  bytes stored in a larger storage array. Some pointables support converting the byte array 
+  into a desired format such as for numeric type.
+  
+  In VXQuery the TaggedValuePointable is used to read a result from this byte array. The 
+  first byte defines the data type and alerts us to what pointable to use for reading the
+  rest of the data.
+
+** Fixed Length Data
+
+  Fixed length data types can be stored in a set field size. The following outlines the
+  Hyracks data type or custom VXQuery definition with the details about the implementation.
+  
+*-------------------------+----------------------+---------------+
+| <<Data Type>>           | <<Pointable Name>>   | <<Data Size>> |
+*-------------------------+----------------------+---------------:
+| xs:boolean              | BooleanPointable     |             1 |
+*-------------------------+----------------------+---------------:
+| xs:byte                 | BytePointable        |             1 |
+*-------------------------+----------------------+---------------:
+| xs:date                 | XSDatePointable      |             6 |
+*-------------------------+----------------------+---------------:
+| xs:dateTime             | XSDateTimePointable  |            12 |
+*-------------------------+----------------------+---------------:
+| xs:dayTimeDuration      | IntegerPointable     |             4 |
+*-------------------------+----------------------+---------------:
+| xs:decimal              | XSDecimalPointable   |             9 |
+*-------------------------+----------------------+---------------:
+| xs:double               | DoublePointable      |             8 |
+*-------------------------+----------------------+---------------:
+| xs:duration             | XSDurationPointable  |             8 |
+*-------------------------+----------------------+---------------:
+| xs:float                | FloatPointable       |             4 |
+*-------------------------+----------------------+---------------:
+| xs:gDay                 | XSDatePointable      |             6 |
+*-------------------------+----------------------+---------------:
+| xs:gMonth               | XSDatePointable      |             6 |
+*-------------------------+----------------------+---------------:
+| xs:gMonthDay            | XSDatePointable      |             6 |
+*-------------------------+----------------------+---------------:
+| xs:gYear                | XSDatePointable      |             6 |
+*-------------------------+----------------------+---------------:
+| xs:gYearMonth           | XSDatePointable      |             6 |
+*-------------------------+----------------------+---------------:
+| xs:int                  | IntegerPointable     |             4 |
+*-------------------------+----------------------+---------------:
+| xs:integer              | LongPointable        |             8 |
+*-------------------------+----------------------+---------------:
+| xs:negativeInteger      | LongPointable        |             8 |
+*-------------------------+----------------------+---------------:
+| xs:nonNegativeInteger   | LongPointable        |             8 |
+*-------------------------+----------------------+---------------:
+| xs:nonPositiveInteger   | LongPointable        |             8 |
+*-------------------------+----------------------+---------------:
+| xs:positiveInteger      | LongPointable        |             8 |
+*-------------------------+----------------------+---------------:
+| xs:short                | ShortPointable       |             2 |
+*-------------------------+----------------------+---------------:
+| xs:time                 | XSTimePointable      |             8 |
+*-------------------------+----------------------+---------------:
+| xs:unsignedByte         | ShortPointable       |             2 |
+*-------------------------+----------------------+---------------:
+| xs:unsignedInt          | LongPointable        |             8 |
+*-------------------------+----------------------+---------------:
+| xs:unsignedLong         | LongPointable        |             8 |
+*-------------------------+----------------------+---------------:
+| xs:unsignedShort        | IntegerPointable     |             4 |
+*-------------------------+----------------------+---------------:
+| xs:yearMonthDuration    | IntegerPointable     |             4 |
+*-------------------------+----------------------+---------------:
+  
+** Variable Length Data
+
+  Some information can not be stored in a fixed length value. The following data types are 
+  stored in variable length values. Because the size varies, the first two bytes are used to 
+  store the length of the total value in bytes. QName is one exception to this rule because 
+  the QName field has three distinct variable length fields. In this case we basically are 
+  storing three strings right after each other.
+  
+  Please note that all strings are stored in UTF8. The UTF8 characters range in size from one
+  to three bytes. UTF9StringWriter supports writing a character sequence into the 
+  UTF8StringPointable format.
+  
+*-------------------------+----------------------+---------------+
+| <<Data Type>>           | <<Pointable Name>>   | <<Data Size>> |
+*-------------------------+----------------------+---------------:
+| xs:anyURI               | UTF8StringPointable  |    2 + length |
+*-------------------------+----------------------+---------------:
+| xs:base64Binary         | XSBinaryPointable    |    2 + length |
+*-------------------------+----------------------+---------------:
+| xs:hexBinary            | XSBinaryPointable    |    2 + length |
+*-------------------------+----------------------+---------------:
+| xs:NOTATION             | UTF8StringPointable  |    2 + length |
+*-------------------------+----------------------+---------------:
+| xs:QName                | XSQNamePointable     |    6 + length |
+*-------------------------+----------------------+---------------:
+| xs:string               | UTF8StringPointable  |    2 + length |
+*-------------------------+----------------------+---------------:
+  
+  
+* String Iterators
+
+  For many string functions, we have used string iterators to traverse the string. The iterator
+  allows the user to ignore the details about the byte size and number of characters. The iterator
+  returns the next character or an end of string value. Stacking iterators can be used to alter
+  the string into a desired form.
+  
+  * LowerCaseStringCharacterIterator
+   
+  * SubstringAfterStringCharacterIterator
+   
+  * SubstringBeforeStringCharacterIterator
+   
+  * SubstringStringCharacterIterator
+   
+  * UpperCaseStringCharacterIterator
+   
+  * UTF8StringCharacterIterator
+  
+* Array Backed Value Store
+
+  The array back value store is a key design element of Hyracks. The object is used to manage an
+  output array. The system creates an array large enough to hold your output. Adding to the result,
+  if necessary. The array can be reused and can hold multiple pointable results due to the starting 
+  offset parameter in the pointable.
+  
+  
+  
+  
+  
