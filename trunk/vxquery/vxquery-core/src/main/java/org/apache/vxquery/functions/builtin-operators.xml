@@ -635,6 +635,7 @@
         <param name="arg1" type="xsext:numeric?"/>
         <param name="arg2" type="xsext:numeric?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.arithmetic.IntegerDivideScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:mod($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
@@ -642,6 +643,7 @@
         <param name="arg1" type="xsext:numeric?"/>
         <param name="arg2" type="xsext:numeric?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.arithmetic.ModScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:and($arg1 as xs:boolean?, $arg2 as xs:boolean?) as xs:boolean? -->
