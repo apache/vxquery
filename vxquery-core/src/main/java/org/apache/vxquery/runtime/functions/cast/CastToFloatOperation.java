@@ -88,7 +88,7 @@ public class CastToFloatOperation extends AbstractCastToOperation {
             if (charIterator.next() != ICharacterIterator.EOS_CHAR) {
                 throw new SystemException(ErrorCode.FORG0001);
             } else if (c == Character.valueOf('I') && c2 == Character.valueOf('N') && c3 == Character.valueOf('F')) {
-                valueFloat = (negativeValue ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY);
+                valueFloat = Float.NEGATIVE_INFINITY;
             } else if (c == Character.valueOf('N') && c2 == Character.valueOf('a') && c3 == Character.valueOf('N')) {
                 valueFloat = Float.NaN;
             } else {
