@@ -2,7 +2,6 @@ package org.apache.vxquery.runtime.functions.comparison;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
@@ -38,7 +37,8 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateBase64BinaryBase64Binary(XSBinaryPointable binaryp1, XSBinaryPointable binaryp2)
             throws SystemException, IOException {
-        return Arrays.equals(binaryp1.getByteArray(), binaryp2.getByteArray());
+        return arraysEqual(binaryp1.getByteArray(), binaryp1.getStartOffset(), binaryp1.getLength(),
+                binaryp2.getByteArray(), binaryp2.getStartOffset(), binaryp2.getLength());
     }
 
     @Override
@@ -58,8 +58,8 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
         DateTime.getTimezoneDateTime(datep2, dCtx, dOut2);
         byte[] bytes2 = abvs2.getByteArray();
 
-        if (XSDateTimePointable.getYearMonth(bytes1, 0) == XSDateTimePointable.getYearMonth(bytes2, 0)
-                && XSDateTimePointable.getDayTime(bytes1, 0) == XSDateTimePointable.getDayTime(bytes2, 0)) {
+        if (XSDateTimePointable.getYearMonth(bytes1, abvs1.getStartOffset()) == XSDateTimePointable.getYearMonth(bytes2, abvs2.getStartOffset())
+                && XSDateTimePointable.getDayTime(bytes1, abvs1.getStartOffset()) == XSDateTimePointable.getDayTime(bytes2, abvs2.getStartOffset())) {
             return true;
         }
         return false;
@@ -152,7 +152,8 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateDurationDuration(XSDurationPointable durationp1, XSDurationPointable durationp2)
             throws SystemException, IOException {
-        return Arrays.equals(durationp1.getByteArray(), durationp2.getByteArray());
+        return arraysEqual(durationp1.getByteArray(), durationp1.getStartOffset(), durationp1.getLength(),
+                durationp2.getByteArray(), durationp2.getStartOffset(), durationp2.getLength());
     }
 
     @Override
@@ -218,7 +219,8 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateHexBinaryHexBinary(XSBinaryPointable binaryp1, XSBinaryPointable binaryp2)
             throws SystemException, IOException {
-        return Arrays.equals(binaryp1.getByteArray(), binaryp2.getByteArray());
+        return arraysEqual(binaryp1.getByteArray(), binaryp1.getStartOffset(), binaryp1.getLength(),
+                binaryp2.getByteArray(), binaryp2.getStartOffset(), binaryp2.getLength());
     }
 
     @Override
@@ -260,7 +262,8 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateQNameQName(XSQNamePointable qnamep1, XSQNamePointable qnamep2) throws SystemException,
             IOException {
-        return Arrays.equals(qnamep1.getByteArray(), qnamep2.getByteArray());
+        return arraysEqual(qnamep1.getByteArray(), qnamep1.getStartOffset(), qnamep1.getLength(),
+                qnamep2.getByteArray(), qnamep2.getStartOffset(), qnamep2.getLength());
     }
 
     @Override
@@ -287,6 +290,18 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     public boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2) throws SystemException,
             IOException {
         return (intp1.compareTo(intp2) == 0);
+    }
+
+    private boolean arraysEqual(byte[] bytes1, int offset1, int length1, byte[] bytes2, int offset2, int length2) {
+        if (length1 != length2) {
+            return false;
+        }
+        for (int i = 0; i < length1; ++i) {
+            if (bytes1[offset1 + i] != bytes2[offset2 + i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

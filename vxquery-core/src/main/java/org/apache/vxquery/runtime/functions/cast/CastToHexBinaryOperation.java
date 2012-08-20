@@ -34,7 +34,7 @@ public class CastToHexBinaryOperation extends AbstractCastToOperation {
         ICharacterIterator charIterator = new UTF8StringCharacterIterator(stringp);
         charIterator.reset();
         abvsInner.reset();
-        int c1 = 0, c2 = 0;
+        int c1 = 0, c2 = 0, length = 0;
         while ((c1 = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
             c2 = charIterator.next();
             if (c2 == ICharacterIterator.EOS_CHAR) {
@@ -47,12 +47,13 @@ public class CastToHexBinaryOperation extends AbstractCastToOperation {
                 throw new SystemException(ErrorCode.FORG0001);
             }
             dOutInner.write(((Character.digit(c1, 16) << 4) + Character.digit(c2, 16)));
+            length += 2;
         }
 
         dOut.write(ValueTag.XS_HEX_BINARY_TAG);
-        dOut.write((byte) ((abvsInner.getLength() >>> 8) & 0xFF));
-        dOut.write((byte) ((abvsInner.getLength() >>> 0) & 0xFF));
-        dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset(), abvsInner.getLength());
+        dOut.write((byte) ((length >>> 8) & 0xFF));
+        dOut.write((byte) ((length >>> 0) & 0xFF));
+        dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset(), length);
     }
 
     @Override
