@@ -24,6 +24,7 @@ import org.apache.vxquery.compiler.algebricks.VXQueryBinaryIntegerInspectorFacto
 import org.apache.vxquery.compiler.algebricks.VXQueryComparatorFactoryProvider;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.compiler.algebricks.VXQueryExpressionRuntimeProvider;
+import org.apache.vxquery.compiler.algebricks.VXQueryNullWriterFactory;
 import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
 import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -35,6 +36,7 @@ import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
 
+import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
 import edu.uci.ics.hyracks.algebricks.compiler.api.HeuristicCompilerFactoryBuilder;
@@ -110,6 +112,8 @@ public class XMLQueryCompiler {
                 return null;
             }
         });
+        builder.setNullWriterFactory(new VXQueryNullWriterFactory());
+        builder.setClusterLocations(new AlgebricksAbsolutePartitionConstraint(new String[] { "nc1" }));
         cFactory = builder.create();
         mdProvider = new VXQueryMetadataProvider();
     }

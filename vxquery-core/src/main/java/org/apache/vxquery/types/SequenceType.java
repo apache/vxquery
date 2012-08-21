@@ -16,11 +16,14 @@
 */
 package org.apache.vxquery.types;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public final class SequenceType {
+public final class SequenceType implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public static final Map<ItemType, SequenceType[]> BUILTIN_SEQ_TYPES;
 
     private ItemType itemType;

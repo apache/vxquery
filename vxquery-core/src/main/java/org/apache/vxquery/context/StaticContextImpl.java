@@ -385,6 +385,10 @@ public class StaticContextImpl implements StaticContext {
         return -1;
     }
 
+    List<SequenceType> getSequenceTypeList() {
+        return sequenceTypeList;
+    }
+
     @Override
     public int getMaxSequenceTypeCode() {
         return typeCounter;

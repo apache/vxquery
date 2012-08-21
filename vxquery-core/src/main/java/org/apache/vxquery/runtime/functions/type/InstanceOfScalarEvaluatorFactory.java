@@ -1,9 +1,8 @@
 package org.apache.vxquery.runtime.functions.type;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.bool.FnFalseScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.bool.FnTrueScalarEvaluatorFactory;
 import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -29,9 +28,9 @@ public class InstanceOfScalarEvaluatorFactory extends AbstractTypeScalarEvaluato
             protected void evaluate(TaggedValuePointable tvp, IPointable result) throws SystemException {
                 boolean success = matcher.sequenceTypeMatch(tvp);
                 if (success) {
-                    FnTrueScalarEvaluatorFactory.setTrue(result);
+                    XDMConstants.setTrue(result);
                 } else {
-                    FnFalseScalarEvaluatorFactory.setFalse(result);
+                    XDMConstants.setFalse(result);
                 }
             }
 

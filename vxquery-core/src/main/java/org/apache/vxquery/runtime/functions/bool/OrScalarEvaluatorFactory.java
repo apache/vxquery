@@ -1,6 +1,7 @@
 package org.apache.vxquery.runtime.functions.bool;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
@@ -30,11 +31,11 @@ public class OrScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                 for (TaggedValuePointable arg : args) {
                     arg.getValue(bp);
                     if (bp.getBoolean()) {
-                        FnTrueScalarEvaluatorFactory.setTrue(result);
+                        XDMConstants.setTrue(result);
                         return;
                     }
                 }
-                FnFalseScalarEvaluatorFactory.setFalse(result);
+                XDMConstants.setFalse(result);
             }
         };
     }

@@ -678,6 +678,7 @@
     <operator name="opext:sort-distinct-nodes-asc-or-atomics">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.nodeid.SortDistinctNodesAscOrAtomicsScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:sort-nodes-desc($arg as node()*) as node()* -->
@@ -772,12 +773,14 @@
     <operator name="opext:attribute">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.AttributePathStepScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:child($arg as node()*) as node()* -->
     <operator name="opext:child">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.ChildPathStepScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:descendant($arg as node()*) as node()* -->

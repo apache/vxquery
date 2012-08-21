@@ -16,11 +16,14 @@
  */
 package org.apache.vxquery.types;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
-public final class NameTest {
+public final class NameTest implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public static final String WILDCARD = null;
 
     public static final NameTest STAR_NAMETEST = new NameTest(null, null);
