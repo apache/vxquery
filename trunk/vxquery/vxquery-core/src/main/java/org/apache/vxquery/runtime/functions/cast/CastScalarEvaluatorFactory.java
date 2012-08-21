@@ -66,7 +66,7 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
 
             @Override
             protected void evaluate(TaggedValuePointable tvp, IPointable result) throws SystemException {
-                int tid = getBaseTypeForCasts(tvp.getTag());
+                int tid = tvp.getTag();
                 if (tid == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                     // TODO Convert to double
                     tid = ValueTag.XS_DOUBLE_TAG;
@@ -377,56 +377,6 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
 
                 } else {
                     aOp = new CastToUntypedAtomicOperation();
-                }
-            }
-
-            private int getBaseTypeForCasts(int tid) throws SystemException {
-                while (true) {
-                    switch (tid) {
-                    // Primitive Datatypes
-                        case ValueTag.XS_ANY_URI_TAG:
-                        case ValueTag.XS_BASE64_BINARY_TAG:
-                        case ValueTag.XS_BOOLEAN_TAG:
-                        case ValueTag.XS_DATE_TAG:
-                        case ValueTag.XS_DATETIME_TAG:
-                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                        case ValueTag.XS_DECIMAL_TAG:
-                        case ValueTag.XS_DOUBLE_TAG:
-                        case ValueTag.XS_DURATION_TAG:
-                        case ValueTag.XS_FLOAT_TAG:
-                        case ValueTag.XS_G_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_TAG:
-                        case ValueTag.XS_HEX_BINARY_TAG:
-                        case ValueTag.XS_INTEGER_TAG:
-                        case ValueTag.XS_QNAME_TAG:
-                        case ValueTag.XS_STRING_TAG:
-                        case ValueTag.XS_TIME_TAG:
-                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
-                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
-                            // Derived Datatypes
-                        case ValueTag.XS_BYTE_TAG:
-                        case ValueTag.XS_INT_TAG:
-                        case ValueTag.XS_LONG_TAG:
-                        case ValueTag.XS_NEGATIVE_INTEGER_TAG:
-                        case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
-                        case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
-                        case ValueTag.XS_POSITIVE_INTEGER_TAG:
-                        case ValueTag.XS_SHORT_TAG:
-                        case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                        case ValueTag.XS_UNSIGNED_INT_TAG:
-                        case ValueTag.XS_UNSIGNED_LONG_TAG:
-                        case ValueTag.XS_UNSIGNED_SHORT_TAG:
-                            return tid;
-
-                        case ValueTag.XS_ANY_ATOMIC_TAG:
-                            throw new SystemException(ErrorCode.XPTY0004);
-
-                        default:
-                            tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
-                    }
                 }
             }
 
