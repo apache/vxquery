@@ -47,7 +47,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
 
         UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
-        convertString(stringp, dOut);
+        convertStringExtra(stringp, dOut, true);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
 
         UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
-        convertString(stringp, dOut);
+        convertStringExtra(stringp, dOut, true);
     }
 
     @Override
@@ -70,6 +70,11 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
 
     @Override
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        convertStringExtra(stringp, dOut, false);
+    }
+
+    private void convertStringExtra(UTF8StringPointable stringp, DataOutput dOut, boolean connoicalForm)
+            throws SystemException, IOException {
         ICharacterIterator charIterator = new UTF8StringCharacterIterator(stringp);
         charIterator.reset();
         byte decimalPlace = 0;
@@ -97,7 +102,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
                 count++;
             } else if (c == Character.valueOf('.') && pastDecimal == false) {
                 pastDecimal = true;
-            } else if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
+            } else if (c == Character.valueOf('E') || c == Character.valueOf('e') && connoicalForm) {
                 break;
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
@@ -105,7 +110,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
         } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
 
         // Parse the exponent.
-        if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
+        if (c == Character.valueOf('E') || c == Character.valueOf('e') && connoicalForm) {
             int moveOffset = 0;
             boolean negativeOffset = false;
             // Check for the negative sign.
