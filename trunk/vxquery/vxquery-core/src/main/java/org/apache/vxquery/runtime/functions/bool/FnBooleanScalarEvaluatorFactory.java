@@ -2,6 +2,7 @@ package org.apache.vxquery.runtime.functions.bool;
 
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -14,8 +15,12 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
+import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
+import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -31,6 +36,11 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
         final SequencePointable seqp = new SequencePointable();
         final LongPointable lp = (LongPointable) LongPointable.FACTORY.createPointable();
         final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
+        final ShortPointable sp = (ShortPointable) ShortPointable.FACTORY.createPointable();
+        final BytePointable bp = (BytePointable) BytePointable.FACTORY.createPointable();
+        final XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+        final DoublePointable dp = (DoublePointable) DoublePointable.FACTORY.createPointable();
+        final FloatPointable fp = (FloatPointable) FloatPointable.FACTORY.createPointable();
         final UTF8StringPointable utf8p = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -52,8 +62,24 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                         return;
                     }
 
+                    case ValueTag.XS_DECIMAL_TAG: {
+                        tvp.getValue(decp);
+                        if (decp.longValue() == 0) {
+                            XDMConstants.setFalse(result);
+                            return;
+                        }
+                        XDMConstants.setTrue(result);
+                        return;
+                    }
+
+                    case ValueTag.XS_INTEGER_TAG:
                     case ValueTag.XS_LONG_TAG:
-                    case ValueTag.XS_INTEGER_TAG: {
+                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                    case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                    case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                    case ValueTag.XS_UNSIGNED_INT_TAG:
+                    case ValueTag.XS_UNSIGNED_LONG_TAG: {
                         tvp.getValue(lp);
                         if (lp.longValue() == 0) {
                             XDMConstants.setFalse(result);
@@ -63,7 +89,8 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                         return;
                     }
 
-                    case ValueTag.XS_INT_TAG: {
+                    case ValueTag.XS_INT_TAG:
+                    case ValueTag.XS_UNSIGNED_SHORT_TAG: {
                         tvp.getValue(ip);
                         if (ip.intValue() == 0) {
                             XDMConstants.setFalse(result);
@@ -73,6 +100,48 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                         return;
                     }
 
+                    case ValueTag.XS_SHORT_TAG:
+                    case ValueTag.XS_UNSIGNED_BYTE_TAG: {
+                        tvp.getValue(sp);
+                        if (sp.shortValue() == 0) {
+                            XDMConstants.setFalse(result);
+                            return;
+                        }
+                        XDMConstants.setTrue(result);
+                        return;
+                    }
+
+                    case ValueTag.XS_BYTE_TAG: {
+                        tvp.getValue(bp);
+                        if (bp.byteValue() == 0) {
+                            XDMConstants.setFalse(result);
+                            return;
+                        }
+                        XDMConstants.setTrue(result);
+                        return;
+                    }
+
+                    case ValueTag.XS_DOUBLE_TAG: {
+                        tvp.getValue(dp);
+                        if (dp.doubleValue() == 0 || Double.isNaN(dp.doubleValue())) {
+                            XDMConstants.setFalse(result);
+                            return;
+                        }
+                        XDMConstants.setTrue(result);
+                        return;
+                    }
+
+                    case ValueTag.XS_FLOAT_TAG: {
+                        tvp.getValue(fp);
+                        if (fp.floatValue() == 0 || Float.isNaN(fp.floatValue())) {
+                            XDMConstants.setFalse(result);
+                            return;
+                        }
+                        XDMConstants.setTrue(result);
+                        return;
+                    }
+
+                    case ValueTag.XS_ANY_URI_TAG:
                     case ValueTag.XS_STRING_TAG: {
                         tvp.getValue(utf8p);
                         if (utf8p.getUTFLength() == 0) {
