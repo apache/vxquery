@@ -26,7 +26,16 @@ Developer Tips
   Hyracks supports several basic data types stored in byte arrays. The byte arrays can be
   accessed through objects referred to as pointables. The pointable helps with tracking the 
   bytes stored in a larger storage array. Some pointables support converting the byte array 
-  into a desired format such as for numeric type.
+  into a desired format such as for numeric type. The most basic pointable has three values
+  stored in the object.
+  
+  * byte array
+  
+  * starting offset
+  
+  * length
+  
+  []
   
   In VXQuery the TaggedValuePointable is used to read a result from this byte array. The 
   first byte defines the data type and alerts us to what pointable to use for reading the
@@ -44,29 +53,29 @@ Developer Tips
 *-------------------------+----------------------+---------------:
 | xs:byte                 | BytePointable        |             1 |
 *-------------------------+----------------------+---------------:
-| xs:date                 | XSDatePointable      |             6 |
+| xs:date                 | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:dateTime             | XSDateTimePointable  |            12 |
+| xs:dateTime             | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDateTimePointable.java}XSDateTimePointable}}  |            12 |
 *-------------------------+----------------------+---------------:
-| xs:dayTimeDuration      | IntegerPointable     |             4 |
+| xs:dayTimeDuration      | LongPointable        |             8 |
 *-------------------------+----------------------+---------------:
-| xs:decimal              | XSDecimalPointable   |             9 |
+| xs:decimal              | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDecimalPointable.java}XSDecimalPointable}}   |             9 |
 *-------------------------+----------------------+---------------:
 | xs:double               | DoublePointable      |             8 |
 *-------------------------+----------------------+---------------:
-| xs:duration             | XSDurationPointable  |             8 |
+| xs:duration             | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDurationPointable.java}XSDurationPointable}}  |            12 |
 *-------------------------+----------------------+---------------:
 | xs:float                | FloatPointable       |             4 |
 *-------------------------+----------------------+---------------:
-| xs:gDay                 | XSDatePointable      |             6 |
+| xs:gDay                 | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gMonth               | XSDatePointable      |             6 |
+| xs:gMonth               | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gMonthDay            | XSDatePointable      |             6 |
+| xs:gMonthDay            | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gYear                | XSDatePointable      |             6 |
+| xs:gYear                | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gYearMonth           | XSDatePointable      |             6 |
+| xs:gYearMonth           | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
 | xs:int                  | IntegerPointable     |             4 |
 *-------------------------+----------------------+---------------:
@@ -82,7 +91,7 @@ Developer Tips
 *-------------------------+----------------------+---------------:
 | xs:short                | ShortPointable       |             2 |
 *-------------------------+----------------------+---------------:
-| xs:time                 | XSTimePointable      |             8 |
+| xs:time                 | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSTimePointable.java}XSTimePointable}}      |             8 |
 *-------------------------+----------------------+---------------:
 | xs:unsignedByte         | ShortPointable       |             2 |
 *-------------------------+----------------------+---------------:
@@ -104,7 +113,7 @@ Developer Tips
   storing three strings right after each other.
   
   Please note that all strings are stored in UTF8. The UTF8 characters range in size from one
-  to three bytes. UTF9StringWriter supports writing a character sequence into the 
+  to three bytes. UTF8StringWriter supports writing a character sequence into the 
   UTF8StringPointable format.
   
 *-------------------------+----------------------+---------------+
@@ -112,13 +121,13 @@ Developer Tips
 *-------------------------+----------------------+---------------:
 | xs:anyURI               | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
-| xs:base64Binary         | XSBinaryPointable    |    2 + length |
+| xs:base64Binary         | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSBinaryPointable.java}XSBinaryPointable}}    |    2 + length |
 *-------------------------+----------------------+---------------:
-| xs:hexBinary            | XSBinaryPointable    |    2 + length |
+| xs:hexBinary            | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSBinaryPointable.java}XSBinaryPointable}}    |    2 + length |
 *-------------------------+----------------------+---------------:
 | xs:NOTATION             | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
-| xs:QName                | XSQNamePointable     |    6 + length |
+| xs:QName                | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSQNamePointable.java}XSQNamePointable}}     |    6 + length |
 *-------------------------+----------------------+---------------:
 | xs:string               | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
@@ -131,17 +140,19 @@ Developer Tips
   returns the next character or an end of string value. Stacking iterators can be used to alter
   the string into a desired form.
   
-  * LowerCaseStringCharacterIterator
+  * {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/ICharacterIterator.java}ICharacterIterator}}
    
-  * SubstringAfterStringCharacterIterator
+  * {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/LowerCaseCharacterIterator.java}LowerCaseStringCharacterIterator}}
    
-  * SubstringBeforeStringCharacterIterator
+  * {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringAfterCharacterIterator.java}SubstringAfterStringCharacterIterator}}
    
-  * SubstringStringCharacterIterator
+  * {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringBeforeCharacterIterator.java}SubstringBeforeStringCharacterIterator}}
    
-  * UpperCaseStringCharacterIterator
+  * {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringCharacterIterator.java}SubstringStringCharacterIterator}}
    
-  * UTF8StringCharacterIterator
+  * {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/UTF8StringCharacterIterator.java}UTF8StringCharacterIterator}}
+
+  * {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/UpperCaseCharacterIterator.java}UpperCaseStringCharacterIterator}}
   
 * Array Backed Value Store
 
