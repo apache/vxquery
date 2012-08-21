@@ -62,23 +62,20 @@ public class DivideOperation extends AbstractArithmeticOperation {
     public void operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2, DataOutput dOut)
             throws SystemException, IOException {
         // Prepare
-        long value1 = decp1.getDecimalValue();
-        long value2 = decp2.getDecimalValue();
-        byte place1 = decp1.getDecimalPlace();
-        byte place2 = decp2.getDecimalPlace();
+        double value1 = decp1.doubleValue();
+        double value2 = decp2.doubleValue();
         if (value2 == 0) {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         // Divide
-        if (value1 > Long.MAX_VALUE * value2) {
-            throw new SystemException(ErrorCode.XPDY0002);
-        }
         value1 /= value2;
-        place1 -= place2;
         // Save
-        dOut.write(ValueTag.XS_DECIMAL_TAG);
-        dOut.writeByte(place1);
-        dOut.writeLong(value1);
+        abvsInner.reset();
+        DoublePointable doublep = new DoublePointable();
+        doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
+        doublep.setDouble(value1);
+        CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
+        castToDecmial.convertDouble(doublep, dOut);
     }
 
     @Override
@@ -463,9 +460,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         // Divide
-        if (value1 > Long.MAX_VALUE * value2) {
-            throw new SystemException(ErrorCode.XPDY0002);
-        }
         value1 /= value2;
         place1 -= place2;
         // Save
@@ -487,9 +481,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         // Divide
-        if (value1 > Long.MAX_VALUE * value2) {
-            throw new SystemException(ErrorCode.XPDY0002);
-        }
         value1 /= value2;
         place1 -= place2;
         // Save
