@@ -16,5 +16,7 @@
 */
 package org.apache.vxquery.types;
 
-public interface XQType {
+import java.io.Serializable;
+
+public interface XQType extends Serializable {
 }

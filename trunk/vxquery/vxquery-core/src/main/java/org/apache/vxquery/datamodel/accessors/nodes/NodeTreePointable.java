@@ -90,7 +90,7 @@ public class NodeTreePointable extends AbstractPointable {
         return dictionaryExists() ? IntegerPointable.getInteger(bytes, getDictionaryEntryCountOffset()) : 0;
     }
 
-    public void getString(int idx, UTF8StringPointable string) {
+    public void getString(int idx, IPointable string) {
         int nEntries = getDictionaryEntryCount();
         if (idx < 0 || idx >= nEntries) {
             throw new IllegalArgumentException(idx + " not within [0, " + nEntries + ")");
@@ -136,11 +136,11 @@ public class NodeTreePointable extends AbstractPointable {
         return nodeIdExists() ? NODE_ID_SIZE : 0;
     }
 
-    private int getDictionaryOffset() {
+    public int getDictionaryOffset() {
         return getNodeIdOffset() + getNodeIdSize();
     }
 
-    private int getDictionarySize() {
+    public int getDictionarySize() {
         return dictionaryExists() ? IntegerPointable.getInteger(bytes, getDictionaryOffset()) : 0;
     }
 

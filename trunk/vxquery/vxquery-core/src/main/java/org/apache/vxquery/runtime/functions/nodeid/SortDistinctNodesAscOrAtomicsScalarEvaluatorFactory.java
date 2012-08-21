@@ -1,7 +1,6 @@
-package org.apache.vxquery.runtime.functions.bool;
+package org.apache.vxquery.runtime.functions.nodeid;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
@@ -12,10 +11,11 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 
-public class FnTrueScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class SortDistinctNodesAscOrAtomicsScalarEvaluatorFactory extends
+        AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public FnTrueScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public SortDistinctNodesAscOrAtomicsScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
@@ -25,7 +25,7 @@ public class FnTrueScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                XDMConstants.setTrue(result);
+                result.set(args[0]);
             }
         };
     }

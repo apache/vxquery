@@ -3,6 +3,7 @@ package org.apache.vxquery.runtime.functions.bool;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -39,10 +40,10 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                     case ValueTag.SEQUENCE_TAG: {
                         tvp.getValue(seqp);
                         if (seqp.getEntryCount() == 0) {
-                            FnFalseScalarEvaluatorFactory.setFalse(result);
+                            XDMConstants.setFalse(result);
                             return;
                         }
-                        FnTrueScalarEvaluatorFactory.setTrue(result);
+                        XDMConstants.setTrue(result);
                         return;
                     }
 
@@ -55,30 +56,30 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                     case ValueTag.XS_INTEGER_TAG: {
                         tvp.getValue(lp);
                         if (lp.longValue() == 0) {
-                            FnFalseScalarEvaluatorFactory.setFalse(result);
+                            XDMConstants.setFalse(result);
                             return;
                         }
-                        FnTrueScalarEvaluatorFactory.setTrue(result);
+                        XDMConstants.setTrue(result);
                         return;
                     }
 
                     case ValueTag.XS_INT_TAG: {
                         tvp.getValue(ip);
                         if (ip.intValue() == 0) {
-                            FnFalseScalarEvaluatorFactory.setFalse(result);
+                            XDMConstants.setFalse(result);
                             return;
                         }
-                        FnTrueScalarEvaluatorFactory.setTrue(result);
+                        XDMConstants.setTrue(result);
                         return;
                     }
 
                     case ValueTag.XS_STRING_TAG: {
                         tvp.getValue(utf8p);
                         if (utf8p.getUTFLength() == 0) {
-                            FnFalseScalarEvaluatorFactory.setFalse(result);
+                            XDMConstants.setFalse(result);
                             return;
                         }
-                        FnTrueScalarEvaluatorFactory.setTrue(result);
+                        XDMConstants.setTrue(result);
                         return;
                     }
                 }
