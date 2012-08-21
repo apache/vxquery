@@ -153,14 +153,23 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         double value = doublep.getDouble();
 
-        if (!Double.isInfinite(value) && !Double.isNaN(value)
-                && ((Math.abs(value) >= 0.000001 && Math.abs(value) <= 1000000) || value == 0)) {
+        if (!Double.isInfinite(value) && !Double.isNaN(value) && Math.abs(value) >= 0.000001
+                && Math.abs(value) <= 1000000) {
             CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
             castToDecimal.convertDouble(doublep, dOutInner);
             XSDecimalPointable decp = new XSDecimalPointable();
             decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
                     XSDecimalPointable.TYPE_TRAITS.getFixedLength());
             convertDecimal(decp, dOut);
+        } else if (value == 0) {
+            long bits = Double.doubleToLongBits(value);
+            boolean negative = ((bits >> 63) == 0) ? false : true;
+            
+            if (negative) {
+                writeChar('-', dOutInner);
+            }
+            writeCharSequence("0", dOutInner);
+            sendStringDataOutput(dOut);
         } else {
             convertDoubleCanonical(doublep, dOut);
         }
@@ -191,11 +200,10 @@ public class CastToStringOperation extends AbstractCastToOperation {
             e = e + DOUBLE_MANTISSA_OFFSET;
 
             if (negative) {
-                // Negative result, but the rest of the calculations can be based on a positive value.
                 writeChar('-', dOutInner);
             }
             if (value == 0) {
-                writeCharSequence("0.0", dOutInner);
+                writeCharSequence("0.0E0", dOutInner);
             } else {
                 // Initialize variables
                 double r, s, mPlus, mMinus;
@@ -396,13 +404,22 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         float value = floatp.getFloat();
 
-        if (!Float.isInfinite(value) && !Float.isNaN(value)
-                && ((Math.abs(value) >= 0.000001 && Math.abs(value) <= 1000000) || value == 0)) {
+        if (!Float.isInfinite(value) && !Float.isNaN(value) && Math.abs(value) >= 0.000001
+                && Math.abs(value) <= 1000000) {
             CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
             castToDecimal.convertFloat(floatp, dOutInner);
             XSDecimalPointable decp = new XSDecimalPointable();
             decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength());
             convertDecimal(decp, dOut);
+        } else if (value == 0) {
+            long bits = Float.floatToIntBits(value);
+            boolean negative = ((bits >> 31) == 0) ? false : true;
+
+            if (negative) {
+                writeChar('-', dOutInner);
+            }
+            writeCharSequence("0", dOutInner);
+            sendStringDataOutput(dOut);
         } else {
             convertFloatCanonical(floatp, dOut);
         }
@@ -433,11 +450,10 @@ public class CastToStringOperation extends AbstractCastToOperation {
             e = e + FLOAT_MANTISSA_OFFSET;
 
             if (negative) {
-                // Negative result, but the rest of the calculations can be based on a positive value.
                 writeChar('-', dOutInner);
             }
             if (value == 0) {
-                writeCharSequence("0.0", dOutInner);
+                writeCharSequence("0.0E0", dOutInner);
             } else {
                 // Initialize variables
                 double r, s, mPlus, mMinus;
