@@ -57,7 +57,8 @@ public class FnCompareEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                 // TODO use the third value as collation
 
                 integerResult[0] = ValueTag.XS_INTEGER_TAG;
-                LongPointable.setLong(integerResult, 1, (long) stringp1.compareTo(stringp2));
+                long compareTo = (stringp1.compareTo(stringp2) == 0 ? 0 : (stringp1.compareTo(stringp2) > 0 ? 1 : -1));
+                LongPointable.setLong(integerResult, 1, compareTo);
                 result.set(integerResult, 0, LongPointable.TYPE_TRAITS.getFixedLength() + 1);
             }
         };
