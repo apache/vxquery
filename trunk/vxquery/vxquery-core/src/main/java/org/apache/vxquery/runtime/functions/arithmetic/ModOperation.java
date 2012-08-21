@@ -86,7 +86,7 @@ public class ModOperation extends AbstractArithmeticOperation {
 
         // Save
         dOut.write(ValueTag.XS_DECIMAL_TAG);
-        dOut.writeByte(0);
+        dOut.writeByte(place1);
         dOut.writeLong(value1);
     }
 
