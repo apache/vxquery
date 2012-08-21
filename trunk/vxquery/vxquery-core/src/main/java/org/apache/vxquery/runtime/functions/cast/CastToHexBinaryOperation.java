@@ -47,7 +47,7 @@ public class CastToHexBinaryOperation extends AbstractCastToOperation {
                 throw new SystemException(ErrorCode.FORG0001);
             }
             dOutInner.write(((Character.digit(c1, 16) << 4) + Character.digit(c2, 16)));
-            length += 2;
+            length += 1;
         }
 
         dOut.write(ValueTag.XS_HEX_BINARY_TAG);
