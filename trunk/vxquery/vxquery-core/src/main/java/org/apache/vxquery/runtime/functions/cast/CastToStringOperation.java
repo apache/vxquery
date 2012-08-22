@@ -285,9 +285,9 @@ public class CastToStringOperation extends AbstractCastToOperation {
     }
 
     @Override
-    public void convertDTDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+    public void convertDTDuration(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        int dayTime = intp.getInteger();
+        long dayTime = longp.getLong();
 
         if (dayTime == 0) {
             writeCharSequence("PT0S", dOutInner);
@@ -340,7 +340,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertDuration(XSDurationPointable durationp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         int yearMonth = durationp.getYearMonth();
-        int dayTime = durationp.getDayTime();
+        long dayTime = durationp.getDayTime();
 
         if (yearMonth < 0 || dayTime < 0) {
             writeChar('-', dOutInner);

@@ -110,8 +110,8 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             return;
 
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                            tvp.getValue(tp.intp);
-                            aOp.convertDTDuration(tp.intp, dOut);
+                            tvp.getValue(tp.longp);
+                            aOp.convertDTDuration(tp.longp, dOut);
                             result.set(abvs);
                             return;
 

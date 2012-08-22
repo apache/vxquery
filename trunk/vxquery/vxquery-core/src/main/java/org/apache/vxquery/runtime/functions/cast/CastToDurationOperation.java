@@ -12,15 +12,16 @@ import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class CastToDurationOperation extends AbstractCastToOperation {
 
     @Override
-    public void convertDTDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+    public void convertDTDuration(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DURATION_TAG);
         dOut.writeInt(0);
-        dOut.writeInt(intp.getInteger());
+        dOut.writeLong(longp.getLong());
     }
 
     @Override
@@ -97,14 +98,14 @@ public class CastToDurationOperation extends AbstractCastToOperation {
                         * DateTime.CHRONON_OF_MINUTE + millisecond);
         dOut.write(ValueTag.XS_DURATION_TAG);
         dOut.writeInt((int) yearMonth);
-        dOut.writeInt((int) dayTime);
+        dOut.writeLong(dayTime);
     }
 
     @Override
     public void convertYMDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DURATION_TAG);
         dOut.writeInt(intp.getInteger());
-        dOut.writeInt(0);
+        dOut.writeLong(0);
     }
 
     @Override

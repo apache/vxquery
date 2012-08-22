@@ -59,7 +59,7 @@ public abstract class AbstractValueComparisonOperation {
     public abstract boolean operateDoubleInteger(DoublePointable doublep1, LongPointable longp2)
             throws SystemException, IOException;
 
-    public abstract boolean operateDTDurationDTDuration(IntegerPointable intp1, IntegerPointable intp2)
+    public abstract boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2)
             throws SystemException, IOException;
 
     public abstract boolean operateDurationDuration(XSDurationPointable durationp1, XSDurationPointable durationp2)

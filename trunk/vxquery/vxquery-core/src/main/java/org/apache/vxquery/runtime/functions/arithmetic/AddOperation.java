@@ -30,11 +30,11 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDateDTDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
+    public void operateDateDTDuration(XSDatePointable datep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner.reset();
         // Add duration.
-        DateTime.normalizeDateTime(datep.getYearMonth(), datep.getDayTime() + intp.getInteger(), dOutInner);
+        DateTime.normalizeDateTime(datep1.getYearMonth(), datep1.getDayTime() + longp2.getLong(), dOutInner);
         byte[] bytes = abvsInner.getByteArray();
         // Convert to date.
         bytes[XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
@@ -50,11 +50,11 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDatetimeDTDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
+    public void operateDatetimeDTDuration(XSDateTimePointable datetimep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         // Add duration.
         abvsInner.reset();
-        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() + intp.getInteger(), dOutInner);
+        DateTime.normalizeDateTime(datetimep1.getYearMonth(), datetimep1.getDayTime() + longp2.getLong(), dOutInner);
         dOut.write(ValueTag.XS_DATETIME_TAG);
         dOut.write(abvsInner.getByteArray());
     }
@@ -126,11 +126,11 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDecimalDTDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
+    public void operateDecimalDTDuration(XSDecimalPointable decp, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        int value = operateIntDecimal(intp.intValue(), decp);
+        long value = operateLongDecimal(longp.longValue(), decp);
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong(value);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalYMDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        int value = operateIntDecimal(intp.intValue(), decp);
+        int value = (int) operateLongDecimal(intp.intValue(), decp);
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
         dOut.writeInt(value);
     }
@@ -176,9 +176,9 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDoubleDTDuration(DoublePointable doublep1, IntegerPointable intp2, DataOutput dOut)
+    public void operateDoubleDTDuration(DoublePointable doublep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        operateDTDurationDouble(intp2, doublep1, dOut);
+        operateDTDurationDouble(longp2, doublep1, dOut);
     }
 
     @Override
@@ -209,65 +209,65 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
+    public void operateDTDurationDate(LongPointable longp, XSDatePointable datep, DataOutput dOut)
             throws SystemException, IOException {
-        operateDateDTDuration(datep, intp, dOut);
+        operateDateDTDuration(datep, longp, dOut);
     }
 
     @Override
-    public void operateDTDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
+    public void operateDTDurationDatetime(LongPointable longp, XSDateTimePointable datetimep, DataOutput dOut)
             throws SystemException, IOException {
-        operateDatetimeDTDuration(datetimep, intp, dOut);
+        operateDatetimeDTDuration(datetimep, longp, dOut);
     }
 
     @Override
-    public void operateDTDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
+    public void operateDTDurationDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut)
             throws SystemException, IOException {
-        operateDecimalDTDuration(decp, intp, dOut);
+        operateDecimalDTDuration(decp, longp, dOut);
     }
 
     @Override
-    public void operateDTDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
+    public void operateDTDurationDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
-        value += doublep.intValue();
+        long value = longp.longValue();
+        value += doublep.longValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong(value);
     }
 
     @Override
-    public void operateDTDurationDTDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
+    public void operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
-        value += intp2.intValue();
+        long value = longp1.longValue();
+        value += longp2.longValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong(value);
     }
 
     @Override
-    public void operateDTDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
+    public void operateDTDurationFloat(LongPointable longp1, FloatPointable floatp2, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
-        value += floatp.intValue();
+        long value = longp1.longValue();
+        value += floatp2.longValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong(value);
     }
 
     @Override
-    public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
+    public void operateDTDurationInteger(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
-        value += longp.intValue();
+        long value = longp1.longValue();
+        value += longp2.longValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong(value);
     }
 
     @Override
-    public void operateDTDurationTime(IntegerPointable intp1, XSTimePointable timep2, DataOutput dOut)
+    public void operateDTDurationTime(LongPointable longp1, XSTimePointable timep2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner.reset();
         // Add duration.
-        DateTime.normalizeDateTime(timep2.getYearMonth(), timep2.getDayTime() + intp1.getInteger(), dOutInner);
+        DateTime.normalizeDateTime(timep2.getYearMonth(), timep2.getDayTime() + longp1.getLong(), dOutInner);
         byte[] bytes = abvsInner.getByteArray();
         // Convert to time.
         bytes[XSTimePointable.HOUR_OFFSET] = bytes[XSDateTimePointable.HOUR_OFFSET];
@@ -292,9 +292,9 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatDTDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut)
+    public void operateFloatDTDuration(FloatPointable floatp, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        operateDTDurationFloat(intp, floatp, dOut);
+        operateDTDurationFloat(longp, floatp, dOut);
     }
 
     @Override
@@ -334,9 +334,9 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
+    public void operateIntegerDTDuration(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        operateDTDurationInteger(intp, longp, dOut);
+        operateDTDurationInteger(longp2, longp1, dOut);
     }
 
     @Override
@@ -364,9 +364,9 @@ public class AddOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateTimeDTDuration(XSTimePointable timep, IntegerPointable intp, DataOutput dOut)
+    public void operateTimeDTDuration(XSTimePointable timep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        operateDTDurationTime(intp, timep, dOut);
+        operateDTDurationTime(longp2, timep1, dOut);
     }
 
     @Override
@@ -420,11 +420,11 @@ public class AddOperation extends AbstractArithmeticOperation {
         dOut.writeInt(value);
     }
 
-    public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws SystemException, IOException {
+    public long operateLongDecimal(long longValue, XSDecimalPointable decp2) throws SystemException, IOException {
         abvsInner.reset();
         XSDecimalPointable decp1 = new XSDecimalPointable();
         decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
-        decp1.setDecimal(intValue, (byte) 0);
+        decp1.setDecimal(longValue, (byte) 0);
         // Prepare
         long value1 = decp1.getDecimalValue();
         long value2 = decp2.getDecimalValue();
@@ -450,6 +450,6 @@ public class AddOperation extends AbstractArithmeticOperation {
         value1 += value2;
         // Save
         decp2.setDecimal(value1, place1);
-        return decp2.intValue();
+        return decp2.longValue();
     }
 }

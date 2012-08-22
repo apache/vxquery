@@ -12,20 +12,21 @@ import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class CastToDTDurationOperation extends AbstractCastToOperation {
 
     @Override
-    public void convertDTDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+    public void convertDTDuration(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.write(intp.getByteArray(), intp.getStartOffset(), intp.getLength());
+        dOut.write(longp.getByteArray(), longp.getStartOffset(), longp.getLength());
     }
 
     @Override
     public void convertDuration(XSDurationPointable durationp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(durationp.getDayTime());
+        dOut.writeLong(durationp.getDayTime());
     }
 
     @Override
@@ -85,13 +86,13 @@ public class CastToDTDurationOperation extends AbstractCastToOperation {
         long dayTime = day * DateTime.CHRONON_OF_DAY + hour * DateTime.CHRONON_OF_HOUR + minute
                 * DateTime.CHRONON_OF_MINUTE + millisecond;
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt((int) (negativeResult * dayTime));
+        dOut.writeLong(negativeResult * dayTime);
     }
 
     @Override
     public void convertYMDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(0);
+        dOut.writeLong(0);
     }
 
     @Override

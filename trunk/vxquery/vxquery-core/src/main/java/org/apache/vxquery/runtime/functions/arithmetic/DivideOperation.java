@@ -29,7 +29,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDateDTDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
+    public void operateDateDTDuration(XSDatePointable datep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -41,7 +41,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDatetimeDTDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
+    public void operateDatetimeDTDuration(XSDateTimePointable datetimep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -88,7 +88,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDecimalDTDuration(XSDecimalPointable decp1, IntegerPointable intp2, DataOutput dOut)
+    public void operateDecimalDTDuration(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -146,7 +146,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDoubleDTDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
+    public void operateDoubleDTDuration(DoublePointable doublep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -179,43 +179,43 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
+    public void operateDTDurationDate(LongPointable longp, XSDatePointable datep, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void operateDTDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
+    public void operateDTDurationDatetime(LongPointable longp, XSDateTimePointable datetimep, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void operateDTDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
+    public void operateDTDurationDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut)
             throws SystemException, IOException {
         if (decp.getDecimalValue() == 0) {
             throw new SystemException(ErrorCode.FOAR0001);
         }
-        int value = intp.intValue();
-        value /= decp.intValue();
+        long value = longp.longValue();
+        value /= decp.longValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong(value);
     }
 
     @Override
-    public void operateDTDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
+    public void operateDTDurationDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
-        value /= doublep.intValue();
+        double value = longp.doubleValue();
+        value /= doublep.doubleValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong((long) value);
     }
 
     @Override
-    public void operateDTDurationDTDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
+    public void operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        double value = intp.intValue();
-        value /= intp2.intValue();
+        double value = longp1.longValue();
+        value /= longp2.longValue();
 
         abvsInner.reset();
         DoublePointable doublep = new DoublePointable();
@@ -226,28 +226,28 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateDTDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
+    public void operateDTDurationFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut)
             throws SystemException, IOException {
-        float value = intp.floatValue();
+        float value = longp.floatValue();
         value /= floatp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt((int) value);
+        dOut.writeLong((long) value);
     }
 
     @Override
-    public void operateDTDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
+    public void operateDTDurationInteger(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        if (longp.getLong() == 0) {
+        if (longp2.getLong() == 0) {
             throw new SystemException(ErrorCode.FOAR0001);
         }
-        int value = intp.intValue();
-        value /= longp.intValue();
+        long value = longp1.longValue();
+        value /= longp2.longValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeLong(value);
     }
 
     @Override
-    public void operateDTDurationTime(IntegerPointable intp, XSTimePointable timep, DataOutput dOut)
+    public void operateDTDurationTime(LongPointable longp, XSTimePointable timep, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -274,7 +274,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateFloatDTDuration(FloatPointable floatp1, IntegerPointable intp2, DataOutput dOut)
+    public void operateFloatDTDuration(FloatPointable floatp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -329,7 +329,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateIntegerDTDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
+    public void operateIntegerDTDuration(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -368,7 +368,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     }
 
     @Override
-    public void operateTimeDTDuration(XSTimePointable timep, IntegerPointable intp, DataOutput dOut)
+    public void operateTimeDTDuration(XSTimePointable timep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
         throw new UnsupportedOperationException();
     }

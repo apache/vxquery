@@ -9,6 +9,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToYMDurationOperation;
 
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
@@ -17,7 +18,7 @@ public class CastableAsYMDurationOperation extends AbstractCastableAsOperation {
     private DataOutput dOutInner = abvsInner.getDataOutput();
 
     @Override
-    public void convertDTDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+    public void convertDTDuration(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 1);
     }

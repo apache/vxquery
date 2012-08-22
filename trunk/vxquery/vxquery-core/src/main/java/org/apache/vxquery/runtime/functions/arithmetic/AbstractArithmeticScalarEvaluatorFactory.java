@@ -173,8 +173,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateDecimalDTDuration(tp1.decp, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateDecimalDTDuration(tp1.decp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -212,8 +212,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateIntegerDTDuration(longp1, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateIntegerDTDuration(longp1, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -252,8 +252,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateFloatDTDuration(tp1.floatp, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateFloatDTDuration(tp1.floatp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -292,8 +292,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateDoubleDTDuration(tp1.doublep, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateDoubleDTDuration(tp1.doublep, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -315,8 +315,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateDateDTDuration(tp1.datep, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateDateDTDuration(tp1.datep, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -338,8 +338,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateDatetimeDTDuration(tp1.datetimep, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateDatetimeDTDuration(tp1.datetimep, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -361,8 +361,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateTimeDTDuration(tp1.timep, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateTimeDTDuration(tp1.timep, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -370,52 +370,52 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             break;
 
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                            tvp1.getValue(tp1.intp);
+                            tvp1.getValue(tp1.longp);
                             switch (tid2) {
                                 case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
-                                    aOp.operateDTDurationDecimal(tp1.intp, tp2.decp, dOut);
+                                    aOp.operateDTDurationDecimal(tp1.longp, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_INTEGER_TAG:
-                                    aOp.operateDTDurationInteger(tp1.intp, longp2, dOut);
+                                    aOp.operateDTDurationInteger(tp1.longp, longp2, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
-                                    aOp.operateDTDurationFloat(tp1.intp, tp2.floatp, dOut);
+                                    aOp.operateDTDurationFloat(tp1.longp, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_DOUBLE_TAG:
                                     tvp2.getValue(tp2.doublep);
-                                    aOp.operateDTDurationDouble(tp1.intp, tp2.doublep, dOut);
+                                    aOp.operateDTDurationDouble(tp1.longp, tp2.doublep, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_DATE_TAG:
                                     tvp2.getValue(tp2.datep);
-                                    aOp.operateDTDurationDate(tp1.intp, tp2.datep, dOut);
+                                    aOp.operateDTDurationDate(tp1.longp, tp2.datep, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_TIME_TAG:
                                     tvp2.getValue(tp2.timep);
-                                    aOp.operateDTDurationTime(tp1.intp, tp2.timep, dOut);
+                                    aOp.operateDTDurationTime(tp1.longp, tp2.timep, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_DATETIME_TAG:
                                     tvp2.getValue(tp2.datetimep);
-                                    aOp.operateDTDurationDatetime(tp1.intp, tp2.datetimep, dOut);
+                                    aOp.operateDTDurationDatetime(tp1.longp, tp2.datetimep, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    aOp.operateDTDurationDTDuration(tp1.intp, tp2.intp, dOut);
+                                    tvp2.getValue(tp2.longp);
+                                    aOp.operateDTDurationDTDuration(tp1.longp, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
                             }
