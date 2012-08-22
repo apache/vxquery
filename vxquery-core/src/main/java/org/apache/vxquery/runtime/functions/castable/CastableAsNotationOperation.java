@@ -49,7 +49,7 @@ public class CastableAsNotationOperation extends AbstractCastableAsOperation {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
-    public void convertDTDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+    public void convertDTDuration(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 

@@ -108,9 +108,9 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     }
 
     @Override
-    public boolean operateDTDurationDTDuration(IntegerPointable intp1, IntegerPointable intp2) throws SystemException,
+    public boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2) throws SystemException,
             IOException {
-        return (aOp1.operateDTDurationDTDuration(intp1, intp2) || aOp2.operateDTDurationDTDuration(intp1, intp2));
+        return (aOp1.operateDTDurationDTDuration(longp1, longp2) || aOp2.operateDTDurationDTDuration(longp1, longp2));
     }
 
     @Override

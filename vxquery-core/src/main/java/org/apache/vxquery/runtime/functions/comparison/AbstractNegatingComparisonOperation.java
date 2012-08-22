@@ -103,9 +103,9 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDTDurationDTDuration(IntegerPointable intp1, IntegerPointable intp2) throws SystemException,
+    public boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2) throws SystemException,
             IOException {
-        return !aOp.operateDTDurationDTDuration(intp1, intp2);
+        return !aOp.operateDTDurationDTDuration(longp1, longp2);
     }
 
     @Override

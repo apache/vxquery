@@ -11,12 +11,13 @@ import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class CastToYMDurationOperation extends AbstractCastToOperation {
 
     @Override
-    public void convertDTDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+    public void convertDTDuration(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
         dOut.writeInt(0);
     }

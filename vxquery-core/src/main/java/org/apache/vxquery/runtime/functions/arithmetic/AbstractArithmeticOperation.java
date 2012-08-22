@@ -19,13 +19,13 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateDateDate(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx,
             DataOutput dOut) throws SystemException, IOException;
 
-    public abstract void operateDateDTDuration(XSDatePointable datep1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateDateDTDuration(XSDatePointable datep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateDatetimeDatetime(XSDateTimePointable datetimep1, XSDateTimePointable datetimep2,
             DynamicContext dCtx, DataOutput dOut) throws SystemException, IOException;
 
-    public abstract void operateDatetimeDTDuration(XSDateTimePointable datetimep1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateDatetimeDTDuration(XSDateTimePointable datetimep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateDatetimeYMDuration(XSDateTimePointable datetimep1, IntegerPointable intp2, DataOutput dOut)
@@ -40,7 +40,7 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateDecimalDouble(XSDecimalPointable decp1, DoublePointable doublep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDecimalDTDuration(XSDecimalPointable decp1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateDecimalDTDuration(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateDecimalFloat(XSDecimalPointable decp1, FloatPointable floatp2, DataOutput dOut)
@@ -58,7 +58,7 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDoubleDTDuration(DoublePointable doublep1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateDoubleDTDuration(DoublePointable doublep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateDoubleFloat(DoublePointable doublep1, FloatPointable floatp2, DataOutput dOut)
@@ -70,28 +70,28 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateDoubleYMDuration(DoublePointable doublep1, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationDate(IntegerPointable intp1, XSDatePointable datep2, DataOutput dOut)
+    public abstract void operateDTDurationDate(LongPointable longp1, XSDatePointable datep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationDatetime(IntegerPointable intp1, XSDateTimePointable datetimep2, DataOutput dOut)
+    public abstract void operateDTDurationDatetime(LongPointable longp1, XSDateTimePointable datetimep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationDecimal(IntegerPointable intp1, XSDecimalPointable decp2, DataOutput dOut)
+    public abstract void operateDTDurationDecimal(LongPointable longp1, XSDecimalPointable decp2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationDouble(IntegerPointable intp1, DoublePointable doublep2, DataOutput dOut)
+    public abstract void operateDTDurationDouble(LongPointable longp1, DoublePointable doublep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationDTDuration(IntegerPointable intp1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationFloat(IntegerPointable intp1, FloatPointable floatp2, DataOutput dOut)
+    public abstract void operateDTDurationFloat(LongPointable longp1, FloatPointable floatp2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationInteger(IntegerPointable intp1, LongPointable longp2, DataOutput dOut)
+    public abstract void operateDTDurationInteger(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDTDurationTime(IntegerPointable intp1, XSTimePointable timep2, DataOutput dOut)
+    public abstract void operateDTDurationTime(LongPointable longp1, XSTimePointable timep2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2, DataOutput dOut)
@@ -100,7 +100,7 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateFloatDouble(FloatPointable floatp1, DoublePointable doublep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateFloatDTDuration(FloatPointable floatp1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateFloatDTDuration(FloatPointable floatp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2, DataOutput dOut)
@@ -118,7 +118,7 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateIntegerDouble(LongPointable longp1, DoublePointable doublep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateIntegerDTDuration(LongPointable longp1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateIntegerDTDuration(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateIntegerFloat(LongPointable longp1, FloatPointable floatp2, DataOutput dOut)
@@ -130,7 +130,7 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateIntegerYMDuration(LongPointable longp1, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateTimeDTDuration(XSTimePointable timep1, IntegerPointable intp2, DataOutput dOut)
+    public abstract void operateTimeDTDuration(XSTimePointable timep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
     public abstract void operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx,

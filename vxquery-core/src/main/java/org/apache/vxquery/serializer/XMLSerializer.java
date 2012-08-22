@@ -460,18 +460,18 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printDTDuration(PrintStream ps, TaggedValuePointable tvp) {
-        IntegerPointable ip = pp.takeOne(IntegerPointable.class);
+        LongPointable lp = pp.takeOne(LongPointable.class);
         try {
-            tvp.getValue(ip);
+            tvp.getValue(lp);
             abvs.reset();
-            castToString.convertDTDuration(ip, dOut);
+            castToString.convertDTDuration(lp, dOut);
             printStringAbvs(ps);
         } catch (SystemException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            pp.giveBack(ip);
+            pp.giveBack(lp);
         }
     }
 

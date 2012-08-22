@@ -139,9 +139,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDTDurationDTDuration(IntegerPointable intp1, IntegerPointable intp2) throws SystemException,
+    public boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2) throws SystemException,
             IOException {
-        return (intp1.compareTo(intp2) == -1);
+        return (longp1.compareTo(longp2) == -1);
     }
 
     @Override

@@ -241,11 +241,11 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                             break;
 
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                            tvp1.getValue(tp1.intp);
+                            tvp1.getValue(tp1.longp);
                             switch (tid2) {
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                                    tvp2.getValue(tp2.intp);
-                                    booleanResult = aOp.operateDTDurationDTDuration(tp1.intp, tp2.intp);
+                                    tvp2.getValue(tp2.longp);
+                                    booleanResult = aOp.operateDTDurationDTDuration(tp1.longp, tp2.longp);
                                     break;
                             }
                             break;

@@ -5,6 +5,7 @@ import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 
 public class XSDurationPointable extends AbstractPointable {
     private final static int YEAR_MONTH_OFFSET = 0;
@@ -20,7 +21,7 @@ public class XSDurationPointable extends AbstractPointable {
 
         @Override
         public int getFixedLength() {
-            return 8;
+            return 12;
         }
     };
 
@@ -46,11 +47,11 @@ public class XSDurationPointable extends AbstractPointable {
         return getYearMonth(bytes, start);
     }
 
-    public static int getDayTime(byte[] bytes, int start) {
-        return IntegerPointable.getInteger(bytes, start + DAY_TIME_OFFSET);
+    public static long getDayTime(byte[] bytes, int start) {
+        return LongPointable.getLong(bytes, start + DAY_TIME_OFFSET);
     }
 
-    public int getDayTime() {
+    public long getDayTime() {
         return getDayTime(bytes, start);
     }
 
@@ -62,11 +63,11 @@ public class XSDurationPointable extends AbstractPointable {
         setYearMonth(bytes, start, value);
     }
     
-    public static void setDayTime(byte[] bytes, int start, int value) {
-        IntegerPointable.setInteger(bytes, start + DAY_TIME_OFFSET, value);
+    public static void setDayTime(byte[] bytes, int start, long value) {
+        LongPointable.setLong(bytes, start + DAY_TIME_OFFSET, value);
     }
 
-    public void setDayTime(int value) {
+    public void setDayTime(long value) {
         setDayTime(bytes, start, value);
     }
 }
