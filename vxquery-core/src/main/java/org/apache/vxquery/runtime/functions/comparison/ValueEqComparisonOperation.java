@@ -104,7 +104,7 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2) throws SystemException,
             IOException {
-        XSDecimalPointable decp2 = new XSDecimalPointable();
+        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.setDecimal(longp2.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == 0);
     }
@@ -222,7 +222,7 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2) throws SystemException,
             IOException {
-        XSDecimalPointable decp1 = new XSDecimalPointable();
+        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.setDecimal(longp1.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == 0);
     }

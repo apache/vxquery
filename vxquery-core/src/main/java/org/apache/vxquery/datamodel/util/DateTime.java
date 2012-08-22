@@ -155,7 +155,7 @@ public class DateTime {
         // Consider time zones.
         if (timezonep.getTimezoneHour() == DateTime.TIMEZONE_HOUR_NULL
                 || timezonep.getTimezoneMinute() == DateTime.TIMEZONE_MINUTE_NULL) {
-            XSDateTimePointable defaultTimezone = new XSDateTimePointable();
+            XSDateTimePointable defaultTimezone = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
             dCtx.getCurrentDateTime(defaultTimezone);
             timezoneHour = defaultTimezone.getTimezoneHour();
             timezoneMinute = defaultTimezone.getTimezoneMinute();

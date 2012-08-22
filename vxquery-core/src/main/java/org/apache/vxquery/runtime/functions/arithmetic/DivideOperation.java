@@ -71,7 +71,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value1 /= value2;
         // Save
         abvsInner.reset();
-        DoublePointable doublep = new DoublePointable();
+        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value1);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
@@ -110,7 +110,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
         }
         // Convert
         abvsInner.reset();
-        XSDecimalPointable decp2 = new XSDecimalPointable();
+        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -218,7 +218,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value /= longp2.longValue();
 
         abvsInner.reset();
-        DoublePointable doublep = new DoublePointable();
+        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
@@ -313,7 +313,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         abvsInner.reset();
-        XSDecimalPointable decp1 = new XSDecimalPointable();
+        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -354,7 +354,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value /= longp2.doubleValue();
 
         abvsInner.reset();
-        DoublePointable doublep = new DoublePointable();
+        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
@@ -439,7 +439,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value /= intp2.intValue();
 
         abvsInner.reset();
-        DoublePointable doublep = new DoublePointable();
+        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
@@ -448,7 +448,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
 
     public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp1 = new XSDecimalPointable();
+        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(intValue, (byte) 0);
         // Prepare
@@ -469,7 +469,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
 
     public int operateDecimalInt(XSDecimalPointable decp1, int intValue) throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp2 = new XSDecimalPointable();
+        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(intValue, (byte) 0);
         // Prepare
