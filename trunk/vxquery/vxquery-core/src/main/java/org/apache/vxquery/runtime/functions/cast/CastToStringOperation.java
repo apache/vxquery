@@ -157,7 +157,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
                 && Math.abs(value) <= 1000000) {
             CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
             castToDecimal.convertDouble(doublep, dOutInner);
-            XSDecimalPointable decp = new XSDecimalPointable();
+            XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
             decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
                     XSDecimalPointable.TYPE_TRAITS.getFixedLength());
             convertDecimal(decp, dOut);
@@ -408,7 +408,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
                 && Math.abs(value) <= 1000000) {
             CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
             castToDecimal.convertFloat(floatp, dOutInner);
-            XSDecimalPointable decp = new XSDecimalPointable();
+            XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
             decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength());
             convertDecimal(decp, dOut);
         } else if (value == 0) {

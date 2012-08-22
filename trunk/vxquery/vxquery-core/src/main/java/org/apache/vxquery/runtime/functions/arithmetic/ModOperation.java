@@ -118,7 +118,7 @@ public class ModOperation extends AbstractArithmeticOperation {
     public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp2 = new XSDecimalPointable();
+        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -278,7 +278,7 @@ public class ModOperation extends AbstractArithmeticOperation {
     public void operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp1 = new XSDecimalPointable();
+        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);

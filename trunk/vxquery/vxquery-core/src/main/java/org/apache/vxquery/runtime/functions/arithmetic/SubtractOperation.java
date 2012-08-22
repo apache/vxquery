@@ -29,12 +29,12 @@ public class SubtractOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         abvsInner1.reset();
         DateTime.getTimezoneDateTime(datep1, dCtx, dOutInner1);
-        XSDateTimePointable datetimep1 = new XSDateTimePointable();
+        XSDateTimePointable datetimep1 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
         datetimep1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(), abvsInner1.getLength());
 
         abvsInner2.reset();
         DateTime.getTimezoneDateTime(datep2, dCtx, dOutInner2);
-        XSDateTimePointable datetimep2 = new XSDateTimePointable();
+        XSDateTimePointable datetimep2 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
         datetimep2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(), abvsInner2.getLength());
 
         operateDatetimeDatetime(datetimep1, datetimep2, dCtx, dOut);
@@ -195,7 +195,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner1.reset();
-        XSDecimalPointable decp2 = new XSDecimalPointable();
+        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
                 XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.longValue(), (byte) 0);
@@ -457,12 +457,12 @@ public class SubtractOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         abvsInner1.reset();
         DateTime.getTimezoneDateTime(timep1, dCtx, dOutInner1);
-        XSDateTimePointable datetimep1 = new XSDateTimePointable();
+        XSDateTimePointable datetimep1 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
         datetimep1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(), abvsInner1.getLength());
 
         abvsInner2.reset();
         DateTime.getTimezoneDateTime(timep2, dCtx, dOutInner2);
-        XSDateTimePointable datetimep2 = new XSDateTimePointable();
+        XSDateTimePointable datetimep2 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
         datetimep2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(), abvsInner2.getLength());
 
         operateDatetimeDatetime(datetimep1, datetimep2, dCtx, dOut);
@@ -527,7 +527,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     public long operateIntDecimal(long longValue, XSDecimalPointable decp2) throws SystemException, IOException {
         abvsInner1.reset();
-        XSDecimalPointable decp1 = new XSDecimalPointable();
+        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
                 XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longValue, (byte) 0);
@@ -561,7 +561,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     public long operateDecimalInt(XSDecimalPointable decp1, long longValue) throws SystemException, IOException {
         abvsInner1.reset();
-        XSDecimalPointable decp2 = new XSDecimalPointable();
+        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
                 XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longValue, (byte) 0);
