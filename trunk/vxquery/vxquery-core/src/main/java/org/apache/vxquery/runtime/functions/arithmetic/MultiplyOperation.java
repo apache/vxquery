@@ -64,14 +64,14 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
         long value2 = decp2.getDecimalValue();
         byte place1 = decp1.getDecimalPlace();
         byte place2 = decp2.getDecimalPlace();
-        if (value1 > Long.MAX_VALUE / value2) {
+        if (Math.abs(value1) > Long.MAX_VALUE / Math.abs(value2)) {
             throw new SystemException(ErrorCode.XPDY0002);
         }
         value1 *= value2;
         place1 += place2;
         dOut.write(ValueTag.XS_DECIMAL_TAG);
         dOut.writeByte(place1);
-        dOut.writeDouble(value1);
+        dOut.writeLong(value1);
     }
 
     @Override
@@ -378,7 +378,7 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
         byte place1 = decp1.getDecimalPlace();
         byte place2 = decp2.getDecimalPlace();
         // Divide
-        if (value1 > Long.MAX_VALUE / value2) {
+        if (Math.abs(value1) > Long.MAX_VALUE / Math.abs(value2)) {
             throw new SystemException(ErrorCode.XPDY0002);
         }
         value1 *= value2;
