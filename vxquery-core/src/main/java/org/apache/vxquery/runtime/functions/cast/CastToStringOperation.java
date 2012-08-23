@@ -164,7 +164,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
         } else if (value == 0) {
             long bits = Double.doubleToLongBits(value);
             boolean negative = ((bits >> 63) == 0) ? false : true;
-            
+
             if (negative) {
                 writeChar('-', dOutInner);
             }
@@ -244,7 +244,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
                 double d;
                 while (!Double.isInfinite(mPlus) && !Double.isNaN(mPlus) && !Double.isInfinite(mMinus)
-                        && !Double.isNaN(mMinus)) {
+                        && !Double.isNaN(mMinus) && !Double.isInfinite(r) && !Double.isNaN(r)) {
                     if (s == r) {
                         // Special case where the value is off by a factor of ten.
                         d = 1;
