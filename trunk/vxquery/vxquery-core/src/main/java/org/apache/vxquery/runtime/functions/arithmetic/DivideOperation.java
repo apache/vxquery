@@ -21,7 +21,10 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DivideOperation extends AbstractArithmeticOperation {
     protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
-
+    private DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
+    private XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+    private XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+    
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
@@ -71,7 +74,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value1 /= value2;
         // Save
         abvsInner.reset();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value1);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
@@ -110,7 +112,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
         }
         // Convert
         abvsInner.reset();
-        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -218,7 +219,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value /= longp2.longValue();
 
         abvsInner.reset();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
@@ -313,7 +313,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         abvsInner.reset();
-        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -354,7 +353,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value /= longp2.doubleValue();
 
         abvsInner.reset();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();
@@ -439,7 +437,6 @@ public class DivideOperation extends AbstractArithmeticOperation {
         value /= intp2.intValue();
 
         abvsInner.reset();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         doublep.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), DoublePointable.TYPE_TRAITS.getFixedLength());
         doublep.setDouble(value);
         CastToDecimalOperation castToDecmial = new CastToDecimalOperation();

@@ -24,6 +24,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     protected final DataOutput dOutInner1 = abvsInner1.getDataOutput();
     protected final ArrayBackedValueStorage abvsInner2 = new ArrayBackedValueStorage();
     protected final DataOutput dOutInner2 = abvsInner2.getDataOutput();
+    private XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+    private XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
 
     public void operateDateDate(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
@@ -64,12 +66,12 @@ public class SubtractOperation extends AbstractArithmeticOperation {
         DateTime.getTimezoneDateTime(datetimep1, dCtx, dOutInner1);
         byte[] bytes1 = abvsInner1.getByteArray();
         int startOffset1 = abvsInner1.getStartOffset() + 1;
-        
+
         abvsInner2.reset();
         DateTime.getTimezoneDateTime(datetimep2, dCtx, dOutInner2);
         byte[] bytes2 = abvsInner2.getByteArray();
         int startOffset2 = abvsInner2.getStartOffset() + 1;
-        
+
         long dayTime1 = XSDateTimePointable.getDayTime(bytes1, startOffset1);
         long dayTime2 = XSDateTimePointable.getDayTime(bytes2, startOffset2);
         long yearMonth = XSDateTimePointable.getYearMonth(bytes1, startOffset1)
@@ -206,7 +208,6 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner1.reset();
-        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
                 XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.longValue(), (byte) 0);
@@ -540,14 +541,13 @@ public class SubtractOperation extends AbstractArithmeticOperation {
 
     public long operateIntDecimal(long longValue, XSDecimalPointable decp2) throws SystemException, IOException {
         abvsInner1.reset();
-        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
                 XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longValue, (byte) 0);
         // Prepare
-        long value1 = decp1.getDecimalValue();
+        long value1 = longValue;
         long value2 = decp2.getDecimalValue();
-        byte place1 = decp1.getDecimalPlace();
+        byte place1 = 0;
         byte place2 = decp2.getDecimalPlace();
         byte count1 = decp1.getDigitCount();
         byte count2 = decp2.getDigitCount();
@@ -573,9 +573,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     }
 
     public long operateDecimalInt(XSDecimalPointable decp1, long longValue) throws SystemException, IOException {
-        abvsInner1.reset();
-        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        decp2.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
+        abvsInner2.reset();
+        decp2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(),
                 XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longValue, (byte) 0);
         // Prepare
