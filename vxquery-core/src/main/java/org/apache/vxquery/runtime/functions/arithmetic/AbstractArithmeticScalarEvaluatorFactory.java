@@ -475,7 +475,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                 throw new SystemException(ErrorCode.XPTY0004);
             }
 
-            private void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOutInteger)
+            private void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOut)
                     throws SystemException, IOException {
                 long value;
                 switch (tvp.getTag()) {
@@ -511,8 +511,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                     default:
                         value = 0;
                 }
-                dOutInteger.write(ValueTag.XS_INTEGER_TAG);
-                dOutInteger.writeLong(value);
+                dOut.write(ValueTag.XS_INTEGER_TAG);
+                dOut.writeLong(value);
             }
 
             private int getBaseTypeForArithmetics(int tid) throws SystemException {
