@@ -29,10 +29,12 @@ import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.data.IPrinter;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -88,6 +90,10 @@ public class XMLSerializer implements IPrinter {
                 printDTDuration(ps, tvp);
                 break;
 
+            case ValueTag.XS_BYTE_TAG:
+                printByte(ps, tvp);
+                break;
+
             case ValueTag.XS_DECIMAL_TAG:
                 printDecimal(ps, tvp);
                 break;
@@ -128,7 +134,19 @@ public class XMLSerializer implements IPrinter {
                 printHexBinary(ps, tvp);
                 break;
 
+            case ValueTag.XS_INT_TAG:
+            case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                printInt(ps, tvp);
+                break;
+
             case ValueTag.XS_INTEGER_TAG:
+            case ValueTag.XS_LONG_TAG:
+            case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+            case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+            case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+            case ValueTag.XS_POSITIVE_INTEGER_TAG:
+            case ValueTag.XS_UNSIGNED_INT_TAG:
+            case ValueTag.XS_UNSIGNED_LONG_TAG:
                 printInteger(ps, tvp);
                 break;
 
@@ -138,6 +156,11 @@ public class XMLSerializer implements IPrinter {
 
             case ValueTag.XS_QNAME_TAG:
                 printQName(ps, tvp);
+                break;
+
+            case ValueTag.XS_SHORT_TAG:
+            case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                printShort(ps, tvp);
                 break;
 
             case ValueTag.XS_STRING_TAG:
@@ -411,6 +434,16 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
+    private void printByte(PrintStream ps, TaggedValuePointable tvp) {
+        BytePointable bp = pp.takeOne(BytePointable.class);
+        try {
+            tvp.getValue(bp);
+            ps.print(bp.byteValue());
+        } finally {
+            pp.giveBack(bp);
+        }
+    }
+
     private void printDouble(PrintStream ps, TaggedValuePointable tvp) {
         DoublePointable dp = pp.takeOne(DoublePointable.class);
         try {
@@ -603,6 +636,16 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
+    private void printInt(PrintStream ps, TaggedValuePointable tvp) {
+        IntegerPointable ip = pp.takeOne(IntegerPointable.class);
+        try {
+            tvp.getValue(ip);
+            ps.print(ip.intValue());
+        } finally {
+            pp.giveBack(ip);
+        }
+    }
+
     private void printInteger(PrintStream ps, TaggedValuePointable tvp) {
         LongPointable lp = pp.takeOne(LongPointable.class);
         try {
@@ -610,6 +653,16 @@ public class XMLSerializer implements IPrinter {
             ps.print(lp.longValue());
         } finally {
             pp.giveBack(lp);
+        }
+    }
+
+    private void printShort(PrintStream ps, TaggedValuePointable tvp) {
+        ShortPointable sp = pp.takeOne(ShortPointable.class);
+        try {
+            tvp.getValue(sp);
+            ps.print(sp.shortValue());
+        } finally {
+            pp.giveBack(sp);
         }
     }
 
