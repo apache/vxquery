@@ -402,19 +402,19 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateYMDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
-        value /= doublep.intValue();
+        double value = intp.doubleValue();
+        value /= doublep.doubleValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeInt((int) value);
     }
 
     @Override
     public void operateYMDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
             throws SystemException, IOException {
-        int value = intp.intValue();
-        value /= floatp.intValue();
+        float value = intp.floatValue();
+        value /= floatp.floatValue();
         dOut.write(ValueTag.XS_YEAR_MONTH_DURATION_TAG);
-        dOut.writeInt(value);
+        dOut.writeInt((int) value);
     }
 
     @Override
@@ -448,44 +448,30 @@ public class DivideOperation extends AbstractArithmeticOperation {
 
     public int operateIntDecimal(int intValue, XSDecimalPointable decp2) throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
-        decp1.setDecimal(intValue, (byte) 0);
         // Prepare
-        long value1 = decp1.getDecimalValue();
-        long value2 = decp2.getDecimalValue();
-        byte place1 = decp1.getDecimalPlace();
-        byte place2 = decp2.getDecimalPlace();
+        double value1 = intValue;
+        double value2 = decp2.doubleValue();
         if (value2 == 0) {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         // Divide
         value1 /= value2;
-        place1 -= place2;
         // Save
-        decp2.setDecimal(value1, place1);
-        return decp2.intValue();
+        return (int) value1;
     }
 
     public int operateDecimalInt(XSDecimalPointable decp1, int intValue) throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
-        decp2.setDecimal(intValue, (byte) 0);
         // Prepare
-        long value1 = decp1.getDecimalValue();
-        long value2 = decp2.getDecimalValue();
-        byte place1 = decp1.getDecimalPlace();
-        byte place2 = decp2.getDecimalPlace();
+        double value1 = decp1.doubleValue();
+        double value2 = intValue;
         if (value2 == 0) {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         // Divide
         value1 /= value2;
-        place1 -= place2;
         // Save
-        decp2.setDecimal(value1, place1);
-        return decp2.intValue();
+        return (int) value1;
     }
 
 }
