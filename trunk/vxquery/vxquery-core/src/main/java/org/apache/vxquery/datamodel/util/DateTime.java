@@ -144,8 +144,8 @@ public class DateTime {
         dOut.writeByte((byte) hour);
         dOut.writeByte((byte) minute);
         dOut.writeInt((int) millisecond);
-        dOut.writeByte((byte) DateTime.TIMEZONE_HOUR_NULL);
-        dOut.writeByte((byte) DateTime.TIMEZONE_MINUTE_NULL);
+        dOut.writeByte((byte) 0);
+        dOut.writeByte((byte) 0);
     }
 
     public static void getTimezoneDateTime(ITimezone timezonep, DynamicContext dCtx, DataOutput dOut)
