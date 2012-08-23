@@ -36,11 +36,14 @@ public class AddOperation extends AbstractArithmeticOperation {
         // Add duration.
         DateTime.normalizeDateTime(datep1.getYearMonth(), datep1.getDayTime() + longp2.getLong(), dOutInner);
         byte[] bytes = abvsInner.getByteArray();
+        int startOffset = abvsInner.getStartOffset() + 1;
         // Convert to date.
-        bytes[XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
-        bytes[XSDatePointable.TIMEZONE_MINUTE_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_MINUTE_OFFSET];
+        bytes[startOffset + XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[startOffset
+                + XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
+        bytes[startOffset + XSDatePointable.TIMEZONE_MINUTE_OFFSET] = bytes[startOffset
+                + XSDateTimePointable.TIMEZONE_MINUTE_OFFSET];
         dOut.write(ValueTag.XS_DATE_TAG);
-        dOut.write(bytes, 0, XSDatePointable.TYPE_TRAITS.getFixedLength());
+        dOut.write(bytes, startOffset, XSDatePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
@@ -56,7 +59,8 @@ public class AddOperation extends AbstractArithmeticOperation {
         abvsInner.reset();
         DateTime.normalizeDateTime(datetimep1.getYearMonth(), datetimep1.getDayTime() + longp2.getLong(), dOutInner);
         dOut.write(ValueTag.XS_DATETIME_TAG);
-        dOut.write(abvsInner.getByteArray());
+        dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
@@ -66,7 +70,8 @@ public class AddOperation extends AbstractArithmeticOperation {
         abvsInner.reset();
         DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() + intp.getInteger(), dOutInner);
         dOut.write(ValueTag.XS_DATETIME_TAG);
-        dOut.write(abvsInner.getByteArray());
+        dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
@@ -76,11 +81,14 @@ public class AddOperation extends AbstractArithmeticOperation {
         // Add duration.
         DateTime.normalizeDateTime(datep.getYearMonth(), datep.getDayTime() + intp.getInteger(), dOutInner);
         byte[] bytes = abvsInner.getByteArray();
+        int startOffset = abvsInner.getStartOffset() + 1;
         // Convert to date.
-        bytes[XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
-        bytes[XSDatePointable.TIMEZONE_MINUTE_OFFSET] = bytes[XSDateTimePointable.TIMEZONE_MINUTE_OFFSET];
+        bytes[startOffset + XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[startOffset
+                + XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
+        bytes[startOffset + XSDatePointable.TIMEZONE_MINUTE_OFFSET] = bytes[startOffset
+                + XSDateTimePointable.TIMEZONE_MINUTE_OFFSET];
         dOut.write(ValueTag.XS_DATE_TAG);
-        dOut.write(bytes, 0, XSDatePointable.TYPE_TRAITS.getFixedLength());
+        dOut.write(bytes, startOffset, XSDatePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
@@ -269,14 +277,16 @@ public class AddOperation extends AbstractArithmeticOperation {
         // Add duration.
         DateTime.normalizeDateTime(timep2.getYearMonth(), timep2.getDayTime() + longp1.getLong(), dOutInner);
         byte[] bytes = abvsInner.getByteArray();
+        int startOffset = abvsInner.getStartOffset() + 1;
         // Convert to time.
-        bytes[XSTimePointable.HOUR_OFFSET] = bytes[XSDateTimePointable.HOUR_OFFSET];
-        bytes[XSTimePointable.MINUTE_OFFSET] = bytes[XSDateTimePointable.MINUTE_OFFSET];
-        bytes[XSTimePointable.MILLISECOND_OFFSET] = bytes[XSDateTimePointable.MILLISECOND_OFFSET];
-        bytes[XSTimePointable.TIMEZONE_HOUR_OFFSET] = (byte) timep2.getTimezoneHour();
-        bytes[XSTimePointable.TIMEZONE_MINUTE_OFFSET] = (byte) timep2.getTimezoneMinute();
+        bytes[startOffset + XSTimePointable.HOUR_OFFSET] = bytes[startOffset + XSDateTimePointable.HOUR_OFFSET];
+        bytes[startOffset + XSTimePointable.MINUTE_OFFSET] = bytes[startOffset + XSDateTimePointable.MINUTE_OFFSET];
+        bytes[startOffset + XSTimePointable.MILLISECOND_OFFSET] = bytes[startOffset
+                + XSDateTimePointable.MILLISECOND_OFFSET];
+        bytes[startOffset + XSTimePointable.TIMEZONE_HOUR_OFFSET] = (byte) timep2.getTimezoneHour();
+        bytes[startOffset + XSTimePointable.TIMEZONE_MINUTE_OFFSET] = (byte) timep2.getTimezoneMinute();
         dOut.write(ValueTag.XS_TIME_TAG);
-        dOut.write(bytes, 0, XSTimePointable.TYPE_TRAITS.getFixedLength());
+        dOut.write(bytes, startOffset, XSTimePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
