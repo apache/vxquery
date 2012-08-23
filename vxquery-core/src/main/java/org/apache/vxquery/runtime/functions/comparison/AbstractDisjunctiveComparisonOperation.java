@@ -114,10 +114,30 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     }
 
     @Override
+    public boolean operateDTDurationDuration(LongPointable longp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        return (aOp1.operateDTDurationDuration(longp1, durationp2) || aOp2
+                .operateDTDurationDuration(longp1, durationp2));
+    }
+
+    @Override
+    public boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
+            throws SystemException, IOException {
+        return (aOp1.operateDurationDTDuration(durationp1, longp2) || aOp2
+                .operateDurationDTDuration(durationp1, longp2));
+    }
+
+    @Override
     public boolean operateDurationDuration(XSDurationPointable durationp1, XSDurationPointable durationp2)
             throws SystemException, IOException {
         return (aOp1.operateDurationDuration(durationp1, durationp2) || aOp2.operateDurationDuration(durationp1,
                 durationp2));
+    }
+
+    @Override
+    public boolean operateDurationYMDuration(XSDurationPointable durationp1, IntegerPointable intp2)
+            throws SystemException, IOException {
+        return (aOp1.operateDurationYMDuration(durationp1, intp2) || aOp2.operateDurationYMDuration(durationp1, intp2));
     }
 
     @Override
@@ -229,6 +249,12 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     public boolean operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx)
             throws SystemException, IOException {
         return (aOp1.operateTimeTime(timep1, timep2, dCtx) || aOp2.operateTimeTime(timep1, timep2, dCtx));
+    }
+
+    @Override
+    public boolean operateYMDurationDuration(IntegerPointable intp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        return (aOp1.operateYMDurationDuration(intp1, durationp2) || aOp2.operateYMDurationDuration(intp1, durationp2));
     }
 
     @Override

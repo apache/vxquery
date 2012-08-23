@@ -109,9 +109,27 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
+    public boolean operateDTDurationDuration(LongPointable longp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        return !aOp.operateDTDurationDuration(longp1, durationp2);
+    }
+
+    @Override
+    public boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
+            throws SystemException, IOException {
+        return !aOp.operateDurationDTDuration(durationp1, longp2);
+    }
+
+    @Override
     public boolean operateDurationDuration(XSDurationPointable durationp1, XSDurationPointable durationp2)
             throws SystemException, IOException {
         return !aOp.operateDurationDuration(durationp1, durationp2);
+    }
+
+    @Override
+    public boolean operateDurationYMDuration(XSDurationPointable durationp1, IntegerPointable intp2)
+            throws SystemException, IOException {
+        return !aOp.operateDurationYMDuration(durationp1, intp2);
     }
 
     @Override
@@ -220,6 +238,12 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     public boolean operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx)
             throws SystemException, IOException {
         return !aOp.operateTimeTime(timep1, timep2, dCtx);
+    }
+
+    @Override
+    public boolean operateYMDurationDuration(IntegerPointable intp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        return !aOp.operateYMDurationDuration(intp1, durationp2);
     }
 
     @Override

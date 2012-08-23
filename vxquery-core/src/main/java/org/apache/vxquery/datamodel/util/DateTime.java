@@ -109,8 +109,8 @@ public class DateTime {
         long minute = dayTime / CHRONON_OF_MINUTE;
         dayTime %= CHRONON_OF_MINUTE;
         long millisecond = dayTime;
-        long month = yearMonth % 12;
-        long year = yearMonth / 12;
+        long month = (yearMonth % 12 == 0 ? 12 : yearMonth % 12);
+        long year = (yearMonth / 12) + (month == 12 ? -1 : 0);
 
         monthDayLimits = (isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP : DateTime.DAYS_OF_MONTH_ORDI);
         while (day < DateTime.FIELD_MINS[DateTime.DAY_FIELD_INDEX] || day > monthDayLimits[(int) month - 1]
@@ -163,8 +163,8 @@ public class DateTime {
             timezoneHour = timezonep.getTimezoneHour();
             timezoneMinute = timezonep.getTimezoneMinute();
         }
-        long dayTime = timezonep.getDayTime() + timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute
-                * DateTime.CHRONON_OF_HOUR;
+        long dayTime = timezonep.getDayTime() - (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute
+                * DateTime.CHRONON_OF_HOUR);
         DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, dOut);
     }
 

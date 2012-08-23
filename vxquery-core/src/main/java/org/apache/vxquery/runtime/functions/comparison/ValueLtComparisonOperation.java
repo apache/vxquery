@@ -12,6 +12,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.util.DateTime;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
@@ -35,7 +36,7 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateBase64BinaryBase64Binary(XSBinaryPointable binaryp1, XSBinaryPointable binaryp2)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -53,6 +54,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
         if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
+                .getYearMonth(abvsInner.getByteArray(), startOffset2)) {
+            return true;
+        } else if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
                 .getYearMonth(abvsInner.getByteArray(), startOffset2)
                 && XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
                         .getDayTime(abvsInner.getByteArray(), startOffset2)) {
@@ -70,6 +74,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
         if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
+                .getYearMonth(abvsInner.getByteArray(), startOffset2)) {
+            return true;
+        } else if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
                 .getYearMonth(abvsInner.getByteArray(), startOffset2)
                 && XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
                         .getDayTime(abvsInner.getByteArray(), startOffset2)) {
@@ -89,6 +96,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = decp1.doubleValue();
         double double2 = doublep2.doubleValue();
+        if (Double.isNaN(doublep2.getDouble())) {
+            return false;
+        }
         return (double1 < double2);
     }
 
@@ -97,13 +107,18 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         float float1 = decp1.floatValue();
         float float2 = floatp2.floatValue();
+        if (Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (float1 < float2);
     }
 
     @Override
     public boolean operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2) throws SystemException,
             IOException {
+        abvsInner.reset();
         XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == -1);
     }
@@ -113,12 +128,18 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = doublep1.doubleValue();
         double double2 = decp2.doubleValue();
+        if (Double.isNaN(doublep1.getDouble())) {
+            return false;
+        }
         return (double1 < double2);
     }
 
     @Override
     public boolean operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep1.getDouble()) || Double.isNaN(doublep2.getDouble())) {
+            return false;
+        }
         return (doublep1.compareTo(doublep2) == -1);
     }
 
@@ -127,6 +148,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = doublep1.doubleValue();
         double double2 = floatp2.doubleValue();
+        if (Double.isNaN(doublep1.getDouble()) || Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (double1 < double2);
     }
 
@@ -135,6 +159,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = doublep1.doubleValue();
         double double2 = longp2.doubleValue();
+        if (Double.isNaN(doublep1.getDouble())) {
+            return false;
+        }
         return (double1 < double2);
     }
 
@@ -145,9 +172,27 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
+    public boolean operateDTDurationDuration(LongPointable longp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    @Override
+    public boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
+            throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    @Override
     public boolean operateDurationDuration(XSDurationPointable durationp1, XSDurationPointable durationp2)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    @Override
+    public boolean operateDurationYMDuration(XSDurationPointable durationp1, IntegerPointable intp2)
+            throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -155,6 +200,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         float float1 = floatp1.floatValue();
         float float2 = decp2.floatValue();
+        if (Float.isNaN(floatp1.getFloat())) {
+            return false;
+        }
         return (float1 < float2);
     }
 
@@ -163,12 +211,18 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = floatp1.doubleValue();
         double double2 = doublep2.doubleValue();
+        if (Float.isNaN(floatp1.getFloat()) || Double.isNaN(double2)) {
+            return false;
+        }
         return (double1 < double2);
     }
 
     @Override
     public boolean operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp1.getFloat()) || Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (floatp1.compareTo(floatp2) == -1);
     }
 
@@ -177,49 +231,54 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         float float1 = floatp1.floatValue();
         float float2 = longp2.floatValue();
+        if (Float.isNaN(floatp1.getFloat())) {
+            return false;
+        }
         return (float1 < float2);
     }
 
     @Override
     public boolean operateGDayGDay(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public boolean operateGMonthDayGMonthDay(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public boolean operateGMonthGMonth(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public boolean operateGYearGYear(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public boolean operateGYearMonthGYearMonth(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public boolean operateHexBinaryHexBinary(XSBinaryPointable binaryp1, XSBinaryPointable binaryp2)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public boolean operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2) throws SystemException,
             IOException {
+        abvsInner.reset();
         XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == -1);
     }
@@ -229,6 +288,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = longp1.doubleValue();
         double double2 = doublep2.doubleValue();
+        if (Double.isNaN(double2)) {
+            return false;
+        }
         return (double1 < double2);
     }
 
@@ -237,6 +299,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         float float1 = longp1.floatValue();
         float float2 = floatp2.floatValue();
+        if (Float.isNaN(float2)) {
+            return false;
+        }
         return (float1 < float2);
     }
 
@@ -249,13 +314,13 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateNotationNotation(UTF8StringPointable stringp1, UTF8StringPointable stringp2)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public boolean operateQNameQName(XSQNamePointable qnamep1, XSQNamePointable qnamep2) throws SystemException,
             IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -272,13 +337,17 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
         DateTime.getTimezoneDateTime(timep2, dCtx, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
-        if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable.getYearMonth(
-                abvsInner.getByteArray(), startOffset2)
-                && XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
-                        .getDayTime(abvsInner.getByteArray(), startOffset2)) {
+        if (XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable.getDayTime(
+                abvsInner.getByteArray(), startOffset2)) {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean operateYMDurationDuration(IntegerPointable intp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override

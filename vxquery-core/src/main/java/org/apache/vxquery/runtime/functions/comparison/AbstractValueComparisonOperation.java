@@ -62,7 +62,16 @@ public abstract class AbstractValueComparisonOperation {
     public abstract boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2)
             throws SystemException, IOException;
 
+    public abstract boolean operateDTDurationDuration(LongPointable longp1, XSDurationPointable durationp2)
+            throws SystemException, IOException;
+
+    public abstract boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
+            throws SystemException, IOException;
+
     public abstract boolean operateDurationDuration(XSDurationPointable durationp1, XSDurationPointable durationp2)
+            throws SystemException, IOException;
+
+    public abstract boolean operateDurationYMDuration(XSDurationPointable durationp1, IntegerPointable intp2)
             throws SystemException, IOException;
 
     public abstract boolean operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2)
@@ -117,6 +126,9 @@ public abstract class AbstractValueComparisonOperation {
             throws SystemException, IOException;
 
     public abstract boolean operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx)
+            throws SystemException, IOException;
+
+    public abstract boolean operateYMDurationDuration(IntegerPointable intp1, XSDurationPointable durationp2)
             throws SystemException, IOException;
 
     public abstract boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2)

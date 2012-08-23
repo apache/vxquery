@@ -53,10 +53,10 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
         DateTime.getTimezoneDateTime(datep2, dCtx, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
-        if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable.getYearMonth(
-                abvsInner.getByteArray(), startOffset2)
-                && XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
-                        .getDayTime(abvsInner.getByteArray(), startOffset2)) {
+        if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
+                .getYearMonth(abvsInner.getByteArray(), startOffset2)
+                && XSDateTimePointable.getDay(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable.getDay(
+                        abvsInner.getByteArray(), startOffset2)) {
             return true;
         }
         return false;
@@ -70,8 +70,8 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
         DateTime.getTimezoneDateTime(datetimep2, dCtx, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
-        if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable.getYearMonth(
-                abvsInner.getByteArray(), startOffset2)
+        if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
+                .getYearMonth(abvsInner.getByteArray(), startOffset2)
                 && XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
                         .getDayTime(abvsInner.getByteArray(), startOffset2)) {
             return true;
@@ -90,6 +90,9 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = decp1.doubleValue();
         double double2 = doublep2.doubleValue();
+        if (Double.isNaN(doublep2.getDouble())) {
+            return false;
+        }
         return (double1 == double2);
     }
 
@@ -98,13 +101,18 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         float float1 = decp1.floatValue();
         float float2 = floatp2.floatValue();
+        if (Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (float1 == float2);
     }
 
     @Override
     public boolean operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2) throws SystemException,
             IOException {
+        abvsInner.reset();
         XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == 0);
     }
@@ -114,12 +122,18 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = doublep1.doubleValue();
         double double2 = decp2.doubleValue();
+        if (Double.isNaN(doublep1.getDouble())) {
+            return false;
+        }
         return (double1 == double2);
     }
 
     @Override
     public boolean operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep1.getDouble()) || Double.isNaN(doublep2.getDouble())) {
+            return false;
+        }
         return (doublep1.compareTo(doublep2) == 0);
     }
 
@@ -128,6 +142,9 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = doublep1.doubleValue();
         double double2 = floatp2.doubleValue();
+        if (Double.isNaN(doublep1.getDouble()) || Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (double1 == double2);
     }
 
@@ -136,6 +153,9 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = doublep1.doubleValue();
         double double2 = longp2.doubleValue();
+        if (Double.isNaN(doublep1.getDouble())) {
+            return false;
+        }
         return (double1 == double2);
     }
 
@@ -146,6 +166,24 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
+    public boolean operateDTDurationDuration(LongPointable longp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        if (durationp2.getYearMonth() == 0 && durationp2.getDayTime() == longp1.getLong()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
+            throws SystemException, IOException {
+        if (durationp1.getYearMonth() == 0 && durationp1.getDayTime() == longp2.getLong()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean operateDurationDuration(XSDurationPointable durationp1, XSDurationPointable durationp2)
             throws SystemException, IOException {
         return arraysEqual(durationp1.getByteArray(), durationp1.getStartOffset(), durationp1.getLength(),
@@ -153,10 +191,22 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
+    public boolean operateDurationYMDuration(XSDurationPointable durationp1, IntegerPointable intp2)
+            throws SystemException, IOException {
+        if (durationp1.getYearMonth() == intp2.getInteger() && durationp1.getDayTime() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2) throws SystemException,
             IOException {
         float float1 = floatp1.floatValue();
         float float2 = decp2.floatValue();
+        if (Float.isNaN(floatp1.getFloat())) {
+            return false;
+        }
         return (float1 == float2);
     }
 
@@ -165,12 +215,18 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = floatp1.doubleValue();
         double double2 = doublep2.doubleValue();
+        if (Float.isNaN(floatp1.getFloat()) || Double.isNaN(double2)) {
+            return false;
+        }
         return (double1 == double2);
     }
 
     @Override
     public boolean operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp1.getFloat()) || Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (floatp1.compareTo(floatp2) == 0);
     }
 
@@ -179,6 +235,9 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         float float1 = floatp1.floatValue();
         float float2 = longp2.floatValue();
+        if (Float.isNaN(floatp1.getFloat())) {
+            return false;
+        }
         return (float1 == float2);
     }
 
@@ -222,7 +281,9 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2) throws SystemException,
             IOException {
+        abvsInner.reset();
         XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == 0);
     }
@@ -232,6 +293,9 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         double double1 = longp1.doubleValue();
         double double2 = doublep2.doubleValue();
+        if (Double.isNaN(double2)) {
+            return false;
+        }
         return (double1 == double2);
     }
 
@@ -240,6 +304,9 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
             IOException {
         float float1 = longp1.floatValue();
         float float2 = floatp2.floatValue();
+        if (Float.isNaN(float2)) {
+            return false;
+        }
         return (float1 == float2);
     }
 
@@ -276,10 +343,19 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
         DateTime.getTimezoneDateTime(timep2, dCtx, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
-        if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable.getYearMonth(
-                abvsInner.getByteArray(), startOffset2)
+        if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
+                .getYearMonth(abvsInner.getByteArray(), startOffset2)
                 && XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
                         .getDayTime(abvsInner.getByteArray(), startOffset2)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean operateYMDurationDuration(IntegerPointable intp1, XSDurationPointable durationp2)
+            throws SystemException, IOException {
+        if (durationp2.getYearMonth() == intp1.getInteger() && durationp2.getDayTime() == 0) {
             return true;
         }
         return false;
