@@ -20,6 +20,8 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class IntegerDivideOperation extends AbstractArithmeticOperation {
     protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
+    private XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+    private XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
 
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
@@ -129,7 +131,6 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     public void operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
@@ -327,7 +328,6 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     public void operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner.reset();
-        XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
         decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.longValue(), (byte) 0);
         operateDecimalDecimal(decp1, decp2, dOut);
