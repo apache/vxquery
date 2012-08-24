@@ -24,7 +24,8 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 public class CastToDecimalOperation extends AbstractCastToOperation {
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private DataOutput dOutInner = abvsInner.getDataOutput();
-
+    private CastToStringOperation castToString = new CastToStringOperation();
+    
     @Override
     public void convertBoolean(BooleanPointable boolp, DataOutput dOut) throws SystemException, IOException {
         long value = (boolp.getBoolean() ? 1 : 0);
@@ -42,8 +43,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
     @Override
     public void convertDouble(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        CastToStringOperation castTo = new CastToStringOperation();
-        castTo.convertDoubleCanonical(doublep, dOutInner);
+        castToString.convertDoubleCanonical(doublep, dOutInner);
 
         UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
@@ -53,8 +53,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
     @Override
     public void convertFloat(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        CastToStringOperation castTo = new CastToStringOperation();
-        castTo.convertFloatCanonical(floatp, dOutInner);
+        castToString.convertFloatCanonical(floatp, dOutInner);
 
         UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
