@@ -841,5 +841,5 @@ public class CastToStringOperation extends AbstractCastToOperation {
             }
         }
     }
-
+    
 }
