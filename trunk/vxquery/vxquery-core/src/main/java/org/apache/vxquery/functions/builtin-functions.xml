@@ -166,16 +166,19 @@
     <!-- fn:current-date() as  xs:date -->
     <function name="fn:current-date">
         <return type="xs:date"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnCurrentDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:current-dateTime()  as xs:dateTime -->
     <function name="fn:current-dateTime">
         <return type="xs:dateTime"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnCurrentDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:current-time() as  xs:time -->
     <function name="fn:current-time">
         <return type="xs:time"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnCurrentTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:data($arg as  item()*) as xs:anyAtomicType* -->
