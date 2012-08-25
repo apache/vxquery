@@ -6,6 +6,9 @@ import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
+/**
+ * The XSQNamePointable holds three strings: URI, Prefix and Local Name.
+ */
 public class XSQNamePointable extends AbstractPointable {
     public static final ITypeTraits TYPE_TRAITS = new ITypeTraits() {
         private static final long serialVersionUID = 1L;

@@ -469,6 +469,7 @@
     <function name="fn:local-name-from-QName">
         <param name="arg" type="xs:QName?"/>
         <return type="xs:NCName?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.qname.FnLocalNameFromQNameScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:lower-case($arg  as xs:string?) as  xs:string -->
@@ -588,6 +589,7 @@
     <function name="fn:namespace-uri-from-QName">
         <param name="arg" type="xs:QName?"/>
         <return type="xs:anyURI?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.qname.FnNamespaceUriFromQNameScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:nilled($arg as  node()?) as xs:boolean?  -->
@@ -659,6 +661,7 @@
     <function name="fn:prefix-from-QName">
         <param name="arg" type="xs:QName?"/>
         <return type="xs:NCName?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.qname.FnPrefixFromQNameScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:QName($paramURI  as xs:string?, $paramQName as xs:string)  as xs:QName -->
