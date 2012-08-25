@@ -35,43 +35,57 @@ public class XSQNamePointable extends AbstractPointable {
         }
     };
 
-    /* TODO Do we need this?
-    public void setQName(IPointable uri, IPointable prefix, IPointable localName) {
-        int uriLength = uri.getLength();
-        int prefixLength = prefix.getLength();
-        set(uri);
-        set(prefix.getByteArray(), prefixLength, uriLength);
-        set(localName.getByteArray(), localName.getLength(), (uriLength + prefixLength));
-    }
-    */
-
     public int getUriLength() {
-        return UTF8StringPointable.getUTFLength(bytes, start) + 2;
+        return getUriLength(bytes, start);
     }
 
     public static int getUriLength(byte[] bytes, int start) {
-        return UTF8StringPointable.getUTFLength(bytes, start) + 2;
+        return getUriUTFLength(bytes, start) + 2;
+    }
+
+    public int getUriUTFLength() {
+        return getUriUTFLength(bytes, start);
+    }
+
+    public static int getUriUTFLength(byte[] bytes, int start) {
+        return UTF8StringPointable.getUTFLength(bytes, start);
     }
 
     public int getPrefixLength() {
-        return UTF8StringPointable.getUTFLength(bytes, start + getUriLength()) + 2;
+        return getPrefixLength(bytes, start);
     }
 
     public static int getPrefixLength(byte[] bytes, int start) {
-        return UTF8StringPointable.getUTFLength(bytes, start + getUriLength(bytes, start)) + 2;
+        return getPrefixUTFLength(bytes, start) + 2;
+    }
+
+    public int getPrefixUTFLength() {
+        return getPrefixUTFLength(bytes, start);
+    }
+
+    public static int getPrefixUTFLength(byte[] bytes, int start) {
+        return UTF8StringPointable.getUTFLength(bytes, start + getUriLength(bytes, start));
     }
 
     public int getLocalNameLength() {
-        return UTF8StringPointable.getUTFLength(bytes, start + getUriLength() + getPrefixLength()) + 2;
+        return getLocalNameLength(bytes, start);
     }
 
     public static int getLocalNameLength(byte[] bytes, int start) {
+        return getLocalNameUTFLength(bytes, start) + 2;
+    }
+
+    public int getLocalNameUTFLength() {
+        return getLocalNameUTFLength(bytes, start);
+    }
+
+    public static int getLocalNameUTFLength(byte[] bytes, int start) {
         return UTF8StringPointable.getUTFLength(bytes,
-                start + getUriLength(bytes, start) + getPrefixLength(bytes, start)) + 2;
+                start + getUriLength(bytes, start) + getPrefixLength(bytes, start));
     }
 
     public void getUri(IPointable stringp) {
-        stringp.set(bytes, start, getUriLength());
+        getUri(bytes, start, stringp);
     }
 
     public static void getUri(byte[] bytes, int start, IPointable stringp) {
@@ -79,7 +93,7 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public void getPrefix(IPointable stringp) {
-        stringp.set(bytes, start + getUriLength(), getPrefixLength());
+        getPrefix(bytes, start, stringp);
     }
 
     public static void getPrefix(byte[] bytes, int start, IPointable stringp) {
@@ -87,7 +101,7 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public void getLocalName(IPointable stringp) {
-        stringp.set(bytes, start + getUriLength() + getPrefixLength(), getLocalNameLength());
+        getLocalName(bytes, start, stringp);
     }
 
     public static void getLocalName(byte[] bytes, int start, IPointable stringp) {

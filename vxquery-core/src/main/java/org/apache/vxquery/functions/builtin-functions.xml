@@ -666,6 +666,7 @@
         <param name="paramURI" type="xs:string?"/>
         <param name="paramQName" type="xs:string"/>
         <return type="xs:QName"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.qname.FnQNameScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:remove($target  as item()*, $position as xs:integer)  as item()* -->
