@@ -325,8 +325,13 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     @Override
     public boolean operateQNameQName(XSQNamePointable qnamep1, XSQNamePointable qnamep2) throws SystemException,
             IOException {
-        return arraysEqual(qnamep1.getByteArray(), qnamep1.getStartOffset(), qnamep1.getLength(),
-                qnamep2.getByteArray(), qnamep2.getStartOffset(), qnamep2.getLength());
+        int startOffsetLocalName1 = qnamep1.getStartOffset() + qnamep1.getUriLength() + qnamep1.getPrefixLength();
+        int startOffsetLocalName2 = qnamep2.getStartOffset() + qnamep2.getUriLength() + qnamep2.getPrefixLength();
+        // Only compare URI and LocalName.
+        return arraysEqual(qnamep1.getByteArray(), qnamep1.getStartOffset(), qnamep1.getUriLength(),
+                qnamep2.getByteArray(), qnamep2.getStartOffset(), qnamep2.getUriLength())
+                && arraysEqual(qnamep1.getByteArray(), startOffsetLocalName1, qnamep1.getLocalNameLength(),
+                        qnamep2.getByteArray(), startOffsetLocalName2, qnamep2.getLocalNameLength());
     }
 
     @Override
