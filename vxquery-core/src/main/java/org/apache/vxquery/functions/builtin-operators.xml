@@ -561,6 +561,7 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.comparison.general.GeneralEqComparisonScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:general-ne($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -568,6 +569,7 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.comparison.general.GeneralNeComparisonScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:general-lt($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -575,6 +577,7 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.comparison.general.GeneralLtComparisonScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:general-le($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -582,6 +585,7 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.comparison.general.GeneralLeComparisonScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:general-gt($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -589,6 +593,7 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.comparison.general.GeneralGtComparisonScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:general-ge($arg1 as item()*, $arg2 as item()*) as xs:boolean -->
@@ -596,6 +601,7 @@
         <param name="arg1" type="item()*"/>
         <param name="arg2" type="item()*"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.comparison.general.GeneralGeComparisonScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:add($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
