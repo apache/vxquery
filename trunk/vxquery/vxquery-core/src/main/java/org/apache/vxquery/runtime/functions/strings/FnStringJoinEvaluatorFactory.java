@@ -30,8 +30,8 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final TaggedValuePointable tvp = new TaggedValuePointable();
-        final UTF8StringPointable stringp1 = new UTF8StringPointable();
-        final UTF8StringPointable stringp2 = new UTF8StringPointable();
+        final UTF8StringPointable stringp1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequencePointable seq = new SequencePointable();
 

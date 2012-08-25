@@ -24,9 +24,9 @@ public class FnStartsWithEvaluatorFactory extends AbstractTaggedValueArgumentSca
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final UTF8StringPointable stringp1 = new UTF8StringPointable();
-        final UTF8StringPointable stringp2 = new UTF8StringPointable();
-        final UTF8StringPointable stringp3 = new UTF8StringPointable();
+        final UTF8StringPointable stringp1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final UTF8StringPointable stringp3 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ICharacterIterator charIterator1 = new UTF8StringCharacterIterator(stringp1);
         final ICharacterIterator charIterator2 = new UTF8StringCharacterIterator(stringp2);
 

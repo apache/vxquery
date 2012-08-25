@@ -83,7 +83,7 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
 
                     result.set(abvs);
                 } catch (Exception e) {
-                    // TODO: handle exception
+                    throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }
         };

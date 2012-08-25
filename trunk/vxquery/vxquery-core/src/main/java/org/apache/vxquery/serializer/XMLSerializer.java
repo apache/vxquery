@@ -47,7 +47,8 @@ public class XMLSerializer implements IPrinter {
     private ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
     private DataOutput dOut = abvs.getDataOutput();
     private CastToStringOperation castToString = new CastToStringOperation();
-
+    private UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+    
     public XMLSerializer() {
         pp = PointablePoolFactory.INSTANCE.createPointablePool();
     }
@@ -683,7 +684,6 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printStringAbvs(PrintStream ps) {
-        UTF8StringPointable stringp = new UTF8StringPointable();
         stringp.set(abvs.getByteArray(), abvs.getStartOffset() + 1, abvs.getLength() - 1);
         printString(ps, stringp);
     }
@@ -756,7 +756,6 @@ public class XMLSerializer implements IPrinter {
             tvp.getValue(ip);
             abvs.reset();
             castToString.convertYMDuration(ip, dOut);
-            UTF8StringPointable stringp = new UTF8StringPointable();
             stringp.set(abvs.getByteArray(), abvs.getStartOffset() + 1, abvs.getLength() - 1);
             printString(ps, stringp);
         } catch (SystemException e) {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
@@ -43,7 +44,7 @@ public class FnCurrentDateTimeScalarEvaluatorFactory extends AbstractTaggedValue
                     castToDateTime.convertDatetime(datetimep, dOutInner);
                     result.set(abvsInner);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }
         };
