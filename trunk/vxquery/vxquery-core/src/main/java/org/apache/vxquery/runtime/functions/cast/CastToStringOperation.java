@@ -666,12 +666,14 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertQName(XSQNamePointable qnamep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        dOutInner.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength() + 4,
-                qnamep.getPrefixLength());
-        writeChar(':', dOutInner);
+        if (qnamep.getPrefixUTFLength() > 0) {
+            dOutInner.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength() + 2,
+                    qnamep.getPrefixUTFLength());
+            writeChar(':', dOutInner);
+        }
         dOutInner.write(qnamep.getByteArray(),
-                qnamep.getStartOffset() + qnamep.getUriLength() + qnamep.getPrefixLength() + 6,
-                qnamep.getLocalNameLength());
+                qnamep.getStartOffset() + qnamep.getUriLength() + qnamep.getPrefixLength() + 2,
+                qnamep.getLocalNameUTFLength());
 
         sendStringDataOutput(dOut);
     }
@@ -841,5 +843,5 @@ public class CastToStringOperation extends AbstractCastToOperation {
             }
         }
     }
-    
+
 }
