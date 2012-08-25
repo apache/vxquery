@@ -21,7 +21,7 @@ public class FnUpperCaseEvaluatorFactory extends AbstractCharacterIteratorCopyin
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final UTF8StringPointable stringp = new UTF8StringPointable();
+        final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ICharacterIterator charIterator = new UpperCaseCharacterIterator(new UTF8StringCharacterIterator(stringp));
         return new AbstractCharacterIteratorCopyingEvaluator(args, charIterator) {
 

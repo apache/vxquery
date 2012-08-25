@@ -21,9 +21,9 @@ public class FnSubstringAfterEvaluatorFactory extends AbstractCharacterIteratorC
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final UTF8StringPointable stringp1 = new UTF8StringPointable();
-        final UTF8StringPointable stringp2 = new UTF8StringPointable();
-        final UTF8StringPointable stringp3 = new UTF8StringPointable();
+        final UTF8StringPointable stringp1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final UTF8StringPointable stringp3 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final SubstringAfterCharacterIterator stringIterator = new SubstringAfterCharacterIterator(
                 new UTF8StringCharacterIterator(stringp1));
         final UTF8StringCharacterIterator searchIterator = new UTF8StringCharacterIterator(stringp2);

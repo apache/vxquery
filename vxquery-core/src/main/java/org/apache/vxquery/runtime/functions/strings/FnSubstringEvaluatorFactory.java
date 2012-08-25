@@ -39,9 +39,9 @@ public class FnSubstringEvaluatorFactory extends AbstractCharacterIteratorCopyin
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final UTF8StringPointable stringp = new UTF8StringPointable();
-        final DoublePointable doublep = new DoublePointable();
-        final LongPointable longp = new LongPointable();
+        final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
+        final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SubstringCharacterIterator charIterator = new SubstringCharacterIterator(new UTF8StringCharacterIterator(
                 stringp));

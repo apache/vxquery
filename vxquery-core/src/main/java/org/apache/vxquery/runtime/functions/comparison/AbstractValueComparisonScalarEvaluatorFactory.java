@@ -69,6 +69,8 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         final TypedPointables tp1 = new TypedPointables();
         final TypedPointables tp2 = new TypedPointables();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
+        final LongPointable longp1 = (LongPointable) LongPointable.FACTORY.createPointable();
+        final LongPointable longp2 = (LongPointable) LongPointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -89,7 +91,6 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                     throw new UnsupportedOperationException();
                 }
                 try {
-                    LongPointable longp1 = (LongPointable) LongPointable.FACTORY.createPointable();
                     switch (tvp1.getTag()) {
                         case ValueTag.XS_INTEGER_TAG:
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
@@ -109,7 +110,6 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                             longp1.set(abvsInteger1.getByteArray(), abvsInteger1.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
                     }
-                    LongPointable longp2 = (LongPointable) LongPointable.FACTORY.createPointable();
                     switch (tvp2.getTag()) {
                         case ValueTag.XS_INTEGER_TAG:
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:

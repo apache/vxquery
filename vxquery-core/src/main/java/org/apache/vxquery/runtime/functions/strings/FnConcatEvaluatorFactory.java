@@ -28,7 +28,7 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final UTF8StringPointable stringp = new UTF8StringPointable();
+        final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {

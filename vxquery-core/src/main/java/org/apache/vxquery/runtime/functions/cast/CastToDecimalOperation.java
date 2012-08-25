@@ -25,6 +25,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private DataOutput dOutInner = abvsInner.getDataOutput();
     private CastToStringOperation castToString = new CastToStringOperation();
+    private UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
     
     @Override
     public void convertBoolean(BooleanPointable boolp, DataOutput dOut) throws SystemException, IOException {
@@ -44,8 +45,6 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
     public void convertDouble(DoublePointable doublep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         castToString.convertDoubleCanonical(doublep, dOutInner);
-
-        UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
         convertStringExtra(stringp, dOut, true);
     }
@@ -54,8 +53,6 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
     public void convertFloat(FloatPointable floatp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         castToString.convertFloatCanonical(floatp, dOutInner);
-
-        UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
         convertStringExtra(stringp, dOut, true);
     }
