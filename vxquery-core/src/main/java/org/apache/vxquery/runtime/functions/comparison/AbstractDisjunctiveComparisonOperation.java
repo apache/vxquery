@@ -68,12 +68,18 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     @Override
     public boolean operateDecimalDouble(XSDecimalPointable decp1, DoublePointable doublep2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep2.getDouble())) {
+            return false;
+        }
         return (aOp1.operateDecimalDouble(decp1, doublep2) || aOp2.operateDecimalDouble(decp1, doublep2));
     }
 
     @Override
     public boolean operateDecimalFloat(XSDecimalPointable decp1, FloatPointable floatp2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (aOp1.operateDecimalFloat(decp1, floatp2) || aOp2.operateDecimalFloat(decp1, floatp2));
     }
 
@@ -86,24 +92,36 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     @Override
     public boolean operateDoubleDecimal(DoublePointable doublep1, XSDecimalPointable decp2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep1.getDouble())) {
+            return false;
+        }
         return (aOp1.operateDoubleDecimal(doublep1, decp2) || aOp2.operateDoubleDecimal(doublep1, decp2));
     }
 
     @Override
     public boolean operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep1.getDouble()) || Double.isNaN(doublep2.getDouble())) {
+            return false;
+        }
         return (aOp1.operateDoubleDouble(doublep1, doublep2) || aOp2.operateDoubleDouble(doublep1, doublep2));
     }
 
     @Override
     public boolean operateDoubleFloat(DoublePointable doublep1, FloatPointable floatp2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep1.getDouble()) || Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (aOp1.operateDoubleFloat(doublep1, floatp2) || aOp2.operateDoubleFloat(doublep1, floatp2));
     }
 
     @Override
     public boolean operateDoubleInteger(DoublePointable doublep1, LongPointable longp2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep1.getDouble())) {
+            return false;
+        }
         return (aOp1.operateDoubleInteger(doublep1, longp2) || aOp2.operateDoubleInteger(doublep1, longp2));
     }
 
@@ -143,24 +161,36 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     @Override
     public boolean operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp1.getFloat())) {
+            return false;
+        }
         return (aOp1.operateFloatDecimal(floatp1, decp2) || aOp2.operateFloatDecimal(floatp1, decp2));
     }
 
     @Override
     public boolean operateFloatDouble(FloatPointable floatp1, DoublePointable doublep2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp1.getFloat()) || Double.isNaN(doublep2.doubleValue())) {
+            return false;
+        }
         return (aOp1.operateFloatDouble(floatp1, doublep2) || aOp2.operateFloatDouble(floatp1, doublep2));
     }
 
     @Override
     public boolean operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp1.getFloat()) || Float.isNaN(floatp2.getFloat())) {
+            return false;
+        }
         return (aOp1.operateFloatFloat(floatp1, floatp2) || aOp2.operateFloatFloat(floatp1, floatp2));
     }
 
     @Override
     public boolean operateFloatInteger(FloatPointable floatp1, LongPointable longp2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp1.getFloat())) {
+            return false;
+        }
         return (aOp1.operateFloatInteger(floatp1, longp2) || aOp2.operateFloatInteger(floatp1, longp2));
     }
 
@@ -212,12 +242,18 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     @Override
     public boolean operateIntegerDouble(LongPointable longp1, DoublePointable doublep2) throws SystemException,
             IOException {
+        if (Double.isNaN(doublep2.doubleValue())) {
+            return false;
+        }
         return (aOp1.operateIntegerDouble(longp1, doublep2) || aOp2.operateIntegerDouble(longp1, doublep2));
     }
 
     @Override
     public boolean operateIntegerFloat(LongPointable longp1, FloatPointable floatp2) throws SystemException,
             IOException {
+        if (Float.isNaN(floatp2.floatValue())) {
+            return false;
+        }
         return (aOp1.operateIntegerFloat(longp1, floatp2) || aOp2.operateIntegerFloat(longp1, floatp2));
     }
 
