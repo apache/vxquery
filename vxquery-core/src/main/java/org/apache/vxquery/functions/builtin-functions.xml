@@ -199,18 +199,21 @@
     <function name="fn:day-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnDayFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:day-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
     <function name="fn:day-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnDayFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:days-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:days-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnDaysFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:deep-equal($parameter1  as item()*, $parameter2 as item()*)  as xs:boolean -->
@@ -356,18 +359,21 @@
     <function name="fn:hours-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:hours-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:hours-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:hours-from-time($arg  as xs:time?) as  xs:integer?  -->
     <function name="fn:hours-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:id($arg as  xs:string*) as element()* -->
@@ -524,36 +530,42 @@
     <function name="fn:minutes-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:minutes-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:minutes-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:minutes-from-time( $arg as xs:time?) as  xs:integer?  -->
     <function name="fn:minutes-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:month-from-date($arg  as xs:date?) as  xs:integer?  -->
     <function name="fn:month-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMonthFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:month-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
     <function name="fn:month-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMonthFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:months-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:months-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMonthsFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:name() as  xs:string -->
@@ -757,18 +769,21 @@
     <function name="fn:seconds-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:decimal?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:seconds-from-duration( $arg as xs:duration?)  as xs:decimal?  -->
     <function name="fn:seconds-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:decimal?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:seconds-from-time( $arg as xs:time?) as  xs:decimal?  -->
     <function name="fn:seconds-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:decimal?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:starts-with($arg1  as xs:string?, $arg2 as xs:string?)  as xs:boolean -->
@@ -913,18 +928,21 @@
     <function name="fn:timezone-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:dayTimeDuration?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:timezone-from-dateTime( $arg as xs:dateTime?)  as xs:dayTimeDuration?  -->
     <function name="fn:timezone-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:dayTimeDuration?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:timezone-from-time( $arg as xs:time?) as  xs:dayTimeDuration?  -->
     <function name="fn:timezone-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:dayTimeDuration?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:tokenize($input  as xs:string?, $pattern as xs:string)  as xs:string* -->
@@ -980,18 +998,21 @@
     <function name="fn:year-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnYearFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:year-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
     <function name="fn:year-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnYearFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:years-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:years-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnYearsFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:zero-or-one($arg  as item()*) as  item()?  -->
