@@ -1,0 +1,93 @@
+package org.apache.vxquery.runtime.functions.datetime;
+
+import java.io.DataOutput;
+import java.io.IOException;
+
+import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
+import org.apache.vxquery.datamodel.util.DateTime;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+
+public class FnAdjustDateToTimezoneScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+    private static final long serialVersionUID = 1L;
+
+    public FnAdjustDateToTimezoneScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+        super(args);
+    }
+
+    @Override
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
+        final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
+        final XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
+        final XSDateTimePointable ctxDatetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+        final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
+        final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
+        final DataOutput dOutInner = abvsInner.getDataOutput();
+        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+        final DataOutput dOut = abvs.getDataOutput();
+
+        return new AbstractTaggedValueArgumentScalarEvaluator(args) {
+            @Override
+            protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+                dCtx.getCurrentDateTime(ctxDatetimep);
+                TaggedValuePointable tvp1 = args[0];
+                if (tvp1.getTag() != ValueTag.XS_DATE_TAG) {
+                    throw new SystemException(ErrorCode.FORG0006);
+                }
+                tvp1.getValue(datep);
+
+                // Second argument is optional and will used the dynamic context if not supplied.
+                long tz;
+                if (args.length == 2) {
+                    TaggedValuePointable tvp2 = args[1];
+                    if (tvp2.getTag() == ValueTag.XS_DAY_TIME_DURATION_TAG) {
+                        tvp2.getValue(longp);
+                        if (Math.abs(longp.getLong()) > DateTime.CHRONON_OF_HOUR * 14) {
+                            throw new SystemException(ErrorCode.FODT0003);
+                        }
+                        tz = longp.getLong() / DateTime.CHRONON_OF_MINUTE;
+                    } else {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                } else {
+                    tz = ctxDatetimep.getTimezoneHour() * 60 + ctxDatetimep.getTimezoneMinute();
+                }
+
+                try {
+                    abvs.reset();
+                    abvsInner.reset();
+                    DateTime.adjustDateTimeToTimezone(datep, tz, dOutInner);
+
+                    byte[] bytes = abvsInner.getByteArray();
+                    int startOffset = abvsInner.getStartOffset() + 1;
+                    // Convert to date.
+                    bytes[startOffset + XSDatePointable.TIMEZONE_HOUR_OFFSET] = bytes[startOffset
+                            + XSDateTimePointable.TIMEZONE_HOUR_OFFSET];
+                    bytes[startOffset + XSDatePointable.TIMEZONE_MINUTE_OFFSET] = bytes[startOffset
+                            + XSDateTimePointable.TIMEZONE_MINUTE_OFFSET];
+                    dOut.write(ValueTag.XS_DATE_TAG);
+                    dOut.write(bytes, startOffset, XSDatePointable.TYPE_TRAITS.getFixedLength());
+
+                    result.set(abvs);
+                } catch (IOException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
+            }
+        };
+    }
+}

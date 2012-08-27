@@ -99,7 +99,8 @@ public class DateTime {
     /**
      * Return a normalized time.
      */
-    public static void normalizeDateTime(long yearMonth, long dayTime, DataOutput dOut) throws IOException {
+    public static void normalizeDateTime(long yearMonth, long dayTime, long timezoneHour, long timezoneMinute,
+            DataOutput dOut) throws IOException {
         long[] monthDayLimits;
 
         long day = dayTime / CHRONON_OF_DAY;
@@ -119,6 +120,11 @@ public class DateTime {
             if (day < DateTime.FIELD_MINS[DateTime.DAY_FIELD_INDEX]) {
                 // Too small
                 --month;
+                if (month < DateTime.FIELD_MINS[DateTime.MONTH_FIELD_INDEX]) {
+                    // Too small
+                    month = DateTime.FIELD_MAXS[DateTime.MONTH_FIELD_INDEX];
+                    --year;
+                }
                 day += monthDayLimits[(int) month - 1];
             }
             if (day > monthDayLimits[(int) month - 1]) {
@@ -144,8 +150,8 @@ public class DateTime {
         dOut.writeByte((byte) hour);
         dOut.writeByte((byte) minute);
         dOut.writeInt((int) millisecond);
-        dOut.writeByte((byte) 0);
-        dOut.writeByte((byte) 0);
+        dOut.writeByte((byte) timezoneHour);
+        dOut.writeByte((byte) timezoneMinute);
     }
 
     public static void getTimezoneDateTime(ITimezone timezonep, DynamicContext dCtx, DataOutput dOut)
@@ -163,9 +169,28 @@ public class DateTime {
             timezoneHour = timezonep.getTimezoneHour();
             timezoneMinute = timezonep.getTimezoneMinute();
         }
-        long dayTime = timezonep.getDayTime() - (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute
-                * DateTime.CHRONON_OF_HOUR);
+        long dayTime = timezonep.getDayTime()
+                - (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute * DateTime.CHRONON_OF_HOUR);
         DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, dOut);
+    }
+
+    public static void adjustDateTimeToTimezone(ITimezone timezonep, long timezone, DataOutput dOut) throws IOException {
+        long timezoneHour = timezone / 60;
+        long timezoneMinute = timezone % 60;
+        long dayTime = timezonep.getDayTime();
+        if (timezonep.getTimezoneHour() == DateTime.TIMEZONE_HOUR_NULL
+                || timezonep.getTimezoneMinute() == DateTime.TIMEZONE_MINUTE_NULL) {
+            // No change.
+        } else {
+            dayTime -= (timezonep.getTimezoneHour() * DateTime.CHRONON_OF_HOUR + timezonep.getTimezoneMinute()
+                    * DateTime.CHRONON_OF_MINUTE);
+            dayTime += (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute * DateTime.CHRONON_OF_MINUTE);
+        }
+        DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, timezoneHour, timezoneMinute, dOut);
+    }
+
+    public static void normalizeDateTime(long yearMonth, long dayTime, DataOutput dOut) throws IOException {
+        normalizeDateTime(yearMonth, dayTime, 0, 0, dOut);
     }
 
 }
