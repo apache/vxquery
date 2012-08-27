@@ -34,7 +34,7 @@ public class XSTimePointable extends AbstractPointable implements ITime, ITimezo
 
         @Override
         public int getFixedLength() {
-            return 4;
+            return 8;
         }
     };
 
