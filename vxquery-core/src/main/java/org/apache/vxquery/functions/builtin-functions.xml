@@ -26,6 +26,7 @@
     <function name="fn:adjust-date-to-timezone">
         <param name="arg" type="xs:date?"/>
         <return type="xs:date?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-date-to-timezone( $arg as xs:date?, $timezone as xs:dayTimeDuration?)  as xs:date? -->
@@ -33,12 +34,14 @@
         <param name="arg" type="xs:date?"/>
         <param name="timezone" type="xs:dayTimeDuration?"/>
         <return type="xs:date?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-dateTime-to-timezone( $arg as xs:dateTime?)  as xs:dateTime? -->
     <function name="fn:adjust-dateTime-to-timezone">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:dateTime?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-dateTime-to-timezone( $arg as xs:dateTime?, $timezone as xs:dayTimeDuration?)  as xs:dateTime? -->
@@ -46,12 +49,14 @@
         <param name="arg" type="xs:dateTime?"/>
         <param name="timezone" type="xs:dayTimeDuration?"/>
         <return type="xs:dateTime?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-time-to-timezone( $arg as xs:time?) as  xs:time? -->
     <function name="fn:adjust-time-to-timezone">
         <param name="arg" type="xs:time?"/>
         <return type="xs:time?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-time-to-timezone( $arg as xs:time?, $timezone as xs:dayTimeDuration?)  as xs:time? -->
@@ -59,6 +64,7 @@
         <param name="arg" type="xs:time?"/>
         <param name="timezone" type="xs:dayTimeDuration?"/>
         <return type="xs:time?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:avg($arg as  xs:anyAtomicType*) as xs:anyAtomicType? -->
