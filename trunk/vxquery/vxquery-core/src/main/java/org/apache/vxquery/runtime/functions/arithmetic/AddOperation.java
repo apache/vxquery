@@ -280,14 +280,8 @@ public class AddOperation extends AbstractArithmeticOperation {
         byte[] bytes = abvsInner.getByteArray();
         int startOffset = abvsInner.getStartOffset() + 1;
         // Convert to time.
-        bytes[startOffset + XSTimePointable.HOUR_OFFSET] = bytes[startOffset + XSDateTimePointable.HOUR_OFFSET];
-        bytes[startOffset + XSTimePointable.MINUTE_OFFSET] = bytes[startOffset + XSDateTimePointable.MINUTE_OFFSET];
-        bytes[startOffset + XSTimePointable.MILLISECOND_OFFSET] = bytes[startOffset
-                + XSDateTimePointable.MILLISECOND_OFFSET];
-        bytes[startOffset + XSTimePointable.TIMEZONE_HOUR_OFFSET] = (byte) timep2.getTimezoneHour();
-        bytes[startOffset + XSTimePointable.TIMEZONE_MINUTE_OFFSET] = (byte) timep2.getTimezoneMinute();
         dOut.write(ValueTag.XS_TIME_TAG);
-        dOut.write(bytes, startOffset, XSTimePointable.TYPE_TRAITS.getFixedLength());
+        dOut.write(bytes, startOffset + XSDateTimePointable.HOUR_OFFSET, XSTimePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
