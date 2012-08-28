@@ -199,6 +199,7 @@
         <param name="arg1" type="xs:date?"/>
         <param name="arg2" type="xs:time?"/>
         <return type="xs:dateTime?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:day-from-date($arg  as xs:date?) as  xs:integer?  -->
