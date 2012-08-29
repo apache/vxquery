@@ -824,6 +824,7 @@
     <function name="fn:string">
         <param name="arg" type="item()?"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnStringScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:string-join($arg1  as xs:string*, $arg2 as xs:string)  as xs:string -->
