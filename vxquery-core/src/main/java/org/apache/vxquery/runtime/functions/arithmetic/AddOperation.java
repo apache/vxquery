@@ -24,11 +24,12 @@ public class AddOperation extends AbstractArithmeticOperation {
     protected final DataOutput dOutInner = abvsInner.getDataOutput();
     private XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
     private XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-    
+    private XSDateTimePointable datetimep1 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -36,7 +37,8 @@ public class AddOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         abvsInner.reset();
         // Add duration.
-        DateTime.normalizeDateTime(datep1.getYearMonth(), datep1.getDayTime() + longp2.getLong(), dOutInner);
+        DateTime.normalizeDateTime(datep1.getYearMonth(), datep1.getDayTime() + longp2.getLong(),
+                datep1.getTimezoneHour(), datep1.getTimezoneMinute(), dOutInner);
         byte[] bytes = abvsInner.getByteArray();
         int startOffset = abvsInner.getStartOffset() + 1;
         // Convert to date.
@@ -51,7 +53,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDatetimeDatetime(XSDateTimePointable datetimep, XSDateTimePointable datetimep2,
             DynamicContext dCtx, DataOutput dOut) throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -59,7 +61,8 @@ public class AddOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         // Add duration.
         abvsInner.reset();
-        DateTime.normalizeDateTime(datetimep1.getYearMonth(), datetimep1.getDayTime() + longp2.getLong(), dOutInner);
+        DateTime.normalizeDateTime(datetimep1.getYearMonth(), datetimep1.getDayTime() + longp2.getLong(),
+                datetimep1.getTimezoneHour(), datetimep1.getTimezoneMinute(), dOutInner);
         dOut.write(ValueTag.XS_DATETIME_TAG);
         dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
                 XSDateTimePointable.TYPE_TRAITS.getFixedLength());
@@ -70,7 +73,8 @@ public class AddOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         // Add duration.
         abvsInner.reset();
-        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() + intp.getInteger(), dOutInner);
+        DateTime.normalizeDateTime(datetimep.getYearMonth() + intp.getInteger(), datetimep.getDayTime(),
+                datetimep.getTimezoneHour(), datetimep.getTimezoneMinute(), dOutInner);
         dOut.write(ValueTag.XS_DATETIME_TAG);
         dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
                 XSDateTimePointable.TYPE_TRAITS.getFixedLength());
@@ -81,7 +85,8 @@ public class AddOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         abvsInner.reset();
         // Add duration.
-        DateTime.normalizeDateTime(datep.getYearMonth(), datep.getDayTime() + intp.getInteger(), dOutInner);
+        DateTime.normalizeDateTime(datep.getYearMonth() + intp.getInteger(), datep.getDayTime(),
+                datep.getTimezoneHour(), datep.getTimezoneMinute(), dOutInner);
         byte[] bytes = abvsInner.getByteArray();
         int startOffset = abvsInner.getStartOffset() + 1;
         // Convert to date.
@@ -274,14 +279,22 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationTime(LongPointable longp1, XSTimePointable timep2, DataOutput dOut)
             throws SystemException, IOException {
+        // Get time into a datetime value.
         abvsInner.reset();
-        // Add duration.
-        DateTime.normalizeDateTime(timep2.getYearMonth(), timep2.getDayTime() + longp1.getLong(), dOutInner);
-        byte[] bytes = abvsInner.getByteArray();
-        int startOffset = abvsInner.getStartOffset() + 1;
+        datetimep1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(),
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
+        datetimep1.setDateTime(DateTime.TIME_DEFAULT_YEAR, DateTime.TIME_DEFAULT_MONTH, DateTime.TIME_DEFAULT_DAY,
+                timep2.getHour(), timep2.getMinute(), timep2.getMilliSecond(), timep2.getTimezoneHour(),
+                timep2.getTimezoneMinute());
+
+        // Subtract.
+        DateTime.normalizeDateTime(datetimep1.getYearMonth(), datetimep1.getDayTime() + longp1.getLong(),
+                timep2.getTimezoneHour(), timep2.getTimezoneMinute(), dOutInner);
+
         // Convert to time.
+        int startOffset = abvsInner.getStartOffset() + 1 + XSDateTimePointable.HOUR_OFFSET;
         dOut.write(ValueTag.XS_TIME_TAG);
-        dOut.write(bytes, startOffset + XSDateTimePointable.HOUR_OFFSET, XSTimePointable.TYPE_TRAITS.getFixedLength());
+        dOut.write(abvsInner.getByteArray(), startOffset, XSTimePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
@@ -377,7 +390,7 @@ public class AddOperation extends AbstractArithmeticOperation {
     @Override
     public void operateTimeTime(XSTimePointable timep, XSTimePointable timep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override

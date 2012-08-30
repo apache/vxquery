@@ -193,7 +193,7 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
                 + getMilliSecond(bytes, start)
                 + (getTimezoneHour(bytes, start) != DateTime.TIMEZONE_HOUR_NULL
                         && getTimezoneMinute(bytes, start) != DateTime.TIMEZONE_MINUTE_NULL ? (getTimezoneHour(bytes,
-                        start) < 0 || getTimezoneMinute(bytes, start) < 0 ? "-" : "+")
+                        start) < 0 || getTimezoneMinute(bytes, start) < 0 ? "" : "+")
                         + getTimezoneHour(bytes, start) + ":" + getTimezoneMinute(bytes, start) : "");
     }
 

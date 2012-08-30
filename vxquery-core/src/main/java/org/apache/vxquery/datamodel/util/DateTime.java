@@ -3,8 +3,6 @@ package org.apache.vxquery.datamodel.util;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.api.ITimezone;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
@@ -43,6 +41,9 @@ public class DateTime {
 
     public static final int YEAR_FIELD_INDEX = 0, MONTH_FIELD_INDEX = 1, DAY_FIELD_INDEX = 2, HOUR_FIELD_INDEX = 3,
             MINUTE_FIELD_INDEX = 4, MILLISECOND_FIELD_INDEX = 5;
+
+    // Default date for time to datetime conversions.
+    public static final int TIME_DEFAULT_YEAR = 1972, TIME_DEFAULT_MONTH = 12, TIME_DEFAULT_DAY = 31;
 
     /**
      * Check whether a given year is a leap year.
@@ -116,7 +117,40 @@ public class DateTime {
         monthDayLimits = (isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP : DateTime.DAYS_OF_MONTH_ORDI);
         while (day < DateTime.FIELD_MINS[DateTime.DAY_FIELD_INDEX] || day > monthDayLimits[(int) month - 1]
                 || month < DateTime.FIELD_MINS[DateTime.MONTH_FIELD_INDEX]
-                || month > DateTime.FIELD_MAXS[DateTime.MONTH_FIELD_INDEX]) {
+                || month > DateTime.FIELD_MAXS[DateTime.MONTH_FIELD_INDEX]
+                || hour < DateTime.FIELD_MINS[DateTime.HOUR_FIELD_INDEX]
+                || hour > DateTime.FIELD_MAXS[DateTime.HOUR_FIELD_INDEX]
+                || minute < DateTime.FIELD_MINS[DateTime.MINUTE_FIELD_INDEX]
+                || minute > DateTime.FIELD_MAXS[DateTime.MINUTE_FIELD_INDEX]
+                || millisecond < DateTime.FIELD_MINS[DateTime.MILLISECOND_FIELD_INDEX]
+                || millisecond > DateTime.FIELD_MAXS[DateTime.MILLISECOND_FIELD_INDEX]) {
+            if (millisecond < DateTime.FIELD_MINS[DateTime.MILLISECOND_FIELD_INDEX]) {
+                // Too small
+                --minute;
+                millisecond += 60000;
+            } else if (millisecond > DateTime.FIELD_MAXS[DateTime.MILLISECOND_FIELD_INDEX]) {
+                // Too large
+                ++minute;
+                millisecond -= 60000;
+            }
+            if (minute < DateTime.FIELD_MINS[DateTime.MINUTE_FIELD_INDEX]) {
+                // Too small
+                --hour;
+                minute += 60;
+            } else if (minute > DateTime.FIELD_MAXS[DateTime.MINUTE_FIELD_INDEX]) {
+                // Too large
+                ++hour;
+                minute -= 60;
+            }
+            if (hour < DateTime.FIELD_MINS[DateTime.HOUR_FIELD_INDEX]) {
+                // Too small
+                --day;
+                hour += 24;
+            } else if (hour > DateTime.FIELD_MAXS[DateTime.HOUR_FIELD_INDEX]) {
+                // Too large
+                ++day;
+                hour -= 24;
+            }
             if (day < DateTime.FIELD_MINS[DateTime.DAY_FIELD_INDEX]) {
                 // Too small
                 --month;
@@ -126,8 +160,7 @@ public class DateTime {
                     --year;
                 }
                 day += monthDayLimits[(int) month - 1];
-            }
-            if (day > monthDayLimits[(int) month - 1]) {
+            } else if (day > monthDayLimits[(int) month - 1]) {
                 // Too large
                 day -= monthDayLimits[(int) month - 1];
                 ++month;
@@ -154,24 +187,22 @@ public class DateTime {
         dOut.writeByte((byte) timezoneMinute);
     }
 
-    public static void getTimezoneDateTime(ITimezone timezonep, DynamicContext dCtx, DataOutput dOut)
+    public static void getUtcTimezoneDateTime(ITimezone timezonep, ITimezone defaultTimezonep, DataOutput dOut)
             throws IOException {
         long timezoneHour;
         long timezoneMinute;
         // Consider time zones.
         if (timezonep.getTimezoneHour() == DateTime.TIMEZONE_HOUR_NULL
                 || timezonep.getTimezoneMinute() == DateTime.TIMEZONE_MINUTE_NULL) {
-            XSDateTimePointable defaultTimezone = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-            dCtx.getCurrentDateTime(defaultTimezone);
-            timezoneHour = defaultTimezone.getTimezoneHour();
-            timezoneMinute = defaultTimezone.getTimezoneMinute();
+            timezoneHour = defaultTimezonep.getTimezoneHour();
+            timezoneMinute = defaultTimezonep.getTimezoneMinute();
         } else {
             timezoneHour = timezonep.getTimezoneHour();
             timezoneMinute = timezonep.getTimezoneMinute();
         }
         long dayTime = timezonep.getDayTime()
-                - (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute * DateTime.CHRONON_OF_HOUR);
-        DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, dOut);
+                - (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute * DateTime.CHRONON_OF_MINUTE);
+        DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, 0, 0, dOut);
     }
 
     public static void adjustDateTimeToTimezone(ITimezone timezonep, long timezone, DataOutput dOut) throws IOException {
@@ -187,10 +218,6 @@ public class DateTime {
             dayTime += (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute * DateTime.CHRONON_OF_MINUTE);
         }
         DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, timezoneHour, timezoneMinute, dOut);
-    }
-
-    public static void normalizeDateTime(long yearMonth, long dayTime, DataOutput dOut) throws IOException {
-        normalizeDateTime(yearMonth, dayTime, 0, 0, dOut);
     }
 
 }

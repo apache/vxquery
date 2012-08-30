@@ -26,7 +26,8 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 public class ValueLtComparisonOperation extends AbstractValueComparisonOperation {
     protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     protected final DataOutput dOutInner = abvsInner.getDataOutput();
-
+    private XSDateTimePointable ctxDatetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+    
     @Override
     public boolean operateAnyURIAnyURI(UTF8StringPointable stringp1, UTF8StringPointable stringp2)
             throws SystemException, IOException {
@@ -49,8 +50,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     public boolean operateDateDate(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx)
             throws SystemException, IOException {
         abvsInner.reset();
-        DateTime.getTimezoneDateTime(datep1, dCtx, dOutInner);
-        DateTime.getTimezoneDateTime(datep2, dCtx, dOutInner);
+        dCtx.getCurrentDateTime(ctxDatetimep);
+        DateTime.getUtcTimezoneDateTime(datep1, ctxDatetimep, dOutInner);
+        DateTime.getUtcTimezoneDateTime(datep2, ctxDatetimep, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
         if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
@@ -69,8 +71,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     public boolean operateDatetimeDatetime(XSDateTimePointable datetimep1, XSDateTimePointable datetimep2,
             DynamicContext dCtx) throws SystemException, IOException {
         abvsInner.reset();
-        DateTime.getTimezoneDateTime(datetimep1, dCtx, dOutInner);
-        DateTime.getTimezoneDateTime(datetimep2, dCtx, dOutInner);
+        dCtx.getCurrentDateTime(ctxDatetimep);
+        DateTime.getUtcTimezoneDateTime(datetimep1, ctxDatetimep, dOutInner);
+        DateTime.getUtcTimezoneDateTime(datetimep2, ctxDatetimep, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
         if (XSDateTimePointable.getYearMonth(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
@@ -333,8 +336,9 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     public boolean operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx)
             throws SystemException, IOException {
         abvsInner.reset();
-        DateTime.getTimezoneDateTime(timep1, dCtx, dOutInner);
-        DateTime.getTimezoneDateTime(timep2, dCtx, dOutInner);
+        dCtx.getCurrentDateTime(ctxDatetimep);
+        DateTime.getUtcTimezoneDateTime(timep1, ctxDatetimep, dOutInner);
+        DateTime.getUtcTimezoneDateTime(timep2, ctxDatetimep, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
         if (XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable.getDayTime(

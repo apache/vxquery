@@ -26,18 +26,25 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     protected final DataOutput dOutInner2 = abvsInner2.getDataOutput();
     private XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
     private XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
+    private XSDateTimePointable ctxDatetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+    private XSDateTimePointable datetimep1 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+    private XSDateTimePointable datetimep2 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+    private XSDateTimePointable datetimep3 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
+    private XSDateTimePointable datetimep4 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
 
     public void operateDateDate(XSDatePointable datep1, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner1.reset();
-        DateTime.getTimezoneDateTime(datep1, dCtx, dOutInner1);
-        XSDateTimePointable datetimep1 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        datetimep1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset() + 1, abvsInner1.getLength());
+        datetimep1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
+        datetimep1.setDateTime(datep1.getYear(), datep1.getMonth(), datep1.getDay(), 0, 0, 0, datep1.getTimezoneHour(),
+                datep1.getTimezoneMinute());
 
-        abvsInner2.reset();
-        DateTime.getTimezoneDateTime(datep2, dCtx, dOutInner2);
-        XSDateTimePointable datetimep2 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        datetimep2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset() + 1, abvsInner2.getLength());
+        datetimep2.set(abvsInner1.getByteArray(),
+                abvsInner1.getStartOffset() + XSDateTimePointable.TYPE_TRAITS.getFixedLength(),
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
+        datetimep2.setDateTime(datep2.getYear(), datep2.getMonth(), datep2.getDay(), 0, 0, 0, datep2.getTimezoneHour(),
+                datep2.getTimezoneMinute());
 
         operateDatetimeDatetime(datetimep1, datetimep2, dCtx, dOut);
     }
@@ -47,7 +54,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         // Add duration.
         abvsInner1.reset();
-        DateTime.normalizeDateTime(datep1.getYearMonth(), datep1.getDayTime() - longp2.getLong(), dOutInner1);
+        DateTime.normalizeDateTime(datep1.getYearMonth(), datep1.getDayTime() - longp2.getLong(),
+                datep1.getTimezoneHour(), datep1.getTimezoneMinute(), dOutInner1);
         byte[] bytes = abvsInner1.getByteArray();
         int startOffset = abvsInner1.getStartOffset() + 1;
         // Convert to date.
@@ -62,49 +70,62 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDatetimeDatetime(XSDateTimePointable datetimep1, XSDateTimePointable datetimep2,
             DynamicContext dCtx, DataOutput dOut) throws SystemException, IOException {
-        abvsInner1.reset();
-        DateTime.getTimezoneDateTime(datetimep1, dCtx, dOutInner1);
-        byte[] bytes1 = abvsInner1.getByteArray();
-        int startOffset1 = abvsInner1.getStartOffset() + 1;
+        dCtx.getCurrentDateTime(ctxDatetimep);
 
         abvsInner2.reset();
-        DateTime.getTimezoneDateTime(datetimep2, dCtx, dOutInner2);
-        byte[] bytes2 = abvsInner2.getByteArray();
-        int startOffset2 = abvsInner2.getStartOffset() + 1;
+        DateTime.getUtcTimezoneDateTime(datetimep1, ctxDatetimep, dOutInner2);
+        int startOffset1 = abvsInner2.getStartOffset() + 1;
+        datetimep3.set(abvsInner2.getByteArray(), startOffset1, XSDateTimePointable.TYPE_TRAITS.getFixedLength());
 
-        long dayTime1 = XSDateTimePointable.getDayTime(bytes1, startOffset1);
-        long dayTime2 = XSDateTimePointable.getDayTime(bytes2, startOffset2);
-        long yearMonth = XSDateTimePointable.getYearMonth(bytes1, startOffset1)
-                - XSDateTimePointable.getYearMonth(bytes2, startOffset2);
-        // Find duration.
-        dayTime1 -= dayTime2;
+        DateTime.getUtcTimezoneDateTime(datetimep2, ctxDatetimep, dOutInner2);
+        int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
+        datetimep4.set(abvsInner2.getByteArray(), startOffset2, XSDateTimePointable.TYPE_TRAITS.getFixedLength());
+
         // Default
-        long year = datetimep1.getYear();
-        long month = datetimep1.getMonth();
-        int change = 1;
-        if (yearMonth > 0) {
-            change = -1;
-        }
-        long[] monthDayLimits = (DateTime.isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP : DateTime.DAYS_OF_MONTH_ORDI);
-        while (yearMonth != 0) {
-            dayTime1 += monthDayLimits[(int) month - 1] * DateTime.CHRONON_OF_DAY;
-            month += change;
-            yearMonth += change;
+        long year = datetimep3.getYear();
+        long month = datetimep3.getMonth();
+        long dayTime = datetimep3.getDayTime();
 
-            if (month < DateTime.FIELD_MINS[DateTime.MONTH_FIELD_INDEX]) {
-                // Too small
-                month = DateTime.FIELD_MAXS[DateTime.MONTH_FIELD_INDEX];
-                --year;
-            } else if (month > DateTime.FIELD_MAXS[DateTime.MONTH_FIELD_INDEX]) {
-                // Too large
-                month = DateTime.FIELD_MINS[DateTime.MONTH_FIELD_INDEX];
-                ++year;
+        // Loop is based on the YYYY-MM-01 00:00:00
+        long[] monthDayLimits = (DateTime.isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP : DateTime.DAYS_OF_MONTH_ORDI);
+        while (year != datetimep4.getYear() || (year == datetimep4.getYear() && month != datetimep4.getMonth())) {
+            if (year > datetimep4.getYear()) {
+                if (month == 1) {
+                    --year;
+                    monthDayLimits = (DateTime.isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP
+                            : DateTime.DAYS_OF_MONTH_ORDI);
+                    month = 12;
+                    dayTime += monthDayLimits[(int) month - 1] * DateTime.CHRONON_OF_DAY;
+                } else {
+                    --month;
+                    dayTime += monthDayLimits[(int) month - 1] * DateTime.CHRONON_OF_DAY;
+                }
+            } else if (year < datetimep4.getYear()) {
+                if (month == 12) {
+                    month = 1;
+                    ++year;
+                    monthDayLimits = (DateTime.isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP
+                            : DateTime.DAYS_OF_MONTH_ORDI);
+                    dayTime -= monthDayLimits[(int) month - 1] * DateTime.CHRONON_OF_DAY;
+                } else {
+                    ++month;
+                    dayTime -= monthDayLimits[(int) month - 1] * DateTime.CHRONON_OF_DAY;
+                }
+            } else {
+                if (month > datetimep4.getMonth()) {
+                    --month;
+                    dayTime += monthDayLimits[(int) month - 1] * DateTime.CHRONON_OF_DAY;
+                } else if (month < datetimep4.getMonth()) {
+                    ++month;
+                    dayTime -= monthDayLimits[(int) month - 1] * DateTime.CHRONON_OF_DAY;
+                }
             }
-            monthDayLimits = (DateTime.isLeapYear(year) ? DateTime.DAYS_OF_MONTH_LEAP : DateTime.DAYS_OF_MONTH_ORDI);
         }
+        dayTime -= datetimep4.getDayTime();
+
         // Save.
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
-        dOut.writeLong(dayTime1);
+        dOut.writeLong(dayTime);
     }
 
     @Override
@@ -112,7 +133,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         // Add duration.
         abvsInner1.reset();
-        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() - longp.getLong(), dOutInner1);
+        DateTime.normalizeDateTime(datetimep.getYearMonth(), datetimep.getDayTime() - longp.getLong(),
+                datetimep.getTimezoneHour(), datetimep.getTimezoneMinute(), dOutInner1);
         dOut.write(ValueTag.XS_DATETIME_TAG);
         dOut.write(abvsInner1.getByteArray(), abvsInner1.getStartOffset() + 1,
                 XSDateTimePointable.TYPE_TRAITS.getFixedLength());
@@ -123,7 +145,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         // Add duration.
         abvsInner1.reset();
-        DateTime.normalizeDateTime(datetimep.getYearMonth() - intp.getInteger(), datetimep.getDayTime(), dOutInner1);
+        DateTime.normalizeDateTime(datetimep.getYearMonth() - intp.getInteger(), datetimep.getDayTime(),
+                datetimep.getTimezoneHour(), datetimep.getTimezoneMinute(), dOutInner1);
         dOut.write(ValueTag.XS_DATETIME_TAG);
         dOut.write(abvsInner1.getByteArray(), abvsInner1.getStartOffset() + 1,
                 XSDateTimePointable.TYPE_TRAITS.getFixedLength());
@@ -134,7 +157,8 @@ public class SubtractOperation extends AbstractArithmeticOperation {
             throws SystemException, IOException {
         // Add duration.
         abvsInner1.reset();
-        DateTime.normalizeDateTime(datep.getYearMonth() - intp.getInteger(), datep.getDayTime(), dOutInner1);
+        DateTime.normalizeDateTime(datep.getYearMonth() - intp.getInteger(), datep.getDayTime(),
+                datep.getTimezoneHour(), datep.getTimezoneMinute(), dOutInner1);
         byte[] bytes = abvsInner1.getByteArray();
         int startOffset = abvsInner1.getStartOffset() + 1;
         // Convert to date.
@@ -279,13 +303,13 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationDate(LongPointable longp, XSDatePointable datep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationDatetime(LongPointable longp, XSDateTimePointable datetimep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -336,7 +360,7 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationTime(LongPointable longp, XSTimePointable timep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -450,34 +474,40 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     @Override
     public void operateTimeDTDuration(XSTimePointable timep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        // Add duration.
+        // Get time into a datetime value.
         abvsInner1.reset();
-        DateTime.normalizeDateTime(0, timep1.getDayTime() - longp2.getLong(), dOutInner1);
-        byte[] bytes = abvsInner1.getByteArray();
-        // Convert to date.
-        int startOffset1 = abvsInner1.getStartOffset() + 1;
-        bytes[startOffset1 + XSTimePointable.HOUR_OFFSET] = bytes[startOffset1 + XSDateTimePointable.HOUR_OFFSET];
-        bytes[startOffset1 + XSTimePointable.MINUTE_OFFSET] = bytes[startOffset1 + XSDateTimePointable.MINUTE_OFFSET];
-        bytes[startOffset1 + XSTimePointable.MILLISECOND_OFFSET] = bytes[startOffset1
-                + XSDateTimePointable.MILLISECOND_OFFSET];
-        bytes[startOffset1 + XSTimePointable.TIMEZONE_HOUR_OFFSET] = (byte) timep1.getTimezoneHour();
-        bytes[startOffset1 + XSTimePointable.TIMEZONE_MINUTE_OFFSET] = (byte) timep1.getTimezoneMinute();
+        datetimep1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
+        datetimep1.setDateTime(DateTime.TIME_DEFAULT_YEAR, DateTime.TIME_DEFAULT_MONTH, DateTime.TIME_DEFAULT_DAY,
+                timep1.getHour(), timep1.getMinute(), timep1.getMilliSecond(), timep1.getTimezoneHour(),
+                timep1.getTimezoneMinute());
+
+        // Subtract.
+        DateTime.normalizeDateTime(datetimep1.getYearMonth(), datetimep1.getDayTime() - longp2.getLong(),
+                timep1.getTimezoneHour(), timep1.getTimezoneMinute(), dOutInner1);
+
+        // Convert to time.
+        int startOffset = abvsInner1.getStartOffset() + 1 + XSDateTimePointable.HOUR_OFFSET;
         dOut.write(ValueTag.XS_TIME_TAG);
-        dOut.write(bytes, startOffset1, XSDatePointable.TYPE_TRAITS.getFixedLength());
+        dOut.write(abvsInner1.getByteArray(), startOffset, XSTimePointable.TYPE_TRAITS.getFixedLength());
     }
 
     @Override
     public void operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
         abvsInner1.reset();
-        DateTime.getTimezoneDateTime(timep1, dCtx, dOutInner1);
-        XSDateTimePointable datetimep1 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        datetimep1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(), abvsInner1.getLength());
+        datetimep1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
+        datetimep1.setDateTime(DateTime.TIME_DEFAULT_YEAR, DateTime.TIME_DEFAULT_MONTH, DateTime.TIME_DEFAULT_DAY,
+                timep1.getHour(), timep1.getMinute(), timep1.getMilliSecond(), timep1.getTimezoneHour(),
+                timep1.getTimezoneMinute());
 
-        abvsInner2.reset();
-        DateTime.getTimezoneDateTime(timep2, dCtx, dOutInner2);
-        XSDateTimePointable datetimep2 = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        datetimep2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(), abvsInner2.getLength());
+        datetimep2.set(abvsInner1.getByteArray(),
+                abvsInner1.getStartOffset() + XSDateTimePointable.TYPE_TRAITS.getFixedLength(),
+                XSDateTimePointable.TYPE_TRAITS.getFixedLength());
+        datetimep2.setDateTime(DateTime.TIME_DEFAULT_YEAR, DateTime.TIME_DEFAULT_MONTH, DateTime.TIME_DEFAULT_DAY,
+                timep2.getHour(), timep2.getMinute(), timep2.getMilliSecond(), timep2.getTimezoneHour(),
+                timep2.getTimezoneMinute());
 
         operateDatetimeDatetime(datetimep1, datetimep2, dCtx, dOut);
     }
@@ -485,13 +515,13 @@ public class SubtractOperation extends AbstractArithmeticOperation {
     @Override
     public void operateYMDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
