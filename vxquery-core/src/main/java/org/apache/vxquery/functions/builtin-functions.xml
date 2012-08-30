@@ -20,6 +20,7 @@
     <function name="fn:abs">
         <param name="arg" type="xsext:numeric?"/>
         <return type="xsext:numeric?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnAbsScalarEvaluatorFactory"/>
     </function>
     
     <!-- fn:adjust-date-to-timezone( $arg as xs:date?) as  xs:date? -->
@@ -95,6 +96,7 @@
     <function name="fn:ceiling">
         <param name="arg" type="xsext:numeric?"/>
         <return type="xsext:numeric?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnCeilingScalarEvaluatorFactory"/>
     </function>
     
     <!-- fn:codepoint-equal($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:boolean? -->
@@ -360,6 +362,7 @@
     <function name="fn:floor">
         <param name="arg" type="xsext:numeric?"/>
         <return type="xsext:numeric?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnFloorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:hours-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
@@ -663,6 +666,7 @@
     <function name="fn:number">
         <param name="arg" type="xs:anyAtomicType?"/>
         <return type="xs:double"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnNumberScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:one-or-more($arg  as item()*) as  item()+ -->
@@ -757,6 +761,7 @@
     <function name="fn:round">
         <param name="arg" type="xsext:numeric?"/>
         <return type="xsext:numeric?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnRoundScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:round-half-to-even( $arg as numeric?) as  numeric?  -->
