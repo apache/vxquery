@@ -207,7 +207,11 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
         }
 
         dOut.write(ValueTag.XS_DOUBLE_TAG);
-        dOut.writeDouble((negativeValue ? valueDouble : -valueDouble));
+        if (valueDouble == 0.0) {
+            dOut.writeDouble((negativeValue ? -0.0 : 0.0));
+        } else {
+            dOut.writeDouble((negativeValue ? valueDouble : -valueDouble));
+        }
     }
 
     @Override

@@ -171,7 +171,11 @@ public class CastToFloatOperation extends AbstractCastToOperation {
         }
 
         dOut.write(ValueTag.XS_FLOAT_TAG);
-        dOut.writeFloat((negativeValue ? valueFloat : -valueFloat));
+        if (valueFloat == 0.0f) {
+            dOut.writeFloat((negativeValue ? -0.0f : 0.0f));
+        } else {
+            dOut.writeFloat((negativeValue ? valueFloat : -valueFloat));
+        }
     }
 
     @Override
