@@ -56,15 +56,24 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                     abvs.reset();
                     switch (tvp1.getTag()) {
                         case ValueTag.XS_ANY_URI_TAG:
-                        case ValueTag.XS_STRING_TAG:
-                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                             tvp1.getValue(tp.utf8sp);
                             castToString.convertAnyURI(tp.utf8sp, dOut);
                             break;
+                        case ValueTag.XS_STRING_TAG:
+                            tvp1.getValue(tp.utf8sp);
+                            castToString.convertString(tp.utf8sp, dOut);
+                            break;
+                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                            tvp1.getValue(tp.utf8sp);
+                            castToString.convertUntypedAtomic(tp.utf8sp, dOut);
+                            break;
                         case ValueTag.XS_BASE64_BINARY_TAG:
-                        case ValueTag.XS_HEX_BINARY_TAG:
                             tvp1.getValue(tp.binaryp);
                             castToString.convertBase64Binary(tp.binaryp, dOut);
+                            break;
+                        case ValueTag.XS_HEX_BINARY_TAG:
+                            tvp1.getValue(tp.binaryp);
+                            castToString.convertHexBinary(tp.binaryp, dOut);
                             break;
                         case ValueTag.XS_BOOLEAN_TAG:
                             tvp1.getValue(tp.boolp);
@@ -75,6 +84,9 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             castToString.convertDatetime(tp.datetimep, dOut);
                             break;
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                            tvp1.getValue(tp.longp);
+                            castToString.convertDTDuration(tp.longp, dOut);
+                            break;
                         case ValueTag.XS_INTEGER_TAG:
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
                         case ValueTag.XS_NEGATIVE_INTEGER_TAG:
@@ -84,20 +96,35 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                         case ValueTag.XS_POSITIVE_INTEGER_TAG:
                         case ValueTag.XS_UNSIGNED_INT_TAG:
                             tvp1.getValue(tp.longp);
-                            castToString.convertDTDuration(tp.longp, dOut);
+                            castToString.convertInteger(tp.longp, dOut);
                             break;
                         case ValueTag.XS_DURATION_TAG:
                             tvp1.getValue(tp.durationp);
                             castToString.convertDuration(tp.durationp, dOut);
                             break;
                         case ValueTag.XS_DATE_TAG:
-                        case ValueTag.XS_G_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_TAG:
                             tvp1.getValue(tp.datep);
                             castToString.convertDate(tp.datep, dOut);
+                            break;
+                        case ValueTag.XS_G_DAY_TAG:
+                            tvp1.getValue(tp.datep);
+                            castToString.convertGDay(tp.datep, dOut);
+                            break;
+                        case ValueTag.XS_G_MONTH_DAY_TAG:
+                            tvp1.getValue(tp.datep);
+                            castToString.convertGMonthDay(tp.datep, dOut);
+                            break;
+                        case ValueTag.XS_G_MONTH_TAG:
+                            tvp1.getValue(tp.datep);
+                            castToString.convertGMonth(tp.datep, dOut);
+                            break;
+                        case ValueTag.XS_G_YEAR_MONTH_TAG:
+                            tvp1.getValue(tp.datep);
+                            castToString.convertGYearMonth(tp.datep, dOut);
+                            break;
+                        case ValueTag.XS_G_YEAR_TAG:
+                            tvp1.getValue(tp.datep);
+                            castToString.convertGYear(tp.datep, dOut);
                             break;
                         case ValueTag.XS_QNAME_TAG:
                             tvp1.getValue(tp.qnamep);
@@ -108,10 +135,13 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             castToString.convertTime(tp.timep, dOut);
                             break;
                         case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                            tvp1.getValue(tp.intp);
+                            castToString.convertYMDuration(tp.intp, dOut);
+                            break;
                         case ValueTag.XS_INT_TAG:
                         case ValueTag.XS_UNSIGNED_SHORT_TAG:
                             tvp1.getValue(tp.intp);
-                            castToString.convertYMDuration(tp.intp, dOut);
+                            castToString.convertInt(tp.intp, dOut);
                             break;
                         case ValueTag.XS_DECIMAL_TAG:
                             tvp1.getValue(tp.decp);
