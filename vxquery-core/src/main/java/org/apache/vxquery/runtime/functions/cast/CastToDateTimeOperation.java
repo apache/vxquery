@@ -96,7 +96,10 @@ public class CastToDateTimeOperation extends AbstractCastToOperation {
         if (!positiveTimezone && date[7] != DateTime.TIMEZONE_MINUTE_NULL) {
             date[7] *= -1;
         }
-
+        if (date[3] == 24) {
+            date[3] = 0;
+        }
+        
         // Double check for a valid datetime
         if (!DateTime.valid(date[0], date[1], date[2], date[3], date[4], date[5], date[6], date[7])) {
             throw new SystemException(ErrorCode.FODT0001);
