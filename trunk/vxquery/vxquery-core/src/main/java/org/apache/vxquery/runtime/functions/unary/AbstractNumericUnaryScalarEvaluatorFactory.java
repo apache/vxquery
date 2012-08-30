@@ -17,6 +17,7 @@
 package org.apache.vxquery.runtime.functions.unary;
 
 import java.io.DataOutput;
+import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
@@ -32,9 +33,12 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
+import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
@@ -52,35 +56,57 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
             final AbstractNumericUnaryOperation aOp = createNumericUnaryOperation();
             final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
             final DataOutput dOut = abvs.getDataOutput();
+            final ArrayBackedValueStorage abvsInteger = new ArrayBackedValueStorage();
+            final DataOutput dOutInteger = abvsInteger.getDataOutput();
             final TypedPointables tp = new TypedPointables();
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                TaggedValuePointable tvp1 = args[0];
-                int tid = getBaseTypeForArithmetics(tvp1.getTag());
+                TaggedValuePointable tvp = args[0];
+                int tid = getBaseTypeForArithmetics(tvp.getTag());
                 abvs.reset();
+
                 try {
                     switch (tid) {
                         case ValueTag.XS_DECIMAL_TAG:
-                            tvp1.getValue(tp.decp);
+                            tvp.getValue(tp.decp);
                             aOp.operateDecimal(tp.decp, dOut);
                             result.set(abvs);
                             return;
 
                         case ValueTag.XS_INTEGER_TAG:
-                            tvp1.getValue(tp.longp);
-                            aOp.operateInteger(tp.longp, dOut);
+                            LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
+                            switch (tvp.getTag()) {
+                                case ValueTag.XS_INTEGER_TAG:
+                                case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                                case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                                case ValueTag.XS_LONG_TAG:
+                                case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                                case ValueTag.XS_UNSIGNED_LONG_TAG:
+                                case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                                case ValueTag.XS_INT_TAG:
+                                case ValueTag.XS_UNSIGNED_INT_TAG:
+                                case ValueTag.XS_SHORT_TAG:
+                                case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                                case ValueTag.XS_BYTE_TAG:
+                                case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                                    abvsInteger.reset();
+                                    getIntegerPointable(tp, tvp, dOutInteger);
+                                    longp.set(abvsInteger.getByteArray(), abvsInteger.getStartOffset() + 1,
+                                            LongPointable.TYPE_TRAITS.getFixedLength());
+                            }
+                            aOp.operateInteger(longp, dOut);
                             result.set(abvs);
                             return;
 
                         case ValueTag.XS_FLOAT_TAG:
-                            tvp1.getValue(tp.floatp);
+                            tvp.getValue(tp.floatp);
                             aOp.operateFloat(tp.floatp, dOut);
                             result.set(abvs);
                             return;
 
                         case ValueTag.XS_DOUBLE_TAG:
-                            tvp1.getValue(tp.doublep);
+                            tvp.getValue(tp.doublep);
                             aOp.operateDouble(tp.doublep, dOut);
                             result.set(abvs);
                             return;
@@ -93,6 +119,46 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
                 throw new SystemException(ErrorCode.XPTY0004);
             }
 
+            private void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOut)
+                    throws SystemException, IOException {
+                long value;
+                switch (tvp.getTag()) {
+                    case ValueTag.XS_INTEGER_TAG:
+                    case ValueTag.XS_LONG_TAG:
+                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                    case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                    case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                    case ValueTag.XS_UNSIGNED_INT_TAG:
+                    case ValueTag.XS_UNSIGNED_LONG_TAG:
+                        tvp.getValue(tp.longp);
+                        value = tp.longp.longValue();
+                        break;
+
+                    case ValueTag.XS_INT_TAG:
+                    case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                        tvp.getValue(tp.intp);
+                        value = tp.intp.longValue();
+                        break;
+
+                    case ValueTag.XS_SHORT_TAG:
+                    case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                        tvp.getValue(tp.shortp);
+                        value = tp.shortp.longValue();
+                        break;
+
+                    case ValueTag.XS_BYTE_TAG:
+                        tvp.getValue(tp.bytep);
+                        value = tp.bytep.longValue();
+                        break;
+
+                    default:
+                        value = 0;
+                }
+                dOut.write(ValueTag.XS_INTEGER_TAG);
+                dOut.writeLong(value);
+            }
+
             private int getBaseTypeForArithmetics(int tid) throws SystemException {
                 while (true) {
                     switch (tid) {
@@ -100,7 +166,6 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
                         case ValueTag.XS_DOUBLE_TAG:
                         case ValueTag.XS_FLOAT_TAG:
                         case ValueTag.XS_INTEGER_TAG:
-                        case ValueTag.XS_LONG_TAG:
                             return tid;
 
                         case ValueTag.XS_ANY_ATOMIC_TAG:
@@ -115,6 +180,9 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
     }
 
     private static class TypedPointables {
+        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
+        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
+        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
         FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
         LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
