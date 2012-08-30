@@ -26,37 +26,37 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDateDTDuration(XSDatePointable datep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDatetimeDatetime(XSDateTimePointable datetimep, XSDateTimePointable datetimep2,
             DynamicContext dCtx, DataOutput dOut) throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDatetimeDTDuration(XSDateTimePointable datetimep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDatetimeYMDuration(XSDateTimePointable datetimep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDateYMDuration(XSDatePointable datep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalDTDuration(XSDecimalPointable decp, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDecimalYMDuration(XSDecimalPointable decp, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleDTDuration(DoublePointable doublep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -207,55 +207,55 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDoubleYMDuration(DoublePointable doublep, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationDate(LongPointable longp, XSDatePointable datep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationDatetime(LongPointable longp, XSDateTimePointable datetimep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationDTDuration(LongPointable longp, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationInteger(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateDTDurationTime(LongPointable longp1, XSTimePointable timep2, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -288,7 +288,7 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateFloatDTDuration(FloatPointable floatp, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -321,7 +321,7 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateFloatYMDuration(FloatPointable floatp, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -351,7 +351,7 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateIntegerDTDuration(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
@@ -381,61 +381,61 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateIntegerYMDuration(LongPointable longp, IntegerPointable intp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateTimeDTDuration(XSTimePointable timep, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateTimeTime(XSTimePointable timep, XSTimePointable timep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationDate(IntegerPointable intp, XSDatePointable datep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationDatetime(IntegerPointable intp, XSDateTimePointable datetimep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationDecimal(IntegerPointable intp, XSDecimalPointable decp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationDouble(IntegerPointable intp, DoublePointable doublep, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationFloat(IntegerPointable intp, FloatPointable floatp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationInteger(IntegerPointable intp, LongPointable longp, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
     public void operateYMDurationYMDuration(IntegerPointable intp, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException {
-        throw new UnsupportedOperationException();
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
 }
