@@ -195,7 +195,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     public void operateDTDurationDecimal(LongPointable longp, XSDecimalPointable decp, DataOutput dOut)
             throws SystemException, IOException {
         if (decp.getDecimalValue() == 0) {
-            throw new SystemException(ErrorCode.FOAR0001);
+            throw new SystemException(ErrorCode.FODT0002);
         }
         long value = longp.longValue();
         value /= decp.longValue();
@@ -206,6 +206,12 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationDouble(LongPointable longp, DoublePointable doublep, DataOutput dOut)
             throws SystemException, IOException {
+        if (Double.isNaN(doublep.doubleValue())) {
+            throw new SystemException(ErrorCode.FOCA0005);
+        }
+        if (doublep.doubleValue() == 0.0) {
+            throw new SystemException(ErrorCode.FODT0002);
+        }
         double value = longp.doubleValue();
         value /= doublep.doubleValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -228,6 +234,12 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateDTDurationFloat(LongPointable longp, FloatPointable floatp, DataOutput dOut)
             throws SystemException, IOException {
+        if (Float.isNaN(floatp.floatValue())) {
+            throw new SystemException(ErrorCode.FOCA0005);
+        }
+        if (floatp.floatValue() == 0.0f) {
+            throw new SystemException(ErrorCode.FODT0002);
+        }
         float value = longp.floatValue();
         value /= floatp.intValue();
         dOut.write(ValueTag.XS_DAY_TIME_DURATION_TAG);
@@ -238,7 +250,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     public void operateDTDurationInteger(LongPointable longp1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
         if (longp2.getLong() == 0) {
-            throw new SystemException(ErrorCode.FOAR0001);
+            throw new SystemException(ErrorCode.FODT0002);
         }
         long value = longp1.longValue();
         value /= longp2.longValue();
