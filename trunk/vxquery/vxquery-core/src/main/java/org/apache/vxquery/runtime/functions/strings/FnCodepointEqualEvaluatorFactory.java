@@ -39,11 +39,11 @@ public class FnCodepointEqualEvaluatorFactory extends AbstractTaggedValueArgumen
                 TaggedValuePointable tvp2 = args[1];
 
                 // Only accept strings as input.
-                if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
+                if (tvp1.getTag() != ValueTag.XS_STRING_TAG && tvp1.getTag() != ValueTag.XS_ANY_URI_TAG) {
+                    throw new SystemException(ErrorCode.XPTY0004);
                 }
-                if (tvp2.getTag() != ValueTag.XS_STRING_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
+                if (tvp2.getTag() != ValueTag.XS_STRING_TAG && tvp2.getTag() != ValueTag.XS_ANY_URI_TAG) {
+                    throw new SystemException(ErrorCode.XPTY0004);
                 }
                 tvp1.getValue(stringp1);
                 tvp2.getValue(stringp2);
