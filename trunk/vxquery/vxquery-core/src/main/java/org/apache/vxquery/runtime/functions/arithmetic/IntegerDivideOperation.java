@@ -372,6 +372,9 @@ public class IntegerDivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
+        if (longp.getLong() == 0) {
+            throw new SystemException(ErrorCode.FOAR0001);
+        }
         long value = longp.getLong();
         value /= longp2.getLong();
         dOut.write(ValueTag.XS_INTEGER_TAG);
