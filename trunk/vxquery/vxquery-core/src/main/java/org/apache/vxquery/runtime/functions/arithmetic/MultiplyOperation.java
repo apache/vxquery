@@ -66,7 +66,7 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
         long value2 = decp2.getDecimalValue();
         byte place1 = decp1.getDecimalPlace();
         byte place2 = decp2.getDecimalPlace();
-        if (Math.abs(value1) > Long.MAX_VALUE / Math.abs(value2)) {
+        if (value2 != 0 && Math.abs(value1) > Long.MAX_VALUE / Math.abs(value2)) {
             throw new SystemException(ErrorCode.XPDY0002);
         }
         value1 *= value2;
@@ -369,23 +369,22 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     }
 
     public long operateLongDecimal(long longValue, XSDecimalPointable decp2) throws SystemException, IOException {
-        abvsInner.reset();
-        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
-        decp1.setDecimal(longValue, (byte) 0);
         // Prepare
-        long value1 = decp1.getDecimalValue();
+        long value1 = longValue;
         long value2 = decp2.getDecimalValue();
-        byte place1 = decp1.getDecimalPlace();
+        byte place1 = 0;
         byte place2 = decp2.getDecimalPlace();
         // Divide
-        if (Math.abs(value1) > Long.MAX_VALUE / Math.abs(value2)) {
+        if (value2 != 0 && Math.abs(value1) > Long.MAX_VALUE / Math.abs(value2)) {
             throw new SystemException(ErrorCode.XPDY0002);
         }
         value1 *= value2;
         place1 += place2;
         // Save
-        decp2.setDecimal(value1, place1);
-        return decp2.longValue();
+        abvsInner.reset();
+        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
+        decp1.setDecimal(value1, place1);
+        return decp1.longValue();
     }
 
 }
