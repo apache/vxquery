@@ -357,7 +357,7 @@ public class DivideOperation extends AbstractArithmeticOperation {
     @Override
     public void operateIntegerInteger(LongPointable longp, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException {
-        if (longp.getLong() == 0) {
+        if (longp2.getLong() == 0) {
             throw new SystemException(ErrorCode.FOAR0001);
         }
         // This is an exception for integer integer operations. The divide operation returns a decimal.
