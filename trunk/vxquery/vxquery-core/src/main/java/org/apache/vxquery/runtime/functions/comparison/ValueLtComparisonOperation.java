@@ -181,6 +181,12 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
+    public boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2) throws SystemException,
+            IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    @Override
     public boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
             throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
@@ -346,6 +352,12 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2) throws SystemException,
+            IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     @Override
