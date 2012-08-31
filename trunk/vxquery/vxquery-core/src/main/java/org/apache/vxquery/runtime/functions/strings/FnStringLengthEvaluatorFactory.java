@@ -1,5 +1,7 @@
 package org.apache.vxquery.runtime.functions.strings;
 
+import java.io.DataOutput;
+
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -12,8 +14,8 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnStringLengthEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -26,7 +28,8 @@ public class FnStringLengthEvaluatorFactory extends AbstractTaggedValueArgumentS
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        final byte[] integerResult = new byte[LongPointable.TYPE_TRAITS.getFixedLength() + 1];
+        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+        final DataOutput dOut = abvs.getDataOutput();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -40,9 +43,14 @@ public class FnStringLengthEvaluatorFactory extends AbstractTaggedValueArgumentS
 
                 // Return the string length of the UTF8 String.
                 tvp1.getValue(stringp);
-                integerResult[0] = ValueTag.XS_INTEGER_TAG;
-                LongPointable.setLong(integerResult, 1, stringp.getStringLength());
-                result.set(integerResult, 0, LongPointable.TYPE_TRAITS.getFixedLength() + 1);
+                try {
+                    abvs.reset();
+                    dOut.write(ValueTag.XS_INTEGER_TAG);
+                    dOut.writeLong(stringp.getStringLength());
+                    result.set(abvs);
+                } catch (Exception e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
             }
         };
     }
