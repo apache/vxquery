@@ -178,6 +178,15 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
+    public boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2) throws SystemException,
+            IOException {
+        if (longp1.getLong() == 0 && intp2.getInteger() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
             throws SystemException, IOException {
         if (durationp1.getYearMonth() == 0 && durationp1.getDayTime() == longp2.getLong()) {
@@ -356,6 +365,15 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
                 .getYearMonth(abvsInner.getByteArray(), startOffset2)
                 && XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) == XSDateTimePointable
                         .getDayTime(abvsInner.getByteArray(), startOffset2)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2) throws SystemException,
+            IOException {
+        if (intp1.getInteger() == 0 && longp2.getLong() == 0) {
             return true;
         }
         return false;

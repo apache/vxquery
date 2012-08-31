@@ -62,6 +62,12 @@ public abstract class AbstractValueComparisonOperation {
     public abstract boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2)
             throws SystemException, IOException;
 
+    public abstract boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2)
+            throws SystemException, IOException;
+
+    public abstract boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2)
+            throws SystemException, IOException;
+
     public abstract boolean operateDTDurationDuration(LongPointable longp1, XSDurationPointable durationp2)
             throws SystemException, IOException;
 

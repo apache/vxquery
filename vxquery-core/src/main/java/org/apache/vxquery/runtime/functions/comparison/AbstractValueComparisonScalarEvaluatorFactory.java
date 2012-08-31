@@ -313,12 +313,20 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                                     tvp2.getValue(tp2.durationp);
                                     booleanResult = aOp.operateDTDurationDuration(tp1.longp, tp2.durationp);
                                     break;
+                                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                                    tvp2.getValue(tp2.intp);
+                                    booleanResult = aOp.operateDTDurationYMDuration(tp1.longp, tp2.intp);
+                                    break;
                             }
                             break;
 
                         case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                             tvp1.getValue(tp1.intp);
                             switch (tid2) {
+                                case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                                    tvp2.getValue(tp2.longp);
+                                    booleanResult = aOp.operateYMDurationDTDuration(tp1.intp, tp2.longp);
+                                    break;
                                 case ValueTag.XS_DURATION_TAG:
                                     tvp2.getValue(tp2.durationp);
                                     booleanResult = aOp.operateYMDurationDuration(tp1.intp, tp2.durationp);

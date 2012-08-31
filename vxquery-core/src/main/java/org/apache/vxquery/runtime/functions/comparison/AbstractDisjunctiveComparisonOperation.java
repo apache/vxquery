@@ -139,6 +139,12 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     }
 
     @Override
+    public boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2) throws SystemException,
+            IOException {
+        return (aOp1.operateDTDurationYMDuration(longp1, intp2) || aOp2.operateDTDurationYMDuration(longp1, intp2));
+    }
+
+    @Override
     public boolean operateDurationDTDuration(XSDurationPointable durationp1, LongPointable longp2)
             throws SystemException, IOException {
         return (aOp1.operateDurationDTDuration(durationp1, longp2) || aOp2
@@ -285,6 +291,12 @@ public abstract class AbstractDisjunctiveComparisonOperation extends AbstractVal
     public boolean operateTimeTime(XSTimePointable timep1, XSTimePointable timep2, DynamicContext dCtx)
             throws SystemException, IOException {
         return (aOp1.operateTimeTime(timep1, timep2, dCtx) || aOp2.operateTimeTime(timep1, timep2, dCtx));
+    }
+
+    @Override
+    public boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2) throws SystemException,
+            IOException {
+        return (aOp1.operateYMDurationDTDuration(intp1, longp2) || aOp2.operateYMDurationDTDuration(intp1, longp2));
     }
 
     @Override
