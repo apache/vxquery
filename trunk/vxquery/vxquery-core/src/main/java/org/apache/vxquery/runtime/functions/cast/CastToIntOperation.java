@@ -145,20 +145,20 @@ public class CastToIntOperation extends AbstractCastToOperation {
         writeIntValue(shortp, dOut);
     }
 
-    public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
-        writeIntValue(bytep, dOut);
+    public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        writeIntValue(shortp, dOut);
     }
 
-    public void convertUnsignedInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeIntValue(intp, dOut);
+    public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        writeIntValue(longp, dOut);
     }
 
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         writeIntValue(longp, dOut);
     }
 
-    public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeIntValue(shortp, dOut);
+    public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        writeIntValue(intp, dOut);
     }
 
     private void writeIntValue(INumeric numericp, DataOutput dOut) throws SystemException, IOException {

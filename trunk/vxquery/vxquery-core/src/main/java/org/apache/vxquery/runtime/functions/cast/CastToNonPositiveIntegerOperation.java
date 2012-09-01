@@ -5,7 +5,8 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 public class CastToNonPositiveIntegerOperation extends CastToIntegerOperation {
 
     public CastToNonPositiveIntegerOperation() {
-        negativeAllowed = false;
+        negativeAllowed = true;
+        negativeRequired = true;
         returnTag = ValueTag.XS_NON_NEGATIVE_INTEGER_TAG;
     }
 

@@ -19,10 +19,12 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
@@ -161,7 +163,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
             decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
                     XSDecimalPointable.TYPE_TRAITS.getFixedLength());
             convertDecimal(decp, dOut);
-        } else if (value == 0) {
+        } else if (value == -0.0 || value == 0.0) {
             long bits = Double.doubleToLongBits(value);
             boolean negative = ((bits >> 63) == 0) ? false : true;
 
@@ -411,7 +413,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
             XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
             decp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength());
             convertDecimal(decp, dOut);
-        } else if (value == 0) {
+        } else if (value == -0.0f || value == 0.0f) {
             long bits = Float.floatToIntBits(value);
             boolean negative = ((bits >> 31) == 0) ? false : true;
 
@@ -637,23 +639,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        long value = longp.getLong();
-        if (value < 0) {
-            // Negative result, but the rest of the calculations can be based on a positive value.
-            writeChar('-', dOutInner);
-            value *= -1;
-        }
-        if (value == 0) {
-            writeChar((char) ('0'), dOutInner);
-        } else {
-            int nDigits = (int) Math.log10(value) + 1;
-            long pow10 = (long) Math.pow(10, nDigits - 1);
-            for (int i = nDigits - 1; i >= 0; --i) {
-                writeChar((char) ('0' + (value / pow10)), dOutInner);
-                value %= pow10;
-                pow10 /= 10;
-            }
-        }
+        writeNumberWithPadding(longp.getLong(), 1, dOutInner);
         sendStringDataOutput(dOut);
     }
 
@@ -735,6 +721,99 @@ public class CastToStringOperation extends AbstractCastToOperation {
         sendStringDataOutput(dOut);
     }
 
+    /**
+     * Derived Datatypes
+     */
+    public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(bytep.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(intp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertNonNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertNonPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(shortp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(shortp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        abvsInner.reset();
+        writeNumberWithPadding(intp.longValue(), 1, dOutInner);
+        sendStringDataOutput(dOut);
+    }
+
+    /**
+     * Returns the number of digits in a long. A few special cases that needed attention.
+     */
+    private int getNumberOfDigits(long value) {
+        if (value == 0) {
+            return 0;
+        }
+        double nDigitsRaw = Math.log10(value);
+        int nDigits = (int) nDigitsRaw;
+        if (nDigits > 11 && nDigitsRaw == nDigits) {
+            // Return exact number of digits and does not need adjustment. (Ex 999999999999999999)
+            return nDigits;
+        } else {
+            // Decimal value returned so we must increment to the next number.
+            return nDigits + 1;
+        }
+    }
+
     private void sendStringDataOutput(DataOutput dOut) throws SystemException, IOException {
         dOut.write(returnTag);
         dOut.write((byte) ((abvsInner.getLength() >>> 8) & 0xFF));
@@ -789,20 +868,22 @@ public class CastToStringOperation extends AbstractCastToOperation {
     private void writeNumberWithPadding(long value, int padding, DataOutput dOut) {
         if (value < 0) {
             writeChar('-', dOut);
+            value = Math.abs(value);
         }
-        value = Math.abs(value);
-        int nDigits = (value == 0 ? 0 : (int) Math.log10(value) + 1);
+        int nDigits = getNumberOfDigits(value);
 
+        // Add zero padding for set length numbers.
         while (padding > nDigits) {
             writeChar('0', dOut);
             --padding;
         }
-        int number;
-        while (nDigits > 0) {
-            number = (int) (value / Math.pow(10, nDigits - 1));
-            writeChar(Character.forDigit(number, 10), dOut);
-            value = (int) (value - number * Math.pow(10, nDigits - 1));
-            --nDigits;
+        
+        // Write the actual number.
+        long pow10 = (long) Math.pow(10, nDigits - 1);
+        for (int i = nDigits - 1; i >= 0; --i) {
+            writeChar((char) ('0' + (value / pow10)), dOut);
+            value %= pow10;
+            pow10 /= 10;
         }
     }
 

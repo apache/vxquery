@@ -7,7 +7,7 @@ public class CastToNegativeIntegerOperation extends CastToIntegerOperation {
     public CastToNegativeIntegerOperation() {
         negativeAllowed = true;
         negativeRequired = true;
-        returnTag = ValueTag.XS_NON_POSITIVE_INTEGER_TAG;
+        returnTag = ValueTag.XS_NEGATIVE_INTEGER_TAG;
     }
 
 }
