@@ -180,20 +180,20 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
         writeDecimalValue(shortp, dOut);
     }
 
-    public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(bytep, dOut);
+    public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        writeDecimalValue(shortp, dOut);
     }
 
-    public void convertUnsignedInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(intp, dOut);
+    public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        writeDecimalValue(longp, dOut);
     }
 
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         writeDecimalValue(longp, dOut);
     }
 
-    public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(shortp, dOut);
+    public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        writeDecimalValue(intp, dOut);
     }
 
     private void writeDecimalValue(INumeric numericp, DataOutput dOut) throws SystemException, IOException {

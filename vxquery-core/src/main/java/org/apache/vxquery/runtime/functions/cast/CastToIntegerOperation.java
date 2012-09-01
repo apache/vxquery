@@ -88,8 +88,6 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
             negative = true;
             c = charIterator.next();
             limit = Long.MIN_VALUE;
-        } else if (negativeRequired) {
-            throw new SystemException(ErrorCode.FORG0001);
         }
 
         // Read the numeric value.
@@ -103,6 +101,10 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
+        
+        if (negativeRequired && value !=0 && !negative) {
+            throw new SystemException(ErrorCode.FORG0001);
+        }
 
         dOut.write(returnTag);
         dOut.writeLong((negative ? value : -value));
@@ -148,20 +150,20 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
         writeIntegerValue(shortp, dOut);
     }
 
-    public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(bytep, dOut);
+    public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        writeIntegerValue(shortp, dOut);
     }
 
-    public void convertUnsignedInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(intp, dOut);
+    public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        writeIntegerValue(longp, dOut);
     }
 
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         writeIntegerValue(longp, dOut);
     }
 
-    public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeIntegerValue(shortp, dOut);
+    public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        writeIntegerValue(intp, dOut);
     }
 
     private void writeIntegerValue(INumeric numericp, DataOutput dOut) throws SystemException, IOException {

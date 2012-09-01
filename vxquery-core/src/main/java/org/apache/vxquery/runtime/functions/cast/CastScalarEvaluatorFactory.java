@@ -269,14 +269,14 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             return;
 
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                            tvp.getValue(tp.bytep);
-                            aOp.convertUnsignedByte(tp.bytep, dOut);
+                            tvp.getValue(tp.shortp);
+                            aOp.convertUnsignedByte(tp.shortp, dOut);
                             result.set(abvs);
                             return;
 
                         case ValueTag.XS_UNSIGNED_INT_TAG:
-                            tvp.getValue(tp.intp);
-                            aOp.convertUnsignedInt(tp.intp, dOut);
+                            tvp.getValue(tp.longp);
+                            aOp.convertUnsignedInt(tp.longp, dOut);
                             result.set(abvs);
                             return;
 
@@ -287,8 +287,8 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             return;
 
                         case ValueTag.XS_UNSIGNED_SHORT_TAG:
-                            tvp.getValue(tp.shortp);
-                            aOp.convertUnsignedShort(tp.shortp, dOut);
+                            tvp.getValue(tp.intp);
+                            aOp.convertUnsignedShort(tp.intp, dOut);
                             result.set(abvs);
                             return;
 

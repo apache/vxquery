@@ -254,20 +254,20 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
         writeDoubleValue(shortp, dOut);
     }
 
-    public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
-        writeDoubleValue(bytep, dOut);
+    public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+        writeDoubleValue(shortp, dOut);
     }
 
-    public void convertUnsignedInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeDoubleValue(intp, dOut);
+    public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
+        writeDoubleValue(longp, dOut);
     }
 
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         writeDoubleValue(longp, dOut);
     }
 
-    public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeDoubleValue(shortp, dOut);
+    public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        writeDoubleValue(intp, dOut);
     }
 
     private void writeDoubleValue(INumeric numericp, DataOutput dOut) throws SystemException, IOException {
