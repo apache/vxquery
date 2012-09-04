@@ -343,6 +343,7 @@
     <function name="fn:exactly-one">
         <param name="arg" type="item()*"/>
         <return type="item()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnExactlyOneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:exists($arg as  item()*) as xs:boolean -->
@@ -673,6 +674,7 @@
     <function name="fn:one-or-more">
         <param name="arg" type="item()*"/>
         <return type="item()+"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnOneOrMoreScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:position() as  xs:integer -->
@@ -1032,5 +1034,6 @@
     <function name="fn:zero-or-one">
         <param name="arg" type="item()*"/>
         <return type="item()?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnZeroOrOneScalarEvaluatorFactory"/>
     </function>
 </functions>
