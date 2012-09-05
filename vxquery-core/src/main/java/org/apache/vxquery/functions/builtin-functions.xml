@@ -429,6 +429,7 @@
         <param name="seqParam" type="xs:anyAtomicType*"/>
         <param name="srcParam" type="xs:anyAtomicType"/>
         <return type="xs:integer*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnIndexOfScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:index-of($seqParam  as xs:anyAtomicType*, $srchParam as xs:anyAtomicType, $collation as xs:string)  as xs:integer* -->
@@ -437,6 +438,7 @@
         <param name="srcParam" type="xs:anyAtomicType"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:integer*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnIndexOfScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:insert-before($target  as item()*, $position as xs:integer, $inserts as item()*)  as item()* -->
@@ -445,6 +447,7 @@
         <param name="position" type="xs:integer"/>
         <param name="inserts" type="item()*"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnInsertBeforeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:iri-to-uri($iri  as xs:string?) as  xs:string -->
