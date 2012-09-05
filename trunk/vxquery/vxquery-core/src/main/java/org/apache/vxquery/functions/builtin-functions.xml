@@ -416,6 +416,7 @@
     <!-- fn:implicit-timezone()  as xs:dayTimeDuration -->
     <function name="fn:implicit-timezone">
         <return type="xs:dayTimeDuration"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnImplicitTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:in-scope-prefixes( $element as element())  as xs:string* -->
