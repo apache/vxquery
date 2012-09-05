@@ -8,7 +8,7 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnMonthFromDateScalarEvaluatorFactory extends AbstractValueFromDateTimeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    final XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
+    private static final XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
 
     public FnMonthFromDateScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
