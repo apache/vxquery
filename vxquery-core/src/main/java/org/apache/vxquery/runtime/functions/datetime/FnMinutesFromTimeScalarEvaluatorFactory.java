@@ -8,7 +8,7 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnMinutesFromTimeScalarEvaluatorFactory extends AbstractValueFromDateTimeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    final XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
+    private static final XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
 
     public FnMinutesFromTimeScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);

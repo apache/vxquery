@@ -4,8 +4,7 @@ import org.apache.vxquery.datamodel.util.DateTime;
 
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
-public class FnDaysFromDurationScalarEvaluatorFactory extends
-        AbstractValueFromDurationScalarEvaluatorFactory {
+public class FnDaysFromDurationScalarEvaluatorFactory extends AbstractValueFromDurationScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
     public FnDaysFromDurationScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {

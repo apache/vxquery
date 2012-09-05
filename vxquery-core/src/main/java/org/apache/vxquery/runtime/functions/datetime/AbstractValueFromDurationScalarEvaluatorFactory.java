@@ -55,6 +55,7 @@ public abstract class AbstractValueFromDurationScalarEvaluatorFactory extends
                         DTDuration = longp.getLong();
                         break;
                     case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                        tvp1.getValue(intp);
                         YMDuration = intp.getInteger();
                         break;
                     default:
