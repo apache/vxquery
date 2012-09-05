@@ -702,6 +702,7 @@
         <param name="target" type="item()*"/>
         <param name="position" type="xs:integer"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnRemoveScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:replace($input  as xs:string?, $pattern as xs:string, $replacement as xs:string)  as xs:string -->
@@ -865,6 +866,7 @@
         <param name="sourceSeq" type="item()*"/>
         <param name="startingLoc" type="xs:double"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnSubsequenceScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:subsequence($sourceSeq  as item()*, $startingLoc as xs:double, $length as xs:double)  as item()* -->
@@ -873,6 +875,7 @@
         <param name="startingLoc" type="xs:double"/>
         <param name="length" type="xs:double"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnSubsequenceScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:substring($sourceString  as xs:string?, $startingLoc as xs:double)  as xs:string -->
@@ -1000,6 +1003,7 @@
     <function name="fn:unordered">
         <param name="sourceSeq" type="item()*"/>
         <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnUnorderedScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:upper-case($arg  as xs:string?) as  xs:string -->
