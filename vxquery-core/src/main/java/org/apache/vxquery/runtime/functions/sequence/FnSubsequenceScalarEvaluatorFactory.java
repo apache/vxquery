@@ -48,24 +48,7 @@ public class FnSubsequenceScalarEvaluatorFactory extends AbstractTaggedValueArgu
                 try {
                     long startingLoc;
                     TaggedValuePointable tvp2 = args[1];
-                    // XQuery Specification calls for double value. Integer and Decimal are allowed to cut down
-                    // on casting.
-                    if (tvp2.getTag() == ValueTag.XS_DOUBLE_TAG) {
-                        tvp2.getValue(doublep);
-                        abvsRound.reset();
-                        round.operateDouble(doublep, abvsRound.getDataOutput());
-                        doublep.set(abvsRound.getByteArray(), abvsRound.getStartOffset() + 1,
-                                DoublePointable.TYPE_TRAITS.getFixedLength());
-                        startingLoc = doublep.longValue();
-                    } else if (tvp2.getTag() == ValueTag.XS_INTEGER_TAG) {
-                        tvp2.getValue(longp);
-                        startingLoc = longp.longValue();
-                    } else if (tvp2.getTag() == ValueTag.XS_DECIMAL_TAG) {
-                        tvp2.getValue(decp);
-                        startingLoc = decp.longValue();
-                    } else {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
+                    startingLoc = getLongFromArgument(tvp2);
                     if (startingLoc < 1) {
                         startingLoc = 1;
                     }
@@ -74,24 +57,7 @@ public class FnSubsequenceScalarEvaluatorFactory extends AbstractTaggedValueArgu
                     long endingLoc = Long.MAX_VALUE;
                     if (args.length > 2) {
                         TaggedValuePointable tvp3 = args[2];
-                        // XQuery Specification calls for double value. Integer and Decimal are allowed to cut down
-                        // on casting.
-                        if (tvp3.getTag() == ValueTag.XS_DOUBLE_TAG) {
-                            tvp3.getValue(doublep);
-                            abvsRound.reset();
-                            round.operateDouble(doublep, abvsRound.getDataOutput());
-                            doublep.set(abvsRound.getByteArray(), abvsRound.getStartOffset() + 1,
-                                    DoublePointable.TYPE_TRAITS.getFixedLength());
-                            endingLoc = startingLoc + doublep.longValue();
-                        } else if (tvp3.getTag() == ValueTag.XS_INTEGER_TAG) {
-                            tvp3.getValue(longp);
-                            endingLoc = startingLoc + longp.longValue();
-                        } else if (tvp3.getTag() == ValueTag.XS_DECIMAL_TAG) {
-                            tvp3.getValue(decp);
-                            endingLoc = startingLoc + decp.longValue();
-                        } else {
-                            throw new SystemException(ErrorCode.FORG0006);
-                        }
+                        endingLoc = getLongFromArgument(tvp3) + startingLoc;
                     }
 
                     abvs.reset();
@@ -123,6 +89,33 @@ public class FnSubsequenceScalarEvaluatorFactory extends AbstractTaggedValueArgu
                     result.set(abvs);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001);
+                }
+            }
+
+            /**
+             * XQuery Specification calls for double value. Integer and Decimal are allowed to cut down on casting.
+             * 
+             * @param tvp
+             * @return
+             * @throws SystemException
+             * @throws IOException
+             */
+            public long getLongFromArgument(TaggedValuePointable tvp) throws SystemException, IOException {
+                if (tvp.getTag() == ValueTag.XS_DOUBLE_TAG) {
+                    tvp.getValue(doublep);
+                    abvsRound.reset();
+                    round.operateDouble(doublep, abvsRound.getDataOutput());
+                    doublep.set(abvsRound.getByteArray(), abvsRound.getStartOffset() + 1,
+                            DoublePointable.TYPE_TRAITS.getFixedLength());
+                    return doublep.longValue();
+                } else if (tvp.getTag() == ValueTag.XS_INTEGER_TAG) {
+                    tvp.getValue(longp);
+                    return longp.longValue();
+                } else if (tvp.getTag() == ValueTag.XS_DECIMAL_TAG) {
+                    tvp.getValue(decp);
+                    return decp.longValue();
+                } else {
+                    throw new SystemException(ErrorCode.FORG0006);
                 }
             }
         };
