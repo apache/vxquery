@@ -23,6 +23,7 @@ import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -70,8 +71,7 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
                         case ValueTag.SEQUENCE_TAG:
                             tvp.getValue(tp.seqp);
                             if (tp.seqp.getEntryCount() == 0) {
-                                dOut.write(ValueTag.SEQUENCE_TAG);
-                                dOut.write(tp.seqp.getByteArray(), tp.seqp.getStartOffset(), tp.seqp.getLength());
+                                XDMConstants.setEmptySequence(result);
                                 return;
                             }
 
