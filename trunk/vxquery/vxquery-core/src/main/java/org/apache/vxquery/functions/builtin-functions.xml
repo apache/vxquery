@@ -657,7 +657,7 @@
 
     <!-- fn:not($arg as  item()*) as xs:boolean -->
     <function name="fn:not">
-        <param name="arg" type="item()*"/>
+        <param name="arg" type="xs:boolean"/>
         <return type="xs:boolean"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.bool.FnNotScalarEvaluatorFactory"/>
     </function>
@@ -775,6 +775,7 @@
     <function name="fn:round-half-to-even">
         <param name="arg" type="xsext:numeric?"/>
         <return type="xsext:numeric?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnRoundHalfToEvenScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:round-half-to-even( $arg as numeric?, $precision as xs:integer)  as numeric?  -->
@@ -782,6 +783,7 @@
         <param name="arg" type="xsext:numeric?"/>
         <param name="precision" type="xs:integer"/>
         <return type="xsext:numeric?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnRoundHalfToEvenScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:seconds-from-dateTime( $arg as xs:dateTime?)  as xs:decimal?  -->
