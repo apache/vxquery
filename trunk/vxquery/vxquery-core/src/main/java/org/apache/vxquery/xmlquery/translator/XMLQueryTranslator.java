@@ -1245,7 +1245,11 @@ public class XMLQueryTranslator {
                 break;
             case INTEGER:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE);
-                value = Long.parseLong(image);
+                try {
+                    value = Long.parseLong(image);
+                } catch (NumberFormatException nfe) {
+                    throw new SystemException(ErrorCode.FOAR0002);
+                }
                 break;
             case STRING:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE);
