@@ -116,7 +116,11 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
     }
 
     public static long getBeforeDecimalPlaceRounded(byte[] bytes, int start) {
-        return Math.round(getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
+        if (getDecimalPlace(bytes, start) != 0) {
+            return Math.round(getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
+        } else {
+            return getDecimalValue(bytes, start);
+        }
     }
 
     public long getBeforeDecimalPlace() {
@@ -124,7 +128,12 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
     }
 
     public static long getBeforeDecimalPlace(byte[] bytes, int start) {
-        return (long) (getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
+        if (getDecimalPlace(bytes, start) != 0) {
+            return (long) (getDecimalValue(bytes, start) / Math.pow(10, getDecimalPlace(bytes, start)));
+        } else {
+            return getDecimalValue(bytes, start);
+        }
+        
     }
 
     public byte getDigitCount() {
