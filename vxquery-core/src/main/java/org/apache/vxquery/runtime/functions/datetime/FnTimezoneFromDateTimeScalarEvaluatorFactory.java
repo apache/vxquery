@@ -3,13 +3,12 @@ package org.apache.vxquery.runtime.functions.datetime;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnTimezoneFromDateTimeScalarEvaluatorFactory extends AbstractValueFromDateTimeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    private static final XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY
-            .createPointable();
 
     public FnTimezoneFromDateTimeScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -26,8 +25,9 @@ public class FnTimezoneFromDateTimeScalarEvaluatorFactory extends AbstractValueF
     }
 
     @Override
-    protected long getInteger(TaggedValuePointable tvp) {
+    protected long getValueAsInteger(TaggedValuePointable tvp) {
+        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
         tvp.getValue(datetimep);
-        return getTimezone(datetimep);
+        return FunctionHelper.getTimezone(datetimep);
     }
 }

@@ -8,7 +8,6 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnYearFromDateScalarEvaluatorFactory extends AbstractValueFromDateTimeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    private static final XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
 
     public FnYearFromDateScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -20,7 +19,8 @@ public class FnYearFromDateScalarEvaluatorFactory extends AbstractValueFromDateT
     }
 
     @Override
-    protected long getInteger(TaggedValuePointable tvp) {
+    protected long getValueAsInteger(TaggedValuePointable tvp) {
+        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
         tvp.getValue(datep);
         return datep.getYear();
     }

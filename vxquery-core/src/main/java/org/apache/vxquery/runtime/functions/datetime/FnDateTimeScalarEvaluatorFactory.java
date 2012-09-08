@@ -3,11 +3,14 @@ package org.apache.vxquery.runtime.functions.datetime;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -32,6 +35,7 @@ public class FnDateTimeScalarEvaluatorFactory extends AbstractTaggedValueArgumen
             throws AlgebricksException {
         final XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
         final XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
 
@@ -39,12 +43,26 @@ public class FnDateTimeScalarEvaluatorFactory extends AbstractTaggedValueArgumen
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
+                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp1.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        XDMConstants.setEmptySequence(result);
+                        return;
+                    }
+                }
                 if (tvp1.getTag() != ValueTag.XS_DATE_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
                 tvp1.getValue(datep);
 
                 TaggedValuePointable tvp2 = args[1];
+                if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp2.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        XDMConstants.setEmptySequence(result);
+                        return;
+                    }
+                }
                 if (tvp2.getTag() != ValueTag.XS_TIME_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
@@ -93,7 +111,8 @@ public class FnDateTimeScalarEvaluatorFactory extends AbstractTaggedValueArgumen
                     dOut.write(timezoneHour);
                     dOut.write(timezoneMinute);
 
-                    result.set(abvs);
+                    result.set(abvs.getByteArray(), abvs.getStartOffset(),
+                            XSDateTimePointable.TYPE_TRAITS.getFixedLength() + 1);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
