@@ -17,50 +17,27 @@
 package org.apache.vxquery.runtime.functions.comparison;
 
 import java.io.DataOutput;
-import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    private static final ArrayBackedValueStorage abvsInteger1 = new ArrayBackedValueStorage();
-    private static final DataOutput dOutInteger1 = abvsInteger1.getDataOutput();
-    private static final ArrayBackedValueStorage abvsInteger2 = new ArrayBackedValueStorage();
-    private static final DataOutput dOutInteger2 = abvsInteger2.getDataOutput();
-    private static final TypedPointables tp1 = new TypedPointables();
-    private static final TypedPointables tp2 = new TypedPointables();
-    private static final LongPointable longp1 = (LongPointable) LongPointable.FACTORY.createPointable();
-    private static final LongPointable longp2 = (LongPointable) LongPointable.FACTORY.createPointable();
 
     public AbstractValueComparisonScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -73,7 +50,7 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         final DataOutput dOut = abvs.getDataOutput();
         final AbstractValueComparisonOperation aOp = createValueComparisonOperation();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        
+
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
@@ -94,10 +71,20 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         };
     }
 
-    public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
+    public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
+            TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
+        final ArrayBackedValueStorage abvsInteger1 = new ArrayBackedValueStorage();
+        final DataOutput dOutInteger1 = abvsInteger1.getDataOutput();
+        final ArrayBackedValueStorage abvsInteger2 = new ArrayBackedValueStorage();
+        final DataOutput dOutInteger2 = abvsInteger2.getDataOutput();
+        final LongPointable longp1 = (LongPointable) LongPointable.FACTORY.createPointable();
+        final LongPointable longp2 = (LongPointable) LongPointable.FACTORY.createPointable();
+        final FunctionHelper.TypedPointables tp1 = new FunctionHelper.TypedPointables();
+        final FunctionHelper.TypedPointables tp2 = new FunctionHelper.TypedPointables();
+
         boolean booleanResult = false;
-        int tid1 = getBaseTypeForComparisons(tvp1.getTag());
-        int tid2 = getBaseTypeForComparisons(tvp2.getTag());
+        int tid1 = FunctionHelper.getBaseTypeForComparisons(tvp1.getTag());
+        int tid2 = FunctionHelper.getBaseTypeForComparisons(tvp2.getTag());
         if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
             // TODO Convert to double
             tid1 = ValueTag.XS_DOUBLE_TAG;
@@ -124,7 +111,7 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                 case ValueTag.XS_BYTE_TAG:
                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                     abvsInteger1.reset();
-                    getIntegerPointable(tp1, tvp1, dOutInteger1);
+                    FunctionHelper.getIntegerPointable(tp1, tvp1, dOutInteger1);
                     longp1.set(abvsInteger1.getByteArray(), abvsInteger1.getStartOffset() + 1,
                             LongPointable.TYPE_TRAITS.getFixedLength());
             }
@@ -143,7 +130,7 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                 case ValueTag.XS_BYTE_TAG:
                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                     abvsInteger2.reset();
-                    getIntegerPointable(tp2, tvp2, dOutInteger2);
+                    FunctionHelper.getIntegerPointable(tp2, tvp2, dOutInteger2);
                     longp2.set(abvsInteger2.getByteArray(), abvsInteger2.getStartOffset() + 1,
                             LongPointable.TYPE_TRAITS.getFixedLength());
             }
@@ -463,100 +450,6 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         } catch (Exception e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
-    }
-
-    private static void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOut)
-            throws SystemException, IOException {
-        long value;
-        switch (tvp.getTag()) {
-            case ValueTag.XS_INTEGER_TAG:
-            case ValueTag.XS_LONG_TAG:
-            case ValueTag.XS_NEGATIVE_INTEGER_TAG:
-            case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
-            case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
-            case ValueTag.XS_POSITIVE_INTEGER_TAG:
-            case ValueTag.XS_UNSIGNED_INT_TAG:
-            case ValueTag.XS_UNSIGNED_LONG_TAG:
-                tvp.getValue(tp.longp);
-                value = tp.longp.longValue();
-                break;
-
-            case ValueTag.XS_INT_TAG:
-            case ValueTag.XS_UNSIGNED_SHORT_TAG:
-                tvp.getValue(tp.intp);
-                value = tp.intp.longValue();
-                break;
-
-            case ValueTag.XS_SHORT_TAG:
-            case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                tvp.getValue(tp.shortp);
-                value = tp.shortp.longValue();
-                break;
-
-            case ValueTag.XS_BYTE_TAG:
-                tvp.getValue(tp.bytep);
-                value = tp.bytep.longValue();
-                break;
-
-            default:
-                value = 0;
-        }
-        dOut.write(ValueTag.XS_INTEGER_TAG);
-        dOut.writeLong(value);
-    }
-
-    private static int getBaseTypeForComparisons(int tid) throws SystemException {
-        while (true) {
-            switch (tid) {
-                case ValueTag.XS_ANY_URI_TAG:
-                case ValueTag.XS_BASE64_BINARY_TAG:
-                case ValueTag.XS_BOOLEAN_TAG:
-                case ValueTag.XS_DATE_TAG:
-                case ValueTag.XS_DATETIME_TAG:
-                case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                case ValueTag.XS_DECIMAL_TAG:
-                case ValueTag.XS_DOUBLE_TAG:
-                case ValueTag.XS_DURATION_TAG:
-                case ValueTag.XS_FLOAT_TAG:
-                case ValueTag.XS_HEX_BINARY_TAG:
-                case ValueTag.XS_INTEGER_TAG:
-                case ValueTag.XS_G_DAY_TAG:
-                case ValueTag.XS_G_MONTH_DAY_TAG:
-                case ValueTag.XS_G_MONTH_TAG:
-                case ValueTag.XS_G_YEAR_MONTH_TAG:
-                case ValueTag.XS_G_YEAR_TAG:
-                case ValueTag.XS_QNAME_TAG:
-                case ValueTag.XS_STRING_TAG:
-                case ValueTag.XS_TIME_TAG:
-                case ValueTag.XS_UNTYPED_ATOMIC_TAG:
-                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
-                    return tid;
-
-                case ValueTag.XS_ANY_ATOMIC_TAG:
-                    throw new SystemException(ErrorCode.XPTY0004);
-
-                default:
-                    tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
-            }
-        }
-    }
-
-    private static class TypedPointables {
-        BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        XSBinaryPointable binaryp = (XSBinaryPointable) XSBinaryPointable.FACTORY.createPointable();
-        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
-        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
-        XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
-        XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
     }
 
     protected abstract AbstractValueComparisonOperation createValueComparisonOperation();
