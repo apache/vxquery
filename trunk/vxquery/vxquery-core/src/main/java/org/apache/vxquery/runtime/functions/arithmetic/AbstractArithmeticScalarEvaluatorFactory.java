@@ -17,20 +17,16 @@
 package org.apache.vxquery.runtime.functions.arithmetic;
 
 import java.io.DataOutput;
-import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
@@ -39,12 +35,7 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractArithmeticScalarEvaluatorFactory extends
@@ -65,8 +56,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         final DataOutput dOutInteger1 = abvsInteger1.getDataOutput();
         final ArrayBackedValueStorage abvsInteger2 = new ArrayBackedValueStorage();
         final DataOutput dOutInteger2 = abvsInteger2.getDataOutput();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
+        final FunctionHelper.TypedPointables tp1 = new FunctionHelper.TypedPointables();
+        final FunctionHelper.TypedPointables tp2 = new FunctionHelper.TypedPointables();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
 
@@ -121,7 +112,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                         case ValueTag.XS_BYTE_TAG:
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
                             abvsInteger1.reset();
-                            getIntegerPointable(tp1, tvp1, dOutInteger1);
+                            FunctionHelper.getIntegerPointable(tp1, tvp1, dOutInteger1);
                             longp1.set(abvsInteger1.getByteArray(), abvsInteger1.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
                     }
@@ -141,7 +132,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                         case ValueTag.XS_BYTE_TAG:
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
                             abvsInteger2.reset();
-                            getIntegerPointable(tp2, tvp2, dOutInteger2);
+                            FunctionHelper.getIntegerPointable(tp2, tvp2, dOutInteger2);
                             longp2.set(abvsInteger2.getByteArray(), abvsInteger2.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
                     }
@@ -475,98 +466,48 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                 throw new SystemException(ErrorCode.XPTY0004);
             }
 
-            private void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOut)
-                    throws SystemException, IOException {
-                long value;
-                switch (tvp.getTag()) {
-                    case ValueTag.XS_INTEGER_TAG:
-                    case ValueTag.XS_LONG_TAG:
-                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_UNSIGNED_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_LONG_TAG:
-                        tvp.getValue(tp.longp);
-                        value = tp.longp.longValue();
-                        break;
 
-                    case ValueTag.XS_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_SHORT_TAG:
-                        tvp.getValue(tp.intp);
-                        value = tp.intp.longValue();
-                        break;
-
-                    case ValueTag.XS_SHORT_TAG:
-                    case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                        tvp.getValue(tp.shortp);
-                        value = tp.shortp.longValue();
-                        break;
-
-                    case ValueTag.XS_BYTE_TAG:
-                        tvp.getValue(tp.bytep);
-                        value = tp.bytep.longValue();
-                        break;
-
-                    default:
-                        value = 0;
-                }
-                dOut.write(ValueTag.XS_INTEGER_TAG);
-                dOut.writeLong(value);
-            }
-
-            private int getBaseTypeForArithmetics(int tid) throws SystemException {
-                if (tid >= BuiltinTypeConstants.BUILTIN_TYPE_COUNT) {
-                    throw new SystemException(ErrorCode.XPTY0004);
-                }
-                while (true) {
-                    switch (tid) {
-                        case ValueTag.XS_STRING_TAG:
-                        case ValueTag.XS_DECIMAL_TAG:
-                        case ValueTag.XS_INTEGER_TAG:
-                        case ValueTag.XS_FLOAT_TAG:
-                        case ValueTag.XS_DOUBLE_TAG:
-                        case ValueTag.XS_ANY_URI_TAG:
-                        case ValueTag.XS_BOOLEAN_TAG:
-                        case ValueTag.XS_DATE_TAG:
-                        case ValueTag.XS_DATETIME_TAG:
-                        case ValueTag.XS_TIME_TAG:
-                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
-                        case ValueTag.XS_BASE64_BINARY_TAG:
-                        case ValueTag.XS_HEX_BINARY_TAG:
-                        case ValueTag.XS_QNAME_TAG:
-                        case ValueTag.XS_G_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_TAG:
-                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
-                            return tid;
-
-                        case ValueTag.XS_ANY_ATOMIC_TAG:
-                            throw new SystemException(ErrorCode.XPTY0004);
-
-                        default:
-                            tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
-                    }
-                }
-            }
         };
     }
+    
+    public static int getBaseTypeForArithmetics(int tid) throws SystemException {
+        if (tid >= BuiltinTypeConstants.BUILTIN_TYPE_COUNT) {
+            throw new SystemException(ErrorCode.XPTY0004);
+        }
+        while (true) {
+            switch (tid) {
+                case ValueTag.XS_STRING_TAG:
+                case ValueTag.XS_DECIMAL_TAG:
+                case ValueTag.XS_INTEGER_TAG:
+                case ValueTag.XS_FLOAT_TAG:
+                case ValueTag.XS_DOUBLE_TAG:
+                case ValueTag.XS_ANY_URI_TAG:
+                case ValueTag.XS_BOOLEAN_TAG:
+                case ValueTag.XS_DATE_TAG:
+                case ValueTag.XS_DATETIME_TAG:
+                case ValueTag.XS_TIME_TAG:
+                case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                case ValueTag.XS_BASE64_BINARY_TAG:
+                case ValueTag.XS_HEX_BINARY_TAG:
+                case ValueTag.XS_QNAME_TAG:
+                case ValueTag.XS_G_DAY_TAG:
+                case ValueTag.XS_G_MONTH_DAY_TAG:
+                case ValueTag.XS_G_MONTH_TAG:
+                case ValueTag.XS_G_YEAR_MONTH_TAG:
+                case ValueTag.XS_G_YEAR_TAG:
+                case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                    return tid;
 
-    private static class TypedPointables {
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
-        XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
+                case ValueTag.XS_ANY_ATOMIC_TAG:
+                    throw new SystemException(ErrorCode.XPTY0004);
+
+                default:
+                    tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
+                    return tid;
+            }
+        }
     }
-
+   
     protected abstract AbstractArithmeticOperation createArithmeticOperation();
 }
