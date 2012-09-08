@@ -3,9 +3,11 @@ package org.apache.vxquery.runtime.functions.datetime;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -34,6 +36,7 @@ public abstract class AbstractValueFromDurationScalarEvaluatorFactory extends
         final XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
         final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         final IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
         final DataOutput dOutInner = abvsInner.getDataOutput();
 
@@ -45,6 +48,13 @@ public abstract class AbstractValueFromDurationScalarEvaluatorFactory extends
                 long YMDuration = 0, DTDuration = 0;
 
                 switch (tvp1.getTag()) {
+                    case ValueTag.SEQUENCE_TAG:
+                        tvp1.getValue(seqp);
+                        if (seqp.getEntryCount() == 0) {
+                            XDMConstants.setEmptySequence(result);
+                            return;
+                        }
+                        break;
                     case ValueTag.XS_DURATION_TAG:
                         tvp1.getValue(durationp);
                         YMDuration = durationp.getYearMonth();

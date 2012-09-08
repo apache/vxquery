@@ -8,8 +8,6 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnDayFromDateTimeScalarEvaluatorFactory extends AbstractValueFromDateTimeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    private static final XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY
-            .createPointable();
 
     public FnDayFromDateTimeScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -21,7 +19,8 @@ public class FnDayFromDateTimeScalarEvaluatorFactory extends AbstractValueFromDa
     }
 
     @Override
-    protected long getInteger(TaggedValuePointable tvp) {
+    protected long getValueAsInteger(TaggedValuePointable tvp) {
+        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
         tvp.getValue(datetimep);
         return datetimep.getDay();
     }
