@@ -99,10 +99,10 @@ public class CastToDateTimeOperation extends AbstractCastToOperation {
         if (date[3] == 24) {
             date[3] = 0;
         }
-        
+
         // Double check for a valid datetime
         if (!DateTime.valid(date[0], date[1], date[2], date[3], date[4], date[5], date[6], date[7])) {
-            throw new SystemException(ErrorCode.FODT0001);
+            throw new SystemException(ErrorCode.FORG0001);
         }
 
         dOut.write(ValueTag.XS_DATETIME_TAG);
