@@ -67,24 +67,24 @@ public class FunctionHelper {
                 tvp.getValue(tp.longp);
                 value = tp.longp.longValue();
                 break;
-    
+
             case ValueTag.XS_INT_TAG:
             case ValueTag.XS_UNSIGNED_SHORT_TAG:
                 tvp.getValue(tp.intp);
                 value = tp.intp.longValue();
                 break;
-    
+
             case ValueTag.XS_SHORT_TAG:
             case ValueTag.XS_UNSIGNED_BYTE_TAG:
                 tvp.getValue(tp.shortp);
                 value = tp.shortp.longValue();
                 break;
-    
+
             case ValueTag.XS_BYTE_TAG:
                 tvp.getValue(tp.bytep);
                 value = tp.bytep.longValue();
                 break;
-    
+
             default:
                 value = 0;
         }
@@ -118,10 +118,10 @@ public class FunctionHelper {
                 case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                 case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                     return tid;
-    
+
                 case ValueTag.XS_ANY_ATOMIC_TAG:
                     throw new SystemException(ErrorCode.XPTY0004);
-    
+
                 default:
                     tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
             }

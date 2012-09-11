@@ -4,7 +4,8 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
-public abstract class AbstractCharacterIteratorCopyingEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public abstract class AbstractCharacterIteratorCopyingEvaluatorFactory extends
+        AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
     public AbstractCharacterIteratorCopyingEvaluatorFactory(IScalarEvaluatorFactory[] args) {

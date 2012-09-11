@@ -88,7 +88,7 @@ public class CastToShortOperation extends AbstractCastToOperation {
             c = charIterator.next();
             limit = Short.MIN_VALUE;
         }
-        
+
         // Read the numeric value.
         do {
             if (Character.isDigit(c)) {

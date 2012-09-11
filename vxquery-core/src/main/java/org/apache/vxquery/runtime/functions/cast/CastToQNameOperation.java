@@ -41,7 +41,7 @@ public class CastToQNameOperation extends AbstractCastToOperation {
         dOut.write((byte) ((0 >>> 8) & 0xFF));
         dOut.write((byte) ((0 >>> 0) & 0xFF));
         // No URI
-        
+
         dOut.write((byte) ((prefixLength >>> 8) & 0xFF));
         dOut.write((byte) ((prefixLength >>> 0) & 0xFF));
         dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset(), prefixLength);
@@ -50,6 +50,6 @@ public class CastToQNameOperation extends AbstractCastToOperation {
         dOut.write((byte) ((localNameLength >>> 8) & 0xFF));
         dOut.write((byte) ((localNameLength >>> 0) & 0xFF));
         dOut.write(abvsInner.getByteArray(), abvsInner.getStartOffset() + prefixLength, localNameLength);
-     }
+    }
 
 }

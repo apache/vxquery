@@ -23,7 +23,7 @@ import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public abstract class AbstractCastToOperation {
-    
+
     /**
      * Primitive Datatypes
      */
@@ -118,54 +118,54 @@ public abstract class AbstractCastToOperation {
     public void convertYMDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     /**
      * Derived Datatypes
      */
     public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertNonNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertNonPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
-    
+
     public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }

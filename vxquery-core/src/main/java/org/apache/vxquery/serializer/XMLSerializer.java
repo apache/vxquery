@@ -48,7 +48,7 @@ public class XMLSerializer implements IPrinter {
     private DataOutput dOut = abvs.getDataOutput();
     private CastToStringOperation castToString = new CastToStringOperation();
     private UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-    
+
     public XMLSerializer() {
         pp = PointablePoolFactory.INSTANCE.createPointablePool();
     }

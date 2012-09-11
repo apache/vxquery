@@ -466,10 +466,9 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                 throw new SystemException(ErrorCode.XPTY0004);
             }
 
-
         };
     }
-    
+
     public static int getBaseTypeForArithmetics(int tid) throws SystemException {
         if (tid >= BuiltinTypeConstants.BUILTIN_TYPE_COUNT) {
             throw new SystemException(ErrorCode.XPTY0004);
@@ -508,6 +507,6 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
             }
         }
     }
-   
+
     protected abstract AbstractArithmeticOperation createArithmeticOperation();
 }
