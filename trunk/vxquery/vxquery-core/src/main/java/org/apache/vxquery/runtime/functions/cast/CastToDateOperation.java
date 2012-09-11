@@ -83,7 +83,7 @@ public class CastToDateOperation extends AbstractCastToOperation {
         }
         // Double check for a valid date
         if (!DateTime.valid(date[0], date[1], date[2], 0, 0, 0, date[3], date[4])) {
-            throw new SystemException(ErrorCode.FODT0001);
+            throw new SystemException(ErrorCode.FORG0001);
         }
 
         dOut.write(ValueTag.XS_DATE_TAG);

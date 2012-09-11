@@ -82,10 +82,10 @@ public class CastToTimeOperation extends AbstractCastToOperation {
         if (date[0] == 24) {
             date[0] = 0;
         }
-        
+
         // Double check for a valid time
         if (!DateTime.valid(1972, 12, 31, date[0], date[1], date[2], date[3], date[4])) {
-            throw new SystemException(ErrorCode.FODT0001);
+            throw new SystemException(ErrorCode.FORG0001);
         }
 
         dOut.write(ValueTag.XS_TIME_TAG);
