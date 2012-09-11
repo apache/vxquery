@@ -85,16 +85,6 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         boolean booleanResult = false;
         int tid1 = FunctionHelper.getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = FunctionHelper.getBaseTypeForComparisons(tvp2.getTag());
-        if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-            // TODO Convert to double
-            tid1 = ValueTag.XS_DOUBLE_TAG;
-            throw new UnsupportedOperationException();
-        }
-        if (tid2 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-            // TODO Convert to double
-            tid2 = ValueTag.XS_DOUBLE_TAG;
-            throw new UnsupportedOperationException();
-        }
         try {
             switch (tvp1.getTag()) {
                 case ValueTag.XS_INTEGER_TAG:
@@ -241,9 +231,11 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                     break;
 
                 case ValueTag.XS_STRING_TAG:
+                case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                     tvp1.getValue(tp1.utf8sp);
                     switch (tid2) {
                         case ValueTag.XS_STRING_TAG:
+                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                             tvp2.getValue(tp2.utf8sp);
                             booleanResult = aOp.operateStringString(tp1.utf8sp, tp2.utf8sp);
                             break;
