@@ -56,7 +56,8 @@ public class XSTimePointable extends AbstractPointable implements ITime, ITimezo
         setTime(bytes, start, hour, minute, second, timezoneHour, timezoneMinute);
     }
 
-    public static void setTime(byte[] bytes, int start, long hour, long minute, long second, long timezoneHour, long timezoneMinute) {
+    public static void setTime(byte[] bytes, int start, long hour, long minute, long second, long timezoneHour,
+            long timezoneMinute) {
         BytePointable.setByte(bytes, start + HOUR_OFFSET, (byte) hour);
         BytePointable.setByte(bytes, start + MINUTE_OFFSET, (byte) minute);
         IntegerPointable.setInteger(bytes, start + MILLISECOND_OFFSET, (byte) second);

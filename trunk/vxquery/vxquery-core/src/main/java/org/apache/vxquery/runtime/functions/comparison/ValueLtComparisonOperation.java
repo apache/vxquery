@@ -27,7 +27,7 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     protected final DataOutput dOutInner = abvsInner.getDataOutput();
     private XSDateTimePointable ctxDatetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-    
+
     @Override
     public boolean operateAnyURIAnyURI(UTF8StringPointable stringp1, UTF8StringPointable stringp2)
             throws SystemException, IOException {

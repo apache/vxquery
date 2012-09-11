@@ -28,8 +28,8 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateDatetimeDTDuration(XSDateTimePointable datetimep1, LongPointable longp2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateDatetimeYMDuration(XSDateTimePointable datetimep1, IntegerPointable intp2, DataOutput dOut)
-            throws SystemException, IOException;
+    public abstract void operateDatetimeYMDuration(XSDateTimePointable datetimep1, IntegerPointable intp2,
+            DataOutput dOut) throws SystemException, IOException;
 
     public abstract void operateDateYMDuration(XSDatePointable datep1, IntegerPointable intp2, DataOutput dOut)
             throws SystemException, IOException;
@@ -139,8 +139,8 @@ public abstract class AbstractArithmeticOperation {
     public abstract void operateYMDurationDate(IntegerPointable intp1, XSDatePointable datep2, DataOutput dOut)
             throws SystemException, IOException;
 
-    public abstract void operateYMDurationDatetime(IntegerPointable intp1, XSDateTimePointable datetimep2, DataOutput dOut)
-            throws SystemException, IOException;
+    public abstract void operateYMDurationDatetime(IntegerPointable intp1, XSDateTimePointable datetimep2,
+            DataOutput dOut) throws SystemException, IOException;
 
     public abstract void operateYMDurationDecimal(IntegerPointable intp1, XSDecimalPointable decp2, DataOutput dOut)
             throws SystemException, IOException;

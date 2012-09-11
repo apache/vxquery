@@ -10,7 +10,7 @@ import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 public class XSDurationPointable extends AbstractPointable {
     private final static int YEAR_MONTH_OFFSET = 0;
     private final static int DAY_TIME_OFFSET = 4;
-    
+
     public static final ITypeTraits TYPE_TRAITS = new ITypeTraits() {
         private static final long serialVersionUID = 1L;
 
@@ -58,11 +58,11 @@ public class XSDurationPointable extends AbstractPointable {
     public static void setYearMonth(byte[] bytes, int start, int value) {
         IntegerPointable.setInteger(bytes, start + YEAR_MONTH_OFFSET, value);
     }
-    
+
     public void setYearMonth(int value) {
         setYearMonth(bytes, start, value);
     }
-    
+
     public static void setDayTime(byte[] bytes, int start, long value) {
         LongPointable.setLong(bytes, start + DAY_TIME_OFFSET, value);
     }

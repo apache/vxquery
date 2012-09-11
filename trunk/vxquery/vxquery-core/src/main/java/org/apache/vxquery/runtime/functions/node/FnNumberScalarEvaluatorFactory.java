@@ -61,7 +61,7 @@ public class FnNumberScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             tvp1.getValue(tp.boolp);
                             castToDouble.convertBoolean(tp.boolp, dOut);
                             break;
-//                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                        //                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                         case ValueTag.XS_INTEGER_TAG:
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
                         case ValueTag.XS_NEGATIVE_INTEGER_TAG:
@@ -73,7 +73,7 @@ public class FnNumberScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             tvp1.getValue(tp.longp);
                             castToDouble.convertInteger(tp.longp, dOut);
                             break;
-//                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                        //                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
                         case ValueTag.XS_INT_TAG:
                         case ValueTag.XS_UNSIGNED_SHORT_TAG:
                             tvp1.getValue(tp.intp);

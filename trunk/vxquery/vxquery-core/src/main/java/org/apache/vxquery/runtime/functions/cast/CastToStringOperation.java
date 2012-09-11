@@ -877,7 +877,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
             writeChar('0', dOut);
             --padding;
         }
-        
+
         // Write the actual number.
         long pow10 = (long) Math.pow(10, nDigits - 1);
         for (int i = nDigits - 1; i >= 0; --i) {

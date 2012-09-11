@@ -13,7 +13,7 @@ import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class CastToBase64BinaryOperation extends AbstractCastToOperation {
     private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
-    
+
     @Override
     public void convertBase64Binary(XSBinaryPointable binaryp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BASE64_BINARY_TAG);

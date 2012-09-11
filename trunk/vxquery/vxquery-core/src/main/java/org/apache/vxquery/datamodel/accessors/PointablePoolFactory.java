@@ -53,7 +53,7 @@ public class PointablePoolFactory {
         pp.register(XSDurationPointable.class, XSDurationPointable.FACTORY);
         pp.register(XSQNamePointable.class, XSQNamePointable.FACTORY);
         pp.register(XSTimePointable.class, XSTimePointable.FACTORY);
-        
+
         pp.register(NodeTreePointable.class, NodeTreePointable.FACTORY);
         pp.register(DocumentNodePointable.class, DocumentNodePointable.FACTORY);
         pp.register(ElementNodePointable.class, ElementNodePointable.FACTORY);

@@ -8,5 +8,5 @@ public class CastToUnsignedByteOperation extends CastToShortOperation {
         negativeAllowed = false;
         returnTag = ValueTag.XS_UNSIGNED_BYTE_TAG;
     }
-    
+
 }

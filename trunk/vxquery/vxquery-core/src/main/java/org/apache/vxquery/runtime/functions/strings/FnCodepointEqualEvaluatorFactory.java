@@ -47,7 +47,7 @@ public class FnCodepointEqualEvaluatorFactory extends AbstractTaggedValueArgumen
                 }
                 tvp1.getValue(stringp1);
                 tvp2.getValue(stringp2);
-                
+
                 if (stringp1.compareTo(stringp2) == 0) {
                     booleanResult[1] = 1;
                 }

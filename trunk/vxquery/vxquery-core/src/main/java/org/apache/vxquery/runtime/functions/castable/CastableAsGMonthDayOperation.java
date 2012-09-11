@@ -46,7 +46,7 @@ public class CastableAsGMonthDayOperation extends AbstractCastableAsOperation {
         }
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) (castable ? 1 : 0));
-}
+    }
 
     @Override
     public void convertUntypedAtomic(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {

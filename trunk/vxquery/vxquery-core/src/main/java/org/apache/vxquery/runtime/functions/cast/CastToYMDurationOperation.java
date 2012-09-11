@@ -32,7 +32,7 @@ public class CastToYMDurationOperation extends AbstractCastToOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         ICharacterIterator charIterator = new UTF8StringCharacterIterator(stringp);
         charIterator.reset();
-        
+
         int value = 0;
         long year = 0, month = 0;
         long negativeResult = 1;

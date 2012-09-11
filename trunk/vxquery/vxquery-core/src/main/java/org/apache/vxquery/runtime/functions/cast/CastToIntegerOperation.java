@@ -101,8 +101,8 @@ public class CastToIntegerOperation extends AbstractCastToOperation {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
-        
-        if (negativeRequired && value !=0 && !negative) {
+
+        if (negativeRequired && value != 0 && !negative) {
             throw new SystemException(ErrorCode.FORG0001);
         }
 

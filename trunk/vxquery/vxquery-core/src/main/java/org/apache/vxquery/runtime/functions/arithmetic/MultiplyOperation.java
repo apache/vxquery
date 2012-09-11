@@ -22,7 +22,7 @@ public class MultiplyOperation extends AbstractArithmeticOperation {
     protected final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
     private XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-    
+
     @Override
     public void operateDateDate(XSDatePointable datep, XSDatePointable datep2, DynamicContext dCtx, DataOutput dOut)
             throws SystemException, IOException {
