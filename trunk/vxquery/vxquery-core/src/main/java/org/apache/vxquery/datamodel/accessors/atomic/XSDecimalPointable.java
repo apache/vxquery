@@ -133,7 +133,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
         } else {
             return getDecimalValue(bytes, start);
         }
-        
+
     }
 
     public byte getDigitCount() {
@@ -171,7 +171,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
 
     @Override
     public long longValue() {
-        return getBeforeDecimalPlaceRounded();
+        return getBeforeDecimalPlace();
     }
 
     @Override
