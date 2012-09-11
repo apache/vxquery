@@ -66,14 +66,8 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
 
             @Override
             protected void evaluate(TaggedValuePointable tvp, IPointable result) throws SystemException {
-                int tid = tvp.getTag();
-                if (tid == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-                    // TODO Convert to double
-                    tid = ValueTag.XS_DOUBLE_TAG;
-                    throw new UnsupportedOperationException();
-                }
-
                 abvs.reset();
+                int tid = tvp.getTag();
                 try {
                     switch (tid) {
                     /**
