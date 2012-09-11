@@ -34,8 +34,8 @@ public class DateTime {
             59999 // millisecond
     };
 
-    public static final int TIMEZONE_HOUR_MIN = -12, TIMEZONE_HOUR_MAX = 14, TIMEZONE_MINUTE_MIN = -60,
-            TIMEZONE_MINUTE_MAX = 60;
+    public static final int TIMEZONE_HOUR_MIN = -14, TIMEZONE_HOUR_MAX = 14, TIMEZONE_MINUTE_MIN = -59,
+            TIMEZONE_MINUTE_MAX = 59;
     // Used to store the timezone value when one does not exist.
     public static final byte TIMEZONE_HOUR_NULL = 127, TIMEZONE_MINUTE_NULL = 127;
 
