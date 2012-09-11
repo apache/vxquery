@@ -471,6 +471,7 @@
         <param name="firstval" type="xs:integer"/>
         <param name="lastval" type="xs:integer"/>
         <return type="xs:integer*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.OpToScalarEvaluatorFactory"/>
     </operator>
 
     <!-- op:union($parameter1  as node()*, $parameter2 as node()*)  as node()* -->
