@@ -197,12 +197,12 @@ public abstract class AbstractCastableAsOperation {
         dOut.write((byte) 0);
     }
 
-    public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
+    public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 0);
     }
 
-    public void convertUnsignedInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+    public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 0);
     }
@@ -212,7 +212,7 @@ public abstract class AbstractCastableAsOperation {
         dOut.write((byte) 0);
     }
 
-    public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+    public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 0);
     }
