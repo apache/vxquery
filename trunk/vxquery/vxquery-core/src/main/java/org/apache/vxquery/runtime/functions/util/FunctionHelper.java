@@ -32,6 +32,7 @@ import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
@@ -135,11 +136,78 @@ public class FunctionHelper {
                 case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                     return tid;
 
+                case ValueTag.XS_LONG_TAG:
+                case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                case ValueTag.XS_UNSIGNED_INT_TAG:
+                case ValueTag.XS_UNSIGNED_LONG_TAG:
+                case ValueTag.XS_INT_TAG:
+                case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                case ValueTag.XS_SHORT_TAG:
+                case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                case ValueTag.XS_BYTE_TAG:
+                    return ValueTag.XS_INTEGER_TAG;
+
                 case ValueTag.XS_ANY_ATOMIC_TAG:
                     throw new SystemException(ErrorCode.XPTY0004);
 
                 default:
                     tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
+            }
+        }
+    }
+
+    public static int getBaseTypeForArithmetics(int tid) throws SystemException {
+        if (tid >= BuiltinTypeConstants.BUILTIN_TYPE_COUNT) {
+            throw new SystemException(ErrorCode.XPTY0004);
+        }
+        while (true) {
+            switch (tid) {
+                case ValueTag.XS_STRING_TAG:
+                case ValueTag.XS_DECIMAL_TAG:
+                case ValueTag.XS_INTEGER_TAG:
+                case ValueTag.XS_FLOAT_TAG:
+                case ValueTag.XS_DOUBLE_TAG:
+                case ValueTag.XS_ANY_URI_TAG:
+                case ValueTag.XS_BOOLEAN_TAG:
+                case ValueTag.XS_DATE_TAG:
+                case ValueTag.XS_DATETIME_TAG:
+                case ValueTag.XS_TIME_TAG:
+                case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                case ValueTag.XS_BASE64_BINARY_TAG:
+                case ValueTag.XS_HEX_BINARY_TAG:
+                case ValueTag.XS_QNAME_TAG:
+                case ValueTag.XS_G_DAY_TAG:
+                case ValueTag.XS_G_MONTH_DAY_TAG:
+                case ValueTag.XS_G_MONTH_TAG:
+                case ValueTag.XS_G_YEAR_MONTH_TAG:
+                case ValueTag.XS_G_YEAR_TAG:
+                case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                    return tid;
+
+                case ValueTag.XS_LONG_TAG:
+                case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                case ValueTag.XS_UNSIGNED_INT_TAG:
+                case ValueTag.XS_UNSIGNED_LONG_TAG:
+                case ValueTag.XS_INT_TAG:
+                case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                case ValueTag.XS_SHORT_TAG:
+                case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                case ValueTag.XS_BYTE_TAG:
+                    return ValueTag.XS_INTEGER_TAG;
+
+                case ValueTag.XS_ANY_ATOMIC_TAG:
+                    throw new SystemException(ErrorCode.XPTY0004);
+
+                default:
+                    tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
+                    return tid;
             }
         }
     }
