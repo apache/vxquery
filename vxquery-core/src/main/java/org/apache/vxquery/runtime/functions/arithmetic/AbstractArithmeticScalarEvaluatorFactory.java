@@ -61,7 +61,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final CastToDoubleOperation castToDouble = new CastToDoubleOperation();
-        
+
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
