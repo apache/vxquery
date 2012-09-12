@@ -249,6 +249,7 @@
     <function name="fn:distinct-values">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnDistinctValuesScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:distinct-values($arg  as xs:anyAtomicType*, $collation as xs:string)  as xs:anyAtomicType* -->
@@ -256,6 +257,7 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnDistinctValuesScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:doc($uri as  xs:string?) as document-node()?  -->
