@@ -19,17 +19,11 @@ package org.apache.vxquery.runtime.functions.cast;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.type.AbstractTypeScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.SequenceType;
 
@@ -38,14 +32,6 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFactory {
@@ -61,7 +47,7 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
         return new AbstractTypeScalarEvaluator(args, ctx) {
             final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
             final DataOutput dOut = abvs.getDataOutput();
-            final TypedPointables tp = new TypedPointables();
+            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
             AbstractCastToOperation aOp = new CastToStringOperation();
 
             @Override
@@ -303,6 +289,8 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToBase64BinaryOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_BOOLEAN) {
                     aOp = new CastToBooleanOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_BYTE) {
+                    aOp = new CastToByteOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_DATE) {
                     aOp = new CastToDateOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_DATETIME) {
@@ -327,27 +315,12 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToGYearOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_G_YEAR_MONTH) {
                     aOp = new CastToGYearMonthOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INTEGER) {
-                    aOp = new CastToIntegerOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_HEX_BINARY) {
                     aOp = new CastToHexBinaryOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NOTATION) {
-                    aOp = new CastToNotationOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_QNAME) {
-                    aOp = new CastToQNameOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_STRING) {
-                    aOp = new CastToStringOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_TIME) {
-                    aOp = new CastToTimeOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNTYPED_ATOMIC) {
-                    aOp = new CastToUntypedAtomicOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_YEAR_MONTH_DURATION) {
-                    aOp = new CastToYMDurationOperation();
-
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_BYTE) {
-                    aOp = new CastToByteOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INT) {
                     aOp = new CastToIntOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INTEGER) {
+                    aOp = new CastToIntegerOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_LONG) {
                     aOp = new CastToLongOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NEGATIVE_INTEGER) {
@@ -356,10 +329,20 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToNonNegativeIntegerOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NON_POSITIVE_INTEGER) {
                     aOp = new CastToNonPositiveIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NOTATION) {
+                    aOp = new CastToNotationOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_POSITIVE_INTEGER) {
                     aOp = new CastToPositiveIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_QNAME) {
+                    aOp = new CastToQNameOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_SHORT) {
                     aOp = new CastToShortOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_STRING) {
+                    aOp = new CastToStringOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_TIME) {
+                    aOp = new CastToTimeOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNTYPED_ATOMIC) {
+                    aOp = new CastToUntypedAtomicOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_BYTE) {
                     aOp = new CastToUnsignedByteOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_INT) {
@@ -368,31 +351,14 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToUnsignedLongOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_SHORT) {
                     aOp = new CastToUnsignedShortOperation();
-
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_YEAR_MONTH_DURATION) {
+                    aOp = new CastToYMDurationOperation();
                 } else {
                     aOp = new CastToUntypedAtomicOperation();
                 }
             }
 
         };
-    }
-
-    private static class TypedPointables {
-        BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        XSBinaryPointable binaryp = (XSBinaryPointable) XSBinaryPointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
-        XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
-        XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
-        XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
     }
 
 }

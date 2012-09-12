@@ -19,17 +19,12 @@ package org.apache.vxquery.runtime.functions.castable;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.type.AbstractTypeScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.SequenceType;
 
@@ -38,12 +33,6 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFactory {
@@ -59,19 +48,13 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
         return new AbstractTypeScalarEvaluator(args, ctx) {
             final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
             final DataOutput dOut = abvs.getDataOutput();
-            final TypedPointables tp = new TypedPointables();
+            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
             AbstractCastableAsOperation aOp = new CastableAsStringOperation();
 
             @Override
             protected void evaluate(TaggedValuePointable tvp, IPointable result) throws SystemException {
-                int tid = getBaseTypeForCasts(tvp.getTag());
-                if (tid == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-                    // TODO Convert to double
-                    tid = ValueTag.XS_DOUBLE_TAG;
-                    throw new UnsupportedOperationException();
-                }
-
                 abvs.reset();
+                int tid = tvp.getTag();
                 try {
                     switch (tid) {
                         case ValueTag.XS_ANY_URI_TAG:
@@ -89,6 +72,12 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                         case ValueTag.XS_BOOLEAN_TAG:
                             tvp.getValue(tp.boolp);
                             aOp.convertBoolean(tp.boolp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_BYTE_TAG:
+                            tvp.getValue(tp.bytep);
+                            aOp.convertByte(tp.bytep, dOut);
                             result.set(abvs);
                             return;
 
@@ -170,9 +159,39 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                             result.set(abvs);
                             return;
 
+                        case ValueTag.XS_INT_TAG:
+                            tvp.getValue(tp.intp);
+                            aOp.convertInt(tp.intp, dOut);
+                            result.set(abvs);
+                            return;
+
                         case ValueTag.XS_INTEGER_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_LONG_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertLong(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertNegativeInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertNonNegativeInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertNonPositiveInteger(tp.longp, dOut);
                             result.set(abvs);
                             return;
 
@@ -182,9 +201,25 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                             result.set(abvs);
                             return;
 
+                        case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertPositiveInteger(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
                         case ValueTag.XS_QNAME_TAG:
                             tvp.getValue(tp.qnamep);
                             aOp.convertQName(tp.qnamep, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.SEQUENCE_TAG:
+                            XDMConstants.setFalse(result);
+                            return;
+
+                        case ValueTag.XS_SHORT_TAG:
+                            tvp.getValue(tp.shortp);
+                            aOp.convertShort(tp.shortp, dOut);
                             result.set(abvs);
                             return;
 
@@ -197,6 +232,30 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                         case ValueTag.XS_TIME_TAG:
                             tvp.getValue(tp.timep);
                             aOp.convertTime(tp.timep, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_BYTE_TAG:
+                            tvp.getValue(tp.shortp);
+                            aOp.convertShort(tp.shortp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_INT_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertUnsignedInt(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_LONG_TAG:
+                            tvp.getValue(tp.longp);
+                            aOp.convertUnsignedLong(tp.longp, dOut);
+                            result.set(abvs);
+                            return;
+
+                        case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                            tvp.getValue(tp.intp);
+                            aOp.convertUnsignedShort(tp.intp, dOut);
                             result.set(abvs);
                             return;
 
@@ -229,6 +288,8 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                     aOp = new CastableAsBase64BinaryOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_BOOLEAN) {
                     aOp = new CastableAsBooleanOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_BYTE) {
+                    aOp = new CastableAsByteOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_DATE) {
                     aOp = new CastableAsDateOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_DATETIME) {
@@ -253,18 +314,38 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                     aOp = new CastableAsGYearOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_G_YEAR_MONTH) {
                     aOp = new CastableAsGYearMonthOperation();
-                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INTEGER) {
-                    aOp = new CastableAsIntegerOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_HEX_BINARY) {
                     aOp = new CastableAsHexBinaryOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INT) {
+                    aOp = new CastableAsIntOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INTEGER) {
+                    aOp = new CastableAsIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_LONG) {
+                    aOp = new CastableAsLongOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NEGATIVE_INTEGER) {
+                    aOp = new CastableAsNegativeIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NON_NEGATIVE_INTEGER) {
+                    aOp = new CastableAsNonNegativeIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NON_POSITIVE_INTEGER) {
+                    aOp = new CastableAsNonPositiveIntegerOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NOTATION) {
                     aOp = new CastableAsNotationOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_QNAME) {
                     aOp = new CastableAsQNameOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_SHORT) {
+                    aOp = new CastableAsShortOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_STRING) {
                     aOp = new CastableAsStringOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_TIME) {
                     aOp = new CastableAsTimeOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_BYTE) {
+                    aOp = new CastableAsUnsignedByteOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_INT) {
+                    aOp = new CastableAsUnsignedIntOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_LONG) {
+                    aOp = new CastableAsUnsignedLongOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_SHORT) {
+                    aOp = new CastableAsUnsignedShortOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNTYPED_ATOMIC) {
                     aOp = new CastableAsUntypedAtomicOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_YEAR_MONTH_DURATION) {
@@ -274,59 +355,7 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                 }
             }
 
-            private int getBaseTypeForCasts(int tid) throws SystemException {
-                while (true) {
-                    switch (tid) {
-                        case ValueTag.XS_ANY_URI_TAG:
-                        case ValueTag.XS_BASE64_BINARY_TAG:
-                        case ValueTag.XS_BOOLEAN_TAG:
-                        case ValueTag.XS_DATE_TAG:
-                        case ValueTag.XS_DATETIME_TAG:
-                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                        case ValueTag.XS_DECIMAL_TAG:
-                        case ValueTag.XS_DOUBLE_TAG:
-                        case ValueTag.XS_DURATION_TAG:
-                        case ValueTag.XS_FLOAT_TAG:
-                        case ValueTag.XS_G_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_DAY_TAG:
-                        case ValueTag.XS_G_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_MONTH_TAG:
-                        case ValueTag.XS_G_YEAR_TAG:
-                        case ValueTag.XS_HEX_BINARY_TAG:
-                        case ValueTag.XS_INTEGER_TAG:
-                        case ValueTag.XS_QNAME_TAG:
-                        case ValueTag.XS_STRING_TAG:
-                        case ValueTag.XS_TIME_TAG:
-                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
-                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
-                            return tid;
-
-                        case ValueTag.XS_ANY_ATOMIC_TAG:
-                            throw new SystemException(ErrorCode.XPTY0004);
-
-                        default:
-                            tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
-                    }
-                }
-            }
-
         };
-    }
-
-    private static class TypedPointables {
-        BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        XSBinaryPointable binaryp = (XSBinaryPointable) XSBinaryPointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
-        XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
-        XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
-        XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
     }
 
 }
