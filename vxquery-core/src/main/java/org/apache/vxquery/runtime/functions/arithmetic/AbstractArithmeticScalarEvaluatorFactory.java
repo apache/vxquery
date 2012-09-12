@@ -26,15 +26,15 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.apache.vxquery.types.BuiltinTypeConstants;
-import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
@@ -52,15 +52,16 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         final AbstractArithmeticOperation aOp = createArithmeticOperation();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
-        final ArrayBackedValueStorage abvsInteger1 = new ArrayBackedValueStorage();
-        final DataOutput dOutInteger1 = abvsInteger1.getDataOutput();
-        final ArrayBackedValueStorage abvsInteger2 = new ArrayBackedValueStorage();
-        final DataOutput dOutInteger2 = abvsInteger2.getDataOutput();
+        final ArrayBackedValueStorage abvsArgument1 = new ArrayBackedValueStorage();
+        final DataOutput dOutArgument1 = abvsArgument1.getDataOutput();
+        final ArrayBackedValueStorage abvsArgument2 = new ArrayBackedValueStorage();
+        final DataOutput dOutArgument2 = abvsArgument2.getDataOutput();
         final FunctionHelper.TypedPointables tp1 = new FunctionHelper.TypedPointables();
         final FunctionHelper.TypedPointables tp2 = new FunctionHelper.TypedPointables();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-
+        final CastToDoubleOperation castToDouble = new CastToDoubleOperation();
+        
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
@@ -82,21 +83,12 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                     }
                     throw new SystemException(ErrorCode.XPTY0004);
                 }
-                int tid1 = getBaseTypeForArithmetics(tvp1.getTag());
-                int tid2 = getBaseTypeForArithmetics(tvp2.getTag());
-                if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-                    // TODO Convert to double
-                    tid1 = ValueTag.XS_DOUBLE_TAG;
-                    throw new UnsupportedOperationException();
-                }
-                if (tid2 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-                    // TODO Convert to double
-                    tid2 = ValueTag.XS_DOUBLE_TAG;
-                    throw new UnsupportedOperationException();
-                }
                 abvs.reset();
                 try {
+                    int tid1 = FunctionHelper.getBaseTypeForArithmetics(tvp1.getTag());
+                    int tid2 = FunctionHelper.getBaseTypeForArithmetics(tvp2.getTag());
                     LongPointable longp1 = (LongPointable) LongPointable.FACTORY.createPointable();
+                    DoublePointable doublep1 = (DoublePointable) DoublePointable.FACTORY.createPointable();
                     switch (tvp1.getTag()) {
                         case ValueTag.XS_INTEGER_TAG:
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
@@ -111,12 +103,25 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                         case ValueTag.XS_UNSIGNED_SHORT_TAG:
                         case ValueTag.XS_BYTE_TAG:
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                            abvsInteger1.reset();
-                            FunctionHelper.getIntegerPointable(tp1, tvp1, dOutInteger1);
-                            longp1.set(abvsInteger1.getByteArray(), abvsInteger1.getStartOffset() + 1,
+                            abvsArgument1.reset();
+                            FunctionHelper.getIntegerPointable(tp1, tvp1, dOutArgument1);
+                            longp1.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
+                            break;
+                        case ValueTag.XS_DOUBLE_TAG:
+                            tvp1.getValue(doublep1);
+                            break;
+                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                            tid1 = ValueTag.XS_DOUBLE_TAG;
+                            tvp1.getValue(tp1.utf8sp);
+                            abvsArgument1.reset();
+                            castToDouble.convertUntypedAtomic(tp1.utf8sp, dOutArgument1);
+                            doublep1.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset() + 1,
+                                    DoublePointable.TYPE_TRAITS.getFixedLength());
+                            break;
                     }
                     LongPointable longp2 = (LongPointable) LongPointable.FACTORY.createPointable();
+                    DoublePointable doublep2 = (DoublePointable) DoublePointable.FACTORY.createPointable();
                     switch (tvp2.getTag()) {
                         case ValueTag.XS_INTEGER_TAG:
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
@@ -131,10 +136,21 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                         case ValueTag.XS_UNSIGNED_SHORT_TAG:
                         case ValueTag.XS_BYTE_TAG:
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                            abvsInteger2.reset();
-                            FunctionHelper.getIntegerPointable(tp2, tvp2, dOutInteger2);
-                            longp2.set(abvsInteger2.getByteArray(), abvsInteger2.getStartOffset() + 1,
+                            abvsArgument2.reset();
+                            FunctionHelper.getIntegerPointable(tp2, tvp2, dOutArgument2);
+                            longp2.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
+                        case ValueTag.XS_DOUBLE_TAG:
+                            tvp2.getValue(doublep2);
+                            break;
+                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                            tid2 = ValueTag.XS_DOUBLE_TAG;
+                            tvp2.getValue(tp2.utf8sp);
+                            abvsArgument2.reset();
+                            castToDouble.convertUntypedAtomic(tp2.utf8sp, dOutArgument2);
+                            doublep2.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset() + 1,
+                                    DoublePointable.TYPE_TRAITS.getFixedLength());
+                            break;
                     }
                     switch (tid1) {
                         case ValueTag.XS_DECIMAL_TAG:
@@ -158,8 +174,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DOUBLE_TAG:
-                                    tvp2.getValue(tp2.doublep);
-                                    aOp.operateDecimalDouble(tp1.decp, tp2.doublep, dOut);
+                                    aOp.operateDecimalDouble(tp1.decp, doublep2, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -197,8 +212,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DOUBLE_TAG:
-                                    tvp2.getValue(tp2.doublep);
-                                    aOp.operateIntegerDouble(longp1, tp2.doublep, dOut);
+                                    aOp.operateIntegerDouble(longp1, doublep2, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -237,8 +251,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DOUBLE_TAG:
-                                    tvp2.getValue(tp2.doublep);
-                                    aOp.operateFloatDouble(tp1.floatp, tp2.doublep, dOut);
+                                    aOp.operateFloatDouble(tp1.floatp, doublep2, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -257,40 +270,38 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             break;
 
                         case ValueTag.XS_DOUBLE_TAG:
-                            tvp1.getValue(tp1.doublep);
                             switch (tid2) {
                                 case ValueTag.XS_DECIMAL_TAG:
                                     tvp2.getValue(tp2.decp);
-                                    aOp.operateDoubleDecimal(tp1.doublep, tp2.decp, dOut);
+                                    aOp.operateDoubleDecimal(doublep1, tp2.decp, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_INTEGER_TAG:
-                                    aOp.operateDoubleInteger(tp1.doublep, longp2, dOut);
+                                    aOp.operateDoubleInteger(doublep1, longp2, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_FLOAT_TAG:
                                     tvp2.getValue(tp2.floatp);
-                                    aOp.operateDoubleFloat(tp1.doublep, tp2.floatp, dOut);
+                                    aOp.operateDoubleFloat(doublep1, tp2.floatp, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_DOUBLE_TAG:
-                                    tvp2.getValue(tp2.doublep);
-                                    aOp.operateDoubleDouble(tp1.doublep, tp2.doublep, dOut);
+                                    aOp.operateDoubleDouble(doublep1, doublep2, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_DAY_TIME_DURATION_TAG:
                                     tvp2.getValue(tp2.longp);
-                                    aOp.operateDoubleDTDuration(tp1.doublep, tp2.longp, dOut);
+                                    aOp.operateDoubleDTDuration(doublep1, tp2.longp, dOut);
                                     result.set(abvs);
                                     return;
 
                                 case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                                     tvp2.getValue(tp2.intp);
-                                    aOp.operateDoubleYMDuration(tp1.doublep, tp2.intp, dOut);
+                                    aOp.operateDoubleYMDuration(doublep1, tp2.intp, dOut);
                                     result.set(abvs);
                                     return;
                             }
@@ -381,8 +392,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DOUBLE_TAG:
-                                    tvp2.getValue(tp2.doublep);
-                                    aOp.operateDTDurationDouble(tp1.longp, tp2.doublep, dOut);
+                                    aOp.operateDTDurationDouble(tp1.longp, doublep2, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -433,8 +443,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                                     return;
 
                                 case ValueTag.XS_DOUBLE_TAG:
-                                    tvp2.getValue(tp2.doublep);
-                                    aOp.operateYMDurationDouble(tp1.intp, tp2.doublep, dOut);
+                                    aOp.operateYMDurationDouble(tp1.intp, doublep2, dOut);
                                     result.set(abvs);
                                     return;
 
@@ -467,45 +476,6 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
             }
 
         };
-    }
-
-    public static int getBaseTypeForArithmetics(int tid) throws SystemException {
-        if (tid >= BuiltinTypeConstants.BUILTIN_TYPE_COUNT) {
-            throw new SystemException(ErrorCode.XPTY0004);
-        }
-        while (true) {
-            switch (tid) {
-                case ValueTag.XS_STRING_TAG:
-                case ValueTag.XS_DECIMAL_TAG:
-                case ValueTag.XS_INTEGER_TAG:
-                case ValueTag.XS_FLOAT_TAG:
-                case ValueTag.XS_DOUBLE_TAG:
-                case ValueTag.XS_ANY_URI_TAG:
-                case ValueTag.XS_BOOLEAN_TAG:
-                case ValueTag.XS_DATE_TAG:
-                case ValueTag.XS_DATETIME_TAG:
-                case ValueTag.XS_TIME_TAG:
-                case ValueTag.XS_DAY_TIME_DURATION_TAG:
-                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
-                case ValueTag.XS_BASE64_BINARY_TAG:
-                case ValueTag.XS_HEX_BINARY_TAG:
-                case ValueTag.XS_QNAME_TAG:
-                case ValueTag.XS_G_DAY_TAG:
-                case ValueTag.XS_G_MONTH_DAY_TAG:
-                case ValueTag.XS_G_MONTH_TAG:
-                case ValueTag.XS_G_YEAR_MONTH_TAG:
-                case ValueTag.XS_G_YEAR_TAG:
-                case ValueTag.XS_UNTYPED_ATOMIC_TAG:
-                    return tid;
-
-                case ValueTag.XS_ANY_ATOMIC_TAG:
-                    throw new SystemException(ErrorCode.XPTY0004);
-
-                default:
-                    tid = BuiltinTypeRegistry.INSTANCE.getSchemaTypeById(tid).getBaseType().getTypeId();
-                    return tid;
-            }
-        }
     }
 
     protected abstract AbstractArithmeticOperation createArithmeticOperation();
