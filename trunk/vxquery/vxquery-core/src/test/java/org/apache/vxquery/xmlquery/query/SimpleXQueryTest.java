@@ -88,26 +88,6 @@ public class SimpleXQueryTest {
     }
 
     @Test
-    public void simple012() {
-        runTest("simple012", "fn:codepoints-to-string((2309, 2358, 2378, 2325))");
-    }
-
-    @Test
-    public void simple013() {
-        runTest("simple013", "fn:string-to-codepoints(fn:codepoints-to-string((2309, 2358, 2378, 2325)))");
-    }
-
-    @Test
-    public void simple014() {
-        runTest("simple014", "normalize-space('        This                 \nis great!       ')");
-    }
-
-    @Test
-    public void simple015() {
-        runTest("simple015", "encode-for-uri('http://www.example.com/00/Weather/CA/Los%20Angeles#ocean')");
-    }
-
-    @Test
     public void simple016() {
         // TODO unzipping every time is a little slow ...
         String temp = gunzip("src/test/resources/documents/", "dblp.xml");
