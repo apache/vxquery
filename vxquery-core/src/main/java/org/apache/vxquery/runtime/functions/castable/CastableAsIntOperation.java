@@ -121,12 +121,12 @@ public class CastableAsIntOperation extends AbstractCastableAsOperation {
         dOut.write((byte) 1);
     }
 
-    public void convertUnsignedByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
+    public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 1);
     }
 
-    public void convertUnsignedShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
+    public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 1);
     }
