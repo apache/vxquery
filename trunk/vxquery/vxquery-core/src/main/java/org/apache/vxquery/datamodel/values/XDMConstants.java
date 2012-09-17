@@ -32,6 +32,8 @@ public class XDMConstants {
 
     private static final byte[] EMPTY_SEQUENCE;
 
+    private static final byte[] EMPTY_STRING;
+
     static {
         BOOLEAN_TRUE_CONSTANT = new byte[2];
         BOOLEAN_TRUE_CONSTANT[0] = ValueTag.XS_BOOLEAN_TAG;
@@ -50,6 +52,11 @@ public class XDMConstants {
             throw new RuntimeException(e);
         }
         EMPTY_SEQUENCE = Arrays.copyOf(abvs.getByteArray(), abvs.getLength());
+        
+        EMPTY_STRING = new byte[3];
+        EMPTY_STRING[0] = ValueTag.XS_STRING_TAG;
+        EMPTY_STRING[1] = 0;
+        EMPTY_STRING[2] = 0;
     }
 
     public static void setTrue(IPointable p) {
@@ -62,6 +69,10 @@ public class XDMConstants {
 
     public static void setEmptySequence(IPointable p) {
         set(p, EMPTY_SEQUENCE);
+    }
+
+    public static void setEmptyString(IPointable p) {
+        set(p, EMPTY_STRING);
     }
 
     private static void set(IPointable p, byte[] array) {
