@@ -16,10 +16,13 @@
  */
 package org.apache.vxquery.runtime.functions.strings;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -39,18 +42,29 @@ public class FnLowerCaseEvaluatorFactory extends AbstractCharacterIteratorCopyin
             throws AlgebricksException {
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ICharacterIterator charIterator = new LowerCaseCharacterIterator(new UTF8StringCharacterIterator(stringp));
-        return new AbstractCharacterIteratorCopyingEvaluator(args, charIterator) {
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
+        return new AbstractCharacterIteratorCopyingEvaluator(args, charIterator) {
             @Override
             protected void preEvaluate(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
 
                 // Only accept strings as input.
-                if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
+                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp1.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        XDMConstants.setEmptyString(tvp);
+                        tvp.getValue(stringp);
+                    } else {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                } else {
+                    if (!FunctionHelper.isDerivedFromString(tvp1.getTag())) {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                    tvp1.getValue(stringp);
                 }
-
-                tvp1.getValue(stringp);
             }
         };
     }

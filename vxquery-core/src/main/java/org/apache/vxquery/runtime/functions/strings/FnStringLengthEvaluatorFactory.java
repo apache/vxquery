@@ -18,12 +18,15 @@ package org.apache.vxquery.runtime.functions.strings;
 
 import java.io.DataOutput;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -46,6 +49,8 @@ public class FnStringLengthEvaluatorFactory extends AbstractTaggedValueArgumentS
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -53,12 +58,22 @@ public class FnStringLengthEvaluatorFactory extends AbstractTaggedValueArgumentS
                 TaggedValuePointable tvp1 = args[0];
 
                 // Only accept strings as input.
-                if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
+                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp1.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        XDMConstants.setEmptyString(tvp);
+                        tvp.getValue(stringp);
+                    } else {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                } else {
+                    if (!FunctionHelper.isDerivedFromString(tvp1.getTag())) {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                    tvp1.getValue(stringp);
                 }
 
                 // Return the string length of the UTF8 String.
-                tvp1.getValue(stringp);
                 try {
                     abvs.reset();
                     dOut.write(ValueTag.XS_INTEGER_TAG);

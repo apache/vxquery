@@ -20,32 +20,19 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
@@ -64,7 +51,7 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
         final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
         final DataOutput dOutInner = abvsInner.getDataOutput();
         final CastToStringOperation castToString = new CastToStringOperation();
-        final TypedPointables tp = new TypedPointables();
+        final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -84,7 +71,7 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                         TaggedValuePointable tvp = args[i];
 
                         // TODO Update function to support cast to a string from any atomic value.
-                        if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
+                        if (!FunctionHelper.isDerivedFromString(tvp.getTag())) {
 
                             try {
                                 abvsInner.reset();
@@ -92,10 +79,6 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                                     case ValueTag.XS_ANY_URI_TAG:
                                         tvp.getValue(tp.utf8sp);
                                         castToString.convertAnyURI(tp.utf8sp, dOutInner);
-                                        break;
-                                    case ValueTag.XS_STRING_TAG:
-                                        tvp.getValue(tp.utf8sp);
-                                        castToString.convertString(tp.utf8sp, dOutInner);
                                         break;
                                     case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                                         tvp.getValue(tp.utf8sp);
@@ -198,8 +181,18 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                                         tvp.getValue(tp.bytep);
                                         castToString.convertByte(tp.bytep, dOutInner);
                                         break;
+                                    case ValueTag.SEQUENCE_TAG:
+                                        tvp.getValue(tp.seqp);
+                                        if (tp.seqp.getEntryCount() == 0) {
+                                            // Byte Format: Type (1 byte) + String Length (2 bytes) + String.
+                                            dOutInner.write(ValueTag.XS_STRING_TAG);
+                                            dOutInner.write(0);
+                                            dOutInner.write(0);
+                                            break;
+                                        }
+                                        // Pass through if not empty sequence.
                                     default:
-                                        throw new SystemException(ErrorCode.XPDY0002);
+                                        throw new SystemException(ErrorCode.XPTY0004);
                                 }
 
                                 stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
@@ -211,38 +204,22 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                             tvp.getValue(stringp);
                         }
 
-                        out.write(stringp.getByteArray(), stringp.getStartOffset() + 2, stringp.getUTFLength());
+                        // If its an empty string do nothing.
+                        if (stringp.getUTFLength() > 0) {
+                            out.write(stringp.getByteArray(), stringp.getStartOffset() + 2, stringp.getUTFLength());
+                        }
                     }
 
                     // Update the full length string in the byte array.
-                    byte[] stringResult = abvs.getByteArray();
-                    stringResult[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-                    stringResult[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
+                    abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
+                    abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
 
-                    result.set(stringResult, 0, abvs.getLength());
+                    result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }
         };
-    }
-
-    private static class TypedPointables {
-        BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        XSBinaryPointable binaryp = (XSBinaryPointable) XSBinaryPointable.FACTORY.createPointable();
-        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
-        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
-        XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
-        XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
     }
 
 }

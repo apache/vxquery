@@ -26,6 +26,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -60,13 +61,26 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
                 TaggedValuePointable tvp2 = args[1];
 
                 // Only accept a sequence of strings and a string.
-                if (tvp1.getTag() != ValueTag.SEQUENCE_TAG) {
+                if (!FunctionHelper.isDerivedFromString(tvp2.getTag())) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
-                if (tvp2.getTag() != ValueTag.XS_STRING_TAG) {
+                if (FunctionHelper.isDerivedFromString(tvp1.getTag())) {
+                    try {
+                        // Return first parameter as a string.
+                        DataOutput out = abvs.getDataOutput();
+                        tvp1.getValue(stringp1);
+                        out.write(ValueTag.XS_STRING_TAG);
+                        out.write(stringp1.getByteArray(), stringp1.getStartOffset(), stringp1.getLength());
+                        result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    return;
+                } else if (tvp1.getTag() != ValueTag.SEQUENCE_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
 
+                // Operate on a sequence.
                 tvp1.getValue(seq);
                 tvp2.getValue(stringp2);
 
@@ -76,30 +90,32 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
                     out.write(ValueTag.XS_STRING_TAG);
 
                     // Default values for the length and update later
-                    out.write(0xFF);
-                    out.write(0xFF);
+                    out.write(0);
+                    out.write(0);
 
                     int seqLen = seq.getEntryCount();
-                    for (int j = 0; j < seqLen; ++j) {
-                        // Add separator if more than one value.
-                        if (j > 0) {
-                            out.write(stringp2.getByteArray(), stringp2.getStartOffset() + 2, stringp2.getUTFLength());
+                    if (seqLen != 0) {
+                        for (int j = 0; j < seqLen; ++j) {
+                            // Add separator if more than one value.
+                            if (j > 0) {
+                                out.write(stringp2.getByteArray(), stringp2.getStartOffset() + 2,
+                                        stringp2.getUTFLength());
+                            }
+                            // Get string from sequence.
+                            seq.getEntry(j, tvp);
+                            if (!FunctionHelper.isDerivedFromString(tvp.getTag())) {
+                                throw new SystemException(ErrorCode.FORG0006);
+                            }
+                            tvp.getValue(stringp1);
+                            out.write(stringp1.getByteArray(), stringp1.getStartOffset() + 2, stringp1.getUTFLength());
                         }
-                        // Get string from sequence.
-                        seq.getEntry(j, tvp);
-                        if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
-                            throw new SystemException(ErrorCode.FORG0006);
-                        }
-                        tvp.getValue(stringp1);
-                        out.write(stringp1.getByteArray(), stringp1.getStartOffset() + 2, stringp1.getUTFLength());
+
+                        // Update the full length string in the byte array.
+                        abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
+                        abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
                     }
 
-                    // Update the full length string in the byte array.
-                    byte[] stringResult = abvs.getByteArray();
-                    stringResult[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-                    stringResult[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
-
-                    result.set(stringResult, 0, abvs.getLength());
+                    result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
