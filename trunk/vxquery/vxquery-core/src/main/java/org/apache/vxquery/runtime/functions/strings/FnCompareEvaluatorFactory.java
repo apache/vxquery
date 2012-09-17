@@ -16,12 +16,15 @@
  */
 package org.apache.vxquery.runtime.functions.strings;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -45,6 +48,7 @@ public class FnCompareEvaluatorFactory extends AbstractTaggedValueArgumentScalar
         final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp3 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final byte[] integerResult = new byte[LongPointable.TYPE_TRAITS.getFixedLength() + 1];
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -52,15 +56,35 @@ public class FnCompareEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                 TaggedValuePointable tvp1 = args[0];
                 TaggedValuePointable tvp2 = args[1];
 
-                // Only accept strings as input.
-                if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
+                // Only accept strings or empty sequence as input.
+                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp1.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        XDMConstants.setEmptySequence(result);
+                        return;
+                    } else {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                } else {
+                    if (!FunctionHelper.isDerivedFromString(tvp1.getTag())) {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                    tvp1.getValue(stringp1);
                 }
-                if (tvp2.getTag() != ValueTag.XS_STRING_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
+                if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp2.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        XDMConstants.setEmptySequence(result);
+                        return;
+                    } else {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                } else {
+                    if (!FunctionHelper.isDerivedFromString(tvp2.getTag())) {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                    tvp2.getValue(stringp2);
                 }
-                tvp1.getValue(stringp1);
-                tvp2.getValue(stringp2);
 
                 // Third parameter is optional.
                 if (args.length > 2) {

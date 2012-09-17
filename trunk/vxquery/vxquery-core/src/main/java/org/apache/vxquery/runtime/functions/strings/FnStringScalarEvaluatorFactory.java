@@ -20,33 +20,20 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -62,7 +49,7 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         final CastToStringOperation castToString = new CastToStringOperation();
-        final TypedPointables tp = new TypedPointables();
+        final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -76,6 +63,15 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             castToString.convertAnyURI(tp.utf8sp, dOut);
                             break;
                         case ValueTag.XS_STRING_TAG:
+                        case ValueTag.XS_NORMALIZED_STRING_TAG:
+                        case ValueTag.XS_TOKEN_TAG:
+                        case ValueTag.XS_LANGUAGE_TAG:
+                        case ValueTag.XS_NMTOKEN_TAG:
+                        case ValueTag.XS_NAME_TAG:
+                        case ValueTag.XS_NCNAME_TAG:
+                        case ValueTag.XS_ID_TAG:
+                        case ValueTag.XS_IDREF_TAG:
+                        case ValueTag.XS_ENTITY_TAG:
                             tvp1.getValue(tp.utf8sp);
                             castToString.convertString(tp.utf8sp, dOut);
                             break;
@@ -180,6 +176,13 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             tvp1.getValue(tp.bytep);
                             castToString.convertByte(tp.bytep, dOut);
                             break;
+                        case ValueTag.SEQUENCE_TAG:
+                            tvp1.getValue(tp.seqp);
+                            if (tp.seqp.getEntryCount() == 0) {
+                                XDMConstants.setEmptyString(result);
+                                return;
+                            }
+                            // Pass through if not empty sequence.
                         default:
                             throw new SystemException(ErrorCode.XPDY0002);
                     }
@@ -191,23 +194,5 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
             }
 
         };
-    }
-
-    private static class TypedPointables {
-        BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        XSBinaryPointable binaryp = (XSBinaryPointable) XSBinaryPointable.FACTORY.createPointable();
-        XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
-        XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
-        XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
-        XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
     }
 }
