@@ -52,6 +52,8 @@ public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValue
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
 
+                // TODO return empty sequence if argument is empty sequence.
+
                 // Only accept a strings.
                 if (tvp1.getTag() != ValueTag.XS_QNAME_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
@@ -59,6 +61,7 @@ public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValue
                 tvp1.getValue(qnamep);
 
                 try {
+                    // TODO return empty sequence if no prefix.
                     abvs.reset();
                     dOut.write(ValueTag.XS_NCNAME_TAG);
                     dOut.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength(),
