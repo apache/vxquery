@@ -29,8 +29,8 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
-import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.comparison.ValueEqComparisonOperation;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -75,7 +75,7 @@ public class FnIndexOfScalarEvaluatorFactory extends AbstractTaggedValueArgument
                         for (int j = 0; j < seqLen; ++j) {
                             seq.getEntry(j, p);
                             tvp.set(p.getByteArray(), p.getStartOffset(), p.getLength());
-                            if (AbstractValueComparisonScalarEvaluatorFactory.compareTaggedValues(aOp, tvp, tvp2, dCtx)) {
+                            if (FunctionHelper.compareTaggedValues(aOp, tvp, tvp2, dCtx)) {
                                 abvsInner.reset();
                                 dOutInner.write(ValueTag.XS_INTEGER_TAG);
                                 dOutInner.writeLong(j + 1);
@@ -83,7 +83,7 @@ public class FnIndexOfScalarEvaluatorFactory extends AbstractTaggedValueArgument
                             }
                         }
                     } else {
-                        if (AbstractValueComparisonScalarEvaluatorFactory.compareTaggedValues(aOp, tvp1, tvp2, dCtx)) {
+                        if (FunctionHelper.compareTaggedValues(aOp, tvp1, tvp2, dCtx)) {
                             abvsInner.reset();
                             dOutInner.write(ValueTag.XS_INTEGER_TAG);
                             dOutInner.writeLong(1);

@@ -104,7 +104,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                         case ValueTag.XS_BYTE_TAG:
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
                             abvsArgument1.reset();
-                            FunctionHelper.getIntegerPointable(tp1, tvp1, dOutArgument1);
+                            FunctionHelper.getIntegerPointable(tvp1, dOutArgument1);
                             longp1.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
                             break;
@@ -137,7 +137,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                         case ValueTag.XS_BYTE_TAG:
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
                             abvsArgument2.reset();
-                            FunctionHelper.getIntegerPointable(tp2, tvp2, dOutArgument2);
+                            FunctionHelper.getIntegerPointable(tvp2, dOutArgument2);
                             longp2.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
                         case ValueTag.XS_DOUBLE_TAG:

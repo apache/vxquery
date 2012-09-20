@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
@@ -33,6 +34,7 @@ import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
@@ -274,8 +276,9 @@ public class FunctionHelper {
         dOut.writeDouble(value);
     }
 
-    public static void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOut)
-            throws SystemException, IOException {
+    public static void getIntegerPointable(TaggedValuePointable tvp, DataOutput dOut) throws SystemException,
+            IOException {
+        TypedPointables tp = new TypedPointables();
         long value;
         switch (tvp.getTag()) {
             case ValueTag.XS_INTEGER_TAG:
@@ -364,5 +367,357 @@ public class FunctionHelper {
                 return true;
         }
         return false;
+    }
+
+    public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
+            TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
+
+        boolean booleanResult = false;
+        int tid1 = getBaseTypeForComparisons(tvp1.getTag());
+        int tid2 = getBaseTypeForComparisons(tvp2.getTag());
+        try {
+            switch (tid1) {
+                case ValueTag.XS_DECIMAL_TAG:
+                    tvp1.getValue(tp1.decp);
+                    switch (tid2) {
+                        case ValueTag.XS_DECIMAL_TAG:
+                            tvp2.getValue(tp2.decp);
+                            booleanResult = aOp.operateDecimalDecimal(tp1.decp, tp2.decp);
+                            break;
+
+                        case ValueTag.XS_INTEGER_TAG:
+                            tvp2.getValue(tp2.longp);
+                            booleanResult = aOp.operateDecimalInteger(tp1.decp, tp2.longp);
+                            break;
+
+                        case ValueTag.XS_FLOAT_TAG:
+                            tvp2.getValue(tp2.floatp);
+                            booleanResult = aOp.operateDecimalFloat(tp1.decp, tp2.floatp);
+                            break;
+
+                        case ValueTag.XS_DOUBLE_TAG:
+                            tvp2.getValue(tp2.doublep);
+                            booleanResult = aOp.operateDecimalDouble(tp1.decp, tp2.doublep);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_INTEGER_TAG:
+                    tvp1.getValue(tp1.longp);
+                    switch (tid2) {
+                        case ValueTag.XS_DECIMAL_TAG:
+                            tvp2.getValue(tp2.decp);
+                            booleanResult = aOp.operateIntegerDecimal(tp1.longp, tp2.decp);
+                            break;
+
+                        case ValueTag.XS_INTEGER_TAG:
+                            tvp2.getValue(tp2.longp);
+                            booleanResult = aOp.operateIntegerInteger(tp1.longp, tp2.longp);
+                            break;
+
+                        case ValueTag.XS_FLOAT_TAG:
+                            tvp2.getValue(tp2.floatp);
+                            booleanResult = aOp.operateIntegerFloat(tp1.longp, tp2.floatp);
+                            break;
+
+                        case ValueTag.XS_DOUBLE_TAG:
+                            tvp2.getValue(tp2.doublep);
+                            booleanResult = aOp.operateIntegerDouble(tp1.longp, tp2.doublep);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_FLOAT_TAG:
+                    tvp1.getValue(tp1.floatp);
+                    switch (tid2) {
+                        case ValueTag.XS_DECIMAL_TAG:
+                            tvp2.getValue(tp2.decp);
+                            booleanResult = aOp.operateFloatDecimal(tp1.floatp, tp2.decp);
+                            break;
+
+                        case ValueTag.XS_INTEGER_TAG:
+                            tvp2.getValue(tp2.longp);
+                            booleanResult = aOp.operateFloatInteger(tp1.floatp, tp2.longp);
+                            break;
+
+                        case ValueTag.XS_FLOAT_TAG:
+                            tvp2.getValue(tp2.floatp);
+                            booleanResult = aOp.operateFloatFloat(tp1.floatp, tp2.floatp);
+                            break;
+
+                        case ValueTag.XS_DOUBLE_TAG:
+                            tvp2.getValue(tp2.doublep);
+                            booleanResult = aOp.operateFloatDouble(tp1.floatp, tp2.doublep);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_DOUBLE_TAG:
+                    tvp1.getValue(tp1.doublep);
+                    switch (tid2) {
+                        case ValueTag.XS_DECIMAL_TAG:
+                            tvp2.getValue(tp2.decp);
+                            booleanResult = aOp.operateDoubleDecimal(tp1.doublep, tp2.decp);
+                            break;
+
+                        case ValueTag.XS_INTEGER_TAG:
+                            tvp2.getValue(tp2.longp);
+                            booleanResult = aOp.operateDoubleInteger(tp1.doublep, tp2.longp);
+                            break;
+
+                        case ValueTag.XS_FLOAT_TAG:
+                            tvp2.getValue(tp2.floatp);
+                            booleanResult = aOp.operateDoubleFloat(tp1.doublep, tp2.floatp);
+                            break;
+
+                        case ValueTag.XS_DOUBLE_TAG:
+                            tvp2.getValue(tp2.doublep);
+                            booleanResult = aOp.operateDoubleDouble(tp1.doublep, tp2.doublep);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_BOOLEAN_TAG:
+                    tvp1.getValue(tp1.boolp);
+                    switch (tid2) {
+                        case ValueTag.XS_BOOLEAN_TAG:
+                            tvp2.getValue(tp2.boolp);
+                            booleanResult = aOp.operateBooleanBoolean(tp1.boolp, tp2.boolp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_STRING_TAG:
+                case ValueTag.XS_NORMALIZED_STRING_TAG:
+                case ValueTag.XS_TOKEN_TAG:
+                case ValueTag.XS_LANGUAGE_TAG:
+                case ValueTag.XS_NMTOKEN_TAG:
+                case ValueTag.XS_NAME_TAG:
+                case ValueTag.XS_NCNAME_TAG:
+                case ValueTag.XS_ID_TAG:
+                case ValueTag.XS_IDREF_TAG:
+                case ValueTag.XS_ENTITY_TAG:
+                case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                    tvp1.getValue(tp1.utf8sp);
+                    switch (tid2) {
+                        case ValueTag.XS_STRING_TAG:
+                        case ValueTag.XS_NORMALIZED_STRING_TAG:
+                        case ValueTag.XS_TOKEN_TAG:
+                        case ValueTag.XS_LANGUAGE_TAG:
+                        case ValueTag.XS_NMTOKEN_TAG:
+                        case ValueTag.XS_NAME_TAG:
+                        case ValueTag.XS_NCNAME_TAG:
+                        case ValueTag.XS_ID_TAG:
+                        case ValueTag.XS_IDREF_TAG:
+                        case ValueTag.XS_ENTITY_TAG:
+                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                            tvp2.getValue(tp2.utf8sp);
+                            booleanResult = aOp.operateStringString(tp1.utf8sp, tp2.utf8sp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_DATE_TAG:
+                    tvp1.getValue(tp1.datep);
+                    switch (tid2) {
+                        case ValueTag.XS_DATE_TAG:
+                            tvp2.getValue(tp2.datep);
+                            booleanResult = aOp.operateDateDate(tp1.datep, tp2.datep, dCtx);
+                            break;
+                        default:
+                            // Cross comparisons between DateTime, Date and Time are not supported.
+                            throw new SystemException(ErrorCode.XPTY0004);
+                    }
+                    break;
+
+                case ValueTag.XS_DATETIME_TAG:
+                    tvp1.getValue(tp1.datetimep);
+                    switch (tid2) {
+                        case ValueTag.XS_DATETIME_TAG:
+                            tvp2.getValue(tp2.datetimep);
+                            booleanResult = aOp.operateDatetimeDatetime(tp1.datetimep, tp2.datetimep, dCtx);
+                            break;
+                        default:
+                            // Cross comparisons between DateTime, Date and Time are not supported.
+                            throw new SystemException(ErrorCode.XPTY0004);
+                    }
+                    break;
+
+                case ValueTag.XS_TIME_TAG:
+                    tvp1.getValue(tp1.timep);
+                    switch (tid2) {
+                        case ValueTag.XS_TIME_TAG:
+                            tvp2.getValue(tp2.timep);
+                            booleanResult = aOp.operateTimeTime(tp1.timep, tp2.timep, dCtx);
+                            break;
+                        default:
+                            // Cross comparisons between DateTime, Date and Time are not supported.
+                            throw new SystemException(ErrorCode.XPTY0004);
+                    }
+                    break;
+
+                case ValueTag.XS_DURATION_TAG:
+                    tvp1.getValue(tp1.durationp);
+                    switch (tid2) {
+                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                            tvp2.getValue(tp2.longp);
+                            booleanResult = aOp.operateDurationDTDuration(tp1.durationp, tp2.longp);
+                            break;
+                        case ValueTag.XS_DURATION_TAG:
+                            tvp2.getValue(tp2.durationp);
+                            booleanResult = aOp.operateDurationDuration(tp1.durationp, tp2.durationp);
+                            break;
+                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                            tvp2.getValue(tp2.intp);
+                            booleanResult = aOp.operateDurationYMDuration(tp1.durationp, tp2.intp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                    tvp1.getValue(tp1.longp);
+                    switch (tid2) {
+                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                            tvp2.getValue(tp2.longp);
+                            booleanResult = aOp.operateDTDurationDTDuration(tp1.longp, tp2.longp);
+                            break;
+                        case ValueTag.XS_DURATION_TAG:
+                            tvp2.getValue(tp2.durationp);
+                            booleanResult = aOp.operateDTDurationDuration(tp1.longp, tp2.durationp);
+                            break;
+                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                            tvp2.getValue(tp2.intp);
+                            booleanResult = aOp.operateDTDurationYMDuration(tp1.longp, tp2.intp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                    tvp1.getValue(tp1.intp);
+                    switch (tid2) {
+                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                            tvp2.getValue(tp2.longp);
+                            booleanResult = aOp.operateYMDurationDTDuration(tp1.intp, tp2.longp);
+                            break;
+                        case ValueTag.XS_DURATION_TAG:
+                            tvp2.getValue(tp2.durationp);
+                            booleanResult = aOp.operateYMDurationDuration(tp1.intp, tp2.durationp);
+                            break;
+                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                            tvp2.getValue(tp2.intp);
+                            booleanResult = aOp.operateYMDurationYMDuration(tp1.intp, tp2.intp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_G_DAY_TAG:
+                    tvp1.getValue(tp1.datep);
+                    switch (tid2) {
+                        case ValueTag.XS_G_DAY_TAG:
+                            tvp2.getValue(tp2.datep);
+                            booleanResult = aOp.operateGDayGDay(tp1.datep, tp2.datep, dCtx);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_G_MONTH_DAY_TAG:
+                    tvp1.getValue(tp1.datep);
+                    switch (tid2) {
+                        case ValueTag.XS_G_MONTH_DAY_TAG:
+                            tvp2.getValue(tp2.datep);
+                            booleanResult = aOp.operateGMonthDayGMonthDay(tp1.datep, tp2.datep, dCtx);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_G_MONTH_TAG:
+                    tvp1.getValue(tp1.datep);
+                    switch (tid2) {
+                        case ValueTag.XS_G_MONTH_TAG:
+                            tvp2.getValue(tp2.datep);
+                            booleanResult = aOp.operateGMonthGMonth(tp1.datep, tp2.datep, dCtx);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_G_YEAR_MONTH_TAG:
+                    tvp1.getValue(tp1.datep);
+                    switch (tid2) {
+                        case ValueTag.XS_G_YEAR_MONTH_TAG:
+                            tvp2.getValue(tp2.datep);
+                            booleanResult = aOp.operateGYearMonthGYearMonth(tp1.datep, tp2.datep, dCtx);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_G_YEAR_TAG:
+                    tvp1.getValue(tp1.datep);
+                    switch (tid2) {
+                        case ValueTag.XS_G_YEAR_TAG:
+                            tvp2.getValue(tp2.datep);
+                            booleanResult = aOp.operateGYearGYear(tp1.datep, tp2.datep, dCtx);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_HEX_BINARY_TAG:
+                    tvp1.getValue(tp1.binaryp);
+                    switch (tid2) {
+                        case ValueTag.XS_HEX_BINARY_TAG:
+                            tvp2.getValue(tp2.binaryp);
+                            booleanResult = aOp.operateHexBinaryHexBinary(tp1.binaryp, tp2.binaryp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_BASE64_BINARY_TAG:
+                    tvp1.getValue(tp1.binaryp);
+                    switch (tid2) {
+                        case ValueTag.XS_BASE64_BINARY_TAG:
+                            tvp2.getValue(tp2.binaryp);
+                            booleanResult = aOp.operateBase64BinaryBase64Binary(tp1.binaryp, tp2.binaryp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_ANY_URI_TAG:
+                    tvp1.getValue(tp1.utf8sp);
+                    switch (tid2) {
+                        case ValueTag.XS_ANY_URI_TAG:
+                            tvp2.getValue(tp2.utf8sp);
+                            booleanResult = aOp.operateAnyURIAnyURI(tp1.utf8sp, tp2.utf8sp);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_QNAME_TAG:
+                    tvp1.getValue(tp1.qnamep);
+                    switch (tid2) {
+                        case ValueTag.XS_QNAME_TAG:
+                            tvp2.getValue(tp2.qnamep);
+                            booleanResult = aOp.operateQNameQName(tp1.qnamep, tp2.qnamep);
+                            break;
+                    }
+                    break;
+
+                case ValueTag.XS_NOTATION_TAG:
+                    tvp1.getValue(tp1.utf8sp);
+                    switch (tid2) {
+                        case ValueTag.XS_NOTATION_TAG:
+                            tvp2.getValue(tp2.utf8sp);
+                            booleanResult = aOp.operateNotationNotation(tp1.utf8sp, tp2.utf8sp);
+                            break;
+                    }
+                    break;
+            }
+            return booleanResult;
+
+        } catch (SystemException se) {
+            throw se;
+        } catch (Exception e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        }
     }
 }

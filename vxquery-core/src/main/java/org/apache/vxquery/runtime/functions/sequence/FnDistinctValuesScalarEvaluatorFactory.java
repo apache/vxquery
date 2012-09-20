@@ -28,8 +28,8 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
-import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.comparison.ValueEqComparisonOperation;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -92,8 +92,7 @@ public class FnDistinctValuesScalarEvaluatorFactory extends AbstractTaggedValueA
                                 for (int k = j + 1; k < seqLen; ++k) {
                                     seq.getEntry(k, p);
                                     tvpCheck.set(p.getByteArray(), p.getStartOffset(), p.getLength());
-                                    if (AbstractValueComparisonScalarEvaluatorFactory.compareTaggedValues(aOp,
-                                            tvpDistinct, tvpCheck, dCtx)) {
+                                    if (FunctionHelper.compareTaggedValues(aOp, tvpDistinct, tvpCheck, dCtx)) {
                                         found = true;
                                         break;
                                     }
