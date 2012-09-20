@@ -682,14 +682,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
     @Override
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
-        //        System.err.println(" convertString in CastToString length = " + stringp.getUTFLength());
-        //        ICharacterIterator charIterator = new UTF8StringCharacterIterator(stringp);
-        //        charIterator.reset();
-        //        for (int c = charIterator.next(); c != ICharacterIterator.EOS_CHAR; c = charIterator.next()) {
-        //            System.err.println("   parse value '" + c + "' as '" + Character.valueOf((char) c) + "'");
-        //        }
-        //        System.err.println(" convertString in CastToString AFTER");
-
         dOut.write(returnTag);
         dOut.write(stringp.getByteArray(), stringp.getStartOffset(), stringp.getLength());
     }
