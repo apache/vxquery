@@ -16,8 +16,13 @@
  */
 package org.apache.vxquery.runtime.functions.util;
 
+import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
@@ -39,6 +44,8 @@ import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.xmlparser.XMLParser;
+import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
@@ -48,6 +55,8 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class FunctionHelper {
 
@@ -731,5 +740,28 @@ public class FunctionHelper {
             System.err.println("   parse value '" + c + "' as '" + Character.valueOf((char) c) + "'");
         }
         System.err.println(" printUTF8String END");
+    }
+
+    public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
+            DataInputStream di, ArrayBackedValueStorage abvs) throws SystemException {
+        try {
+            bbis.setByteBuffer(
+                    ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                            stringp.getLength() + stringp.getStartOffset())), 0);
+            String fName = di.readUTF();
+            readInDocFromString(fName, in, abvs);
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        }
+    }
+
+    public static void readInDocFromString(String fName, InputSource in, ArrayBackedValueStorage abvs)
+            throws SystemException {
+        try {
+            in.setCharacterStream(new InputStreamReader(new FileInputStream(fName)));
+            XMLParser.parseInputSource(in, abvs, false, null);
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        }
     }
 }
