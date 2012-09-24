@@ -17,11 +17,14 @@
 package org.apache.vxquery.runtime.functions.node;
 
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -38,10 +41,10 @@ import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
-public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public FnDocScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public FnCollectionScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
@@ -49,31 +52,45 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final InputSource in = new InputSource();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final TaggedValuePointable nodep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
+        final SequenceBuilder sb = new SequenceBuilder();
+        final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
+        final InputSource in = new InputSource();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp = args[0];
-                if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                    tvp.getValue(seqp);
-                    if (seqp.getEntryCount() == 0) {
-                        XDMConstants.setEmptySequence(result);
-                        return;
-                    } else {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                }
+                // TODO add support empty sequence and no argument.
                 if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
                 tvp.getValue(stringp);
-                FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs);
-                result.set(abvs);
+                try {
+                    // Get the list of files.
+                    bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(),
+                            stringp.getStartOffset(), stringp.getLength() + stringp.getStartOffset())), 0);
+                    String collectionName = di.readUTF();
+                    File collectionDirectory = new File(collectionName);
+                    File[] list = collectionDirectory.listFiles();
+
+                    abvs.reset();
+                    sb.reset(abvs);
+                    for (int i = 0; i < list.length; ++i) {
+                        // Add the document node to the sequence.
+                        abvsFileNode.reset();
+                        FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode);
+                        nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
+                        sb.addItem(nodep);
+                    }
+                    sb.finish();
+                    result.set(abvs);
+                } catch (IOException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
             }
         };
     }

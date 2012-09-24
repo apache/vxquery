@@ -122,6 +122,7 @@
     <function name="fn:collection">
         <param name="arg" type="xs:string?"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnCollectionScalarEvaluatorFactory"/>
     </function>
     
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:integer?  -->
@@ -271,6 +272,7 @@
     <function name="fn:doc-available">
         <param name="uri" type="xs:string?"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnDocAvailableScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:document-uri($arg  as node()?) as  xs:anyURI?  -->

@@ -38,10 +38,10 @@ import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
-public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public FnDocScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public FnDocAvailableScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
@@ -62,7 +62,7 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
                     tvp.getValue(seqp);
                     if (seqp.getEntryCount() == 0) {
-                        XDMConstants.setEmptySequence(result);
+                        XDMConstants.setFalse(result);
                         return;
                     } else {
                         throw new SystemException(ErrorCode.FORG0006);
@@ -71,9 +71,13 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
-                tvp.getValue(stringp);
-                FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs);
-                result.set(abvs);
+                
+                try {
+                    FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs);
+                    XDMConstants.setTrue(result);
+                } catch (Exception e) {
+                    XDMConstants.setFalse(result);
+                }
             }
         };
     }
