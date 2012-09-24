@@ -314,12 +314,14 @@
     <!-- fn:error() as  none -->
     <function name="fn:error">
         <return type="none"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.error.FnErrorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:error($error as  xs:QName) as none -->
     <function name="fn:error">
         <param name="error" type="xs:QName"/>
         <return type="none"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.error.FnErrorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:error($error as  xs:QName?, $description as xs:string)  as none -->
@@ -327,6 +329,7 @@
         <param name="error" type="xs:QName?"/>
         <param name="description" type="xs:string"/>
         <return type="none"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.error.FnErrorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:error($error as  xs:QName?, $description as xs:string, $error-object as item()*)  as none -->
@@ -335,6 +338,7 @@
         <param name="description" type="xs:string"/>
         <param name="error-object" type="item()*"/>
         <return type="none"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.error.FnErrorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:escape-html-uri($uri  as xs:string?) as  xs:string -->
