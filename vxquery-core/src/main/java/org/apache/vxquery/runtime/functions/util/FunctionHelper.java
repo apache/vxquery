@@ -680,6 +680,18 @@ public class FunctionHelper {
         dOut.writeLong(value);
     }
 
+    public static String getStringFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
+            DataInputStream di) throws SystemException {
+        try {
+            bbis.setByteBuffer(
+                    ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                            stringp.getLength() + stringp.getStartOffset())), 0);
+            return di.readUTF();
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        }
+    }
+
     public static long getTimezone(ITimezone timezonep) {
         return timezonep.getTimezoneHour() * DateTime.CHRONON_OF_HOUR + timezonep.getTimezoneMinute()
                 * DateTime.CHRONON_OF_MINUTE;
@@ -744,15 +756,8 @@ public class FunctionHelper {
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
             DataInputStream di, ArrayBackedValueStorage abvs) throws SystemException {
-        try {
-            bbis.setByteBuffer(
-                    ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                            stringp.getLength() + stringp.getStartOffset())), 0);
-            String fName = di.readUTF();
-            readInDocFromString(fName, in, abvs);
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        }
+        String fName = getStringFromPointable(stringp, bbis, di);
+        readInDocFromString(fName, in, abvs);
     }
 
     public static void readInDocFromString(String fName, InputSource in, ArrayBackedValueStorage abvs)
