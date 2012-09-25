@@ -111,6 +111,7 @@
     <function name="fn:codepoints-to-string">
         <param name="arg" type="xs:integer*"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCodepointsToStringEvaluatorFactory"/>
     </function>
     
     <!-- fn:collection() as  node()* -->
@@ -873,6 +874,7 @@
     <function name="fn:string-to-codepoints">
         <param name="arg" type="xs:string?"/>
         <return type="xs:integer*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnStringToCodepointsEvaluatorFactory"/>
     </function>
 
     <!-- fn:subsequence($sourceSeq  as item()*, $startingLoc as xs:double)  as item()* -->
