@@ -140,6 +140,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                             FunctionHelper.getIntegerPointable(tvp2, dOutArgument2);
                             longp2.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset() + 1,
                                     LongPointable.TYPE_TRAITS.getFixedLength());
+                            break;
                         case ValueTag.XS_DOUBLE_TAG:
                             tvp2.getValue(doublep2);
                             break;
