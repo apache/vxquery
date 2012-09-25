@@ -730,7 +730,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     }
 
     /**
-     * Derived Datatypes
+     * Derived Numeric Datatypes
      */
     public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
@@ -802,6 +802,63 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         writeNumberWithPadding(intp.longValue(), 1, dOutInner);
         sendStringDataOutput(dOut);
+    }
+
+    /**
+     * Derived String Data Types
+     */
+    @Override
+    public void convertEntity(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertID(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertIDREF(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertLanguage(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertName(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertNCName(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertNMToken(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertNormalizedString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
+    }
+
+    @Override
+    public void convertToken(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        // TODO Add check to verify string consists of limited character set.
+        convertString(stringp, dOut);
     }
 
     /**

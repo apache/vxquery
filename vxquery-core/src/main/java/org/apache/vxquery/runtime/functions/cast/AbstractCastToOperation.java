@@ -136,7 +136,7 @@ public abstract class AbstractCastToOperation {
     }
 
     /**
-     * Derived Datatypes
+     * Derived Numeric Datatypes
      */
     public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
@@ -186,4 +186,44 @@ public abstract class AbstractCastToOperation {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
+    /**
+     * Derived String Datatypes
+     */
+
+    public void convertEntity(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertID(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertIDREF(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertLanguage(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertName(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertNCName(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertNMToken(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertNormalizedString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException,
+            IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertToken(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
 }
