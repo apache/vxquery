@@ -18,14 +18,17 @@ package org.apache.vxquery.runtime.functions.qname;
 
 import java.io.DataOutput;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -51,6 +54,8 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
         final DataOutput dOut = abvs.getDataOutput();
         final ArrayBackedValueStorage abvsParamQName = new ArrayBackedValueStorage();
         final DataOutput dOutParamQName = abvsParamQName.getDataOutput();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -59,14 +64,35 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                 TaggedValuePointable tvp2 = args[1];
 
                 // Only accept a strings.
-                if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
+                if (args.length == 2) {
+                    if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                        tvp1.getValue(seqp);
+                        if (seqp.getEntryCount() == 0) {
+                            XDMConstants.setEmptyString(tvp);
+                            tvp.getValue(paramURI);
+                        } else {
+                            throw new SystemException(ErrorCode.FORG0006);
+                        }
+                    } else {
+                        if (!FunctionHelper.isDerivedFromString(tvp1.getTag())) {
+                            throw new SystemException(ErrorCode.FORG0006);
+                        }
+                        tvp1.getValue(paramURI);
+                    }
+                    if (tvp2.getTag() != ValueTag.XS_STRING_TAG) {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                    tvp2.getValue(paramQName);
+                } else if (args.length == 1) {
+                    if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
+                        throw new SystemException(ErrorCode.FORG0006);
+                    }
+                    XDMConstants.setEmptyString(tvp);
+                    tvp.getValue(paramURI);
+                    tvp2.getValue(paramQName);
+                } else {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
-                if (tvp2.getTag() != ValueTag.XS_STRING_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
-                }
-                tvp1.getValue(paramURI);
-                tvp2.getValue(paramQName);
 
                 try {
                     abvs.reset();
