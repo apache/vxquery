@@ -198,7 +198,7 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             return;
 
                             /**
-                             * Derived Datatypes (Alphabetical)
+                             * Derived Numeric Datatypes (Alphabetical)
                              */
                         case ValueTag.XS_BYTE_TAG:
                             tvp.getValue(tp.bytep);
@@ -272,6 +272,62 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             result.set(abvs);
                             return;
 
+                            /**
+                             * Derived String Datatypes (Alphabetical)
+                             */
+                        case ValueTag.XS_ENTITY_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertEntity(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_ID_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertID(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_IDREF_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertIDREF(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_LANGUAGE_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertIDREF(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_NAME_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertName(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_NCNAME_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertNCName(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_NMTOKEN_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertNMToken(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_NORMALIZED_STRING_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertNormalizedString(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                            
+                        case ValueTag.XS_TOKEN_TAG:
+                            tvp.getValue(tp.utf8sp);
+                            aOp.convertToken(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
                     }
                 } catch (SystemException se) {
                     throw se;
@@ -303,6 +359,8 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToDoubleOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_DURATION) {
                     aOp = new CastToDurationOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_ENTITY) {
+                    aOp = new CastToEntityOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_FLOAT) {
                     aOp = new CastToFloatOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_G_DAY) {
@@ -317,18 +375,32 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToGYearMonthOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_HEX_BINARY) {
                     aOp = new CastToHexBinaryOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_ID) {
+                    aOp = new CastToIDOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_IDREF) {
+                    aOp = new CastToIDREFOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INT) {
                     aOp = new CastToIntOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_INTEGER) {
                     aOp = new CastToIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_LANGUAGE) {
+                    aOp = new CastToLanguageOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_LONG) {
                     aOp = new CastToLongOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NAME) {
+                    aOp = new CastToNameOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NCNAME) {
+                    aOp = new CastToNCNameOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NEGATIVE_INTEGER) {
                     aOp = new CastToNegativeIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NMTOKEN) {
+                    aOp = new CastToNMTokenOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NON_NEGATIVE_INTEGER) {
                     aOp = new CastToNonNegativeIntegerOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NON_POSITIVE_INTEGER) {
                     aOp = new CastToNonPositiveIntegerOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NORMALIZED_STRING) {
+                    aOp = new CastToNormalizedStringOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_NOTATION) {
                     aOp = new CastToNotationOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_POSITIVE_INTEGER) {
@@ -341,6 +413,8 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                     aOp = new CastToStringOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_TIME) {
                     aOp = new CastToTimeOperation();
+                } else if (sType.getItemType() == BuiltinTypeRegistry.XS_TOKEN) {
+                    aOp = new CastToTokenOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNTYPED_ATOMIC) {
                     aOp = new CastToUntypedAtomicOperation();
                 } else if (sType.getItemType() == BuiltinTypeRegistry.XS_UNSIGNED_BYTE) {
