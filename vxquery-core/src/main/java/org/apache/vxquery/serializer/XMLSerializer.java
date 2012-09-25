@@ -181,6 +181,15 @@ public class XMLSerializer implements IPrinter {
                 break;
 
             case ValueTag.XS_STRING_TAG:
+            case ValueTag.XS_NORMALIZED_STRING_TAG:
+            case ValueTag.XS_TOKEN_TAG:
+            case ValueTag.XS_LANGUAGE_TAG:
+            case ValueTag.XS_NMTOKEN_TAG:
+            case ValueTag.XS_NAME_TAG:
+            case ValueTag.XS_NCNAME_TAG:
+            case ValueTag.XS_ID_TAG:
+            case ValueTag.XS_IDREF_TAG:
+            case ValueTag.XS_ENTITY_TAG:
                 printString(ps, tvp);
                 break;
 
