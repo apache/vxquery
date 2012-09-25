@@ -33,6 +33,7 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -47,6 +48,7 @@ public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValue
             throws AlgebricksException {
         final XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
 
@@ -68,6 +70,7 @@ public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValue
                     throw new SystemException(ErrorCode.FORG0006);
                 }
                 tvp1.getValue(qnamep);
+                qnamep.getPrefix(stringp);
 
                 try {
                     // Return empty sequence if no prefix.
@@ -76,8 +79,7 @@ public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValue
                     } else {
                         abvs.reset();
                         dOut.write(ValueTag.XS_NCNAME_TAG);
-                        dOut.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength(),
-                                qnamep.getPrefixLength());
+                        dOut.write(stringp.getByteArray(), stringp.getStartOffset(), stringp.getLength());
                         result.set(abvs);
                     }
                 } catch (Exception e) {
