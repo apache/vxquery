@@ -18,9 +18,11 @@ package org.apache.vxquery.runtime.functions.qname;
 
 import java.io.DataOutput;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -44,6 +46,7 @@ public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValue
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
 
@@ -52,21 +55,31 @@ public class FnPrefixFromQNameScalarEvaluatorFactory extends AbstractTaggedValue
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
 
-                // TODO return empty sequence if argument is empty sequence.
-
-                // Only accept a strings.
+                // Only accept a QNames or empty sequence.
+                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp1.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        XDMConstants.setEmptySequence(result);
+                        return;
+                    }
+                    // Pass through.
+                }
                 if (tvp1.getTag() != ValueTag.XS_QNAME_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
                 tvp1.getValue(qnamep);
 
                 try {
-                    // TODO return empty sequence if no prefix.
-                    abvs.reset();
-                    dOut.write(ValueTag.XS_NCNAME_TAG);
-                    dOut.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength(),
-                            qnamep.getPrefixLength());
-                    result.set(abvs);
+                    // Return empty sequence if no prefix.
+                    if (qnamep.getPrefixLength() == 0) {
+                        XDMConstants.setEmptySequence(result);
+                    } else {
+                        abvs.reset();
+                        dOut.write(ValueTag.XS_NCNAME_TAG);
+                        dOut.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength(),
+                                qnamep.getPrefixLength());
+                        result.set(abvs);
+                    }
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
