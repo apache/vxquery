@@ -82,7 +82,7 @@ public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                     // TODO Update to dynamic error.
                     throw new SystemException(ErrorCode.FOER0000);
                 }
-                
+
                 // Only QName, description and optional error-object parameters.
                 if (args.length > 1) {
                     TaggedValuePointable tvp1 = args[0];

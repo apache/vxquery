@@ -280,49 +280,49 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             aOp.convertEntity(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_ID_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertID(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_IDREF_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertIDREF(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_LANGUAGE_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertIDREF(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_NAME_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertName(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_NCNAME_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertNCName(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_NMTOKEN_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertNMToken(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_NORMALIZED_STRING_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertNormalizedString(tp.utf8sp, dOut);
                             result.set(abvs);
                             return;
-                            
+
                         case ValueTag.XS_TOKEN_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertToken(tp.utf8sp, dOut);
