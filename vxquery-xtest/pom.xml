@@ -18,9 +18,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.vxquery</groupId>
-  <artifactId>apache-vxquery-xtest-incubating</artifactId>
+  <artifactId>apache-vxquery-xtest</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1-incubating-SNAPSHOT</version>
   <name>VXQuery XTest</name>
   <description>Apache VXQuery Test Driver</description>
 
@@ -103,8 +103,8 @@
 
     <dependency>
       <groupId>org.apache.vxquery</groupId>
-      <artifactId>apache-vxquery-core-incubating</artifactId>
-      <version>0.1-SNAPSHOT</version>
+      <artifactId>apache-vxquery-core</artifactId>
+      <version>0.1-incubating-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
