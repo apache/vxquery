@@ -59,8 +59,9 @@ public class PromoteScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFa
                 abvs.reset();
                 int tid = tvp.getTag();
                 if (castToTag == -1 || castToTag == 0) {
-                    // No change.
+                    // The promote type is not supported. No change.
                     result.set(tvp);
+                    return;
                 } else if (castToTag > 0) {
                     try {
                         switch (tid) {
@@ -172,6 +173,10 @@ public class PromoteScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFa
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                                 return;
 
+                            default:
+                                // Promote type does not require us to change the value.
+                                result.set(tvp);
+                                return;
                         }
                     } catch (SystemException se) {
                         throw se;
