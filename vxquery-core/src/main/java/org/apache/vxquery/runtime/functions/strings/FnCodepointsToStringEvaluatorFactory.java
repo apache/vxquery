@@ -26,6 +26,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -56,12 +57,6 @@ public class FnCodepointsToStringEvaluatorFactory extends AbstractTaggedValueArg
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
-                // Only accept sequences as input.
-                if (tvp1.getTag() != ValueTag.SEQUENCE_TAG) {
-                    throw new SystemException(ErrorCode.FORG0006);
-                }
-                tvp1.getValue(seqp);
-
                 try {
                     // Byte Format: Type (1 byte) + String Length (2 bytes) + String.
                     DataOutput out = abvs.getDataOutput();
@@ -71,22 +66,26 @@ public class FnCodepointsToStringEvaluatorFactory extends AbstractTaggedValueArg
                     out.write(0);
                     out.write(0);
 
-                    int c;
-                    for (int j = 0; j < seqp.getEntryCount(); ++j) {
-                        seqp.getEntry(j, p);
-                        tvp.set(p.getByteArray(), p.getStartOffset(), p.getLength());
-                        tvp.getValue(longp);
-                        c = longp.intValue();
-                        if ((c >= 0x0001) && (c <= 0x007F)) {
-                            out.write((byte) c);
-                        } else if (c > 0x07FF) {
-                            out.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
-                            out.write((byte) (0x80 | ((c >> 6) & 0x3F)));
-                            out.write((byte) (0x80 | ((c >> 0) & 0x3F)));
-                        } else {
-                            out.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
-                            out.write((byte) (0x80 | ((c >> 0) & 0x3F)));
+                    // Only accept sequences of integers or an integer as input.
+                    if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                        tvp1.getValue(seqp);
+                        for (int j = 0; j < seqp.getEntryCount(); ++j) {
+                            seqp.getEntry(j, p);
+                            tvp.set(p.getByteArray(), p.getStartOffset(), p.getLength());
+                            tvp.getValue(longp);
+                            if (!Character.isDefined(longp.intValue())) {
+                                throw new SystemException(ErrorCode.FOCH0001);
+                            }
+                            FunctionHelper.writeChar((char) longp.intValue(), out);
                         }
+                    } else if (tvp1.getTag() == ValueTag.XS_INTEGER_TAG) {
+                        tvp1.getValue(longp);
+                        if (!Character.isDefined(longp.intValue())) {
+                            throw new SystemException(ErrorCode.FOCH0001);
+                        }
+                        FunctionHelper.writeChar((char) longp.intValue(), out);
+                    } else {
+                        throw new SystemException(ErrorCode.FORG0006);
                     }
 
                     // Update the full length string in the byte array.
