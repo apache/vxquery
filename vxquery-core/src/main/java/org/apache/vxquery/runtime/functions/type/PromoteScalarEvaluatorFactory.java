@@ -183,7 +183,6 @@ public class PromoteScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFa
                     } catch (Exception e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
-                    throw new SystemException(ErrorCode.XPTY0004);
                 }
             }
 
