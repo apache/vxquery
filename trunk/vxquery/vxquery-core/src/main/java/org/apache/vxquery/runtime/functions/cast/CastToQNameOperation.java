@@ -24,6 +24,7 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -49,7 +50,7 @@ public class CastToQNameOperation extends AbstractCastToOperation {
             if (c == Character.valueOf(':')) {
                 prefixLength = abvsInner.getLength();
             } else {
-                dOutInner.writeChar(c);
+                FunctionHelper.writeChar((char) c, dOutInner);
             }
         }
 
