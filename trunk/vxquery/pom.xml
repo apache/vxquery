@@ -18,9 +18,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.vxquery</groupId>
-  <artifactId>apache-vxquery-incubating</artifactId>
+  <artifactId>apache-vxquery</artifactId>
   <packaging>pom</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1-incubating-SNAPSHOT</version>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>
@@ -203,6 +203,21 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/source.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.4</version>
       </plugin>
     </plugins>
   </build>
