@@ -34,6 +34,8 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.api.IDate;
+import org.apache.vxquery.datamodel.api.ITime;
 import org.apache.vxquery.datamodel.api.ITimezone;
 import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -680,6 +682,33 @@ public class FunctionHelper {
         dOut.writeLong(value);
     }
 
+    /**
+     * Returns the number of digits in a long. A few special cases that needed attention.
+     */
+    public static int getNumberOfDigits(long value) {
+        if (value == 0) {
+            return 0;
+        }
+        double nDigitsRaw = Math.log10(value);
+        int nDigits = (int) nDigitsRaw;
+        if (nDigits > 11 && nDigitsRaw == nDigits) {
+            // Return exact number of digits and does not need adjustment. (Ex 999999999999999999)
+            return nDigits;
+        } else {
+            // Decimal value returned so we must increment to the next number.
+            return nDigits + 1;
+        }
+    }
+
+    public static long getPowerOf10(double value, long max, long min) {
+        value = Math.abs(value);
+        for (long i = min; i < max; i++) {
+            if (Math.pow(10, i) > value)
+                return i;
+        }
+        return max;
+    }
+
     public static String getStringFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
             DataInputStream di) throws SystemException {
         try {
@@ -744,6 +773,16 @@ public class FunctionHelper {
         return false;
     }
 
+    /**
+     * Returns 0 if positive, nonzero if negative.
+     * 
+     * @param value
+     * @return
+     */
+    public static boolean isNumberPostive(long value) {
+        return ((value & 0x8000000000000000L) == 0 ? true : false);
+    }
+
     public static void printUTF8String(UTF8StringPointable stringp) {
         System.err.println(" printUTF8String START length = " + stringp.getUTFLength());
         ICharacterIterator charIterator = new UTF8StringCharacterIterator(stringp);
@@ -767,6 +806,110 @@ public class FunctionHelper {
             XMLParser.parseInputSource(in, abvs, false, null);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
+        }
+    }
+
+    public static void writeChar(char c, DataOutput dOut) {
+        try {
+            if ((c >= 0x0001) && (c <= 0x007F)) {
+                dOut.write((byte) c);
+            } else if (c > 0x07FF) {
+                dOut.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
+                dOut.write((byte) (0x80 | ((c >> 6) & 0x3F)));
+                dOut.write((byte) (0x80 | ((c >> 0) & 0x3F)));
+            } else {
+                dOut.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
+                dOut.write((byte) (0x80 | ((c >> 0) & 0x3F)));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeCharSequence(CharSequence charSequence, DataOutput dOut) {
+        for (int i = 0; i < charSequence.length(); ++i) {
+            writeChar(charSequence.charAt(i), dOut);
+        }
+    }
+
+    public static void writeDateAsString(IDate date, DataOutput dOut) {
+        // Year
+        writeNumberWithPadding(date.getYear(), 4, dOut);
+        writeChar('-', dOut);
+
+        // Month
+        writeNumberWithPadding(date.getMonth(), 2, dOut);
+        writeChar('-', dOut);
+
+        // Day
+        writeNumberWithPadding(date.getDay(), 2, dOut);
+    }
+
+    /**
+     * Writes a number to the DataOutput with zeros as place holders if the number is too small to fill the padding.
+     * 
+     * @param value
+     * @param padding
+     * @param dOut
+     * @throws IOException
+     */
+    public static void writeNumberWithPadding(long value, int padding, DataOutput dOut) {
+        if (value < 0) {
+            writeChar('-', dOut);
+            value = Math.abs(value);
+        }
+        int nDigits = getNumberOfDigits(value);
+
+        // Add zero padding for set length numbers.
+        while (padding > nDigits) {
+            writeChar('0', dOut);
+            --padding;
+        }
+
+        // Write the actual number.
+        long pow10 = (long) Math.pow(10, nDigits - 1);
+        for (int i = nDigits - 1; i >= 0; --i) {
+            writeChar((char) ('0' + (value / pow10)), dOut);
+            value %= pow10;
+            pow10 /= 10;
+        }
+    }
+
+    public static void writeTimeAsString(ITime time, DataOutput dOut) {
+        // Hours
+        writeNumberWithPadding(time.getHour(), 2, dOut);
+        writeChar(':', dOut);
+
+        // Minute
+        writeNumberWithPadding(time.getMinute(), 2, dOut);
+        writeChar(':', dOut);
+
+        // Milliseconds
+        writeNumberWithPadding(time.getMilliSecond() / DateTime.CHRONON_OF_SECOND, 2, dOut);
+        if (time.getMilliSecond() % DateTime.CHRONON_OF_SECOND != 0) {
+            writeChar('.', dOut);
+            writeNumberWithPadding(time.getMilliSecond() % DateTime.CHRONON_OF_SECOND, 3, dOut);
+        }
+    }
+
+    public static void writeTimezoneAsString(ITimezone timezone, DataOutput dOut) {
+        long timezoneHour = timezone.getTimezoneHour();
+        long timezoneMinute = timezone.getTimezoneMinute();
+        if (timezoneHour != DateTime.TIMEZONE_HOUR_NULL && timezoneMinute != DateTime.TIMEZONE_MINUTE_NULL) {
+            if (timezoneHour == 0 && timezoneMinute == 0) {
+                writeChar('Z', dOut);
+            } else {
+                if (timezoneHour >= 0 && timezoneMinute >= 0) {
+                    writeChar('+', dOut);
+                } else {
+                    writeChar('-', dOut);
+                    timezoneHour = Math.abs(timezoneHour);
+                    timezoneMinute = Math.abs(timezoneMinute);
+                }
+                writeNumberWithPadding(timezoneHour, 2, dOut);
+                writeChar(':', dOut);
+                writeNumberWithPadding(timezoneMinute, 2, dOut);
+            }
         }
     }
 }
