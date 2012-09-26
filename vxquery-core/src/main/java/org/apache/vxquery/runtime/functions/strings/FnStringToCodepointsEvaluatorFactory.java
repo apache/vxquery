@@ -80,7 +80,7 @@ public class FnStringToCodepointsEvaluatorFactory extends AbstractTaggedValueArg
                         return;
                     }
                 }
-                
+
                 // Return sequence of character values.
                 try {
                     charIterator.reset();

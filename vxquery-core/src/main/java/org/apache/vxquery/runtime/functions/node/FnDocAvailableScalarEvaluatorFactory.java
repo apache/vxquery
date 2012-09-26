@@ -71,7 +71,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
                 if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
-                
+
                 try {
                     FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs);
                     XDMConstants.setTrue(result);
