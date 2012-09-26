@@ -24,6 +24,7 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
@@ -50,29 +51,19 @@ public abstract class AbstractCharacterIteratorCopyingEvaluator extends Abstract
             out.write(ValueTag.XS_STRING_TAG);
 
             // Default values for the length and update later
-            out.write(0xFF);
-            out.write(0xFF);
+            out.write(0);
+            out.write(0);
 
             int c;
             while (ICharacterIterator.EOS_CHAR != (c = charIterator.next())) {
-                if ((c >= 0x0001) && (c <= 0x007F)) {
-                    out.write((byte) c);
-                } else if (c > 0x07FF) {
-                    out.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
-                    out.write((byte) (0x80 | ((c >> 6) & 0x3F)));
-                    out.write((byte) (0x80 | ((c >> 0) & 0x3F)));
-                } else {
-                    out.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
-                    out.write((byte) (0x80 | ((c >> 0) & 0x3F)));
-                }
+                FunctionHelper.writeChar((char) c, out);
             }
 
             // Update the full length string in the byte array.
-            byte[] stringResult = abvs.getByteArray();
-            stringResult[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-            stringResult[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
+            abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
+            abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
 
-            result.set(stringResult, 0, abvs.getLength());
+            result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }

@@ -109,7 +109,7 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                         if (c == Character.valueOf(':')) {
                             prefixLength = abvsParamQName.getLength();
                         } else {
-                            dOutParamQName.writeChar(c);
+                            FunctionHelper.writeChar((char) c, dOutParamQName);
                         }
                     }
 
