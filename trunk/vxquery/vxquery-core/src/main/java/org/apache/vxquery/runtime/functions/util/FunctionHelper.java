@@ -86,9 +86,9 @@ public class FunctionHelper {
         final TypedPointables tp1 = new TypedPointables();
         final TypedPointables tp2 = new TypedPointables();
 
-        boolean booleanResult = false;
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
+
         try {
             switch (tid1) {
                 case ValueTag.XS_DECIMAL_TAG:
@@ -96,23 +96,19 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DECIMAL_TAG:
                             tvp2.getValue(tp2.decp);
-                            booleanResult = aOp.operateDecimalDecimal(tp1.decp, tp2.decp);
-                            break;
+                            return aOp.operateDecimalDecimal(tp1.decp, tp2.decp);
 
                         case ValueTag.XS_INTEGER_TAG:
                             tvp2.getValue(tp2.longp);
-                            booleanResult = aOp.operateDecimalInteger(tp1.decp, tp2.longp);
-                            break;
+                            return aOp.operateDecimalInteger(tp1.decp, tp2.longp);
 
                         case ValueTag.XS_FLOAT_TAG:
                             tvp2.getValue(tp2.floatp);
-                            booleanResult = aOp.operateDecimalFloat(tp1.decp, tp2.floatp);
-                            break;
+                            return aOp.operateDecimalFloat(tp1.decp, tp2.floatp);
 
                         case ValueTag.XS_DOUBLE_TAG:
                             tvp2.getValue(tp2.doublep);
-                            booleanResult = aOp.operateDecimalDouble(tp1.decp, tp2.doublep);
-                            break;
+                            return aOp.operateDecimalDouble(tp1.decp, tp2.doublep);
                     }
                     break;
 
@@ -121,23 +117,19 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DECIMAL_TAG:
                             tvp2.getValue(tp2.decp);
-                            booleanResult = aOp.operateIntegerDecimal(tp1.longp, tp2.decp);
-                            break;
+                            return aOp.operateIntegerDecimal(tp1.longp, tp2.decp);
 
                         case ValueTag.XS_INTEGER_TAG:
                             tvp2.getValue(tp2.longp);
-                            booleanResult = aOp.operateIntegerInteger(tp1.longp, tp2.longp);
-                            break;
+                            return aOp.operateIntegerInteger(tp1.longp, tp2.longp);
 
                         case ValueTag.XS_FLOAT_TAG:
                             tvp2.getValue(tp2.floatp);
-                            booleanResult = aOp.operateIntegerFloat(tp1.longp, tp2.floatp);
-                            break;
+                            return aOp.operateIntegerFloat(tp1.longp, tp2.floatp);
 
                         case ValueTag.XS_DOUBLE_TAG:
                             tvp2.getValue(tp2.doublep);
-                            booleanResult = aOp.operateIntegerDouble(tp1.longp, tp2.doublep);
-                            break;
+                            return aOp.operateIntegerDouble(tp1.longp, tp2.doublep);
                     }
                     break;
 
@@ -146,23 +138,19 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DECIMAL_TAG:
                             tvp2.getValue(tp2.decp);
-                            booleanResult = aOp.operateFloatDecimal(tp1.floatp, tp2.decp);
-                            break;
+                            return aOp.operateFloatDecimal(tp1.floatp, tp2.decp);
 
                         case ValueTag.XS_INTEGER_TAG:
                             tvp2.getValue(tp2.longp);
-                            booleanResult = aOp.operateFloatInteger(tp1.floatp, tp2.longp);
-                            break;
+                            return aOp.operateFloatInteger(tp1.floatp, tp2.longp);
 
                         case ValueTag.XS_FLOAT_TAG:
                             tvp2.getValue(tp2.floatp);
-                            booleanResult = aOp.operateFloatFloat(tp1.floatp, tp2.floatp);
-                            break;
+                            return aOp.operateFloatFloat(tp1.floatp, tp2.floatp);
 
                         case ValueTag.XS_DOUBLE_TAG:
                             tvp2.getValue(tp2.doublep);
-                            booleanResult = aOp.operateFloatDouble(tp1.floatp, tp2.doublep);
-                            break;
+                            return aOp.operateFloatDouble(tp1.floatp, tp2.doublep);
                     }
                     break;
 
@@ -171,23 +159,19 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DECIMAL_TAG:
                             tvp2.getValue(tp2.decp);
-                            booleanResult = aOp.operateDoubleDecimal(tp1.doublep, tp2.decp);
-                            break;
+                            return aOp.operateDoubleDecimal(tp1.doublep, tp2.decp);
 
                         case ValueTag.XS_INTEGER_TAG:
                             tvp2.getValue(tp2.longp);
-                            booleanResult = aOp.operateDoubleInteger(tp1.doublep, tp2.longp);
-                            break;
+                            return aOp.operateDoubleInteger(tp1.doublep, tp2.longp);
 
                         case ValueTag.XS_FLOAT_TAG:
                             tvp2.getValue(tp2.floatp);
-                            booleanResult = aOp.operateDoubleFloat(tp1.doublep, tp2.floatp);
-                            break;
+                            return aOp.operateDoubleFloat(tp1.doublep, tp2.floatp);
 
                         case ValueTag.XS_DOUBLE_TAG:
                             tvp2.getValue(tp2.doublep);
-                            booleanResult = aOp.operateDoubleDouble(tp1.doublep, tp2.doublep);
-                            break;
+                            return aOp.operateDoubleDouble(tp1.doublep, tp2.doublep);
                     }
                     break;
 
@@ -196,8 +180,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_BOOLEAN_TAG:
                             tvp2.getValue(tp2.boolp);
-                            booleanResult = aOp.operateBooleanBoolean(tp1.boolp, tp2.boolp);
-                            break;
+                            return aOp.operateBooleanBoolean(tp1.boolp, tp2.boolp);
                     }
                     break;
 
@@ -225,9 +208,9 @@ public class FunctionHelper {
                         case ValueTag.XS_IDREF_TAG:
                         case ValueTag.XS_ENTITY_TAG:
                         case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                        case ValueTag.XS_ANY_URI_TAG:
                             tvp2.getValue(tp2.utf8sp);
-                            booleanResult = aOp.operateStringString(tp1.utf8sp, tp2.utf8sp);
-                            break;
+                            return aOp.operateStringString(tp1.utf8sp, tp2.utf8sp);
                     }
                     break;
 
@@ -236,11 +219,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DATE_TAG:
                             tvp2.getValue(tp2.datep);
-                            booleanResult = aOp.operateDateDate(tp1.datep, tp2.datep, dCtx);
-                            break;
-                        default:
-                            // Cross comparisons between DateTime, Date and Time are not supported.
-                            throw new SystemException(ErrorCode.XPTY0004);
+                            return aOp.operateDateDate(tp1.datep, tp2.datep, dCtx);
                     }
                     break;
 
@@ -249,11 +228,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DATETIME_TAG:
                             tvp2.getValue(tp2.datetimep);
-                            booleanResult = aOp.operateDatetimeDatetime(tp1.datetimep, tp2.datetimep, dCtx);
-                            break;
-                        default:
-                            // Cross comparisons between DateTime, Date and Time are not supported.
-                            throw new SystemException(ErrorCode.XPTY0004);
+                            return aOp.operateDatetimeDatetime(tp1.datetimep, tp2.datetimep, dCtx);
                     }
                     break;
 
@@ -262,11 +237,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_TIME_TAG:
                             tvp2.getValue(tp2.timep);
-                            booleanResult = aOp.operateTimeTime(tp1.timep, tp2.timep, dCtx);
-                            break;
-                        default:
-                            // Cross comparisons between DateTime, Date and Time are not supported.
-                            throw new SystemException(ErrorCode.XPTY0004);
+                            return aOp.operateTimeTime(tp1.timep, tp2.timep, dCtx);
                     }
                     break;
 
@@ -275,16 +246,15 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
                             tvp2.getValue(tp2.longp);
-                            booleanResult = aOp.operateDurationDTDuration(tp1.durationp, tp2.longp);
-                            break;
+                            return aOp.operateDurationDTDuration(tp1.durationp, tp2.longp);
+
                         case ValueTag.XS_DURATION_TAG:
                             tvp2.getValue(tp2.durationp);
-                            booleanResult = aOp.operateDurationDuration(tp1.durationp, tp2.durationp);
-                            break;
+                            return aOp.operateDurationDuration(tp1.durationp, tp2.durationp);
+
                         case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                             tvp2.getValue(tp2.intp);
-                            booleanResult = aOp.operateDurationYMDuration(tp1.durationp, tp2.intp);
-                            break;
+                            return aOp.operateDurationYMDuration(tp1.durationp, tp2.intp);
                     }
                     break;
 
@@ -293,16 +263,15 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
                             tvp2.getValue(tp2.longp);
-                            booleanResult = aOp.operateDTDurationDTDuration(tp1.longp, tp2.longp);
-                            break;
+                            return aOp.operateDTDurationDTDuration(tp1.longp, tp2.longp);
+
                         case ValueTag.XS_DURATION_TAG:
                             tvp2.getValue(tp2.durationp);
-                            booleanResult = aOp.operateDTDurationDuration(tp1.longp, tp2.durationp);
-                            break;
+                            return aOp.operateDTDurationDuration(tp1.longp, tp2.durationp);
+
                         case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                             tvp2.getValue(tp2.intp);
-                            booleanResult = aOp.operateDTDurationYMDuration(tp1.longp, tp2.intp);
-                            break;
+                            return aOp.operateDTDurationYMDuration(tp1.longp, tp2.intp);
                     }
                     break;
 
@@ -311,16 +280,15 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
                             tvp2.getValue(tp2.longp);
-                            booleanResult = aOp.operateYMDurationDTDuration(tp1.intp, tp2.longp);
-                            break;
+                            return aOp.operateYMDurationDTDuration(tp1.intp, tp2.longp);
+
                         case ValueTag.XS_DURATION_TAG:
                             tvp2.getValue(tp2.durationp);
-                            booleanResult = aOp.operateYMDurationDuration(tp1.intp, tp2.durationp);
-                            break;
+                            return aOp.operateYMDurationDuration(tp1.intp, tp2.durationp);
+
                         case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                             tvp2.getValue(tp2.intp);
-                            booleanResult = aOp.operateYMDurationYMDuration(tp1.intp, tp2.intp);
-                            break;
+                            return aOp.operateYMDurationYMDuration(tp1.intp, tp2.intp);
                     }
                     break;
 
@@ -329,8 +297,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_G_DAY_TAG:
                             tvp2.getValue(tp2.datep);
-                            booleanResult = aOp.operateGDayGDay(tp1.datep, tp2.datep, dCtx);
-                            break;
+                            return aOp.operateGDayGDay(tp1.datep, tp2.datep, dCtx);
                     }
                     break;
 
@@ -339,8 +306,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_G_MONTH_DAY_TAG:
                             tvp2.getValue(tp2.datep);
-                            booleanResult = aOp.operateGMonthDayGMonthDay(tp1.datep, tp2.datep, dCtx);
-                            break;
+                            return aOp.operateGMonthDayGMonthDay(tp1.datep, tp2.datep, dCtx);
                     }
                     break;
 
@@ -349,8 +315,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_G_MONTH_TAG:
                             tvp2.getValue(tp2.datep);
-                            booleanResult = aOp.operateGMonthGMonth(tp1.datep, tp2.datep, dCtx);
-                            break;
+                            return aOp.operateGMonthGMonth(tp1.datep, tp2.datep, dCtx);
                     }
                     break;
 
@@ -359,8 +324,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_G_YEAR_MONTH_TAG:
                             tvp2.getValue(tp2.datep);
-                            booleanResult = aOp.operateGYearMonthGYearMonth(tp1.datep, tp2.datep, dCtx);
-                            break;
+                            return aOp.operateGYearMonthGYearMonth(tp1.datep, tp2.datep, dCtx);
                     }
                     break;
 
@@ -369,8 +333,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_G_YEAR_TAG:
                             tvp2.getValue(tp2.datep);
-                            booleanResult = aOp.operateGYearGYear(tp1.datep, tp2.datep, dCtx);
-                            break;
+                            return aOp.operateGYearGYear(tp1.datep, tp2.datep, dCtx);
                     }
                     break;
 
@@ -379,8 +342,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_HEX_BINARY_TAG:
                             tvp2.getValue(tp2.binaryp);
-                            booleanResult = aOp.operateHexBinaryHexBinary(tp1.binaryp, tp2.binaryp);
-                            break;
+                            return aOp.operateHexBinaryHexBinary(tp1.binaryp, tp2.binaryp);
                     }
                     break;
 
@@ -389,8 +351,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_BASE64_BINARY_TAG:
                             tvp2.getValue(tp2.binaryp);
-                            booleanResult = aOp.operateBase64BinaryBase64Binary(tp1.binaryp, tp2.binaryp);
-                            break;
+                            return aOp.operateBase64BinaryBase64Binary(tp1.binaryp, tp2.binaryp);
                     }
                     break;
 
@@ -399,8 +360,21 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_ANY_URI_TAG:
                             tvp2.getValue(tp2.utf8sp);
-                            booleanResult = aOp.operateAnyURIAnyURI(tp1.utf8sp, tp2.utf8sp);
-                            break;
+                            return aOp.operateAnyURIAnyURI(tp1.utf8sp, tp2.utf8sp);
+
+                        case ValueTag.XS_STRING_TAG:
+                        case ValueTag.XS_NORMALIZED_STRING_TAG:
+                        case ValueTag.XS_TOKEN_TAG:
+                        case ValueTag.XS_LANGUAGE_TAG:
+                        case ValueTag.XS_NMTOKEN_TAG:
+                        case ValueTag.XS_NAME_TAG:
+                        case ValueTag.XS_NCNAME_TAG:
+                        case ValueTag.XS_ID_TAG:
+                        case ValueTag.XS_IDREF_TAG:
+                        case ValueTag.XS_ENTITY_TAG:
+                        case ValueTag.XS_UNTYPED_ATOMIC_TAG:
+                            tvp2.getValue(tp2.utf8sp);
+                            return aOp.operateStringString(tp1.utf8sp, tp2.utf8sp);
                     }
                     break;
 
@@ -409,8 +383,7 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_QNAME_TAG:
                             tvp2.getValue(tp2.qnamep);
-                            booleanResult = aOp.operateQNameQName(tp1.qnamep, tp2.qnamep);
-                            break;
+                            return aOp.operateQNameQName(tp1.qnamep, tp2.qnamep);
                     }
                     break;
 
@@ -419,18 +392,16 @@ public class FunctionHelper {
                     switch (tid2) {
                         case ValueTag.XS_NOTATION_TAG:
                             tvp2.getValue(tp2.utf8sp);
-                            booleanResult = aOp.operateNotationNotation(tp1.utf8sp, tp2.utf8sp);
-                            break;
+                            return aOp.operateNotationNotation(tp1.utf8sp, tp2.utf8sp);
                     }
                     break;
             }
-            return booleanResult;
-
         } catch (SystemException se) {
             throw se;
         } catch (Exception e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
+        throw new SystemException(ErrorCode.XPTY0004);
     }
 
     public static int getBaseTypeForArithmetics(int tid) throws SystemException {
@@ -528,6 +499,7 @@ public class FunctionHelper {
                     return ValueTag.XS_INTEGER_TAG;
 
                 case ValueTag.XS_ANY_ATOMIC_TAG:
+                case ValueTag.SEQUENCE_TAG:
                     throw new SystemException(ErrorCode.XPTY0004);
 
                 default:

@@ -195,8 +195,8 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                     // Set up value comparison tagged value pointables.
                     if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG && tid2 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         // Only need to change tag since the storage is the same for untyped atomic and string.
-                        tid1 = ValueTag.XS_STRING_TAG;
-                        tid2 = ValueTag.XS_STRING_TAG;
+                        tvp1.getByteArray()[0] = ValueTag.XS_STRING_TAG;
+                        tvp2.getByteArray()[0] = ValueTag.XS_STRING_TAG;
                     } else if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         tid1 = tid2;
                         getCastToOperator(tid2);
