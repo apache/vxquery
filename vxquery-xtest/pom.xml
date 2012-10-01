@@ -24,6 +24,13 @@
   <name>VXQuery XTest</name>
   <description>Apache VXQuery Test Driver</description>
 
+  <parent>
+    <groupId>org.apache.vxquery</groupId>
+    <artifactId>apache-vxquery</artifactId>
+    <version>0.1-incubating-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+
   <distributionManagement>
     <site>
       <id>vxquery.website</id>
@@ -34,15 +41,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>appassembler-maven-plugin</artifactId>
@@ -75,11 +73,10 @@
   </build>
   
   <dependencies>
-
     <dependency>
-      <groupId>args4j</groupId>
-      <artifactId>args4j</artifactId>
-      <version>2.0.9</version>
+      <groupId>org.apache.vxquery</groupId>
+      <artifactId>apache-vxquery-core</artifactId>
+      <version>0.1-incubating-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -88,25 +85,6 @@
       <version>6.1.4</version>
       <scope>compile</scope>
     </dependency>
-
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-control-cc</artifactId>
-      <version>0.2.1-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-control-nc</artifactId>
-      <version>0.2.1-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.vxquery</groupId>
-      <artifactId>apache-vxquery-core</artifactId>
-      <version>0.1-incubating-SNAPSHOT</version>
-    </dependency>
-
   </dependencies>
 
   <reporting>
@@ -127,14 +105,6 @@
         <configuration>
             <linkOnly>true</linkOnly>
         </configuration>            
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>0.7</version>
-        <configuration>
-          <numUnapprovedLicenses>0</numUnapprovedLicenses>
-        </configuration>
       </plugin>
     </plugins>
   </reporting>

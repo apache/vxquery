@@ -131,21 +131,6 @@
       </developer>         
   </developers>
 
-  <repositories>
-    <repository>
-      <id>hyracks-snapshots</id>
-      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
-      <snapshots>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>hyracks-releases</id>
-      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
-      <releases>
-      </releases>
-    </repository>
-  </repositories>
-
   <mailingLists>
       <mailingList>
         <name>VXQuery-dev</name>
@@ -177,8 +162,59 @@
     </site>
   </distributionManagement>
 
+  <repositories>
+    <repository>
+      <id>hyracks-snapshots</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
+      <snapshots>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>hyracks-releases</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
+      <releases>
+      </releases>
+    </repository>
+  </repositories>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>args4j</groupId>
+      <artifactId>args4j</artifactId>
+      <version>2.0.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-cc</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-nc</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-algebricks-compiler</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -244,6 +280,11 @@
         <configuration>
             <linkOnly>true</linkOnly>
         </configuration>            
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.7</version>
       </plugin>
     </plugins>
   </reporting>
