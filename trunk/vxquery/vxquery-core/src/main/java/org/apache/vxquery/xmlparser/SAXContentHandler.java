@@ -21,9 +21,11 @@ import java.util.List;
 
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.CommentNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.DocumentNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.ElementNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.PINodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.types.BuiltinTypeQNames;
@@ -51,6 +53,10 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     private final TextNodeBuilder tnb;
 
+    private final CommentNodeBuilder cnb;
+
+    private final PINodeBuilder pinb;
+
     private final AttributeNodeBuilder anb;
 
     private final DictionaryBuilder db;
@@ -73,6 +79,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         this.tempABVS = new ArrayBackedValueStorage();
         docb = new DocumentNodeBuilder();
         tnb = new TextNodeBuilder();
+        cnb = new CommentNodeBuilder();
+        pinb = new PINodeBuilder();
         anb = new AttributeNodeBuilder();
         db = new DictionaryBuilder();
         buffer = new StringBuilder();
@@ -125,7 +133,14 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public void processingInstruction(String target, String data) throws SAXException {
         try {
             flushText();
-            throw new UnsupportedOperationException();
+            peekENBStackTop().startChild(pinb);
+            tempABVS.reset();
+            tempABVS.getDataOutput().writeUTF(target);
+            pinb.setTarget(tempABVS);
+            tempABVS.reset();
+            tempABVS.getDataOutput().writeUTF(data);
+            pinb.setContent(tempABVS);
+            peekENBStackTop().endChild(pinb);
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
@@ -220,7 +235,13 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public void comment(char[] ch, int start, int length) throws SAXException {
         try {
             flushText();
-            throw new UnsupportedOperationException();
+            peekENBStackTop().startChild(cnb);
+            buffer.append(ch, start, length);
+            tempABVS.reset();
+            tempABVS.getDataOutput().writeUTF(buffer.toString());
+            cnb.setValue(tempABVS);
+            peekENBStackTop().endChild(cnb);
+            buffer.delete(0, buffer.length());
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
