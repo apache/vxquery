@@ -3,35 +3,22 @@
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
   <id>src</id>
   <formats>
-    <format>dir</format>
+    <format>tar.gz</format>
   </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
-  <moduleSets>
-    <moduleSet>
-      <sources>
-        <outputDirectoryMapping>${module.basedir.name}</outputDirectoryMapping>
-        <fileSets>
-          <fileSet>
-            <includes>
-              <include>src/**</include>
-              <include>pom.xml</include>
-              <include>build*.xml</include>
-              <include>findbugs*.xml</include>
-            </includes>
-            <excludes>
-              <exclude>target/**</exclude>
-            </excludes>
-          </fileSet>
-        </fileSets>
-      </sources>
-    </moduleSet>
-  </moduleSets>
   <fileSets>
     <fileSet>
+      <directory>${project.basedir}</directory>
+      <outputDirectory>/</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
       <includes>
-        <include>src/**</include>
-        <include>pom.xml</include>
+        <include>**/src/**</include>
+        <include>**/pom.xml</include>
+        <include>**/build*.xml</include>
+        <include>**/findbugs*.xml</include>
       </includes>
+      <excludes>
+        <exclude>**/${project.build.directory}/**</exclude>
+      </excludes>      
     </fileSet>
   </fileSets>
 </assembly>
