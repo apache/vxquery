@@ -26,9 +26,9 @@
 
   <parent>
     <groupId>org.apache.vxquery</groupId>
-    <artifactId>apache-vxquery</artifactId>
+    <artifactId>apache-vxquery-parent</artifactId>
     <version>0.1-incubating-SNAPSHOT</version>
-    <relativePath>..</relativePath>
+    <relativePath>../vxquery-parent</relativePath>
   </parent>
 
   <distributionManagement>
