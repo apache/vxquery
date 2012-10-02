@@ -63,7 +63,6 @@ public class XMLSerializer implements IPrinter {
     private ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
     private DataOutput dOut = abvs.getDataOutput();
     private CastToStringOperation castToString = new CastToStringOperation();
-    private UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
 
     private boolean lastWasAtomic = false;
 
@@ -416,6 +415,7 @@ public class XMLSerializer implements IPrinter {
             dnp.getContent(ntp, seqp);
             printSequence(ps, seqp);
         } finally {
+            pp.giveBack(seqp);
             pp.giveBack(dnp);
         }
     }
@@ -717,8 +717,13 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printStringAbvs(PrintStream ps) {
-        stringp.set(abvs.getByteArray(), abvs.getStartOffset() + 1, abvs.getLength() - 1);
-        printString(ps, stringp);
+        UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
+        try {
+            utf8sp.set(abvs.getByteArray(), abvs.getStartOffset() + 1, abvs.getLength() - 1);
+            printString(ps, utf8sp);
+        } finally {
+            pp.giveBack(utf8sp);
+        }
     }
 
     private void printString(PrintStream ps, TaggedValuePointable tvp) {
@@ -789,8 +794,7 @@ public class XMLSerializer implements IPrinter {
             tvp.getValue(ip);
             abvs.reset();
             castToString.convertYMDuration(ip, dOut);
-            stringp.set(abvs.getByteArray(), abvs.getStartOffset() + 1, abvs.getLength() - 1);
-            printString(ps, stringp);
+            printStringAbvs(ps);
         } catch (SystemException e) {
             e.printStackTrace();
         } catch (IOException e) {
