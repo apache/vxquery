@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
+import org.apache.vxquery.datamodel.builders.nodes.AbstractNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.CommentNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
@@ -133,14 +134,14 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public void processingInstruction(String target, String data) throws SAXException {
         try {
             flushText();
-            peekENBStackTop().startChild(pinb);
+            startChildInParent(pinb);
             tempABVS.reset();
             tempABVS.getDataOutput().writeUTF(target);
             pinb.setTarget(tempABVS);
             tempABVS.reset();
             tempABVS.getDataOutput().writeUTF(data);
             pinb.setContent(tempABVS);
-            peekENBStackTop().endChild(pinb);
+            endChildInParent(pinb);
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
@@ -235,12 +236,12 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public void comment(char[] ch, int start, int length) throws SAXException {
         try {
             flushText();
-            peekENBStackTop().startChild(cnb);
+            startChildInParent(cnb);
             buffer.append(ch, start, length);
             tempABVS.reset();
             tempABVS.getDataOutput().writeUTF(buffer.toString());
             cnb.setValue(tempABVS);
-            peekENBStackTop().endChild(cnb);
+            endChildInParent(cnb);
             buffer.delete(0, buffer.length());
         } catch (IOException e) {
             e.printStackTrace();
@@ -317,19 +318,19 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         return enbStack.get(enbStack.size() - 1);
     }
 
-    private void startChildInParent(ElementNodeBuilder enb) throws IOException {
+    private void startChildInParent(AbstractNodeBuilder anb) throws IOException {
         if (enbStack.isEmpty()) {
-            docb.startChild(enb);
+            docb.startChild(anb);
         } else {
-            peekENBStackTop().startChild(enb);
+            peekENBStackTop().startChild(anb);
         }
     }
 
-    private void endChildInParent(ElementNodeBuilder enb) throws IOException {
+    private void endChildInParent(AbstractNodeBuilder anb) throws IOException {
         if (enbStack.isEmpty()) {
-            docb.endChild(enb);
+            docb.endChild(anb);
         } else {
-            peekENBStackTop().endChild(enb);
+            peekENBStackTop().endChild(anb);
         }
     }
 }
