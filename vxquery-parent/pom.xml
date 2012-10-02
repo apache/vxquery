@@ -18,19 +18,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.vxquery</groupId>
-  <artifactId>apache-vxquery</artifactId>
+  <artifactId>apache-vxquery-parent</artifactId>
   <packaging>pom</packaging>
   <version>0.1-incubating-SNAPSHOT</version>
-  <name>VXQuery</name>
-  <description>A Versatile XQuery Processor</description>
+  <name>VXQuery Parent</name>
   <url>http://incubator.apache.org/vxquery/</url>
-
-  <parent>
-    <groupId>org.apache.vxquery</groupId>
-    <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.1-incubating-SNAPSHOT</version>
-    <relativePath>vxquery-parent</relativePath>
-  </parent>
 
   <organization>
     <name>Apache Software Foundation</name>
@@ -165,7 +157,7 @@
     <site>
       <id>vxquery.website</id>
       <name>VXQuery Website</name>
-      <url>file:../../site/</url>
+      <url>file:../../../site/</url>
     </site>
   </distributionManagement>
 
@@ -227,41 +219,6 @@
         <artifactId>maven-site-plugin</artifactId>
         <version>3.0</version>
       </plugin>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <id>generate-site</id>
-            <phase>pre-site</phase>
-            <configuration>
-              <target>
-                  <ant antfile="build-site.xml" target="build">
-                      <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
-                  </ant>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/source.xml</descriptor>
-          </descriptors>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.4</version>
-      </plugin>
     </plugins>
   </build>
 
@@ -300,12 +257,5 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties> 
-
-  <modules>
-    <module>vxquery-parent</module>
-    <module>vxquery-core</module>
-    <module>vxquery-xtest</module>
-    <module>vxquery-cli</module>
-  </modules>
  
 </project>
