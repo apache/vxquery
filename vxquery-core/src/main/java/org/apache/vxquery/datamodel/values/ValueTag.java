@@ -82,4 +82,22 @@ public class ValueTag {
     public static final int COMMENT_NODE_TAG = 105;
     public static final int PI_NODE_TAG = 106;
     public static final int NODE_TREE_TAG = 107;
+
+    public static boolean isAtomic(int tag) {
+        return tag < 100;
+    }
+
+    public static boolean isNode(int tag) {
+        switch (tag) {
+            case DOCUMENT_NODE_TAG:
+            case ELEMENT_NODE_TAG:
+            case ATTRIBUTE_NODE_TAG:
+            case TEXT_NODE_TAG:
+            case COMMENT_NODE_TAG:
+            case PI_NODE_TAG:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
