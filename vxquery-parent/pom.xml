@@ -157,7 +157,7 @@
     <site>
       <id>vxquery.website</id>
       <name>VXQuery Website</name>
-      <url>file:../../../site/</url>
+      <url>file:../../site/</url>
     </site>
   </distributionManagement>
 
@@ -171,6 +171,12 @@
     <repository>
       <id>hyracks-releases</id>
       <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
+      <releases>
+      </releases>
+    </repository>
+    <repository>
+      <id>hyracks-thirdparty</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-thirdparty/</url>
       <releases>
       </releases>
     </repository>
@@ -221,37 +227,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.4</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>index</report>
-              <report>license</report>
-              <report>project-team</report>
-              <report>scm</report>
-              <report>issue-tracking</report>
-              <report>mailing-list</report>
-              <report>plugins</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-        <configuration>
-            <linkOnly>true</linkOnly>
-        </configuration>            
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>0.7</version>
-      </plugin>
-    </plugins>
-  </reporting>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
