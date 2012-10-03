@@ -20,14 +20,14 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-xtest</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-incubating-SNAPSHOT</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery XTest</name>
   <description>Apache VXQuery Test Driver</description>
 
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.1-incubating-SNAPSHOT</version>
+    <version>0.2-incubating-SNAPSHOT</version>
     <relativePath>../vxquery-parent</relativePath>
   </parent>
 
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>org.apache.vxquery</groupId>
       <artifactId>apache-vxquery-core</artifactId>
-      <version>0.1-incubating-SNAPSHOT</version>
+      <version>0.2-incubating-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -105,6 +105,11 @@
         <configuration>
             <linkOnly>true</linkOnly>
         </configuration>            
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.7</version>
       </plugin>
     </plugins>
   </reporting>

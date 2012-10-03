@@ -18,6 +18,12 @@
 
 <project name="vxquery" default="build" basedir=".">
 
+    <property name="xqts.url" value="http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea" />
+    <property name="xqts.zip.file" value="XQTS_1_0_3.zip" />
+    <property name="testsuites.dir" value="${basedir}/testsuites" />
+    <property name="xqts.dir" value="${basedir}/testsuites/XQTS" />
+    <property name="xqts.catalog.file" value="XQTSCatalog.xml" />
+
     <target name="init">
         <available file="${testsuites.dir}/${xqts.zip.file}" property="xqts.zip.present"/>
         <available file="${xqts.dir}/${xqts.catalog.file}" property="xqts.catalog.present"/>

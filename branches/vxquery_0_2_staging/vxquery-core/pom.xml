@@ -20,14 +20,14 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-core</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-incubating-SNAPSHOT</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery Core</name>
   <description>Apache VXQuery Processor</description>
 
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.1-incubating-SNAPSHOT</version>
+    <version>0.2-incubating-SNAPSHOT</version>
     <relativePath>../vxquery-parent</relativePath>
   </parent>
 
@@ -76,24 +76,6 @@
                       <property name="src.code.dir" value="${basedir}/src/main/java" />
                       <property name="xslt.dir" value="${basedir}/src/main/xslt" />
                       <property name="classpath.xslt" refid="maven.compile.classpath" />
-                  </ant>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>get-xqts</id>
-            <phase>generate-test-resources</phase>
-            <configuration>
-              <target>
-                  <ant antfile="build-xqts.xml" target="build">
-                      <property name="xqts.url" value="http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea" />
-                      <property name="xqts.zip.file" value="XQTS_1_0_3.zip" />
-                      <property name="testsuites.dir" value="${basedir}/../../testsuites" />
-                      <property name="xqts.dir" value="${basedir}/../../testsuites/XQTS" />
-                      <property name="xqts.catalog.file" value="XQTSCatalog.xml" />
                   </ant>
               </target>
             </configuration>
@@ -153,11 +135,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>0.7</version>
       </plugin>
     </plugins>
     <pluginManagement>
