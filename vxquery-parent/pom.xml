@@ -20,7 +20,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.1-incubating-SNAPSHOT</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery Parent</name>
   <url>http://incubator.apache.org/vxquery/</url>
 
@@ -227,6 +227,21 @@
       </plugin>
     </plugins>
   </build>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.4</version>
+        <reportSets>
+          <reportSet>
+            <reports/>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>  
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

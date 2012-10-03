@@ -20,7 +20,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery</artifactId>
   <packaging>pom</packaging>
-  <version>0.1-incubating-SNAPSHOT</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>
@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.1-incubating-SNAPSHOT</version>
+    <version>0.2-incubating-SNAPSHOT</version>
     <relativePath>vxquery-parent</relativePath>
   </parent>
 
@@ -103,21 +103,14 @@
             <linkOnly>true</linkOnly>
         </configuration>            
       </plugin>
-      <!--
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>0.7</version>
-      </plugin>
-      -->
     </plugins>
   </reporting>
 
   <modules>
     <module>vxquery-parent</module>
     <module>vxquery-core</module>
-    <module>vxquery-xtest</module>
     <module>vxquery-cli</module>
+    <module>vxquery-xtest</module>
   </modules>
  
 </project>
