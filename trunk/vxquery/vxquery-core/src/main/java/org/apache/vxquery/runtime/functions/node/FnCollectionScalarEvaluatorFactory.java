@@ -81,10 +81,13 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
                     sb.reset(abvs);
                     for (int i = 0; i < list.length; ++i) {
                         // Add the document node to the sequence.
-                        abvsFileNode.reset();
-                        FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode);
-                        nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
-                        sb.addItem(nodep);
+                        if (list[i].getPath().endsWith(".xml")) {
+                            abvsFileNode.reset();
+                            FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode);
+                            nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
+                                    abvsFileNode.getLength());
+                            sb.addItem(nodep);
+                        }
                     }
                     sb.finish();
                     result.set(abvs);
