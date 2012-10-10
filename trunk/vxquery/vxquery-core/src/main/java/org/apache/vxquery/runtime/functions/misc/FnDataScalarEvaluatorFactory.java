@@ -96,7 +96,7 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
                         break;
 
                     default:
-                        sb.addItem(p);
+                        sb.addItem(tvp);
                 }
             }
 
