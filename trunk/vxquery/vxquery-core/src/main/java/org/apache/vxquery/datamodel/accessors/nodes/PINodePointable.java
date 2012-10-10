@@ -51,11 +51,11 @@ public class PINodePointable extends AbstractPointable {
         return nodeTree.nodeIdExists() ? IntegerPointable.getInteger(bytes, getLocalNodeIdOffset()) : -1;
     }
 
-    public void getTarget(NodeTreePointable nodeTree, UTF8StringPointable target) {
+    public void getTarget(NodeTreePointable nodeTree, IPointable target) {
         target.set(bytes, getTargetOffset(nodeTree), getTargetSize(nodeTree));
     }
 
-    public void getContent(NodeTreePointable nodeTree, UTF8StringPointable content) {
+    public void getContent(NodeTreePointable nodeTree, IPointable content) {
         content.set(bytes, getContentOffset(nodeTree), getContentSize(nodeTree));
     }
 
