@@ -204,7 +204,7 @@
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-algebricks-compiler</artifactId>
+      <artifactId>algebricks-compiler</artifactId>
       <version>0.2.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
