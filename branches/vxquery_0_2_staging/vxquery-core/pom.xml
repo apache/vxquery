@@ -248,7 +248,6 @@
         <version>0.7</version>
         <configuration>
           <excludes>
-            <exclude>findbugs-exclude.xml</exclude>
             <exclude>testsuites/**/*</exclude>
             <exclude>reports/**/*</exclude>
           </excludes>
