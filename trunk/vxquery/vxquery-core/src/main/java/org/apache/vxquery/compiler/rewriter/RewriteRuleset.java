@@ -19,6 +19,8 @@ package org.apache.vxquery.compiler.rewriter;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.vxquery.compiler.rewriter.rules.CollectionRewriteRule;
+
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.BreakSelectIntoConjunctsRule;
@@ -48,6 +50,12 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetAlgebricksPhysicalOperat
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 
 public class RewriteRuleset {
+    public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
+        List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
+        normalization.add(new CollectionRewriteRule());
+        return normalization;
+    }
+    
     public final static List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
         List<IAlgebraicRewriteRule> typeInfer = new LinkedList<IAlgebraicRewriteRule>();
         typeInfer.add(new InferTypesRule());
