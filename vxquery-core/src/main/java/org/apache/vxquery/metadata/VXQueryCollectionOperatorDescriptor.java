@@ -30,17 +30,19 @@ import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.api.job.IOperatorDescriptorRegistry;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.dataflow.common.comm.io.ArrayTupleBuilder;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
 import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.FrameUtils;
 import edu.uci.ics.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
-import edu.uci.ics.hyracks.dataflow.std.base.AbstractUnaryOutputSourceOperatorNodePushable;
+import edu.uci.ics.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
 
 public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
     private String collectionName;
 
-    public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, String collectionName, RecordDescriptor rDesc) {
-        super(spec, 0, 1);
+    public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, String collectionName,
+            RecordDescriptor rDesc) {
+        super(spec, 1, 1);
         this.collectionName = collectionName;
         recordDescriptors[0] = rDesc;
     }
@@ -48,30 +50,53 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     @Override
     public IOperatorNodePushable createPushRuntime(IHyracksTaskContext ctx,
             IRecordDescriptorProvider recordDescProvider, int partition, int nPartitions) {
-        final ArrayTupleBuilder tb = new ArrayTupleBuilder(1);
+        final FrameTupleAccessor fta = new FrameTupleAccessor(ctx.getFrameSize(),
+                recordDescProvider.getInputRecordDescriptor(getActivityId(), 0));
+        final ArrayTupleBuilder tb = new ArrayTupleBuilder(recordDescProvider.getOutputRecordDescriptor(
+                getActivityId(), 0).getFieldCount());
         final ByteBuffer frame = ctx.allocateFrame();
         final FrameTupleAppender appender = new FrameTupleAppender(ctx.getFrameSize());
         final InputSource in = new InputSource();
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
 
-        return new AbstractUnaryOutputSourceOperatorNodePushable() {
+        return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
-            public void initialize() throws HyracksDataException {
+            public void open() throws HyracksDataException {
                 appender.reset(frame, true);
                 writer.open();
-                try {
-                    File collectionDirectory = new File(collectionName);
-                    File[] list = collectionDirectory.listFiles();
+            }
 
+            @Override
+            public void nextFrame(ByteBuffer buffer) throws HyracksDataException {
+                fta.reset(buffer);
+                File collectionDirectory = new File(collectionName);
+                File[] list = collectionDirectory.listFiles();
+
+                // Go through each tuple.
+                for (int t = 0; t < fta.getTupleCount(); ++t) {
+                    // Add a field for the document node to each tuple.
                     for (int i = 0; i < list.length; ++i) {
                         // Add the document node to the frame output.
                         if (list[i].getPath().endsWith(".xml")) {
-                            abvsFileNode.reset();
-                            FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode);
-
+                            // First copy all new fields over.
                             tb.reset();
-                            tb.addField(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
+                            if (fta.getFieldCount() > 0) {
+                                for (int f = 0; f < fta.getFieldCount(); ++f) {
+                                    tb.addField(fta, t, f);
+                                }
+                            }
+                            
+                            // Now add new field.
+                            abvsFileNode.reset();
+                            try {
+                                FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode);
+                            } catch (Exception e) {
+                                throw new HyracksDataException(e);
+                            }
+                            tb.addField(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
+                                    abvsFileNode.getLength());
 
+                            // Send to the writer.
                             if (!appender.append(tb.getFieldEndOffsets(), tb.getByteArray(), 0, tb.getSize())) {
                                 FrameUtils.flushFrame(frame, writer);
                                 appender.reset(frame, true);
@@ -82,13 +107,22 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             }
                         }
                     }
-                   
-                } catch (Exception e) {
-                    writer.fail();
-                    throw new HyracksDataException(e);
-                } finally {
-                    writer.close();
                 }
+            }
+
+            @Override
+            public void fail() throws HyracksDataException {
+                writer.fail();
+            }
+
+            @Override
+            public void close() throws HyracksDataException {
+                // Check if needed?
+                fta.reset(frame);
+                if (fta.getTupleCount() > 0) {
+                    FrameUtils.flushFrame(frame, writer);
+                }
+                writer.close();
             }
         };
     }
