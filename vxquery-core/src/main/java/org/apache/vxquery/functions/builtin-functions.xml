@@ -171,6 +171,7 @@
     <function name="fn:count">
         <param name="arg" type="item()*"/>
         <return type="xs:integer"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnCountScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:current-date() as  xs:date -->
