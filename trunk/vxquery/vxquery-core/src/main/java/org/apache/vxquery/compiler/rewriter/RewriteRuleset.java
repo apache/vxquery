@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.CollectionRewriteRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRewriteRule;
 
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -53,6 +54,7 @@ public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
         normalization.add(new CollectionRewriteRule());
+        normalization.add(new RemoveUnusedSortDistinctNodesRewriteRule());
         return normalization;
     }
     
