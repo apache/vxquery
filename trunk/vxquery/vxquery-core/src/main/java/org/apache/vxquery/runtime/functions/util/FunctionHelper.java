@@ -63,6 +63,7 @@ import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 public class FunctionHelper {
 
     public static class TypedPointables {
+        // TODO Switch from this class to the PointablePool.
         public BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
         public BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
         public DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
