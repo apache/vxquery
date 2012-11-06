@@ -46,9 +46,9 @@ Eclipse Setup
     * Download and install the Hyracks Asterix Stabilization branch.
 
 ----------------------------------------
-$ svn checkout https://hyracks.googlecode.com/svn/branches/hyracks_asterix_stabilization hyracks_asterix_stabilization
+$ svn checkout https://hyracks.googlecode.com/svn/branches/fullstack_staging hyracks_for_vxquery
 (Accept the certificate information for *.googlecode.com.)
-$ cd hyracks_asterix_stabilization
+$ cd hyracks_for_vxquery
 $ mvn install -DskipTests
 $ cd ..
 ----------------------------------------
