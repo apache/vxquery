@@ -33,7 +33,15 @@ limitations under the License.
       
         <menu name="For Developers">
             <item name="Development Tips" href="development_tips.html"/>
+            <item name="Eclipse Setup" href="development_eclipse_setup.html"/>
         </menu>
+
+        <menu name="For Users">
+            <item name="Installation" href="user_installation.html"/>
+            <item name="Executing a Query" href="user_query.html"/>
+            <item name="Running the Test Suite" href="user_running_tests.html"/>
+        </menu>
+
     </body>
 </project>
 

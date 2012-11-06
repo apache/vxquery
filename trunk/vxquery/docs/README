@@ -20,15 +20,7 @@ from the command line.
 $ mkdir /path/to/VXQuery
 $ cd /path/to/VXQuery
 
-2. Download and install the Hyracks Asterix Stabilization branch.
-
-$ svn checkout https://hyracks.googlecode.com/svn/branches/hyracks_asterix_stabilization hyracks_asterix_stabilization
-(Accept the certificate information for *.googlecode.com.)
-$ cd hyracks_asterix_stabilization
-$ mvn install -DskipTests
-$ cd ..
-
-3. Download and install the Apache VXQuery Incubating.
+2. Download and install the Apache VXQuery Incubating.
 
 $ svn checkout https://svn.apache.org/repos/asf/incubator/vxquery/trunk/ apache_vxquery_incubating
 (Accept the certificate information for *.apache.org.)
