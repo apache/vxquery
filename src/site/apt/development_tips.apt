@@ -16,11 +16,6 @@
 Developer Tips
 
 
-* Installation
-
-  Install instructions can be found in the {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/docs/README}README file}}.
-
-
 * Hyracks Data Mapping
 
   Hyracks supports several basic data types stored in byte arrays. The byte arrays can be
