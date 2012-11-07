@@ -70,7 +70,7 @@ public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgume
                 } else {
                     result.set(dataArea);
                 }
-            }
+           }
 
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
