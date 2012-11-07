@@ -27,15 +27,13 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 public class RemoveUnusedSortDistinctNodesRewriteRule implements IAlgebraicRewriteRule {
     /**
-     * Find where a sequence is sorted even though it comes in sorted form.
-     * Search pattern: assign [function-call: sort-distinct-nodes-asc-or-atomics] <- aggregate [function-call: sequence]
+     * Find where a sort distinct nodes is being used and not required.
+     * Search pattern: assign [function-call: sort-distinct-nodes-asc-or-atomics]
      */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
@@ -56,33 +54,10 @@ public class RemoveUnusedSortDistinctNodesRewriteRule implements IAlgebraicRewri
                 BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
             return false;
         }
-
-        // Find the subplan operator.
-        AbstractLogicalOperator op2 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
-        if (op2.getOperatorTag() != LogicalOperatorTag.SUBPLAN) {
-            return false;
-        }
-        SubplanOperator subplan = (SubplanOperator) op2;
-
-        // Find the sequence function form an aggregate operator in the subplan.
-        AbstractLogicalOperator op3 = (AbstractLogicalOperator) subplan.getNestedPlans().get(0).getRoots().get(0).getValue();
-        if (op3.getOperatorTag() != LogicalOperatorTag.AGGREGATE) {
-            return false;
-        }
-        AggregateOperator aggregate = (AggregateOperator) op3;
-        // Check to see if the expression is a constant expression and type string.
-        ILogicalExpression logicalExpression2 = (ILogicalExpression) aggregate.getExpressions().get(0).getValue();
-        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
-        }
-        AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
-        if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.SEQUENCE.getFunctionIdentifier())) {
-            return false;
-        }
         
         // Remove the sort-distinct-nodes-asc-or-atomics.
         assign.getExpressions().set(0, functionCall.getArguments().get(0));
-        return false;
+        return true;
     }
 
     @Override

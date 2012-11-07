@@ -42,9 +42,19 @@ sh ./apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq
 ----------------------------------------
 JAVA_OPTS="-Xmx1024m"
 ----------------------------------------
+
  
 * Example
 
+  Query file (test.xq):
 ----------------------------------------
-JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase apache_vxquery_incubating/testsuites/XQTS/ -htmlreport /tmp/full_report.html
+for $x in doc("books.xml")/bookstore/book
+where $x/price>30
+order by $x/title
+return $x/title
+----------------------------------------
+
+  Command line:
+----------------------------------------
+JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq test.xq
 ----------------------------------------
