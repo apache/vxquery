@@ -28,6 +28,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
@@ -42,6 +43,8 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
      */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+        IFunctionInfo aggregateInfo;
+
         // Check if assign is for sort-distinct-nodes-asc-or-atomics.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
@@ -55,10 +58,20 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
             return false;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier())) {
+        if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_AVG_1.getFunctionIdentifier())) {
+            aggregateInfo = BuiltinFunctions.FN_AVG_1;
+        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier())) {
+            aggregateInfo = BuiltinFunctions.FN_COUNT_1;
+        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier())) {
+            aggregateInfo = BuiltinFunctions.FN_MIN_1;
+        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier())) {
+            aggregateInfo = BuiltinFunctions.FN_MAX_1;
+        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier())) {
+            aggregateInfo = BuiltinFunctions.FN_SUM_1;
+        } else {
             return false;
         }
-        
+
         // If the first argument is treat, allow it to pass.
         ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
         if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
@@ -76,17 +89,16 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
         }
         VariableReferenceExpression variableExpression = (VariableReferenceExpression) logicalExpression3;
         int variableId = variableExpression.getVariableReference().getId();
-        
-        
+
         // Search for variable see if it is a aggregate sequence.
         AbstractLogicalOperator opSearch = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
         opSearch = findSequenceAggregateOperator(opSearch, variableId);
         if (opSearch == null) {
             return false;
         }
-        
+
         AggregateOperator aggregate = (AggregateOperator) opSearch;
-        
+
         // Check to see if the expression is a function and sort-distinct-nodes-asc-or-atomics.
         ILogicalExpression logicalExpressionSearch = (ILogicalExpression) aggregate.getExpressions().get(0).getValue();
         if (logicalExpressionSearch.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
@@ -96,9 +108,9 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
         if (!functionCallSearch.getFunctionIdentifier().equals(BuiltinOperators.SEQUENCE.getFunctionIdentifier())) {
             return false;
         }
-        
+
         // Set the aggregate function to use count.
-        functionCallSearch.setFunctionInfo(BuiltinFunctions.FN_COUNT_1);
+        functionCallSearch.setFunctionInfo(aggregateInfo);
 
         // Remove the aggregate assign.
         assign.getExpressions().set(0, functionCall2.getArguments().get(0));
@@ -112,25 +124,28 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
                 AggregateOperator aggregate = (AggregateOperator) opSearch;
 
                 // Check to see if the expression is a function and sort-distinct-nodes-asc-or-atomics.
-                ILogicalExpression logicalExpressionSearch = (ILogicalExpression) aggregate.getExpressions().get(0).getValue();
+                ILogicalExpression logicalExpressionSearch = (ILogicalExpression) aggregate.getExpressions().get(0)
+                        .getValue();
                 if (logicalExpressionSearch.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
                     opSearch = (AbstractLogicalOperator) opSearch.getInputs().get(0).getValue();
                     continue;
                 }
                 AbstractFunctionCallExpression functionCallSearch = (AbstractFunctionCallExpression) logicalExpressionSearch;
-                if (!functionCallSearch.getFunctionIdentifier().equals(BuiltinOperators.SEQUENCE.getFunctionIdentifier())) {
+                if (!functionCallSearch.getFunctionIdentifier().equals(
+                        BuiltinOperators.SEQUENCE.getFunctionIdentifier())) {
                     opSearch = (AbstractLogicalOperator) opSearch.getInputs().get(0).getValue();
                     continue;
                 }
-                
+
                 // TODO search for variable ID.
-                
+
                 // Found the aggregate operator!!!
                 return opSearch;
             } else if (opSearch.getOperatorTag() == LogicalOperatorTag.SUBPLAN) {
                 // Run through subplan.
                 SubplanOperator subplan = (SubplanOperator) opSearch;
-                AbstractLogicalOperator opSubplan = (AbstractLogicalOperator) subplan.getNestedPlans().get(0).getRoots().get(0).getValue();
+                AbstractLogicalOperator opSubplan = (AbstractLogicalOperator) subplan.getNestedPlans().get(0)
+                        .getRoots().get(0).getValue();
                 AbstractLogicalOperator search = findSequenceAggregateOperator(opSubplan, variableId);
                 if (search != null) {
                     return search;

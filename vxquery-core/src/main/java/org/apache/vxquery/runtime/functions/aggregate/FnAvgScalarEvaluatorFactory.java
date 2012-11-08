@@ -14,22 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.runtime.functions.sequence;
+package org.apache.vxquery.runtime.functions.aggregate;
 
 import java.io.DataOutput;
-import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
+import org.apache.vxquery.runtime.functions.arithmetic.DivideOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
-import org.apache.vxquery.runtime.functions.comparison.ValueEqComparisonOperation;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -40,60 +39,65 @@ import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public class FnIndexOfScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public FnIndexOfScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public FnAvgScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
-        final DataOutput dOutInner = abvsInner.getDataOutput();
-        final SequenceBuilder sb = new SequenceBuilder();
-        final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        final AbstractValueComparisonOperation aOp = new ValueEqComparisonOperation();
-        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final SequencePointable seqp = new SequencePointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
+        final TaggedValuePointable tvpNext = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+        final DataOutput dOut = abvs.getDataOutput();
+        final AddOperation aOp = new AddOperation();
+        final DivideOperation aOpDivide = new DivideOperation();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                try {
-                    abvs.reset();
-                    sb.reset(abvs);
-                    TaggedValuePointable tvp1 = args[0];
-                    TaggedValuePointable tvp2 = args[1];
-
-                    if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
-                        tvp1.getValue(seq);
-                        int seqLen = seq.getEntryCount();
+                TaggedValuePointable tvp = args[0];
+                if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp.getValue(seqp);
+                    int seqLen = seqp.getEntryCount();
+                    if (seqLen == 0) {
+                        XDMConstants.setEmptySequence(result);
+                    } else {
+                        // Add up the sequence.
                         for (int j = 0; j < seqLen; ++j) {
-                            seq.getEntry(j, p);
-                            tvp.set(p.getByteArray(), p.getStartOffset(), p.getLength());
-                            if (FunctionHelper.compareTaggedValues(aOp, tvp, tvp2, dCtx)) {
-                                abvsInner.reset();
-                                dOutInner.write(ValueTag.XS_INTEGER_TAG);
-                                dOutInner.writeLong(j + 1);
-                                sb.addItem(abvsInner);
+                            seqp.getEntry(j, p);
+                            tvpNext.set(p.getByteArray(), p.getStartOffset(), p.getLength());
+                            if (j == 0) {
+                                // Init.
+                                tvpSum.set(tvpNext);
+                            } else {
+                                FunctionHelper.arithmeticOperation(aOp, dCtx, tvpNext, tvpSum, tvpSum);
                             }
                         }
-                    } else {
-                        if (FunctionHelper.compareTaggedValues(aOp, tvp1, tvp2, dCtx)) {
-                            abvsInner.reset();
-                            dOutInner.write(ValueTag.XS_INTEGER_TAG);
-                            dOutInner.writeLong(1);
-                            sb.addItem(abvsInner);
+
+                        // Set count as a TaggedValuePointable.
+                        try {
+                            abvs.reset();
+                            dOut.write(ValueTag.XS_INTEGER_TAG);
+                            dOut.writeLong(seqLen);
+                            tvpCount.set(abvs);
+                        } catch (Exception e) {
+                            throw new SystemException(ErrorCode.SYSE0001, e);
                         }
+
+                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum);
+                        result.set(tvpSum);
                     }
-                    sb.finish();
-                    result.set(abvs);
-                } catch (IOException e) {
-                    throw new SystemException(ErrorCode.SYSE0001);
+                } else {
+                    // Only one result.
+                    result.set(tvp);
                 }
             }
         };
