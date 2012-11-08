@@ -72,6 +72,8 @@
     <function name="fn:avg">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnAvgScalarEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnAvgAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:base-uri() as  xs:anyURI? -->
@@ -530,6 +532,8 @@
     <function name="fn:max">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxScalarEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:max($arg as  xs:anyAtomicType*, $collation as string)  as xs:anyAtomicType?  -->
@@ -537,12 +541,16 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxScalarEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:min($arg as  xs:anyAtomicType*) as xs:anyAtomicType?  -->
     <function name="fn:min">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMinScalarEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMinAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:min($arg as  xs:anyAtomicType*, $collation as string)  as xs:anyAtomicType?  -->
@@ -550,6 +558,8 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMinScalarEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMinAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:minutes-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
@@ -951,6 +961,8 @@
     <function name="fn:sum">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnSumScalarEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnSumAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:sum($arg as  xs:anyAtomicType*, $zero as xs:anyAtomicType?)  as xs:anyAtomicType?  -->
@@ -958,6 +970,8 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <param name="zero" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnSumScalarEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnSumAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:timezone-from-date( $arg as xs:date?) as  xs:dayTimeDuration?  -->
