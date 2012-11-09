@@ -66,7 +66,7 @@ public class FnSumScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                     if (seqLen == 0) {
                         // Default zero value as second argument.
                         if (args.length == 2) {
-                            TaggedValuePointable tvp2 = args[0];
+                            TaggedValuePointable tvp2 = args[1];
                             result.set(tvp2);
                         } else {
                             // No argument return an integer.
