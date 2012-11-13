@@ -46,7 +46,11 @@ JAVA_OPTS="-Xmx1024m"
  
 * Example
 
-  Query file (test.xq):
+  The following example query is from {{{http://www.w3schools.com/xquery/default.asp}W3Schools XQuery Tutorial}}. 
+  If you are new to XQuery, the W3Schools tutorial is a great place to start.
+  
+  [[i]] Query file (test.xq)
+  
 ----------------------------------------
 for $x in doc("books.xml")/bookstore/book
 where $x/price>30
@@ -54,7 +58,8 @@ order by $x/title
 return $x/title
 ----------------------------------------
 
-  Command line:
+  [[i]] Command line
+  
 ----------------------------------------
 JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq test.xq
 ----------------------------------------
