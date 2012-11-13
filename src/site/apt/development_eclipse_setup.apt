@@ -15,35 +15,41 @@
 
 Eclipse Setup
 
+  Eclipse is a nice IDE for developing in Java and below are the instructions to setting up 
+  Eclipse for VXQuery development.
 
 * Installation
 
   * Install Classic Eclipse
 
-  Follow the instruction for eclipse on from www.eclipse.org for the "Classic" eclipse version.
+  Follow the instruction for eclipse on from {{{http://www.eclipse.org}www.eclipse.org}} for 
+  the "Classic" eclipse version.
 
-  * Install m2e for Maven Support
+  * Install Maven Integration (m2e)
+  
+  VXQuery uses {{{http://maven.apache.org/}Maven}} to define external libraries and build instructions.
+  The Eclipse plugin for Maven integeration can be found at {{{http://eclipse.org/m2e/}m2e}}.
 
-    * Go to "Help" and select "Install New Software..."
-    
-    * Select the Juno site resource.
-    
-    * Search for "Maven"
-    
-    * Install m2e.
-    
-    * Restart.
-
-* Eclipse Configuration
+* Code Formatter Setup
 
   For VXQuery, the Hyracks project Eclipse formating template has been adopted as the standard. The 
   template file can be found at {{{http://hyracks.googlecode.com/files/HyracksCodeFormatProfile.xml}http://hyracks.googlecode.com/files/HyracksCodeFormatProfile.xml}}  
-   
-* Code Setup
   
-  * Import Hyracks Code Base
+  Menu Options from Preferences:
+  
+  * Java
+  
+    * Code Style
+  
+      * Formatter
+   
+* Code Import Setup
+  
+  [[1]] Import Hyracks Code Base
 
-    * Download and install the Hyracks Asterix Stabilization branch.
+    Download and install the Hyracks Full Stack Staging branch to get the latest Hyracks support
+    for development. This is required since some new features being build are affecting Hyracks 
+    development.
 
 ----------------------------------------
 $ svn checkout https://hyracks.googlecode.com/svn/branches/fullstack_staging hyracks_for_vxquery
@@ -53,22 +59,31 @@ $ mvn install -DskipTests
 $ cd ..
 ----------------------------------------
 
-    * From Eclipse Import the maven project.
+    Finally, from Eclipse's File menu "import" the Maven Hyracks project you have just downloaded 
+    through SVN.
 
-  * Import VXQuery Code Base
+  [[1]] Import VXQuery Code Base
 
-    * Install VXQuery
-  
-    Follow the {{{user_installation.html}instructions}} for installing VXQuery. 
+    The VXQuery code base must be installed so eclipse has full access. Similar to the Hyracks
+    installation, VXQuery needs to be downloaded from Apache's SVN repository.
+
+----------------------------------------
+$ svn checkout https://svn.apache.org/repos/asf/incubator/vxquery/trunk/ apache_vxquery_incubating
+(Accept the certificate information for *.apache.org.)
+$ cd apache_vxquery_incubating/vxquery
+$ mvn package -DskipTests
+$ cd ../..
+----------------------------------------
  
-    * Import VXQuery
-  
-    Import VXQuery into eclipse a Maven Project. 
+    Finally, from Eclipse's File menu "import" the Maven VXQuery project you have just downloaded 
+    through SVN. 
     
-    * Additional Project Configuration
+  [[1]] Additional Project Configuration
     
-    Add "target/generated-sources/javacc" as a source folder in vxquery core.
-    
+    Some eclipse build errors will show up. To remove these display errors, add 
+    "target/generated-sources/javacc" as a source folder in VXQuery Core.
+
+
 * Debugging
 
   Eclipse can be used to debug VXQuery. Using the following java option will allow eclipse to pause the 
@@ -76,7 +91,8 @@ $ cd ..
   
   "-Xdebug -Xrunjdwp:transport=dt_socket,address=127.0.0.1:8000,server=y,suspend=y" 
   
-  Realize you may need to update the address for your system. More details can be found at {{{http://www.ibm.com/developerworks/opensource/library/os-eclipse-javadebug/index.html}IBM}}
+  Realize you may need to update the address for your system. More details can be found at 
+  {{{http://www.ibm.com/developerworks/opensource/library/os-eclipse-javadebug/index.html}IBM}}
 
 ----------------------------------------
 JAVA_OPTS="-Xmx1024m -Xdebug -Xrunjdwp:transport=dt_socket,address=127.0.0.1:8000,server=y,suspend=y" sh vxquery-cli/target/appassembler/bin/vxq ../test.xq -showoet
