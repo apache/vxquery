@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Issue Tracking</title>
+    <title></title>
     <style type="text/css" media="all">
       @import url("./css/maven-base.css");
       @import url("./css/maven-theme.css");
@@ -46,32 +46,9 @@
         
                                 <h5>Project Documentation</h5>
                   <ul>
-                                                                                                                                                                                          <li class="expanded">
+                                                                                                                                                                                <li class="collapsed">
                           <a href="project-info.html" title="Project Information">Project Information</a>
-                    <ul>
-                      <li class="none">
-                          <a href="index.html" title="About">About</a>
-            </li>
-                      <li class="none">
-                          <a href="license.html" title="Project License">Project License</a>
-            </li>
-                      <li class="none">
-                          <a href="team-list.html" title="Project Team">Project Team</a>
-            </li>
-                      <li class="none">
-                          <a href="source-repository.html" title="Source Repository">Source Repository</a>
-            </li>
-                      <li class="none">
-            <strong>Issue Tracking</strong>
-          </li>
-                      <li class="none">
-                          <a href="mail-lists.html" title="Mailing Lists">Mailing Lists</a>
-            </li>
-                      <li class="none">
-                          <a href="plugins.html" title="Project Plugins">Project Plugins</a>
-            </li>
-              </ul>
-        </li>
+                  </li>
           </ul>
                        <h5>Modules</h5>
                   <ul>
@@ -106,8 +83,8 @@
                           <a href="user_query.html" title="Executing a Query">Executing a Query</a>
             </li>
                   <li class="none">
-                          <a href="user_running_tests.html" title="Running the Test Suite">Running the Test Suite</a>
-            </li>
+            <strong>Running the Test Suite</strong>
+          </li>
           </ul>
                              <a href="http://maven.apache.org/" title="Built by Maven" class="poweredBy">
         <img class="poweredBy" alt="Built by Maven" src="./images/logos/maven-feather.png" />
@@ -118,7 +95,17 @@
     </div>
     <div id="bodyColumn">
       <div id="contentBox">
-        <div class="section"><h2>Overview<a name="Overview"></a></h2><a name="Overview"></a><p>This project uses <a class="externalLink" href="http://www.atlassian.com/software/jira">JIRA</a> a J2EE-based, issue tracking and project management application.</p></div><div class="section"><h2>Issue Tracking<a name="Issue_Tracking"></a></h2><a name="Issue_Tracking"></a><p>Issues, bugs, and feature requests should be submitted to the following issue tracking system for this project.</p><div class="source"><pre><a class="externalLink" href="https://issues.apache.org/jira/browse/VXQUERY">https://issues.apache.org/jira/browse/VXQUERY</a></pre></div></div>
+        <!-- Licensed to the Apache Software Foundation (ASF) under one or more --><!-- contributor license agreements.  See the NOTICE file distributed with --><!-- this work for additional information regarding copyright ownership. --><!-- The ASF licenses this file to You under the Apache License, Version 2.0 --><!-- (the "License"); you may not use this file except in compliance with --><!-- the License.  You may obtain a copy of the License at --><!--  --><!-- http://www.apache.org/licenses/LICENSE-2.0 --><!--  --><!-- Unless required by applicable law or agreed to in writing, software --><!-- distributed under the License is distributed on an "AS IS" BASIS, --><!-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. --><!-- See the License for the specific language governing permissions and --><!-- limitations under the License. --><div class="section"><h2>Running the Test Suite<a name="Running_the_Test_Suite"></a></h2><div class="section"><h3>Command<a name="Command"></a></h3><div><pre>sh ./apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest</pre></div></div><div class="section"><h3>Command Line Options<a name="Command_Line_Options"></a></h3><div><pre> -O N            : Optimization Level
+ -exclude VAL    : Exclude filter regular expression
+ -htmlreport VAL : HTML Report output file
+ -include VAL    : Include filter regular expression
+ -keepalive N    : Milliseconds to keep server alive after tests have completed
+ -port N         : Port for web server to listen on
+ -textreport VAL : Text Report output file
+ -threads N      : Number of threads
+ -v              : Verbose
+ -xmlreport VAL  : XML Report output file
+ -xqtsbase VAL   : XQTS Base Directory</pre></div></div><div class="section"><h3>Java Options<a name="Java_Options"></a></h3><p>The command can be run with Java options to increase the amount of memory. Also helps to use a logging properties file that only output serious errors. This will reduce the output to only a few &quot;LINE 7:&quot; lines. Should help with the speed in running the test.</p><div><pre>JAVA_OPTS=&quot;-Xmx1024m -Djava.util.logging.config.file=/path/to/logging.properties&quot;</pre></div></div><div class="section"><h3>Example<a name="Example"></a></h3><div><pre>JAVA_OPTS=&quot;-Xmx1024m  -Djava.util.logging.config.file=/path/to/logging.properties&quot; sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase apache_vxquery_incubating/testsuites/XQTS/ -htmlreport /tmp/full_report.html</pre></div><p>View the results at <a class="externalLink" href="file:///tmp/full_report.html">file:///tmp/full_report.html</a>.</p></div></div>
       </div>
     </div>
     <div class="clear">
