@@ -40,8 +40,8 @@ sh ./apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xte
  
 * Java Options
 
-  The command can be run with Java options to increase the amount of memory. Also helps
-  to use a logging properties file that only output serious errors. This will reduce the
+  The command can be run with Java options to increase the amount of memory to one gigabyte.
+  Also helps to use a logging properties file that only output serious errors. This will reduce the
   output to only a few "LINE 7:" lines. Should help with the speed in running the test.
 
 ----------------------------------------
