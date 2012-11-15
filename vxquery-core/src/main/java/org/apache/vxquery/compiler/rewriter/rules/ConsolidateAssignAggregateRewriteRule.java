@@ -44,51 +44,92 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         IFunctionInfo aggregateInfo;
+        AbstractFunctionCallExpression finalFunctionCall;
+        Mutable<ILogicalExpression> mutableVariableExpresion;
 
-        // Check if assign is for sort-distinct-nodes-asc-or-atomics.
+        // Check if assign is for aggregate function.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
             return false;
         }
         AssignOperator assign = (AssignOperator) op;
 
-        // Check to see if the expression is a function and sort-distinct-nodes-asc-or-atomics.
-        ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
+        Mutable<ILogicalExpression> mutableLogicalExpression = assign.getExpressions().get(0);
+        ILogicalExpression logicalExpression = mutableLogicalExpression.getValue();
         if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
             return false;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_AVG_1.getFunctionIdentifier())) {
-            aggregateInfo = BuiltinFunctions.FN_AVG_1;
-        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier())) {
+        if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier())) {
             aggregateInfo = BuiltinFunctions.FN_COUNT_1;
-        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier())) {
-            aggregateInfo = BuiltinFunctions.FN_MIN_1;
-        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier())) {
-            aggregateInfo = BuiltinFunctions.FN_MAX_1;
-        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier())) {
-            aggregateInfo = BuiltinFunctions.FN_SUM_1;
+
+            // Argument for count is "item()*"
+            // If the first argument is treat, allow it to pass.
+            ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return false;
+            }
+            AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
+            if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.TREAT.getFunctionIdentifier())) {
+                return false;
+            }
+
+            // find variable id for argument to count.
+            Mutable<ILogicalExpression> mutableLogicalExpression3 = functionCall2.getArguments().get(0);
+            ILogicalExpression logicalExpression3 = (ILogicalExpression) mutableLogicalExpression3.getValue();
+            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+                return false;
+            }
+            mutableVariableExpresion = mutableLogicalExpression3;
+            finalFunctionCall = functionCall2;
         } else {
-            return false;
+            if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_AVG_1.getFunctionIdentifier())) {
+                aggregateInfo = BuiltinFunctions.FN_AVG_1;
+            } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier())) {
+                aggregateInfo = BuiltinFunctions.FN_MIN_1;
+            } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier())) {
+                aggregateInfo = BuiltinFunctions.FN_MAX_1;
+            } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier())) {
+                aggregateInfo = BuiltinFunctions.FN_SUM_1;
+            } else {
+                return false;
+            }
+
+            // Argument for these aggregate is "xs:anyAtomicType*"
+            // If the first argument is promote followed by data, allow it to pass.
+            ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return false;
+            }
+            AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
+            if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.PROMOTE.getFunctionIdentifier())) {
+                return false;
+            }
+
+            // If the first argument is promote followed by data, allow it to pass.
+            ILogicalExpression logicalExpression3 = (ILogicalExpression) functionCall2.getArguments().get(0).getValue();
+            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return false;
+            }
+            AbstractFunctionCallExpression functionCall3 = (AbstractFunctionCallExpression) logicalExpression3;
+            if (!functionCall3.getFunctionIdentifier().equals(BuiltinFunctions.FN_DATA_1.getFunctionIdentifier())) {
+                return false;
+            }
+
+            // find variable id for argument to the aggregate function.
+            Mutable<ILogicalExpression> mutableLogicalExpression4 = functionCall3.getArguments().get(0);
+            ILogicalExpression logicalExpression4 = (ILogicalExpression) mutableLogicalExpression4.getValue();
+            if (logicalExpression4.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+                return false;
+            }
+            mutableVariableExpresion = mutableLogicalExpression4;
+            finalFunctionCall = functionCall3;
         }
 
-        // If the first argument is treat, allow it to pass.
-        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
-        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
-        }
-        AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
-        if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.TREAT.getFunctionIdentifier())) {
-            return false;
-        }
-
-        // find variable id for argument to count.
-        ILogicalExpression logicalExpression3 = (ILogicalExpression) functionCall2.getArguments().get(0).getValue();
-        if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
-            return false;
-        }
-        VariableReferenceExpression variableExpression = (VariableReferenceExpression) logicalExpression3;
-        int variableId = variableExpression.getVariableReference().getId();
+        // Variable details.
+        VariableReferenceExpression variableReference = (VariableReferenceExpression) mutableVariableExpresion
+                .getValue();
+        int variableId = variableReference.getVariableReference().getId();
 
         // Search for variable see if it is a aggregate sequence.
         AbstractLogicalOperator opSearch = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
@@ -109,16 +150,23 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
             return false;
         }
 
-        // Set the aggregate function to use count.
+        // Set the aggregate function to use new aggregate option.
         functionCallSearch.setFunctionInfo(aggregateInfo);
 
-        // Remove the aggregate assign.
-        assign.getExpressions().set(0, functionCall2.getArguments().get(0));
+        // Alter arguments to include the aggregate arguments.
+        finalFunctionCall.getArguments().get(0).setValue(functionCallSearch.getArguments().get(0).getValue());
+
+        // Move the arguments for the assign function into aggregate. 
+        functionCallSearch.getArguments().get(0).setValue(functionCall.getArguments().get(0).getValue());
+
+        // Remove the aggregate assign, by creating a no op.
+        assign.getExpressions().get(0).setValue(variableReference);
+
         return true;
     }
 
     private AbstractLogicalOperator findSequenceAggregateOperator(AbstractLogicalOperator opSearch, int variableId) {
-        while (opSearch.getOperatorTag() != LogicalOperatorTag.EMPTYTUPLESOURCE) {
+        while (true) {
             if (opSearch.getOperatorTag() == LogicalOperatorTag.AGGREGATE) {
                 // Check for variable assignment and sequence.
                 AggregateOperator aggregate = (AggregateOperator) opSearch;
@@ -137,7 +185,11 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
                     continue;
                 }
 
-                // TODO search for variable ID.
+                // Only find operator for the following variable ID.
+                if (variableId != aggregate.getVariables().get(0).getId()) {
+                    opSearch = (AbstractLogicalOperator) opSearch.getInputs().get(0).getValue();
+                    continue;
+                }
 
                 // Found the aggregate operator!!!
                 return opSearch;
@@ -151,9 +203,13 @@ public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteR
                     return search;
                 }
             }
-            opSearch = (AbstractLogicalOperator) opSearch.getInputs().get(0).getValue();
+            if (opSearch.getOperatorTag() != LogicalOperatorTag.EMPTYTUPLESOURCE && opSearch.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
+                opSearch = (AbstractLogicalOperator) opSearch.getInputs().get(0).getValue();
+            } else {
+                break;
+            }
         }
-        if (opSearch.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE) {
+        if (opSearch.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE || opSearch.getOperatorTag() == LogicalOperatorTag.NESTEDTUPLESOURCE) {
             return null;
         }
         return opSearch;
