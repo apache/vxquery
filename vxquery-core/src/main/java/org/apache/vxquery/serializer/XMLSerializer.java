@@ -64,8 +64,6 @@ public class XMLSerializer implements IPrinter {
     private DataOutput dOut = abvs.getDataOutput();
     private CastToStringOperation castToString = new CastToStringOperation();
 
-    private boolean lastWasAtomic = false;
-
     public XMLSerializer() {
         pp = PointablePoolFactory.INSTANCE.createPointablePool();
     }
@@ -83,15 +81,6 @@ public class XMLSerializer implements IPrinter {
 
     private void printTaggedValuePointable(PrintStream ps, TaggedValuePointable tvp) {
         byte tag = tvp.getTag();
-        if (ValueTag.isAtomic(tag)) {
-            if (lastWasAtomic) {
-                ps.append(' ');
-            } else {
-                lastWasAtomic = true;
-            }
-        } else {
-            lastWasAtomic = false;
-        }
         switch ((int) tag) {
             case ValueTag.XS_ANY_URI_TAG:
                 printString(ps, tvp);
