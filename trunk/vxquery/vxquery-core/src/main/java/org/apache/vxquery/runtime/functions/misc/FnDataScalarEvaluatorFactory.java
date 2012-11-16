@@ -143,6 +143,7 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
                             pp.giveBack(sp);
                             pp.giveBack(dnp);
                         }
+                        break;
                     }
 
                     case ValueTag.ELEMENT_NODE_TAG: {
@@ -159,6 +160,7 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
                             pp.giveBack(sp);
                             pp.giveBack(enp);
                         }
+                        break;
                     }
 
                     case ValueTag.PI_NODE_TAG: {
