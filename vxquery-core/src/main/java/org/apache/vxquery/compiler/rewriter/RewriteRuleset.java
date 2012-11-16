@@ -56,6 +56,7 @@ public class RewriteRuleset {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
         normalization.add(new CollectionRewriteRule());
         normalization.add(new RemoveUnusedSortDistinctNodesRewriteRule());
+        normalization.add(new InlineVariablesRule());
         normalization.add(new ConsolidateAssignAggregateRewriteRule());
         return normalization;
     }
