@@ -18,7 +18,6 @@ package org.apache.vxquery.runtime.functions.aggregate;
 
 import java.io.DataOutput;
 
-import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
@@ -36,8 +35,6 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentAggregateEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    // TODO Populate the dynamic context.
-    private static final DynamicContext dCtx = null;
 
     public FnSumAggregateEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);

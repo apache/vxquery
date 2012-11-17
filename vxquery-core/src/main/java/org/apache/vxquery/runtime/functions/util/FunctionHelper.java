@@ -60,7 +60,6 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
@@ -1187,6 +1186,55 @@ public class FunctionHelper {
             in.setCharacterStream(new InputStreamReader(new FileInputStream(fName)));
             XMLParser.parseInputSource(in, abvs, false, null);
         } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        }
+    }
+
+    public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,
+            TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
+        TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    
+        ArrayBackedValueStorage abvsArgument1 = new ArrayBackedValueStorage();
+        DataOutput dOutArgument1 = abvsArgument1.getDataOutput();
+        ArrayBackedValueStorage abvsArgument2 = new ArrayBackedValueStorage();
+        DataOutput dOutArgument2 = abvsArgument2.getDataOutput();
+        CastToDoubleOperation castToDouble = new CastToDoubleOperation();
+        UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+    
+        try {
+            abvsArgument1.reset();
+            if (tvp1.getTag() == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
+                tvp1.getValue(stringp);
+                castToDouble.convertUntypedAtomic(stringp, dOutArgument1);
+                tvp1new.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset(),
+                        DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
+            } else if (isDerivedFromInteger(tvp1.getTag())) {
+                getIntegerPointable(tvp1, dOutArgument1);
+                tvp1new.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset(),
+                        LongPointable.TYPE_TRAITS.getFixedLength() + 1);
+            } else {
+                tvp1new = tvp1;
+            }
+            abvsArgument2.reset();
+            if (tvp2.getTag() == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
+                tvp2.getValue(stringp2);
+                castToDouble.convertUntypedAtomic(stringp2, dOutArgument2);
+                tvp2new.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset(),
+                        DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
+            } else if (isDerivedFromInteger(tvp2.getTag())) {
+                getIntegerPointable(tvp2, dOutArgument2);
+                tvp2new.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset(),
+                        LongPointable.TYPE_TRAITS.getFixedLength() + 1);
+            } else {
+                tvp2new = tvp2;
+            }
+    
+            return compareTaggedValues(aOp, tvp1new, tvp2new, dCtx);
+        } catch (SystemException se) {
+            throw se;
+        } catch (Exception e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
     }

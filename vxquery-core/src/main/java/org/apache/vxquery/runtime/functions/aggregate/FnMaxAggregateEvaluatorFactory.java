@@ -16,60 +16,21 @@
  */
 package org.apache.vxquery.runtime.functions.aggregate;
 
-import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
-import org.apache.vxquery.runtime.functions.comparison.ValueLtComparisonOperation;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.runtime.functions.comparison.ValueGtComparisonOperation;
 
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluator;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
 
-public class FnMaxAggregateEvaluatorFactory extends AbstractTaggedValueArgumentAggregateEvaluatorFactory {
+public class FnMaxAggregateEvaluatorFactory extends AbstractMaxMinAggregateEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    // TODO Populate the dynamic context.
-    private static final DynamicContext dCtx = null;
 
     public FnMaxAggregateEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
     @Override
-    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
-        final AbstractValueComparisonOperation aOp = new ValueLtComparisonOperation();
-        final TaggedValuePointable tvpMax = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-
-        return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
-            long count;
-
-            @Override
-            public void init() throws AlgebricksException {
-                count = 0;
-            }
-
-            @Override
-            public void finish(IPointable result) throws AlgebricksException {
-                result.set(tvpMax);
-            }
-
-            @Override
-            protected void step(TaggedValuePointable[] args) throws SystemException {
-                TaggedValuePointable tvp = args[0];
-                if (count == 0) {
-                    // Init.
-                    tvpMax.set(tvp);
-                } else if (FunctionHelper.compareTaggedValues(aOp, tvpMax, tvp, dCtx)) {
-                    tvpMax.set(tvp);
-                }
-                count++;
-            }
-
-        };
+    protected AbstractValueComparisonOperation createValueComparisonOperation() {
+        return new ValueGtComparisonOperation();
     }
+
 }
