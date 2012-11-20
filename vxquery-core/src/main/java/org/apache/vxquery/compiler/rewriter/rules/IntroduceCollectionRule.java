@@ -29,6 +29,7 @@ import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
 import org.apache.vxquery.types.AnyItemType;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
@@ -51,7 +52,7 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
-public class CollectionRewriteRule implements IAlgebraicRewriteRule {
+public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
     final ByteBufferInputStream bbis = new ByteBufferInputStream();
     final DataInputStream di = new DataInputStream(bbis);
     final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
@@ -65,6 +66,8 @@ public class CollectionRewriteRule implements IAlgebraicRewriteRule {
      */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+        VXQueryConstantValue constantValue;
+
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
@@ -90,19 +93,48 @@ public class CollectionRewriteRule implements IAlgebraicRewriteRule {
 
         // Get the string assigned to the collection function.
         AbstractLogicalOperator op3 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
-        if (op3.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
-            return false;
-        }
-        AssignOperator assign2 = (AssignOperator) op3;
+        if (op3.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
+            AssignOperator assign2 = (AssignOperator) op3;
 
-        // Check to see if the expression is a constant expression and type string.
-        ILogicalExpression logicalExpression2 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
-        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-            return false;
-        }
-        ConstantExpression constantExpression = (ConstantExpression) logicalExpression2;
-        VXQueryConstantValue constantValue = (VXQueryConstantValue) constantExpression.getValue();
-        if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
+            // Check to see if the expression is a constant expression and type string.
+            ILogicalExpression logicalExpression2 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
+            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+                return false;
+            }
+            ConstantExpression constantExpression = (ConstantExpression) logicalExpression2;
+            constantValue = (VXQueryConstantValue) constantExpression.getValue();
+            if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
+                return false;
+            }
+        } else if (op3.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE) {
+            ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return false;
+            }
+            AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
+            if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.PROMOTE.getFunctionIdentifier())) {
+                return false;
+            }
+            
+            ILogicalExpression logicalExpression3 = (ILogicalExpression) functionCall2.getArguments().get(0).getValue();
+            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return false;
+            }
+            AbstractFunctionCallExpression functionCall3 = (AbstractFunctionCallExpression) logicalExpression3;
+            if (!functionCall3.getFunctionIdentifier().equals(BuiltinFunctions.FN_DATA_1.getFunctionIdentifier())) {
+                return false;
+            }
+            
+            ILogicalExpression logicalExpression4 = (ILogicalExpression) functionCall3.getArguments().get(0).getValue();
+            if (logicalExpression4.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+                return false;
+            }
+            ConstantExpression constantExpression = (ConstantExpression) logicalExpression4;
+            constantValue = (VXQueryConstantValue) constantExpression.getValue();
+            if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
+                return false;
+            }
+        } else {
             return false;
         }
 
