@@ -17,47 +17,63 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.functions.BuiltinOperators;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
-public class RemoveUnusedSortDistinctNodesRewriteRule implements IAlgebraicRewriteRule {
+public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRule {
     /**
-     * Find where a sort distinct nodes is being used and not required.
-     * Search pattern: assign [function-call: sort-distinct-nodes-asc-or-atomics]
+     * Find where an unnest is followed by a subplan with the root operator of aggregate.
+     * Search pattern: unnest -> subplan -> (aggregate ... )
      */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
-        // Check if assign is for sort-distinct-nodes-asc-or-atomics.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-        if (op.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+        if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
         }
-        AssignOperator assign = (AssignOperator) op;
+        UnnestOperator unnest = (UnnestOperator) op;
 
-        // Check to see if the expression is a function and sort-distinct-nodes-asc-or-atomics.
-        ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
-        if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+        // Check if assign is for fn:Collection.
+        AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
+        if (op2.getOperatorTag() != LogicalOperatorTag.SUBPLAN) {
             return false;
         }
-        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier().equals(
-                BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
+        SubplanOperator subplan = (SubplanOperator) op2;
+
+        AbstractLogicalOperator subplanOp = (AbstractLogicalOperator) subplan.getNestedPlans().get(0).getRoots().get(0)
+                .getValue();
+        if (subplanOp.getOperatorTag() != LogicalOperatorTag.AGGREGATE) {
             return false;
         }
         
-        // Remove the sort-distinct-nodes-asc-or-atomics.
-        assign.getExpressions().set(0, functionCall.getArguments().get(0));
+        AbstractLogicalOperator subplanEnd = findLastSubplanOperator(subplanOp);
+        
+        // Remove the subplan.
+        unnest.getInputs().get(0).setValue(subplanOp);
+        
+        // Make inline the arguments for the subplan.
+        subplanEnd.getInputs().get(0).setValue(subplan.getInputs().get(0).getValue());
+
         return true;
+    }
+
+    private AbstractLogicalOperator findLastSubplanOperator(AbstractLogicalOperator op) {
+        AbstractLogicalOperator next;
+        while (op.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
+            op = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+            next = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+            if (next.getOperatorTag() == LogicalOperatorTag.NESTEDTUPLESOURCE) {
+                break;
+            }
+        }
+        return op;
     }
 
     @Override

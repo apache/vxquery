@@ -35,9 +35,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOpera
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
-public class ConsolidateAssignAggregateRewriteRule implements IAlgebraicRewriteRule {
+public class ConsolidateAssignAggregateRule implements IAlgebraicRewriteRule {
     /**
-     * Find where an assign for a aggregate function is used before aggregate operator for a sequence. .
+     * Find where an assign for a aggregate function is used before aggregate operator for a sequence.
      * Search pattern 1: assign [function-call: count(function-call: treat($$))]
      * Search pattern 2: $$ for aggregate [function-call: sequence()]
      */

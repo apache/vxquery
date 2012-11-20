@@ -19,9 +19,11 @@ package org.apache.vxquery.compiler.rewriter;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.vxquery.compiler.rewriter.rules.CollectionRewriteRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRewriteRule;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRewriteRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
+import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
+import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
 
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -54,10 +56,13 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
-        normalization.add(new CollectionRewriteRule());
-        normalization.add(new RemoveUnusedSortDistinctNodesRewriteRule());
+        normalization.add(new RemoveUnusedSortDistinctNodesRule());
         normalization.add(new InlineVariablesRule());
-        normalization.add(new ConsolidateAssignAggregateRewriteRule());
+        normalization.add(new ConsolidateAssignAggregateRule());
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        normalization.add(new EliminateUnnestAggregateSubplanRule());
+        normalization.add(new IntroduceCollectionRule());
+        normalization.add(new IntroduceTwoStepAggregateRule());
         return normalization;
     }
     
