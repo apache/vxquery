@@ -17,8 +17,14 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.functions.BuiltinOperators;
+import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -26,7 +32,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
@@ -34,6 +42,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOp
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 
 public class ConsolidateAssignAggregateRule implements IAlgebraicRewriteRule {
     /**
@@ -162,6 +172,23 @@ public class ConsolidateAssignAggregateRule implements IAlgebraicRewriteRule {
         // Remove the aggregate assign, by creating a no op.
         assign.getExpressions().get(0).setValue(variableReference);
 
+        // Add an assign operator to set up partitioning variable.
+        // Create a new assign for a TRUE variable.
+        LogicalVariable trueVar = context.newVar();
+        IPointable p = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
+        XDMConstants.setTrue(p);
+        VXQueryConstantValue cv = new VXQueryConstantValue(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN,
+                Quantifier.QUANT_ONE), p.getByteArray());
+        AssignOperator trueAssignOp = new AssignOperator(trueVar, new MutableObject<ILogicalExpression>(
+                new ConstantExpression(cv)));
+
+        ILogicalOperator aggInput = aggregate.getInputs().get(0).getValue();
+        aggregate.getInputs().get(0).setValue(trueAssignOp);
+        trueAssignOp.getInputs().add(new MutableObject<ILogicalOperator>(aggInput));
+
+        // Set partitioning variable.
+        aggregate.setPartitioningVariable(trueVar);
+
         return true;
     }
 
@@ -203,13 +230,15 @@ public class ConsolidateAssignAggregateRule implements IAlgebraicRewriteRule {
                     return search;
                 }
             }
-            if (opSearch.getOperatorTag() != LogicalOperatorTag.EMPTYTUPLESOURCE && opSearch.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
+            if (opSearch.getOperatorTag() != LogicalOperatorTag.EMPTYTUPLESOURCE
+                    && opSearch.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
                 opSearch = (AbstractLogicalOperator) opSearch.getInputs().get(0).getValue();
             } else {
                 break;
             }
         }
-        if (opSearch.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE || opSearch.getOperatorTag() == LogicalOperatorTag.NESTEDTUPLESOURCE) {
+        if (opSearch.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE
+                || opSearch.getOperatorTag() == LogicalOperatorTag.NESTEDTUPLESOURCE) {
             return null;
         }
         return opSearch;

@@ -115,7 +115,7 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
             if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.PROMOTE.getFunctionIdentifier())) {
                 return false;
             }
-            
+
             ILogicalExpression logicalExpression3 = (ILogicalExpression) functionCall2.getArguments().get(0).getValue();
             if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
                 return false;
@@ -124,7 +124,7 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
             if (!functionCall3.getFunctionIdentifier().equals(BuiltinFunctions.FN_DATA_1.getFunctionIdentifier())) {
                 return false;
             }
-            
+
             ILogicalExpression logicalExpression4 = (ILogicalExpression) functionCall3.getArguments().get(0).getValue();
             if (logicalExpression4.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
                 return false;
