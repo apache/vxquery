@@ -52,12 +52,12 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         if (subplanOp.getOperatorTag() != LogicalOperatorTag.AGGREGATE) {
             return false;
         }
-        
+
         AbstractLogicalOperator subplanEnd = findLastSubplanOperator(subplanOp);
-        
+
         // Remove the subplan.
         unnest.getInputs().get(0).setValue(subplanOp);
-        
+
         // Make inline the arguments for the subplan.
         subplanEnd.getInputs().get(0).setValue(subplan.getInputs().get(0).getValue());
 

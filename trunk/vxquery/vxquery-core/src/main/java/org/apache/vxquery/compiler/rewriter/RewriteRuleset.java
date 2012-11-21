@@ -65,7 +65,7 @@ public class RewriteRuleset {
         normalization.add(new IntroduceTwoStepAggregateRule());
         return normalization;
     }
-    
+
     public final static List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
         List<IAlgebraicRewriteRule> typeInfer = new LinkedList<IAlgebraicRewriteRule>();
         typeInfer.add(new InferTypesRule());

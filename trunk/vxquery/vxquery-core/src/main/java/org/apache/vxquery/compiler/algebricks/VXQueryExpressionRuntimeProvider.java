@@ -19,6 +19,7 @@ package org.apache.vxquery.compiler.algebricks;
 import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.Function;
 
@@ -26,6 +27,7 @@ import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionRuntimeProvider;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCallExpression;
@@ -41,6 +43,9 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.evaluators.ConstantEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.evaluators.TupleFieldEvaluatorFactory;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvider {
     @Override
@@ -48,6 +53,20 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
             IOperatorSchema[] inputSchemas, JobGenContext context) throws AlgebricksException {
         switch (expr.getExpressionTag()) {
             case CONSTANT:
+                IAlgebricksConstantValue constantValue = (IAlgebricksConstantValue) ((ConstantExpression) expr).getValue();
+                if (constantValue.isFalse()) {
+                    IPointable p = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
+                    XDMConstants.setFalse(p);
+                    return new ConstantEvaluatorFactory(p.getByteArray());
+                } else if (constantValue.isNull()) {
+                    IPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
+                    XDMConstants.setEmptySequence(p);
+                    return new ConstantEvaluatorFactory(p.getByteArray());
+                } else if (constantValue.isTrue()) {
+                    IPointable p = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
+                    XDMConstants.setTrue(p);
+                    return new ConstantEvaluatorFactory(p.getByteArray());
+                }
                 VXQueryConstantValue cv = (VXQueryConstantValue) ((ConstantExpression) expr).getValue();
                 return new ConstantEvaluatorFactory(cv.getValue());
 

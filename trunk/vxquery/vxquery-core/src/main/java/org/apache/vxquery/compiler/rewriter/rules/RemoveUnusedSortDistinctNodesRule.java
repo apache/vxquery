@@ -54,7 +54,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
             return false;
         }
-        
+
         // Remove the sort-distinct-nodes-asc-or-atomics.
         assign.getExpressions().set(0, functionCall.getArguments().get(0));
         return true;
