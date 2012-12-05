@@ -30,6 +30,7 @@ import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFactoryProvider;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
@@ -85,6 +86,7 @@ public class XMLQueryCompiler {
                 return null;
             }
         });
+        builder.setHashFunctionFactoryProvider(VXQueryBinaryHashFunctionFactoryProvider.INSTANCE);
         builder.setTypeTraitProvider(new ITypeTraitProvider() {
             @Override
             public ITypeTraits getTypeTrait(Object type) {
