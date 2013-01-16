@@ -32,7 +32,8 @@ limitations under the License.
         <menu ref="modules"/>
       
         <menu name="For Developers">
-            <item name="Development Tips" href="development_tips.html"/>
+            <item name="Data Basic Types" href="development_tips.html"/>
+            <item name="Data XML and Node Types" href="development_xml_node_details.html"/>
             <item name="Eclipse Setup" href="development_eclipse_setup.html"/>
         </menu>
 

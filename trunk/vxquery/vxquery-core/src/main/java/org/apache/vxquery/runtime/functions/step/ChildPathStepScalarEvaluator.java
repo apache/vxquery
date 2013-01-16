@@ -28,7 +28,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 
-public class ChildPathStepScalarEvaluator extends AbstractPathStepScalarEvaluator {
+public class ChildPathStepScalarEvaluator extends AbstractSinglePathStepScalarEvaluator {
     private final TaggedValuePointable rootTVP;
 
     private final DocumentNodePointable dnp;

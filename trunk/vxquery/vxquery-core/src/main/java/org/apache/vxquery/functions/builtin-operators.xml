@@ -794,12 +794,14 @@
     <operator name="opext:descendant">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.DescendantPathStepScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:descendant-or-self($arg as node()*) as node()* -->
     <operator name="opext:descendant-or-self">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.DescendantOrSelfPathStepScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:following($arg as node()*) as node()* -->
@@ -836,6 +838,7 @@
     <operator name="opext:self">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.SelfPathStepScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:sequence($arg as item()*) as item()* -->
