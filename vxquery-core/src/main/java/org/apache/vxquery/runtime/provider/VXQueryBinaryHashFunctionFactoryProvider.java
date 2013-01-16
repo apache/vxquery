@@ -31,10 +31,10 @@ public class VXQueryBinaryHashFunctionFactoryProvider implements IBinaryHashFunc
 
     @Override
     public IBinaryHashFunctionFactory getBinaryHashFunctionFactory(Object type) throws AlgebricksException {
-        
+
         // Treat all data as a raw array of bytes.
         return VXQueryRawBinaryHashFunctionFactory.INSTANCE;
-        
+
     }
 
 }

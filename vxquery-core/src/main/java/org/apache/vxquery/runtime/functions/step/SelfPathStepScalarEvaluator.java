@@ -16,39 +16,44 @@
  */
 package org.apache.vxquery.runtime.functions.step;
 
+import java.io.IOException;
+
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public class AttributePathStepScalarEvaluator extends AbstractSinglePathStepScalarEvaluator {
+public class SelfPathStepScalarEvaluator extends AbstractSinglePathStepScalarEvaluator {
     private final TaggedValuePointable rootTVP;
 
-    private final ElementNodePointable enp;
+    final SequenceBuilder sb = new SequenceBuilder();
 
-    public AttributePathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
+    private ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+
+    public SelfPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args, ctx);
         rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
     }
 
     @Override
     protected void getSequence(NodeTreePointable ntp, SequencePointable seqp) throws SystemException {
         ntp.getRootNode(rootTVP);
-        switch (rootTVP.getTag()) {
-            case ValueTag.ELEMENT_NODE_TAG:
-                rootTVP.getValue(enp);
-                if (enp.attributesChunkExists()) {
-                    enp.getAttributeSequence(ntp, seqp);
-                    return;
-                }
+
+        // Create sequence with node.
+        try {
+            abvs.reset();
+            sb.reset(abvs);
+            sb.addItem(rootTVP);
+            sb.finish();
+            seqp.set(abvs);
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001);
         }
-        XDMConstants.setEmptySequence(seqp);
     }
 }
