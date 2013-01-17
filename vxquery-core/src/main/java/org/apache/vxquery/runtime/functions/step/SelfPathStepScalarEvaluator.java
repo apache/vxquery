@@ -18,42 +18,67 @@ package org.apache.vxquery.runtime.functions.step;
 
 import java.io.IOException;
 
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.types.DocumentType;
+import org.apache.vxquery.types.ElementType;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public class SelfPathStepScalarEvaluator extends AbstractSinglePathStepScalarEvaluator {
+public class SelfPathStepScalarEvaluator extends AbstractPathStepScalarEvaluator {
     private final TaggedValuePointable rootTVP;
 
     final SequenceBuilder sb = new SequenceBuilder();
 
-    private ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+    private final ArrayBackedValueStorage seqAbvs;
 
     public SelfPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args, ctx);
         rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        seqAbvs = new ArrayBackedValueStorage();
     }
 
     @Override
-    protected void getSequence(NodeTreePointable ntp, SequencePointable seqp) throws SystemException {
-        ntp.getRootNode(rootTVP);
-
-        // Create sequence with node.
+    protected final void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         try {
-            abvs.reset();
-            sb.reset(abvs);
-            sb.addItem(rootTVP);
-            sb.finish();
-            seqp.set(abvs);
+            if (args[0].getTag() != ValueTag.NODE_TREE_TAG) {
+                throw new SystemException(ErrorCode.SYSE0001);
+            }
+            args[0].getValue(ntp);
+
+            // Set up the result sequence and get the root node.
+            seqAbvs.reset();
+            seqb.reset(seqAbvs);
+            ntp.getRootNode(rootTVP);
+
+            // Solve for self.
+            switch (rootTVP.getTag()) {
+                case ValueTag.DOCUMENT_NODE_TAG:
+                    setNodeTest(SequenceType.create(DocumentType.ANYDOCUMENT, Quantifier.QUANT_ONE));
+                    break;
+                case ValueTag.ELEMENT_NODE_TAG:
+                    setNodeTest(SequenceType.create(ElementType.ANYELEMENT, Quantifier.QUANT_ONE));
+                    break;
+                default:
+                    throw new SystemException(ErrorCode.SYSE0001);
+            }
+            itemTvp.set(rootTVP);
+            if (matches()) {
+                appendNodeToResult();
+            }
+
+            seqb.finish();
+            result.set(seqAbvs);
         } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001);
+            throw new SystemException(ErrorCode.SYSE0001, e);
         }
     }
 }

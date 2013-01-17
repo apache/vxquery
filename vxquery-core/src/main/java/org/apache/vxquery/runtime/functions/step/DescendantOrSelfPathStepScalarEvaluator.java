@@ -30,20 +30,16 @@ import org.apache.vxquery.types.SequenceType;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DescendantOrSelfPathStepScalarEvaluator extends AbstractDescendantPathStepScalarEvaluator {
     private final TaggedValuePointable rootTVP;
-
-    private final IntegerPointable ip;
 
     private final ArrayBackedValueStorage seqAbvs;
 
     public DescendantOrSelfPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args, ctx);
         rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         seqAbvs = new ArrayBackedValueStorage();
     }
 
