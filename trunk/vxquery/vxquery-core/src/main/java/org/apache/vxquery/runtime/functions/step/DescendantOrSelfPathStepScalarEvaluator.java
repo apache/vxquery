@@ -22,6 +22,7 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.types.DocumentType;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
@@ -60,14 +61,17 @@ public class DescendantOrSelfPathStepScalarEvaluator extends AbstractDescendantP
             ntp.getRootNode(rootTVP);
 
             // Solve for self.
-            if (args[1].getTag() != ValueTag.XS_INT_TAG) {
-                throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
+            switch (rootTVP.getTag()) {
+                case ValueTag.DOCUMENT_NODE_TAG:
+                    setNodeTest(SequenceType.create(DocumentType.ANYDOCUMENT, Quantifier.QUANT_ONE));
+                    break;
+                case ValueTag.ELEMENT_NODE_TAG:
+                    setNodeTest(SequenceType.create(ElementType.ANYELEMENT, Quantifier.QUANT_ONE));
+                    break;
+                default:
+                    throw new SystemException(ErrorCode.SYSE0001);
             }
-            args[1].getValue(ip);
-            int typeCode = ip.getInteger();
-            SequenceType sType = dCtx.getStaticContext().lookupSequenceType(typeCode);
-            setNodeTest(sType);
-            rootTVP.set(itemTvp);
+            itemTvp.set(rootTVP);
             if (matches()) {
                 appendNodeToResult();
             }
