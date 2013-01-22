@@ -20,14 +20,14 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-core</artifactId>
   <packaging>jar</packaging>
-  <version>0.2-incubating-SNAPSHOT</version>
+  <version>0.2-incubating</version>
   <name>VXQuery Core</name>
   <description>Apache VXQuery Processor</description>
 
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.2-incubating-SNAPSHOT</version>
+    <version>0.2-incubating</version>
     <relativePath>../vxquery-parent</relativePath>
   </parent>
 

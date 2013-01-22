@@ -20,7 +20,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.2-incubating-SNAPSHOT</version>
+  <version>0.2-incubating</version>
   <name>VXQuery Parent</name>
   <url>http://incubator.apache.org/vxquery/</url>
 
