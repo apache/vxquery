@@ -193,19 +193,19 @@
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-control-cc</artifactId>
-      <version>0.2.2</version>
+      <version>${hyracks.version}</version>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-control-nc</artifactId>
-      <version>0.2.2</version>
+      <version>${hyracks.version}</version>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>algebricks-compiler</artifactId>
-      <version>0.2.2</version>
+      <version>${hyracks.version}</version>
     </dependency>
   </dependencies>
 
@@ -231,6 +231,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <hyracks.version>0.2.3-SNAPSHOT</hyracks.version>
   </properties> 
  
 </project>
