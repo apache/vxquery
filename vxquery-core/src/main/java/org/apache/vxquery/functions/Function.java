@@ -18,6 +18,11 @@ package org.apache.vxquery.functions;
 
 import javax.xml.namespace.QName;
 
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.IPropertyPropagationPolicy;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrderYESPropagationPolicy;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodesYESPropagationPolicy;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
@@ -35,10 +40,16 @@ public abstract class Function implements IFunctionInfo {
 
     protected final Signature signature;
 
+    protected IPropertyPropagationPolicy<DocumentOrder> documentOrderPropagationPolicy;
+
+    protected IPropertyPropagationPolicy<UniqueNodes> uniqueNodesPropagationPolicy;
+
     public Function(QName qname, Signature signature) {
         this.fid = new FunctionIdentifier(VXQUERY, "{" + qname.getNamespaceURI() + "}" + qname.getLocalPart());
         this.qname = qname;
         this.signature = signature;
+        this.documentOrderPropagationPolicy = new DocumentOrderYESPropagationPolicy();
+        this.uniqueNodesPropagationPolicy = new UniqueNodesYESPropagationPolicy();
     }
 
     @Override
@@ -62,6 +73,14 @@ public abstract class Function implements IFunctionInfo {
     public IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args)
             throws SystemException {
         throw new SystemException(ErrorCode.SYSE0001, "No IUnnestingEvaluatorFactory runtime for " + fid.getName());
+    }
+
+    public IPropertyPropagationPolicy<DocumentOrder> getDocumentOrderPropagationPolicy() {
+        return this.documentOrderPropagationPolicy;
+    }
+
+    public IPropertyPropagationPolicy<UniqueNodes> getUniqueNodesPropagationPolicy() {
+        return this.uniqueNodesPropagationPolicy;
     }
 
     public QName getName() {

@@ -197,6 +197,12 @@
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
         <!-- implementation assumes input in document order -->
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- op:gDay-equal($arg1  as xs:gDay, $arg2 as xs:gDay)  as xs:boolean -->
@@ -247,6 +253,12 @@
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
         <!-- implementation assumes input in document order -->
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- op:is-same-node($parameter1 as node(), $parameter2 as node()) as xs:boolean -->
@@ -481,6 +493,12 @@
         <return type="node()*"/>
         <!-- as we do the doc-order-sort and the duplicate elimination -->
         <!-- after the concatenation, we can reuse the concat iterator -->
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- op:yearMonthDuration-greater-than( $arg1 as xs:yearMonthDuration, $arg2 as xs:yearMonthDuration)  as xs:boolean -->
@@ -673,12 +691,18 @@
     <operator name="opext:sort-nodes-asc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
     <operator name="opext:sort-distinct-nodes-asc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- opext:sort-nodes-asc-or-atomics($arg as item()*) as item()* -->
@@ -710,6 +734,12 @@
     <operator name="opext:deflate-sequences">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- opext:pi-constructor($target as xs:sring, $content as xs:string) as node() -->
@@ -788,6 +818,12 @@
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.ChildPathStepScalarEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- opext:descendant($arg as node()*) as node()* -->
@@ -795,6 +831,7 @@
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.DescendantPathStepScalarEvaluatorFactory"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodesNOPropagationPolicy"/>
     </operator>
 
     <!-- opext:descendant-or-self($arg as node()*) as node()* -->
@@ -802,6 +839,7 @@
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.DescendantOrSelfPathStepScalarEvaluatorFactory"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodesNOPropagationPolicy"/>
     </operator>
 
     <!-- opext:following($arg as node()*) as node()* -->
@@ -853,6 +891,12 @@
         <param name="arg" type="item()*"/>
         <return type="item()"/>
         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.sequence.IterateUnnestingEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </operator>
 
     <!-- opext:validate-lax($arg as item()*) as item()* -->
