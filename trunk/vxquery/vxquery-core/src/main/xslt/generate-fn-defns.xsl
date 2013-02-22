@@ -20,6 +20,7 @@
 
     <xsl:template match="/">
         <xsl:for-each select="/functions/function">
+            @SuppressWarnings("unchecked")
             public static final org.apache.vxquery.functions.Function <xsl:value-of select="translate(@name, 'abcdefghijklmnopqrstuvwxyz-:', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ__')"/>_<xsl:value-of select="count(param)"/>
                 = new org.apache.vxquery.functions.BuiltinFunction(<xsl:value-of select="translate(@name, 'abcdefghijklmnopqrstuvwxyz-:', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ__')"/>_QNAME,
                 new org.apache.vxquery.functions.Signature(
@@ -44,6 +45,28 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 ) {
+                <xsl:if test="property">
+                    {
+	                <xsl:for-each select="property">
+                        <xsl:if test="@type = 'DocumentOrder'">
+	                        this.documentOrderPropagationPolicy = new <xsl:value-of select="@class"/>(
+	                        <xsl:for-each select="argument">
+	                           <xsl:value-of select="@value"/>
+	                           <xsl:if test="position() != last()">,</xsl:if>
+	                        </xsl:for-each>
+	                        );
+	                    </xsl:if>
+	                    <xsl:if test="@type = 'UniqueNodes'">
+                            this.uniqueNodesPropagationPolicy = new <xsl:value-of select="@class"/>(
+                            <xsl:for-each select="argument">
+                               <xsl:value-of select="@value"/>
+                               <xsl:if test="position() != last()">,</xsl:if>
+                            </xsl:for-each>
+                            );
+                        </xsl:if>
+	                </xsl:for-each>
+	                }
+                </xsl:if>
                 <xsl:for-each select="runtime">
                     <xsl:if test="@type = 'scalar'">
                     public edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory createScalarEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {

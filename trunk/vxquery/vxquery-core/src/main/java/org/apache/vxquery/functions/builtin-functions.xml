@@ -200,6 +200,12 @@
         <param name="arg" type="item()*"/>
         <return type="xs:anyAtomicType*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.misc.FnDataScalarEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </function>
 
     <!-- fn:dateTime($arg1  as xs:date?, $arg2 as xs:time?)  as xs:dateTime?  -->
@@ -357,6 +363,9 @@
         <param name="arg" type="item()*"/>
         <return type="item()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnExactlyOneScalarEvaluatorFactory"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </function>
 
     <!-- fn:exists($arg as  item()*) as xs:boolean -->
@@ -700,6 +709,12 @@
         <param name="arg" type="item()*"/>
         <return type="item()+"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnOneOrMoreScalarEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </function>
 
     <!-- fn:position() as  xs:integer -->
@@ -777,6 +792,9 @@
     <!-- fn:root() as  node() -->
     <function name="fn:root" implicit-context="true">
         <return type="node()"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </function>
 
     <!-- fn:root($arg as  node()?) as node()?  -->
@@ -1015,6 +1033,12 @@
         <param name="value" type="item()*"/>
         <param name="label" type="xs:string"/>
         <return type="item()*"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </function>
 
     <!-- fn:translate($arg  as xs:string?, $mapString as xs:string, $transString as xs:string)  as xs:string -->
@@ -1036,6 +1060,10 @@
         <param name="sourceSeq" type="item()*"/>
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnUnorderedScalarEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrderNOPropagationPolicy"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </function>
 
     <!-- fn:upper-case($arg  as xs:string?) as  xs:string -->
@@ -1071,5 +1099,8 @@
         <param name="arg" type="item()*"/>
         <return type="item()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnZeroOrOneScalarEvaluatorFactory"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="1"/>
+        </property>
     </function>
 </functions>
