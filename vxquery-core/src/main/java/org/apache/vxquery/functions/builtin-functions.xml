@@ -201,10 +201,10 @@
         <return type="xs:anyAtomicType*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.misc.FnDataScalarEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
     </function>
 
@@ -364,7 +364,7 @@
         <return type="item()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnExactlyOneScalarEvaluatorFactory"/>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
     </function>
 
@@ -710,10 +710,10 @@
         <return type="item()+"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnOneOrMoreScalarEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
     </function>
 
@@ -792,15 +792,15 @@
     <!-- fn:root() as  node() -->
     <function name="fn:root" implicit-context="true">
         <return type="node()"/>
-        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
-        </property>
     </function>
 
     <!-- fn:root($arg as  node()?) as node()?  -->
     <function name="fn:root">
         <param name="arg" type="node()?"/>
         <return type="node()"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
     </function>
 
     <!-- fn:round($arg as  numeric?) as numeric?  -->
@@ -1034,10 +1034,10 @@
         <param name="label" type="xs:string"/>
         <return type="item()*"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
     </function>
 
@@ -1062,7 +1062,7 @@
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnUnorderedScalarEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrderNOPropagationPolicy"/>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
     </function>
 
@@ -1100,7 +1100,7 @@
         <return type="item()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnZeroOrOneScalarEvaluatorFactory"/>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
-            <argument value="1"/>
+            <argument value="0"/>
         </property>
     </function>
 </functions>
