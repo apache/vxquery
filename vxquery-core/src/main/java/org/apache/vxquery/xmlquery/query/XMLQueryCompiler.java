@@ -27,6 +27,7 @@ import org.apache.vxquery.compiler.algebricks.VXQueryExpressionRuntimeProvider;
 import org.apache.vxquery.compiler.algebricks.VXQueryNullWriterFactory;
 import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
 import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
+import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
@@ -46,14 +47,20 @@ import edu.uci.ics.hyracks.algebricks.compiler.api.ICompilerFactory;
 import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialFixpointRuleController;
 import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialOnceRuleController;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
 import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.AbstractRuleController;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IOptimizationContextFactory;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
 import edu.uci.ics.hyracks.algebricks.data.ISerializerDeserializerProvider;
 import edu.uci.ics.hyracks.algebricks.data.ITypeTraitProvider;
 import edu.uci.ics.hyracks.api.dataflow.value.ISerializerDeserializer;
@@ -76,7 +83,19 @@ public class XMLQueryCompiler {
 
     public XMLQueryCompiler(XQueryCompilationListener listener) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
-        HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder();
+        HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
+                new IOptimizationContextFactory() {
+                    @Override
+                    public IOptimizationContext createOptimizationContext(int varCounter, int frameSize,
+                            IExpressionEvalSizeComputer expressionEvalSizeComputer,
+                            IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
+                            IExpressionTypeComputer expressionTypeComputer, INullableTypeComputer nullableTypeComputer,
+                            PhysicalOptimizationConfig physicalOptimizationConfig) {
+                        return new VXQueryOptimizationContext(varCounter, frameSize, expressionEvalSizeComputer,
+                                mergeAggregationExpressionFactory, expressionTypeComputer, nullableTypeComputer,
+                                physicalOptimizationConfig);
+                    }
+                });
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {
