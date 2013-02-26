@@ -1,34 +1,36 @@
-Apache VXQuery
---------------
+                   Apache VXQuery
+
+What is it?
+===========
+
+Apache VXQuery aims to be a standards compliant XML Query processor
+implemented in Java. The focus is on the evaluation of queries on large
+amounts of XML data. Specifically the goal is to evaluate queries on large
+collections of relatively small XML documents. To achieve this, queries are
+evaluated on a cluster of shared nothing machines. VXQuery levarages the
+runtime facilities provided by Hyracks (http://hyracks.org) and the algebraic
+framework provided by Algebricks.
 
 
-Requirements:
+Building
+========
 
+Requirements
+------------
 1. JDK >= 1.6
 2. Apache Maven >= 2.0
 
-
-Setup:
-
-VXQuery is currently only located in SVN. The following instructions are to check out the 
-active version under active development. In addition to VXQuery, the current release of 
-Hyracks needs to be set up for VXQuery to run properly. The following steps are to be followed
-from the command line.
+Setup
+-----
+VXQuery is currently only located in SVN. The following instructions are to
+check out the active version under active development. 
 
 1. Create a folder for all the VXQuery files. 
 
 $ mkdir /path/to/VXQuery
 $ cd /path/to/VXQuery
 
-2. Download and install the Hyracks Asterix Stabilization branch.
-
-$ svn checkout https://hyracks.googlecode.com/svn/branches/hyracks_asterix_stabilization hyracks_asterix_stabilization
-(Accept the certificate information for *.googlecode.com.)
-$ cd hyracks_asterix_stabilization
-$ mvn install -DskipTests
-$ cd ..
-
-3. Download and install the Apache VXQuery Incubating.
+2. Download and install the Apache VXQuery Incubating.
 
 $ svn checkout https://svn.apache.org/repos/asf/incubator/vxquery/trunk/ apache_vxquery_incubating
 (Accept the certificate information for *.apache.org.)
@@ -37,27 +39,29 @@ $ mvn package -DskipTests
 $ cd ../..
 
 
-Running:
+Running
+=======
 
 There are two ways to run VXQuery:
 Note: shell scripts exist for running VXQuery for Un*x like systems.
-TODO: Add Windows batch files
 
 1. Command line client (vxq)
 
-Type "sh apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq" without any 
-arguments for help on executing the command line client.
-
+Run 
+$ sh apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq
+without any arguments for help on executing the command line client.
 
 2. XQTS test driver (xtest)
 
 The xtest test driver can be used to execute XQuery tests from the XQTS suite.
 
-Type "sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest" without 
-any arguments for help on executing xtest.
+Run
+$ sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest
+without any arguments for help on executing xtest.
 
-Typically the test suite will need extra memory to run and output can be stored in html for easy viewing.
-Sample Test Command: JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase apache_vxquery_incubating/testsuites/XQTS/ -htmlreport /tmp/full_report.html
-The result can be viewed at file:///tmp/full_report.html
+Typically the test suite will need extra memory to run and output can be
+written in html for easy viewing. Sample Test Command: 
+$ JAVA_OPTS="-Xmx1024m -Djava.util.logging.config.file=/path/to/logging.properties" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase apache_vxquery_incubating/testsuites/XQTS/ -htmlreport /tmp/full_report.html
+The result can be viewed at /tmp/full_report.html
 
-Note: XQTS test suite is set up as part of the Apache VXQuery Incubating setup process.
+Note: XQTS test suite is set up as part of the Apache VXQuery setup process.
