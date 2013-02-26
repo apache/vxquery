@@ -8,6 +8,35 @@ Requirements:
 2. Apache Maven >= 2.0
 
 
+Setup:
+
+VXQuery is currently only located in SVN. The following instructions are to check out the 
+active version under active development. In addition to VXQuery, the current release of 
+Hyracks needs to be set up for VXQuery to run properly. The following steps are to be followed
+from the command line.
+
+1. Create a folder for all the VXQuery files. 
+
+$ mkdir /path/to/VXQuery
+$ cd /path/to/VXQuery
+
+2. Download and install the Hyracks Asterix Stabilization branch.
+
+$ svn checkout https://hyracks.googlecode.com/svn/branches/hyracks_asterix_stabilization hyracks_asterix_stabilization
+(Accept the certificate information for *.googlecode.com.)
+$ cd hyracks_asterix_stabilization
+$ mvn install -DskipTests
+$ cd ..
+
+3. Download and install the Apache VXQuery Incubating.
+
+$ svn checkout https://svn.apache.org/repos/asf/incubator/vxquery/trunk/ apache_vxquery_incubating
+(Accept the certificate information for *.apache.org.)
+$ cd apache_vxquery_incubating/vxquery
+$ mvn package -DskipTests
+$ cd ../..
+
+
 Running:
 
 There are two ways to run VXQuery:
@@ -19,17 +48,16 @@ TODO: Add Windows batch files
 Type "sh apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq" without any 
 arguments for help on executing the command line client.
 
+
 2. XQTS test driver (xtest)
 
 The xtest test driver can be used to execute XQuery tests from the XQTS suite.
-
-The XQTS testsuite can be retrieved from http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip.
 
 Type "sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest" without 
 any arguments for help on executing xtest.
 
 Typically the test suite will need extra memory to run and output can be stored in html for easy viewing.
-Sample Test Command: 
-  JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest \
-                           -xqtsbase <path to unzipped testsuite> \
-                           -htmlreport <path to HTML report>
+Sample Test Command: JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase apache_vxquery_incubating/testsuites/XQTS/ -htmlreport /tmp/full_report.html
+The result can be viewed at file:///tmp/full_report.html
+
+Note: XQTS test suite is set up as part of the Apache VXQuery Incubating setup process.
