@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinality.Cardinality;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.functions.Function;
@@ -67,20 +68,94 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
 
         // Find the available variables.
-        HashMap<Integer, DocumentOrder> documentOrderVariables = getParentDocumentOrderVariableMap(opRef.getValue(),
+        HashMap<Integer, DocumentOrder> documentOrderVariables = getProducerDocumentOrderVariableMap(opRef.getValue(),
                 vxqueryContext);
-        updateVariableMap(op, documentOrderVariables, vxqueryContext);
+        Cardinality cardinalityVariable = getProducerCardinality(opRef.getValue(), vxqueryContext);
+
+        // Update sort operator if found.
+        int variableId = getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId(opRef);
+        if (variableId > 0) {
+            if (documentOrderVariables.get(variableId) == DocumentOrder.YES) {
+                // Do not need to sort the result.
+                // All the checks for this operation were done in the getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId function.
+                AssignOperator assign = (AssignOperator) op;
+                ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
+                AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
+                functionCall.setFunctionInfo(BuiltinOperators.DISTINCT_NODES_OR_ATOMICS);
+            } else {
+                // No change.
+            }
+
+        }
+
+        // Now with the new operator, update the variable mappings.
+        cardinalityVariable = updateCardinalityVariable(op, cardinalityVariable, vxqueryContext);
+        updateDocumentOrderVariableMap(op, documentOrderVariables, cardinalityVariable, vxqueryContext);
 
         // Save propagated value.
         vxqueryContext.putDocumentOrderOperatorVariableMap(opRef.getValue(), documentOrderVariables);
+        vxqueryContext.putCardinalityOperatorMap(opRef.getValue(), cardinalityVariable);
         return false;
     }
 
-    private void updateVariableMap(AbstractLogicalOperator op, HashMap<Integer, DocumentOrder> documentOrderVariables,
+    private Cardinality updateCardinalityVariable(AbstractLogicalOperator op, Cardinality cardinalityVariable,
+            VXQueryOptimizationContext vxqueryContext) {
+        switch (op.getOperatorTag()) {
+            case AGGREGATE:
+                cardinalityVariable = Cardinality.ONE;
+                break;
+            case SUBPLAN:
+                // Find the last operator to set a variable and call this function again.
+                SubplanOperator subplan = (SubplanOperator) op;
+                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(0)
+                        .getRoots().get(0).getValue();
+                cardinalityVariable = updateCardinalityVariable(lastOperator, cardinalityVariable, vxqueryContext);
+                break;
+            case UNNEST:
+                cardinalityVariable = Cardinality.MANY;
+                break;
+
+            // The following operators do not change the variable.
+            case ASSIGN:
+            case CLUSTER:
+            case DATASOURCESCAN:
+            case DIE:
+            case DISTINCT:
+            case EMPTYTUPLESOURCE:
+            case EXCHANGE:
+            case EXTENSION_OPERATOR:
+            case GROUP:
+            case INDEX_INSERT_DELETE:
+            case INNERJOIN:
+            case INSERT_DELETE:
+            case LEFTOUTERJOIN:
+            case LIMIT:
+            case NESTEDTUPLESOURCE:
+            case ORDER:
+            case PARTITIONINGSPLIT:
+            case PROJECT:
+            case REPLICATE:
+            case RUNNINGAGGREGATE:
+            case SCRIPT:
+            case SELECT:
+            case SINK:
+            case UNIONALL:
+            case UNNEST_MAP:
+            case UPDATE:
+            case WRITE:
+            case WRITE_RESULT:
+            default:
+                break;
+        }
+        return cardinalityVariable;
+    }
+
+    private void updateDocumentOrderVariableMap(AbstractLogicalOperator op,
+            HashMap<Integer, DocumentOrder> documentOrderVariables, Cardinality cardinalityVariable,
             VXQueryOptimizationContext vxqueryContext) {
         int variableId;
         DocumentOrder documentOrder;
-        HashMap<Integer, DocumentOrder> documentOrderVariablesForOperator = getParentDocumentOrderVariableMap(op,
+        HashMap<Integer, DocumentOrder> documentOrderVariablesForOperator = getProducerDocumentOrderVariableMap(op,
                 vxqueryContext);
 
         // Get the DocumentOrder from propagation.
@@ -101,58 +176,13 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 documentOrder = propagateDocumentOrder(assignLogicalExpression, documentOrderVariablesForOperator);
                 documentOrderVariables.put(variableId, documentOrder);
                 break;
-            case CLUSTER:
-                break;
-            case DATASOURCESCAN:
-                break;
-            case DIE:
-                break;
-            case DISTINCT:
-                break;
-            case EMPTYTUPLESOURCE:
-                break;
-            case EXCHANGE:
-                break;
-            case EXTENSION_OPERATOR:
-                break;
-            case GROUP:
-                break;
-            case INDEX_INSERT_DELETE:
-                break;
-            case INNERJOIN:
-                break;
-            case INSERT_DELETE:
-                break;
-            case LEFTOUTERJOIN:
-                break;
-            case LIMIT:
-                break;
-            case NESTEDTUPLESOURCE:
-                break;
-            case ORDER:
-                break;
-            case PARTITIONINGSPLIT:
-                break;
-            case PROJECT:
-                break;
-            case REPLICATE:
-                break;
-            case RUNNINGAGGREGATE:
-                break;
-            case SCRIPT:
-                break;
-            case SELECT:
-                break;
-            case SINK:
-                break;
             case SUBPLAN:
                 // Find the last operator to set a variable and call this function again.
                 SubplanOperator subplan = (SubplanOperator) op;
                 AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(0)
                         .getRoots().get(0).getValue();
-                updateVariableMap(lastOperator, documentOrderVariables, vxqueryContext);
-                break;
-            case UNIONALL:
+                updateDocumentOrderVariableMap(lastOperator, documentOrderVariables, cardinalityVariable,
+                        vxqueryContext);
                 break;
             case UNNEST:
                 // Get unnest item property.
@@ -162,7 +192,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 documentOrder = propagateDocumentOrder(logicalExpression, documentOrderVariablesForOperator);
 
                 // Reset properties based on unnest duplication.
-                getDocumentOrderNOVariables(documentOrderVariables);
+                updateDocumentOrderVariables(documentOrderVariables, DocumentOrder.NO);
                 documentOrderVariables.put(variableId, documentOrder);
 
                 // Add position variable property.
@@ -171,28 +201,54 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                     documentOrderVariables.put(variableId, DocumentOrder.YES);
                 }
                 break;
-            case UNNEST_MAP:
-                break;
-            case UPDATE:
-                break;
+
+            // The following operators do not change or add to the variable map.
+            case EMPTYTUPLESOURCE:
+            case NESTEDTUPLESOURCE:
             case WRITE:
                 break;
+
+            // The following operators have not been implemented.
+            case CLUSTER:
+            case DATASOURCESCAN:
+            case DIE:
+            case DISTINCT:
+            case EXCHANGE:
+            case EXTENSION_OPERATOR:
+            case GROUP:
+            case INDEX_INSERT_DELETE:
+            case INNERJOIN:
+            case INSERT_DELETE:
+            case LEFTOUTERJOIN:
+            case LIMIT:
+            case ORDER:
+            case PARTITIONINGSPLIT:
+            case PROJECT:
+            case REPLICATE:
+            case RUNNINGAGGREGATE:
+            case SCRIPT:
+            case SELECT:
+            case SINK:
+            case UNIONALL:
+            case UNNEST_MAP:
+            case UPDATE:
             case WRITE_RESULT:
-                break;
             default:
-                break;
+                throw new RuntimeException("Operator has not been implemented in rewrite rule.");
         }
 
     }
 
     /**
-     * Sets all the variables to DocumentOrder.NO.
+     * Sets all the variables to DocumentOrder.
+     * 
      * @param documentOrderVariables
+     * @param documentOrder
      */
-    private void getDocumentOrderNOVariables(
-            HashMap<Integer, DocumentOrder> documentOrderVariables) {
+    private void updateDocumentOrderVariables(HashMap<Integer, DocumentOrder> documentOrderVariables,
+            DocumentOrder documentOrder) {
         for (Entry<Integer, DocumentOrder> entry : documentOrderVariables.entrySet()) {
-            documentOrderVariables.put(entry.getKey(), DocumentOrder.NO);
+            documentOrderVariables.put(entry.getKey(), documentOrder);
         }
     }
 
@@ -203,18 +259,40 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
      * @param vxqueryContext
      * @return
      */
-    private HashMap<Integer, DocumentOrder> getParentDocumentOrderVariableMap(ILogicalOperator op,
+    private HashMap<Integer, DocumentOrder> getProducerDocumentOrderVariableMap(ILogicalOperator op,
             VXQueryOptimizationContext vxqueryContext) {
-        AbstractLogicalOperator parentOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
-        if (parentOp.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE) {
-            return new HashMap<Integer, DocumentOrder>();
+        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+        switch (producerOp.getOperatorTag()) {
+            case EMPTYTUPLESOURCE:
+                return new HashMap<Integer, DocumentOrder>();
+            case NESTEDTUPLESOURCE:
+                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
+                return getProducerDocumentOrderVariableMap(nestedTuplesource.getDataSourceReference().getValue(),
+                        vxqueryContext);
+            default:
+                return new HashMap<Integer, DocumentOrder>(
+                        vxqueryContext.getDocumentOrderOperatorVariableMap(producerOp));
         }
-        if (parentOp.getOperatorTag() == LogicalOperatorTag.NESTEDTUPLESOURCE) {
-            NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) parentOp;
-            return getParentDocumentOrderVariableMap(nestedTuplesource.getDataSourceReference().getValue(),
-                    vxqueryContext);
+    }
+
+    /**
+     * Get the DocumentOrder variable map of the parent operator.
+     * 
+     * @param op
+     * @param vxqueryContext
+     * @return
+     */
+    private Cardinality getProducerCardinality(ILogicalOperator op, VXQueryOptimizationContext vxqueryContext) {
+        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+        switch (producerOp.getOperatorTag()) {
+            case EMPTYTUPLESOURCE:
+                return Cardinality.ONE;
+            case NESTEDTUPLESOURCE:
+                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
+                return getProducerCardinality(nestedTuplesource.getDataSourceReference().getValue(), vxqueryContext);
+            default:
+                return vxqueryContext.getCardinalityOperatorMap(producerOp);
         }
-        return new HashMap<Integer, DocumentOrder>(vxqueryContext.getDocumentOrderOperatorVariableMap(parentOp));
     }
 
     private DocumentOrder propagateDocumentOrder(ILogicalExpression expr, HashMap<Integer, DocumentOrder> variableMap) {
@@ -246,11 +324,11 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         return documentOrder;
     }
 
-    private boolean isOperatorSortDistinctNodesAscOrAtomics(Mutable<ILogicalOperator> opRef) {
+    private int getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId(Mutable<ILogicalOperator> opRef) {
         // Check if assign is for sort-distinct-nodes-asc-or-atomics.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
-            return false;
+            return 0;
         }
         AssignOperator assign = (AssignOperator) op;
 
@@ -258,13 +336,20 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         // sort-distinct-nodes-asc-or-atomics.
         ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
         if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
+            return 0;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
         if (!functionCall.getFunctionIdentifier().equals(
                 BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
-            return false;
+            return 0;
         }
-        return true;
+
+        // Find the variable id used as the parameter.
+        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+            return 0;
+        }
+        VariableReferenceExpression variableExpression = (VariableReferenceExpression) logicalExpression2;
+        return variableExpression.getVariableReference().getId();
     }
 }
