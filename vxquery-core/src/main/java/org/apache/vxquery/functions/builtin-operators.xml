@@ -704,9 +704,16 @@
             <argument value="0"/>
         </property>
     </operator>
-
-    <!-- opext:sort-nodes-asc-or-atomics($arg as item()*) as item()* -->
+    
+    <!-- opext:sort-distinct-nodes-asc-or-atomics($arg as item()*) as item()* -->
     <operator name="opext:sort-distinct-nodes-asc-or-atomics">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.nodeid.SortDistinctNodesAscOrAtomicsScalarEvaluatorFactory"/>
+    </operator>
+
+    <!-- opext:distinct-nodes-or-atomics($arg as item()*) as item()* -->
+    <operator name="opext:distinct-nodes-or-atomics">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.nodeid.SortDistinctNodesAscOrAtomicsScalarEvaluatorFactory"/>
