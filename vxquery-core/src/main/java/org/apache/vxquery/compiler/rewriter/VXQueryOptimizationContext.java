@@ -17,6 +17,7 @@ package org.apache.vxquery.compiler.rewriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinality.Cardinality;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
 
@@ -32,6 +33,7 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
 
     private final Map<ILogicalOperator, HashMap<Integer, DocumentOrder>> documentOrderOperatorVariableMap = new HashMap<ILogicalOperator, HashMap<Integer, DocumentOrder>>();
     private final Map<ILogicalOperator, HashMap<Integer, UniqueNodes>> uniqueNodesOperatorVariableMap = new HashMap<ILogicalOperator, HashMap<Integer, UniqueNodes>>();
+    private final Map<ILogicalOperator, Cardinality> cardinalityOperatorMap = new HashMap<ILogicalOperator, Cardinality>();
 
     public VXQueryOptimizationContext(int varCounter, int frameSize,
             IExpressionEvalSizeComputer expressionEvalSizeComputer,
@@ -42,8 +44,24 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
                 expressionTypeComputer, nullableTypeComputer, physicalOptimizationConfig);
     }
 
+    public Cardinality getCardinalityOperatorMap(ILogicalOperator op) {
+        if (cardinalityOperatorMap.containsKey(op)) {
+            return cardinalityOperatorMap.get(op);
+        } else {
+            return null;
+        }
+    }
+
+    public void putCardinalityOperatorMap(ILogicalOperator op, Cardinality cardinality) {
+        this.cardinalityOperatorMap.put(op, cardinality);
+    }
+
     public HashMap<Integer, DocumentOrder> getDocumentOrderOperatorVariableMap(ILogicalOperator op) {
-        return documentOrderOperatorVariableMap.get(op);
+        if (documentOrderOperatorVariableMap.containsKey(op)) {
+            return documentOrderOperatorVariableMap.get(op);
+        } else {
+            return null;
+        }
     }
 
     public void putDocumentOrderOperatorVariableMap(ILogicalOperator op, HashMap<Integer, DocumentOrder> variableMap) {
@@ -51,7 +69,11 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
     }
 
     public HashMap<Integer, UniqueNodes> getUniqueNodesOperatorVariableMap(ILogicalOperator op) {
-        return uniqueNodesOperatorVariableMap.get(op);
+        if (uniqueNodesOperatorVariableMap.containsKey(op)) {
+            return uniqueNodesOperatorVariableMap.get(op);
+        } else {
+            return null;
+        }
     }
 
     public void putUniqueNodesOperatorVariableMap(ILogicalOperator op, HashMap<Integer, UniqueNodes> variableMap) {
