@@ -63,6 +63,7 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+                String collectionName;
                 TaggedValuePointable tvp = args[0];
                 // TODO add support empty sequence and no argument.
                 if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
@@ -73,10 +74,17 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
                     // Get the list of files.
                     bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(),
                             stringp.getStartOffset(), stringp.getLength() + stringp.getStartOffset())), 0);
-                    String collectionName = di.readUTF();
-                    File collectionDirectory = new File(collectionName);
-                    File[] list = collectionDirectory.listFiles();
+                    collectionName = di.readUTF();
+                } catch (IOException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
+                File collectionDirectory = new File(collectionName);
+                if (!collectionDirectory.exists()) {
+                    throw new RuntimeException("The collection directory (" + collectionName + ") does not exist.");
+                }
+                File[] list = collectionDirectory.listFiles();
 
+                try {
                     abvs.reset();
                     sb.reset(abvs);
                     for (int i = 0; i < list.length; ++i) {
