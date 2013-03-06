@@ -25,6 +25,7 @@ import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinality.Cardinality;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.functions.Function;
 
@@ -68,34 +69,228 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
 
         // Find the available variables.
+        Cardinality cardinalityVariable = getProducerCardinality(opRef.getValue(), vxqueryContext);
         HashMap<Integer, DocumentOrder> documentOrderVariables = getProducerDocumentOrderVariableMap(opRef.getValue(),
                 vxqueryContext);
-        Cardinality cardinalityVariable = getProducerCardinality(opRef.getValue(), vxqueryContext);
+        HashMap<Integer, UniqueNodes> uniqueNodesVariables = getProducerUniqueNodesVariableMap(opRef.getValue(),
+                vxqueryContext);
 
         // Update sort operator if found.
         int variableId = getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId(opRef);
         if (variableId > 0) {
-            if (documentOrderVariables.get(variableId) == DocumentOrder.YES) {
-                // Do not need to sort the result.
-                // All the checks for this operation were done in the getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId function.
-                AssignOperator assign = (AssignOperator) op;
-                ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
-                AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-                functionCall.setFunctionInfo(BuiltinOperators.DISTINCT_NODES_OR_ATOMICS);
-            } else {
-                // No change.
-            }
+            // Find the function expression.
+            // All the checks for these variable assigns and casting were done in the 
+            // getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId function.
+            AssignOperator assign = (AssignOperator) op;
+            ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
+            AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
 
+            if (uniqueNodesVariables.get(variableId) == UniqueNodes.YES) {
+                // Only unique nodes.
+                if (documentOrderVariables.get(variableId) == DocumentOrder.YES) {
+                    // Do not need to sort or remove duplicates from the result.
+                    assign.getExpressions().get(0).setValue(functionCall.getArguments().get(0).getValue());
+                } else {
+                    // Unique nodes but needs to be sorted.
+                    functionCall.setFunctionInfo(BuiltinOperators.SORT_NODES_ASC);
+                }
+            } else {
+                // Duplicates possible in the result.
+                if (documentOrderVariables.get(variableId) == DocumentOrder.YES) {
+                    // Do not need to sort the result.
+                    functionCall.setFunctionInfo(BuiltinOperators.DISTINCT_NODES_OR_ATOMICS);
+                } else {
+                    // No change.
+                }
+            }
         }
 
         // Now with the new operator, update the variable mappings.
         cardinalityVariable = updateCardinalityVariable(op, cardinalityVariable, vxqueryContext);
-        updateDocumentOrderVariableMap(op, documentOrderVariables, cardinalityVariable, vxqueryContext);
+        updateVariableMap(op, cardinalityVariable, documentOrderVariables, uniqueNodesVariables, vxqueryContext);
 
         // Save propagated value.
-        vxqueryContext.putDocumentOrderOperatorVariableMap(opRef.getValue(), documentOrderVariables);
         vxqueryContext.putCardinalityOperatorMap(opRef.getValue(), cardinalityVariable);
+        vxqueryContext.putDocumentOrderOperatorVariableMap(opRef.getValue(), documentOrderVariables);
+        vxqueryContext.putUniqueNodesOperatorVariableMap(opRef.getValue(), uniqueNodesVariables);
         return false;
+    }
+
+    private int getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId(Mutable<ILogicalOperator> opRef) {
+        // Check if assign is for sort-distinct-nodes-asc-or-atomics.
+        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
+        if (op.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+            return 0;
+        }
+        AssignOperator assign = (AssignOperator) op;
+
+        // Check to see if the expression is a function and
+        // sort-distinct-nodes-asc-or-atomics.
+        ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
+        if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+            return 0;
+        }
+        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
+        if (!functionCall.getFunctionIdentifier().equals(
+                BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
+            return 0;
+        }
+
+        // Find the variable id used as the parameter.
+        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+            return 0;
+        }
+        VariableReferenceExpression variableExpression = (VariableReferenceExpression) logicalExpression2;
+        return variableExpression.getVariableReference().getId();
+    }
+
+    /**
+     * Get the Cardinality variable of the parent operator.
+     * 
+     * @param op
+     * @param vxqueryContext
+     * @return
+     */
+    private Cardinality getProducerCardinality(ILogicalOperator op, VXQueryOptimizationContext vxqueryContext) {
+        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+        switch (producerOp.getOperatorTag()) {
+            case EMPTYTUPLESOURCE:
+                return Cardinality.ONE;
+            case NESTEDTUPLESOURCE:
+                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
+                return getProducerCardinality(nestedTuplesource.getDataSourceReference().getValue(), vxqueryContext);
+            default:
+                return vxqueryContext.getCardinalityOperatorMap(producerOp);
+        }
+    }
+
+    /**
+     * Get the DocumentOrder variable map of the parent operator.
+     * 
+     * @param op
+     * @param vxqueryContext
+     * @return
+     */
+    private HashMap<Integer, DocumentOrder> getProducerDocumentOrderVariableMap(ILogicalOperator op,
+            VXQueryOptimizationContext vxqueryContext) {
+        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+        switch (producerOp.getOperatorTag()) {
+            case EMPTYTUPLESOURCE:
+                return new HashMap<Integer, DocumentOrder>();
+            case NESTEDTUPLESOURCE:
+                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
+                return getProducerDocumentOrderVariableMap(nestedTuplesource.getDataSourceReference().getValue(),
+                        vxqueryContext);
+            default:
+                return new HashMap<Integer, DocumentOrder>(
+                        vxqueryContext.getDocumentOrderOperatorVariableMap(producerOp));
+        }
+    }
+
+    /**
+     * Get the DocumentOrder variable map of the parent operator.
+     * 
+     * @param op
+     * @param vxqueryContext
+     * @return
+     */
+    private HashMap<Integer, UniqueNodes> getProducerUniqueNodesVariableMap(ILogicalOperator op,
+            VXQueryOptimizationContext vxqueryContext) {
+        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+        switch (producerOp.getOperatorTag()) {
+            case EMPTYTUPLESOURCE:
+                return new HashMap<Integer, UniqueNodes>();
+            case NESTEDTUPLESOURCE:
+                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
+                return getProducerUniqueNodesVariableMap(nestedTuplesource.getDataSourceReference().getValue(),
+                        vxqueryContext);
+            default:
+                return new HashMap<Integer, UniqueNodes>(vxqueryContext.getUniqueNodesOperatorVariableMap(producerOp));
+        }
+    }
+
+    private DocumentOrder propagateDocumentOrder(ILogicalExpression expr, HashMap<Integer, DocumentOrder> variableMap) {
+        DocumentOrder documentOrder = null;
+        switch (expr.getExpressionTag()) {
+            case FUNCTION_CALL:
+                AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) expr;
+
+                // Look up all arguments.
+                List<DocumentOrder> argProperties = new ArrayList<DocumentOrder>();
+                for (Mutable<ILogicalExpression> argExpr : functionCall.getArguments()) {
+                    argProperties.add(propagateDocumentOrder(argExpr.getValue(), variableMap));
+                }
+
+                // Propagate the property.
+                Function func = (Function) functionCall.getFunctionInfo();
+                documentOrder = func.getDocumentOrderPropagationPolicy().propagate(argProperties);
+                break;
+            case VARIABLE:
+                VariableReferenceExpression variableReference = (VariableReferenceExpression) expr;
+                int argVariableId = variableReference.getVariableReference().getId();
+                documentOrder = variableMap.get(argVariableId);
+                break;
+            case CONSTANT:
+            default:
+                documentOrder = DocumentOrder.YES;
+                break;
+        }
+        return documentOrder;
+    }
+
+    private UniqueNodes propagateUniqueNodes(ILogicalExpression expr, HashMap<Integer, UniqueNodes> variableMap) {
+        UniqueNodes uniqueNodes = null;
+        switch (expr.getExpressionTag()) {
+            case FUNCTION_CALL:
+                AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) expr;
+
+                // Look up all arguments.
+                List<UniqueNodes> argProperties = new ArrayList<UniqueNodes>();
+                for (Mutable<ILogicalExpression> argExpr : functionCall.getArguments()) {
+                    argProperties.add(propagateUniqueNodes(argExpr.getValue(), variableMap));
+                }
+
+                // Propagate the property.
+                Function func = (Function) functionCall.getFunctionInfo();
+                uniqueNodes = func.getUniqueNodesPropagationPolicy().propagate(argProperties);
+                break;
+            case VARIABLE:
+                VariableReferenceExpression variableReference = (VariableReferenceExpression) expr;
+                int argVariableId = variableReference.getVariableReference().getId();
+                uniqueNodes = variableMap.get(argVariableId);
+                break;
+            case CONSTANT:
+            default:
+                uniqueNodes = UniqueNodes.YES;
+                break;
+        }
+        return uniqueNodes;
+    }
+
+    /**
+     * Sets all the variables to DocumentOrder.
+     * 
+     * @param documentOrderVariables
+     * @param documentOrder
+     */
+    private void resetDocumentOrderVariables(HashMap<Integer, DocumentOrder> documentOrderVariables,
+            DocumentOrder documentOrder) {
+        for (Entry<Integer, DocumentOrder> entry : documentOrderVariables.entrySet()) {
+            documentOrderVariables.put(entry.getKey(), documentOrder);
+        }
+    }
+
+    /**
+     * Sets all the variables to UniqueNodes.
+     * 
+     * @param uniqueNodesVariables
+     * @param uniqueNodes
+     */
+    private void resetUniqueNodesVariables(HashMap<Integer, UniqueNodes> uniqueNodesVariables, UniqueNodes uniqueNodes) {
+        for (Entry<Integer, UniqueNodes> entry : uniqueNodesVariables.entrySet()) {
+            uniqueNodesVariables.put(entry.getKey(), uniqueNodes);
+        }
     }
 
     private Cardinality updateCardinalityVariable(AbstractLogicalOperator op, Cardinality cardinalityVariable,
@@ -150,12 +345,15 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         return cardinalityVariable;
     }
 
-    private void updateDocumentOrderVariableMap(AbstractLogicalOperator op,
-            HashMap<Integer, DocumentOrder> documentOrderVariables, Cardinality cardinalityVariable,
+    private void updateVariableMap(AbstractLogicalOperator op, Cardinality cardinalityVariable,
+            HashMap<Integer, DocumentOrder> documentOrderVariables, HashMap<Integer, UniqueNodes> uniqueNodesVariables,
             VXQueryOptimizationContext vxqueryContext) {
         int variableId;
         DocumentOrder documentOrder;
         HashMap<Integer, DocumentOrder> documentOrderVariablesForOperator = getProducerDocumentOrderVariableMap(op,
+                vxqueryContext);
+        UniqueNodes uniqueNodes;
+        HashMap<Integer, UniqueNodes> uniqueNodesVariablesForOperator = getProducerUniqueNodesVariableMap(op,
                 vxqueryContext);
 
         // Get the DocumentOrder from propagation.
@@ -166,7 +364,9 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                         .getValue();
                 variableId = aggregate.getVariables().get(0).getId();
                 documentOrder = propagateDocumentOrder(aggregateLogicalExpression, documentOrderVariablesForOperator);
+                uniqueNodes = propagateUniqueNodes(aggregateLogicalExpression, uniqueNodesVariablesForOperator);
                 documentOrderVariables.put(variableId, documentOrder);
+                uniqueNodesVariables.put(variableId, uniqueNodes);
                 break;
             case ASSIGN:
                 AssignOperator assign = (AssignOperator) op;
@@ -174,31 +374,37 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                         .getValue();
                 variableId = assign.getVariables().get(0).getId();
                 documentOrder = propagateDocumentOrder(assignLogicalExpression, documentOrderVariablesForOperator);
+                uniqueNodes = propagateUniqueNodes(assignLogicalExpression, uniqueNodesVariablesForOperator);
                 documentOrderVariables.put(variableId, documentOrder);
+                uniqueNodesVariables.put(variableId, uniqueNodes);
                 break;
             case SUBPLAN:
                 // Find the last operator to set a variable and call this function again.
                 SubplanOperator subplan = (SubplanOperator) op;
                 AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(0)
                         .getRoots().get(0).getValue();
-                updateDocumentOrderVariableMap(lastOperator, documentOrderVariables, cardinalityVariable,
+                updateVariableMap(lastOperator, cardinalityVariable, documentOrderVariables, uniqueNodesVariables,
                         vxqueryContext);
                 break;
             case UNNEST:
                 // Get unnest item property.
                 UnnestOperator unnest = (UnnestOperator) op;
-                ILogicalExpression logicalExpression = (ILogicalExpression) unnest.getExpressionRef().getValue();
+                ILogicalExpression unnestLogicalExpression = (ILogicalExpression) unnest.getExpressionRef().getValue();
                 variableId = unnest.getVariables().get(0).getId();
-                documentOrder = propagateDocumentOrder(logicalExpression, documentOrderVariablesForOperator);
+                documentOrder = propagateDocumentOrder(unnestLogicalExpression, documentOrderVariablesForOperator);
+                uniqueNodes = propagateUniqueNodes(unnestLogicalExpression, uniqueNodesVariablesForOperator);
 
                 // Reset properties based on unnest duplication.
-                updateDocumentOrderVariables(documentOrderVariables, DocumentOrder.NO);
+                resetDocumentOrderVariables(documentOrderVariables, DocumentOrder.NO);
+                resetUniqueNodesVariables(uniqueNodesVariables, UniqueNodes.NO);
                 documentOrderVariables.put(variableId, documentOrder);
+                uniqueNodesVariables.put(variableId, uniqueNodes);
 
                 // Add position variable property.
                 if (unnest.getPositionalVariable() != null) {
                     variableId = unnest.getPositionalVariable().getId();
                     documentOrderVariables.put(variableId, DocumentOrder.YES);
+                    uniqueNodesVariables.put(variableId, UniqueNodes.YES);
                 }
                 break;
 
@@ -236,120 +442,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             default:
                 throw new RuntimeException("Operator has not been implemented in rewrite rule.");
         }
-
     }
 
-    /**
-     * Sets all the variables to DocumentOrder.
-     * 
-     * @param documentOrderVariables
-     * @param documentOrder
-     */
-    private void updateDocumentOrderVariables(HashMap<Integer, DocumentOrder> documentOrderVariables,
-            DocumentOrder documentOrder) {
-        for (Entry<Integer, DocumentOrder> entry : documentOrderVariables.entrySet()) {
-            documentOrderVariables.put(entry.getKey(), documentOrder);
-        }
-    }
-
-    /**
-     * Get the DocumentOrder variable map of the parent operator.
-     * 
-     * @param op
-     * @param vxqueryContext
-     * @return
-     */
-    private HashMap<Integer, DocumentOrder> getProducerDocumentOrderVariableMap(ILogicalOperator op,
-            VXQueryOptimizationContext vxqueryContext) {
-        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
-        switch (producerOp.getOperatorTag()) {
-            case EMPTYTUPLESOURCE:
-                return new HashMap<Integer, DocumentOrder>();
-            case NESTEDTUPLESOURCE:
-                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
-                return getProducerDocumentOrderVariableMap(nestedTuplesource.getDataSourceReference().getValue(),
-                        vxqueryContext);
-            default:
-                return new HashMap<Integer, DocumentOrder>(
-                        vxqueryContext.getDocumentOrderOperatorVariableMap(producerOp));
-        }
-    }
-
-    /**
-     * Get the DocumentOrder variable map of the parent operator.
-     * 
-     * @param op
-     * @param vxqueryContext
-     * @return
-     */
-    private Cardinality getProducerCardinality(ILogicalOperator op, VXQueryOptimizationContext vxqueryContext) {
-        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
-        switch (producerOp.getOperatorTag()) {
-            case EMPTYTUPLESOURCE:
-                return Cardinality.ONE;
-            case NESTEDTUPLESOURCE:
-                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
-                return getProducerCardinality(nestedTuplesource.getDataSourceReference().getValue(), vxqueryContext);
-            default:
-                return vxqueryContext.getCardinalityOperatorMap(producerOp);
-        }
-    }
-
-    private DocumentOrder propagateDocumentOrder(ILogicalExpression expr, HashMap<Integer, DocumentOrder> variableMap) {
-        DocumentOrder documentOrder = null;
-        switch (expr.getExpressionTag()) {
-            case FUNCTION_CALL:
-                AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) expr;
-
-                // Look up all arguments.
-                List<DocumentOrder> argProperties = new ArrayList<DocumentOrder>();
-                for (Mutable<ILogicalExpression> argExpr : functionCall.getArguments()) {
-                    argProperties.add(propagateDocumentOrder(argExpr.getValue(), variableMap));
-                }
-
-                // Propagate the property.
-                Function func = (Function) functionCall.getFunctionInfo();
-                documentOrder = func.getDocumentOrderPropagationPolicy().propagate(argProperties);
-                break;
-            case VARIABLE:
-                VariableReferenceExpression variableReference = (VariableReferenceExpression) expr;
-                int argVariableId = variableReference.getVariableReference().getId();
-                documentOrder = variableMap.get(argVariableId);
-                break;
-            case CONSTANT:
-            default:
-                documentOrder = DocumentOrder.YES;
-                break;
-        }
-        return documentOrder;
-    }
-
-    private int getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId(Mutable<ILogicalOperator> opRef) {
-        // Check if assign is for sort-distinct-nodes-asc-or-atomics.
-        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-        if (op.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
-            return 0;
-        }
-        AssignOperator assign = (AssignOperator) op;
-
-        // Check to see if the expression is a function and
-        // sort-distinct-nodes-asc-or-atomics.
-        ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
-        if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return 0;
-        }
-        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier().equals(
-                BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
-            return 0;
-        }
-
-        // Find the variable id used as the parameter.
-        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
-        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
-            return 0;
-        }
-        VariableReferenceExpression variableExpression = (VariableReferenceExpression) logicalExpression2;
-        return variableExpression.getVariableReference().getId();
-    }
 }
