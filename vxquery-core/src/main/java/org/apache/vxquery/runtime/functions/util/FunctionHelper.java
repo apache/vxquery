@@ -18,6 +18,7 @@ package org.apache.vxquery.runtime.functions.util;
 
 import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -1182,6 +1183,10 @@ public class FunctionHelper {
 
     public static void readInDocFromString(String fName, InputSource in, ArrayBackedValueStorage abvs)
             throws SystemException {
+        File file = new File(fName);
+        if (!file.exists()) {
+            throw new RuntimeException("The file (" + fName + ") does not exist.");
+        }
         try {
             in.setCharacterStream(new InputStreamReader(new FileInputStream(fName)));
             XMLParser.parseInputSource(in, abvs, false, null);

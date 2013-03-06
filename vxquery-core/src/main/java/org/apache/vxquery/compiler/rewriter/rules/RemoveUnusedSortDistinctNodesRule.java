@@ -189,7 +189,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
     }
 
     /**
-     * Get the DocumentOrder variable map of the parent operator.
+     * Get the UniqueNodes variable map of the parent operator.
      * 
      * @param op
      * @param vxqueryContext
@@ -409,17 +409,18 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 break;
 
             // The following operators do not change or add to the variable map.
+            case DATASOURCESCAN:
             case EMPTYTUPLESOURCE:
+            case EXCHANGE:
             case NESTEDTUPLESOURCE:
             case WRITE:
+            case WRITE_RESULT:
                 break;
 
             // The following operators have not been implemented.
             case CLUSTER:
-            case DATASOURCESCAN:
             case DIE:
             case DISTINCT:
-            case EXCHANGE:
             case EXTENSION_OPERATOR:
             case GROUP:
             case INDEX_INSERT_DELETE:
@@ -438,9 +439,9 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case UNIONALL:
             case UNNEST_MAP:
             case UPDATE:
-            case WRITE_RESULT:
             default:
-                throw new RuntimeException("Operator has not been implemented in rewrite rule.");
+                throw new RuntimeException("Operator (" + op.getOperatorTag()
+                        + ") has not been implemented in rewrite rule.");
         }
     }
 
