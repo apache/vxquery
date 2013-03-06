@@ -691,12 +691,23 @@
     <operator name="opext:sort-nodes-asc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.nodeid.SortDistinctNodesAscOrAtomicsScalarEvaluatorFactory"/>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </operator>
 
-    <!-- opext:sort-nodes-asc($arg as node()*) as node()* -->
+    <!-- opext:sort-nodes-asc-or-atomics($arg as item()*) as item()* -->
+    <operator name="opext:sort-nodes-asc-or-atomics">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.nodeid.SortDistinctNodesAscOrAtomicsScalarEvaluatorFactory"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+    </operator>
+
+    <!-- opext:sort-distinct-nodes-asc($arg as node()*) as node()* -->
     <operator name="opext:sort-distinct-nodes-asc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
@@ -723,15 +734,27 @@
     <operator name="opext:sort-nodes-desc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
     </operator>
 
-    <!-- opext:sort-nodes-desc($arg as node()*) as node()* -->
+    <!-- opext:sort-nodes-desc-or-atomics($arg as item()*) as item()* -->
+    <operator name="opext:sort-nodes-desc-or-atomics">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+    </operator>
+
+    <!-- opext:sort-distinct-nodes-desc($arg as node()*) as node()* -->
     <operator name="opext:sort-distinct-nodes-desc">
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
     </operator>
 
-    <!-- opext:sort-nodes-desc-or-atomics($arg as item()*) as item()* -->
+    <!-- opext:sort-distinct-nodes-desc-or-atomics($arg as item()*) as item()* -->
     <operator name="opext:sort-distinct-nodes-desc-or-atomics">
         <param name="arg" type="item()*"/>
         <return type="item()*"/>
