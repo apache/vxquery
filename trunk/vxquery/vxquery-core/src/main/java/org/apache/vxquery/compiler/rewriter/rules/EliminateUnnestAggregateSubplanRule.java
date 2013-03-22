@@ -17,12 +17,18 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.vxquery.functions.BuiltinOperators;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -31,6 +37,7 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
     /**
      * Find where an unnest is followed by a subplan with the root operator of aggregate.
      * Search pattern: unnest -> subplan -> (aggregate ... )
+     * Replacement pattern: assign -> ...
      */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
@@ -40,7 +47,6 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         }
         UnnestOperator unnest = (UnnestOperator) op;
 
-        // Check if assign is for fn:Collection.
         AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
         if (op2.getOperatorTag() != LogicalOperatorTag.SUBPLAN) {
             return false;
@@ -52,13 +58,27 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         if (subplanOp.getOperatorTag() != LogicalOperatorTag.AGGREGATE) {
             return false;
         }
+        AggregateOperator aggregate = (AggregateOperator) subplanOp;
 
-        AbstractLogicalOperator subplanEnd = findLastSubplanOperator(subplanOp);
+        // Check to see if the expression is a function and op:sequence.
+        ILogicalExpression logicalExpression = (ILogicalExpression) aggregate.getExpressions().get(0).getValue();
+        if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+            return false;
+        }
+        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
+        if (!functionCall.getFunctionIdentifier().equals(BuiltinOperators.SEQUENCE.getFunctionIdentifier())) {
+            return false;
+        }
 
-        // Remove the subplan.
-        unnest.getInputs().get(0).setValue(subplanOp);
+        // Replace search string with assign.
+        AssignOperator aOp = new AssignOperator(unnest.getVariable(), functionCall.getArguments().get(0));
+        for (Mutable<ILogicalOperator> input : subplanOp.getInputs()) {
+            aOp.getInputs().add(input);
+        }
+        opRef.setValue(aOp);
 
         // Make inline the arguments for the subplan.
+        AbstractLogicalOperator subplanEnd = findLastSubplanOperator(subplanOp);
         subplanEnd.getInputs().get(0).setValue(subplan.getInputs().get(0).getValue());
 
         return true;
