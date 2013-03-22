@@ -125,7 +125,8 @@
     <function name="fn:collection">
         <param name="arg" type="xs:string?"/>
         <return type="node()*"/>
-        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnCollectionScalarEvaluatorFactory"/>
+        <!-- All fn:collection query plans are rewritten to use Algebricks' datasource_scan operator. -->
+        <!-- <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnCollectionScalarEvaluatorFactory"/> -->
     </function>
     
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:integer?  -->
