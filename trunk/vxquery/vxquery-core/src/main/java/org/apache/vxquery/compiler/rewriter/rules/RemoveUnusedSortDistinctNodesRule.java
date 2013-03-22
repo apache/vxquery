@@ -38,6 +38,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractOperatorWithNestedPlans;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
@@ -58,6 +59,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
      */
     @Override
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
+        boolean operatorChanged = false;
         // Do not process empty or nested tuple source.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE
@@ -90,15 +92,18 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 if (documentOrderVariables.get(variableId) == DocumentOrder.YES) {
                     // Do not need to sort or remove duplicates from the result.
                     assign.getExpressions().get(0).setValue(functionCall.getArguments().get(0).getValue());
+                    operatorChanged = true;
                 } else {
                     // Unique nodes but needs to be sorted.
                     functionCall.setFunctionInfo(BuiltinOperators.SORT_NODES_ASC);
+                    operatorChanged = true;
                 }
             } else {
                 // Duplicates possible in the result.
                 if (documentOrderVariables.get(variableId) == DocumentOrder.YES) {
                     // Do not need to sort the result.
                     functionCall.setFunctionInfo(BuiltinOperators.DISTINCT_NODES_OR_ATOMICS);
+                    operatorChanged = true;
                 } else {
                     // No change.
                 }
@@ -113,7 +118,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         vxqueryContext.putCardinalityOperatorMap(opRef.getValue(), cardinalityVariable);
         vxqueryContext.putDocumentOrderOperatorVariableMap(opRef.getValue(), documentOrderVariables);
         vxqueryContext.putUniqueNodesOperatorVariableMap(opRef.getValue(), uniqueNodesVariables);
-        return false;
+        return operatorChanged;
     }
 
     private int getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId(Mutable<ILogicalOperator> opRef) {
@@ -299,12 +304,13 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case AGGREGATE:
                 cardinalityVariable = Cardinality.ONE;
                 break;
+            case GROUP:
             case SUBPLAN:
                 // Find the last operator to set a variable and call this function again.
-                SubplanOperator subplan = (SubplanOperator) op;
-                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(0)
-                        .getRoots().get(0).getValue();
-                cardinalityVariable = updateCardinalityVariable(lastOperator, cardinalityVariable, vxqueryContext);
+                AbstractOperatorWithNestedPlans operatorWithNestedPlan = (AbstractOperatorWithNestedPlans) op;
+                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) operatorWithNestedPlan
+                        .getNestedPlans().get(0).getRoots().get(0).getValue();
+                cardinalityVariable = vxqueryContext.getCardinalityOperatorMap(lastOperator);
                 break;
             case UNNEST:
                 cardinalityVariable = Cardinality.MANY;
@@ -312,35 +318,38 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
             // The following operators do not change the variable.
             case ASSIGN:
-            case CLUSTER:
             case DATASOURCESCAN:
-            case DIE:
-            case DISTINCT:
             case EMPTYTUPLESOURCE:
             case EXCHANGE:
+            case LIMIT:
+            case NESTEDTUPLESOURCE:
+            case ORDER:
+            case PROJECT:
+            case SELECT:
+            case WRITE:
+            case WRITE_RESULT:
+                break;
+
+            // The following operators' analyses has not yet been implemented.
+            case CLUSTER:
+            case DIE:
+            case DISTINCT:
             case EXTENSION_OPERATOR:
-            case GROUP:
             case INDEX_INSERT_DELETE:
             case INNERJOIN:
             case INSERT_DELETE:
             case LEFTOUTERJOIN:
-            case LIMIT:
-            case NESTEDTUPLESOURCE:
-            case ORDER:
             case PARTITIONINGSPLIT:
-            case PROJECT:
             case REPLICATE:
             case RUNNINGAGGREGATE:
             case SCRIPT:
-            case SELECT:
             case SINK:
             case UNIONALL:
             case UNNEST_MAP:
             case UPDATE:
-            case WRITE:
-            case WRITE_RESULT:
             default:
-                break;
+                throw new RuntimeException("Operator (" + op.getOperatorTag()
+                        + ") has not been implemented in rewrite rule.");
         }
         return cardinalityVariable;
     }
@@ -391,20 +400,32 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 UnnestOperator unnest = (UnnestOperator) op;
                 ILogicalExpression unnestLogicalExpression = (ILogicalExpression) unnest.getExpressionRef().getValue();
                 variableId = unnest.getVariables().get(0).getId();
+                Cardinality inputCardinality = vxqueryContext.getCardinalityOperatorMap(op.getInputs().get(0)
+                        .getValue());
                 documentOrder = propagateDocumentOrder(unnestLogicalExpression, documentOrderVariablesForOperator);
                 uniqueNodes = propagateUniqueNodes(unnestLogicalExpression, uniqueNodesVariablesForOperator);
 
                 // Reset properties based on unnest duplication.
                 resetDocumentOrderVariables(documentOrderVariables, DocumentOrder.NO);
                 resetUniqueNodesVariables(uniqueNodesVariables, UniqueNodes.NO);
-                documentOrderVariables.put(variableId, documentOrder);
-                uniqueNodesVariables.put(variableId, uniqueNodes);
+                if (inputCardinality == Cardinality.ONE) {
+                    documentOrderVariables.put(variableId, documentOrder);
+                    uniqueNodesVariables.put(variableId, uniqueNodes);
+                } else {
+                    documentOrderVariables.put(variableId, DocumentOrder.NO);
+                    uniqueNodesVariables.put(variableId, UniqueNodes.NO);
+                }
 
                 // Add position variable property.
                 if (unnest.getPositionalVariable() != null) {
                     variableId = unnest.getPositionalVariable().getId();
-                    documentOrderVariables.put(variableId, DocumentOrder.YES);
-                    uniqueNodesVariables.put(variableId, UniqueNodes.YES);
+                    if (inputCardinality == Cardinality.ONE) {
+                        documentOrderVariables.put(variableId, DocumentOrder.YES);
+                        uniqueNodesVariables.put(variableId, UniqueNodes.YES);
+                    } else {
+                        documentOrderVariables.put(variableId, DocumentOrder.NO);
+                        uniqueNodesVariables.put(variableId, UniqueNodes.NO);
+                    }
                 }
                 break;
 
@@ -417,7 +438,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case WRITE_RESULT:
                 break;
 
-            // The following operators have not been implemented.
+            // The following operators' analyses has not yet been implemented.
             case CLUSTER:
             case DIE:
             case DISTINCT:
