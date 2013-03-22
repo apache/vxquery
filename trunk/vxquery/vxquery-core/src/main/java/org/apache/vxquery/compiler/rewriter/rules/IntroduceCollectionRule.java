@@ -68,18 +68,12 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         VXQueryConstantValue constantValue;
 
-        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-        if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
-            return false;
-        }
-        UnnestOperator unnest = (UnnestOperator) op;
-
         // Check if assign is for fn:Collection.
-        AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
-        if (op2.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
+        if (op.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
             return false;
         }
-        AssignOperator assign = (AssignOperator) op2;
+        AssignOperator assign = (AssignOperator) op;
 
         // Check to see if the expression is a function and fn:Collection.
         ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
@@ -92,9 +86,9 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
         }
 
         // Get the string assigned to the collection function.
-        AbstractLogicalOperator op3 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
-        if (op3.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
-            AssignOperator assign2 = (AssignOperator) op3;
+        AbstractLogicalOperator op2 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
+        if (op2.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
+            AssignOperator assign2 = (AssignOperator) op2;
 
             // Check to see if the expression is a constant expression and type string.
             ILogicalExpression logicalExpression2 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
@@ -106,7 +100,7 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
             if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
                 return false;
             }
-        } else if (op3.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE) {
+        } else if (op2.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE) {
             ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
             if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
                 return false;
@@ -157,7 +151,7 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
         List<Object> types = new ArrayList<Object>();
         types.add(SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
         VXQueryCollectionDataSource ds = new VXQueryCollectionDataSource(collectionName, types.toArray());
-        DataSourceScanOperator opNew = new DataSourceScanOperator(unnest.getVariables(), ds);
+        DataSourceScanOperator opNew = new DataSourceScanOperator(assign.getVariables(), ds);
         opNew.getInputs().addAll(assign.getInputs());
         opRef.setValue(opNew);
         return true;
