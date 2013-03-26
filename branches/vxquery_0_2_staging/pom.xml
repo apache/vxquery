@@ -20,7 +20,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery</artifactId>
   <packaging>pom</packaging>
-  <version>0.2-incubating</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>

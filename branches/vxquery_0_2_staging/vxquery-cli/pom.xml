@@ -20,7 +20,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-cli</artifactId>
   <packaging>jar</packaging>
-  <version>0.2-incubating</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery CLI</name>
   <description>Apache VXQuery Command-Line Utility</description>
 
