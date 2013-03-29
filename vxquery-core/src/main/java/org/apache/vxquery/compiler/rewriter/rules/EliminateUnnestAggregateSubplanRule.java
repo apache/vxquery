@@ -47,6 +47,16 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         }
         UnnestOperator unnest = (UnnestOperator) op;
 
+        // Check to see if the expression is the iterate operator.
+        ILogicalExpression logicalExpression = (ILogicalExpression) unnest.getExpressionRef().getValue();
+        if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+            return false;
+        }
+        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
+        if (!functionCall.getFunctionIdentifier().equals(BuiltinOperators.ITERATE.getFunctionIdentifier())) {
+            return false;
+        }
+
         AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
         if (op2.getOperatorTag() != LogicalOperatorTag.SUBPLAN) {
             return false;
@@ -61,17 +71,17 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         AggregateOperator aggregate = (AggregateOperator) subplanOp;
 
         // Check to see if the expression is a function and op:sequence.
-        ILogicalExpression logicalExpression = (ILogicalExpression) aggregate.getExpressions().get(0).getValue();
-        if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+        ILogicalExpression logicalExpression2 = (ILogicalExpression) aggregate.getExpressions().get(0).getValue();
+        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
             return false;
         }
-        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier().equals(BuiltinOperators.SEQUENCE.getFunctionIdentifier())) {
+        AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
+        if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.SEQUENCE.getFunctionIdentifier())) {
             return false;
         }
 
         // Replace search string with assign.
-        AssignOperator aOp = new AssignOperator(unnest.getVariable(), functionCall.getArguments().get(0));
+        AssignOperator aOp = new AssignOperator(unnest.getVariable(), functionCall2.getArguments().get(0));
         for (Mutable<ILogicalOperator> input : subplanOp.getInputs()) {
             aOp.getInputs().add(input);
         }
