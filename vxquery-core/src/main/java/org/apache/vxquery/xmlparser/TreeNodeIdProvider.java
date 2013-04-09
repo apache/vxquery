@@ -28,6 +28,7 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         currentId = 0;
     }
     
+    // TODO Remove this operator once all calls have been migrated to dataSourceScanId.
     public TreeNodeIdProvider(short partition) {
         this.partitionDataSource = partition;
         dataSouceScanId = 0;

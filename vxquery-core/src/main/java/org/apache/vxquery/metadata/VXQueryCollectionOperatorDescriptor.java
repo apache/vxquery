@@ -62,7 +62,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
         final int partitionId = ctx.getTaskAttemptId().getTaskId().getPartition();
         // TODO Add the data source scan id.
-        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId);
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partitionId);
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
