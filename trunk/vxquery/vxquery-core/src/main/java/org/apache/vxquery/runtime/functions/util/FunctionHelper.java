@@ -49,6 +49,8 @@ import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 import org.xml.sax.InputSource;
 
@@ -1176,12 +1178,12 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs) throws SystemException {
+            DataInputStream di, ArrayBackedValueStorage abvs, ITreeNodeIdProvider treeNodeIdProvider) throws SystemException {
         String fName = getStringFromPointable(stringp, bbis, di);
-        readInDocFromString(fName, in, abvs);
+        readInDocFromString(fName, in, abvs, treeNodeIdProvider);
     }
 
-    public static void readInDocFromString(String fName, InputSource in, ArrayBackedValueStorage abvs)
+    public static void readInDocFromString(String fName, InputSource in, ArrayBackedValueStorage abvs, ITreeNodeIdProvider treeNodeIdProvider)
             throws SystemException {
         File file = new File(fName);
         if (!file.exists()) {
@@ -1189,7 +1191,7 @@ public class FunctionHelper {
         }
         try {
             in.setCharacterStream(new InputStreamReader(new FileInputStream(fName)));
-            XMLParser.parseInputSource(in, abvs, false, null);
+            XMLParser.parseInputSource(in, abvs, false, treeNodeIdProvider);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }

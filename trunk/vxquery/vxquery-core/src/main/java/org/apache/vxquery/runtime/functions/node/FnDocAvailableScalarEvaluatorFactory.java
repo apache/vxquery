@@ -73,7 +73,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
                 }
 
                 try {
-                    FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs);
+                    FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs, null);
                     XDMConstants.setTrue(result);
                 } catch (Exception e) {
                     XDMConstants.setFalse(result);

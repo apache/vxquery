@@ -137,6 +137,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             startChildInParent(pinb);
             tempABVS.reset();
             tempABVS.getDataOutput().writeUTF(target);
+            if (createNodeIds) {
+                pinb.setLocalNodeId(nodeIdCounter++);
+            }
             pinb.setTarget(tempABVS);
             tempABVS.reset();
             tempABVS.getDataOutput().writeUTF(data);
@@ -240,6 +243,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             buffer.append(ch, start, length);
             tempABVS.reset();
             tempABVS.getDataOutput().writeUTF(buffer.toString());
+            if (createNodeIds) {
+                cnb.setLocalNodeId(nodeIdCounter++);
+            }
             cnb.setValue(tempABVS);
             endChildInParent(cnb);
             buffer.delete(0, buffer.length());
@@ -254,6 +260,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             peekENBStackTop().startChild(tnb);
             tempABVS.reset();
             tempABVS.getDataOutput().writeUTF(buffer.toString());
+            if (createNodeIds) {
+                tnb.setLocalNodeId(nodeIdCounter++);
+            }
             tnb.setValue(tempABVS);
             peekENBStackTop().endChild(tnb);
             buffer.delete(0, buffer.length());

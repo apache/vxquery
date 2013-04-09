@@ -30,6 +30,8 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -59,6 +61,9 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
         final SequenceBuilder sb = new SequenceBuilder();
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
         final InputSource in = new InputSource();
+        final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
+        // TODO Add the data source scan id.
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partition);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -91,7 +96,7 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
                         // Add the document node to the sequence.
                         if (list[i].getPath().endsWith(".xml")) {
                             abvsFileNode.reset();
-                            FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode);
+                            FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode, nodeIdProvider);
                             nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
                                     abvsFileNode.getLength());
                             sb.addItem(nodep);
