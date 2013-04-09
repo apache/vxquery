@@ -20,6 +20,8 @@ import java.io.File;
 import java.nio.ByteBuffer;
 
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
@@ -58,6 +60,9 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final FrameTupleAppender appender = new FrameTupleAppender(ctx.getFrameSize());
         final InputSource in = new InputSource();
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
+        final int partitionId = ctx.getTaskAttemptId().getTaskId().getPartition();
+        // TODO Add the data source scan id.
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId);
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -85,11 +90,11 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                     tb.addField(fta, t, f);
                                 }
                             }
-                            
+
                             // Now add new field.
                             abvsFileNode.reset();
                             try {
-                                FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode);
+                                FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode, nodeIdProvider);
                             } catch (Exception e) {
                                 throw new HyracksDataException(e);
                             }

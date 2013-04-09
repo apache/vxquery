@@ -27,6 +27,8 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -54,6 +56,9 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
+        final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
+        // TODO Add the data source scan id.
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partition);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -72,7 +77,7 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                     throw new SystemException(ErrorCode.FORG0006);
                 }
                 tvp.getValue(stringp);
-                FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs);
+                FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs, nodeIdProvider);
                 result.set(abvs);
             }
         };
