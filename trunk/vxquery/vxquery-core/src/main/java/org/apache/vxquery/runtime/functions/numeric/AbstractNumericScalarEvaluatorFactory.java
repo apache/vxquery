@@ -28,6 +28,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -59,7 +60,7 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
             final DataOutput dOut = abvs.getDataOutput();
             final ArrayBackedValueStorage abvsInteger = new ArrayBackedValueStorage();
             final DataOutput dOutInteger = abvsInteger.getDataOutput();
-            final TypedPointables tp = new TypedPointables();
+            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
@@ -184,17 +185,6 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
                 }
             }
         };
-    }
-
-    private static class TypedPointables {
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     }
 
     protected abstract AbstractNumericOperation createNumericOperation();

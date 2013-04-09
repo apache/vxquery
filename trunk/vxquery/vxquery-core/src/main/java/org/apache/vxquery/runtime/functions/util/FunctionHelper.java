@@ -35,6 +35,12 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.api.IDate;
 import org.apache.vxquery.datamodel.api.ITime;
 import org.apache.vxquery.datamodel.api.ITimezone;
@@ -50,7 +56,6 @@ import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
-import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 import org.xml.sax.InputSource;
 
@@ -79,6 +84,8 @@ public class FunctionHelper {
         public ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
         public SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         public UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+
+        // XQuery Specific
         public XSBinaryPointable binaryp = (XSBinaryPointable) XSBinaryPointable.FACTORY.createPointable();
         public XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
         public XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
@@ -86,6 +93,15 @@ public class FunctionHelper {
         public XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
         public XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
         public XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
+
+        // XQuery Nodes
+        public AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY.createPointable();
+        public DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
+        public ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
+        public NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
+        public PINodePointable pinp = (PINodePointable) PINodePointable.FACTORY.createPointable();
+        public TextOrCommentNodePointable tocnp = (TextOrCommentNodePointable) TextOrCommentNodePointable.FACTORY
+                .createPointable();
     }
 
     public static void arithmeticOperation(AbstractArithmeticOperation aOp, DynamicContext dCtx,
@@ -1178,13 +1194,14 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, ITreeNodeIdProvider treeNodeIdProvider) throws SystemException {
+            DataInputStream di, ArrayBackedValueStorage abvs, ITreeNodeIdProvider treeNodeIdProvider)
+            throws SystemException {
         String fName = getStringFromPointable(stringp, bbis, di);
         readInDocFromString(fName, in, abvs, treeNodeIdProvider);
     }
 
-    public static void readInDocFromString(String fName, InputSource in, ArrayBackedValueStorage abvs, ITreeNodeIdProvider treeNodeIdProvider)
-            throws SystemException {
+    public static void readInDocFromString(String fName, InputSource in, ArrayBackedValueStorage abvs,
+            ITreeNodeIdProvider treeNodeIdProvider) throws SystemException {
         File file = new File(fName);
         if (!file.exists()) {
             throw new RuntimeException("The file (" + fName + ") does not exist.");
@@ -1201,7 +1218,7 @@ public class FunctionHelper {
             TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
         TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    
+
         ArrayBackedValueStorage abvsArgument1 = new ArrayBackedValueStorage();
         DataOutput dOutArgument1 = abvsArgument1.getDataOutput();
         ArrayBackedValueStorage abvsArgument2 = new ArrayBackedValueStorage();
@@ -1209,7 +1226,7 @@ public class FunctionHelper {
         CastToDoubleOperation castToDouble = new CastToDoubleOperation();
         UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-    
+
         try {
             abvsArgument1.reset();
             if (tvp1.getTag() == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
@@ -1237,7 +1254,7 @@ public class FunctionHelper {
             } else {
                 tvp2new = tvp2;
             }
-    
+
             return compareTaggedValues(aOp, tvp1new, tvp2new, dCtx);
         } catch (SystemException se) {
             throw se;
