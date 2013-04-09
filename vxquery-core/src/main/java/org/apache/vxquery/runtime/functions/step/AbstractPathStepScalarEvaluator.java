@@ -216,7 +216,16 @@ public abstract class AbstractPathStepScalarEvaluator extends AbstractTaggedValu
         mainOut.write(ValueTag.NODE_TREE_TAG);
         boolean hasDictionary = ntp.dictionaryExists() && hasDictionary(itemTvp.getTag());
         byte header = (byte) (hasDictionary ? NodeTreePointable.HEADER_DICTIONARY_EXISTS_MASK : 0);
+		// TODO add all header flags to this setting.
+        boolean hasNodeIds = ntp.nodeIdExists();
+        if (hasNodeIds) {
+            header |= NodeTreePointable.HEADER_NODEID_EXISTS_MASK;
+        }
         mainOut.write(header);
+        if (hasNodeIds) {
+            // TODO put in real id.
+            mainOut.writeLong(ntp.getRootNodeId());
+        }
         if (hasDictionary) {
             mainOut.write(ntp.getByteArray(), ntp.getDictionaryOffset(), ntp.getDictionarySize());
         }
