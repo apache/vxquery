@@ -27,6 +27,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -57,7 +58,7 @@ public class FnRoundHalfToEvenScalarEvaluatorFactory extends AbstractTaggedValue
             final DataOutput dOut = abvs.getDataOutput();
             final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
             final DataOutput dOutInner = abvsInner.getDataOutput();
-            final TypedPointables tp = new TypedPointables();
+            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
             final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
             final CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
 
@@ -266,16 +267,6 @@ public class FnRoundHalfToEvenScalarEvaluatorFactory extends AbstractTaggedValue
                 }
             }
         };
-    }
-
-    private static class TypedPointables {
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
     }
 
 }

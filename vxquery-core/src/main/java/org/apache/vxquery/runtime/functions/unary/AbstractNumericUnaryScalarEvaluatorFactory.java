@@ -20,12 +20,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -33,12 +33,7 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
@@ -58,7 +53,7 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
             final DataOutput dOut = abvs.getDataOutput();
             final ArrayBackedValueStorage abvsInteger = new ArrayBackedValueStorage();
             final DataOutput dOutInteger = abvsInteger.getDataOutput();
-            final TypedPointables tp = new TypedPointables();
+            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
@@ -177,16 +172,6 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
                 }
             }
         };
-    }
-
-    private static class TypedPointables {
-        BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
     }
 
     protected abstract AbstractNumericUnaryOperation createNumericUnaryOperation();
