@@ -760,6 +760,20 @@
         <return type="item()*"/>
     </operator>
 
+    <!-- opext:local-id-from-node($arg as node()) as xs:int -->
+    <operator name="opext:local-id-from-node">
+        <param name="arg" type="node()"/>
+        <return type="xs:int"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.LocalIdFromNodeScalarEvaluatorFactory"/>
+    </operator>
+
+    <!-- opext:tree-id-from-node($arg as node()) as xs:integer -->
+    <operator name="opext:tree-id-from-node">
+        <param name="arg" type="node()"/>
+        <return type="xs:integer"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.TreeIdFromNodeScalarEvaluatorFactory"/>
+    </operator>
+
     <!-- opext:deflate-sequences($arg as item()*) as item()* -->
     <operator name="opext:deflate-sequences">
         <param name="arg" type="item()*"/>
