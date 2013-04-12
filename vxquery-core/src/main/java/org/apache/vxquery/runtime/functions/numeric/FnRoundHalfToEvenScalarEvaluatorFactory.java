@@ -28,6 +28,7 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper.TypedPointables;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
