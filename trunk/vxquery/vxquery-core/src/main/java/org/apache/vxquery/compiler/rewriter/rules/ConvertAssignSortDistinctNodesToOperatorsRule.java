@@ -42,6 +42,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLog
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DistinctOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.GroupByOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.OrderOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.OrderOperator.IOrder;
@@ -128,34 +129,32 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         unnestOperator.getInputs().add(ntsRef);
         nextOperatorRef = new MutableObject<ILogicalOperator>(unnestOperator);
 
-        // Assign Tree Node ID key.
-        LogicalVariable nodeTreeIdKeyVariable = context.newVar();
-        AssignOperator nodeTreeIdAssignOp = getAssignOperator(unnestVariable, nodeTreeIdKeyVariable,
-                BuiltinOperators.TREE_ID_FROM_NODE);
-        nodeTreeIdAssignOp.getInputs().add(nextOperatorRef);
-        nextOperatorRef = new MutableObject<ILogicalOperator>(nodeTreeIdAssignOp);
-
-        // Assign Tree Node ID key.
-        LogicalVariable nodeLocalIdKeyVariable = context.newVar();
-        AssignOperator nodeLocalIdAssignOp = getAssignOperator(unnestVariable, nodeLocalIdKeyVariable,
-                BuiltinOperators.LOCAL_ID_FROM_NODE);
-        nodeLocalIdAssignOp.getInputs().add(nextOperatorRef);
-        nextOperatorRef = new MutableObject<ILogicalOperator>(nodeLocalIdAssignOp);
+        // Assign Node ID key.
+        LogicalVariable nodeIdKeyVariable = context.newVar();
+        AssignOperator nodeIdAssignOp = getAssignOperator(unnestVariable, nodeIdKeyVariable,
+                BuiltinOperators.ID_FROM_NODE);
+        nodeIdAssignOp.getInputs().add(nextOperatorRef);
+        nextOperatorRef = new MutableObject<ILogicalOperator>(nodeIdAssignOp);
 
         // Prepare for Order and Distinct.
-        Mutable<ILogicalExpression> nodeTreeIdKeyVariableRef = new MutableObject<ILogicalExpression>(
-                new VariableReferenceExpression(nodeTreeIdKeyVariable));
-        Mutable<ILogicalExpression> nodeLocalIdKeyVariableRef = new MutableObject<ILogicalExpression>(
-                new VariableReferenceExpression(nodeLocalIdKeyVariable));
+        Mutable<ILogicalExpression> nodeIdKeyVariableRef = new MutableObject<ILogicalExpression>(
+                new VariableReferenceExpression(nodeIdKeyVariable));
 
         // Distinct.
         if (functionCall.getFunctionIdentifier().equals(
                 BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())
                 || functionCall.getFunctionIdentifier().equals(
                         BuiltinOperators.DISTINCT_NODES_OR_ATOMICS.getFunctionIdentifier())) {
-            DistinctOperator distinctOperator = getDistinctOperator(nodeTreeIdKeyVariableRef, nodeLocalIdKeyVariableRef);
+            // TODO switch to use group by instead of distinct Operator.
+            DistinctOperator distinctOperator = getDistinctOperator(nodeIdKeyVariableRef);
             distinctOperator.getInputs().add(nextOperatorRef);
             nextOperatorRef = new MutableObject<ILogicalOperator>(distinctOperator);
+
+//            LogicalVariable groupByKeyVariable = context.newVar();
+//            ILogicalExpression nodeIdKeyVre = new VariableReferenceExpression(nodeIdKeyVariable);
+//            GroupByOperator groupByOperator = getGroupByOperator(nodeIdKeyVre, groupByKeyVariable);
+//            distinctOperator.getInputs().add(nextOperatorRef);
+//            nextOperatorRef = new MutableObject<ILogicalOperator>(groupByOperator);
         }
 
         // Order.
@@ -163,7 +162,7 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
                 BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())
                 || functionCall.getFunctionIdentifier().equals(
                         BuiltinOperators.SORT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
-            OrderOperator orderOperator = getOrderOperator(nodeTreeIdKeyVariableRef, nodeLocalIdKeyVariableRef);
+            OrderOperator orderOperator = getOrderOperator(nodeIdKeyVariableRef);
             orderOperator.getInputs().add(nextOperatorRef);
             nextOperatorRef = new MutableObject<ILogicalOperator>(orderOperator);
         }
@@ -202,24 +201,25 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         return new AggregateOperator(aggregateVariables, exprs);
     }
 
-    private AssignOperator getAssignOperator(LogicalVariable unnestVariable, LogicalVariable nodeTreeIdKeyVariable,
+    private AssignOperator getAssignOperator(LogicalVariable unnestVariable, LogicalVariable outputVariable,
             IFunctionInfo inputFunction) {
         List<Mutable<ILogicalExpression>> nodeArgs = new ArrayList<Mutable<ILogicalExpression>>();
         nodeArgs.add(new MutableObject<ILogicalExpression>(new VariableReferenceExpression(unnestVariable)));
-        ScalarFunctionCallExpression nodeTreeIdFunctionExpression = new ScalarFunctionCallExpression(inputFunction,
-                nodeArgs);
-        Mutable<ILogicalExpression> nodeTreeIdExpression = new MutableObject<ILogicalExpression>(
-                nodeTreeIdFunctionExpression);
-
-        return new AssignOperator(nodeTreeIdKeyVariable, nodeTreeIdExpression);
+        ScalarFunctionCallExpression unctionExpression = new ScalarFunctionCallExpression(inputFunction, nodeArgs);
+        Mutable<ILogicalExpression> nodeTreeIdExpression = new MutableObject<ILogicalExpression>(unctionExpression);
+        return new AssignOperator(outputVariable, nodeTreeIdExpression);
     }
 
-    private DistinctOperator getDistinctOperator(Mutable<ILogicalExpression> nodeTreeIdKeyVariableRef,
-            Mutable<ILogicalExpression> nodeLocalIdKeyVariableRef) {
+    private DistinctOperator getDistinctOperator(Mutable<ILogicalExpression> variableRef) {
         List<Mutable<ILogicalExpression>> distinctArgs = new ArrayList<Mutable<ILogicalExpression>>();
-        distinctArgs.add(nodeTreeIdKeyVariableRef);
-        distinctArgs.add(nodeLocalIdKeyVariableRef);
+        distinctArgs.add(variableRef);
         return new DistinctOperator(distinctArgs);
+    }
+
+    private GroupByOperator getGroupByOperator(ILogicalExpression variableRef, LogicalVariable outputVariable) {
+        GroupByOperator op = new GroupByOperator();
+        op.addGbyExpression(outputVariable, variableRef);
+        return op;
     }
 
     private Mutable<ILogicalOperator> getInputOperator(Mutable<ILogicalOperator> opRef) {
@@ -236,12 +236,9 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         }
     }
 
-    private OrderOperator getOrderOperator(Mutable<ILogicalExpression> nodeTreeIdKeyVariableRef,
-            Mutable<ILogicalExpression> nodeLocalIdKeyVariableRef) {
+    private OrderOperator getOrderOperator(Mutable<ILogicalExpression> variableRef) {
         List<Pair<IOrder, Mutable<ILogicalExpression>>> orderArgs = new ArrayList<Pair<IOrder, Mutable<ILogicalExpression>>>();
-        orderArgs.add(new Pair<IOrder, Mutable<ILogicalExpression>>(OrderOperator.ASC_ORDER, nodeTreeIdKeyVariableRef));
-        orderArgs
-                .add(new Pair<IOrder, Mutable<ILogicalExpression>>(OrderOperator.ASC_ORDER, nodeLocalIdKeyVariableRef));
+        orderArgs.add(new Pair<IOrder, Mutable<ILogicalExpression>>(OrderOperator.ASC_ORDER, variableRef));
         return new OrderOperator(orderArgs);
     }
 
