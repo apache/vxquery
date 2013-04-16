@@ -20,7 +20,7 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
     
     private final short partitionDataSource;
     private final short dataSouceScanId;
-    private int currentId;
+    private short currentId;
     
     public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId) {
         this.partitionDataSource = partitionDataSource;
@@ -35,9 +35,10 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         currentId = 0;
     }
     
-    public long getId() {
-        long p = partitionDataSource;
-        long dssi = dataSouceScanId;
-        return ((p << 48) | (dssi << 32)) | currentId++;
+    public int getId() {
+        int p = partitionDataSource;
+        int dssi = dataSouceScanId;
+        // TODO the first 2 bytes from a combination of data source scan id and currentId.
+        return (p << 16) | currentId++;
     }
 }

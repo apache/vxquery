@@ -21,6 +21,7 @@ import java.io.DataOutput;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -56,14 +57,15 @@ public class TreeIdFromNodeScalarEvaluatorFactory extends AbstractTaggedValueArg
                     try {
                         abvs.reset();
                         tvp1.getValue(ntp);
-                        dOut.write(ValueTag.XS_INTEGER_TAG);
-                        dOut.writeLong(ntp.getRootNodeId());
+                        dOut.write(ValueTag.XS_INT_TAG);
+                        tvp1.getValue(ntp);
+                        dOut.writeInt(ntp.getRootNodeId());
                         result.set(abvs);
                     } catch (Exception e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
                 } else {
-                    throw new SystemException(ErrorCode.FORG0006);
+                    XDMConstants.setEmptySequence(result);
                 }
             }
 

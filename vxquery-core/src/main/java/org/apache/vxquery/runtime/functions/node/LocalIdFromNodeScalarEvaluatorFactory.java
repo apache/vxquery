@@ -19,8 +19,8 @@ package org.apache.vxquery.runtime.functions.node;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -46,56 +46,28 @@ public class LocalIdFromNodeScalarEvaluatorFactory extends AbstractTaggedValueAr
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
-        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
                 // Only accept node trees as input.
-                if (tvp1.getTag() == ValueTag.NODE_TREE_TAG) {
-                    try {
+                try {
+                    int localNodeId = FunctionHelper.getLocalNodeId(tvp1);
+                    if (localNodeId == -1) {
+                        XDMConstants.setEmptySequence(result);
+                    } else {
                         abvs.reset();
-                        tvp1.getValue(tp.ntp);
                         dOut.write(ValueTag.XS_INT_TAG);
-                        tp.ntp.getRootNode(tvp);
-                        switch (tvp.getTag()) {
-                            case ValueTag.ATTRIBUTE_NODE_TAG:
-                                tvp.getValue(tp.anp);
-                                dOut.writeInt(tp.anp.getLocalNodeId(tp.ntp));
-                                break;
-                            case ValueTag.COMMENT_NODE_TAG:
-                            case ValueTag.TEXT_NODE_TAG:
-                                tvp.getValue(tp.tocnp);
-                                dOut.writeInt(tp.tocnp.getLocalNodeId(tp.ntp));
-                                break;
-                            case ValueTag.DOCUMENT_NODE_TAG:
-                                tvp.getValue(tp.dnp);
-                                dOut.writeInt(tp.dnp.getLocalNodeId(tp.ntp));
-                                break;
-                            case ValueTag.ELEMENT_NODE_TAG:
-                                tvp.getValue(tp.enp);
-                                dOut.writeInt(tp.enp.getLocalNodeId(tp.ntp));
-                                break;
-                            case ValueTag.PI_NODE_TAG:
-                                tvp.getValue(tp.pinp);
-                                dOut.writeInt(tp.pinp.getLocalNodeId(tp.ntp));
-                                break;
-                            default:
-                                dOut.writeInt(-1);
-                        }
-
+                        dOut.writeInt(localNodeId);
                         result.set(abvs);
-                    } catch (Exception e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
                     }
-                } else {
-                    throw new SystemException(ErrorCode.FORG0006);
+                } catch (Exception e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }
 
+
         };
     }
-
 }

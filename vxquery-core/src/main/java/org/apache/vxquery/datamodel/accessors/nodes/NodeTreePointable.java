@@ -37,7 +37,7 @@ public class NodeTreePointable extends AbstractPointable {
 
     private static final int HEADER_OFFSET = 0;
     private static final int HEADER_SIZE = 1;
-    private static final int NODE_ID_SIZE = 8;
+    private static final int NODE_ID_SIZE = 4;
 
     private static final int DICTIONARY_SIZE_SIZE = 4;
     private static final int DICTIONARY_NENTRIES_SIZE = 4;
@@ -98,8 +98,8 @@ public class NodeTreePointable extends AbstractPointable {
         return (getHeader() & HEADER_TYPE_EXISTS_MASK) != 0;
     }
 
-    public long getRootNodeId() {
-        return nodeIdExists() ? LongPointable.getLong(bytes, getNodeIdOffset()) : -1;
+    public int getRootNodeId() {
+        return nodeIdExists() ? IntegerPointable.getInteger(bytes, getNodeIdOffset()) : -1;
     }
 
     public int getDictionaryEntryCount() {

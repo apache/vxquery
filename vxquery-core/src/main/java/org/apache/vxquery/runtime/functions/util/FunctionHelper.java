@@ -1083,6 +1083,46 @@ public class FunctionHelper {
     }
 
     /**
+     * Get the local node id from a tagged value pointable when available.
+     */
+    public static int getLocalNodeId(TaggedValuePointable tvp1) {
+        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final TypedPointables tp = new TypedPointables();
+        int localNodeId = -1;
+        if (tvp1.getTag() == ValueTag.NODE_TREE_TAG) {
+            tvp1.getValue(tp.ntp);
+            tp.ntp.getRootNode(tvp);
+            switch (tvp.getTag()) {
+                case ValueTag.ATTRIBUTE_NODE_TAG:
+                    tvp.getValue(tp.anp);
+                    localNodeId = tp.anp.getLocalNodeId(tp.ntp);
+                    break;
+                case ValueTag.COMMENT_NODE_TAG:
+                case ValueTag.TEXT_NODE_TAG:
+                    tvp.getValue(tp.tocnp);
+                    localNodeId = tp.tocnp.getLocalNodeId(tp.ntp);
+                    break;
+                case ValueTag.DOCUMENT_NODE_TAG:
+                    tvp.getValue(tp.dnp);
+                    localNodeId = tp.dnp.getLocalNodeId(tp.ntp);
+                    break;
+                case ValueTag.ELEMENT_NODE_TAG:
+                    tvp.getValue(tp.enp);
+                    localNodeId = tp.enp.getLocalNodeId(tp.ntp);
+                    break;
+                case ValueTag.PI_NODE_TAG:
+                    tvp.getValue(tp.pinp);
+                    localNodeId = tp.pinp.getLocalNodeId(tp.ntp);
+                    break;
+                default:
+                    localNodeId = -1;
+                    break;
+            }
+        }
+        return localNodeId;
+    }
+
+    /**
      * Returns the number of digits in a long. A few special cases that needed attention.
      */
     public static int getNumberOfDigits(long value) {
@@ -1366,4 +1406,5 @@ public class FunctionHelper {
             }
         }
     }
+
 }

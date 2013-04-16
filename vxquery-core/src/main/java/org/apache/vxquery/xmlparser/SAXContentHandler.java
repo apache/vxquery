@@ -306,7 +306,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
         out.write(header);
         if (createNodeIds) {
-            out.writeLong(nodeIdProvider.getId());
+            out.writeInt(nodeIdProvider.getId());
         }
         db.write(abvs);
         out.write(docABVS.getByteArray(), docABVS.getStartOffset(), docABVS.getLength());

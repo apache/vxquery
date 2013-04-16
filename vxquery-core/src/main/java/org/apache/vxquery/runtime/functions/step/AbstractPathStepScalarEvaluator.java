@@ -223,8 +223,7 @@ public abstract class AbstractPathStepScalarEvaluator extends AbstractTaggedValu
         }
         mainOut.write(header);
         if (hasNodeIds) {
-            // TODO put in real id.
-            mainOut.writeLong(ntp.getRootNodeId());
+            mainOut.writeInt(ntp.getRootNodeId());
         }
         if (hasDictionary) {
             mainOut.write(ntp.getByteArray(), ntp.getDictionaryOffset(), ntp.getDictionarySize());
