@@ -40,11 +40,13 @@ import edu.uci.ics.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperat
 
 public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
+    private int dataSourceId;
     private String collectionName;
 
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, String collectionName,
-            RecordDescriptor rDesc) {
+            int dataSourceId, RecordDescriptor rDesc) {
         super(spec, 1, 1);
+        this.dataSourceId = dataSourceId;
         this.collectionName = collectionName;
         recordDescriptors[0] = rDesc;
     }
@@ -61,8 +63,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final InputSource in = new InputSource();
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
         final int partitionId = ctx.getTaskAttemptId().getTaskId().getPartition();
-        // TODO Add the data source scan id.
-        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partitionId);
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partitionId, (short) dataSourceId);
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override

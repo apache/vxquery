@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -66,6 +67,7 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
      */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+        VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
         VXQueryConstantValue constantValue;
 
         // Check if assign is for fn:Collection.
@@ -150,7 +152,14 @@ public class IntroduceCollectionRule implements IAlgebraicRewriteRule {
         // Build the new operator and update the query plan.
         List<Object> types = new ArrayList<Object>();
         types.add(SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
-        VXQueryCollectionDataSource ds = new VXQueryCollectionDataSource(collectionName, types.toArray());
+        VXQueryCollectionDataSource ds;
+        if (vxqueryContext.getCollectionDataSourceMap(collectionName) != null) {
+            ds = vxqueryContext.getCollectionDataSourceMap(collectionName);
+        } else {
+            int nextId = vxqueryContext.getCollectionDataSourceMapSize() + 1;
+            ds = new VXQueryCollectionDataSource(nextId, collectionName, types.toArray());
+            vxqueryContext.putCollectionDataSourceMap(collectionName, ds);
+        }
         DataSourceScanOperator opNew = new DataSourceScanOperator(assign.getVariables(), ds);
         opNew.getInputs().addAll(assign.getInputs());
         opRef.setValue(opNew);

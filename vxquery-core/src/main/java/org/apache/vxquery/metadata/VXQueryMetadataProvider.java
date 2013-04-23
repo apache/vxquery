@@ -56,8 +56,10 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             throws AlgebricksException {
         VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
         RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
-        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds.getId(), rDesc);
+        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds.getId(),
+                ds.getDataSourceId(), rDesc);
 
+        // TODO review if locations needs to be updated for parallel processing.
         String[] locations = new String[1];
         locations[0] = "nc1";
         AlgebricksAbsolutePartitionConstraint constraint = new AlgebricksAbsolutePartitionConstraint(locations);

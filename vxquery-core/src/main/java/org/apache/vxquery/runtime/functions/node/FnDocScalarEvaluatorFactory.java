@@ -57,7 +57,6 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
         final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
-        // TODO Add the data source scan id.
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
