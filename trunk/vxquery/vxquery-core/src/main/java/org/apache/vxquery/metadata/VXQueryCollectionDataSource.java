@@ -31,13 +31,15 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.properties.RandomPartitioning
 import edu.uci.ics.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
 
 public class VXQueryCollectionDataSource implements IDataSource<String> {
+    private final int dataSourceId;
     private final String collectionName;
 
     private final Object[] types;
 
     private IDataSourcePropertiesProvider propProvider;
 
-    public VXQueryCollectionDataSource(String file, Object[] types) {
+    public VXQueryCollectionDataSource(int id, String file, Object[] types) {
+        this.dataSourceId = id;
         this.collectionName = file;
         this.types = types;
         final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(new RandomPartitioningProperty(
@@ -48,6 +50,10 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
                 return vec;
             }
         };
+    }
+
+    public int getDataSourceId() {
+        return dataSourceId;
     }
 
     @Override

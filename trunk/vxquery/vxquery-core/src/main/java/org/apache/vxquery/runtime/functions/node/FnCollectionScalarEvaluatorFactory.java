@@ -62,7 +62,6 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
         final InputSource in = new InputSource();
         final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
-        // TODO Add the data source scan id.
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
