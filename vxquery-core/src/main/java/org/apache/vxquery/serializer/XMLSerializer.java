@@ -412,6 +412,7 @@ public class XMLSerializer implements IPrinter {
     private void printSequence(PrintStream ps, TaggedValuePointable tvp) {
         SequencePointable seqp = pp.takeOne(SequencePointable.class);
         try {
+            tvp.getValue(seqp);
             printSequence(ps, seqp);
         } finally {
             pp.giveBack(seqp);
