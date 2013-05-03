@@ -330,7 +330,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case WRITE_RESULT:
                 break;
 
-            // The following operators' analyses has not yet been implemented.
+            // The following operators' analysis has not yet been implemented.
             case CLUSTER:
             case DIE:
             case DISTINCT:
@@ -434,11 +434,12 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case EMPTYTUPLESOURCE:
             case EXCHANGE:
             case NESTEDTUPLESOURCE:
+            case SELECT:
             case WRITE:
             case WRITE_RESULT:
                 break;
 
-            // The following operators' analyses has not yet been implemented.
+            // The following operators' analysis has not yet been implemented.
             case CLUSTER:
             case DIE:
             case DISTINCT:
@@ -455,7 +456,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case REPLICATE:
             case RUNNINGAGGREGATE:
             case SCRIPT:
-            case SELECT:
             case SINK:
             case UNIONALL:
             case UNNEST_MAP:
