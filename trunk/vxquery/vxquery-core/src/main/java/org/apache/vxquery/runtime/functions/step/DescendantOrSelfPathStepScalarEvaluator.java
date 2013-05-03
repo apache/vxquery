@@ -54,9 +54,6 @@ public class DescendantOrSelfPathStepScalarEvaluator extends AbstractDescendantP
             seqAbvs.reset();
             seqb.reset(seqAbvs);
 
-            int tag = args[0].getTag();
-            System.err.println("tag = " + tag);
-
             // Check the argument passed in as sequence or node tree.
             if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
                 args[0].getValue(seqp);
@@ -68,9 +65,6 @@ public class DescendantOrSelfPathStepScalarEvaluator extends AbstractDescendantP
                     }
                     tvp.getValue(ntp);
                     processNodeTree(rootTVP);
-
-                    int tag2 = tvp.getTag();
-                    System.err.println("tag2 = " + tag2);
                 }
             } else if (args[0].getTag() == ValueTag.NODE_TREE_TAG) {
                 args[0].getValue(ntp);
