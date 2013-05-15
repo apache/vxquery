@@ -24,6 +24,7 @@ import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubpla
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
+import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
 
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -61,7 +62,11 @@ public class RewriteRuleset {
         normalization.add(new ConsolidateAssignAggregateRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
         normalization.add(new EliminateUnnestAggregateSubplanRule());
+
+        normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+
         normalization.add(new IntroduceTwoStepAggregateRule());
         return normalization;
     }

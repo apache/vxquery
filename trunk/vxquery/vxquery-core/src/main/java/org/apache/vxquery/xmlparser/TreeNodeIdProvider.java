@@ -17,28 +17,38 @@
 package org.apache.vxquery.xmlparser;
 
 public class TreeNodeIdProvider implements ITreeNodeIdProvider {
-    
+
     private final short partitionDataSource;
     private final short dataSouceScanId;
+    private final byte dataSourceBits;
     private short currentId;
-    
-    public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId) {
+
+    public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId, short totalDataSources) {
         this.partitionDataSource = partitionDataSource;
         this.dataSouceScanId = dataSouceScanId;
+        this.dataSourceBits = getBitsNeeded(totalDataSources);
         currentId = 0;
     }
-    
-    // TODO Remove this operator once all calls have been migrated to dataSourceScanId.
+
     public TreeNodeIdProvider(short partition) {
         this.partitionDataSource = partition;
         dataSouceScanId = 0;
+        dataSourceBits = 0;
         currentId = 0;
     }
-    
+
     public int getId() {
         int p = partitionDataSource;
         int dssi = dataSouceScanId;
-        // TODO the first 2 bytes from a combination of data source scan id and currentId.
-        return (p << 16) | currentId++;
+        return (p << 16) | (dssi << (16 - dataSourceBits)) | currentId++;
+    }
+
+    private byte getBitsNeeded(int number) {
+        byte count = 0;
+        while (number > 0) {
+            count++;
+            number = number >> 1;
+        }
+        return count;
     }
 }
