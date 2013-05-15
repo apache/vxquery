@@ -40,14 +40,16 @@ import edu.uci.ics.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperat
 
 public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
-    private int dataSourceId;
+    private short dataSourceId;
+    private short totalDataSources;
     private String collectionName;
 
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, String collectionName,
-            int dataSourceId, RecordDescriptor rDesc) {
+            int dataSourceId, int totalDataSources, RecordDescriptor rDesc) {
         super(spec, 1, 1);
-        this.dataSourceId = dataSourceId;
         this.collectionName = collectionName;
+        this.dataSourceId = (short) dataSourceId;
+        this.totalDataSources = (short) totalDataSources;
         recordDescriptors[0] = rDesc;
     }
 
@@ -62,8 +64,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final FrameTupleAppender appender = new FrameTupleAppender(ctx.getFrameSize());
         final InputSource in = new InputSource();
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
-        final int partitionId = ctx.getTaskAttemptId().getTaskId().getPartition();
-        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partitionId, (short) dataSourceId);
+        final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override

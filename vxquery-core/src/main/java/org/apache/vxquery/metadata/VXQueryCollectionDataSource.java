@@ -33,6 +33,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.properties.StructuralProperti
 public class VXQueryCollectionDataSource implements IDataSource<String> {
     private final int dataSourceId;
     private final String collectionName;
+    private int totalDataSources;
 
     private final Object[] types;
 
@@ -50,6 +51,14 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
                 return vec;
             }
         };
+    }
+
+    public int getTotalDataSources() {
+        return totalDataSources;
+    }
+
+    public void setTotalDataSources(int totalDataSources) {
+        this.totalDataSources = totalDataSources;
     }
 
     public int getDataSourceId() {

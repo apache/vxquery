@@ -57,7 +57,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
         RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
         IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds.getId(),
-                ds.getDataSourceId(), rDesc);
+                ds.getDataSourceId(), ds.getTotalDataSources(), rDesc);
 
         // TODO review if locations needs to be updated for parallel processing.
         String[] locations = new String[1];

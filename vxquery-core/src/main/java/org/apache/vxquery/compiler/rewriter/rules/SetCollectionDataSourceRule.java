@@ -16,22 +16,23 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.types.AnyItemType;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 
-public class IntroduceCollectionRule extends AbstractCollectionRule {
+public class SetCollectionDataSourceRule extends AbstractCollectionRule {
     /**
-     * Find the default query plan created for collection and updated it to use parallelization.
-     * The following is an example of of the operators we are looking with a constant for the collection name.
+     * Find the collection functions and generate the data source objects.
      * Search pattern: unnest <- assign [function-call: collection] <- assign [constant: string]
      */
     @Override
@@ -39,25 +40,16 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
         String collectionName = getCollectionName(opRef);
 
-        if (collectionName != null) {
-            // Build the new operator and update the query plan.
-            VXQueryCollectionDataSource ds = vxqueryContext.getCollectionDataSourceMap(collectionName);
-            if (ds != null) {
-                ds.setTotalDataSources(vxqueryContext.getCollectionDataSourceMapSize());
+        // Build the new collection.
+        if (collectionName != null && vxqueryContext.getCollectionDataSourceMap(collectionName) == null) {
+            int collectionId = vxqueryContext.getCollectionDataSourceMapSize() + 1;
+            List<Object> types = new ArrayList<Object>();
+            types.add(SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
 
-                // Known to be true because of collection name.
-                AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-                UnnestOperator unnest = (UnnestOperator) op;
-                AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
-                AssignOperator assign = (AssignOperator) op2;
-
-                DataSourceScanOperator opNew = new DataSourceScanOperator(unnest.getVariables(), ds);
-                opNew.getInputs().addAll(assign.getInputs());
-                opRef.setValue(opNew);
-                return true;
-            }
+            VXQueryCollectionDataSource ds = new VXQueryCollectionDataSource(collectionId, collectionName,
+                    types.toArray());
+            vxqueryContext.putCollectionDataSourceMap(collectionName, ds);
         }
         return false;
     }
-
 }
