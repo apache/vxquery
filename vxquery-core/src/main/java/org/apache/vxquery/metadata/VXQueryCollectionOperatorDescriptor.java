@@ -78,42 +78,48 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             public void nextFrame(ByteBuffer buffer) throws HyracksDataException {
                 fta.reset(buffer);
                 File collectionDirectory = new File(collectionName);
-                File[] list = collectionDirectory.listFiles();
 
                 // Go through each tuple.
                 for (int t = 0; t < fta.getTupleCount(); ++t) {
-                    // Add a field for the document node to each tuple.
-                    for (int i = 0; i < list.length; ++i) {
-                        // Add the document node to the frame output.
-                        if (list[i].getPath().endsWith(".xml")) {
-                            // First copy all new fields over.
-                            tb.reset();
-                            if (fta.getFieldCount() > 0) {
-                                for (int f = 0; f < fta.getFieldCount(); ++f) {
-                                    tb.addField(fta, t, f);
-                                }
-                            }
+                    addXmlFile(collectionDirectory, t);
+                }
+            }
 
-                            // Now add new field.
-                            abvsFileNode.reset();
-                            try {
-                                FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode, nodeIdProvider);
-                            } catch (Exception e) {
-                                throw new HyracksDataException(e);
-                            }
-                            tb.addField(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
-                                    abvsFileNode.getLength());
-
-                            // Send to the writer.
-                            if (!appender.append(tb.getFieldEndOffsets(), tb.getByteArray(), 0, tb.getSize())) {
-                                FrameUtils.flushFrame(frame, writer);
-                                appender.reset(frame, true);
-                                if (!appender.append(tb.getFieldEndOffsets(), tb.getByteArray(), 0, tb.getSize())) {
-                                    throw new IllegalStateException(
-                                            "Could not write frame (VXQueryCollectionOperatorDescriptor.createPushRuntime).");
-                                }
+            private void addXmlFile(File collectionDirectory, int t) throws HyracksDataException {
+                // Add a field for the document node to each tuple.
+                for (File file : collectionDirectory.listFiles()) {
+                    // Add the document node to the frame output.
+                    if (file.getPath().toLowerCase().endsWith(".xml")) {
+                        // First copy all new fields over.
+                        tb.reset();
+                        if (fta.getFieldCount() > 0) {
+                            for (int f = 0; f < fta.getFieldCount(); ++f) {
+                                tb.addField(fta, t, f);
                             }
                         }
+
+                        // Now add new field.
+                        abvsFileNode.reset();
+                        try {
+                            FunctionHelper.readInDocFromString(file.getPath(), in, abvsFileNode, nodeIdProvider);
+                        } catch (Exception e) {
+                            throw new HyracksDataException(e);
+                        }
+                        tb.addField(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
+                                abvsFileNode.getLength());
+
+                        // Send to the writer.
+                        if (!appender.append(tb.getFieldEndOffsets(), tb.getByteArray(), 0, tb.getSize())) {
+                            FrameUtils.flushFrame(frame, writer);
+                            appender.reset(frame, true);
+                            if (!appender.append(tb.getFieldEndOffsets(), tb.getByteArray(), 0, tb.getSize())) {
+                                throw new IllegalStateException(
+                                        "Could not write frame (VXQueryCollectionOperatorDescriptor.createPushRuntime).");
+                            }
+                        }
+                    } else if (file.isDirectory()) {
+                        // Consider all XML file in sub directories.
+                        addXmlFile(file, t);
                     }
                 }
             }
