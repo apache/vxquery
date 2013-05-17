@@ -86,25 +86,30 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
                 if (!collectionDirectory.exists()) {
                     throw new RuntimeException("The collection directory (" + collectionName + ") does not exist.");
                 }
-                File[] list = collectionDirectory.listFiles();
 
                 try {
                     abvs.reset();
                     sb.reset(abvs);
-                    for (int i = 0; i < list.length; ++i) {
-                        // Add the document node to the sequence.
-                        if (list[i].getPath().endsWith(".xml")) {
-                            abvsFileNode.reset();
-                            FunctionHelper.readInDocFromString(list[i].getPath(), in, abvsFileNode, nodeIdProvider);
-                            nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
-                                    abvsFileNode.getLength());
-                            sb.addItem(nodep);
-                        }
-                    }
+                    addXmlFiles(collectionDirectory);
                     sb.finish();
                     result.set(abvs);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
+                }
+            }
+
+            private void addXmlFiles(File collectionDirectory) throws SystemException, IOException {
+                for (File file : collectionDirectory.listFiles()) {
+                    // Add the document node to the sequence.
+                    if (file.getPath().toLowerCase().endsWith(".xml")) {
+                        abvsFileNode.reset();
+                        FunctionHelper.readInDocFromString(file.getPath(), in, abvsFileNode, nodeIdProvider);
+                        nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
+                        sb.addItem(nodep);
+                    } else if (file.isDirectory()) {
+                        // Consider all XML file in sub directories.
+                        addXmlFiles(file);
+                    }
                 }
             }
         };
