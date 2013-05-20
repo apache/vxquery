@@ -89,7 +89,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 // Add a field for the document node to each tuple.
                 for (File file : collectionDirectory.listFiles()) {
                     // Add the document node to the frame output.
-                    if (file.getPath().toLowerCase().endsWith(".xml")) {
+                    if (FunctionHelper.readableXmlFile(file.getPath())) {
                         // First copy all new fields over.
                         tb.reset();
                         if (fta.getFieldCount() > 0) {
