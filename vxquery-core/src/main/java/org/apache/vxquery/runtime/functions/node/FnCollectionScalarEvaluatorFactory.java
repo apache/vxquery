@@ -101,7 +101,7 @@ public class FnCollectionScalarEvaluatorFactory extends AbstractTaggedValueArgum
             private void addXmlFiles(File collectionDirectory) throws SystemException, IOException {
                 for (File file : collectionDirectory.listFiles()) {
                     // Add the document node to the sequence.
-                    if (file.getPath().toLowerCase().endsWith(".xml")) {
+                    if (FunctionHelper.readableXmlFile(file.getPath())) {
                         abvsFileNode.reset();
                         FunctionHelper.readInDocFromString(file.getPath(), in, abvsFileNode, nodeIdProvider);
                         nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());

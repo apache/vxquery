@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
@@ -1233,6 +1234,18 @@ public class FunctionHelper {
         System.err.println(" printUTF8String END");
     }
 
+    /**
+     * Checks the path has an acceptable file name extension to read in.
+     * @param path
+     * @return
+     */
+    public static boolean readableXmlFile(String path) {
+        if (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".xml.gz")) {
+            return true;
+        }
+        return false;
+    }
+
     public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
             DataInputStream di, ArrayBackedValueStorage abvs, ITreeNodeIdProvider treeNodeIdProvider)
             throws SystemException {
@@ -1247,7 +1260,11 @@ public class FunctionHelper {
             throw new RuntimeException("The file (" + fName + ") does not exist.");
         }
         try {
-            in.setCharacterStream(new InputStreamReader(new FileInputStream(fName)));
+            if (fName.toLowerCase().endsWith(".xml.gz")) {
+                in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(fName))));
+            } else {
+                in.setCharacterStream(new InputStreamReader(new FileInputStream(fName)));
+            }
             XMLParser.parseInputSource(in, abvs, false, treeNodeIdProvider);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
