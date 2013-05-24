@@ -45,7 +45,7 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 
-public class ConsolidateAssignAggregateRule implements IAlgebraicRewriteRule {
+public class ConsolidateAssignAggregateRule extends AbstractVXQueryAggregateRule {
     /**
      * Find where an assign for a aggregate function is used before aggregate operator for a sequence.
      * Search pattern 1: assign [function-call: count(function-call: treat($$))]
@@ -70,73 +70,17 @@ public class ConsolidateAssignAggregateRule implements IAlgebraicRewriteRule {
             return false;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier())) {
-            aggregateInfo = BuiltinFunctions.FN_COUNT_1;
-
-            // Argument for count is "item()*"
-            // If the first argument is treat, allow it to pass.
-            ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
-            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return false;
-            }
-            AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
-            if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.TREAT.getFunctionIdentifier())) {
-                return false;
-            }
-
-            // find variable id for argument to count.
-            Mutable<ILogicalExpression> mutableLogicalExpression3 = functionCall2.getArguments().get(0);
-            ILogicalExpression logicalExpression3 = (ILogicalExpression) mutableLogicalExpression3.getValue();
-            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
-                return false;
-            }
-            mutableVariableExpresion = mutableLogicalExpression3;
-            finalFunctionCall = functionCall2;
-        } else {
-            if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_AVG_1.getFunctionIdentifier())) {
-                aggregateInfo = BuiltinFunctions.FN_AVG_1;
-            } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier())) {
-                aggregateInfo = BuiltinFunctions.FN_MIN_1;
-            } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier())) {
-                aggregateInfo = BuiltinFunctions.FN_MAX_1;
-            } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier())) {
-                aggregateInfo = BuiltinFunctions.FN_SUM_1;
-            } else {
-                return false;
-            }
-
-            // Argument for these aggregate is "xs:anyAtomicType*"
-            // If the first argument is promote followed by data, allow it to pass.
-            ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
-            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return false;
-            }
-            AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
-            if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.PROMOTE.getFunctionIdentifier())) {
-                return false;
-            }
-
-            // If the first argument is promote followed by data, allow it to pass.
-            ILogicalExpression logicalExpression3 = (ILogicalExpression) functionCall2.getArguments().get(0).getValue();
-            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return false;
-            }
-            AbstractFunctionCallExpression functionCall3 = (AbstractFunctionCallExpression) logicalExpression3;
-            if (!functionCall3.getFunctionIdentifier().equals(BuiltinFunctions.FN_DATA_1.getFunctionIdentifier())) {
-                return false;
-            }
-
-            // find variable id for argument to the aggregate function.
-            Mutable<ILogicalExpression> mutableLogicalExpression4 = functionCall3.getArguments().get(0);
-            ILogicalExpression logicalExpression4 = (ILogicalExpression) mutableLogicalExpression4.getValue();
-            if (logicalExpression4.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
-                return false;
-            }
-            mutableVariableExpresion = mutableLogicalExpression4;
-            finalFunctionCall = functionCall3;
+        aggregateInfo = getAggregateFunction(functionCall);
+        if (aggregateInfo == null) {
+            return false;
         }
-
+        finalFunctionCall = getAggregateLastFunctionCall(aggregateInfo, functionCall);
+        if (finalFunctionCall == null) {
+            return false;
+        }
+        
         // Variable details.
+        mutableVariableExpresion = finalFunctionCall.getArguments().get(0);
         VariableReferenceExpression variableReference = (VariableReferenceExpression) mutableVariableExpresion
                 .getValue();
         int variableId = variableReference.getVariableReference().getId();
