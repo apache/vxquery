@@ -80,8 +80,18 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
             return false;
         }
 
+        // Use the left over functions from iterator and sequence.
+        Mutable<ILogicalExpression> assignExpression = functionCall2.getArguments().get(0);
+        ILogicalExpression lastUnnestExpression = findLastFunctionExpression(logicalExpression);
+        if (lastUnnestExpression != null) {
+            // Additional functions are included in the iterate function that need to be included.
+            AbstractFunctionCallExpression lastUnnestFunction = (AbstractFunctionCallExpression) lastUnnestExpression;
+            lastUnnestFunction.getArguments().set(0, functionCall2.getArguments().get(0));
+            assignExpression = functionCall.getArguments().get(0);
+        }
+
         // Replace search string with assign.
-        AssignOperator aOp = new AssignOperator(unnest.getVariable(), functionCall2.getArguments().get(0));
+        AssignOperator aOp = new AssignOperator(unnest.getVariable(), assignExpression);
         for (Mutable<ILogicalOperator> input : subplanOp.getInputs()) {
             aOp.getInputs().add(input);
         }
@@ -92,6 +102,18 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         subplanEnd.getInputs().get(0).setValue(subplan.getInputs().get(0).getValue());
 
         return true;
+    }
+
+    private ILogicalExpression findLastFunctionExpression(ILogicalExpression expression) {
+        if (expression.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) expression;
+            ILogicalExpression nextExpression = functionCall.getArguments().get(0).getValue();
+            if (nextExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return expression;
+            }
+            return findLastFunctionExpression(nextExpression);
+        }
+        return null;
     }
 
     private AbstractLogicalOperator findLastSubplanOperator(AbstractLogicalOperator op) {
