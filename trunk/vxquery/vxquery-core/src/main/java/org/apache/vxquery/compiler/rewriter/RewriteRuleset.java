@@ -20,11 +20,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignSortDistinctNodesToOperatorsRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSinglePathsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
+import org.apache.vxquery.compiler.rewriter.rules.InlineReferenceVariablePolicy;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
+import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
+import org.apache.vxquery.compiler.rewriter.rules.temporary.InlineVariablesRule;
 
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -39,7 +45,6 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.ExtractGbyExpressionsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.FactorRedundantGroupAndDecorVarsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InferTypesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
@@ -57,11 +62,25 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
+        normalization.add(new SetVariableIdContextRule());
+
         normalization.add(new RemoveUnusedSortDistinctNodesRule());
-        normalization.add(new InlineVariablesRule());
-        normalization.add(new ConsolidateAssignAggregateRule());
+        normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        // TODO Fix the group by operator before putting back in the rule set.
+//        normalization.add(new ConvertAssignSortDistinctNodesToOperatorsRule());
+
+        normalization.add(new ConsolidateAssignAggregateRule());
+        normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        
+        normalization.add(new ConvertAssignToAggregateRule());
+
         normalization.add(new EliminateUnnestAggregateSubplanRule());
+        normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        
+        normalization.add(new EliminateSubplanForSinglePathsRule());
 
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());

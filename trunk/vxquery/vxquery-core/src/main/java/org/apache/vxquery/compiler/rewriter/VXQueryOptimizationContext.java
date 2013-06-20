@@ -38,13 +38,12 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
 
     private final Map<String, VXQueryCollectionDataSource> dataSourceScanMap = new HashMap<String, VXQueryCollectionDataSource>();
 
-    public VXQueryOptimizationContext(int varCounter, int frameSize,
-            IExpressionEvalSizeComputer expressionEvalSizeComputer,
+    public VXQueryOptimizationContext(int varCounter, IExpressionEvalSizeComputer expressionEvalSizeComputer,
             IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
-            IExpressionTypeComputer expressionTypeComputer, INullableTypeComputer nullableTypeComputer,
-            PhysicalOptimizationConfig physicalOptimizationConfig) {
-        super(varCounter, frameSize, expressionEvalSizeComputer, mergeAggregationExpressionFactory,
-                expressionTypeComputer, nullableTypeComputer, physicalOptimizationConfig);
+            IExpressionTypeComputer expressionTypeComputer,
+            INullableTypeComputer nullableTypeComputer, PhysicalOptimizationConfig physicalOptimizationConfig) {
+        super(varCounter, expressionEvalSizeComputer, mergeAggregationExpressionFactory, expressionTypeComputer,
+                nullableTypeComputer, physicalOptimizationConfig);
     }
 
     public VXQueryCollectionDataSource getCollectionDataSourceMap(String collectionName) {
@@ -54,11 +53,11 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
             return null;
         }
     }
-    
+
     public int getCollectionDataSourceMapSize() {
         return dataSourceScanMap.size();
     }
-    
+
     public void putCollectionDataSourceMap(String collectionName, VXQueryCollectionDataSource ds) {
         this.dataSourceScanMap.put(collectionName, ds);
     }

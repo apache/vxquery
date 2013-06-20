@@ -83,6 +83,7 @@ public class TestRunnerFactory {
         ncConfig1.ccPort = 39001;
         ncConfig1.clusterNetIPAddress = "127.0.0.1";
         ncConfig1.dataIPAddress = "127.0.0.1";
+        ncConfig1.datasetIPAddress = "127.0.0.1";
         ncConfig1.nodeId = "nc1";
         nc1 = new NodeControllerService(ncConfig1);
         nc1.start();
@@ -92,12 +93,12 @@ public class TestRunnerFactory {
         ncConfig2.ccPort = 39001;
         ncConfig2.clusterNetIPAddress = "127.0.0.1";
         ncConfig2.dataIPAddress = "127.0.0.1";
+        ncConfig2.datasetIPAddress = "127.0.0.1";
         ncConfig2.nodeId = "nc2";
         nc2 = new NodeControllerService(ncConfig2);
         nc2.start();
 
         hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
-        hcc.createApplication("test", null);
     }
 
     public void registerReporter(ResultReporter reporter) {
@@ -129,7 +130,7 @@ public class TestRunnerFactory {
                         spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
                         spec.setMaxReattempts(0);
-                        JobId jobId = hcc.startJob("test", spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
+                        JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
                         hcc.waitForCompletion(jobId);
                         res.result = FileUtils.readFileToString(tempFile, "UTF-8").trim();
                     } catch (HyracksException e) {

@@ -86,12 +86,12 @@ public class XMLQueryCompiler {
         HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
                 new IOptimizationContextFactory() {
                     @Override
-                    public IOptimizationContext createOptimizationContext(int varCounter, int frameSize,
+                    public IOptimizationContext createOptimizationContext(int varCounter,
                             IExpressionEvalSizeComputer expressionEvalSizeComputer,
                             IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
                             IExpressionTypeComputer expressionTypeComputer, INullableTypeComputer nullableTypeComputer,
                             PhysicalOptimizationConfig physicalOptimizationConfig) {
-                        return new VXQueryOptimizationContext(varCounter, frameSize, expressionEvalSizeComputer,
+                        return new VXQueryOptimizationContext(varCounter, expressionEvalSizeComputer,
                                 mergeAggregationExpressionFactory, expressionTypeComputer, nullableTypeComputer,
                                 physicalOptimizationConfig);
                     }
@@ -156,7 +156,7 @@ public class XMLQueryCompiler {
         listener.notifyOptimizedResult(module);
         JobSpecification jobSpec;
         try {
-            jobSpec = compiler.createJob(null);
+            jobSpec = compiler.createJob(null, null);
         } catch (AlgebricksException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }

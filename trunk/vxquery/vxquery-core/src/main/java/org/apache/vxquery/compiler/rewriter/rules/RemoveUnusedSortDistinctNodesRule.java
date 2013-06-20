@@ -332,7 +332,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
             // The following operators' analysis has not yet been implemented.
             case CLUSTER:
-            case DIE:
             case DISTINCT:
             case EXTENSION_OPERATOR:
             case INDEX_INSERT_DELETE:
@@ -441,7 +440,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
             // The following operators' analysis has not yet been implemented.
             case CLUSTER:
-            case DIE:
             case DISTINCT:
             case EXTENSION_OPERATOR:
             case GROUP:
