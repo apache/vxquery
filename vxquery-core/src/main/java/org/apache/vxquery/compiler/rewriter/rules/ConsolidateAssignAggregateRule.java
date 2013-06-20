@@ -131,7 +131,8 @@ public class ConsolidateAssignAggregateRule extends AbstractVXQueryAggregateRule
         trueAssignOp.getInputs().add(new MutableObject<ILogicalOperator>(aggInput));
 
         // Set partitioning variable.
-        aggregate.setPartitioningVariable(trueVar);
+        // TODO Review why this is not valid in 0.2.6
+//        aggregate.setPartitioningVariable(trueVar);
 
         return true;
     }
