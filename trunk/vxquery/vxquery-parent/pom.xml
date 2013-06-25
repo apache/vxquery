@@ -231,7 +231,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <hyracks.version>0.2.6</hyracks.version>
+    <hyracks.version>0.2.7-SNAPSHOT</hyracks.version>
   </properties> 
  
 </project>
