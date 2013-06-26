@@ -52,9 +52,9 @@ Eclipse Setup
     development.
 
 ----------------------------------------
-$ svn checkout https://hyracks.googlecode.com/svn/branches/fullstack_staging hyracks_for_vxquery
-(Accept the certificate information for *.googlecode.com.)
+$ git clone https://code.google.com/p/hyracks/ hyracks_for_vxquery
 $ cd hyracks_for_vxquery
+$ git checkout -b ecarm002/vxquery_compatibility origin/ecarm002/vxquery_compatibility
 $ mvn install -DskipTests
 $ cd ..
 ----------------------------------------
