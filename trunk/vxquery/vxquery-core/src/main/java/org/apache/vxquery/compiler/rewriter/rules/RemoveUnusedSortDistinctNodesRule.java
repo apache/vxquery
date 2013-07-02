@@ -42,6 +42,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractOpe
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.OrderOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -386,6 +387,20 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 documentOrderVariables.put(variableId, documentOrder);
                 uniqueNodesVariables.put(variableId, uniqueNodes);
                 break;
+            case ORDER:
+                // Get order variable id that is altered.
+                OrderOperator order = (OrderOperator) op;
+                ILogicalExpression orderLogicalExpression = order.getOrderExpressions().get(0).second.getValue();
+                if (orderLogicalExpression.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+                    throw new RuntimeException("Operator (" + op.getOperatorTag()
+                            + ") has received unexpected input in rewrite rule.");
+                }
+                VariableReferenceExpression variableExpression = (VariableReferenceExpression) orderLogicalExpression;
+                variableId = variableExpression.getVariableReference().getId();
+
+                // Remove document order from variable used in order operator.
+                documentOrderVariables.put(variableId, DocumentOrder.NO);
+                break;
             case SUBPLAN:
                 // Find the last operator to set a variable and call this function again.
                 SubplanOperator subplan = (SubplanOperator) op;
@@ -448,7 +463,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case INSERT_DELETE:
             case LEFTOUTERJOIN:
             case LIMIT:
-            case ORDER:
             case PARTITIONINGSPLIT:
             case PROJECT:
             case REPLICATE:
