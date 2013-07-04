@@ -93,6 +93,13 @@ $ cd ../..
   
   Realize you may need to update the address for your system. More details can be found at 
   {{{http://www.ibm.com/developerworks/opensource/library/os-eclipse-javadebug/index.html}IBM}}
+  
+  In eclipse create a debug configuration for VXQuery using Java remote application settings. The default
+  setting will most likely work out of the box. To show all the source code for debugging, add all the 
+  source code for the eclipse workspace.
+
+  To begin the debug process, execute the command below. In eclipse select the new debug configuration
+  to start the eclipse debugger.
 
 ----------------------------------------
 JAVA_OPTS="-Xmx1024m -Xdebug -Xrunjdwp:transport=dt_socket,address=127.0.0.1:8000,server=y,suspend=y" sh vxquery-cli/target/appassembler/bin/vxq ../test.xq -showoet
