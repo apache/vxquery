@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.compiler.rewriter.rules.temporary.InlineVariablesRule;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
@@ -29,6 +28,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 
 /**
  * Where assign operators only assign a new variable ID for a reference expression,

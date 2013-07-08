@@ -30,7 +30,6 @@ import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
-import org.apache.vxquery.compiler.rewriter.rules.temporary.InlineVariablesRule;
 
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -45,6 +44,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.ExtractGbyExpressionsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.FactorRedundantGroupAndDecorVarsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InferTypesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
