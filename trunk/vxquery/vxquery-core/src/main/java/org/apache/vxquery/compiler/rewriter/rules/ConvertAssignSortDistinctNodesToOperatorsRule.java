@@ -37,11 +37,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCal
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.UnnestingFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DistinctOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.GroupByOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.OrderOperator;
@@ -52,32 +50,8 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraicRewriteRule {
 
-    /**
-     * Set the default context for the variable id in the optimization context.
-     */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
-        int variableId = 0;
-
-        // TODO Move the setVarCounter to the compiler after the translator has run.
-        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-        switch (op.getOperatorTag()) {
-            case ASSIGN:
-            case AGGREGATE:
-                AbstractAssignOperator assign = (AbstractAssignOperator) op;
-                variableId = assign.getVariables().get(0).getId();
-                break;
-            case UNNEST:
-                UnnestOperator unnest = (UnnestOperator) op;
-                variableId = unnest.getVariable().getId();
-                break;
-            default:
-                return false;
-        }
-
-        if (context.getVarCounter() <= variableId) {
-            context.setVarCounter(variableId + 1);
-        }
         return false;
     }
 
@@ -116,7 +90,7 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         // Nested tuple source.
         Mutable<ILogicalOperator> inputOperator = getInputOperator(assign.getInputs().get(0));
         NestedTupleSourceOperator ntsOperator = new NestedTupleSourceOperator(inputOperator);
-        Mutable<ILogicalOperator> ntsRef = new MutableObject<ILogicalOperator>(ntsOperator);
+        nextOperatorRef = new MutableObject<ILogicalOperator>(ntsOperator);
 
         // Get variable that is being used for sort and distinct operators.
         VariableReferenceExpression inputVariableRef = (VariableReferenceExpression) functionCall.getArguments().get(0)
@@ -126,7 +100,7 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         // Unnest.
         LogicalVariable unnestVariable = context.newVar();
         UnnestOperator unnestOperator = getUnnestOperator(inputVariable, unnestVariable);
-        unnestOperator.getInputs().add(ntsRef);
+        unnestOperator.getInputs().add(nextOperatorRef);
         nextOperatorRef = new MutableObject<ILogicalOperator>(unnestOperator);
 
         // Assign Node ID key.
@@ -145,28 +119,23 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
                 BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())
                 || functionCall.getFunctionIdentifier().equals(
                         BuiltinOperators.DISTINCT_NODES_OR_ATOMICS.getFunctionIdentifier())) {
-            // TODO switch to use group by instead of distinct Operator.
-            DistinctOperator distinctOperator = getDistinctOperator(nodeIdKeyVariableRef);
-            distinctOperator.getInputs().add(nextOperatorRef);
-            nextOperatorRef = new MutableObject<ILogicalOperator>(distinctOperator);
-
-//            LogicalVariable groupByKeyVariable = context.newVar();
-//            ILogicalExpression nodeIdKeyVre = new VariableReferenceExpression(nodeIdKeyVariable);
-//            GroupByOperator groupByOperator = getGroupByOperator(nodeIdKeyVre, groupByKeyVariable);
-//            distinctOperator.getInputs().add(nextOperatorRef);
-//            nextOperatorRef = new MutableObject<ILogicalOperator>(groupByOperator);
+            LogicalVariable groupByVariable = context.newVar();
+            ILogicalExpression nodeIdKeyVre = new VariableReferenceExpression(nodeIdKeyVariable);
+            GroupByOperator groupByOperator = getGroupByOperator(groupByVariable, nodeIdKeyVre);
+            groupByOperator.getInputs().add(nextOperatorRef);
+            nextOperatorRef = new MutableObject<ILogicalOperator>(groupByOperator);
         }
 
-        // Order.
-        if (functionCall.getFunctionIdentifier().equals(
-                BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())
-                || functionCall.getFunctionIdentifier().equals(
-                        BuiltinOperators.SORT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
-            OrderOperator orderOperator = getOrderOperator(nodeIdKeyVariableRef);
-            orderOperator.getInputs().add(nextOperatorRef);
-            nextOperatorRef = new MutableObject<ILogicalOperator>(orderOperator);
-        }
-
+//        // Order.
+//        if (functionCall.getFunctionIdentifier().equals(
+//                BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())
+//                || functionCall.getFunctionIdentifier().equals(
+//                        BuiltinOperators.SORT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
+//            OrderOperator orderOperator = getOrderOperator(nodeIdKeyVariableRef);
+//            orderOperator.getInputs().add(nextOperatorRef);
+//            nextOperatorRef = new MutableObject<ILogicalOperator>(orderOperator);
+//        }
+//
         // Aggregate.
         LogicalVariable aggregateVariable = assign.getVariables().get(0);
         AggregateOperator aggregateOperator = getAggregateOperator(unnestVariable, aggregateVariable);
@@ -191,8 +160,8 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         Mutable<ILogicalExpression> unnestVariableRef = new MutableObject<ILogicalExpression>(
                 new VariableReferenceExpression(unnestVariable));
         aggregateSequenceArgs.add(unnestVariableRef);
+        
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
-
         ILogicalExpression aggregateExp = new AggregateFunctionCallExpression(BuiltinOperators.SEQUENCE, false,
                 aggregateSequenceArgs);
         Mutable<ILogicalExpression> aggregateExpRef = new MutableObject<ILogicalExpression>(aggregateExp);
@@ -210,13 +179,7 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         return new AssignOperator(outputVariable, nodeTreeIdExpression);
     }
 
-    private DistinctOperator getDistinctOperator(Mutable<ILogicalExpression> variableRef) {
-        List<Mutable<ILogicalExpression>> distinctArgs = new ArrayList<Mutable<ILogicalExpression>>();
-        distinctArgs.add(variableRef);
-        return new DistinctOperator(distinctArgs);
-    }
-
-    private GroupByOperator getGroupByOperator(ILogicalExpression variableRef, LogicalVariable outputVariable) {
+    private GroupByOperator getGroupByOperator(LogicalVariable outputVariable, ILogicalExpression variableRef) {
         GroupByOperator op = new GroupByOperator();
         op.addGbyExpression(outputVariable, variableRef);
         return op;
@@ -239,7 +202,9 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
     private OrderOperator getOrderOperator(Mutable<ILogicalExpression> variableRef) {
         List<Pair<IOrder, Mutable<ILogicalExpression>>> orderArgs = new ArrayList<Pair<IOrder, Mutable<ILogicalExpression>>>();
         orderArgs.add(new Pair<IOrder, Mutable<ILogicalExpression>>(OrderOperator.ASC_ORDER, variableRef));
-        return new OrderOperator(orderArgs);
+        OrderOperator oo = new OrderOperator(orderArgs);
+//        oo.setExecutionMode(AbstractLogicalOperator.ExecutionMode.LOCAL);
+        return oo;
     }
 
     private UnnestOperator getUnnestOperator(LogicalVariable inputVariable, LogicalVariable unnestVariable) {

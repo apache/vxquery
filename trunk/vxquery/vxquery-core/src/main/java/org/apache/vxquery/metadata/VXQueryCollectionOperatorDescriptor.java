@@ -105,6 +105,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         } catch (Exception e) {
                             throw new HyracksDataException(e);
                         }
+//                        System.err.println(file.getPath());
+//                        System.err.println(abvsFileNode.getLength() - abvsFileNode.getStartOffset());
                         tb.addField(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
                                 abvsFileNode.getLength());
 
