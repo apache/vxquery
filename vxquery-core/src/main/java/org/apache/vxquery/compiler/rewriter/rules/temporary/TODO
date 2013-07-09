@@ -1,1 +1,0 @@
-Update the rewriter ruleset to use the new hyracks InlineVariableRule and remove this folder and all files after hyracks issue #99 has been resolved.
