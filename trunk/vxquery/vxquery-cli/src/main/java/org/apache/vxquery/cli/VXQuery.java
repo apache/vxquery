@@ -30,6 +30,7 @@ import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
@@ -85,86 +86,95 @@ public class VXQuery {
     }
 
     private void execute() throws Exception {
-        if (!opts.compileOnly) {
-            startLocalHyracks();
-        }
-        try {
-            for (String query : opts.arguments) {
-                String qStr = slurp(query);
-                if (opts.showQuery) {
-                    System.err.println(qStr);
-                }
-                XQueryCompilationListener listener = new XQueryCompilationListener() {
-                    @Override
-                    public void notifyCodegenResult(Module module) {
-                        if (opts.showRP) {
-                            JobSpecification jobSpec = module.getHyracksJobSpecification();
-                            System.err.println(jobSpec.toString());
-                        }
-                    }
-
-                    @Override
-                    public void notifyTranslationResult(Module module) {
-                        if (opts.showTET) {
-                            try {
-                                LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
-                                StringBuilder buffer = new StringBuilder();
-                                PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
-                                System.err.println(buffer.toString());
-                            } catch (AlgebricksException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void notifyTypecheckResult(Module module) {
-                    }
-
-                    @Override
-                    public void notifyOptimizedResult(Module module) {
-                        if (opts.showOET) {
-                            try {
-                                LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
-                                StringBuilder buffer = new StringBuilder();
-                                PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
-                                System.err.println(buffer.toString());
-                            } catch (AlgebricksException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void notifyParseResult(ModuleNode moduleNode) {
-                        if (opts.showAST) {
-                            System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
-                        }
-                    }
-                };
-                File result = createTempFile("test");
-                XMLQueryCompiler compiler = new XMLQueryCompiler(listener);
-                CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
-                        RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
-                        result.getAbsolutePath()) });
-                compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
-                if (opts.compileOnly) {
-                    continue;
-                }
-
-                Module module = compiler.getModule();
-                JobSpecification js = module.getHyracksJobSpecification();
-
-                DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
-                js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
-
-                for (int i = 0; i < opts.repeatExec; ++i) {
-                    runInProcess(js, result);
+        if (opts.clientNetIpAddress != null) {
+            hcc = new HyracksConnection(opts.clientNetIpAddress, opts.clientNetPort);
+            runQueries();
+        } else {
+            if (!opts.compileOnly) {
+                startLocalHyracks();
+            }
+            try {
+                runQueries();
+            } finally {
+                if (!opts.compileOnly) {
+                    stopLocalHyracks();
                 }
             }
-        } finally {
-            if (!opts.compileOnly) {
-                stopLocalHyracks();
+        }
+    }
+
+    private void runQueries() throws IOException, SystemException, Exception {
+        for (String query : opts.arguments) {
+            String qStr = slurp(query);
+            if (opts.showQuery) {
+                System.err.println(qStr);
+            }
+            XQueryCompilationListener listener = new XQueryCompilationListener() {
+                @Override
+                public void notifyCodegenResult(Module module) {
+                    if (opts.showRP) {
+                        JobSpecification jobSpec = module.getHyracksJobSpecification();
+                        System.err.println(jobSpec.toString());
+                    }
+                }
+
+                @Override
+                public void notifyTranslationResult(Module module) {
+                    if (opts.showTET) {
+                        try {
+                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
+                            StringBuilder buffer = new StringBuilder();
+                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
+                            System.err.println(buffer.toString());
+                        } catch (AlgebricksException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void notifyTypecheckResult(Module module) {
+                }
+
+                @Override
+                public void notifyOptimizedResult(Module module) {
+                    if (opts.showOET) {
+                        try {
+                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
+                            StringBuilder buffer = new StringBuilder();
+                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
+                            System.err.println(buffer.toString());
+                        } catch (AlgebricksException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void notifyParseResult(ModuleNode moduleNode) {
+                    if (opts.showAST) {
+                        System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
+                    }
+                }
+            };
+            File result = createTempFile("test");
+            XMLQueryCompiler compiler = new XMLQueryCompiler(listener);
+            CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
+                    RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
+                            result.getAbsolutePath()) });
+            compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
+            if (opts.compileOnly) {
+                continue;
+            }
+
+            Module module = compiler.getModule();
+            JobSpecification js = module.getHyracksJobSpecification();
+
+            DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
+            js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
+
+            for (int i = 0; i < opts.repeatExec; ++i) {
+                runInProcess(js, result);
             }
         }
     }
@@ -241,6 +251,12 @@ public class VXQuery {
     }
 
     private static class CmdLineOptions {
+        @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController")
+        public String clientNetIpAddress = null;
+
+        @Option(name = "-client-net-port", usage = "Port of the ClusterController (default 1098)")
+        public int clientNetPort = 1098;
+
         @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;
 

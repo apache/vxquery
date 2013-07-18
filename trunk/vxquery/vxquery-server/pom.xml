@@ -18,67 +18,87 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.vxquery</groupId>
-  <artifactId>apache-vxquery</artifactId>
-  <packaging>pom</packaging>
+  <artifactId>apache-vxquery-server</artifactId>
+  <packaging>jar</packaging>
   <version>0.1-incubating-SNAPSHOT</version>
-  <name>VXQuery</name>
-  <description>A Versatile XQuery Processor</description>
-  <url>http://incubator.apache.org/vxquery/</url>
+  <name>VXQuery Server</name>
+  <description>Apache VXQuery Server</description>
 
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
     <version>0.1-incubating-SNAPSHOT</version>
-    <relativePath>vxquery-parent</relativePath>
+    <relativePath>../vxquery-parent</relativePath>
   </parent>
 
   <distributionManagement>
     <site>
       <id>vxquery.website</id>
       <name>VXQuery Website</name>
-      <url>file:../../site/</url>
+      <url>file:../../site/vxquery-server/</url>
     </site>
   </distributionManagement>
 
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>appassembler-maven-plugin</artifactId>
+        <version>1.1.1</version>
         <executions>
           <execution>
-            <id>generate-site</id>
-            <phase>pre-site</phase>
             <configuration>
-              <target>
-                  <ant antfile="build-site.xml" target="build">
-                      <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
-                  </ant>
-              </target>
+              <programs>
+                <program>
+                  <mainClass>edu.uci.ics.hyracks.control.cc.CCDriver</mainClass>
+                  <name>vxquerycc</name>
+                </program>
+                <program>
+                  <mainClass>edu.uci.ics.hyracks.control.nc.NCDriver</mainClass>
+                  <name>vxquerync</name>
+                </program>
+              </programs>
+              <repositoryLayout>flat</repositoryLayout>
+              <repositoryName>lib</repositoryName>
             </configuration>
+            <phase>package</phase>
             <goals>
-              <goal>run</goal>
+              <goal>assemble</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/source.xml</descriptor>
-          </descriptors>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.4</version>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.0</version>
       </plugin>
     </plugins>
   </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.vxquery</groupId>
+      <artifactId>apache-vxquery-core</artifactId>
+      <version>0.1-incubating-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-cc</artifactId>
+      <version>${hyracks.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-nc</artifactId>
+      <version>${hyracks.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 
   <reporting>
     <plugins>
@@ -90,11 +110,7 @@
           <reportSet>
             <reports>
               <report>index</report>
-              <report>license</report>
-              <report>project-team</report>
-              <report>scm</report>
-              <report>issue-tracking</report>
-              <report>mailing-list</report>
+              <report>dependencies</report>
               <report>plugins</report>
             </reports>
           </reportSet>
@@ -103,22 +119,6 @@
             <linkOnly>true</linkOnly>
         </configuration>            
       </plugin>
-      <!--
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>0.7</version>
-      </plugin>
-      -->
     </plugins>
   </reporting>
-
-  <modules>
-    <module>vxquery-parent</module>
-    <module>vxquery-core</module>
-    <module>vxquery-xtest</module>
-    <module>vxquery-server</module>
-    <module>vxquery-cli</module>
-  </modules>
- 
 </project>
