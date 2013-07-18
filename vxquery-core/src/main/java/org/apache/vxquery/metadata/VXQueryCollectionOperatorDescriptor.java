@@ -55,7 +55,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 
     @Override
     public IOperatorNodePushable createPushRuntime(IHyracksTaskContext ctx,
-            IRecordDescriptorProvider recordDescProvider, int partition, int nPartitions) {
+            IRecordDescriptorProvider recordDescProvider, int partition, int nPartitions) throws HyracksDataException {
         final FrameTupleAccessor fta = new FrameTupleAccessor(ctx.getFrameSize(),
                 recordDescProvider.getInputRecordDescriptor(getActivityId(), 0));
         final ArrayTupleBuilder tb = new ArrayTupleBuilder(recordDescProvider.getOutputRecordDescriptor(
