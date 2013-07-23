@@ -157,11 +157,10 @@ public class VXQuery {
                     }
                 }
             };
-            File result = createTempFile("test");
+            FileSplit[] fileSplits = getFileSplits(opts.outfileSplits);
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener);
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
-                    RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
-                            result.getAbsolutePath()) });
+                    RootStaticContextImpl.INSTANCE), fileSplits);
             compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
             if (opts.compileOnly) {
                 continue;
@@ -174,15 +173,41 @@ public class VXQuery {
             js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
             for (int i = 0; i < opts.repeatExec; ++i) {
-                runInProcess(js, result);
+                runJob(js, fileSplits);
             }
         }
     }
+    
+    private FileSplit[] getFileSplits(String arg) throws IOException {
+        if (arg == null) {
+            File result = createTempFile("test");
+            return new FileSplit[] {
+                new FileSplit("nc1", result.getAbsolutePath())
+            };
+        } else {
+            String[] fileIds = arg.split(",");
+            FileSplit[] splits = new FileSplit[fileIds.length];
+            for (int i = 0; i < fileIds.length; ++i) {
+                String[] components = fileIds[i].split(":");
+                System.err.println(components);
+                splits[i] = new FileSplit(components[0], components[1]);
+            }
+            return splits;
+        }
+    }
 
-    private void runInProcess(JobSpecification spec, File result) throws Exception {
+    private void runJob(JobSpecification spec, FileSplit[] fileSplits) throws Exception {
         JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
         hcc.waitForCompletion(jobId);
-        dumpOutputFiles(result);
+        if (opts.outfileSplits == null) {
+            File result = fileSplits[0].getLocalFile().getFile();
+            dumpOutputFiles(result);
+        } else {
+            System.err.println("Results in:");
+            for (FileSplit fs : fileSplits) {
+                System.out.println(fs.getNodeName() + ":" + fs.getLocalFile().toString());
+            }
+        }
     }
 
     private void dumpOutputFiles(File f) throws IOException {
@@ -256,6 +281,9 @@ public class VXQuery {
 
         @Option(name = "-client-net-port", usage = "Port of the ClusterController (default 1098)")
         public int clientNetPort = 1098;
+
+        @Option(name = "-outfile-splits", usage = "Output file splits (e.g. \"nc1:/tmp/foo,nc2:/tmp/bar\"")
+        public String outfileSplits;
 
         @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;
