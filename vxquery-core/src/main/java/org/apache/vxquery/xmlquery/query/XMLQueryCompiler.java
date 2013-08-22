@@ -44,6 +44,7 @@ import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
 import edu.uci.ics.hyracks.algebricks.compiler.api.HeuristicCompilerFactoryBuilder;
 import edu.uci.ics.hyracks.algebricks.compiler.api.ICompiler;
 import edu.uci.ics.hyracks.algebricks.compiler.api.ICompilerFactory;
+import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.PrioritizedRuleController;
 import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialFixpointRuleController;
 import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialOnceRuleController;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -80,6 +81,8 @@ public class XMLQueryCompiler {
     private Module module;
 
     private ICompiler compiler;
+    
+    private int frameSize = 65536;
 
     public XMLQueryCompiler(XQueryCompilationListener listener) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
@@ -96,6 +99,7 @@ public class XMLQueryCompiler {
                                 physicalOptimizationConfig);
                     }
                 });
+        builder.getPhysicalOptimizationConfig().setFrameSize(frameSize);
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {
@@ -157,6 +161,7 @@ public class XMLQueryCompiler {
         JobSpecification jobSpec;
         try {
             jobSpec = compiler.createJob(null, null);
+            jobSpec.setFrameSize(frameSize);
         } catch (AlgebricksException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
@@ -177,7 +182,8 @@ public class XMLQueryCompiler {
         SequentialFixpointRuleController seqCtrlNoDfs = new SequentialFixpointRuleController(false);
         SequentialFixpointRuleController seqCtrlFullDfs = new SequentialFixpointRuleController(true);
         SequentialOnceRuleController seqOnceCtrl = new SequentialOnceRuleController(true);
-        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlNoDfs,
+        PrioritizedRuleController priorityCtrl = new PrioritizedRuleController();
+        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
                 RewriteRuleset.buildXQueryNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqOnceCtrl,
                 RewriteRuleset.buildTypeInferenceRuleCollection()));
