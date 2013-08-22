@@ -167,4 +167,8 @@ public class SequenceTypeMatcher {
     public void setSequenceType(SequenceType sType) {
         this.sequenceType = sType;
     }
+    
+    public String toString() {
+        return "sequenceMatcher[" + this.sequenceType + "]";
+    }
 }
