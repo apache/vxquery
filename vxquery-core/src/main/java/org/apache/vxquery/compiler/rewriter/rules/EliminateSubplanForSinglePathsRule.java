@@ -32,12 +32,12 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule {
     /**
-     * Find where an unnest is followed by a subplan with the root operator of aggregate.
-     * Search pattern: unnest -> subplan -> (aggregate ... )
-     * Replacement pattern: assign -> ...
+     * Find where an subplan that only receives on tuple for input.
+     * Search pattern: subplan ( plan__nested )
+     * Replacement pattern: plan__nested
      */
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         // Do not process empty or nested tuple source.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE
@@ -121,13 +121,13 @@ public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule
                         .getNestedPlans().get(0).getRoots().get(0).getValue();
                 cardinalityVariable = vxqueryContext.getCardinalityOperatorMap(lastOperator);
                 break;
+            case DATASOURCESCAN:
             case UNNEST:
                 cardinalityVariable = Cardinality.MANY;
                 break;
 
             // The following operators do not change the variable.
             case ASSIGN:
-            case DATASOURCESCAN:
             case EMPTYTUPLESOURCE:
             case EXCHANGE:
             case LIMIT:
@@ -163,7 +163,7 @@ public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule
     }
 
     @Override
-    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         return false;
     }
 }
