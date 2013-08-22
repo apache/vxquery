@@ -23,6 +23,7 @@ import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignSortDistinctNodesToOperatorsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSinglePathsRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
 import org.apache.vxquery.compiler.rewriter.rules.InlineReferenceVariablePolicy;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
@@ -64,29 +65,43 @@ public class RewriteRuleset {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
         normalization.add(new SetVariableIdContextRule());
 
+        // Remove unused functions.
         normalization.add(new RemoveUnusedSortDistinctNodesRule());
         normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
-        // TODO Fix the group by operator before putting back in the rule set.
-//        normalization.add(new ConvertAssignSortDistinctNodesToOperatorsRule());
 
+        // TODO Fix the group by operator before putting back in the rule set.
+        //        normalization.add(new ConvertAssignSortDistinctNodesToOperatorsRule());
+
+        // Find assign for scalar aggregate function followed by an aggregate operator.
         normalization.add(new ConsolidateAssignAggregateRule());
         normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
-        
+
+        // Find assign for scalar aggregate function.
         normalization.add(new ConvertAssignToAggregateRule());
 
+        // Find unnest followed by aggregate in a subplan. 
         normalization.add(new EliminateUnnestAggregateSubplanRule());
         normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
-        
-        normalization.add(new EliminateSubplanForSinglePathsRule());
 
+        // Remove single tuple input subplans and merge unnest aggregate operators.
+        normalization.add(new EliminateSubplanForSinglePathsRule());
+        normalization.add(new EliminateUnnestAggregateSequencesRule());
+
+        // Convert to a data source scan operator.
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
+        // Use two step aggregate operators if possible.
         normalization.add(new IntroduceTwoStepAggregateRule());
+
+        // Used to clean up any missing noops after all the subplans have been altered.
+        normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+
         return normalization;
     }
 
