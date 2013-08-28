@@ -18,6 +18,7 @@ package org.apache.vxquery.runtime.functions.step;
 
 import java.io.IOException;
 
+import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
@@ -33,6 +34,7 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractSinglePathStepScalarEvaluator extends AbstractPathStepScalarEvaluator {
+    protected final DynamicContext dCtx;
 
     private final IntegerPointable ip;
 
@@ -44,6 +46,7 @@ public abstract class AbstractSinglePathStepScalarEvaluator extends AbstractPath
 
     public AbstractSinglePathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args, ctx);
+        dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         seqAbvs = new ArrayBackedValueStorage();
