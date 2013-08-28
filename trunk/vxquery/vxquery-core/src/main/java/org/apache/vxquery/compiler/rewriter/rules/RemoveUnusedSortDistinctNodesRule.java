@@ -47,6 +47,50 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOper
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
+/**
+ * The rule searches for where the xquery sort distinct function is used and
+ * determines if the sort and distinct is necessary. The plan is modified if
+ * any of these items is not required.
+ * 
+ * <pre>
+ * Before
+ * 
+ *   plan__parent
+ *   ASSIGN( $v1 : sort_distinct_nodes_asc_or_atomics( $v0 ) )
+ *   plan__child
+ *   
+ *   Where $v0 is a variable defined in plan__child.
+ *   
+ * After 
+ * 
+ *   if ( $v0 is unique nodes && $v0 is in document order )
+ *     
+ *     plan__parent
+ *     ASSIGN( $v1 : $v0 )
+ *     plan__child
+ *     
+ *   if ( $v0 is NOT unique nodes && $v0 is in document order )
+ *   
+ *     plan__parent
+ *     ASSIGN( $v1 : distinct_nodes_or_atomics( $v0 ) )
+ *     plan__child
+ *     
+ *   if ( $v0 is unique nodes && $v0 is NOT in document order )
+ *   
+ *     plan__parent
+ *     ASSIGN( $v1 : sort_nodes_asc( $v0 ) )
+ *     plan__child
+ *     
+ *   if ( $v0 is NOT unique nodes && $v0 is NOT in document order )
+ *   
+ *     plan__parent
+ *     ASSIGN( $v1 : sort_distinct_nodes_asc_or_atomics( $v0 ) )
+ *     plan__child
+ * </pre>
+ * 
+ * @author prestonc
+ */
+
 public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule {
 
     @Override
@@ -54,10 +98,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         return false;
     }
 
-    /**
-     * Find where a sort distinct nodes is being used and not required based on input parameters.
-     * Search pattern: assign [function-call: sort-distinct-nodes-asc-or-atomics]
-     */
     @Override
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         boolean operatorChanged = false;
@@ -313,13 +353,13 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                         .getNestedPlans().get(0).getRoots().get(0).getValue();
                 cardinalityVariable = vxqueryContext.getCardinalityOperatorMap(lastOperator);
                 break;
+            case DATASOURCESCAN:
             case UNNEST:
                 cardinalityVariable = Cardinality.MANY;
                 break;
 
             // The following operators do not change the variable.
             case ASSIGN:
-            case DATASOURCESCAN:
             case EMPTYTUPLESOURCE:
             case EXCHANGE:
             case LIMIT:
