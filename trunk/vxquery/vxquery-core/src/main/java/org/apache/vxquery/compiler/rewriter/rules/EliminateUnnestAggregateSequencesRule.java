@@ -29,16 +29,34 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionC
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
+/**
+ * The rule searches for unnest followed by an aggregate operator with a
+ * sequence function and converts the aggregate operator to an assign.
+ * 
+ * <pre>
+ * Before
+ * 
+ *   plan__parent
+ *   UNNEST( $v2 : iterate( $v1 ) )
+ *   AGGREGATE( $v1 : sequence( $v0 ) )
+ *   plan__child
+ *   
+ *   where plan__parent does not use $v1 and $v0 is defined in plan__child.
+ *   
+ * After
+ * 
+ *   plan__parent
+ *   UNNEST( $v2 : iterate( $v1 ) )
+ *   ASSIGN( $v1 : $v0 )
+ *   plan__child
+ * </pre>
+ * 
+ * @author prestonc
+ */
 public class EliminateUnnestAggregateSequencesRule implements IAlgebraicRewriteRule {
-    /**
-     * Find where an unnest is followed by a aggregate.
-     * Search pattern: unnest -> (aggregate ... )
-     * Replacement pattern: assign -> ...
-     */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
@@ -73,36 +91,15 @@ public class EliminateUnnestAggregateSequencesRule implements IAlgebraicRewriteR
             return false;
         }
 
-        // Use the left over functions from iterator and sequence.
-        Mutable<ILogicalExpression> assignExpression = functionCall2.getArguments().get(0);
-        ILogicalExpression lastUnnestExpression = findLastFunctionExpression(logicalExpression);
-        if (lastUnnestExpression != null) {
-            // Additional functions are included in the iterate function that need to be included.
-            AbstractFunctionCallExpression lastUnnestFunction = (AbstractFunctionCallExpression) lastUnnestExpression;
-            lastUnnestFunction.getArguments().set(0, functionCall2.getArguments().get(0));
-            assignExpression = functionCall.getArguments().get(0);
-        }
-
         // Replace search string with assign.
+        Mutable<ILogicalExpression> assignExpression = functionCall2.getArguments().get(0);
         AssignOperator aOp = new AssignOperator(unnest.getVariable(), assignExpression);
         for (Mutable<ILogicalOperator> input : aggregate.getInputs()) {
             aOp.getInputs().add(input);
         }
-        opRef.setValue(aOp);
+        unnest.getInputs().get(0).setValue(aOp);
 
         return true;
-    }
-
-    private ILogicalExpression findLastFunctionExpression(ILogicalExpression expression) {
-        if (expression.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) expression;
-            ILogicalExpression nextExpression = functionCall.getArguments().get(0).getValue();
-            if (nextExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return expression;
-            }
-            return findLastFunctionExpression(nextExpression);
-        }
-        return null;
     }
 
     @Override
