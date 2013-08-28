@@ -30,11 +30,11 @@ import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 
+/**
+ * Find the collection functions and generate the data source objects.
+ * Search pattern: unnest <- assign [function-call: collection] <- assign [constant: string]
+ */
 public class SetCollectionDataSourceRule extends AbstractCollectionRule {
-    /**
-     * Find the collection functions and generate the data source objects.
-     * Search pattern: unnest <- assign [function-call: collection] <- assign [constant: string]
-     */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;

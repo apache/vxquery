@@ -26,11 +26,11 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLog
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
+/**
+ * Set the default context for the variable id in the optimization context.
+ * @author prestonc
+ */
 public class SetVariableIdContextRule implements IAlgebraicRewriteRule {
-
-    /**
-     * Set the default context for the variable id in the optimization context.
-     */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         int variableId = 0;
