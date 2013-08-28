@@ -19,7 +19,6 @@ package org.apache.vxquery.runtime.functions.step;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
@@ -43,8 +42,6 @@ import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractPathStepScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
-    protected final DynamicContext dCtx;
-
     protected final SequenceBuilder seqb;
 
     protected final NodeTreePointable ntp;
@@ -57,7 +54,6 @@ public abstract class AbstractPathStepScalarEvaluator extends AbstractTaggedValu
 
     public AbstractPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args);
-        dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
         seqb = new SequenceBuilder();
         nodeAbvs = new ArrayBackedValueStorage();
