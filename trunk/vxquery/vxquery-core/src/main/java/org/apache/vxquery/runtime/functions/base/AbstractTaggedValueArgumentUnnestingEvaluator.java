@@ -17,6 +17,7 @@
 package org.apache.vxquery.runtime.functions.base;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.exceptions.SystemException;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -41,8 +42,12 @@ public abstract class AbstractTaggedValueArgumentUnnestingEvaluator implements I
         for (int i = 0; i < args.length; ++i) {
             args[i].evaluate(tuple, tvps[i]);
         }
-        init(tvps);
+        try {
+            init(tvps);
+        } catch (SystemException e) {
+            throw new AlgebricksException(e);
+        }
     }
 
-    protected abstract void init(TaggedValuePointable[] args);
+    protected abstract void init(TaggedValuePointable[] args) throws SystemException;
 }

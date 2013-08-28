@@ -869,6 +869,7 @@
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.ChildPathStepScalarEvaluatorFactory"/>
+        <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.step.ChildPathStepUnnestingEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
