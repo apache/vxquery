@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignSortDistinctNodesToOperatorsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSinglePathsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
@@ -89,6 +90,8 @@ public class RewriteRuleset {
         // Remove single tuple input subplans and merge unnest aggregate operators.
         normalization.add(new EliminateSubplanForSinglePathsRule());
         normalization.add(new EliminateUnnestAggregateSequencesRule());
+        
+        normalization.add(new ConvertAssignToUnnestRule());
 
         // Convert to a data source scan operator.
         normalization.add(new SetCollectionDataSourceRule());

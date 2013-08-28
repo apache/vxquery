@@ -16,6 +16,8 @@
  */
 package org.apache.vxquery.runtime.functions.base;
 
+import org.apache.vxquery.context.DynamicContext;
+
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -25,15 +27,20 @@ import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 
 public abstract class AbstractTaggedValueArgumentUnnestingEvaluatorFactory implements IUnnestingEvaluatorFactory {
     private static final long serialVersionUID = 1L;
+    
+    protected DynamicContext dCtx;
 
     private final IScalarEvaluatorFactory[] args;
 
     public AbstractTaggedValueArgumentUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         this.args = args;
+        this.dCtx = null;
     }
 
     @Override
     public final IUnnestingEvaluator createUnnestingEvaluator(IHyracksTaskContext ctx) throws AlgebricksException {
+        dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
+
         IScalarEvaluator[] es = new IScalarEvaluator[args.length];
         for (int i = 0; i < es.length; ++i) {
             es[i] = args[i].createScalarEvaluator(ctx);
