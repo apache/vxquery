@@ -33,12 +33,34 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOper
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
+/**
+ * The rule searches for unnest followed by subplan with the root operator an
+ * aggregate and removes the aggregate subplan.
+ * 
+ * <pre>
+ * Before
+ * 
+ *   plan__parent
+ *   UNNEST( $v2 : iterate( $v1 ) )
+ *   SUBPLAN{
+ *     AGGREGATE( $v1 : sequence( $v0 ) )
+ *     plan__nested
+ *     NESTEDTUPLESOURCE
+ *   }
+ *   plan__child
+ *   
+ *   where plan__parent does not use $v1 and $v0 is defined plan__child.
+ *    
+ * After 
+ * 
+ *   plan__parent
+ *   UNNEST( $v2 : iterate( $v1 ) )
+ *   ASSIGN( $v1 : $v0 )
+ *   plan__nested
+ *   plan__child
+ * </pre>
+ */
 public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRule {
-    /**
-     * Find where an unnest is followed by a subplan with the root operator of aggregate.
-     * Search pattern: unnest -> subplan -> (aggregate ... )
-     * Replacement pattern: assign -> ...
-     */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
@@ -80,26 +102,20 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
             return false;
         }
 
-        // Use the left over functions from iterator and sequence.
-        Mutable<ILogicalExpression> assignExpression = functionCall2.getArguments().get(0);
-        ILogicalExpression lastUnnestExpression = findLastFunctionExpression(logicalExpression);
-        if (lastUnnestExpression != null) {
-            // Additional functions are included in the iterate function that need to be included.
-            AbstractFunctionCallExpression lastUnnestFunction = (AbstractFunctionCallExpression) lastUnnestExpression;
-            lastUnnestFunction.getArguments().set(0, functionCall2.getArguments().get(0));
-            assignExpression = functionCall.getArguments().get(0);
+        // Make inline the arguments for the subplan.
+        AbstractLogicalOperator subplanEnd = findLastSubplanOperator(subplanOp);
+        int count = 0;
+        for (Mutable<ILogicalOperator> input : subplan.getInputs()) {
+            subplanEnd.getInputs().get(count++).setValue(input.getValue());
         }
 
         // Replace search string with assign.
-        AssignOperator aOp = new AssignOperator(unnest.getVariable(), assignExpression);
-        for (Mutable<ILogicalOperator> input : subplanOp.getInputs()) {
+        Mutable<ILogicalExpression> assignExpression = functionCall2.getArguments().get(0);
+        AssignOperator aOp = new AssignOperator(aggregate.getVariables().get(0), assignExpression);
+        for (Mutable<ILogicalOperator> input : aggregate.getInputs()) {
             aOp.getInputs().add(input);
         }
-        opRef.setValue(aOp);
-
-        // Make inline the arguments for the subplan.
-        AbstractLogicalOperator subplanEnd = findLastSubplanOperator(subplanOp);
-        subplanEnd.getInputs().get(0).setValue(subplan.getInputs().get(0).getValue());
+        unnest.getInputs().get(0).setValue(aOp);
 
         return true;
     }
