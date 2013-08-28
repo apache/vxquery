@@ -31,8 +31,28 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOper
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 
 /**
- * Where assign operators only assign a new variable ID for a reference expression,
- * all references are updated to the first variable ID.
+ * The inline reference variable rule searches for assignments that only create
+ * a new variable ID and then update all reference for that variable to be the
+ * original variable. This rule is immediately followed by a rule to remove
+ * unused assign variables.
+ * 
+ * <pre>
+ * Before
+ * 
+ *  plan__parent
+ *  ASSIGN( $v : reference_variable($vr) )
+ *  plan__child
+ *  
+ *  Where $vr is a reference variable defined in plan__child.
+ *  
+ * After
+ * 
+ *  plan__parent_new
+ *  ASSIGN( $v : reference_variable($vr) )
+ *  plan__child
+ *  
+ *  such that plan__parent_new = {for each $v in plan__parent is replaced with $vr}
+ * </pre>
  */
 public class InlineReferenceVariablePolicy implements InlineVariablesRule.IInlineVariablePolicy {
 

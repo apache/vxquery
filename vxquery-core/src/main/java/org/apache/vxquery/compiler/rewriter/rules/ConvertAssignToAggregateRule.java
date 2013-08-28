@@ -42,6 +42,38 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTuple
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 
+/**
+ * The rule searches for assign operators that have a xquery aggregate function.
+ * The aggregate function will be more efficient when used by an aggregate
+ * operator.
+ * XQuery aggregate functions are implemented in both scalar (one XDM Instance
+ * input as a sequence) and iterative (a stream of XDM Instances each one is
+ * single object).
+ * 
+ * <pre>
+ * Before
+ * 
+ *   plan__parent
+ *   ASSIGN( $v2 : sf1( $v0 ) )
+ *   plan__child
+ *   
+ *   Where sf1 is a XQuery aggregate function expression (count, max, min, 
+ *   average, sum) with any supporting functions like treat, promote or data. 
+ *   The variable $v0 is defined in plan__child.
+ *   
+ * After
+ * 
+ *   plan__parent
+ *   SUBPLAN{
+ *     AGGREGATE( $v2 : af1( $v1 ) )
+ *     UNNEST( $v1 : iterate( $v0 ) )
+ *     NESTEDTUPLESOURCE
+ *   }
+ *   plan__child
+ * </pre>
+ * 
+ * @author prestonc
+ */
 public class ConvertAssignToAggregateRule extends AbstractVXQueryAggregateRule {
     /**
      * Find where an assign for a aggregate function is used before aggregate operator for a sequence.

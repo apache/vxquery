@@ -20,7 +20,6 @@ import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
@@ -41,16 +40,50 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLog
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
-import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 
+/**
+ * The rule searches for assign operator with an aggregate function expression
+ * immediately following an aggregate operator with a sequence expression.
+ * XQuery aggregate functions are implemented in both scalar (one XDM Instance
+ * input as a sequence) and iterative (a stream of XDM Instances each one is
+ * single object).
+ * 
+ * <pre>
+ * Before 
+ * 
+ *   plan__parent
+ *   ASSIGN( $v2 : sf1( $v1 ) )
+ *   SUBPLAN{
+ *     AGGREGATE( $v1 : sequence( $v0 ) )
+ *     plan__nested
+ *     NESTEDTUPLESOURCE
+ *   }
+ *   plan__child
+ *   
+ *   Where sf1 is a XQuery aggregate function expression (count, max, min, 
+ *   average, sum) with any supporting functions like treat, promote or data. 
+ *   Also plan__parent does not use $v1
+ *   
+ * After
+ * 
+ *   plan__parent
+ *   SUBPLAN{
+ *     AGGREGATE( $v2 : af1( $v0 ) )
+ *     plan__nested
+ *     NESTEDTUPLESOURCE
+ *   }
+ *   plan__child
+ *   
+ *   Where af1 is a XQuery aggregate function expression (count, max, min, 
+ *   average, sum) that has been implemented in an iterative approach and works 
+ *   on individual tuples instead of one value in given as a sequence.
+ * </pre>
+ * 
+ * @author prestoncarman
+ */
 public class ConsolidateAssignAggregateRule extends AbstractVXQueryAggregateRule {
-    /**
-     * Find where an assign for a aggregate function is used before aggregate operator for a sequence.
-     * Search pattern 1: assign [function-call: count(function-call: treat($$))]
-     * Search pattern 2: $$ for aggregate [function-call: sequence()]
-     */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         IFunctionInfo aggregateInfo;
@@ -78,7 +111,7 @@ public class ConsolidateAssignAggregateRule extends AbstractVXQueryAggregateRule
         if (finalFunctionCall == null) {
             return false;
         }
-        
+
         // Variable details.
         mutableVariableExpresion = finalFunctionCall.getArguments().get(0);
         VariableReferenceExpression variableReference = (VariableReferenceExpression) mutableVariableExpresion
@@ -132,7 +165,7 @@ public class ConsolidateAssignAggregateRule extends AbstractVXQueryAggregateRule
 
         // Set partitioning variable.
         // TODO Review why this is not valid in 0.2.6
-//        aggregate.setPartitioningVariable(trueVar);
+        //        aggregate.setPartitioningVariable(trueVar);
 
         return true;
     }

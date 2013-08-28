@@ -31,11 +31,33 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLog
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
+/**
+ * The rule searches for aggregate operators with an aggregate function
+ * expression that has not been initialized for two step aggregation.
+ * 
+ * <pre>
+ * Before
+ * 
+ *   plan__parent
+ *   AGGREGATE( $v : af1( $v1 ) )
+ *   plan__child
+ *   
+ *   Where af1 is a VXquery aggregate function expression configured for single 
+ *   step processing and $v1 is defined in plan__child.
+ *   
+ * After
+ * 
+ *   if (af1 == count) aggregate operating settings:
+ *     Step 1: count
+ *     Step 2: sum
+ *   if (af1 in (max, min, sum)) aggregate operating settings:
+ *     Step 1: af1
+ *     Step 2: af1
+ * </pre>
+ * 
+ * @author prestonc
+ */
 public class IntroduceTwoStepAggregateRule implements IAlgebraicRewriteRule {
-    /**
-     * Find where an aggregate functions can be switched to two step.
-     * Search pattern: aggregate [function-call: (count, min, max, sum)]
-     */
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         // Check if aggregate function.
