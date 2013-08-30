@@ -26,6 +26,7 @@ import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinality.Cardinality;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
+import org.apache.vxquery.compiler.rewriter.rules.util.CardinalityRuleToolbox;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.functions.Function;
 
@@ -112,7 +113,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
 
         // Find the available variables.
-        Cardinality cardinalityVariable = getProducerCardinality(opRef.getValue(), vxqueryContext);
+        Cardinality cardinalityVariable = CardinalityRuleToolbox.getProducerCardinality(opRef.getValue(),
+                vxqueryContext);
         HashMap<Integer, DocumentOrder> documentOrderVariables = getProducerDocumentOrderVariableMap(opRef.getValue(),
                 vxqueryContext);
         HashMap<Integer, UniqueNodes> uniqueNodesVariables = getProducerUniqueNodesVariableMap(opRef.getValue(),
@@ -152,7 +154,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         }
 
         // Now with the new operator, update the variable mappings.
-        cardinalityVariable = updateCardinalityVariable(op, cardinalityVariable, vxqueryContext);
+        cardinalityVariable = CardinalityRuleToolbox.updateCardinalityVariable(op, cardinalityVariable, vxqueryContext);
         updateVariableMap(op, cardinalityVariable, documentOrderVariables, uniqueNodesVariables, vxqueryContext);
 
         // Save propagated value.
@@ -189,26 +191,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         }
         VariableReferenceExpression variableExpression = (VariableReferenceExpression) logicalExpression2;
         return variableExpression.getVariableReference().getId();
-    }
-
-    /**
-     * Get the Cardinality variable of the parent operator.
-     * 
-     * @param op
-     * @param vxqueryContext
-     * @return
-     */
-    private Cardinality getProducerCardinality(ILogicalOperator op, VXQueryOptimizationContext vxqueryContext) {
-        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
-        switch (producerOp.getOperatorTag()) {
-            case EMPTYTUPLESOURCE:
-                return Cardinality.ONE;
-            case NESTEDTUPLESOURCE:
-                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
-                return getProducerCardinality(nestedTuplesource.getDataSourceReference().getValue(), vxqueryContext);
-            default:
-                return vxqueryContext.getCardinalityOperatorMap(producerOp);
-        }
     }
 
     /**
@@ -339,61 +321,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         }
     }
 
-    private Cardinality updateCardinalityVariable(AbstractLogicalOperator op, Cardinality cardinalityVariable,
-            VXQueryOptimizationContext vxqueryContext) {
-        switch (op.getOperatorTag()) {
-            case AGGREGATE:
-                cardinalityVariable = Cardinality.ONE;
-                break;
-            case GROUP:
-            case SUBPLAN:
-                // Find the last operator to set a variable and call this function again.
-                AbstractOperatorWithNestedPlans operatorWithNestedPlan = (AbstractOperatorWithNestedPlans) op;
-                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) operatorWithNestedPlan
-                        .getNestedPlans().get(0).getRoots().get(0).getValue();
-                cardinalityVariable = vxqueryContext.getCardinalityOperatorMap(lastOperator);
-                break;
-            case DATASOURCESCAN:
-            case UNNEST:
-                cardinalityVariable = Cardinality.MANY;
-                break;
-
-            // The following operators do not change the variable.
-            case ASSIGN:
-            case EMPTYTUPLESOURCE:
-            case EXCHANGE:
-            case LIMIT:
-            case NESTEDTUPLESOURCE:
-            case ORDER:
-            case PROJECT:
-            case SELECT:
-            case WRITE:
-            case WRITE_RESULT:
-                break;
-
-            // The following operators' analysis has not yet been implemented.
-            case CLUSTER:
-            case DISTINCT:
-            case EXTENSION_OPERATOR:
-            case INDEX_INSERT_DELETE:
-            case INNERJOIN:
-            case INSERT_DELETE:
-            case LEFTOUTERJOIN:
-            case PARTITIONINGSPLIT:
-            case REPLICATE:
-            case RUNNINGAGGREGATE:
-            case SCRIPT:
-            case SINK:
-            case UNIONALL:
-            case UNNEST_MAP:
-            case UPDATE:
-            default:
-                throw new RuntimeException("Operator (" + op.getOperatorTag()
-                        + ") has not been implemented in rewrite rule.");
-        }
-        return cardinalityVariable;
-    }
-
     private void updateVariableMap(AbstractLogicalOperator op, Cardinality cardinalityVariable,
             HashMap<Integer, DocumentOrder> documentOrderVariables, HashMap<Integer, UniqueNodes> uniqueNodesVariables,
             VXQueryOptimizationContext vxqueryContext) {
@@ -485,6 +412,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
             // The following operators do not change or add to the variable map.
             case DATASOURCESCAN:
+            case DISTRIBUTE_RESULT:
             case EMPTYTUPLESOURCE:
             case EXCHANGE:
             case NESTEDTUPLESOURCE:
