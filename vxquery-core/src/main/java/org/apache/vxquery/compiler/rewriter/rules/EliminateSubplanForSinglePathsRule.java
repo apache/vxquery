@@ -19,14 +19,13 @@ package org.apache.vxquery.compiler.rewriter.rules;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinality.Cardinality;
+import org.apache.vxquery.compiler.rewriter.rules.util.CardinalityRuleToolbox;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractOperatorWithNestedPlans;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
@@ -67,7 +66,7 @@ public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule
 
         // Set cardinality in the context. Must update each time the rule is run.
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        Cardinality cardinalityVariable = getProducerCardinality(opRef.getValue(), vxqueryContext);
+        Cardinality cardinalityVariable = CardinalityRuleToolbox.getProducerCardinality(opRef.getValue(), vxqueryContext);
 
         if (op.getOperatorTag() == LogicalOperatorTag.SUBPLAN && cardinalityVariable == Cardinality.ONE) {
             SubplanOperator subplan = (SubplanOperator) op;
@@ -88,7 +87,7 @@ public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule
         }
 
         // Now with the new operator, update the variable mappings.
-        cardinalityVariable = updateCardinalityVariable(op, cardinalityVariable, vxqueryContext);
+        cardinalityVariable = CardinalityRuleToolbox.updateCardinalityVariable(op, cardinalityVariable, vxqueryContext);
         // Save propagated value.
         vxqueryContext.putCardinalityOperatorMap(opRef.getValue(), cardinalityVariable);
 
@@ -105,81 +104,6 @@ public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule
             }
         }
         return op;
-    }
-
-    /**
-     * Get the Cardinality variable of the parent operator.
-     * 
-     * @param op
-     * @param vxqueryContext
-     * @return
-     */
-    private Cardinality getProducerCardinality(ILogicalOperator op, VXQueryOptimizationContext vxqueryContext) {
-        AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
-        switch (producerOp.getOperatorTag()) {
-            case EMPTYTUPLESOURCE:
-                return Cardinality.ONE;
-            case NESTEDTUPLESOURCE:
-                NestedTupleSourceOperator nestedTuplesource = (NestedTupleSourceOperator) producerOp;
-                return getProducerCardinality(nestedTuplesource.getDataSourceReference().getValue(), vxqueryContext);
-            default:
-                return vxqueryContext.getCardinalityOperatorMap(producerOp);
-        }
-    }
-
-    private Cardinality updateCardinalityVariable(AbstractLogicalOperator op, Cardinality cardinalityVariable,
-            VXQueryOptimizationContext vxqueryContext) {
-        switch (op.getOperatorTag()) {
-            case AGGREGATE:
-                cardinalityVariable = Cardinality.ONE;
-                break;
-            case GROUP:
-            case SUBPLAN:
-                // Find the last operator to set a variable and call this function again.
-                AbstractOperatorWithNestedPlans operatorWithNestedPlan = (AbstractOperatorWithNestedPlans) op;
-                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) operatorWithNestedPlan
-                        .getNestedPlans().get(0).getRoots().get(0).getValue();
-                cardinalityVariable = vxqueryContext.getCardinalityOperatorMap(lastOperator);
-                break;
-            case DATASOURCESCAN:
-            case UNNEST:
-                cardinalityVariable = Cardinality.MANY;
-                break;
-
-            // The following operators do not change the variable.
-            case ASSIGN:
-            case EMPTYTUPLESOURCE:
-            case EXCHANGE:
-            case LIMIT:
-            case NESTEDTUPLESOURCE:
-            case ORDER:
-            case PROJECT:
-            case SELECT:
-            case WRITE:
-            case WRITE_RESULT:
-                break;
-
-            // The following operators' analysis has not yet been implemented.
-            case CLUSTER:
-            case DISTINCT:
-            case EXTENSION_OPERATOR:
-            case INDEX_INSERT_DELETE:
-            case INNERJOIN:
-            case INSERT_DELETE:
-            case LEFTOUTERJOIN:
-            case PARTITIONINGSPLIT:
-            case REPLICATE:
-            case RUNNINGAGGREGATE:
-            case SCRIPT:
-            case SINK:
-            case UNIONALL:
-            case UNNEST_MAP:
-            case UPDATE:
-            default:
-                throw new RuntimeException("Operator (" + op.getOperatorTag()
-                        + ") has not been implemented in rewrite rule.");
-        }
-        return cardinalityVariable;
     }
 
     @Override
