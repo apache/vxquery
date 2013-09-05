@@ -18,6 +18,7 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.functions.BuiltinOperators;
+import org.apache.vxquery.functions.Function;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -41,15 +42,16 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * 
  *   plan__parent
  *   UNNEST( $v2 : iterate( $v1 ) )
- *   ASSIGN( $v1 : child( $v0 ) )
+ *   ASSIGN( $v1 : sf1( $v0 ) )
  *   plan__child
  *   
  *   where plan__parent does not use $v1 and $v0 is defined in plan__child.
+ *   sf1 is a scalar function that has a unnesting implementation.
  *   
  * After
  * 
  *   plan__parent
- *   UNNEST( $v2 : child( $v0 ) )
+ *   UNNEST( $v2 : uf1( $v0 ) )
  *   plan__child
  * </pre>
  * 
@@ -86,10 +88,11 @@ public class ConvertAssignToUnnestRule implements IAlgebraicRewriteRule {
             return false;
         }
         AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
-        if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.CHILD.getFunctionIdentifier())) {
+        Function functionInfo2 = (Function) functionCall2.getFunctionInfo();
+        if (!functionInfo2.hasUnnestingEvaluatorFactory()) {
             return false;
         }
-
+        
         // TODO add checks for variables used that have now been removed.
 
         // Update the unnest parameters.
@@ -98,7 +101,7 @@ public class ConvertAssignToUnnestRule implements IAlgebraicRewriteRule {
             unnest.getInputs().get(index++).setValue(input.getValue());
         }
 
-        UnnestingFunctionCallExpression child = new UnnestingFunctionCallExpression(BuiltinOperators.CHILD, functionCall2.getArguments());
+        UnnestingFunctionCallExpression child = new UnnestingFunctionCallExpression(functionInfo2, functionCall2.getArguments());
         unnest.getExpressionRef().setValue(child);
         
         return true;

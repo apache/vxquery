@@ -65,6 +65,17 @@
                             );
                         </xsl:if>
 	                </xsl:for-each>
+	                <xsl:for-each select="runtime">
+                        <xsl:if test="@type = 'scalar'">
+                        this.scalarEvaluatorFactory = true;
+                        </xsl:if>
+                        <xsl:if test="@type = 'aggregate'">
+                        this.aggregateEvaluatorFactory = true;
+                        </xsl:if>
+                        <xsl:if test="@type = 'unnesting'">
+                        this.unnestingEvaluatorFactory = true;
+                        </xsl:if>
+                    </xsl:for-each>
 	                }
                 </xsl:if>
                 <xsl:for-each select="runtime">

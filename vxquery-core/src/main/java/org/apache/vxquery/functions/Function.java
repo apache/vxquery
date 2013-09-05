@@ -41,8 +41,11 @@ public abstract class Function implements IFunctionInfo {
     protected final Signature signature;
 
     protected IPropertyPropagationPolicy<DocumentOrder> documentOrderPropagationPolicy;
-
     protected IPropertyPropagationPolicy<UniqueNodes> uniqueNodesPropagationPolicy;
+
+    protected boolean aggregateEvaluatorFactory = false;
+    protected boolean scalarEvaluatorFactory = false;
+    protected boolean unnestingEvaluatorFactory = false;
 
     public Function(QName qname, Signature signature) {
         this.fid = new FunctionIdentifier(VXQUERY, "{" + qname.getNamespaceURI() + "}" + qname.getLocalPart());
@@ -81,6 +84,18 @@ public abstract class Function implements IFunctionInfo {
 
     public IPropertyPropagationPolicy<UniqueNodes> getUniqueNodesPropagationPolicy() {
         return this.uniqueNodesPropagationPolicy;
+    }
+
+    public boolean hasAggregateEvaluatorFactory() {
+        return this.aggregateEvaluatorFactory;
+    }
+
+    public boolean hasScalarEvaluatorFactory() {
+        return this.scalarEvaluatorFactory;
+    }
+
+    public boolean hasUnnestingEvaluatorFactory() {
+        return this.unnestingEvaluatorFactory;
     }
 
     public QName getName() {
