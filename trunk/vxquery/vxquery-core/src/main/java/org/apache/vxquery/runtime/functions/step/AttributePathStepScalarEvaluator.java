@@ -49,6 +49,8 @@ public class AttributePathStepScalarEvaluator extends AbstractSinglePathStepScal
                     return;
                 }
         }
-        XDMConstants.setEmptySequence(seqp);
+        TaggedValuePointable seqTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        XDMConstants.setEmptySequence(seqTvp);
+        seqTvp.getValue(seqp);
     }
 }
