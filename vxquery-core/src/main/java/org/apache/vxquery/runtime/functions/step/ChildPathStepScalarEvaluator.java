@@ -58,6 +58,8 @@ public class ChildPathStepScalarEvaluator extends AbstractSinglePathStepScalarEv
                     return;
                 }
         }
-        XDMConstants.setEmptySequence(seqp);
+        TaggedValuePointable seqTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        XDMConstants.setEmptySequence(seqTvp);
+        seqTvp.getValue(seqp);
     }
 }

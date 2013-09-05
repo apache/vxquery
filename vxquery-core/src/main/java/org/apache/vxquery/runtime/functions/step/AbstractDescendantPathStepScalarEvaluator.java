@@ -54,39 +54,40 @@ public abstract class AbstractDescendantPathStepScalarEvaluator extends Abstract
     protected void searchSubtree(TaggedValuePointable nodePointable) throws SystemException {
         try {
             SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+            boolean search = false;
 
             // Find all child element to search.
             switch (nodePointable.getTag()) {
                 case ValueTag.DOCUMENT_NODE_TAG:
                     nodePointable.getValue(dnp);
                     dnp.getContent(ntp, seqp);
+                    search = true;
                     break;
 
                 case ValueTag.ELEMENT_NODE_TAG:
                     nodePointable.getValue(enp);
                     if (enp.childrenChunkExists()) {
                         enp.getChildrenSequence(ntp, seqp);
+                        search = true;
                     }
-                    break;
-
-                default:
-                    XDMConstants.setEmptySequence(seqp);
                     break;
             }
 
-            int seqSize = seqp.getEntryCount();
-            for (int i = 0; i < seqSize; ++i) {
-                seqp.getEntry(i, itemTvp);
-                // Only search element nodes.
-                if (itemTvp.getTag() == ValueTag.ELEMENT_NODE_TAG) {
-                    if (matches()) {
-                        appendNodeToResult();
+            if (search) {
+                int seqSize = seqp.getEntryCount();
+                for (int i = 0; i < seqSize; ++i) {
+                    seqp.getEntry(i, itemTvp);
+                    // Only search element nodes.
+                    if (itemTvp.getTag() == ValueTag.ELEMENT_NODE_TAG) {
+                        if (matches()) {
+                            appendNodeToResult();
+                        }
+                        // Now check this elements children.
+                        TaggedValuePointable tvpTemp = (TaggedValuePointable) TaggedValuePointable.FACTORY
+                                .createPointable();
+                        tvpTemp.set(itemTvp);
+                        searchSubtree(tvpTemp);
                     }
-                    // Now check this elements children.
-                    TaggedValuePointable tvpTemp = (TaggedValuePointable) TaggedValuePointable.FACTORY
-                            .createPointable();
-                    tvpTemp.set(itemTvp);
-                    searchSubtree(tvpTemp);
                 }
             }
         } catch (IOException e) {
