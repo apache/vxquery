@@ -81,10 +81,10 @@ public class XMLQueryCompiler {
     private Module module;
 
     private ICompiler compiler;
-    
+
     private int frameSize = 65536;
 
-    public XMLQueryCompiler(XQueryCompilationListener listener) {
+    public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
                 new IOptimizationContextFactory() {
@@ -138,9 +138,10 @@ public class XMLQueryCompiler {
             }
         });
         builder.setNullWriterFactory(new VXQueryNullWriterFactory());
-        builder.setClusterLocations(new AlgebricksAbsolutePartitionConstraint(new String[] { "nc1" }));
+        builder.setClusterLocations(new AlgebricksAbsolutePartitionConstraint(nodeList));
         cFactory = builder.create();
         mdProvider = new VXQueryMetadataProvider();
+        mdProvider.setNodeList(nodeList);
     }
 
     public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel)
