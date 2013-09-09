@@ -49,7 +49,7 @@ import org.apache.vxquery.functions.ExternalFunction;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.functions.Signature;
 import org.apache.vxquery.functions.UserDefinedXQueryFunction;
-import org.apache.vxquery.metadata.QueryResultDataSink;
+import org.apache.vxquery.metadata.QueryResultSetDataSink;
 import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
 import org.apache.vxquery.types.AnyItemType;
 import org.apache.vxquery.types.AnyNodeType;
@@ -168,13 +168,13 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.UnnestingFunction
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DistributeResultOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.EmptyTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.OrderOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.WriteOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.plan.ALogicalPlanImpl;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -661,7 +661,8 @@ public class XMLQueryTranslator {
         unnest.getInputs().add(mutable(tCtx.op));
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
         exprs.add(mutable(vre(iLVar)));
-        WriteOperator op = new WriteOperator(exprs, new QueryResultDataSink(ccb.getResultFileSplits()));
+        QueryResultSetDataSink sink = new QueryResultSetDataSink(ccb.getResultSetId(), null);
+        DistributeResultOperator op = new DistributeResultOperator(exprs, sink);
         op.getInputs().add(mutable(unnest));
         ALogicalPlanImpl lp = new ALogicalPlanImpl(mutable(op));
 

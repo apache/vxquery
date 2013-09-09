@@ -16,6 +16,7 @@
  */
 package org.apache.vxquery.metadata;
 
+import java.io.IOException;
 import java.util.List;
 
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
@@ -33,17 +34,29 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IDataSourceIndex;
 import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.IOperatorSchema;
 import edu.uci.ics.hyracks.algebricks.core.jobgen.impl.JobGenContext;
+import edu.uci.ics.hyracks.algebricks.data.IAWriterFactory;
 import edu.uci.ics.hyracks.algebricks.data.IPrinterFactory;
+import edu.uci.ics.hyracks.algebricks.data.IResultSerializerFactoryProvider;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IPushRuntimeFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.operators.std.SinkWriterRuntimeFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.serializer.ResultSerializerFactoryProvider;
 import edu.uci.ics.hyracks.algebricks.runtime.writers.PrinterBasedWriterFactory;
 import edu.uci.ics.hyracks.api.dataflow.IOperatorDescriptor;
+import edu.uci.ics.hyracks.api.dataflow.value.IResultSerializerFactory;
 import edu.uci.ics.hyracks.api.dataflow.value.ISerializerDeserializer;
 import edu.uci.ics.hyracks.api.dataflow.value.RecordDescriptor;
+import edu.uci.ics.hyracks.api.dataset.ResultSetId;
 import edu.uci.ics.hyracks.api.job.JobSpecification;
 import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
+import edu.uci.ics.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
+    String[] nodeList;
+
+    public void setNodeList(String[] nodeList) {
+        this.nodeList = nodeList;
+    }
+
     @Override
     public IDataSource<String> findDataSource(String id) throws AlgebricksException {
         return null;
@@ -59,10 +72,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds.getId(),
                 ds.getDataSourceId(), ds.getTotalDataSources(), rDesc);
 
-        // TODO review if locations needs to be updated for parallel processing.
-        String[] locations = new String[1];
-        locations[0] = "nc1";
-        AlgebricksAbsolutePartitionConstraint constraint = new AlgebricksAbsolutePartitionConstraint(locations);
+        AlgebricksAbsolutePartitionConstraint constraint = new AlgebricksAbsolutePartitionConstraint(nodeList);
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
     }
 
@@ -143,7 +153,23 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getResultHandleRuntime(IDataSink sink,
             int[] printColumns, IPrinterFactory[] printerFactories, RecordDescriptor inputDesc, boolean ordered,
             JobSpecification spec) throws AlgebricksException {
-        // TODO Auto-generated method stub
-        return null;
+        QueryResultSetDataSink rsds = (QueryResultSetDataSink) sink;
+        ResultSetId rssId = (ResultSetId) rsds.getId();
+
+        IResultSerializerFactoryProvider resultSerializerFactoryProvider = ResultSerializerFactoryProvider.INSTANCE;
+        IAWriterFactory writerFactory = PrinterBasedWriterFactory.INSTANCE;
+
+        ResultWriterOperatorDescriptor resultWriter = null;
+        try {
+            IResultSerializerFactory resultSerializedAppenderFactory = resultSerializerFactoryProvider
+                    .getAqlResultSerializerFactoryProvider(printColumns, printerFactories, writerFactory);
+            resultWriter = new ResultWriterOperatorDescriptor(spec, rssId, ordered, false,
+                    resultSerializedAppenderFactory);
+        } catch (IOException e) {
+            throw new AlgebricksException(e);
+        }
+
+        return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(resultWriter, null);
     }
+
 }

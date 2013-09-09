@@ -66,6 +66,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
+        final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -77,7 +78,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             @Override
             public void nextFrame(ByteBuffer buffer) throws HyracksDataException {
                 fta.reset(buffer);
-                File collectionDirectory = new File(collectionName);
+                String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
+                File collectionDirectory = new File(collectionModifiedName);
 
                 // Go through each tuple.
                 for (int t = 0; t < fta.getTupleCount(); ++t) {
