@@ -38,6 +38,7 @@ import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
 import edu.uci.ics.hyracks.api.client.HyracksConnection;
 import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
+import edu.uci.ics.hyracks.api.dataset.ResultSetId;
 import edu.uci.ics.hyracks.api.exceptions.HyracksException;
 import edu.uci.ics.hyracks.api.job.JobFlag;
 import edu.uci.ics.hyracks.api.job.JobId;
@@ -116,13 +117,12 @@ public class TestRunnerFactory {
                 long start = System.currentTimeMillis();
                 try {
                     try {
-                        XMLQueryCompiler compiler = new XMLQueryCompiler(null);
+                        XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[]{ "nc1" });
                         File tempFile = File.createTempFile(testCase.getXQueryFile().getName(), ".tmp");
                         tempFile.deleteOnExit();
                         Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
-                                RootStaticContextImpl.INSTANCE), new FileSplit[] { new FileSplit("nc1",
-                                tempFile.getAbsolutePath()) });
+                                RootStaticContextImpl.INSTANCE), new ResultSetId(System.nanoTime()));
                         compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                         JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
 
