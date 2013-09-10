@@ -33,6 +33,7 @@ import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.result.ResultUtils;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
@@ -313,32 +314,6 @@ public class VXQuery {
 
         @Argument
         private List<String> arguments = new ArrayList<String>();
-    }
-
-    public static class ResultUtils {
-        public static String getStringFromBuffer(ByteBuffer buffer, IFrameTupleAccessor fta)
-                throws HyracksDataException {
-            String resultRecords = "";
-            ByteBufferInputStream bbis = new ByteBufferInputStream();
-            try {
-                fta.reset(buffer);
-                for (int tIndex = 0; tIndex < fta.getTupleCount(); tIndex++) {
-                    int start = fta.getTupleStartOffset(tIndex);
-                    int length = fta.getTupleEndOffset(tIndex) - start;
-                    bbis.setByteBuffer(buffer, start);
-                    byte[] recordBytes = new byte[length];
-                    bbis.read(recordBytes, 0, length);
-                    resultRecords += new String(recordBytes, 0, length);
-                }
-            } finally {
-                try {
-                    bbis.close();
-                } catch (IOException e) {
-                    throw new HyracksDataException(e);
-                }
-            }
-            return resultRecords;
-        }
     }
 
 }
