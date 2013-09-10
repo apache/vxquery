@@ -17,21 +17,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.vxquery</groupId>
+  
+  <parent>
+    <groupId>org.apache.vxquery</groupId>
+    <artifactId>apache-vxquery-parent</artifactId>
+    <version>0.2-incubating-SNAPSHOT</version>
+    <relativePath>vxquery-parent</relativePath>
+  </parent>
+  
   <artifactId>apache-vxquery</artifactId>
   <packaging>pom</packaging>
   <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>
-
-  <parent>
-    <groupId>org.apache.vxquery</groupId>
-    <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.2-incubating</version>
-    <relativePath>vxquery-parent</relativePath>
-  </parent>
-
+  
   <distributionManagement>
     <site>
       <id>vxquery.website</id>
@@ -107,5 +107,4 @@
     <module>vxquery-cli</module>
     <module>vxquery-xtest</module>
   </modules>
- 
 </project>

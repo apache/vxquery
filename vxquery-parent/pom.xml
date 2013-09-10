@@ -1,28 +1,16 @@
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+  license agreements. See the NOTICE file distributed with this work for additional 
+  information regarding copyright ownership. The ASF licenses this file to 
+  You under the Apache License, Version 2.0 (the "License"); you may not use 
+  this file except in compliance with the License. You may obtain a copy of 
+  the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+  by applicable law or agreed to in writing, software distributed under the 
+  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+  OF ANY KIND, either express or implied. See the License for the specific 
+  language governing permissions and limitations under the License. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.vxquery</groupId>
-  <artifactId>apache-vxquery-parent</artifactId>
-  <packaging>pom</packaging>
-  <version>0.2-incubating-SNAPSHOT</version>
-  <name>VXQuery Parent</name>
-  <url>http://incubator.apache.org/vxquery/</url>
 
   <parent>
     <groupId>org.apache</groupId>
@@ -30,6 +18,13 @@
     <version>13</version>
     <relativePath></relativePath>
   </parent>
+
+  <groupId>org.apache.vxquery</groupId>
+  <artifactId>apache-vxquery-parent</artifactId>
+  <packaging>pom</packaging>
+  <version>0.2-incubating-SNAPSHOT</version>
+  <name>VXQuery Parent</name>
+  <url>http://incubator.apache.org/vxquery/</url>
 
   <organization>
     <name>Apache Software Foundation</name>
@@ -51,107 +46,107 @@
   </issueManagement>
 
   <developers>
-      <developer>
-        <id>jochen</id>
-        <name>Jochen Wiedmann</name>
-        <email></email>
-        <roles>
-            <role>Mentor</role>
-        </roles>
-        <organization></organization>
-        <timezone></timezone>
-      </developer>         
-      <developer>
-        <id>radup</id>
-        <name>Radu Preotiuc</name>
-        <email></email>
-        <roles>
-            <role>Mentor</role>
-        </roles>
-        <organization></organization>
-        <timezone></timezone>
-      </developer>         
-      <developer>
-        <id>sanjiva</id>
-        <name>Sanjiva Weerawarana</name>
-        <email></email>
-        <roles>
-            <role>Mentor</role>
-        </roles>
-        <organization></organization>
-        <timezone></timezone>
-      </developer>         
-      <developer>
-        <id>cezar</id>
-        <name>Cezar Andrei</name>
-        <email></email>
-        <roles>
-          <role>Project Manager</role>
-          <role>Architect</role>
-          <role>Champion</role>
-        </roles>
-        <organization></organization>
-        <timezone>-6</timezone>
-      </developer>         
-      <developer>
-        <id>vinayakb</id>
-        <name>Vinayak Borkar</name>
-        <email></email>
-        <roles>
-          <role>Project Manager</role>
-          <role>Architect</role>
-        </roles>
-        <organization></organization>
-        <timezone>-8</timezone>
-      </developer>         
-      <developer>
-        <id>dtabass</id>
-        <name>Michael J. Carey</name>
-        <email></email>
-        <roles>
-          <role>Architect</role>
-        </roles>
-        <organization></organization>
-        <timezone>-8</timezone>
-      </developer>         
-      <developer>
-        <id>prestonc</id>
-        <name>Preston Carman</name>
-        <email></email>
-        <roles>
-          <role>Developer</role>
-        </roles>
-        <organization></organization>
-        <timezone>-8</timezone>
-      </developer>         
-      <developer>
-        <id>tillw</id>
-        <name>Till Westmann</name>
-        <email></email>
-        <roles>
-          <role>Project Manager</role>
-          <role>Architect</role>
-        </roles>
-        <organization></organization>
-        <timezone>-8</timezone>
-      </developer>         
+    <developer>
+      <id>jochen</id>
+      <name>Jochen Wiedmann</name>
+      <email></email>
+      <roles>
+        <role>Mentor</role>
+      </roles>
+      <organization></organization>
+      <timezone></timezone>
+    </developer>
+    <developer>
+      <id>radup</id>
+      <name>Radu Preotiuc</name>
+      <email></email>
+      <roles>
+        <role>Mentor</role>
+      </roles>
+      <organization></organization>
+      <timezone></timezone>
+    </developer>
+    <developer>
+      <id>sanjiva</id>
+      <name>Sanjiva Weerawarana</name>
+      <email></email>
+      <roles>
+        <role>Mentor</role>
+      </roles>
+      <organization></organization>
+      <timezone></timezone>
+    </developer>
+    <developer>
+      <id>cezar</id>
+      <name>Cezar Andrei</name>
+      <email></email>
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+        <role>Champion</role>
+      </roles>
+      <organization></organization>
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
+      <id>vinayakb</id>
+      <name>Vinayak Borkar</name>
+      <email></email>
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+      </roles>
+      <organization></organization>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>dtabass</id>
+      <name>Michael J. Carey</name>
+      <email></email>
+      <roles>
+        <role>Architect</role>
+      </roles>
+      <organization></organization>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>prestonc</id>
+      <name>Preston Carman</name>
+      <email></email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <organization></organization>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>tillw</id>
+      <name>Till Westmann</name>
+      <email></email>
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+      </roles>
+      <organization></organization>
+      <timezone>-8</timezone>
+    </developer>
   </developers>
 
   <mailingLists>
-      <mailingList>
-        <name>VXQuery-dev</name>
-        <subscribe>vxquery-dev-subscribe@incubator.apache.org</subscribe>
-        <unsubscribe>vxquery-dev-unsubscribe@incubator.apache.org</unsubscribe>
-       <post>vxquery-dev@incubator.apache.org</post>
-       <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-dev/</archive>
-      </mailingList>
-      <mailingList>
-        <name>VXQuery-commits</name>
-        <subscribe>vxquery-commits-subscribe@incubator.apache.org</subscribe>
-        <unsubscribe>vxquery-commits-unsubscribe@incubator.apache.org</unsubscribe>
-       <post>vxquery-commits@incubator.apache.org</post>
-       <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-commits/</archive>
-      </mailingList>
+    <mailingList>
+      <name>VXQuery-dev</name>
+      <subscribe>vxquery-dev-subscribe@incubator.apache.org</subscribe>
+      <unsubscribe>vxquery-dev-unsubscribe@incubator.apache.org</unsubscribe>
+      <post>vxquery-dev@incubator.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-dev/</archive>
+    </mailingList>
+    <mailingList>
+      <name>VXQuery-commits</name>
+      <subscribe>vxquery-commits-subscribe@incubator.apache.org</subscribe>
+      <unsubscribe>vxquery-commits-unsubscribe@incubator.apache.org</unsubscribe>
+      <post>vxquery-commits@incubator.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-commits/</archive>
+    </mailingList>
   </mailingLists>
 
   <scm>
@@ -197,7 +192,6 @@
   </repositories>
 
   <dependencies>
-
     <dependency>
       <groupId>args4j</groupId>
       <artifactId>args4j</artifactId>
@@ -222,6 +216,36 @@
       <version>0.2.1</version>
     </dependency>
   </dependencies>
+
+  <!-- DR -->
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
@@ -254,7 +278,7 @@
           <autoVersionSubmodules>true</autoVersionSubmodules>
         </configuration>
       </plugin>
-      <plugin>
+      <!--DR <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
         <version>1.4</version>
@@ -262,13 +286,15 @@
           <execution>
             <id>sign-artifacts</id>
             <phase>verify</phase>
-            <goals><goal>sign</goal></goals>
+            <goals>
+              <goal>sign</goal>
+            </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin> -->
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>
       <plugin>
@@ -277,7 +303,7 @@
         <version>2.5.1</version>
         <reportSets>
           <reportSet>
-            <reports/>
+            <reports />
           </reportSet>
         </reportSets>
       </plugin>
@@ -296,11 +322,10 @@
         </configuration>
       </plugin>
     </plugins>
-  </reporting>  
+  </reporting>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties> 
- 
+  </properties>
 </project>
