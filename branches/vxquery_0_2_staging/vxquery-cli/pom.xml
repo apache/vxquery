@@ -17,19 +17,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.vxquery</groupId>
-  <artifactId>apache-vxquery-cli</artifactId>
-  <packaging>jar</packaging>
-  <version>0.2-incubating-SNAPSHOT</version>
-  <name>VXQuery CLI</name>
-  <description>Apache VXQuery Command-Line Utility</description>
-
+  
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.2-incubating</version>
+    <version>0.2-incubating-SNAPSHOT</version>
     <relativePath>../vxquery-parent</relativePath>
   </parent>
+  
+  <artifactId>apache-vxquery-cli</artifactId>
+  <packaging>jar</packaging>
+  <name>VXQuery CLI</name>
+  <description>Apache VXQuery Command-Line Utility</description>
 
   <distributionManagement>
     <site>
@@ -76,8 +75,34 @@
     <dependency>
       <groupId>org.apache.vxquery</groupId>
       <artifactId>apache-vxquery-core</artifactId>
-      <version>0.2-incubating</version>
+      <version>0.2-incubating-SNAPSHOT</version>
       <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-api</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-algebricks-common</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-algebricks-core</artifactId>
+      <version>0.2.1</version>
+    </dependency>    
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-common</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-dataflow-std</artifactId>
+      <version>0.2.1</version>
     </dependency>
   </dependencies>
   
