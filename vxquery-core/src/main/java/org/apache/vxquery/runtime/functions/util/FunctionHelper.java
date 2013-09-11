@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.PointablePool;
+import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
@@ -69,6 +71,7 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
@@ -510,6 +513,157 @@ public class FunctionHelper {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
+    public static void atomize(TaggedValuePointable tvp, IPointable result) throws IOException {
+        NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
+        switch (tvp.getTag()) {
+            case ValueTag.NODE_TREE_TAG:
+                tvp.getValue(ntp);
+                atomizeNode(ntp, result);
+                break;
+
+            default:
+                result.set(tvp);
+        }
+    }
+
+    public static void atomizeNode(NodeTreePointable ntp, IPointable result) throws IOException {
+        ArrayBackedValueStorage tempABVS = new ArrayBackedValueStorage();
+        TaggedValuePointable tempTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        VoidPointable vp = (VoidPointable) VoidPointable.FACTORY.createPointable();
+        PointablePool pp = PointablePoolFactory.INSTANCE.createPointablePool();
+        ntp.getRootNode(tempTVP);
+        switch (tempTVP.getTag()) {
+            case ValueTag.ATTRIBUTE_NODE_TAG: {
+                AttributeNodePointable anp = pp.takeOne(AttributeNodePointable.class);
+                try {
+                    tempTVP.getValue(anp);
+                    anp.getValue(ntp, result);
+                } finally {
+                    pp.giveBack(anp);
+                }
+                break;
+            }
+
+            case ValueTag.TEXT_NODE_TAG:
+            case ValueTag.COMMENT_NODE_TAG: {
+                TextOrCommentNodePointable tcnp = pp.takeOne(TextOrCommentNodePointable.class);
+                try {
+                    tempTVP.getValue(tcnp);
+                    tcnp.getValue(ntp, vp);
+                    tempABVS.reset();
+                    tempABVS.getDataOutput().write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
+                    tempABVS.append(vp);
+                    result.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
+                } finally {
+                    pp.giveBack(tcnp);
+                }
+                break;
+            }
+
+            case ValueTag.DOCUMENT_NODE_TAG: {
+                DocumentNodePointable dnp = pp.takeOne(DocumentNodePointable.class);
+                SequencePointable sp = pp.takeOne(SequencePointable.class);
+                try {
+                    tempTVP.getValue(dnp);
+                    dnp.getContent(ntp, sp);
+                    buildStringConcatenation(sp, tempABVS, ntp);
+                    result.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
+                } finally {
+                    pp.giveBack(sp);
+                    pp.giveBack(dnp);
+                }
+                break;
+            }
+
+            case ValueTag.ELEMENT_NODE_TAG: {
+                ElementNodePointable enp = pp.takeOne(ElementNodePointable.class);
+                SequencePointable sp = pp.takeOne(SequencePointable.class);
+                try {
+                    tempTVP.getValue(enp);
+                    if (enp.childrenChunkExists()) {
+                        enp.getChildrenSequence(ntp, sp);
+                        buildStringConcatenation(sp, tempABVS, ntp);
+                        result.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
+                    }
+                } finally {
+                    pp.giveBack(sp);
+                    pp.giveBack(enp);
+                }
+                break;
+            }
+
+            case ValueTag.PI_NODE_TAG: {
+                PINodePointable pnp = pp.takeOne(PINodePointable.class);
+                try {
+                    tempTVP.getValue(pnp);
+                    pnp.getContent(ntp, vp);
+                    tempABVS.reset();
+                    tempABVS.getDataOutput().write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
+                    tempABVS.append(vp);
+                    result.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
+                } finally {
+                    pp.giveBack(pnp);
+                }
+                break;
+            }
+
+        }
+    }
+
+    public static void buildStringConcatenation(SequencePointable sp, ArrayBackedValueStorage tempABVS,
+            NodeTreePointable ntp) throws IOException {
+        tempABVS.reset();
+        DataOutput out = tempABVS.getDataOutput();
+        out.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
+        // Leave room for the utf-8 length
+        out.write(0);
+        out.write(0);
+        buildConcatenationRec(sp, out, ntp);
+        int utflen = tempABVS.getLength() - 3;
+        byte[] bytes = tempABVS.getByteArray();
+        // Patch utf-8 length at bytes 1 and 2
+        bytes[1] = (byte) ((utflen >>> 8) & 0xFF);
+        bytes[2] = (byte) ((utflen >>> 0) & 0xFF);
+    }
+
+    public static void buildConcatenationRec(SequencePointable sp, DataOutput out, NodeTreePointable ntp)
+            throws IOException {
+        TaggedValuePointable tempTVP2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        VoidPointable vp = (VoidPointable) VoidPointable.FACTORY.createPointable();
+        PointablePool pp = PointablePoolFactory.INSTANCE.createPointablePool();
+        int nItems = sp.getEntryCount();
+        for (int i = 0; i < nItems; ++i) {
+            sp.getEntry(i, tempTVP2);
+            switch (tempTVP2.getTag()) {
+                case ValueTag.TEXT_NODE_TAG: {
+                    TextOrCommentNodePointable tcnp = pp.takeOne(TextOrCommentNodePointable.class);
+                    try {
+                        tempTVP2.getValue(tcnp);
+                        tcnp.getValue(ntp, vp);
+                        out.write(vp.getByteArray(), vp.getStartOffset() + 2, vp.getLength() - 2);
+                    } finally {
+                        pp.giveBack(tcnp);
+                    }
+                    break;
+                }
+                case ValueTag.ELEMENT_NODE_TAG: {
+                    ElementNodePointable enp = pp.takeOne(ElementNodePointable.class);
+                    SequencePointable sp2 = pp.takeOne(SequencePointable.class);
+                    try {
+                        tempTVP2.getValue(enp);
+                        if (enp.childrenChunkExists()) {
+                            enp.getChildrenSequence(ntp, sp2);
+                            buildConcatenationRec(sp2, out, ntp);
+                        }
+                    } finally {
+                        pp.giveBack(sp2);
+                        pp.giveBack(enp);
+                    }
+                }
+            }
+        }
+    }
+
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
         final TypedPointables tp1 = new TypedPointables();
@@ -940,6 +1094,7 @@ public class FunctionHelper {
     public static int getBaseTypeForGeneralComparisons(int tid) throws SystemException {
         while (true) {
             switch (tid) {
+                case ValueTag.NODE_TREE_TAG:
                 case ValueTag.XS_ANY_URI_TAG:
                 case ValueTag.XS_BASE64_BINARY_TAG:
                 case ValueTag.XS_BOOLEAN_TAG:
@@ -1236,6 +1391,7 @@ public class FunctionHelper {
 
     /**
      * Checks the path has an acceptable file name extension to read in.
+     * 
      * @param path
      * @return
      */
