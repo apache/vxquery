@@ -17,14 +17,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
     <version>0.2-incubating-SNAPSHOT</version>
     <relativePath>../vxquery-parent</relativePath>
   </parent>
-  
+
   <artifactId>apache-vxquery-cli</artifactId>
   <packaging>jar</packaging>
   <name>VXQuery CLI</name>
@@ -66,11 +66,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.3</version>
       </plugin>
     </plugins>
   </build>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.vxquery</groupId>
@@ -93,7 +92,7 @@
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-algebricks-core</artifactId>
       <version>0.2.1</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-control-common</artifactId>
@@ -105,7 +104,7 @@
       <version>0.2.1</version>
     </dependency>
   </dependencies>
-  
+
   <reporting>
     <plugins>
       <plugin>
@@ -122,8 +121,8 @@
           </reportSet>
         </reportSets>
         <configuration>
-            <linkOnly>true</linkOnly>
-        </configuration>            
+          <linkOnly>true</linkOnly>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
@@ -140,5 +139,4 @@
       </plugin>
     </plugins>
   </reporting>
-  
 </project>
