@@ -149,12 +149,6 @@
     </mailingList>
   </mailingLists>
 
-  <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
-    <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
-  </scm>
-
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>

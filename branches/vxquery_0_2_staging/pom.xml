@@ -32,6 +32,12 @@
   <description>A Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>
   
+  <scm>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
+    <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
+  </scm>
+
   <distributionManagement>
     <site>
       <id>vxquery.website</id>
