@@ -184,49 +184,68 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                     TaggedValuePointable tvpArg1, TaggedValuePointable tvpArg2, DynamicContext dCtx)
                     throws SystemException {
                 boolean tagTransformed1 = false, tagTransformed2 = false;
-                int tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpArg1.getTag());
-                int tid2 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpArg2.getTag());
                 abvsInner1.reset();
                 abvsInner2.reset();
+                TaggedValuePointable tvpTransform1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                TaggedValuePointable tvpTransform2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                tvpTransform1.set(tvpArg1);
+                tvpTransform2.set(tvpArg2);
+                int tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform1.getTag());
+                int tid2 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform2.getTag());
+                
                 // Converted tags
-                TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                TaggedValuePointable tvpCompare1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                TaggedValuePointable tvpCompare2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
                 try {
+                    // Converts node tree's into untyped atomic values that can then be compared as atomic items.
+                    if (tid1 == ValueTag.NODE_TREE_TAG && tid2 == ValueTag.NODE_TREE_TAG) {
+                        FunctionHelper.atomize(tvpArg1, tvpTransform1);
+                        FunctionHelper.atomize(tvpArg2, tvpTransform2);
+                        tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform1.getTag());
+                        tid2 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform2.getTag());
+                    } else if (tid1 == ValueTag.NODE_TREE_TAG) {
+                        FunctionHelper.atomize(tvpArg1, tvpTransform1);
+                        tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform1.getTag());
+                    } else if (tid2 == ValueTag.NODE_TREE_TAG) {
+                        FunctionHelper.atomize(tvpArg2, tvpTransform2);
+                        tid2 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform2.getTag());
+                    }
+
                     // Set up value comparison tagged value pointables.
                     if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG && tid2 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         // Only need to change tag since the storage is the same for untyped atomic and string.
-                        tvp1.getByteArray()[0] = ValueTag.XS_STRING_TAG;
-                        tvp2.getByteArray()[0] = ValueTag.XS_STRING_TAG;
+                        tvpCompare1.getByteArray()[0] = ValueTag.XS_STRING_TAG;
+                        tvpCompare2.getByteArray()[0] = ValueTag.XS_STRING_TAG;
                     } else if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         tid1 = tid2;
                         getCastToOperator(tid2);
-                        tvpArg1.getValue(tp1.utf8sp);
+                        tvpTransform1.getValue(tp1.utf8sp);
                         aCastToOp.convertUntypedAtomic(tp1.utf8sp, dOutInner1);
-                        tvp1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(), abvsInner1.getLength());
+                        tvpCompare1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(), abvsInner1.getLength());
                         tagTransformed1 = true;
                     } else if (tid2 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         tid2 = tid1;
                         getCastToOperator(tid1);
-                        tvpArg2.getValue(tp2.utf8sp);
+                        tvpTransform2.getValue(tp2.utf8sp);
                         aCastToOp.convertUntypedAtomic(tp2.utf8sp, dOutInner2);
-                        tvp2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(), abvsInner2.getLength());
+                        tvpCompare2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(), abvsInner2.getLength());
                         tagTransformed2 = true;
                     }
                     // Copy over the values not changed and upgrade numeric values to double.
                     if (!tagTransformed1) {
-                        tvp1 = tvpArg1;
-                        if (FunctionHelper.isDerivedFromDouble(tvp1.getTag())) {
-                            FunctionHelper.getDoublePointable(tvpArg1, dOutInner1);
-                            tvp1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
+                        tvpCompare1 = tvpTransform1;
+                        if (FunctionHelper.isDerivedFromDouble(tvpCompare1.getTag())) {
+                            FunctionHelper.getDoublePointable(tvpTransform1, dOutInner1);
+                            tvpCompare1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
                                     DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
                             tagTransformed1 = true;
                         }
                     }
                     if (!tagTransformed2) {
-                        tvp2 = tvpArg2;
-                        if (FunctionHelper.isDerivedFromDouble(tvp2.getTag())) {
-                            FunctionHelper.getDoublePointable(tvpArg2, dOutInner2);
-                            tvp2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(),
+                        tvpCompare2 = tvpTransform2;
+                        if (FunctionHelper.isDerivedFromDouble(tvpCompare2.getTag())) {
+                            FunctionHelper.getDoublePointable(tvpTransform2, dOutInner2);
+                            tvpCompare2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(),
                                     DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
                             tagTransformed2 = true;
                         }
@@ -236,7 +255,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
-                return FunctionHelper.compareTaggedValues(aOp, tvp1, tvp2, dCtx);
+                return FunctionHelper.compareTaggedValues(aOp, tvpCompare1, tvpCompare2, dCtx);
             }
 
             private void getCastToOperator(int tid) {
