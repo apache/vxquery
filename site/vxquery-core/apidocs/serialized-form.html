@@ -1634,7 +1634,7 @@
 <li class="blockList"><a name="org.apache.vxquery.xmlquery.query.ParseException">
 <!--   -->
 </a>
-<h3>Class <a href="org/apache/vxquery/xmlquery/query/ParseException.html" title="class in org.apache.vxquery.xmlquery.query">org.apache.vxquery.xmlquery.query.ParseException</a> extends <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a> implements Serializable</h3>
+<h3>Class org.apache.vxquery.xmlquery.query.ParseException extends <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a> implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>1L</dd>
@@ -1647,29 +1647,19 @@
 <ul class="blockList">
 <li class="blockList">
 <h4>currentToken</h4>
-<pre><a href="org/apache/vxquery/xmlquery/query/Token.html" title="class in org.apache.vxquery.xmlquery.query">Token</a> currentToken</pre>
-<div class="block">This is the last token that has been consumed successfully.  If
- this object has been created due to a parse error, the token
- followng this token will (therefore) be the first error token.</div>
+<pre>org.apache.vxquery.xmlquery.query.Token currentToken</pre>
 </li>
 <li class="blockList">
 <h4>expectedTokenSequences</h4>
 <pre>int[][] expectedTokenSequences</pre>
-<div class="block">Each entry in this array is an array of integers.  Each array
- of integers represents a sequence of tokens (by their ordinal
- values) that is expected at this point of the parse.</div>
 </li>
 <li class="blockList">
 <h4>tokenImage</h4>
 <pre><a href="http://docs.oracle.com/javase/6/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[] tokenImage</pre>
-<div class="block">This is a reference to the "tokenImage" array of the generated
- parser within which the parse error occurred.  This array is
- defined in the generated ...Constants interface.</div>
 </li>
 <li class="blockListLast">
 <h4>eol</h4>
 <pre><a href="http://docs.oracle.com/javase/6/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> eol</pre>
-<div class="block">The end of line string for this machine.</div>
 </li>
 </ul>
 </li>
@@ -1678,7 +1668,7 @@
 <li class="blockList"><a name="org.apache.vxquery.xmlquery.query.Token">
 <!--   -->
 </a>
-<h3>Class <a href="org/apache/vxquery/xmlquery/query/Token.html" title="class in org.apache.vxquery.xmlquery.query">org.apache.vxquery.xmlquery.query.Token</a> extends <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a> implements Serializable</h3>
+<h3>Class org.apache.vxquery.xmlquery.query.Token extends <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a> implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>1L</dd>
@@ -1692,58 +1682,34 @@
 <li class="blockList">
 <h4>kind</h4>
 <pre>int kind</pre>
-<div class="block">An integer that describes the kind of this token.  This numbering
- system is determined by JavaCCParser, and a table of these numbers is
- stored in the file ...Constants.java.</div>
 </li>
 <li class="blockList">
 <h4>beginLine</h4>
 <pre>int beginLine</pre>
-<div class="block">The line number of the first character of this Token.</div>
 </li>
 <li class="blockList">
 <h4>beginColumn</h4>
 <pre>int beginColumn</pre>
-<div class="block">The column number of the first character of this Token.</div>
 </li>
 <li class="blockList">
 <h4>endLine</h4>
 <pre>int endLine</pre>
-<div class="block">The line number of the last character of this Token.</div>
 </li>
 <li class="blockList">
 <h4>endColumn</h4>
 <pre>int endColumn</pre>
-<div class="block">The column number of the last character of this Token.</div>
 </li>
 <li class="blockList">
 <h4>image</h4>
 <pre><a href="http://docs.oracle.com/javase/6/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> image</pre>
-<div class="block">The string image of the token.</div>
 </li>
 <li class="blockList">
 <h4>next</h4>
-<pre><a href="org/apache/vxquery/xmlquery/query/Token.html" title="class in org.apache.vxquery.xmlquery.query">Token</a> next</pre>
-<div class="block">A reference to the next regular (non-special) token from the input
- stream.  If this is the last token from the input stream, or if the
- token manager has not read tokens beyond this one, this field is
- set to null.  This is true only if this token is also a regular
- token.  Otherwise, see below for a description of the contents of
- this field.</div>
+<pre>org.apache.vxquery.xmlquery.query.Token next</pre>
 </li>
 <li class="blockListLast">
 <h4>specialToken</h4>
-<pre><a href="org/apache/vxquery/xmlquery/query/Token.html" title="class in org.apache.vxquery.xmlquery.query">Token</a> specialToken</pre>
-<div class="block">This field is used to access special tokens that occur prior to this
- token, but after the immediately preceding regular (non-special) token.
- If there are no such special tokens, this field is set to null.
- When there are more than one such special token, this field refers
- to the last of these special tokens, which in turn refers to the next
- previous special token through its specialToken field, and so on
- until the first special token (whose specialToken field is null).
- The next fields of special tokens refer to other special tokens that
- immediately follow it (without an intervening regular token).  If there
- is no such token, this field is null.</div>
+<pre>org.apache.vxquery.xmlquery.query.Token specialToken</pre>
 </li>
 </ul>
 </li>
@@ -1752,7 +1718,7 @@
 <li class="blockList"><a name="org.apache.vxquery.xmlquery.query.TokenMgrError">
 <!--   -->
 </a>
-<h3>Class <a href="org/apache/vxquery/xmlquery/query/TokenMgrError.html" title="class in org.apache.vxquery.xmlquery.query">org.apache.vxquery.xmlquery.query.TokenMgrError</a> extends <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Error.html?is-external=true" title="class or interface in java.lang">Error</a> implements Serializable</h3>
+<h3>Class org.apache.vxquery.xmlquery.query.TokenMgrError extends <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Error.html?is-external=true" title="class or interface in java.lang">Error</a> implements Serializable</h3>
 <dl class="nameValue">
 <dt>serialVersionUID:</dt>
 <dd>1L</dd>
@@ -1766,8 +1732,6 @@
 <li class="blockListLast">
 <h4>errorCode</h4>
 <pre>int errorCode</pre>
-<div class="block">Indicates the reason why the exception is thrown. It will have
- one of the above 4 values.</div>
 </li>
 </ul>
 </li>
