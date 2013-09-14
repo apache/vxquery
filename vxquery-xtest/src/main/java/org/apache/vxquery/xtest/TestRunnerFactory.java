@@ -112,7 +112,7 @@ public class TestRunnerFactory {
                 long start = System.currentTimeMillis();
                 try {
                     try {
-                        XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" });
+                        XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, 65536);
                         Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
                                 RootStaticContextImpl.INSTANCE), new ResultSetId(testCase.getXQueryDisplayName()

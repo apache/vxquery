@@ -55,7 +55,6 @@ import edu.uci.ics.hyracks.api.comm.IFrameTupleAccessor;
 import edu.uci.ics.hyracks.api.dataset.IHyracksDataset;
 import edu.uci.ics.hyracks.api.dataset.IHyracksDatasetReader;
 import edu.uci.ics.hyracks.api.dataset.ResultSetId;
-import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.api.job.JobFlag;
 import edu.uci.ics.hyracks.api.job.JobId;
 import edu.uci.ics.hyracks.api.job.JobSpecification;
@@ -65,7 +64,6 @@ import edu.uci.ics.hyracks.control.common.controllers.CCConfig;
 import edu.uci.ics.hyracks.control.common.controllers.NCConfig;
 import edu.uci.ics.hyracks.control.nc.NodeControllerService;
 import edu.uci.ics.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
-import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class VXQuery {
     private final CmdLineOptions opts;
@@ -171,15 +169,7 @@ public class VXQuery {
                 }
             };
 
-            // Get cluster node configuration.
-            Map<String, NodeControllerInfo> nodeControllerInfos = hcc.getNodeControllerInfos();
-            String[] nodeList = new String[nodeControllerInfos.size()];
-            int index = 0;
-            for (String node : nodeControllerInfos.keySet()) {
-                nodeList[index++] = node;
-            }
-
-            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, nodeList);
+            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId);
@@ -199,6 +189,19 @@ public class VXQuery {
                 runJob(js, writer);
             }
         }
+    }
+
+    /**
+     * Get cluster node configuration.
+     */
+    private String[] getNodeList() throws Exception {
+        Map<String, NodeControllerInfo> nodeControllerInfos = hcc.getNodeControllerInfos();
+        String[] nodeList = new String[nodeControllerInfos.size()];
+        int index = 0;
+        for (String node : nodeControllerInfos.keySet()) {
+            nodeList[index++] = node;
+        }
+        return nodeList;
     }
 
     private void runJob(JobSpecification spec, PrintWriter writer) throws Exception {
@@ -281,6 +284,9 @@ public class VXQuery {
 
         @Option(name = "-local-node-controllers", usage = "Number of local node controllers (default 1)")
         public int localNodeControllers = 1;
+
+        @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
+        public int frameSize = 65536;
 
         @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;
