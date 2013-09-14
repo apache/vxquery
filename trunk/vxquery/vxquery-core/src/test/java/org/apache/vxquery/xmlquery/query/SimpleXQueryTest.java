@@ -30,7 +30,6 @@ import org.apache.vxquery.context.StaticContextImpl;
 import org.junit.Test;
 
 import edu.uci.ics.hyracks.api.dataset.ResultSetId;
-import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
 
 public class SimpleXQueryTest {
     @Test
@@ -134,7 +133,7 @@ public class SimpleXQueryTest {
     }
 
     private static void runTestInternal(String testName, String query) throws Exception {
-        XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" });
+        XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, 65536);
         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                 new ResultSetId(System.nanoTime()));
         compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE);

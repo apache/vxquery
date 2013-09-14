@@ -82,10 +82,11 @@ public class XMLQueryCompiler {
 
     private ICompiler compiler;
 
-    private int frameSize = 65536;
+    private int frameSize;
 
-    public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList) {
+    public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
+        this.frameSize = frameSize;
         HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
                 new IOptimizationContextFactory() {
                     @Override
@@ -99,7 +100,7 @@ public class XMLQueryCompiler {
                                 physicalOptimizationConfig);
                     }
                 });
-        builder.getPhysicalOptimizationConfig().setFrameSize(frameSize);
+        builder.getPhysicalOptimizationConfig().setFrameSize(this.frameSize);
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {
