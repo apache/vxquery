@@ -67,6 +67,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
+        final int frameSize = ctx.getFrameSize();
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -82,8 +83,13 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 File collectionDirectory = new File(collectionModifiedName);
 
                 // Go through each tuple.
-                for (int t = 0; t < fta.getTupleCount(); ++t) {
-                    addXmlFile(collectionDirectory, t);
+                if (collectionDirectory.isDirectory()) {
+                    for (int t = 0; t < fta.getTupleCount(); ++t) {
+                        addXmlFile(collectionDirectory, t);
+                    }
+                } else {
+                    throw new HyracksDataException(
+                            "Invalid directory parameter passed to collection (VXQueryCollectionOperatorDescriptor.nextFrame).");
                 }
             }
 
@@ -107,17 +113,22 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         } catch (Exception e) {
                             throw new HyracksDataException(e);
                         }
-//                        System.err.println(file.getPath());
-//                        System.err.println(abvsFileNode.getLength() - abvsFileNode.getStartOffset());
+
                         tb.addField(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
                                 abvsFileNode.getLength());
+
+                        // Can not fit XML file into frame.
+                        if (frameSize <= (abvsFileNode.getLength() - abvsFileNode.getStartOffset())) {
+                            throw new HyracksDataException(
+                                    "XML file is to large for the current frame size (VXQueryCollectionOperatorDescriptor.addXmlFile).");
+                        }
 
                         // Send to the writer.
                         if (!appender.append(tb.getFieldEndOffsets(), tb.getByteArray(), 0, tb.getSize())) {
                             FrameUtils.flushFrame(frame, writer);
                             appender.reset(frame, true);
                             if (!appender.append(tb.getFieldEndOffsets(), tb.getByteArray(), 0, tb.getSize())) {
-                                throw new IllegalStateException(
+                                throw new HyracksDataException(
                                         "Could not write frame (VXQueryCollectionOperatorDescriptor.createPushRuntime).");
                             }
                         }
