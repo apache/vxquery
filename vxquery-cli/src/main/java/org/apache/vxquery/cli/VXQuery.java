@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +81,7 @@ public class VXQuery {
     }
 
     public static void main(String[] args) throws Exception {
+        Date start = new Date();
         final CmdLineOptions opts = new CmdLineOptions();
         CmdLineParser parser = new CmdLineParser(opts);
         try {
@@ -94,6 +96,11 @@ public class VXQuery {
         }
         VXQuery vxq = new VXQuery(opts);
         vxq.execute();
+        Date end = new Date();
+        if (opts.timing) {
+            System.out.println("Execution time: " + (end.getTime() - start.getTime()) + "ms");
+        }
+
     }
 
     private void execute() throws Exception {
