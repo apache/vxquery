@@ -76,6 +76,31 @@
           </descriptors>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+          </reportPlugins>
+        </configuration>
+        <executions> 
+          <execution> 
+            <id>attach-site</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals> 
+          </execution> 
+        </executions> 
+      </plugin>
     </plugins>
   </build>
 
