@@ -1,0 +1,57 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Running the Test Suite
+
+
+* Command
+
+----------------------------------------
+sh ./apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest
+----------------------------------------
+
+* Command Line Options
+
+----------------------------------------
+ -O N            : Optimization Level
+ -exclude VAL    : Exclude filter regular expression
+ -htmlreport VAL : HTML Report output file
+ -include VAL    : Include filter regular expression
+ -keepalive N    : Milliseconds to keep server alive after tests have completed
+ -port N         : Port for web server to listen on
+ -textreport VAL : Text Report output file
+ -threads N      : Number of threads
+ -v              : Verbose
+ -xmlreport VAL  : XML Report output file
+ -xqtsbase VAL   : XQTS Base Directory
+----------------------------------------
+ 
+* Java Options
+
+  The command can be run with Java options to increase the amount of memory to one gigabyte.
+  Also helps to use a logging properties file that only output serious errors. This will reduce the
+  output to only a few "LINE 7:" lines. Should help with the speed in running the test.
+
+----------------------------------------
+JAVA_OPTS="-Xmx1024m -Djava.util.logging.config.file=/path/to/logging.properties"
+----------------------------------------
+ 
+* Example
+
+----------------------------------------
+JAVA_OPTS="-Xmx1024m  -Djava.util.logging.config.file=/path/to/logging.properties" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase apache_vxquery_incubating/testsuites/XQTS/ -htmlreport /tmp/full_report.html
+----------------------------------------
+
+  View the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.
