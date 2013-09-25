@@ -27,7 +27,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.2-incubating-SNAPSHOT</version>
+  <version>0.2-incubating</version>
   <name>VXQuery Parent</name>
   <url>http://incubator.apache.org/vxquery/</url>
 
@@ -295,4 +295,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
+
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/pom/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/pom/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/pom/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</url>
+  </scm>
 </project>
