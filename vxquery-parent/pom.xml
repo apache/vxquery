@@ -27,7 +27,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.3-incubating-SNAPSHOT</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <name>VXQuery Parent</name>
   <url>http://incubator.apache.org/vxquery/</url>
 
@@ -232,10 +232,8 @@
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-release-plugin</artifactId>
-      <version>2.4.1</version>
       <configuration>
         <autoVersionSubmodules>true</autoVersionSubmodules>
-        <tagBase>https://svn.apache.org/repos/asf/incubator/vxquery/tags/</tagBase>
       </configuration>
     </plugin>
     <plugin>
