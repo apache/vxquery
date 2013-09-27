@@ -1,0 +1,116 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.vxquery</groupId>
+  <artifactId>apache-vxquery</artifactId>
+  <packaging>pom</packaging>
+  <version>0.2-incubating</version>
+  <name>VXQuery</name>
+  <description>A Versatile XQuery Processor</description>
+  <url>http://incubator.apache.org/vxquery/</url>
+
+  <parent>
+    <groupId>org.apache.vxquery</groupId>
+    <artifactId>apache-vxquery-parent</artifactId>
+    <version>0.2-incubating</version>
+    <relativePath>vxquery-parent</relativePath>
+  </parent>
+
+  <distributionManagement>
+    <site>
+      <id>vxquery.website</id>
+      <name>VXQuery Website</name>
+      <url>file:../../site/</url>
+    </site>
+  </distributionManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>generate-site</id>
+            <phase>pre-site</phase>
+            <configuration>
+              <target>
+                  <ant antfile="build-site.xml" target="build">
+                      <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
+                  </ant>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/source.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.4</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.5.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>license</report>
+              <report>project-team</report>
+              <report>scm</report>
+              <report>issue-tracking</report>
+              <report>mailing-list</report>
+              <report>plugins</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+        <configuration>
+            <linkOnly>true</linkOnly>
+        </configuration>            
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <modules>
+    <module>vxquery-parent</module>
+    <module>vxquery-core</module>
+    <module>vxquery-cli</module>
+    <module>vxquery-xtest</module>
+  </modules>
+ 
+</project>
