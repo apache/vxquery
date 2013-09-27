@@ -155,13 +155,6 @@
   </mailingLists>
 
   <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>dist</id>
-      <name>dist directory</name>
-      <url>file:dist</url>
-      <layout>default</layout>
-    </repository>
     <site>
       <id>vxquery.website</id>
       <name>VXQuery Website</name>
