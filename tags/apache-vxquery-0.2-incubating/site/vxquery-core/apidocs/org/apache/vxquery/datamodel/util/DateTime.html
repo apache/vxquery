@@ -1,0 +1,704 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+<title>DateTime (VXQuery Core 0.2-incubating-SNAPSHOT API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="DateTime (VXQuery Core 0.2-incubating-SNAPSHOT API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/DateTime.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Class</li>
+<li>Next Class</li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?org/apache/vxquery/datamodel/util/DateTime.html" target="_top">Frames</a></li>
+<li><a href="DateTime.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">org.apache.vxquery.datamodel.util</div>
+<h2 title="Class DateTime" class="title">Class DateTime</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li>org.apache.vxquery.datamodel.util.DateTime</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<hr>
+<br>
+<pre>public class <span class="strong">DateTime</span>
+extends <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#CHRONON_OF_DAY">CHRONON_OF_DAY</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#CHRONON_OF_HOUR">CHRONON_OF_HOUR</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#CHRONON_OF_MINUTE">CHRONON_OF_MINUTE</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#CHRONON_OF_SECOND">CHRONON_OF_SECOND</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#DAY_FIELD_INDEX">DAY_FIELD_INDEX</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static long[]</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#DAYS_OF_MONTH_LEAP">DAYS_OF_MONTH_LEAP</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static long[]</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#DAYS_OF_MONTH_ORDI">DAYS_OF_MONTH_ORDI</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int[]</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#FIELD_MAXS">FIELD_MAXS</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int[]</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#FIELD_MINS">FIELD_MINS</a></strong></code>
+<div class="block">Minimum feasible value of each field</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#HOUR_FIELD_INDEX">HOUR_FIELD_INDEX</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#MILLISECOND_FIELD_INDEX">MILLISECOND_FIELD_INDEX</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#MINUTE_FIELD_INDEX">MINUTE_FIELD_INDEX</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#MONTH_FIELD_INDEX">MONTH_FIELD_INDEX</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIME_DEFAULT_DAY">TIME_DEFAULT_DAY</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIME_DEFAULT_MONTH">TIME_DEFAULT_MONTH</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIME_DEFAULT_YEAR">TIME_DEFAULT_YEAR</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIMEZONE_HOUR_MAX">TIMEZONE_HOUR_MAX</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIMEZONE_HOUR_MIN">TIMEZONE_HOUR_MIN</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static byte</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIMEZONE_HOUR_NULL">TIMEZONE_HOUR_NULL</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIMEZONE_MINUTE_MAX">TIMEZONE_MINUTE_MAX</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIMEZONE_MINUTE_MIN">TIMEZONE_MINUTE_MIN</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static byte</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#TIMEZONE_MINUTE_NULL">TIMEZONE_MINUTE_NULL</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#YEAR_FIELD_INDEX">YEAR_FIELD_INDEX</a></strong></code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#DateTime()">DateTime</a></strong>()</code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#adjustDateTimeToTimezone(org.apache.vxquery.datamodel.api.ITimezone, long, java.io.DataOutput)">adjustDateTimeToTimezone</a></strong>(<a href="../../../../../org/apache/vxquery/datamodel/api/ITimezone.html" title="interface in org.apache.vxquery.datamodel.api">ITimezone</a>&nbsp;timezonep,
+                        long&nbsp;timezone,
+                        <a href="http://docs.oracle.com/javase/6/docs/api/java/io/DataOutput.html?is-external=true" title="class or interface in java.io">DataOutput</a>&nbsp;dOut)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#getUtcTimezoneDateTime(org.apache.vxquery.datamodel.api.ITimezone, org.apache.vxquery.datamodel.api.ITimezone, java.io.DataOutput)">getUtcTimezoneDateTime</a></strong>(<a href="../../../../../org/apache/vxquery/datamodel/api/ITimezone.html" title="interface in org.apache.vxquery.datamodel.api">ITimezone</a>&nbsp;timezonep,
+                      <a href="../../../../../org/apache/vxquery/datamodel/api/ITimezone.html" title="interface in org.apache.vxquery.datamodel.api">ITimezone</a>&nbsp;defaultTimezonep,
+                      <a href="http://docs.oracle.com/javase/6/docs/api/java/io/DataOutput.html?is-external=true" title="class or interface in java.io">DataOutput</a>&nbsp;dOut)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#isLeapYear(long)">isLeapYear</a></strong>(long&nbsp;year)</code>
+<div class="block">Check whether a given year is a leap year.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#normalizeDateTime(long, long, long, long, java.io.DataOutput)">normalizeDateTime</a></strong>(long&nbsp;yearMonth,
+                 long&nbsp;dayTime,
+                 long&nbsp;timezoneHour,
+                 long&nbsp;timezoneMinute,
+                 <a href="http://docs.oracle.com/javase/6/docs/api/java/io/DataOutput.html?is-external=true" title="class or interface in java.io">DataOutput</a>&nbsp;dOut)</code>
+<div class="block">Return a normalized time.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/vxquery/datamodel/util/DateTime.html#valid(long, long, long, long, long, long, long, long)">valid</a></strong>(long&nbsp;year,
+     long&nbsp;month,
+     long&nbsp;day,
+     long&nbsp;hour,
+     long&nbsp;minute,
+     long&nbsp;millisecond,
+     long&nbsp;timezoneHour,
+     long&nbsp;timezoneMinute)</code>
+<div class="block">Check whether a given year is a leap year.</div>
+</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang">equals</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang">hashCode</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang">toString</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true#wait(long, int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="DAYS_OF_MONTH_ORDI">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>DAYS_OF_MONTH_ORDI</h4>
+<pre>public static final&nbsp;long[] DAYS_OF_MONTH_ORDI</pre>
+</li>
+</ul>
+<a name="DAYS_OF_MONTH_LEAP">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>DAYS_OF_MONTH_LEAP</h4>
+<pre>public static final&nbsp;long[] DAYS_OF_MONTH_LEAP</pre>
+</li>
+</ul>
+<a name="CHRONON_OF_SECOND">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CHRONON_OF_SECOND</h4>
+<pre>public static final&nbsp;long CHRONON_OF_SECOND</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.CHRONON_OF_SECOND">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="CHRONON_OF_MINUTE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CHRONON_OF_MINUTE</h4>
+<pre>public static final&nbsp;long CHRONON_OF_MINUTE</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.CHRONON_OF_MINUTE">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="CHRONON_OF_HOUR">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CHRONON_OF_HOUR</h4>
+<pre>public static final&nbsp;long CHRONON_OF_HOUR</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.CHRONON_OF_HOUR">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="CHRONON_OF_DAY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CHRONON_OF_DAY</h4>
+<pre>public static final&nbsp;long CHRONON_OF_DAY</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.CHRONON_OF_DAY">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="FIELD_MINS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FIELD_MINS</h4>
+<pre>public static final&nbsp;int[] FIELD_MINS</pre>
+<div class="block">Minimum feasible value of each field</div>
+</li>
+</ul>
+<a name="FIELD_MAXS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FIELD_MAXS</h4>
+<pre>public static final&nbsp;int[] FIELD_MAXS</pre>
+</li>
+</ul>
+<a name="TIMEZONE_HOUR_MIN">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIMEZONE_HOUR_MIN</h4>
+<pre>public static final&nbsp;int TIMEZONE_HOUR_MIN</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIMEZONE_HOUR_MIN">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIMEZONE_HOUR_MAX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIMEZONE_HOUR_MAX</h4>
+<pre>public static final&nbsp;int TIMEZONE_HOUR_MAX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIMEZONE_HOUR_MAX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIMEZONE_MINUTE_MIN">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIMEZONE_MINUTE_MIN</h4>
+<pre>public static final&nbsp;int TIMEZONE_MINUTE_MIN</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIMEZONE_MINUTE_MIN">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIMEZONE_MINUTE_MAX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIMEZONE_MINUTE_MAX</h4>
+<pre>public static final&nbsp;int TIMEZONE_MINUTE_MAX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIMEZONE_MINUTE_MAX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIMEZONE_HOUR_NULL">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIMEZONE_HOUR_NULL</h4>
+<pre>public static final&nbsp;byte TIMEZONE_HOUR_NULL</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIMEZONE_HOUR_NULL">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIMEZONE_MINUTE_NULL">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIMEZONE_MINUTE_NULL</h4>
+<pre>public static final&nbsp;byte TIMEZONE_MINUTE_NULL</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIMEZONE_MINUTE_NULL">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="YEAR_FIELD_INDEX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>YEAR_FIELD_INDEX</h4>
+<pre>public static final&nbsp;int YEAR_FIELD_INDEX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.YEAR_FIELD_INDEX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="MONTH_FIELD_INDEX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>MONTH_FIELD_INDEX</h4>
+<pre>public static final&nbsp;int MONTH_FIELD_INDEX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.MONTH_FIELD_INDEX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="DAY_FIELD_INDEX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>DAY_FIELD_INDEX</h4>
+<pre>public static final&nbsp;int DAY_FIELD_INDEX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.DAY_FIELD_INDEX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="HOUR_FIELD_INDEX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>HOUR_FIELD_INDEX</h4>
+<pre>public static final&nbsp;int HOUR_FIELD_INDEX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.HOUR_FIELD_INDEX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="MINUTE_FIELD_INDEX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>MINUTE_FIELD_INDEX</h4>
+<pre>public static final&nbsp;int MINUTE_FIELD_INDEX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.MINUTE_FIELD_INDEX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="MILLISECOND_FIELD_INDEX">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>MILLISECOND_FIELD_INDEX</h4>
+<pre>public static final&nbsp;int MILLISECOND_FIELD_INDEX</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.MILLISECOND_FIELD_INDEX">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIME_DEFAULT_YEAR">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIME_DEFAULT_YEAR</h4>
+<pre>public static final&nbsp;int TIME_DEFAULT_YEAR</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIME_DEFAULT_YEAR">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIME_DEFAULT_MONTH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TIME_DEFAULT_MONTH</h4>
+<pre>public static final&nbsp;int TIME_DEFAULT_MONTH</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIME_DEFAULT_MONTH">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+<a name="TIME_DEFAULT_DAY">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>TIME_DEFAULT_DAY</h4>
+<pre>public static final&nbsp;int TIME_DEFAULT_DAY</pre>
+<dl><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../constant-values.html#org.apache.vxquery.datamodel.util.DateTime.TIME_DEFAULT_DAY">Constant Field Values</a></dd></dl>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="DateTime()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>DateTime</h4>
+<pre>public&nbsp;DateTime()</pre>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="isLeapYear(long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isLeapYear</h4>
+<pre>public static&nbsp;boolean&nbsp;isLeapYear(long&nbsp;year)</pre>
+<div class="block">Check whether a given year is a leap year.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>year</code> - </dd>
+<dt><span class="strong">Returns:</span></dt><dd></dd></dl>
+</li>
+</ul>
+<a name="valid(long, long, long, long, long, long, long, long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>valid</h4>
+<pre>public static&nbsp;boolean&nbsp;valid(long&nbsp;year,
+            long&nbsp;month,
+            long&nbsp;day,
+            long&nbsp;hour,
+            long&nbsp;minute,
+            long&nbsp;millisecond,
+            long&nbsp;timezoneHour,
+            long&nbsp;timezoneMinute)</pre>
+<div class="block">Check whether a given year is a leap year.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>year</code> - </dd>
+<dt><span class="strong">Returns:</span></dt><dd></dd></dl>
+</li>
+</ul>
+<a name="normalizeDateTime(long, long, long, long, java.io.DataOutput)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>normalizeDateTime</h4>
+<pre>public static&nbsp;void&nbsp;normalizeDateTime(long&nbsp;yearMonth,
+                     long&nbsp;dayTime,
+                     long&nbsp;timezoneHour,
+                     long&nbsp;timezoneMinute,
+                     <a href="http://docs.oracle.com/javase/6/docs/api/java/io/DataOutput.html?is-external=true" title="class or interface in java.io">DataOutput</a>&nbsp;dOut)
+                              throws <a href="http://docs.oracle.com/javase/6/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<div class="block">Return a normalized time.</div>
+<dl><dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/6/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code></dd></dl>
+</li>
+</ul>
+<a name="getUtcTimezoneDateTime(org.apache.vxquery.datamodel.api.ITimezone, org.apache.vxquery.datamodel.api.ITimezone, java.io.DataOutput)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getUtcTimezoneDateTime</h4>
+<pre>public static&nbsp;void&nbsp;getUtcTimezoneDateTime(<a href="../../../../../org/apache/vxquery/datamodel/api/ITimezone.html" title="interface in org.apache.vxquery.datamodel.api">ITimezone</a>&nbsp;timezonep,
+                          <a href="../../../../../org/apache/vxquery/datamodel/api/ITimezone.html" title="interface in org.apache.vxquery.datamodel.api">ITimezone</a>&nbsp;defaultTimezonep,
+                          <a href="http://docs.oracle.com/javase/6/docs/api/java/io/DataOutput.html?is-external=true" title="class or interface in java.io">DataOutput</a>&nbsp;dOut)
+                                   throws <a href="http://docs.oracle.com/javase/6/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<dl><dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/6/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code></dd></dl>
+</li>
+</ul>
+<a name="adjustDateTimeToTimezone(org.apache.vxquery.datamodel.api.ITimezone, long, java.io.DataOutput)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>adjustDateTimeToTimezone</h4>
+<pre>public static&nbsp;void&nbsp;adjustDateTimeToTimezone(<a href="../../../../../org/apache/vxquery/datamodel/api/ITimezone.html" title="interface in org.apache.vxquery.datamodel.api">ITimezone</a>&nbsp;timezonep,
+                            long&nbsp;timezone,
+                            <a href="http://docs.oracle.com/javase/6/docs/api/java/io/DataOutput.html?is-external=true" title="class or interface in java.io">DataOutput</a>&nbsp;dOut)
+                                     throws <a href="http://docs.oracle.com/javase/6/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<dl><dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/6/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code></dd></dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/DateTime.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../deprecated-list.html">Deprecated</a></li>
+<li><a href="../../../../../index-all.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Class</li>
+<li>Next Class</li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?org/apache/vxquery/datamodel/util/DateTime.html" target="_top">Frames</a></li>
+<li><a href="DateTime.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2013 <a href="http://www.apache.org/">Apache Software Foundation</a>. All Rights Reserved.</small></p>
+</body>
+</html>

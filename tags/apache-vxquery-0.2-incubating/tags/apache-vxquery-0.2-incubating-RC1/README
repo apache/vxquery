@@ -1,0 +1,35 @@
+Apache VXQuery
+--------------
+
+
+Requirements:
+
+1. JDK >= 1.6
+2. Apache Maven >= 2.0
+
+
+Running:
+
+There are two ways to run VXQuery:
+Note: shell scripts exist for running VXQuery for Un*x like systems.
+TODO: Add Windows batch files
+
+1. Command line client (vxq)
+
+Type "sh apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq" without any 
+arguments for help on executing the command line client.
+
+2. XQTS test driver (xtest)
+
+The xtest test driver can be used to execute XQuery tests from the XQTS suite.
+
+The XQTS testsuite can be retrieved from http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip.
+
+Type "sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest" without 
+any arguments for help on executing xtest.
+
+Typically the test suite will need extra memory to run and output can be stored in html for easy viewing.
+Sample Test Command: 
+  JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest \
+                           -xqtsbase <path to unzipped testsuite> \
+                           -htmlreport <path to HTML report>
