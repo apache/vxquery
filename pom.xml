@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.2-incubating</version>
+    <version>0.3-incubating-SNAPSHOT</version>
     <relativePath>vxquery-parent</relativePath>
   </parent>
 
@@ -31,9 +31,9 @@
   <url>http://incubator.apache.org/vxquery/</url>
 
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating</developerConnection>
-    <url>https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating</url>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
+    <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
   </scm>
 
   <distributionManagement>
