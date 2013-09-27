@@ -31,9 +31,9 @@
   <url>http://incubator.apache.org/vxquery/</url>
 
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating</connection>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/apache-vxquery-0.2-incubating</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating</developerConnection>
-    <url>https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating</url>
+    <url>https://svn.apache.org/repos/asf/incubator/vxquery/apache-vxquery-0.2-incubating</url>
   </scm>
 
   <distributionManagement>

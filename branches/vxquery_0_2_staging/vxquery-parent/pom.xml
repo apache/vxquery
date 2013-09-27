@@ -232,8 +232,10 @@
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-release-plugin</artifactId>
+      <version>2.4.1</version>
       <configuration>
         <autoVersionSubmodules>true</autoVersionSubmodules>
+        <tagBase>https://svn.apache.org/repos/asf/incubator/vxquery/tags/</tagBase>
       </configuration>
     </plugin>
     <plugin>
@@ -290,8 +292,8 @@
   </properties>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/pom/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/pom/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/pom/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</developerConnection>
+    <url>http://svn.apache.org/viewvc/incubator/vxquery/tags/apache-vxquery-0.2-incubating/apache-vxquery-parent</url>
   </scm>
 </project>
