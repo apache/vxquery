@@ -27,7 +27,7 @@
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.2-incubating-SNAPSHOT</version>
+  <version>0.2-incubating</version>
   <name>VXQuery Parent</name>
   <url>http://incubator.apache.org/vxquery/</url>
 
@@ -46,9 +46,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
-    <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating/vxquery</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating/vxquery</developerConnection>
+    <url>https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating/vxquery</url>
   </scm>
 
   <issueManagement>
