@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.2-incubating</version>
+    <version>0.2-incubating-SNAPSHOT</version>
     <relativePath>vxquery-parent</relativePath>
   </parent>
 
@@ -29,6 +29,12 @@
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>
+
+  <scm>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
+    <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
+  </scm>
 
   <distributionManagement>
     <site>
