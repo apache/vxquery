@@ -26,7 +26,7 @@
 
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery</artifactId>
-  <version>0.2-incubating</version>
+  <version>0.2-incubating-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
@@ -283,6 +283,7 @@
           </descriptors>
         </configuration>
       </plugin>
+      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -309,6 +310,7 @@
           </execution> 
         </executions> 
       </plugin>
+      -->
     </plugins>
   </build>
 
