@@ -19,9 +19,8 @@
 
   <parent>
     <groupId>org.apache.vxquery</groupId>
-    <artifactId>apache-vxquery-parent</artifactId>
+    <artifactId>apache-vxquery</artifactId>
     <version>0.2-incubating-SNAPSHOT</version>
-    <relativePath>../vxquery-parent</relativePath>
   </parent>
 
   <artifactId>apache-vxquery-cli</artifactId>
@@ -65,6 +64,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-site</id>
+            <phase>none</phase>
+          </execution>          
+        </executions>
       </plugin>
     </plugins>
   </build>

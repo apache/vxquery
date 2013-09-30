@@ -18,24 +18,149 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.vxquery</groupId>
-    <artifactId>apache-vxquery-parent</artifactId>
-    <version>0.2-incubating-SNAPSHOT</version>
-    <relativePath>vxquery-parent</relativePath>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>13</version>
+    <relativePath />
   </parent>
 
+  <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery</artifactId>
+  <version>0.2-incubating</version>
   <packaging>pom</packaging>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
   <url>http://incubator.apache.org/vxquery/</url>
 
+  <organization>
+    <name>Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+  </organization>
+  
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+  
   <scm>
     <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
     <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
   </scm>
 
+  <issueManagement>
+    <system>Jira</system>
+    <url>https://issues.apache.org/jira/browse/VXQUERY</url>
+  </issueManagement>
+  
+  <developers>
+    <developer>
+      <id>jochen</id>
+      <name>Jochen Wiedmann</name>
+      <email />
+      <roles>
+        <role>Mentor</role>
+      </roles>
+      <organization />
+      <timezone />
+    </developer>
+    <developer>
+      <id>radup</id>
+      <name>Radu Preotiuc</name>
+      <email />
+      <roles>
+        <role>Mentor</role>
+      </roles>
+      <organization />
+      <timezone />
+    </developer>
+    <developer>
+      <id>sanjiva</id>
+      <name>Sanjiva Weerawarana</name>
+      <email />
+      <roles>
+        <role>Mentor</role>
+      </roles>
+      <organization />
+      <timezone />
+    </developer>
+    <developer>
+      <id>cezar</id>
+      <name>Cezar Andrei</name>
+      <email />
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+        <role>Champion</role>
+      </roles>
+      <organization />
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
+      <id>vinayakb</id>
+      <name>Vinayak Borkar</name>
+      <email />
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+      </roles>
+      <organization />
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>dtabass</id>
+      <name>Michael J. Carey</name>
+      <email />
+      <roles>
+        <role>Architect</role>
+      </roles>
+      <organization />
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>prestonc</id>
+      <name>Preston Carman</name>
+      <email />
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <organization />
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>tillw</id>
+      <name>Till Westmann</name>
+      <email />
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+      </roles>
+      <organization />
+      <timezone>-8</timezone>
+    </developer>
+  </developers>
+  
+  <mailingLists>
+    <mailingList>
+      <name>VXQuery-dev</name>
+      <subscribe>vxquery-dev-subscribe@incubator.apache.org</subscribe>
+      <unsubscribe>vxquery-dev-unsubscribe@incubator.apache.org</unsubscribe>
+      <post>vxquery-dev@incubator.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-dev/</archive>
+    </mailingList>
+    <mailingList>
+      <name>VXQuery-commits</name>
+      <subscribe>vxquery-commits-subscribe@incubator.apache.org</subscribe>
+      <unsubscribe>vxquery-commits-unsubscribe@incubator.apache.org</unsubscribe>
+      <post>vxquery-commits@incubator.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-commits/</archive>
+    </mailingList>
+  </mailingLists>
+  
   <distributionManagement>
     <site>
       <id>vxquery.website</id>
@@ -44,8 +169,92 @@
     </site>
   </distributionManagement>
 
+  <repositories>
+    <repository>
+      <id>hyracks-snapshots</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
+      <snapshots>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>hyracks-releases</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
+      <releases>
+      </releases>
+    </repository>
+    <repository>
+      <id>hyracks-thirdparty</id>
+      <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-thirdparty/</url>
+      <releases>
+      </releases>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>args4j</groupId>
+      <artifactId>args4j</artifactId>
+      <version>2.0.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-cc</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-nc</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-algebricks-compiler</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <createChecksum>true</createChecksum>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+        </configuration>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>aggregate</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <notimestamp>true</notimestamp>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -82,6 +291,7 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.7</version>
             </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -107,7 +317,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>2.7</version>
         <reportSets>
           <reportSet>
             <reports>
@@ -125,11 +335,29 @@
           <linkOnly>true</linkOnly>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.7</version>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <notimestamp>true</notimestamp>
+        </configuration>
+      </plugin>
     </plugins>
   </reporting>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
   <modules>
-    <module>vxquery-parent</module>
     <module>vxquery-core</module>
     <module>vxquery-cli</module>
     <module>vxquery-xtest</module>
