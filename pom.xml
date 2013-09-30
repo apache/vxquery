@@ -48,7 +48,7 @@
   
   <scm>
     <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/branches/vxquery_0_2_staging</developerConnection>
     <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
   </scm>
 
@@ -335,6 +335,8 @@
         </reportSets>
         <configuration>
           <linkOnly>true</linkOnly>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+          <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
         </configuration>
       </plugin>
       <plugin>
