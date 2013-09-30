@@ -19,9 +19,8 @@
 
   <parent>
     <groupId>org.apache.vxquery</groupId>
-    <artifactId>apache-vxquery-parent</artifactId>
+    <artifactId>apache-vxquery</artifactId>
     <version>0.2-incubating</version>
-    <relativePath>../vxquery-parent</relativePath>
   </parent>
 
   <artifactId>apache-vxquery-core</artifactId>
@@ -122,10 +121,12 @@
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
+      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
       </plugin>
+      -->
     </plugins>
   </build>
 
