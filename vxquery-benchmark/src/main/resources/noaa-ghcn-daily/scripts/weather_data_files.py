@@ -175,7 +175,7 @@ class WeatherDataFiles:
         print "CSV DETAILS OF PROCESSED STATIONS"
         print "Number of stations:\t" + "{:,}".format(station_count)
         print "Number of files:\t" + "{:,}".format(file_count)
-        print "Data size:\t\t" + sizeof_fmt(data_size) + "\n"
+        print "Data size:\t\t" + "{:,}".format(data_size) + " Bytes\n"
 
         print "CSV DETAILS OF unPROCESSED STATIONS"
         print "Number of stations:\t" + "{:,}".format(station_count_missing) + "\n"
@@ -183,7 +183,7 @@ class WeatherDataFiles:
         print "FOLDER DETAILS"
         print "Number of stations:\t" + "{:,}".format(station_count_actual)
         print "Number of files:\t" + "{:,}".format(file_count_actual)
-        print "Data size:\t\t" + sizeof_fmt(data_size_actual) + "\n"
+        print "Data size:\t\t" + "{:,}".format(data_size_actual) + " Bytes\n"
 
     
     def get_progress_csv_row(self, file_name, status, file_count=-1, data_size=-1):
@@ -247,17 +247,3 @@ class WeatherDataFiles:
             if columns[self.INDEX_DATA_STATUS].strip() != self.DATA_FILE_CREATED:
                 break
         return columns[self.INDEX_DATA_FILE_NAME]
-
-# sizeof_fmt function is taken from an answer posted to stackoverflow.com.
-#
-# Question: 
-#   http://stackoverflow.com/questions/1094841
-# Answer Author: 
-#   http://stackoverflow.com/users/55246/sridhar-ratnakumar
-def sizeof_fmt(num):
-    for x in ['bytes', 'KB', 'MB', 'GB']:
-        if num < 1024.0 and num > -1024.0:
-            return "%3.1f%s" % (num, x)
-        num /= 1024.0
-    return "%3.1f%s" % (num, 'TB')
-    

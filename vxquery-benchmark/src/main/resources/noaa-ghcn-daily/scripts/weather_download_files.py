@@ -14,10 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
 import os.path
 import shutil
 import tarfile
-import urllib2
+import urllib
 
 # Custom modules.
 from weather_dly_config import *
@@ -42,37 +43,9 @@ class WeatherDownloadFiles:
         file_name = self.save_path + "/" + url.split('/')[-1]
 
         if not os.path.isfile(file_name) or reset:
-            download_file_with_status(url, file_name)
-
-    # download_file_with_status function is based on a question posted to
-    # stackoverflow.com.
-    #
-    # Question: 
-    #   http://stackoverflow.com/questions/22676
-    # Answer Authors: 
-    #   http://stackoverflow.com/users/394/pablog
-    #   http://stackoverflow.com/users/160206/bjorn-pollex
-    def download_file_with_status(self, url, file_name):
-        u = urllib2.urlopen(url)
-        f = open(file_name, 'wb')
-        meta = u.info()
-        file_size = int(meta.getheaders("Content-Length")[0])
-        print "Downloading: %s Bytes: %s" % (file_name, file_size)
-
-        file_size_dl = 0
-        block_sz = 8192
-        while True:
-            buffer = u.read(block_sz)
-            if not buffer:
-                break
-
-            file_size_dl += len(buffer)
-            f.write(buffer)
-            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-            status = status + chr(8) * (len(status) + 1)
-            print status,
-
-        f.close()
+            print "Downloading: " + url
+            urllib.urlretrieve(url, file_name, report_download_status)
+            print
 
     # Unzip the package file, unless it exists.
     def unzip_package(self, package, reset=False):
@@ -87,3 +60,20 @@ class WeatherDownloadFiles:
             tar_file = tarfile.open(file_name, 'r:gz')
             tar_file.extractall(unzipped_path)
  
+# Report download status.
+def report_download_status(count, block, size):
+    line_size = 20
+    erase = "\b" * line_size
+    sys.stdout.write(erase)
+    report = get_report_line( (float(count) * block) / size, line_size)
+    sys.stdout.write(report)
+
+def get_report_line(percentage, line_size):
+    report = ""
+    for i in range(0, line_size):
+        if (float(i) / line_size < percentage):
+            report += "="
+        else:
+            report += "-"
+    return report
+            
