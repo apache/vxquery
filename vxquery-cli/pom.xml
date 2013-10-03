@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery</artifactId>
-    <version>0.2-incubating</version>
+    <version>0.3-incubating-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-vxquery-cli</artifactId>
@@ -83,7 +83,7 @@
     <dependency>
       <groupId>org.apache.vxquery</groupId>
       <artifactId>apache-vxquery-core</artifactId>
-      <version>0.2-incubating</version>
+      <version>0.3-incubating-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
 
