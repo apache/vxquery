@@ -25,7 +25,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
@@ -43,19 +45,19 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  *   plan__parent
  *   UNNEST( $v2 : iterate( $v1 ) )
  *   SUBPLAN{
- *     AGGREGATE( $v1 : sequence( $v0 ) )
+ *     AGGREGATE( $v1 : sequence( \@expression ) )
  *     plan__nested
  *     NESTEDTUPLESOURCE
  *   }
  *   plan__child
  *   
- *   where plan__parent does not use $v1 and $v0 is defined plan__child.
+ *   where plan__parent does not use $v1.
  *    
  * After 
  * 
  *   plan__parent
- *   UNNEST( $v2 : iterate( $v1 ) )
- *   ASSIGN( $v1 : $v0 )
+ *   UNNEST( $v2 : iterate( $v3 ) )
+ *   ASSIGN( $v3 : \@expression )
  *   plan__nested
  *   plan__child
  * </pre>
@@ -111,10 +113,12 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
 
         // Replace search string with assign.
         Mutable<ILogicalExpression> assignExpression = functionCall2.getArguments().get(0);
-        AssignOperator aOp = new AssignOperator(aggregate.getVariables().get(0), assignExpression);
+        LogicalVariable assignVariable = context.newVar();
+        AssignOperator aOp = new AssignOperator(assignVariable, assignExpression);
         for (Mutable<ILogicalOperator> input : aggregate.getInputs()) {
             aOp.getInputs().add(input);
         }
+        functionCall.getArguments().get(0).setValue(new VariableReferenceExpression(assignVariable));
         unnest.getInputs().get(0).setValue(aOp);
 
         return true;
