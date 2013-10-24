@@ -47,10 +47,6 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  *    or
  *   ASSIGN( $source : promote( data( $v0 ) ) )
  *   ASSIGN( $v0 : constant )
- *    or
- *   ASSIGN( $source : promote( data( $v00 ) ) )
- *   ASSIGN( $v00 : treat( $v0 ) ) )
- *   ASSIGN( $v0 : constant )
  *   
  * After 
  * 
