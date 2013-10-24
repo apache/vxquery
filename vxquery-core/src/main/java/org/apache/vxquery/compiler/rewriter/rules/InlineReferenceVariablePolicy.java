@@ -16,7 +16,6 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.mutable.Mutable;
 
@@ -25,7 +24,6 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
@@ -57,7 +55,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 public class InlineReferenceVariablePolicy implements InlineVariablesRule.IInlineVariablePolicy {
 
     @Override
-    public boolean addExpressionToInlineMap(ILogicalExpression expr, Set<FunctionIdentifier> doNotInlineFuncs) {
+    public boolean isCandidateForInlining(ILogicalExpression expr) {
         if (expr.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
             return true;
         }
@@ -84,7 +82,7 @@ public class InlineReferenceVariablePolicy implements InlineVariablesRule.IInlin
     }
 
     @Override
-    public boolean transformOperator(AbstractLogicalOperator op) {
+    public boolean isCanidateInlineTarget(AbstractLogicalOperator op) {
         return true;
     }
 
