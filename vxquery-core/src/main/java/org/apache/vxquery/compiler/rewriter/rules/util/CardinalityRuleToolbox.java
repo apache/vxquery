@@ -60,6 +60,8 @@ public class CardinalityRuleToolbox {
                 cardinalityVariable = vxqueryContext.getCardinalityOperatorMap(lastOperator);
                 break;
             case DATASOURCESCAN:
+            case INNERJOIN:
+            case LEFTOUTERJOIN:
             case UNNEST:
                 cardinalityVariable = Cardinality.MANY;
                 break;
@@ -83,9 +85,7 @@ public class CardinalityRuleToolbox {
             case DISTINCT:
             case EXTENSION_OPERATOR:
             case INDEX_INSERT_DELETE:
-            case INNERJOIN:
             case INSERT_DELETE:
-            case LEFTOUTERJOIN:
             case PARTITIONINGSPLIT:
             case REPLICATE:
             case RUNNINGAGGREGATE:

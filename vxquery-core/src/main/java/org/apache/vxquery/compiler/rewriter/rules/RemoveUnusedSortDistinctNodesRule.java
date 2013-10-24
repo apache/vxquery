@@ -42,6 +42,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLog
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractOperatorWithNestedPlans;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.InnerJoinOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.LeftOuterJoinOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.OrderOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
@@ -336,45 +338,60 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         switch (op.getOperatorTag()) {
             case AGGREGATE:
                 AggregateOperator aggregate = (AggregateOperator) op;
-                ILogicalExpression aggregateLogicalExpression = (ILogicalExpression) aggregate.getExpressions().get(0)
-                        .getValue();
-                variableId = aggregate.getVariables().get(0).getId();
-                documentOrder = propagateDocumentOrder(aggregateLogicalExpression, documentOrderVariablesForOperator);
-                uniqueNodes = propagateUniqueNodes(aggregateLogicalExpression, uniqueNodesVariablesForOperator);
-                documentOrderVariables.put(variableId, documentOrder);
-                uniqueNodesVariables.put(variableId, uniqueNodes);
+                for (int index = 0; index < aggregate.getExpressions().size(); index++) {
+                    ILogicalExpression aggregateLogicalExpression = (ILogicalExpression) aggregate.getExpressions()
+                            .get(index).getValue();
+                    variableId = aggregate.getVariables().get(index).getId();
+                    documentOrder = propagateDocumentOrder(aggregateLogicalExpression,
+                            documentOrderVariablesForOperator);
+                    uniqueNodes = propagateUniqueNodes(aggregateLogicalExpression, uniqueNodesVariablesForOperator);
+                    documentOrderVariables.put(variableId, documentOrder);
+                    uniqueNodesVariables.put(variableId, uniqueNodes);
+                }
                 break;
             case ASSIGN:
                 AssignOperator assign = (AssignOperator) op;
-                ILogicalExpression assignLogicalExpression = (ILogicalExpression) assign.getExpressions().get(0)
-                        .getValue();
-                variableId = assign.getVariables().get(0).getId();
-                documentOrder = propagateDocumentOrder(assignLogicalExpression, documentOrderVariablesForOperator);
-                uniqueNodes = propagateUniqueNodes(assignLogicalExpression, uniqueNodesVariablesForOperator);
-                documentOrderVariables.put(variableId, documentOrder);
-                uniqueNodesVariables.put(variableId, uniqueNodes);
+                for (int index = 0; index < assign.getExpressions().size(); index++) {
+                    ILogicalExpression assignLogicalExpression = (ILogicalExpression) assign.getExpressions()
+                            .get(index).getValue();
+                    variableId = assign.getVariables().get(index).getId();
+                    documentOrder = propagateDocumentOrder(assignLogicalExpression, documentOrderVariablesForOperator);
+                    uniqueNodes = propagateUniqueNodes(assignLogicalExpression, uniqueNodesVariablesForOperator);
+                    documentOrderVariables.put(variableId, documentOrder);
+                    uniqueNodesVariables.put(variableId, uniqueNodes);
+                }
+                break;
+            case INNERJOIN:
+            case LEFTOUTERJOIN:
+                resetDocumentOrderVariables(documentOrderVariables, DocumentOrder.NO);
+                resetUniqueNodesVariables(uniqueNodesVariables, UniqueNodes.NO);
                 break;
             case ORDER:
                 // Get order variable id that is altered.
                 OrderOperator order = (OrderOperator) op;
-                ILogicalExpression orderLogicalExpression = order.getOrderExpressions().get(0).second.getValue();
-                if (orderLogicalExpression.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
-                    throw new RuntimeException("Operator (" + op.getOperatorTag()
-                            + ") has received unexpected input in rewrite rule.");
-                }
-                VariableReferenceExpression variableExpression = (VariableReferenceExpression) orderLogicalExpression;
-                variableId = variableExpression.getVariableReference().getId();
+                for (int index = 0; index < order.getOrderExpressions().size(); index++) {
+                    ILogicalExpression orderLogicalExpression = order.getOrderExpressions().get(index).second
+                            .getValue();
+                    if (orderLogicalExpression.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+                        throw new RuntimeException("Operator (" + op.getOperatorTag()
+                                + ") has received unexpected input in rewrite rule.");
+                    }
+                    VariableReferenceExpression variableExpression = (VariableReferenceExpression) orderLogicalExpression;
+                    variableId = variableExpression.getVariableReference().getId();
 
-                // Remove document order from variable used in order operator.
-                documentOrderVariables.put(variableId, DocumentOrder.NO);
+                    // Remove document order from variable used in order operator.
+                    documentOrderVariables.put(variableId, DocumentOrder.NO);
+                }
                 break;
             case SUBPLAN:
                 // Find the last operator to set a variable and call this function again.
                 SubplanOperator subplan = (SubplanOperator) op;
-                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(0)
-                        .getRoots().get(0).getValue();
-                updateVariableMap(lastOperator, cardinalityVariable, documentOrderVariables, uniqueNodesVariables,
-                        vxqueryContext);
+                for (int index = 0; index < subplan.getNestedPlans().size(); index++) {
+                    AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(index)
+                            .getRoots().get(0).getValue();
+                    updateVariableMap(lastOperator, cardinalityVariable, documentOrderVariables, uniqueNodesVariables,
+                            vxqueryContext);
+                }
                 break;
             case UNNEST:
                 // Get unnest item property.
@@ -427,9 +444,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case EXTENSION_OPERATOR:
             case GROUP:
             case INDEX_INSERT_DELETE:
-            case INNERJOIN:
             case INSERT_DELETE:
-            case LEFTOUTERJOIN:
             case LIMIT:
             case PARTITIONINGSPLIT:
             case PROJECT:
