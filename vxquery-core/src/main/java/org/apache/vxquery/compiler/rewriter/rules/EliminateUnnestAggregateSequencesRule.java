@@ -25,7 +25,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
@@ -93,10 +95,12 @@ public class EliminateUnnestAggregateSequencesRule implements IAlgebraicRewriteR
 
         // Replace search string with assign.
         Mutable<ILogicalExpression> assignExpression = functionCall2.getArguments().get(0);
-        AssignOperator aOp = new AssignOperator(unnest.getVariable(), assignExpression);
+        LogicalVariable assignVariable = context.newVar();
+        AssignOperator aOp = new AssignOperator(assignVariable, assignExpression);
         for (Mutable<ILogicalOperator> input : aggregate.getInputs()) {
             aOp.getInputs().add(input);
         }
+        functionCall.getArguments().get(0).setValue(new VariableReferenceExpression(assignVariable));
         unnest.getInputs().get(0).setValue(aOp);
 
         return true;

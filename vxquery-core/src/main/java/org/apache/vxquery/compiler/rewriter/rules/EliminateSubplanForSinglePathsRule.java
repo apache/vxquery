@@ -57,6 +57,9 @@ public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule
     @Override
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
+        // TODO Fix EliminateSubplanForSinglePathsRule to check for variables used after the subplan.
+        // TODO Add back to the rewrite rule list once fixed.
+        
         // Do not process empty or nested tuple source.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE
@@ -67,6 +70,10 @@ public class EliminateSubplanForSinglePathsRule implements IAlgebraicRewriteRule
         // Set cardinality in the context. Must update each time the rule is run.
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
         Cardinality cardinalityVariable = CardinalityRuleToolbox.getProducerCardinality(opRef.getValue(), vxqueryContext);
+        
+        // Track variables created
+        
+        // Track variables used
 
         if (op.getOperatorTag() == LogicalOperatorTag.SUBPLAN && cardinalityVariable == Cardinality.ONE) {
             SubplanOperator subplan = (SubplanOperator) op;
