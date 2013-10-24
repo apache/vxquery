@@ -20,16 +20,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignSortDistinctNodesToOperatorsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
-import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSinglePathsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
 import org.apache.vxquery.compiler.rewriter.rules.InlineReferenceVariablePolicy;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushUnnestDownThroughProductRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedTreatRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
 
@@ -51,15 +51,18 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerR
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PullSelectOutOfEqJoin;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushAssignDownThroughProductRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushLimitDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectIntoDataSourceScanRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectIntoJoinRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSubplanWithAggregateDownThroughProductRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ReinferAllTypesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.RemoveUnusedAssignAndAggregateRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetAlgebricksPhysicalOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
 
 public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
@@ -73,6 +76,10 @@ public class RewriteRuleset {
 
         // TODO Fix the group by operator before putting back in the rule set.
         //        normalization.add(new ConvertAssignSortDistinctNodesToOperatorsRule());
+
+        normalization.add(new RemoveUnusedTreatRule());
+        normalization.add(new InlineVariablesRule(new InlineReferenceVariablePolicy()));
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Find assign for scalar aggregate function followed by an aggregate operator.
         normalization.add(new ConsolidateAssignAggregateRule());
@@ -88,9 +95,10 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Remove single tuple input subplans and merge unnest aggregate operators.
-        normalization.add(new EliminateSubplanForSinglePathsRule());
+        // TODO Fix EliminateSubplanForSinglePathsRule to check for variables used after the subplan.
+        //        normalization.add(new EliminateSubplanForSinglePathsRule());
         normalization.add(new EliminateUnnestAggregateSequencesRule());
-        
+
         normalization.add(new ConvertAssignToUnnestRule());
 
         // Convert to a data source scan operator.
@@ -106,6 +114,25 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         return normalization;
+    }
+
+    /**
+     * When a nested data sources exist, convert the plan to use the join operator.
+     * 
+     * @return
+     */
+    public final static List<IAlgebraicRewriteRule> buildNestedDataSourceRuleCollection() {
+        List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();
+
+        xquery.add(new SimpleUnnestToProductRule());
+        xquery.add(new PushAssignDownThroughProductRule());
+        xquery.add(new PushUnnestDownThroughProductRule());
+        xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
+        xquery.add(new InlineVariablesRule());
+        xquery.add(new PushSelectDownRule());
+        xquery.add(new PushSelectIntoJoinRule());
+
+        return xquery;
     }
 
     public final static List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
