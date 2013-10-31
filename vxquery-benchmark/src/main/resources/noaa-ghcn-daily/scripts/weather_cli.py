@@ -154,7 +154,7 @@ def main(argv):
 
 
     # Set up the XML build objects.
-    convert = WeatherDailyXMLFile(download_path, xml_data_save_path, COMPRESSED, DEBUG_OUTPUT)
+    convert = WeatherWebServiceMonthlyXMLFile(download_path, xml_data_save_path, COMPRESSED, DEBUG_OUTPUT)
     progress_file = xml_data_save_path + "_data_progress.csv"
     data = WeatherDataFiles(ghcnd_data_dly_path, progress_file)
     options = list()

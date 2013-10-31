@@ -94,10 +94,10 @@ class WeatherConvertToXML:
         # Default
         return 0
     
-    def get_base_folder(self, station_id):
+    def get_base_folder(self, station_id, data_type="sensors"):
         # Default
         station_prefix = station_id[:3]
-        return self.save_path + station_prefix + "/" + station_id + "/" 
+        return self.save_path + data_type + "/" + station_prefix + "/" + station_id + "/" 
     
     def process_file(self, file_name, max_files):
         print "Processing file: " + file_name
@@ -151,9 +151,15 @@ class WeatherConvertToXML:
                 <credit_URL>http://www.ncdc.noaa.gov/</credit_URL>
             """)
     
+    def default_xml_web_service_start(self, total_records):
+        field_xml = ""
+        field_xml += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+        field_xml += "<dataCollection pageCount=\"1\" totalCount=\"" + str(total_records) + "\">\n"
+        return field_xml
+    
     def default_xml_field_date(self, report_date, indent=2):
         field_xml = ""
-        field_xml += self.get_indent_space(indent) + "<observation_date_iso8601>" + report_date.isoformat() + "</observation_date_iso8601>\n"
+        field_xml += self.get_indent_space(indent) + "<date>" + str(report_date.year) + "-" + str(report_date.month).zfill(2) + "-" + str(report_date.day).zfill(2) + "T00:00:00.000</date>\n"
         return field_xml
     
     def default_xml_field_date_iso8601(self, report_date):
@@ -268,15 +274,17 @@ class WeatherConvertToXML:
 
         indent_space = self.get_indent_space(indent)
         field_id = self.get_dly_field(row, DLY_FIELD_ELEMENT)
+        station_id = "GHCND:" + self.get_dly_field(row, DLY_FIELD_ID)
     
         field_xml = ""
-        field_xml += indent_space + "<type>" + field_id + "</type>\n"
-        field_xml += indent_space + "<data>" + value.strip() + "</data>\n"
+        field_xml += indent_space + "<dataType>" + field_id + "</dataType>\n"
+        field_xml += indent_space + "<station>" + station_id + "</station>\n"
+        field_xml += indent_space + "<value>" + value.strip() + "</value>\n"
         field_xml += indent_space + "<attributes>\n"
-        field_xml += indent_space + "    <attribute>" + mflag.strip() + "</attribute>\n"
-        field_xml += indent_space + "    <attribute>" + qflag.strip() + "</attribute>\n"
-        field_xml += indent_space + "    <attribute>" + sflag.strip() + "</attribute>\n"
-        field_xml += indent_space + "    <attribute></attribute>\n"
+        field_xml += indent_space + indent_space + "<attribute>" + mflag.strip() + "</attribute>\n"
+        field_xml += indent_space + indent_space + "<attribute>" + qflag.strip() + "</attribute>\n"
+        field_xml += indent_space + indent_space + "<attribute>" + sflag.strip() + "</attribute>\n"
+        field_xml += indent_space + indent_space + "<attribute></attribute>\n"
         field_xml += indent_space + "</attributes>\n"
 
         # print field_xml
@@ -285,6 +293,9 @@ class WeatherConvertToXML:
     def default_xml_end(self):
         return textwrap.dedent("""\
             </ghcnd_observation>""")
+
+    def default_xml_web_service_end(self):
+        return "</dataCollection>"
 
     def default_xml_start_tag(self, tag, indent=1):
         return self.get_indent_space(indent) + "<" + tag + ">\n"
@@ -421,7 +432,7 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
         station_xml_file += self.default_xml_end()
         
         # Make sure the station folder is available.
-        ghcnd_xml_station_path = self.get_base_folder(station_id)
+        ghcnd_xml_station_path = self.get_base_folder(station_id, "stations")
         if not os.path.isdir(ghcnd_xml_station_path):
             os.makedirs(ghcnd_xml_station_path)
                 
@@ -445,7 +456,8 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
         station_id = self.get_dly_field(records[0], DLY_FIELD_ID)
 
         # Information for each daily file.
-        daily_xml_file = self.default_xml_start()
+        count = 0
+        daily_xml_file = ""
         
         for day in range(1, 32):
             try:
@@ -456,17 +468,19 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
                 for record in records:
                     record_xml_snip = self.default_xml_day_reading(record, report_date.day)
                     if record_xml_snip is not "":
-                        daily_xml_file += self.default_xml_start_tag("record")
-                        daily_xml_file += self.default_xml_field_station_id(station_id)
+                        daily_xml_file += self.default_xml_start_tag("data")
                         daily_xml_file += self.default_xml_field_date(report_date)
                         daily_xml_file += record_xml_snip
-                        daily_xml_file += self.default_xml_end_tag("record")
+                        daily_xml_file += self.default_xml_end_tag("data")
                         found_data = True
+                        count += 1
 
             except ValueError:
                 pass
 
-        daily_xml_file += self.default_xml_end()
+        daily_xml_file = self.default_xml_web_service_start(count) + daily_xml_file + self.default_xml_web_service_end()
+        daily_xml_file = daily_xml_file.replace("\n", "");
+        daily_xml_file = daily_xml_file.replace(self.get_indent_space(1), "");
 
         if not found_data:
             return 0
