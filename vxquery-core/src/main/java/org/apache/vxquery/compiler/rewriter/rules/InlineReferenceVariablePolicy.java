@@ -14,18 +14,11 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.vxquery.compiler.rewriter.rules.InlineReferenceVariablesRule.IInlineReferenceVariablePolicy;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 
 /**
@@ -52,7 +45,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
  *  such that plan__parent_new = {for each $v in plan__parent is replaced with $vr}
  * </pre>
  */
-public class InlineReferenceVariablePolicy implements InlineVariablesRule.IInlineVariablePolicy {
+public class InlineReferenceVariablePolicy implements IInlineReferenceVariablePolicy {
 
     @Override
     public boolean isCandidateForInlining(ILogicalExpression expr) {
@@ -60,25 +53,6 @@ public class InlineReferenceVariablePolicy implements InlineVariablesRule.IInlin
             return true;
         }
         return false;
-    }
-
-    @Override
-    public List<Mutable<ILogicalOperator>> descendIntoNextOperator(AbstractLogicalOperator op) {
-        List<Mutable<ILogicalOperator>> descendOp = new ArrayList<Mutable<ILogicalOperator>>();
-        // Descend into nested plans removing projects on the way.
-        if (op.getOperatorTag() == LogicalOperatorTag.SUBPLAN) {
-            SubplanOperator subplan = (SubplanOperator) op;
-            for (ILogicalPlan nestedOpRef : subplan.getNestedPlans()) {
-                for (Mutable<ILogicalOperator> rootOpRef : nestedOpRef.getRoots()) {
-                    descendOp.add(rootOpRef);
-                }
-            }
-        }
-        // Descend into children removing projects on the way.
-        for (Mutable<ILogicalOperator> inputOpRef : op.getInputs()) {
-            descendOp.add(inputOpRef);
-        }
-        return descendOp;
     }
 
     @Override

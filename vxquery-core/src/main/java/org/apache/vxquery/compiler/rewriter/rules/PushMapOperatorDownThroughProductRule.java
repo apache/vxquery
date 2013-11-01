@@ -30,7 +30,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLog
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.visitors.VariableUtilities;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
-public class PushUnnestDownThroughProductRule implements IAlgebraicRewriteRule {
+public class PushMapOperatorDownThroughProductRule implements IAlgebraicRewriteRule {
 
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
@@ -41,7 +41,7 @@ public class PushUnnestDownThroughProductRule implements IAlgebraicRewriteRule {
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
         AbstractLogicalOperator op1 = (AbstractLogicalOperator) opRef.getValue();
-        if (op1.getOperatorTag() != LogicalOperatorTag.UNNEST) {
+        if (!op1.isMap()) {
             return false;
         }
         Mutable<ILogicalOperator> op2Ref = op1.getInputs().get(0);
