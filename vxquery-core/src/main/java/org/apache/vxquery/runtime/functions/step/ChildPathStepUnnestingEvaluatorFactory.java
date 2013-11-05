@@ -18,6 +18,7 @@ package org.apache.vxquery.runtime.functions.step;
 
 import java.io.IOException;
 
+import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
@@ -37,6 +38,7 @@ import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -49,7 +51,7 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
     }
 
     @Override
-    protected IUnnestingEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws AlgebricksException {
 
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -58,6 +60,7 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
         final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
         final TaggedValuePointable itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
 
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
             private int index;

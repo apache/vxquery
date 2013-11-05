@@ -26,6 +26,7 @@ import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 
 public class IterateUnnestingEvaluatorFactory extends AbstractTaggedValueArgumentUnnestingEvaluatorFactory {
@@ -36,7 +37,7 @@ public class IterateUnnestingEvaluatorFactory extends AbstractTaggedValueArgumen
     }
 
     @Override
-    protected IUnnestingEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws AlgebricksException {
         final SequencePointable seqp = new SequencePointable();
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
             private int index;
