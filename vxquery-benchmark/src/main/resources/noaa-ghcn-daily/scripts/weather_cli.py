@@ -43,9 +43,11 @@ def main(argv):
     reset = False
     save_path = "/tmp"
     update = False
+    web_service_download = False
+    token = ""
     
     try:
-        opts, args = getopt.getopt(argv, "a:cdf:lhm:no:p:s:tru", ["max_station_files=", "file=", "save_directory=", "package=", "partitions=", "nodes="])
+        opts, args = getopt.getopt(argv, "a:cdf:lhm:no:p:s:truw:", ["max_station_files=", "file=", "save_directory=", "package=", "partitions=", "nodes=", "web_service="])
     except getopt.GetoptError:
         print 'The file options for weather_cli.py were not correctly specified.'
         print 'To see a full list of options try:'
@@ -70,6 +72,7 @@ def main(argv):
             print '    -s (str)  The directory for saving the downloaded and created XML files.'
             print '    -t        Print the statistics of the data progress file.'
             print '    -u        Recalculate the file count and data size for each data source file.'
+            print '    -w (str)  Downloads the station XML file form the web service.'
             sys.exit()
         elif opt in ('-a', "--partitions"):
             no_data_processing = True
@@ -124,6 +127,14 @@ def main(argv):
             print_stats = True
         elif opt == '-u':
             update = True
+        elif opt == '-w':
+            # check if file exists.
+            if arg is not "":
+                token = arg
+            else:
+                print 'Error: Argument must be a string --web_service (-w).'
+                sys.exit()
+            web_service_download = True
 
     # Required fields to run the script.
     if save_path == "" or not os.path.exists(save_path):
@@ -167,6 +178,8 @@ def main(argv):
     data.build_progress_file(options, convert)
     
     if not no_data_processing:
+        if token is not "":
+            convert.set_token(token)
         if process_file_name is not "":
             # process a single file
             if os.path.exists(process_file_name):
@@ -184,6 +197,13 @@ def main(argv):
                     data.update_file_status(file_name, WeatherDataFiles.DATA_FILE_CREATED, file_count, data_size)
                 else:
                     data.update_file_status(file_name, WeatherDataFiles.DATA_FILE_MISSING)
+                
+    elif web_service_download and token is not "":
+            # process directory
+            data.reset()
+            for file_name in data:
+                 station_id = file_name[:file_name.index('.')]
+                 convert.download_station_data(station_id, token)
                 
     elif print_stats:
         data.print_progress_file_stats(convert)

@@ -78,3 +78,10 @@ def get_report_line(percentage, line_size):
             report += "-"
     return report
             
+# Download the file, unless it exists.
+def download_file_save_as(url, new_file_name, reset=False):
+    if not os.path.isfile(new_file_name) or reset:
+        print "Downloading: " + url
+        urllib.urlretrieve(url, new_file_name, report_download_status)
+        print
+
