@@ -24,7 +24,6 @@ import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
-import org.apache.vxquery.compiler.rewriter.rules.InlineReferenceVariablesRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushMapOperatorDownThroughProductRule;
@@ -58,6 +57,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectIntoJoinRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSubplanWithAggregateDownThroughProductRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ReinferAllTypesRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.RemoveRedundantVariablesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.RemoveUnusedAssignAndAggregateRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetAlgebricksPhysicalOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
@@ -70,22 +70,22 @@ public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
         normalization.add(new SetVariableIdContextRule());
-        
+
         // Remove unused functions.
         normalization.add(new RemoveUnusedSortDistinctNodesRule());
-        normalization.add(new InlineReferenceVariablesRule());
+        normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // TODO Fix the group by operator before putting back in the rule set.
         //        normalization.add(new ConvertAssignSortDistinctNodesToOperatorsRule());
 
         normalization.add(new RemoveUnusedTreatRule());
-        normalization.add(new InlineReferenceVariablesRule());
+        normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Find assign for scalar aggregate function followed by an aggregate operator.
         normalization.add(new ConsolidateAssignAggregateRule());
-        normalization.add(new InlineReferenceVariablesRule());
+        normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Find assign for scalar aggregate function.
@@ -93,7 +93,7 @@ public class RewriteRuleset {
 
         // Find unnest followed by aggregate in a subplan. 
         normalization.add(new EliminateUnnestAggregateSubplanRule());
-        normalization.add(new InlineReferenceVariablesRule());
+        normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Remove single tuple input subplans and merge unnest aggregate operators.
@@ -112,7 +112,7 @@ public class RewriteRuleset {
         normalization.add(new IntroduceTwoStepAggregateRule());
 
         // Used to clean up any missing noops after all the subplans have been altered.
-        normalization.add(new InlineReferenceVariablesRule());
+        normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         return normalization;
@@ -123,14 +123,12 @@ public class RewriteRuleset {
      */
     public final static List<IAlgebraicRewriteRule> buildNestedDataSourceRuleCollection() {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();
-
         xquery.add(new SimpleUnnestToProductRule());
         xquery.add(new PushMapOperatorDownThroughProductRule());
         xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
         xquery.add(new InlineVariablesRule());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
-
         return xquery;
     }
 
