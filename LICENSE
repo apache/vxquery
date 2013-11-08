@@ -200,15 +200,3 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
-   ===================================================================
-
-   The DBLP (http://dblp.uni-trier.de/db/) database in
-
-       vxquery-core/src/test/resources/documents/dblp.xml.gz
-
-   can be used under the terms and conditions of the Open Data Commons
-   Attribution License (ODC-BY 1.0). The full ODC-BY 1.0 license text
-   is avaialable at
-
-       http://opendatacommons.org/licenses/by/1.0/
