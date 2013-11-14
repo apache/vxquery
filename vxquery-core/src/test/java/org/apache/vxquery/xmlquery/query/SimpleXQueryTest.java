@@ -90,7 +90,7 @@ public class SimpleXQueryTest {
     @Test
     public void simple016() {
         // TODO unzipping every time is a little slow ...
-        String temp = gunzip("src/test/resources/documents/", "pom.xml");
+        String temp = gunzip("src/test/resources/documents/", "dblp.xml");
         runTest("simple016", "string-length(doc('" + temp + "'))");
     }
 
