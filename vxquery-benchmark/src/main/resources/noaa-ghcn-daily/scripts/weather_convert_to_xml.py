@@ -100,12 +100,17 @@ class WeatherConvertToXML:
         return 0
     
     def get_base_folder(self, station_id, data_type="sensors"):
-        # Default
-        station_prefix = station_id[:3]
-        return self.save_path + data_type + "/" + station_prefix + "/" + station_id + "/" 
+        return build_base_save_folder(self.save_path, station_id, data_type) 
     
-    def process_file(self, file_name, max_files):
-        print "Processing file: " + file_name
+    def process_station_file(self, file_name):
+        print "Processing station file: " + file_name
+        file_stream = open(file_name, 'r')
+        
+        row = file_stream.readline()
+        return self.process_station_data(row)
+
+    def process_sensor_file(self, file_name, max_files):
+        print "Processing sensor file: " + file_name
         file_stream = open(file_name, 'r')
     
         month_last = 0
@@ -187,7 +192,6 @@ class WeatherConvertToXML:
         field_xml = ""
         field_xml += "            <observation_day>" + str(day) + "</observation_day>\n"
         return field_xml
-    
     
     def default_xml_field_station_id(self, station_id, indent=2):
         field_xml = ""
@@ -430,9 +434,13 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
     # Station data
     def process_station_data(self, row):
         station_id = self.get_dly_field(row, DLY_FIELD_ID)
-        
+        download = 0
         if self.token is not "":
-            return self.download_station_data(station_id, self.token, True)
+            download = self.download_station_data(station_id, self.token, True)
+        
+        # If not downloaded generate.
+        if download != 0:
+            return download
         else:
             # Information for each daily file.
             station_xml_file = self.default_xml_start()
@@ -457,25 +465,34 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
 
     # Station data
     def download_station_data(self, station_id, token, reset = False):
-        
         # Make sure the station folder is available.
         ghcnd_xml_station_path = self.get_base_folder(station_id, "stations")
         if not os.path.isdir(ghcnd_xml_station_path):
             os.makedirs(ghcnd_xml_station_path)
                 
-        # Save XML string to disk.
-        save_file_name = ghcnd_xml_station_path + station_id + ".xml"
-
         # Build download URL.
         url = "http://www.ncdc.noaa.gov/cdo-services/services/datasets/GHCND/stations/GHCND:" + station_id + ".xml?token=" + token
-
-        # Get station web service file.
-        station_xml_file = download_file_save_as(url, save_file_name, reset)
+        url_file = urllib.urlopen(url)
+        station_xml_file = ""
+        while (True):
+            line = url_file.readline()
+            if not line:
+                break
+            station_xml_file += line
         
+        if station_xml_file.find("<cdoError>") != -1:
+            if self.debug_output:
+                print "Error in station download"
+            return 0
+        
+        # Save XML string to disk.
+        save_file_name = ghcnd_xml_station_path + station_id + ".xml"
+        save_file_name = self.save_file(save_file_name, station_xml_file)
+    
         if save_file_name is not "":
             if self.debug_output:
                 print "Wrote file: " + save_file_name
-            return 1
+            return 2
         else:
             return 0
 
@@ -532,4 +549,9 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
             return 1
         else:
             return 0
+
+def build_base_save_folder(save_path, station_id, data_type="sensors"):
+    # Default
+    station_prefix = station_id[:3]
+    return save_path + data_type + "/" + station_prefix + "/" + station_id + "/" 
 
