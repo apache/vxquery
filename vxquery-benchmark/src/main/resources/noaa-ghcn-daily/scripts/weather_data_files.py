@@ -107,14 +107,16 @@ class WeatherDataFiles:
         current_partition = 0
         csv_sorted = self.get_csv_in_partition_order()
         for item in csv_sorted:
-            file_name = item.rsplit(self.SEPERATOR)[self.INDEX_DATA_FILE_NAME]
+            row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
+            file_name = row_contents[self.INDEX_DATA_FILE_NAME]
             station_id = os.path.basename(file_name).split('.')[0]
 
             # Copy station files
             for type in ("sensors", "stations"):
                 file_path = build_base_save_folder(save_path, station_id, type)
                 new_file_path = build_base_save_folder(partition_paths[current_partition], station_id, type)
-                distutils.dir_util.copy_tree(file_path, new_file_path)
+                if os.path.isdir(file_path):
+                    distutils.dir_util.copy_tree(file_path, new_file_path)
             
             # Update partition
             current_partition += 1
