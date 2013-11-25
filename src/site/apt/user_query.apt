@@ -19,7 +19,7 @@ Executing a Query
 * Command
 
 ----------------------------------------
-sh ./apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq
+sh ./apache-vxquery-X.Y-incubating/vxquery-cli/target/appassembler/bin/vxq
 ----------------------------------------
 
 * Command Line Options
@@ -61,5 +61,5 @@ return $x/title
   [[i]] Command line
   
 ----------------------------------------
-JAVA_OPTS="-Xmx1024m" sh apache_vxquery_incubating/vxquery/vxquery-cli/target/appassembler/bin/vxq test.xq
+JAVA_OPTS="-Xmx1024m" sh ./apache-vxquery-X.Y-incubating/vxquery-cli/target/appassembler/bin/vxq test.xq
 ----------------------------------------

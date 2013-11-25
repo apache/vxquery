@@ -15,5 +15,19 @@
 
 Installation
 
+* Requirements
 
-  Install instructions can be found in the {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/docs/README}README file}}.
+  * Apache VXQuery source archive (apache-vxquery-X.Y-incubating-source-release.zip)
+
+  * JDK >= 1.7
+
+  * Apache Maven >= 3.2
+
+* Steps
+
+--- 
+$ unzip apache-vxquery-X.Y-incubating-source-release.zip
+$ cd apache-vxquery-X.Y-incubating
+$ mvn package -DskipTests
+$ cd ..
+---

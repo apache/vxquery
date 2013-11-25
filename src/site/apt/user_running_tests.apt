@@ -19,7 +19,7 @@ Running the Test Suite
 * Command
 
 ----------------------------------------
-sh ./apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest
+sh ./apache-vxquery-X.Y-incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest
 ----------------------------------------
 
 * Command Line Options
@@ -50,8 +50,27 @@ JAVA_OPTS="-Xmx1024m -Djava.util.logging.config.file=/path/to/logging.properties
  
 * Example
 
+  To run the XQTS testsuite
+  
+  * get the archive {{{http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip}XQTS_1_0_3.zip}} (e.g. using wget),
+
 ----------------------------------------
-JAVA_OPTS="-Xmx1024m  -Djava.util.logging.config.file=/path/to/logging.properties" sh apache_vxquery_incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase apache_vxquery_incubating/testsuites/XQTS/ -htmlreport /tmp/full_report.html
+$ wget http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip
 ----------------------------------------
 
-  View the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.
+  * unpack it,
+
+----------------------------------------
+$ mkdir xqts
+$ cd xqts
+$ unzip ../XQTS_1_0_3.zip
+$ cd ..
+----------------------------------------
+
+  * run the tests, and
+
+----------------------------------------
+JAVA_OPTS="-Xmx1024m  -Djava.util.logging.config.file=/path/to/logging.properties" sh ./apache-vxquery-X.Y-incubating/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase xqts -htmlreport /tmp/full_report.html
+----------------------------------------
+
+  * view the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.
