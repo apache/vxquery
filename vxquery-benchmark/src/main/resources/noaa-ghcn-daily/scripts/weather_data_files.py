@@ -107,7 +107,7 @@ class WeatherDataFiles:
         current_partition = 0
         csv_sorted = self.get_csv_in_partition_order()
         for item in csv_sorted:
-            row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
+            row_contents = item.rsplit(self.SEPERATOR)
             file_name = row_contents[self.INDEX_DATA_FILE_NAME]
             station_id = os.path.basename(file_name).split('.')[0]
 
