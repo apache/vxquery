@@ -30,6 +30,7 @@ COMPRESSED = False
 # http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt
 #
 def main(argv):
+    append = False
     max_records = 0
     package = "ghcnd_gsn"
     partitions = 0
@@ -41,7 +42,7 @@ def main(argv):
     update = False
     
     try:
-        opts, args = getopt.getopt(argv, "a:cf:hl:m:p:rs:uvw:", ["max_station_files=", "file=", "locality=", "save_directory=", "package=", "partitions=", "nodes=", "web_service="])
+        opts, args = getopt.getopt(argv, "acd:f:hl:m:p:rs:uvw:", ["max_station_files=", "file=", "locality=", "save_directory=", "package=", "partitions=", "nodes=", "web_service="])
     except getopt.GetoptError:
         print 'The file options for weather_cli.py were not correctly specified.'
         print 'To see a full list of options try:'
@@ -50,8 +51,9 @@ def main(argv):
     for opt, arg in opts:
         if opt == '-h':
             print 'Converting weather daily files to xml options:'
-            print '    -a (int)  The number of partitions for creating split up generated data.'
+            print '    -a        Append the results to the progress file.'
             print '    -c        Compress the produced XML file with .gz.'
+            print '    -d (str)  The directory for saving the downloaded files and generated XML files.'
             print '    -f (str)  The file name of a specific station to process.'
             print '              * Helpful when testing a single stations XML file output.'
             print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, statistics).'
@@ -60,20 +62,23 @@ def main(argv):
             print '              Alternate form: --max_station_files=(int)'
             print '    -p (str)  The package used to generate files. (all, gsn, hcn)'
             print '    -r        Reset the build process. (For one section or all sections depending on other parameters.)'
-            print '    -s (str)  The directory for saving the downloaded files and generated XML files.'
+            print '    -s (int)  The number of partitions (sections) for creating split up generated data.'
             print '    -u        Recalculate the file count and data size for each data source file.'
             print '    -v        Extra debug information.'
             print '    -w (str)  Downloads the station XML file form the web service.'
             sys.exit()
-        elif opt in ('-a', "--partitions"):
-            if arg.isdigit():
-                partitions = int(arg)
-            else:
-                print 'Error: Argument must be an integer for --partitions (-a).'
-                sys.exit()
+        elif opt in ('-a', "--append"):
+            append = True
         elif opt == '-c':
             global COMPRESSED
             COMPRESSED = True
+        elif opt in ('-d', "--save_directory"):
+            # check if file exists.
+            if os.path.exists(arg):
+                save_path = arg
+            else:
+                print 'Error: Argument must be a directory for --save_directory (-s).'
+                sys.exit()
         elif opt in ('-f', "--file"):
             # check if file exists.
             if os.path.exists(arg):
@@ -101,13 +106,6 @@ def main(argv):
                 sys.exit()
         elif opt == '-r':
             reset = True
-        elif opt in ('-s', "--save_directory"):
-            # check if file exists.
-            if os.path.exists(arg):
-                save_path = arg
-            else:
-                print 'Error: Argument must be a directory for --save_directory (-s).'
-                sys.exit()
         elif opt == '-u':
             update = True
         elif opt == '-v':
@@ -158,7 +156,8 @@ def main(argv):
     if section in ("all", "progress_file"):
         print 'Processing the progress_file section.'
         options = list()
-        options.append('append')
+        if append:
+            options.append('append')
         if update:
             options.append('recalculate')
         if reset:
@@ -187,6 +186,7 @@ def main(argv):
                     data.update_file_sensor_status(file_name, WeatherDataFiles.DATA_FILE_MISSING)
                 
     if section in ("all", "station_build"):
+        print 'Processing the station_build section.'
         data.reset()
         data.set_type("station")
         if token is not "":
