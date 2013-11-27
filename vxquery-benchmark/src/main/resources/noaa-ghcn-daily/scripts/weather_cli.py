@@ -31,18 +31,19 @@ COMPRESSED = False
 #
 def main(argv):
     append = False
+    download_path = ""
     max_records = 0
     package = "ghcnd_gsn"
     partitions = 0
     process_file_name = ""
     reset = False
-    save_path = "/tmp"
+    save_path = ""
     section = "all"
     token = ""
     update = False
     
     try:
-        opts, args = getopt.getopt(argv, "acd:f:hl:m:p:rs:uvw:", ["max_station_files=", "file=", "locality=", "save_directory=", "package=", "partitions=", "nodes=", "web_service="])
+        opts, args = getopt.getopt(argv, "acd:f:hl:m:p:rs:uvw:", ["download_directory=", "file=", "locality=", "max_station_files=", "nodes=", "save_directory=", "package=", "partitions=", "web_service="])
     except getopt.GetoptError:
         print 'The file options for weather_cli.py were not correctly specified.'
         print 'To see a full list of options try:'
@@ -72,6 +73,13 @@ def main(argv):
         elif opt == '-c':
             global COMPRESSED
             COMPRESSED = True
+        elif opt == '--download_directory':
+            # check if file exists.
+            if os.path.exists(arg):
+                download_path = arg
+            else:
+                print 'Error: Argument must be a directory for --download_directory.'
+                sys.exit()
         elif opt in ('-d', "--save_directory"):
             # check if file exists.
             if os.path.exists(arg):
@@ -121,11 +129,12 @@ def main(argv):
 
     # Required fields to run the script.
     if save_path == "" or not os.path.exists(save_path):
-        print 'Error: The save directory option must be supplied: --save_directory (-s).'
+        print 'Error: The save directory option must be supplied: --save_directory (-d).'
         sys.exit()
 
     # Set up downloads folder.
-    download_path = save_path + "/downloads"
+    if download_path == "":
+        download_path = save_path + "/downloads"
     if section in ("all", "download"):
         print 'Processing the download section.'
         download = WeatherDownloadFiles(download_path)
