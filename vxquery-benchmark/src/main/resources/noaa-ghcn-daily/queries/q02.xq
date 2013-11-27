@@ -1,8 +1,9 @@
 (: XQuery Aggregate Query :)
-(: Find the total precipitation recorded :)
+(: Find the annual precipitation for a Seattle using the airport station (USW00024233) for 1999. :)
 fn:sum(
-    let $collection := "/tmp/test/1.0_partition_ghcnd_gsn_xml_gz/sensors"
+    let $collection := "/tmp/test/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($collection)/dataCollection/data
-    where $r/dataType eq "PRCP"
+    let $date := xs:date($r/date)
+    where $r/station eq "GHCND:USW00024233" and $r/dataType eq "PRCP" and fn:year-from-date($date) eq 1999
     return $r/value
 )
