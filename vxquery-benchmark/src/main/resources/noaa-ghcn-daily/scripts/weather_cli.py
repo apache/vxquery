@@ -54,6 +54,7 @@ def main(argv):
             print 'Converting weather daily files to xml options:'
             print '    -a        Append the results to the progress file.'
             print '    -c        Compress the produced XML file with .gz.'
+            print '    --donwload_directory (str)  The directory for saving the downloaded files. (default: downloads)'
             print '    -d (str)  The directory for saving the downloaded files and generated XML files.'
             print '    -f (str)  The file name of a specific station to process.'
             print '              * Helpful when testing a single stations XML file output.'
@@ -61,9 +62,9 @@ def main(argv):
             print '    -m (int)  Limits the number of files created for each station.'
             print '              * Helpful when testing to make sure all elements are supported for each station.'
             print '              Alternate form: --max_station_files=(int)'
+            print '    --partitions (int)  The number of partitions (sections) for creating split up generated data.'
             print '    -p (str)  The package used to generate files. (all, gsn, hcn)'
             print '    -r        Reset the build process. (For one section or all sections depending on other parameters.)'
-            print '    -s (int)  The number of partitions (sections) for creating split up generated data.'
             print '    -u        Recalculate the file count and data size for each data source file.'
             print '    -v        Extra debug information.'
             print '    -w (str)  Downloads the station XML file form the web service.'
@@ -105,6 +106,12 @@ def main(argv):
                 max_records = int(arg)
             else:
                 print 'Error: Argument must be an integer for --max_station_files (-m).'
+                sys.exit()
+        elif opt == "--partitions":
+            if arg.isdigit():
+                partitions = int(arg)
+            else:
+                print 'Error: Argument must be an integer for --partitions.'
                 sys.exit()
         elif opt in ('-p', "--package"):
             if arg in ("all", "gsn", "hcn"):
