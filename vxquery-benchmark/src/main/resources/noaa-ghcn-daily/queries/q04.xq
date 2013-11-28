@@ -7,5 +7,5 @@ let $collection2 := "/tmp/test/1.0_partition_ghcnd_all_xml/sensors"
 for $r in collection($collection2)/dataCollection/data
 
 where some $x in $s/locationLabels satisfies ($x/type eq "county" and $x/value eq "Los Angeles") 
-    and xs:date($r/date) eq xs:date("1976/7/4")
+    and xs:date($r/date) eq xs:date("1976-07-04")
 return $r
