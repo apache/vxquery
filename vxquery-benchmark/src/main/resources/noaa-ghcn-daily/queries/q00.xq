@@ -1,5 +1,6 @@
 (: XQuery Filter Query :)
-(: See historical data for Riverside, CA (ASN00008113) station by selecting the weather readings for December 25 over the last 10 years. :)
+(: See historical data for Riverside, CA (ASN00008113) station by selecting   :)
+(: the weather readings for December 25 over the last 10 years.               :)
 let $collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
 for $r in collection($collection)/dataCollection/data
 let $date := xs:date(fn:substring($r/date, 0, 11))
