@@ -27,7 +27,7 @@ def main(argv):
     push_folder_name = ""
     
     try:
-        opts, args = getopt.getopt(argv, "c:f:", ["cluster=", "folder="])
+        opts, args = getopt.getopt(argv, "c:f:h", ["cluster=", "folder="])
     except getopt.GetoptError:
         print 'The file options for push_benchmark.py were not correctly specified.'
         print 'To see a full list of options try:'
