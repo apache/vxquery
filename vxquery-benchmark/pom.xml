@@ -29,6 +29,14 @@
   <name>VXQuery Benchmark</name>
   <description>Apache VXQuery Benchmark</description>
 
+  <distributionManagement>
+    <site>
+      <id>vxquery.website</id>
+      <name>VXQuery Website</name>
+      <url>file:../../site/vxquery-benchmark/</url>
+    </site>
+  </distributionManagement>
+
   <build>
     <plugins>
       <plugin>

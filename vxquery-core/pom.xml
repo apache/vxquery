@@ -312,6 +312,7 @@
         <version>2.9</version>
         <configuration>
           <notimestamp>true</notimestamp>
+          <maxmemory>2g</maxmemory>
         </configuration>
       </plugin>
     </plugins>
