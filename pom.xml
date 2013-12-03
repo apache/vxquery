@@ -59,6 +59,16 @@
   
   <developers>
     <developer>
+      <id>antelder</id>
+      <name>Ant Elder</name>
+      <email />
+      <roles>
+        <role>Mentor</role>
+      </roles>
+      <organization />
+      <timezone />
+    </developer>
+    <developer>
       <id>jochen</id>
       <name>Jochen Wiedmann</name>
       <email />
@@ -69,8 +79,8 @@
       <timezone />
     </developer>
     <developer>
-      <id>radup</id>
-      <name>Radu Preotiuc</name>
+      <id>marvin</id>
+      <name>Marvin Humphrey</name>
       <email />
       <roles>
         <role>Mentor</role>
@@ -78,16 +88,7 @@
       <organization />
       <timezone />
     </developer>
-    <developer>
-      <id>sanjiva</id>
-      <name>Sanjiva Weerawarana</name>
-      <email />
-      <roles>
-        <role>Mentor</role>
-      </roles>
-      <organization />
-      <timezone />
-    </developer>
+
     <developer>
       <id>cezar</id>
       <name>Cezar Andrei</name>
@@ -99,17 +100,6 @@
       </roles>
       <organization />
       <timezone>-6</timezone>
-    </developer>
-    <developer>
-      <id>vinayakb</id>
-      <name>Vinayak Borkar</name>
-      <email />
-      <roles>
-        <role>Project Manager</role>
-        <role>Architect</role>
-      </roles>
-      <organization />
-      <timezone>-8</timezone>
     </developer>
     <developer>
       <id>dtabass</id>
@@ -132,6 +122,16 @@
       <timezone>-8</timezone>
     </developer>
     <developer>
+      <id>sjaco002</id>
+      <name>Steven Jacobs</name>
+      <email />
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <organization />
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
       <id>tillw</id>
       <name>Till Westmann</name>
       <email />
@@ -141,6 +141,38 @@
       </roles>
       <organization />
       <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>vinayakb</id>
+      <name>Vinayak Borkar</name>
+      <email />
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+      </roles>
+      <organization />
+      <timezone>-8</timezone>
+    </developer>
+
+    <developer>
+      <id>radup</id>
+      <name>Radu Preotiuc</name>
+      <email />
+      <roles>
+        <role>Mentor (dormant)</role>
+      </roles>
+      <organization />
+      <timezone />
+    </developer>
+    <developer>
+      <id>sanjiva</id>
+      <name>Sanjiva Weerawarana</name>
+      <email />
+      <roles>
+        <role>Mentor (dormant)</role>
+      </roles>
+      <organization />
+      <timezone />
     </developer>
   </developers>
   
