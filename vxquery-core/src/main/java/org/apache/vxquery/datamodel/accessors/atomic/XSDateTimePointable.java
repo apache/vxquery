@@ -16,6 +16,9 @@
  */
 package org.apache.vxquery.datamodel.accessors.atomic;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 import org.apache.vxquery.datamodel.api.IDate;
 import org.apache.vxquery.datamodel.api.ITime;
 import org.apache.vxquery.datamodel.api.ITimezone;
@@ -74,6 +77,32 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
         }
     };
 
+    public void setCurrentDateTime() {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        int ms = cal.get(Calendar.MILLISECOND);
+        int tzOffsetInMs = tz.getOffset(
+                cal.get(Calendar.ERA),
+                year,
+                month, 
+                day, 
+                cal.get(Calendar.DAY_OF_WEEK), 
+                ms);
+        int tzOffsetInMin = tzOffsetInMs / 1000 / 60;
+        setDateTime(
+                year,
+                month + 1,
+                day,
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE),
+                cal.get(Calendar.SECOND) * 1000 + ms,
+                tzOffsetInMin / 60,
+                tzOffsetInMin % 60);
+    }
+    
     public void setDateTime(long year, long month, long day, long hour, long minute, long milliSecond,
             long timezoneHour, long timezoneMinute) {
         setDateTime(bytes, start, year, month, day, hour, minute, milliSecond, timezoneHour, timezoneMinute);
@@ -196,17 +225,20 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
     }
 
     public static String toString(byte[] bytes, int start) {
-        return getMonth(bytes, start)
+        final long millis = getMilliSecond(bytes, start);
+        return getYear(bytes, start)
+                + "-"
+                + getMonth(bytes, start)
                 + "-"
                 + getDay(bytes, start)
-                + "-"
-                + getYear(bytes, start)
                 + "T"
                 + getHour(bytes, start)
                 + ":"
                 + getMinute(bytes, start)
                 + ":"
-                + getMilliSecond(bytes, start)
+                + millis / 1000
+                + "."
+                + millis % 1000
                 + (getTimezoneHour(bytes, start) != DateTime.TIMEZONE_HOUR_NULL
                         && getTimezoneMinute(bytes, start) != DateTime.TIMEZONE_MINUTE_NULL ? (getTimezoneHour(bytes,
                         start) < 0 || getTimezoneMinute(bytes, start) < 0 ? "" : "+")

@@ -30,11 +30,10 @@ public class DynamicContextImpl implements DynamicContext {
 
     private final Map<QName, ArrayBackedValueStorage> variables;
 
-    private final ArrayBackedValueStorage currentDateTime;
+    private byte[] currentDateTime;
 
     public DynamicContextImpl(StaticContext sCtx) {
         this.sCtx = sCtx;
-        currentDateTime = new ArrayBackedValueStorage();
         variables = new HashMap<QName, ArrayBackedValueStorage>();
     }
 
@@ -49,12 +48,15 @@ public class DynamicContextImpl implements DynamicContext {
 
     @Override
     public void setCurrentDateTime(IValueReference value) {
-        currentDateTime.assign(value);
+        if (currentDateTime == null) {
+            currentDateTime = new byte[value.getLength()];
+        }
+        System.arraycopy(value.getByteArray(), value.getStartOffset(), currentDateTime, 0, value.getLength());
     }
 
     @Override
     public void getCurrentDateTime(IPointable value) {
-        value.set(currentDateTime);
+        value.set(currentDateTime, 0, currentDateTime.length);
     }
 
     @Override

@@ -21,6 +21,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
+
 import edu.uci.ics.hyracks.api.context.IHyracksJobletContext;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -66,10 +68,13 @@ class DynamicContextImplFactory implements IDynamicContextFactory {
 
     static IDynamicContextFactory createInstance(DynamicContextImpl dCtx) {
         IStaticContextFactory scFactory = dCtx.getStaticContext().createFactory();
-        VoidPointable vp = new VoidPointable();
-        dCtx.getCurrentDateTime(vp);
-        byte[] currentDateTime = Arrays.copyOfRange(vp.getByteArray(), vp.getStartOffset(), vp.getLength());
 
+        final int dtLen = XSDateTimePointable.TYPE_TRAITS.getFixedLength();
+        byte[] currentDateTime = new byte[dtLen];
+        XSDateTimePointable datetimep = new XSDateTimePointable();
+        datetimep.set(currentDateTime, 0, dtLen);
+        datetimep.setCurrentDateTime();
+        
         Map<QName, ArrayBackedValueStorage> vMap = dCtx.getVariableMap();
         int nVars = vMap.size();
         QName[] variableNames = new QName[nVars];
