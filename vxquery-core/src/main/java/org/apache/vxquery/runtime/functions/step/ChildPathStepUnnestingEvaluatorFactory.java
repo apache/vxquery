@@ -51,7 +51,8 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
     }
 
     @Override
-    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws AlgebricksException {
+    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
 
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -62,9 +63,14 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
         final TaggedValuePointable itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
 
+        final SequencePointable seqa = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final TaggedValuePointable itemTvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
-            private int index;
+            private int indexSequence;
+            private int indexSeqArgs;
             private int seqLength;
+            private int seqArgsLength;
 
             private boolean first;
             private ArrayBackedValueStorage nodeAbvs;
@@ -72,11 +78,33 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
 
             @Override
             public boolean step(IPointable result) throws AlgebricksException {
-                while (index < seqLength) {
+                if (seqArgsLength > 0) {
+                    while (indexSeqArgs < seqArgsLength) {
+                        seqLength = seqa.getEntryCount();
+                        seqa.getEntry(indexSeqArgs, itemTvp2);
+                        if (itemTvp2.getTag() != ValueTag.NODE_TREE_TAG) {
+                            String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
+                            throw new AlgebricksException(description);
+                        }
+                        itemTvp2.getValue(ntp);
+                        if (stepNodeTree(result)) {
+                            return true;
+                        }
+                    }
+                } else {
+                    if (stepNodeTree(result)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            protected boolean stepNodeTree(IPointable result) throws AlgebricksException {
+                while (indexSequence < seqLength) {
                     // Get the next item
-                    seqp.getEntry(index, itemTvp);
-                    ++index;
-                    
+                    seqp.getEntry(indexSequence, itemTvp);
+                    ++indexSequence;
+
                     // Test to see if the item fits the path step
                     if (matches()) {
                         try {
@@ -96,7 +124,8 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
                 first = true;
                 nodeAbvs = new ArrayBackedValueStorage();
 
-                index = 0;
+                indexSequence = 0;
+                indexSeqArgs = 0;
                 if (first) {
                     if (args[1].getTag() != ValueTag.XS_INT_TAG) {
                         throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
@@ -107,12 +136,18 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
                     filter = NodeTestFilter.getNodeTestFilter(sType);
                     first = false;
                 }
-                if (args[0].getTag() != ValueTag.NODE_TREE_TAG) {
+                if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
+                    args[0].getValue(seqa);
+                    seqArgsLength = seqa.getEntryCount();
+                } else if (args[0].getTag() == ValueTag.NODE_TREE_TAG) {
+                    args[0].getValue(ntp);
+                    getSequence(ntp, seqp);
+                    seqLength = seqp.getEntryCount();
+                    seqArgsLength = -1;
+
+                } else {
                     throw new SystemException(ErrorCode.SYSE0001);
                 }
-                args[0].getValue(ntp);
-                getSequence(ntp, seqp);
-                seqLength = seqp.getEntryCount();
             }
 
             protected boolean matches() {

@@ -38,9 +38,13 @@ public abstract class AbstractSinglePathStepScalarEvaluator extends AbstractPath
 
     private final IntegerPointable ip;
 
+    private final SequencePointable seqa;
+
     private final SequencePointable seqp;
 
     private final ArrayBackedValueStorage seqAbvs;
+
+    private final TaggedValuePointable itemTvp2;
 
     private boolean first;
 
@@ -48,8 +52,10 @@ public abstract class AbstractSinglePathStepScalarEvaluator extends AbstractPath
         super(args, ctx);
         dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
+        seqa = (SequencePointable) SequencePointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         seqAbvs = new ArrayBackedValueStorage();
+        itemTvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         first = true;
     }
 
@@ -68,24 +74,40 @@ public abstract class AbstractSinglePathStepScalarEvaluator extends AbstractPath
                 setNodeTest(sType);
                 first = false;
             }
-            if (args[0].getTag() != ValueTag.NODE_TREE_TAG) {
-                throw new SystemException(ErrorCode.SYSE0001);
-            }
-            args[0].getValue(ntp);
-            getSequence(ntp, seqp);
             seqAbvs.reset();
             seqb.reset(seqAbvs);
-            int seqSize = seqp.getEntryCount();
-            for (int i = 0; i < seqSize; ++i) {
-                seqp.getEntry(i, itemTvp);
-                if (matches()) {
-                    appendNodeToResult();
+            if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
+                args[0].getValue(seqa);
+                int seqSize = seqa.getEntryCount();
+                for (int index = 0; index < seqSize; ++index) {
+                    seqa.getEntry(index, itemTvp2);
+                    if (itemTvp2.getTag() != ValueTag.NODE_TREE_TAG) {
+                        throw new SystemException(ErrorCode.SYSE0001);
+                    }
+                    itemTvp2.getValue(ntp);
+                    processNodeTree();
                 }
+            } else if (args[0].getTag() == ValueTag.NODE_TREE_TAG) {
+                args[0].getValue(ntp);
+                processNodeTree();
+            } else {
+                throw new SystemException(ErrorCode.SYSE0001);
             }
             seqb.finish();
             result.set(seqAbvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
+        }
+    }
+
+    protected void processNodeTree() throws SystemException, IOException {
+        getSequence(ntp, seqp);
+        int seqSize = seqp.getEntryCount();
+        for (int i = 0; i < seqSize; ++i) {
+            seqp.getEntry(i, itemTvp);
+            if (matches()) {
+                appendNodeToResult();
+            }
         }
     }
 }
