@@ -82,7 +82,7 @@ public class ConvertAssignToUnnestRule implements IAlgebraicRewriteRule {
         }
         AssignOperator assign = (AssignOperator) op2;
 
-        // Check to see if the expression is a child function.
+        // Check to see if the expression has an unnesting implementation.
         ILogicalExpression logicalExpression2 = (ILogicalExpression) assign.getExpressions().get(0).getValue();
         if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
             return false;
@@ -96,11 +96,9 @@ public class ConvertAssignToUnnestRule implements IAlgebraicRewriteRule {
         // TODO add checks for variables used that have now been removed.
 
         // Update the unnest parameters.
-        int index = 0;
-        for (Mutable<ILogicalOperator> input : assign.getInputs()) {
-            unnest.getInputs().get(index++).setValue(input.getValue());
-        }
-
+        unnest.getInputs().clear();
+        unnest.getInputs().addAll(assign.getInputs());
+    
         UnnestingFunctionCallExpression child = new UnnestingFunctionCallExpression(functionInfo2, functionCall2.getArguments());
         unnest.getExpressionRef().setValue(child);
         
