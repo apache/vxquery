@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
@@ -27,6 +28,7 @@ import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubpla
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushMapOperatorDownThroughProductRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedudantTreatExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedTreatRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
@@ -48,6 +50,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRu
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceProjectsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PullSelectOutOfEqJoin;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushLimitDownRule;
@@ -67,7 +70,7 @@ public class RewriteRuleset {
     /**
      * Optimizations specific to XQuery.
      */
-    public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
+    public final static List<IAlgebraicRewriteRule> buildPathStepNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
         normalization.add(new SetVariableIdContextRule());
 
@@ -83,14 +86,6 @@ public class RewriteRuleset {
         normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
-        // Find assign for scalar aggregate function followed by an aggregate operator.
-        normalization.add(new ConsolidateAssignAggregateRule());
-        normalization.add(new RemoveRedundantVariablesRule());
-        normalization.add(new RemoveUnusedAssignAndAggregateRule());
-
-        // Find assign for scalar aggregate function.
-        normalization.add(new ConvertAssignToAggregateRule());
-
         // Find unnest followed by aggregate in a subplan. 
         normalization.add(new EliminateUnnestAggregateSubplanRule());
         normalization.add(new RemoveRedundantVariablesRule());
@@ -102,11 +97,35 @@ public class RewriteRuleset {
         normalization.add(new EliminateUnnestAggregateSequencesRule());
 
         normalization.add(new ConvertAssignToUnnestRule());
+        normalization.add(new ConsolidateUnnestsRule());
 
+        // Used to clean up any missing noops after all the subplans have been altered.
+        normalization.add(new RemoveRedundantVariablesRule());
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+
+        normalization.add(new RemoveRedudantTreatExpressionsRule());
+        
         // Convert to a data source scan operator.
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
+
+        return normalization;
+    }
+
+    /**
+     * Optimizations specific to XQuery.
+     */
+    public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
+        List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
+
+        // Find assign for scalar aggregate function followed by an aggregate operator.
+        normalization.add(new ConsolidateAssignAggregateRule());
+        normalization.add(new RemoveRedundantVariablesRule());
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+
+        // Find assign for scalar aggregate function.
+        normalization.add(new ConvertAssignToAggregateRule());
 
         // Use two step aggregate operators if possible.
         normalization.add(new IntroduceTwoStepAggregateRule());
@@ -170,6 +189,12 @@ public class RewriteRuleset {
         return opPushDown;
     }
 
+    public final static List<IAlgebraicRewriteRule> buildIntroduceProjectRuleCollection() {
+        List<IAlgebraicRewriteRule> project = new LinkedList<IAlgebraicRewriteRule>();
+        project.add(new IntroduceProjectsRule());
+        return project;
+    }
+    
     public final static List<IAlgebraicRewriteRule> buildDataExchangeRuleCollection() {
         List<IAlgebraicRewriteRule> dataExchange = new LinkedList<IAlgebraicRewriteRule>();
         dataExchange.add(new SetExecutionModeRule());

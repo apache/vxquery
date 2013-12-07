@@ -186,6 +186,8 @@ public class XMLQueryCompiler {
         SequentialOnceRuleController seqOnceCtrl = new SequentialOnceRuleController(true);
         PrioritizedRuleController priorityCtrl = new PrioritizedRuleController();
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
+                RewriteRuleset.buildPathStepNormalizationRuleCollection()));
+        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
                 RewriteRuleset.buildXQueryNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
                 RewriteRuleset.buildNestedDataSourceRuleCollection()));
