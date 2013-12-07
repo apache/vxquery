@@ -433,6 +433,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case EMPTYTUPLESOURCE:
             case EXCHANGE:
             case NESTEDTUPLESOURCE:
+            case PROJECT:
             case SELECT:
             case WRITE:
             case WRITE_RESULT:
@@ -447,7 +448,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case INSERT_DELETE:
             case LIMIT:
             case PARTITIONINGSPLIT:
-            case PROJECT:
             case REPLICATE:
             case RUNNINGAGGREGATE:
             case SCRIPT:
