@@ -14,8 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-/* Footer begin */
-        OPERATOR_COLLECTION = java.util.Collections.unmodifiableList(temp);
-    }
-}
-/* Footer end */
+    public static final java.util.List<org.apache.vxquery.functions.Function> OPERATOR_COLLECTION;
+    
+    static {
+        java.util.List<org.apache.vxquery.functions.Function> temp = new java.util.ArrayList<org.apache.vxquery.functions.Function>();

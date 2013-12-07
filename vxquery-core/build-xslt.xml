@@ -34,10 +34,13 @@
 
         <xslt classpath="${classpath.xslt}" processor="trax" in="${src.code.dir}/org/apache/vxquery/functions/builtin-operators.xml" out="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java.qnames" style="${xslt.dir}/generate-op-qnames.xsl"/>
         <xslt classpath="${classpath.xslt}" processor="trax" in="${src.code.dir}/org/apache/vxquery/functions/builtin-operators.xml" out="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java.operators" style="${xslt.dir}/generate-op-defns.xsl"/>
-        <concat destfile="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java">
+		<xslt classpath="${classpath.xslt}" processor="trax" in="${src.code.dir}/org/apache/vxquery/functions/builtin-operators.xml" out="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java.operator_collection" style="${xslt.dir}/generate-op-collection.xsl"/>
+		        <concat destfile="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java">
             <fileset file="${src.code.dir}/org/apache/vxquery/functions/BuiltinOperators.java.header"/>
             <fileset file="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java.qnames"/>
             <fileset file="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java.operators"/>
+            <fileset file="${src.code.dir}/org/apache/vxquery/functions/BuiltinOperators.java.fncollection_begin"/>
+            <fileset file="${build.gen-src.dir}/org/apache/vxquery/functions/BuiltinOperators.java.operator_collection"/>
             <fileset file="${src.code.dir}/org/apache/vxquery/functions/BuiltinOperators.java.footer"/>
         </concat>
     </target>
