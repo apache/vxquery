@@ -17,6 +17,7 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
 import org.apache.vxquery.functions.BuiltinOperators;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -42,24 +43,24 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * <pre>
  * Before
  * 
- *   plan__parent
+ *   %PARENT_PLAN
  *   UNNEST( $v2 : iterate( $v1 ) )
  *   SUBPLAN{
- *     AGGREGATE( $v1 : sequence( \@expression ) )
- *     plan__nested
+ *     AGGREGATE( $v1 : sequence( %expression ) )
+ *     %NESTED_PLAN
  *     NESTEDTUPLESOURCE
  *   }
- *   plan__child
+ *   %CHILD_PLAN
  *   
- *   where plan__parent does not use $v1.
+ *   where %PARENT_PLAN does not use $v1.
  *    
  * After 
  * 
- *   plan__parent
+ *   %PARENT_PLAN
  *   UNNEST( $v2 : iterate( $v3 ) )
- *   ASSIGN( $v3 : \@expression )
- *   plan__nested
- *   plan__child
+ *   ASSIGN( $v3 : %expression )
+ *   %NESTED_PLAN
+ *   %CHILD_PLAN
  * </pre>
  */
 public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRule {
@@ -105,7 +106,7 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         }
 
         // Make inline the arguments for the subplan.
-        AbstractLogicalOperator subplanEnd = findLastSubplanOperator(subplanOp);
+        AbstractLogicalOperator subplanEnd = OperatorToolbox.findLastSubplanOperator(subplanOp);
         int count = 0;
         for (Mutable<ILogicalOperator> input : subplan.getInputs()) {
             subplanEnd.getInputs().get(count++).setValue(input.getValue());
@@ -122,30 +123,6 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         unnest.getInputs().get(0).setValue(aOp);
 
         return true;
-    }
-
-    private ILogicalExpression findLastFunctionExpression(ILogicalExpression expression) {
-        if (expression.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) expression;
-            ILogicalExpression nextExpression = functionCall.getArguments().get(0).getValue();
-            if (nextExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return expression;
-            }
-            return findLastFunctionExpression(nextExpression);
-        }
-        return null;
-    }
-
-    private AbstractLogicalOperator findLastSubplanOperator(AbstractLogicalOperator op) {
-        AbstractLogicalOperator next;
-        while (op.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
-            op = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
-            next = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
-            if (next.getOperatorTag() == LogicalOperatorTag.NESTEDTUPLESOURCE) {
-                break;
-            }
-        }
-        return op;
     }
 
     @Override
