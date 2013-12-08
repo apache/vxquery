@@ -64,6 +64,10 @@ public abstract class Function implements IFunctionInfo {
 
     public abstract boolean useContextImplicitly();
 
+    public boolean isFunctional() {
+        return true;
+    }
+
     public IScalarEvaluatorFactory createScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) throws SystemException {
         throw new SystemException(ErrorCode.SYSE0001, "No IScalarEvaluatorFactory runtime for " + fid.getName());
     }
