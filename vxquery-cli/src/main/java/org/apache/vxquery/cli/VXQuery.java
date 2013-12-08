@@ -76,14 +76,28 @@ public class VXQuery {
 
     private ResultSetId resultSetId;
 
+    /**
+     * Constructor to use command line options passed.
+     * 
+     * @param opts
+     *            Command line options object
+     */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
     }
 
+    /**
+     * Main method to get command line options and execute query process.
+     * 
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         Date start = new Date();
         final CmdLineOptions opts = new CmdLineOptions();
         CmdLineParser parser = new CmdLineParser(opts);
+
+        // parse command line options, give error message if no arguments passed
         try {
             parser.parseArgument(args);
         } catch (Exception e) {
@@ -97,12 +111,19 @@ public class VXQuery {
         VXQuery vxq = new VXQuery(opts);
         vxq.execute();
         Date end = new Date();
+        // if -timing argument passed, show the starting and ending times
         if (opts.timing) {
             System.out.println("Execution time: " + (end.getTime() - start.getTime()) + "ms");
         }
 
     }
 
+    /**
+     * Creates a new Hyracks connection with: the client IP address and port provided, if IP address is provided in command line. Otherwise create a new virtual
+     * cluster with Hyracks nodes. Queries passed are run either way. After running queries, if a virtual cluster has been created, it is shut down.
+     * 
+     * @throws Exception
+     */
     private void execute() throws Exception {
         if (opts.clientNetIpAddress != null) {
             hcc = new HyracksConnection(opts.clientNetIpAddress, opts.clientNetPort);
@@ -121,6 +142,14 @@ public class VXQuery {
         }
     }
 
+    /**
+     * Reads the contents of the files passed in the list of arguments to a string. If -showquery argument is passed, output the query as string. Run the query
+     * for the string.
+     * 
+     * @throws IOException
+     * @throws SystemException
+     * @throws Exception
+     */
     private void runQueries() throws IOException, SystemException, Exception {
         for (String query : opts.arguments) {
             String qStr = slurp(query);
@@ -128,6 +157,12 @@ public class VXQuery {
                 System.err.println(qStr);
             }
             XQueryCompilationListener listener = new XQueryCompilationListener() {
+
+                /**
+                 * On providing -showrp argument, output the query inputs, outputs and user constraints for each module as result of code generation.
+                 * 
+                 * @param module
+                 */
                 @Override
                 public void notifyCodegenResult(Module module) {
                     if (opts.showRP) {
@@ -136,6 +171,12 @@ public class VXQuery {
                     }
                 }
 
+                /**
+                 * On providing -showtet argument, output the syntax translation tree for the module in the format: "-- logical operator(if exists) | execution mode |"
+                 * where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
+                 * 
+                 * @param module
+                 */
                 @Override
                 public void notifyTranslationResult(Module module) {
                     if (opts.showTET) {
@@ -154,6 +195,12 @@ public class VXQuery {
                 public void notifyTypecheckResult(Module module) {
                 }
 
+                /**
+                 * On providing -showoet argument, output the optimized expression tree for the module in the format:
+                 * "-- logical operator(if exists) | execution mode |" where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
+                 * 
+                 * @param module
+                 */
                 @Override
                 public void notifyOptimizedResult(Module module) {
                     if (opts.showOET) {
@@ -168,6 +215,12 @@ public class VXQuery {
                     }
                 }
 
+                /**
+                 * On providing -showast argument, output the abstract syntax tree obtained from parsing by serializing the DomDriver object to a pretty-printed XML
+                 * String.
+                 * 
+                 * @param moduleNode
+                 */
                 @Override
                 public void notifyParseResult(ModuleNode moduleNode) {
                     if (opts.showAST) {
@@ -192,6 +245,7 @@ public class VXQuery {
             js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
             PrintWriter writer = new PrintWriter(System.out, true);
+            // Repeat execution for number of times provided in -repeatexec argument
             for (int i = 0; i < opts.repeatExec; ++i) {
                 runJob(js, writer);
             }
@@ -200,6 +254,9 @@ public class VXQuery {
 
     /**
      * Get cluster node configuration.
+     * 
+     * @return Configuration of node controllers as array of Strings.
+     * @throws Exception
      */
     private String[] getNodeList() throws Exception {
         Map<String, NodeControllerInfo> nodeControllerInfos = hcc.getNodeControllerInfos();
@@ -211,6 +268,16 @@ public class VXQuery {
         return nodeList;
     }
 
+    /**
+     * Creates a Hyracks dataset, if not already existing with the job frame size, and 1 reader. Allocates a new buffer of size specified in the frame of Hyracks
+     * node. Creates new dataset reader with the current job ID and result set ID. Outputs the string in buffer for each frame.
+     * 
+     * @param spec
+     *            JobSpecification object, containing frame size. Current specified job.
+     * @param writer
+     *            Writer for output of job.
+     * @throws Exception
+     */
     private void runJob(JobSpecification spec, PrintWriter writer) throws Exception {
         if (hds == null) {
             hds = new HyracksDataset(hcc, spec.getFrameSize(), 1);
@@ -234,11 +301,19 @@ public class VXQuery {
 
     /**
      * Create a unique result set id to get the correct query back from the cluster.
+     * 
+     * @return Result Set id generated with current system time.
      */
     protected ResultSetId createResultSetId() {
         return new ResultSetId(System.nanoTime());
     }
 
+    /**
+     * Start local virtual cluster with cluster controller node and node controller nodes. IP address provided for node controller is localhost. Unassigned ports
+     * 39000 and 39001 are used for client and cluster port respectively. Creates a new Hyracks connection with the IP address and client ports.
+     * 
+     * @throws Exception
+     */
     public void startLocalHyracks() throws Exception {
         CCConfig ccConfig = new CCConfig();
         ccConfig.clientNetIpAddress = "127.0.0.1";
@@ -271,6 +346,11 @@ public class VXQuery {
         hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
     }
 
+    /**
+     * Shuts down the virtual cluster, alongwith all nodes and node execution, network and queue managers.
+     * 
+     * @throws Exception
+     */
     public void stopLocalHyracks() throws Exception {
         for (int i = 0; i < ncs.length; i++) {
             ncs[i].stop();
@@ -278,10 +358,21 @@ public class VXQuery {
         cc.stop();
     }
 
+    /**
+     * Reads the contents of file given in query into a String. The file is always closed. For XML files UTF-8 encoding is used.
+     * 
+     * @param query
+     *            The query with filename to be processed
+     * @return UTF-8 formatted query string
+     * @throws IOException
+     */
     private static String slurp(String query) throws IOException {
         return FileUtils.readFileToString(new File(query), "UTF-8");
     }
 
+    /**
+     * Helper class with fields and methods to handle all command line options
+     */
     private static class CmdLineOptions {
         @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController")
         public String clientNetIpAddress = null;
