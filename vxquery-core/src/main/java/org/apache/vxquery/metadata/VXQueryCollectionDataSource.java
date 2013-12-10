@@ -33,6 +33,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.properties.StructuralProperti
 public class VXQueryCollectionDataSource implements IDataSource<String> {
     private final int dataSourceId;
     private final String collectionName;
+    private final List<Integer> childSeq;
     private int totalDataSources;
 
     private final Object[] types;
@@ -51,6 +52,7 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
                 return vec;
             }
         };
+        this.childSeq = new ArrayList<Integer>();
     }
 
     public int getTotalDataSources() {
@@ -82,6 +84,14 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
 
     @Override
     public void computeFDs(List<LogicalVariable> scanVariables, List<FunctionalDependency> fdList) {
+    }
+
+    public void addChildSeq(int integer) {
+        childSeq.add(integer);
+    }
+
+    public List<Integer> getChildSeq() {
+        return childSeq;
     }
 
 }

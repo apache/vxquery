@@ -67,10 +67,9 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             List<LogicalVariable> scanVariables, List<LogicalVariable> projectVariables, boolean projectPushed,
             IOperatorSchema opSchema, IVariableTypeEnvironment typeEnv, JobGenContext context,
             JobSpecification jobSpec, Object implConfig) throws AlgebricksException {
-        VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
         RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
-        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds.getId(),
-                ds.getDataSourceId(), ds.getTotalDataSources(), rDesc);
+        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec,
+                (VXQueryCollectionDataSource) dataSource, rDesc);
 
         AlgebricksAbsolutePartitionConstraint constraint = new AlgebricksAbsolutePartitionConstraint(nodeList);
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
