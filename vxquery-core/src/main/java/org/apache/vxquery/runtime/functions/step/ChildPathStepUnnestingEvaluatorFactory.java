@@ -16,23 +16,10 @@
  */
 package org.apache.vxquery.runtime.functions.step;
 
-import java.io.IOException;
-
-import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.builders.nodes.NodeSubTreeBuilder;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.step.NodeTestFilter.INodeFilter;
-import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -40,8 +27,6 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueArgumentUnnestingEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -53,136 +38,18 @@ public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueA
     @Override
     protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-
-        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        final TaggedValuePointable rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
-        final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
-        final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
-        final TaggedValuePointable itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-
-        final SequencePointable seqa = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        final TaggedValuePointable itemTvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-
+        final ChildPathStep childPathStep = new ChildPathStep(ctx);
+        
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
-            private int indexSequence;
-            private int indexSeqArgs;
-            private int seqLength;
-            private int seqArgsLength;
-
-            private boolean first;
-            private ArrayBackedValueStorage nodeAbvs;
-            private INodeFilter filter;
-
             @Override
             public boolean step(IPointable result) throws AlgebricksException {
-                if (seqArgsLength > 0) {
-                    while (indexSeqArgs < seqArgsLength) {
-                        seqLength = seqa.getEntryCount();
-                        seqa.getEntry(indexSeqArgs, itemTvp2);
-                        if (itemTvp2.getTag() != ValueTag.NODE_TREE_TAG) {
-                            String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
-                            throw new AlgebricksException(description);
-                        }
-                        itemTvp2.getValue(ntp);
-                        if (stepNodeTree(result)) {
-                            return true;
-                        }
-                    }
-                } else {
-                    if (stepNodeTree(result)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            protected boolean stepNodeTree(IPointable result) throws AlgebricksException {
-                while (indexSequence < seqLength) {
-                    // Get the next item
-                    seqp.getEntry(indexSequence, itemTvp);
-                    ++indexSequence;
-
-                    // Test to see if the item fits the path step
-                    if (matches()) {
-                        try {
-                            setNodeToResult(result);
-                            return true;
-                        } catch (IOException e) {
-                            String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
-                            throw new AlgebricksException(description);
-                        }
-                    }
-                }
-                return false;
+                return childPathStep.step(result);
             }
 
             @Override
             protected void init(TaggedValuePointable[] args) throws SystemException {
-                first = true;
-                nodeAbvs = new ArrayBackedValueStorage();
-
-                indexSequence = 0;
-                indexSeqArgs = 0;
-                if (first) {
-                    if (args[1].getTag() != ValueTag.XS_INT_TAG) {
-                        throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
-                    }
-                    args[1].getValue(ip);
-                    int typeCode = ip.getInteger();
-                    SequenceType sType = dCtx.getStaticContext().lookupSequenceType(typeCode);
-                    filter = NodeTestFilter.getNodeTestFilter(sType);
-                    first = false;
-                }
-                if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
-                    args[0].getValue(seqa);
-                    seqArgsLength = seqa.getEntryCount();
-                } else if (args[0].getTag() == ValueTag.NODE_TREE_TAG) {
-                    args[0].getValue(ntp);
-                    getSequence(ntp, seqp);
-                    seqLength = seqp.getEntryCount();
-                    seqArgsLength = -1;
-
-                } else {
-                    throw new SystemException(ErrorCode.SYSE0001);
-                }
+                childPathStep.init(args);
             }
-
-            protected boolean matches() {
-                return filter.accept(ntp, itemTvp);
-            }
-
-            protected void setNodeToResult(IPointable result) throws IOException {
-                nodeAbvs.reset();
-                NodeSubTreeBuilder nstb = new NodeSubTreeBuilder();
-                nstb.reset(nodeAbvs);
-                nstb.setChildNode(ntp, itemTvp);
-                nstb.finish();
-                result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
-            }
-
-            protected void getSequence(NodeTreePointable ntp, SequencePointable seqp) throws SystemException {
-                ntp.getRootNode(rootTVP);
-                switch (rootTVP.getTag()) {
-                    case ValueTag.DOCUMENT_NODE_TAG:
-                        rootTVP.getValue(dnp);
-                        dnp.getContent(ntp, seqp);
-                        return;
-
-                    case ValueTag.ELEMENT_NODE_TAG:
-                        rootTVP.getValue(enp);
-                        if (enp.childrenChunkExists()) {
-                            enp.getChildrenSequence(ntp, seqp);
-                            return;
-                        }
-                }
-                TaggedValuePointable seqTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                XDMConstants.setEmptySequence(seqTvp);
-                seqTvp.getValue(seqp);
-            }
-
         };
     }
 }

@@ -16,50 +16,54 @@
  */
 package org.apache.vxquery.runtime.functions.step;
 
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.SystemException;
+import java.io.IOException;
 
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public class ChildPathStepScalarEvaluator extends AbstractSinglePathStepScalarEvaluator {
-    private final TaggedValuePointable rootTVP;
+public class ChildPathStepScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+    private final SequenceBuilder seqb;
 
-    private final DocumentNodePointable dnp;
+    private final ArrayBackedValueStorage seqAbvs;
 
-    private final ElementNodePointable enp;
+    private final TaggedValuePointable itemTvp;
+
+    private final ChildPathStep childPathStep;
 
     public ChildPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
-        super(args, ctx);
-        rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
-        enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
+        super(args);
+        seqb = new SequenceBuilder();
+        seqAbvs = new ArrayBackedValueStorage();
+        itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        childPathStep = new ChildPathStep(ctx);
     }
 
     @Override
-    protected void getSequence(NodeTreePointable ntp, SequencePointable seqp) throws SystemException {
-        ntp.getRootNode(rootTVP);
-        switch (rootTVP.getTag()) {
-            case ValueTag.DOCUMENT_NODE_TAG:
-                rootTVP.getValue(dnp);
-                dnp.getContent(ntp, seqp);
-                return;
-
-            case ValueTag.ELEMENT_NODE_TAG:
-                rootTVP.getValue(enp);
-                if (enp.childrenChunkExists()) {
-                    enp.getChildrenSequence(ntp, seqp);
-                    return;
+    protected final void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+        try {
+            childPathStep.init(args);
+            seqAbvs.reset();
+            seqb.reset(seqAbvs);
+            try {
+                while (childPathStep.step(itemTvp)) {
+                    seqb.addItem(itemTvp);
                 }
+            } catch (AlgebricksException e) {
+                throw new SystemException(ErrorCode.SYSE0001, e);
+            }
+            seqb.finish();
+            result.set(seqAbvs);
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
         }
-        TaggedValuePointable seqTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        XDMConstants.setEmptySequence(seqTvp);
-        seqTvp.getValue(seqp);
     }
 }
