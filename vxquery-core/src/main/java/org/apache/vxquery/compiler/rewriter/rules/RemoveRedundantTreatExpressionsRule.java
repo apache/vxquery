@@ -62,7 +62,7 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  * @author prestonc
  */
 
-public class RemoveRedudantTreatExpressionsRule implements IAlgebraicRewriteRule {
+public class RemoveRedundantTreatExpressionsRule implements IAlgebraicRewriteRule {
     final StaticContextImpl dCtx = new StaticContextImpl(RootStaticContextImpl.INSTANCE);
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
