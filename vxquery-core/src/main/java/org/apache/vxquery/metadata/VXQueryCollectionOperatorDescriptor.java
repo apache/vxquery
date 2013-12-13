@@ -112,16 +112,16 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         abvsFileNode.reset();
                         try {
                             FunctionHelper.readInDocFromString(file.getPath(), in, abvsFileNode, nodeIdProvider);
-                            // Can not fit XML file into frame.
-                            if (frameSize <= (abvsFileNode.getLength() - abvsFileNode.getStartOffset())) {
-                                throw new HyracksDataException(
-                                        "XML node is to large for the current frame size (VXQueryCollectionOperatorDescriptor.addXmlFile).");
-                            }
                         } catch (Exception e) {
                             throw new HyracksDataException(e);
                         }
 
                         if (childSeq.isEmpty()) {
+                            // Can not fit XML file into frame.
+                            if (frameSize <= (abvsFileNode.getLength() - abvsFileNode.getStartOffset())) {
+                                throw new HyracksDataException(
+                                        "XML node is to large for the current frame size (VXQueryCollectionOperatorDescriptor.addXmlFile).");
+                            }
                             // Return the whole XML file.
                             tb.addField(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(),
                                     abvsFileNode.getLength());
