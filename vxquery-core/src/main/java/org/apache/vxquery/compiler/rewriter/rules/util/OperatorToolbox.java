@@ -24,12 +24,27 @@ import org.apache.commons.lang3.mutable.Mutable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractUnnestOperator;
 
 public class OperatorToolbox {
 
+    public static Mutable<ILogicalOperator> findLastSubplanOperator(Mutable<ILogicalOperator> opRef) {
+        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef;
+        AbstractLogicalOperator next;
+        while (op.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
+            opRef = op.getInputs().get(0);
+            op = (AbstractLogicalOperator) opRef;
+            next = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
+            if (next.getOperatorTag() == LogicalOperatorTag.NESTEDTUPLESOURCE) {
+                break;
+            }
+        }
+        return opRef;
+    }
+    
     public static AbstractLogicalOperator findLastSubplanOperator(AbstractLogicalOperator op) {
         AbstractLogicalOperator next;
         while (op.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
@@ -41,7 +56,7 @@ public class OperatorToolbox {
         }
         return op;
     }
-
+    
     public static List<Mutable<ILogicalExpression>> getExpression(Mutable<ILogicalOperator> opRef) {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         List<Mutable<ILogicalExpression>> result = new ArrayList<Mutable<ILogicalExpression>>();
@@ -89,4 +104,68 @@ public class OperatorToolbox {
         return result;
     }
 
+
+    public static Mutable<ILogicalOperator> findProducerOf(Mutable<ILogicalOperator> opRef, LogicalVariable lv) {
+        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
+        switch (op.getOperatorTag()) {
+            case AGGREGATE:
+            case ASSIGN:
+            case RUNNINGAGGREGATE:
+                AbstractAssignOperator aao = (AbstractAssignOperator) op;
+                if (aao.getVariables().contains(lv)) {
+                    return opRef;
+                }
+                for (Mutable<ILogicalOperator> input : op.getInputs()) {
+                    Mutable<ILogicalOperator> opInput = findProducerOf(input, lv);
+                    if (opInput != null) {
+                        return opInput;
+                    }
+                }
+                break;
+            case UNNEST:
+            case UNNEST_MAP:
+                AbstractUnnestOperator auo = (AbstractUnnestOperator) op;
+                if (auo.getVariables().contains(lv)) {
+                    return opRef;
+                }
+                for (Mutable<ILogicalOperator> input : op.getInputs()) {
+                    Mutable<ILogicalOperator> opInput = findProducerOf(input, lv);
+                     if (opInput != null) {
+                        return opInput;
+                    }
+                }
+                break;
+            case EMPTYTUPLESOURCE:
+            case NESTEDTUPLESOURCE:
+                return null;
+            case CLUSTER:
+            case DATASOURCESCAN:
+            case DISTINCT:
+            case DISTRIBUTE_RESULT:
+            case EXCHANGE:
+            case EXTENSION_OPERATOR:
+            case GROUP:
+            case INDEX_INSERT_DELETE:
+            case INNERJOIN:
+            case INSERT_DELETE:
+            case LEFTOUTERJOIN:
+            case LIMIT:
+            case ORDER:
+            case PARTITIONINGSPLIT:
+            case PROJECT:
+            case REPLICATE:
+            case SCRIPT:
+            case SELECT:
+            case SINK:
+            case SUBPLAN:
+            case UNIONALL:
+            case UPDATE:
+            case WRITE:
+            case WRITE_RESULT:
+            default:
+                // TODO Not yet implemented.
+                break;
+        }
+        return null;
+    }
 }

@@ -32,8 +32,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReference
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 
 public class ExpressionToolbox {
-    
-    public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe, LogicalVariable lv) {
+
+    public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe,
+            LogicalVariable lv) {
         ILogicalExpression le = mutableLe.getValue();
         if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
             VariableReferenceExpression vre = (VariableReferenceExpression) le;
@@ -52,7 +53,24 @@ public class ExpressionToolbox {
         return null;
     }
 
-    public static Mutable<ILogicalExpression> findFunctionExpression(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi) {
+    public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe) {
+        ILogicalExpression le = mutableLe.getValue();
+        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+            return mutableLe;
+        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+                Mutable<ILogicalExpression> resultLe = findVariableExpression(argExp);
+                if (resultLe != null) {
+                    return resultLe;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Mutable<ILogicalExpression> findFunctionExpression(Mutable<ILogicalExpression> mutableLe,
+            FunctionIdentifier fi) {
         ILogicalExpression le = mutableLe.getValue();
         if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
             AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
@@ -86,11 +104,10 @@ public class ExpressionToolbox {
         }
         return null;
     }
-    
+
     public static void getConstantAsPointable(ConstantExpression typeExpression, TaggedValuePointable tvp) {
         VXQueryConstantValue treatTypeConstant = (VXQueryConstantValue) typeExpression.getValue();
         tvp.set(treatTypeConstant.getValue(), 0, treatTypeConstant.getValue().length);
     }
-
 
 }
