@@ -304,6 +304,7 @@
             <exclude>reports/**/*</exclude>
           </excludes>
           <numUnapprovedLicenses>0</numUnapprovedLicenses>
+          <maxmemory>2g</maxmemory>
         </configuration>
       </plugin>
       <plugin>
