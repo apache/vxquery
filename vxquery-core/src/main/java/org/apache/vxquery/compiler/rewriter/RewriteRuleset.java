@@ -161,7 +161,7 @@ public class RewriteRuleset {
         return xquery;
     }
 
-    public final static List<IAlgebraicRewriteRule> buildInlineNormalizationRuleCollection() {
+    public final static List<IAlgebraicRewriteRule> buildRedundantExpressionNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
         normalization.add(new RemoveRedundantTreatExpressionsRule());
         normalization.add(new RemoveRedundantDataExpressionsRule());
