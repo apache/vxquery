@@ -64,7 +64,7 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  * 
  * @author prestonc
  */
-
+// TODO Replace with constant folding rule.
 public class RemoveUnusedTreatRule implements IAlgebraicRewriteRule {
     final StaticContextImpl dCtx = new StaticContextImpl(RootStaticContextImpl.INSTANCE);
 
