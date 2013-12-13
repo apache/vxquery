@@ -69,114 +69,114 @@ public class PromoteScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFa
                                 tvp.getValue(tp.utf8sp);
                                 aOp.convertAnyURI(tp.utf8sp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_BYTE_TAG:
                                 tvp.getValue(tp.bytep);
                                 aOp.convertByte(tp.bytep, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_DECIMAL_TAG:
                                 tvp.getValue(tp.decp);
                                 aOp.convertDecimal(tp.decp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_DOUBLE_TAG:
                                 tvp.getValue(tp.doublep);
                                 aOp.convertDouble(tp.doublep, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_FLOAT_TAG:
                                 tvp.getValue(tp.floatp);
                                 aOp.convertFloat(tp.floatp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_INT_TAG:
                                 tvp.getValue(tp.intp);
                                 aOp.convertInt(tp.intp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_INTEGER_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertInteger(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_LONG_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertLong(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_NEGATIVE_INTEGER_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertNegativeInteger(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertNonNegativeInteger(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertNonPositiveInteger(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_POSITIVE_INTEGER_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertPositiveInteger(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_SHORT_TAG:
                                 tvp.getValue(tp.shortp);
                                 aOp.convertShort(tp.shortp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_STRING_TAG:
                                 tvp.getValue(tp.utf8sp);
                                 aOp.convertString(tp.utf8sp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_UNSIGNED_BYTE_TAG:
                                 tvp.getValue(tp.shortp);
                                 aOp.convertUnsignedByte(tp.shortp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_UNSIGNED_INT_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertUnsignedInt(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_UNSIGNED_LONG_TAG:
                                 tvp.getValue(tp.longp);
                                 aOp.convertUnsignedLong(tp.longp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             case ValueTag.XS_UNSIGNED_SHORT_TAG:
                                 tvp.getValue(tp.intp);
                                 aOp.convertUnsignedShort(tp.intp, dOut);
                                 result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                                return;
+                                break;
 
                             default:
                                 // Promote type does not require us to change the value.
                                 result.set(tvp);
-                                return;
+                                break;
                         }
                     } catch (SystemException se) {
                         throw se;

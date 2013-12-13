@@ -62,15 +62,14 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp = args[0];
+                boolean booleanResult = true;
                 switch (tvp.getTag()) {
                     case ValueTag.SEQUENCE_TAG: {
                         tvp.getValue(seqp);
                         if (seqp.getEntryCount() == 0) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_BOOLEAN_TAG: {
@@ -81,11 +80,9 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                     case ValueTag.XS_DECIMAL_TAG: {
                         tvp.getValue(decp);
                         if (decp.longValue() == 0) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_INTEGER_TAG:
@@ -98,77 +95,69 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                     case ValueTag.XS_UNSIGNED_LONG_TAG: {
                         tvp.getValue(lp);
                         if (lp.longValue() == 0) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_INT_TAG:
                     case ValueTag.XS_UNSIGNED_SHORT_TAG: {
                         tvp.getValue(ip);
                         if (ip.intValue() == 0) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_SHORT_TAG:
                     case ValueTag.XS_UNSIGNED_BYTE_TAG: {
                         tvp.getValue(sp);
                         if (sp.shortValue() == 0) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_BYTE_TAG: {
                         tvp.getValue(bp);
                         if (bp.byteValue() == 0) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_DOUBLE_TAG: {
                         tvp.getValue(dp);
                         if (dp.doubleValue() == 0 || Double.isNaN(dp.doubleValue())) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_FLOAT_TAG: {
                         tvp.getValue(fp);
                         if (fp.floatValue() == 0 || Float.isNaN(fp.floatValue())) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
 
                     case ValueTag.XS_ANY_URI_TAG:
                     case ValueTag.XS_STRING_TAG: {
                         tvp.getValue(utf8p);
                         if (utf8p.getUTFLength() == 0) {
-                            XDMConstants.setFalse(result);
-                            return;
+                            booleanResult = false;
                         }
-                        XDMConstants.setTrue(result);
-                        return;
+                        break;
                     }
+                    default:
+                        throw new SystemException(ErrorCode.FORG0006);
                 }
-                throw new SystemException(ErrorCode.FORG0006);
+                if (booleanResult) {
+                    XDMConstants.setTrue(result);
+                } else {
+                    XDMConstants.setFalse(result);
+                }
             }
         };
     }
