@@ -24,11 +24,13 @@ import org.apache.vxquery.compiler.rewriter.rules.ConsolidateDataScanUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSingleItemsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushMapOperatorDownThroughProductRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantPromoteExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantTreatExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
@@ -104,19 +106,20 @@ public class RewriteRuleset {
         normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
-
         // Convert to a data source scan operator.
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         normalization.add(new ConsolidateUnnestsRule());
-        
+
         normalization.add(new RemoveRedundantTreatExpressionsRule());
+        normalization.add(new RemoveRedundantDataExpressionsRule());
         normalization.add(new RemoveRedundantPromoteExpressionsRule());
 
         normalization.add(new ConsolidateDataScanUnnestRule());
 
+        normalization.add(new EliminateSubplanForSingleItemsRule());
         return normalization;
     }
 
@@ -156,6 +159,14 @@ public class RewriteRuleset {
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
         return xquery;
+    }
+
+    public final static List<IAlgebraicRewriteRule> buildInlineNormalizationRuleCollection() {
+        List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
+        normalization.add(new RemoveRedundantTreatExpressionsRule());
+        normalization.add(new RemoveRedundantDataExpressionsRule());
+        normalization.add(new RemoveRedundantPromoteExpressionsRule());
+        return normalization;
     }
 
     public final static List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
