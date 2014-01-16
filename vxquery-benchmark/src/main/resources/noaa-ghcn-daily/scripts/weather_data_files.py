@@ -90,6 +90,24 @@ class WeatherDataFiles:
             self.close_progress_data(True)
         self.reset()
         
+    def create_test_links(self, save_path, test, node, partitions):
+        test_path = save_path + "/" + test
+        if not os.path.isdir(test_path):
+            os.makedirs(test_path)
+        for i in range(partitions):
+            test_partition_path = test_path + "/partition" + str(i+1)
+            if (node <= i):
+                # link
+                if test == "speed_up":
+                    os.symlink(save_path + "/" + str(i+1) + "." + str(node) + "_partition_ghcnd_all_xml_gz", test_partition_path)
+                if test == "batch_scale_up":
+                    os.symlink(save_path + "/" + str(partitions) + "." + str(node) + "_partition_ghcnd_all_xml_gz", test_partition_path)
+            else:
+                # fake directories
+                os.makedirs(test_partition_path + "/sensors")
+                os.makedirs(test_partition_path + "/stations")
+            
+        
     # Once the initial data has been generated, the data can be copied into a set number of partitions. 
     def copy_to_n_partitions(self, save_path, partitions):
         

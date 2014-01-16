@@ -35,15 +35,17 @@ def main(argv):
     max_records = 0
     package = "ghcnd_gsn"
     partitions = 0
+    nodes = -1
     process_file_name = ""
     reset = False
     save_path = ""
     section = "all"
+    test = ""
     token = ""
     update = False
     
     try:
-        opts, args = getopt.getopt(argv, "acd:f:hl:m:p:rs:uvw:", ["download_directory=", "file=", "locality=", "max_station_files=", "nodes=", "save_directory=", "package=", "partitions=", "web_service="])
+        opts, args = getopt.getopt(argv, "acd:f:hl:m:n:p:rs:t:uvw:", ["download_directory=", "file=", "locality=", "max_station_files=", "nodes=", "save_directory=", "package=", "partitions=", "web_service="])
     except getopt.GetoptError:
         print 'The file options for weather_cli.py were not correctly specified.'
         print 'To see a full list of options try:'
@@ -62,8 +64,10 @@ def main(argv):
             print '    -m (int)  Limits the number of files created for each station.'
             print '              * Helpful when testing to make sure all elements are supported for each station.'
             print '              Alternate form: --max_station_files=(int)'
+            print '    -n (int)  The numeric node id starting at 0.'
             print '    --partitions (int)  The number of partitions (sections) for creating split up generated data.'
             print '    -p (str)  The package used to generate files. (all, gsn, hcn)'
+            print '    -t (str)  The benchmark test used to partition files. (speed_up, batch_scale_up)'
             print '    -r        Reset the build process. (For one section or all sections depending on other parameters.)'
             print '    -u        Recalculate the file count and data size for each data source file.'
             print '    -v        Extra debug information.'
@@ -96,7 +100,7 @@ def main(argv):
                 print 'Error: Argument must be a file name for --file (-f).'
                 sys.exit()
         elif opt in ('-l', "--locality"):
-            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "statistics"):
+            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "test_links", "statistics"):
                 section = arg
             else:
                 print 'Error: Argument must be a string for --locality (-l) and a valid locality.'
@@ -106,6 +110,12 @@ def main(argv):
                 max_records = int(arg)
             else:
                 print 'Error: Argument must be an integer for --max_station_files (-m).'
+                sys.exit()
+        elif opt in ('-n'):
+            if arg.isdigit():
+                nodes = int(arg)
+            else:
+                print 'Error: Argument must be an integer for -n.'
                 sys.exit()
         elif opt == "--partitions":
             if arg.isdigit():
@@ -118,6 +128,12 @@ def main(argv):
                 package = "ghcnd_" + arg
             else:
                 print 'Error: Argument must be an string for one of the known weather packages: "all", "gsn", "hcn"'
+                sys.exit()
+        elif opt in ('-t'):
+            if arg in ("speed_up", "batch_scale_up"):
+                test = arg
+            else:
+                print 'Error: Argument must be an string for one of the known benchmark tests: "speed_up", "batch_scale_up"'
                 sys.exit()
         elif opt == '-r':
             reset = True
@@ -220,6 +236,15 @@ def main(argv):
         print 'Processing the partition section.'
         data.reset()
         data.copy_to_n_partitions(xml_data_save_path, partitions)
+
+    if section in ("test_links"):
+        if test and partitions > 0 and nodes > -1:
+            print 'Processing the test links section.'
+            data.reset()
+            data.create_test_links(save_path, test, nodes, partitions)
+        else:
+            print 'Error: Not enough information for this section.'
+            sys.exit()
 
     if section in ("all", "statistics"):
         print 'Processing the statistics section.'

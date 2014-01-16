@@ -1,15 +1,11 @@
-Utilities for Benchmark and Cluster Operations
+Utilities for Benchmark Operations
 =====================
 
 # Introduction
 
-Helpful scripts or configuration document to work with cluster and benchmarking.
+Helpful scripts or configuration document to work with the benchmarks.
 
-## Cluster XML Config
+## Saxon Collection
 
-See cluster_exmaple.xml.
-
-## Push Folder
-
-Files need to be pushed out to all the cluster nodes can be set up by this 
-python script. Will only work on linux.
+To test the data with other XQuery processors, the saxon script helps with 
+creating a collection.xml file.
