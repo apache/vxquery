@@ -102,6 +102,9 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
         }
 
         Mutable<ILogicalExpression> lvm1 = ExpressionToolbox.findVariableExpression(aggregate.getExpressions().get(0));
+        if (lvm1 == null) {
+            return false;
+        }
         VariableReferenceExpression vre1 = (VariableReferenceExpression) lvm1.getValue();
 
         // UNNEST($v1, iterate($v0) )
@@ -125,6 +128,9 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
             return false;
         }
         Mutable<ILogicalExpression> lvm2 = ExpressionToolbox.findVariableExpression(subplanUnnest.getExpressionRef());
+        if (lvm2 == null) {
+            return false;
+        }
         VariableReferenceExpression vre2 = (VariableReferenceExpression) lvm2.getValue();
 
         // NESTEDTUPLESOURCE
