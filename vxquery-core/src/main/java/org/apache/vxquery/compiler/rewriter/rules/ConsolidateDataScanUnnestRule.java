@@ -18,18 +18,13 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
-import org.apache.vxquery.types.BuiltinTypeRegistry;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -37,15 +32,12 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
 /**
