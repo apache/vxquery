@@ -158,6 +158,8 @@ public class RewriteRuleset {
         xquery.add(new InlineVariablesRule());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
+        xquery.add(new RemoveRedundantVariablesRule());
+        xquery.add(new RemoveUnusedAssignAndAggregateRule());
         return xquery;
     }
 
