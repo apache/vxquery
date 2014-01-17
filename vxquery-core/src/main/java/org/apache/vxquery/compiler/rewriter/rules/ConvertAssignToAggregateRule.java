@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.functions.BuiltinOperators;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -99,15 +100,20 @@ public class ConvertAssignToAggregateRule extends AbstractVXQueryAggregateRule {
             return false;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
+        // TODO get the function through the function definition
         aggregateInfo = getAggregateFunction(functionCall);
         if (aggregateInfo == null) {
             return false;
         }
-        finalFunctionCall = getAggregateLastFunctionCall(aggregateInfo, functionCall);
-        if (finalFunctionCall == null) {
+        Mutable<ILogicalExpression> mutableVariableExpresion = ExpressionToolbox.findVariableExpression(mutableLogicalExpression);
+        if (mutableVariableExpresion == null) {
             return false;
         }
+        Mutable<ILogicalExpression> finalFunctionCallM = ExpressionToolbox
+                .findLastFunctionExpression(mutableLogicalExpression);
+        finalFunctionCall = (AbstractFunctionCallExpression) finalFunctionCallM.getValue();
 
+        
         // Build a subplan for replacing the sort distinct function with operators.
         // Nested tuple source.
         Mutable<ILogicalOperator> inputOperator = getInputOperator(assign.getInputs().get(0));
@@ -115,8 +121,7 @@ public class ConvertAssignToAggregateRule extends AbstractVXQueryAggregateRule {
         nextOperatorRef = new MutableObject<ILogicalOperator>(ntsOperator);
 
         // Get variable that is being used for sort and distinct operators.
-        VariableReferenceExpression inputVariableRef = (VariableReferenceExpression) finalFunctionCall.getArguments()
-                .get(0).getValue();
+        VariableReferenceExpression inputVariableRef = (VariableReferenceExpression) mutableVariableExpresion.getValue();
         LogicalVariable inputVariable = inputVariableRef.getVariableReference();
 
         // Unnest.

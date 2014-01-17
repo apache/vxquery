@@ -69,6 +69,25 @@ public class ExpressionToolbox {
         return null;
     }
 
+    public static Mutable<ILogicalExpression> findLastFunctionExpression(Mutable<ILogicalExpression> mutableLe) {
+        ILogicalExpression le = mutableLe.getValue();
+        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+            return null;
+        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+                if (argExp.getValue().getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+                    return mutableLe;
+                }
+                Mutable<ILogicalExpression> resultLe = findLastFunctionExpression(argExp);
+                if (resultLe != null) {
+                    return resultLe;
+                }
+            }
+        }
+        return null;
+    }
+
     public static Mutable<ILogicalExpression> findFunctionExpression(Mutable<ILogicalExpression> mutableLe,
             FunctionIdentifier fi) {
         ILogicalExpression le = mutableLe.getValue();

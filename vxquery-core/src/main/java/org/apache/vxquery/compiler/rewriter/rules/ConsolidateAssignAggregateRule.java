@@ -19,6 +19,7 @@ package org.apache.vxquery.compiler.rewriter.rules;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
@@ -103,17 +104,20 @@ public class ConsolidateAssignAggregateRule extends AbstractVXQueryAggregateRule
             return false;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
+        // TODO Use the function definition
         aggregateInfo = getAggregateFunction(functionCall);
         if (aggregateInfo == null) {
             return false;
         }
-        finalFunctionCall = getAggregateLastFunctionCall(aggregateInfo, functionCall);
-        if (finalFunctionCall == null) {
+        mutableVariableExpresion = ExpressionToolbox.findVariableExpression(mutableLogicalExpression);
+        if (mutableVariableExpresion == null) {
             return false;
         }
+        Mutable<ILogicalExpression> finalFunctionCallM = ExpressionToolbox
+                .findLastFunctionExpression(mutableLogicalExpression);
+        finalFunctionCall = (AbstractFunctionCallExpression) finalFunctionCallM.getValue();
 
         // Variable details.
-        mutableVariableExpresion = finalFunctionCall.getArguments().get(0);
         VariableReferenceExpression variableReference = (VariableReferenceExpression) mutableVariableExpresion
                 .getValue();
         int variableId = variableReference.getVariableReference().getId();
