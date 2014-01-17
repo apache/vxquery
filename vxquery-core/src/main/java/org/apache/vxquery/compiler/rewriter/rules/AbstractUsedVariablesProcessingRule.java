@@ -23,15 +23,17 @@ import org.apache.commons.lang3.mutable.Mutable;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractOperatorWithNestedPlans;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.visitors.VariableUtilities;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 /**
  * The AbstractUsedVariablesProcessingRule provides a frame work to track used
- * variables to assist in some rewrite rules that must track used variables in 
+ * variables to assist in some rewrite rules that must track used variables in
  * the above plan.
  * 
  * @author prestonc
@@ -65,10 +67,23 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         VariableUtilities.getUsedVariables(op, usedVariables);
 
+        if (op.hasNestedPlans()) {
+            AbstractOperatorWithNestedPlans opwnp = (AbstractOperatorWithNestedPlans) op;
+            for (ILogicalPlan rootPlans : opwnp.getNestedPlans()) {
+                for (Mutable<ILogicalOperator> inputOpRef : rootPlans.getRoots()) {
+                    if (rewritePreOnePass(inputOpRef, context)) {
+                        modified = true;
+                    }
+                }
+            }
+        }
+
         // Descend into children merging unnest along the way.
-        for (Mutable<ILogicalOperator> inputOpRef : op.getInputs()) {
-            if (rewritePreOnePass(inputOpRef, context)) {
-                modified = true;
+        if (op.hasInputs()) {
+            for (Mutable<ILogicalOperator> inputOpRef : op.getInputs()) {
+                if (rewritePreOnePass(inputOpRef, context)) {
+                    modified = true;
+                }
             }
         }
 
