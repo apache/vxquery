@@ -87,11 +87,11 @@ class WeatherConvertToXML:
                 total_size += os.path.getsize(fp)
         return total_size
 
-    def process_one_month_sensor_set(self, records):
+    def process_one_month_sensor_set(self, records, page):
         # Default
         return 0
     
-    def process_one_day(self, records, report_date):
+    def process_one_day(self, records, report_date, page):
         # Default
         return 0
     
@@ -109,41 +109,44 @@ class WeatherConvertToXML:
         row = file_stream.readline()
         return self.process_station_data(row)
 
-    def process_sensor_file(self, file_name, max_files):
+    def process_sensor_file(self, file_name, max_files, sensor_max = 99):
         print "Processing sensor file: " + file_name
         file_stream = open(file_name, 'r')
     
         month_last = 0
         year_last = 0
         records = []
-        station_data = False
+        page = 0
+        sensor_count = 0
     
         file_count = 0
         for row in file_stream:
-            if not station_data:
-                self.process_station_data(row)
-                station_data = True
-            
             month = self.get_dly_field(row, DLY_FIELD_MONTH)
             year = self.get_dly_field(row, DLY_FIELD_YEAR)
             
-            if (month_last == 0 and year_last == 0) or (month == month_last and year == year_last):
-                records.append(row)
-            else:
-                # process set and start over.
-                file_count += self.process_one_month_sensor_set(records)
+            if (month_last != 0 and year_last != 0) and (sensor_count >= sensor_max or month != month_last or year != year_last):
+                # process set
+                file_count += self.process_one_month_sensor_set(records, page)
                 records = []
-                records.append(row)
-                   
-                if max_files != 0 and file_count >= max_files:
-                    # Stop creating more files after the max is reached.
-                    break
-        
+                if sensor_count >= sensor_max:
+                    # start a new page.
+                    page += 1
+                else:
+                    # start over.
+                    page = 0
+                sensor_count = 0
+            
+            records.append(row)
+            sensor_count += 1
+            if max_files != 0 and file_count >= max_files:
+                # Stop creating more files after the max is reached.
+                break
+
             month_last = month
             year_last = year
         
         station_id = self.get_dly_field(records[0], DLY_FIELD_ID)
-        data_size = self.get_folder_size(self.get_base_folder(station_id))
+        data_size = self.get_folder_size(self.get_base_folder(station_id) + "/" + station_id)
         print "Created " + str(file_count) + " XML files for a data size of " + str(data_size) + "."
         
         return (file_count, data_size)
@@ -316,7 +319,7 @@ class WeatherConvertToXML:
         return (" " * (4 * indent))
     
 class WeatherDailyXMLFile(WeatherConvertToXML):
-    def process_one_month_sensor_set(self, records):
+    def process_one_month_sensor_set(self, records, page):
         year = int(self.get_dly_field(records[0], DLY_FIELD_YEAR))
         month = int(self.get_dly_field(records[0], DLY_FIELD_MONTH))
     
@@ -328,7 +331,7 @@ class WeatherDailyXMLFile(WeatherConvertToXML):
                 # TODO find out what is a valid python date range? 1889?
                 # Attempt to see if this is valid date.
                 report_date = date(year, month, day)
-                save_file_name = self.process_one_day(records, report_date)
+                save_file_name = self.process_one_day(records, report_date, page)
                 if save_file_name is not "":
                     count = count + 1
                     if self.debug_output:
@@ -339,7 +342,7 @@ class WeatherDailyXMLFile(WeatherConvertToXML):
                 pass
         return count
 
-    def process_one_day(self, records, report_date):
+    def process_one_day(self, records, report_date, page):
         station_id = self.get_dly_field(records[0], DLY_FIELD_ID)
         found_data = False
                 
@@ -360,18 +363,18 @@ class WeatherDailyXMLFile(WeatherConvertToXML):
             return ""
         
         # Make sure the station folder is available.
-        ghcnd_xml_station_path = self.get_base_folder(station_id) + str(report_date.year) + "/"
+        ghcnd_xml_station_path = self.get_base_folder(station_id) + "/" + station_id + "/" + str(report_date.year) + "/"
         if not os.path.isdir(ghcnd_xml_station_path):
             os.makedirs(ghcnd_xml_station_path)
         
         # Save XML string to disk.
-        save_file_name = ghcnd_xml_station_path + station_id + "_" + str(report_date.year).zfill(4) + str(report_date.month).zfill(2) + str(report_date.day).zfill(2) + ".xml"
+        save_file_name = ghcnd_xml_station_path + build_sensor_save_filename(station_id, report_date, page)
         save_file_name = self.save_file(save_file_name, daily_xml_file)
                 
         return save_file_name
     
 class WeatherMonthlyXMLFile(WeatherConvertToXML):
-    def process_one_month_sensor_set(self, records):
+    def process_one_month_sensor_set(self, records, page):
         found_data = False        
         year = int(self.get_dly_field(records[0], DLY_FIELD_YEAR))
         month = int(self.get_dly_field(records[0], DLY_FIELD_MONTH))
@@ -415,12 +418,12 @@ class WeatherMonthlyXMLFile(WeatherConvertToXML):
             return 0
 
         # Make sure the station folder is available.
-        ghcnd_xml_station_path = self.get_base_folder(station_id) + str(report_date.year) + "/"
+        ghcnd_xml_station_path = self.get_base_folder(station_id) + "/" + station_id + "/" + str(report_date.year) + "/"
         if not os.path.isdir(ghcnd_xml_station_path):
             os.makedirs(ghcnd_xml_station_path)
                 
         # Save XML string to disk.
-        save_file_name = ghcnd_xml_station_path + station_id + "_" + str(report_date.year).zfill(4) + str(report_date.month).zfill(2) + ".xml"
+        save_file_name = ghcnd_xml_station_path + build_sensor_save_filename(station_id, report_date, page)
         save_file_name = self.save_file(save_file_name, daily_xml_file)
 
         if save_file_name is not "":
@@ -431,12 +434,15 @@ class WeatherMonthlyXMLFile(WeatherConvertToXML):
             return 0
 
 class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
+    skip_downloading = False
     # Station data
     def process_station_data(self, row):
         station_id = self.get_dly_field(row, DLY_FIELD_ID)
         download = 0
-        if self.token is not "":
+        if self.token is not "" and not self.skip_downloading:
             download = self.download_station_data(station_id, self.token, True)
+            if download == 0:
+                self.skip_downloading = True
         
         # If not downloaded generate.
         if download != 0:
@@ -465,6 +471,8 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
 
     # Station data
     def download_station_data(self, station_id, token, reset = False):
+        import time
+        time.sleep(5)
         # Make sure the station folder is available.
         ghcnd_xml_station_path = self.get_base_folder(station_id, "stations")
         if not os.path.isdir(ghcnd_xml_station_path):
@@ -497,7 +505,7 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
             return 0
 
     # Sensor data
-    def process_one_month_sensor_set(self, records):
+    def process_one_month_sensor_set(self, records, page):
         found_data = False        
         year = int(self.get_dly_field(records[0], DLY_FIELD_YEAR))
         month = int(self.get_dly_field(records[0], DLY_FIELD_MONTH))
@@ -535,12 +543,12 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
             return 0
 
         # Make sure the station folder is available.
-        ghcnd_xml_station_path = self.get_base_folder(station_id) + str(report_date.year) + "/"
+        ghcnd_xml_station_path = self.get_base_folder(station_id) + "/" + station_id + "/" + str(report_date.year) + "/"
         if not os.path.isdir(ghcnd_xml_station_path):
             os.makedirs(ghcnd_xml_station_path)
                 
         # Save XML string to disk.
-        save_file_name = ghcnd_xml_station_path + station_id + "_" + str(report_date.year).zfill(4) + str(report_date.month).zfill(2) + ".xml"
+        save_file_name = ghcnd_xml_station_path + build_sensor_save_filename(station_id, report_date, page)
         save_file_name = self.save_file(save_file_name, daily_xml_file)
 
         if save_file_name is not "":
@@ -553,5 +561,9 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
 def build_base_save_folder(save_path, station_id, data_type="sensors"):
     # Default
     station_prefix = station_id[:3]
-    return save_path + data_type + "/" + station_prefix + "/" + station_id + "/" 
+    return save_path + data_type + "/" + station_prefix + "/"
+
+def build_sensor_save_filename(station_id, report_date, page):
+    # Default
+    return station_id + "_" + str(report_date.year).zfill(4) + str(report_date.month).zfill(2) + "_" + str(page) + ".xml"
 

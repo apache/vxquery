@@ -40,6 +40,7 @@ class WeatherDataFiles:
     SEPERATOR = ","
     
     type = "sensor"
+    data_reset = False
     
     def __init__(self, base_path, progress_file_name="/tmp/_weather_data.csv"):
         self.base_path = base_path
@@ -300,6 +301,9 @@ class WeatherDataFiles:
     def set_type(self, type):
         self.type = type
 
+    def set_data_reset(self, data_reset):
+        self.data_reset = data_reset
+
 
     # Iterator Functions
     def __iter__(self):
@@ -314,8 +318,8 @@ class WeatherDataFiles:
             row = self.progress_data[self.current]
             self.current += 1
             columns = row.rsplit(self.SEPERATOR)
-            if self.type == "sensor" and columns[self.INDEX_DATA_SENSORS_STATUS].strip() != self.DATA_FILE_GENERATED:
+            if self.type == "sensor" and (columns[self.INDEX_DATA_SENSORS_STATUS].strip() != self.DATA_FILE_GENERATED or self.data_reset):
                 break
-            elif self.type == "station" and columns[self.INDEX_DATA_STATION_STATUS].strip() != self.DATA_FILE_DOWNLOADED:
+            elif self.type == "station" and (columns[self.INDEX_DATA_STATION_STATUS].strip() != self.DATA_FILE_DOWNLOADED or self.data_reset):
                 break
         return columns[self.INDEX_DATA_FILE_NAME]

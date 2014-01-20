@@ -56,7 +56,7 @@ def main(argv):
             print 'Converting weather daily files to xml options:'
             print '    -a        Append the results to the progress file.'
             print '    -c        Compress the produced XML file with .gz.'
-            print '    --donwload_directory (str)  The directory for saving the downloaded files. (default: downloads)'
+            print '    --download_directory (str)  The directory for saving the downloaded files. (default: downloads)'
             print '    -d (str)  The directory for saving the downloaded files and generated XML files.'
             print '    -f (str)  The file name of a specific station to process.'
             print '              * Helpful when testing a single stations XML file output.'
@@ -201,7 +201,7 @@ def main(argv):
         if process_file_name is not "":
             # process a single file
             if os.path.exists(process_file_name):
-                (file_count, data_size) = convert.process_sensor_file(process_file_name, max_records)
+                (file_count, data_size) = convert.process_sensor_file(process_file_name, max_records, 4)
                 data.update_file_sensor_status(process_file_name, WeatherDataFiles.DATA_FILE_GENERATED, file_count, data_size)
             else:
                 data.update_file_sensor_status(process_file_name, WeatherDataFiles.DATA_FILE_MISSING)
@@ -209,10 +209,11 @@ def main(argv):
             # process directory
             data.reset()
             data.set_type("sensor")
+            data.set_data_reset(reset)
             for file_name in data:
                 file_path = ghcnd_data_dly_path + '/' + file_name
                 if os.path.exists(file_path):
-                    (file_count, data_size) = convert.process_sensor_file(file_path, max_records)
+                    (file_count, data_size) = convert.process_sensor_file(file_path, max_records, 4)
                     data.update_file_sensor_status(file_name, WeatherDataFiles.DATA_FILE_GENERATED, file_count, data_size)
                 else:
                     data.update_file_sensor_status(file_name, WeatherDataFiles.DATA_FILE_MISSING)
@@ -221,6 +222,7 @@ def main(argv):
         print 'Processing the station_build section.'
         data.reset()
         data.set_type("station")
+        data.set_data_reset(reset)
         if token is not "":
             convert.set_token(token)
         for file_name in data: 
