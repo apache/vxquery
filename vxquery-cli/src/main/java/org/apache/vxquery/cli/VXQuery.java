@@ -279,8 +279,9 @@ public class VXQuery {
      * @throws Exception
      */
     private void runJob(JobSpecification spec, PrintWriter writer) throws Exception {
+        int nReaders = 1;
         if (hds == null) {
-            hds = new HyracksDataset(hcc, spec.getFrameSize(), 1);
+            hds = new HyracksDataset(hcc, spec.getFrameSize(), nReaders);
         }
 
         JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
