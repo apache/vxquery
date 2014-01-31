@@ -29,9 +29,11 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
+import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
+import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
@@ -205,7 +207,9 @@ public class VXQuery {
                 public void notifyOptimizedResult(Module module) {
                     if (opts.showOET) {
                         try {
-                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
+                            StaticContext ctx = module.getCompilerControlBlock().getStaticContext();
+                        	VXQueryLogicalExpressionPrettyPrintVisitor ev = new VXQueryLogicalExpressionPrettyPrintVisitor(ctx);
+                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
                             StringBuilder buffer = new StringBuilder();
                             PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
                             System.err.println(buffer.toString());
