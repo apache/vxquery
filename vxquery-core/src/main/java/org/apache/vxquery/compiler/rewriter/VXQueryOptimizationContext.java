@@ -27,6 +27,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSi
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.AlgebricksOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
 
@@ -40,10 +41,10 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
 
     public VXQueryOptimizationContext(int varCounter, IExpressionEvalSizeComputer expressionEvalSizeComputer,
             IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
-            IExpressionTypeComputer expressionTypeComputer,
-            INullableTypeComputer nullableTypeComputer, PhysicalOptimizationConfig physicalOptimizationConfig) {
+            IExpressionTypeComputer expressionTypeComputer, INullableTypeComputer nullableTypeComputer,
+            PhysicalOptimizationConfig physicalOptimizationConfig, LogicalOperatorPrettyPrintVisitor prettyPrintVisitor) {
         super(varCounter, expressionEvalSizeComputer, mergeAggregationExpressionFactory, expressionTypeComputer,
-                nullableTypeComputer, physicalOptimizationConfig);
+                nullableTypeComputer, physicalOptimizationConfig, prettyPrintVisitor);
     }
 
     public VXQueryCollectionDataSource getCollectionDataSourceMap(String collectionName) {

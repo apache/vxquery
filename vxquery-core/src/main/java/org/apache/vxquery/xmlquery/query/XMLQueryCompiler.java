@@ -26,6 +26,7 @@ import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.compiler.algebricks.VXQueryExpressionRuntimeProvider;
 import org.apache.vxquery.compiler.algebricks.VXQueryNullWriterFactory;
 import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
+import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
 import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -58,6 +59,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IMergeAggregation
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
 import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.AbstractRuleController;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IOptimizationContextFactory;
@@ -75,6 +77,8 @@ public class XMLQueryCompiler {
     private final ICompilerFactory cFactory;
 
     private final VXQueryMetadataProvider mdProvider;
+    
+    private LogicalOperatorPrettyPrintVisitor pprinter;
 
     private ModuleNode moduleNode;
 
@@ -97,7 +101,7 @@ public class XMLQueryCompiler {
                             PhysicalOptimizationConfig physicalOptimizationConfig) {
                         return new VXQueryOptimizationContext(varCounter, expressionEvalSizeComputer,
                                 mergeAggregationExpressionFactory, expressionTypeComputer, nullableTypeComputer,
-                                physicalOptimizationConfig);
+                                physicalOptimizationConfig, pprinter);
                     }
                 });
         builder.getPhysicalOptimizationConfig().setFrameSize(this.frameSize);
@@ -150,6 +154,8 @@ public class XMLQueryCompiler {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
+        pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(module
+                .getCompilerControlBlock().getStaticContext()));
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);

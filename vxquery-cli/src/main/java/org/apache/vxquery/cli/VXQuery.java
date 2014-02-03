@@ -51,6 +51,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.PlanPrettyPrinter;
+import edu.uci.ics.hyracks.algebricks.core.algebra.visitors.ILogicalExpressionVisitor;
 import edu.uci.ics.hyracks.api.client.HyracksConnection;
 import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
 import edu.uci.ics.hyracks.api.client.NodeControllerInfo;
@@ -182,14 +183,7 @@ public class VXQuery {
                 @Override
                 public void notifyTranslationResult(Module module) {
                     if (opts.showTET) {
-                        try {
-                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor();
-                            StringBuilder buffer = new StringBuilder();
-                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
-                            System.err.println(buffer.toString());
-                        } catch (AlgebricksException e) {
-                            e.printStackTrace();
-                        }
+                        System.err.println(appendPrettyPlan(new StringBuilder(), module).toString());
                     }
                 }
 
@@ -206,16 +200,7 @@ public class VXQuery {
                 @Override
                 public void notifyOptimizedResult(Module module) {
                     if (opts.showOET) {
-                        try {
-                            StaticContext ctx = module.getCompilerControlBlock().getStaticContext();
-                        	VXQueryLogicalExpressionPrettyPrintVisitor ev = new VXQueryLogicalExpressionPrettyPrintVisitor(ctx);
-                            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
-                            StringBuilder buffer = new StringBuilder();
-                            PlanPrettyPrinter.printPlan(module.getBody(), buffer, v, 0);
-                            System.err.println(buffer.toString());
-                        } catch (AlgebricksException e) {
-                            e.printStackTrace();
-                        }
+                        System.err.println(appendPrettyPlan(new StringBuilder(), module).toString());
                     }
                 }
 
@@ -230,6 +215,18 @@ public class VXQuery {
                     if (opts.showAST) {
                         System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
                     }
+                }
+                
+                private StringBuilder appendPrettyPlan(StringBuilder sb, Module module) {
+                    try {
+                        StaticContext ctx = module.getCompilerControlBlock().getStaticContext();
+                        ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(ctx);
+                        LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
+                        PlanPrettyPrinter.printPlan(module.getBody(), sb, v, 0);
+                    } catch (AlgebricksException e) {
+                        e.printStackTrace();
+                    }
+                    return sb;
                 }
             };
 
