@@ -4,5 +4,5 @@
 (: meters per second). (Wind value is in tenth of a meter per second)         :)
 let $collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
 for $r in collection($collection)/dataCollection/data
-where $r/dataType eq "AWND" and $r/value > 491.744
+where $r/dataType eq "AWND" and xs:decimal(fn:data($r/value)) gt 491.744
 return $r
