@@ -78,6 +78,9 @@ public class VXQuery {
     private IHyracksDataset hds;
 
     private ResultSetId resultSetId;
+    private static List<String> timing;
+    private static int totalTiming;
+    private static String message;
 
     /**
      * Constructor to use command line options passed.
@@ -87,6 +90,7 @@ public class VXQuery {
      */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
+        timing = new ArrayList<String>();
     }
 
     /**
@@ -116,7 +120,18 @@ public class VXQuery {
         Date end = new Date();
         // if -timing argument passed, show the starting and ending times
         if (opts.timing) {
-            System.out.println("Execution time: " + (end.getTime() - start.getTime()) + "ms");
+            message = "Execution time: " + (end.getTime() - start.getTime()) + "ms";
+            System.out.println(message);
+            timing.add(message);
+            if (opts.repeatExec > 3) {
+                message = "Average execution time: " + (totalTiming / (opts.repeatExec - 3)) + "ms";
+                System.out.println(message);
+                timing.add(message);
+            }
+            System.out.println("Timing Summary:");
+            for (String time : timing) {
+                System.out.println("  " + time);
+            }
         }
 
     }
@@ -154,6 +169,8 @@ public class VXQuery {
      * @throws Exception
      */
     private void runQueries() throws IOException, SystemException, Exception {
+        Date start;
+        Date end;
         for (String query : opts.arguments) {
             String qStr = slurp(query);
             if (opts.showQuery) {
@@ -216,11 +233,12 @@ public class VXQuery {
                         System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
                     }
                 }
-                
+
                 private StringBuilder appendPrettyPlan(StringBuilder sb, Module module) {
                     try {
                         StaticContext ctx = module.getCompilerControlBlock().getStaticContext();
-                        ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(ctx);
+                        ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(
+                                ctx);
                         LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
                         PlanPrettyPrinter.printPlan(module.getBody(), sb, v, 0);
                     } catch (AlgebricksException e) {
@@ -230,11 +248,19 @@ public class VXQuery {
                 }
             };
 
+            start = new Date();
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId);
             compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
+            end = new Date();
+            // if -timing argument passed, show the starting and ending times
+            if (opts.timing) {
+                message = "Compile time: " + (end.getTime() - start.getTime()) + "ms";
+                System.out.println(message);
+                timing.add(message);
+            }
             if (opts.compileOnly) {
                 continue;
             }
@@ -248,7 +274,18 @@ public class VXQuery {
             PrintWriter writer = new PrintWriter(System.out, true);
             // Repeat execution for number of times provided in -repeatexec argument
             for (int i = 0; i < opts.repeatExec; ++i) {
+                start = new Date();
                 runJob(js, writer);
+                end = new Date();
+                // if -timing argument passed, show the starting and ending times
+                if (opts.timing) {
+                    if ((i + 1) > 3) {
+                        totalTiming += end.getTime() - start.getTime();
+                    }
+                    message = "Job (" + (i + 1) + ") execution time: " + (end.getTime() - start.getTime()) + "ms";
+                    System.out.println(message);
+                    timing.add(message);
+                }
             }
         }
     }
