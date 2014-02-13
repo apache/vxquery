@@ -128,7 +128,7 @@ class WeatherConvertToXML:
                 # process set
                 file_count += self.process_one_month_sensor_set(records, page)
                 records = []
-                if sensor_count >= sensor_max:
+                if sensor_count >= sensor_max and month == month_last and year == year_last:
                     # start a new page.
                     page += 1
                 else:

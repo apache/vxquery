@@ -18,6 +18,17 @@ Detailed GHDN-DAILY information:
 The process takes a save folder for the data. The folder contains a several 
 folders:
 
+ - all_xml_files (The generated xml files for a given package)
  - downloads (All files taken from the NOAA HTTP site)
- - 1\_node\_{package}\_xml{\_compression} (The generated xml files for a given 
-     package)
+ - dataset-[name] (all files related to a single dataset)
+     
+     
+# Examples commands
+
+Building
+
+
+Partitioning
+python weather_cli.py -x weather_example.xml
+
+Linking

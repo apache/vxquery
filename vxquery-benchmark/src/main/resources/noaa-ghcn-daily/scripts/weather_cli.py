@@ -20,6 +20,7 @@ import sys, getopt
 from weather_data_files import *
 from weather_download_files import *
 from weather_convert_to_xml import *
+from weather_config import *
 
 DEBUG_OUTPUT = False
 COMPRESSED = False
@@ -31,21 +32,17 @@ COMPRESSED = False
 #
 def main(argv):
     append = False
-    download_path = ""
     max_records = 0
     package = "ghcnd_gsn"
-    partitions = 0
-    nodes = -1
     process_file_name = ""
     reset = False
-    save_path = ""
     section = "all"
-    test = ""
     token = ""
     update = False
+    xml_config_path = ""
     
     try:
-        opts, args = getopt.getopt(argv, "acd:f:hl:m:n:p:rs:t:uvw:", ["download_directory=", "file=", "locality=", "max_station_files=", "nodes=", "save_directory=", "package=", "partitions=", "web_service="])
+        opts, args = getopt.getopt(argv, "acf:hl:m:ruvw:x:", ["file=", "locality=", "max_station_files=", "web_service=", "xml_config="])
     except getopt.GetoptError:
         print 'The file options for weather_cli.py were not correctly specified.'
         print 'To see a full list of options try:'
@@ -56,42 +53,23 @@ def main(argv):
             print 'Converting weather daily files to xml options:'
             print '    -a        Append the results to the progress file.'
             print '    -c        Compress the produced XML file with .gz.'
-            print '    --download_directory (str)  The directory for saving the downloaded files. (default: downloads)'
-            print '    -d (str)  The directory for saving the downloaded files and generated XML files.'
             print '    -f (str)  The file name of a specific station to process.'
             print '              * Helpful when testing a single stations XML file output.'
             print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, statistics).'
             print '    -m (int)  Limits the number of files created for each station.'
             print '              * Helpful when testing to make sure all elements are supported for each station.'
             print '              Alternate form: --max_station_files=(int)'
-            print '    -n (int)  The numeric node id starting at 0.'
-            print '    --partitions (int)  The number of partitions (sections) for creating split up generated data.'
-            print '    -p (str)  The package used to generate files. (all, gsn, hcn)'
-            print '    -t (str)  The benchmark test used to partition files. (speed_up, batch_scale_up)'
             print '    -r        Reset the build process. (For one section or all sections depending on other parameters.)'
             print '    -u        Recalculate the file count and data size for each data source file.'
             print '    -v        Extra debug information.'
             print '    -w (str)  Downloads the station XML file form the web service.'
+            print '    -x (str)  XML config file for weather data.'
             sys.exit()
         elif opt in ('-a', "--append"):
             append = True
         elif opt == '-c':
             global COMPRESSED
             COMPRESSED = True
-        elif opt == '--download_directory':
-            # check if file exists.
-            if os.path.exists(arg):
-                download_path = arg
-            else:
-                print 'Error: Argument must be a directory for --download_directory.'
-                sys.exit()
-        elif opt in ('-d', "--save_directory"):
-            # check if file exists.
-            if os.path.exists(arg):
-                save_path = arg
-            else:
-                print 'Error: Argument must be a directory for --save_directory (-s).'
-                sys.exit()
         elif opt in ('-f', "--file"):
             # check if file exists.
             if os.path.exists(arg):
@@ -111,29 +89,11 @@ def main(argv):
             else:
                 print 'Error: Argument must be an integer for --max_station_files (-m).'
                 sys.exit()
-        elif opt in ('-n'):
-            if arg.isdigit():
-                nodes = int(arg)
-            else:
-                print 'Error: Argument must be an integer for -n.'
-                sys.exit()
-        elif opt == "--partitions":
-            if arg.isdigit():
-                partitions = int(arg)
-            else:
-                print 'Error: Argument must be an integer for --partitions.'
-                sys.exit()
         elif opt in ('-p', "--package"):
             if arg in ("all", "gsn", "hcn"):
                 package = "ghcnd_" + arg
             else:
                 print 'Error: Argument must be an string for one of the known weather packages: "all", "gsn", "hcn"'
-                sys.exit()
-        elif opt in ('-t'):
-            if arg in ("speed_up", "batch_scale_up"):
-                test = arg
-            else:
-                print 'Error: Argument must be an string for one of the known benchmark tests: "speed_up", "batch_scale_up"'
                 sys.exit()
         elif opt == '-r':
             reset = True
@@ -149,15 +109,27 @@ def main(argv):
             else:
                 print 'Error: Argument must be a string --web_service (-w).'
                 sys.exit()
+        elif opt in ('-x', "--xml_config"):
+            # check if file exists.
+            if os.path.exists(arg):
+                xml_config_path = arg
+            else:
+                print 'Error: Argument must be a xml file for --xml_config (-x).'
+                sys.exit()
 
     # Required fields to run the script.
-    if save_path == "" or not os.path.exists(save_path):
+    if xml_config_path == "" or not os.path.exists(xml_config_path):
+        print 'Error: The xml config option must be supplied: --xml_config (-x).'
+        sys.exit()
+    config = WeatherConfig(xml_config_path)
+    
+    # Required fields to run the script.
+    if config.get_save_path() == "" or not os.path.exists(config.get_save_path()):
         print 'Error: The save directory option must be supplied: --save_directory (-d).'
         sys.exit()
 
     # Set up downloads folder.
-    if download_path == "":
-        download_path = save_path + "/downloads"
+    download_path = config.get_save_path() + "/downloads"
     if section in ("all", "download"):
         print 'Processing the download section.'
         download = WeatherDownloadFiles(download_path)
@@ -168,18 +140,12 @@ def main(argv):
 
 
     # Create some basic paths for save files and references.
-    ghcnd_data_dly_path = download_path + '/' + package + '/' + package
-    ghcnd_xml_path = save_path + "/1.0_partition_" + package + '_xml/'
-    ghcnd_xml_gz_path = save_path + "/1.0_partition_" + package + '_xml_gz/'
-    if COMPRESSED:
-        xml_data_save_path = ghcnd_xml_gz_path
-    else:
-        xml_data_save_path = ghcnd_xml_path
+    ghcnd_data_dly_path = download_path + '/' + config.get_package() + '/' + config.get_package()
+    xml_data_save_path = config.get_save_path() + '/all_xml_files/'
 
     # Make sure the xml folder is available.
     if not os.path.isdir(xml_data_save_path):
         os.makedirs(xml_data_save_path)
-
 
     # Set up the XML build objects.
     convert = WeatherWebServiceMonthlyXMLFile(download_path, xml_data_save_path, COMPRESSED, DEBUG_OUTPUT)
@@ -233,24 +199,35 @@ def main(argv):
                 data.update_file_station_status(file_name, status)
             else:
                 data.update_file_station_status(file_name, WeatherDataFiles.DATA_FILE_MISSING)
-                
-    if section in ("all", "partition") and partitions > 1:
-        print 'Processing the partition section.'
-        data.reset()
-        data.copy_to_n_partitions(xml_data_save_path, partitions)
+                    
+    for dataset in config.get_dataset_list():
+        # Set up the setting for each dataset.
+        dataset_folder = "/dataset-" + dataset.get_name()
+        progress_file = config.get_save_path() + dataset_folder + "/_data_progress.csv"
+        data = WeatherDataFiles(ghcnd_data_dly_path, progress_file)
+        base_paths = []
+        for paths in dataset.get_save_paths():
+            base_paths.append(paths + dataset_folder + "/")
 
-    if section in ("test_links"):
-        if test and partitions > 0 and nodes > -1:
-            print 'Processing the test links section.'
-            data.reset()
-            data.create_test_links(save_path, test, nodes, partitions)
-        else:
-            print 'Error: Not enough information for this section.'
-            sys.exit()
+        if section in ("all", "partition"):
+            for partition in dataset.get_partitions():
+                print 'Processing the partition section (' + dataset.get_name() + ':d' + str(len(base_paths)) + ':p' + str(partition) + ').'
+                data.reset()
+                data.copy_to_n_partitions(xml_data_save_path, partition, base_paths)
+    
+        if section in ("all", "test_links"):
+            # TODO determine current node 
+            if test and partitions > 0 and virtual_partitions > 0 and nodes > -1:
+                print 'Processing the test links section.'
+                data.reset()
+                data.create_test_links(config.get_save_path(), xml_data_save_path, test, nodes, partitions, virtual_partitions, base_paths)
+            else:
+                print 'Error: Not enough information for this section.'
+                sys.exit()
 
-    if section in ("all", "statistics"):
-        print 'Processing the statistics section.'
-        data.print_progress_file_stats(convert)
-                
+#     if section in ("statistics"):
+#         print 'Processing the statistics section.'
+#         data.print_progress_file_stats(convert)
+                  
 if __name__ == "__main__":
     main(sys.argv[1:])

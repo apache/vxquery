@@ -20,6 +20,7 @@ import linecache
 import distutils.core
 
 from weather_convert_to_xml import *
+from collections import OrderedDict
 
 # Weather data files created to manage the conversion process.
 # Allows partition and picking up where you left off.
@@ -91,57 +92,79 @@ class WeatherDataFiles:
             self.close_progress_data(True)
         self.reset()
         
-    def create_test_links(self, save_path, test, node, partitions):
+    def create_test_links(self, save_path, xml_save_path, test, node, partitions, virtual_partitions, base_paths=[]):
+        if (len(base_paths) == 0):
+            base_paths.append(os.path.dirname(save_path))
+        partition_list = sorted(get_partition_paths(partitions, base_paths))
+        
         test_path = save_path + "/" + test
         if not os.path.isdir(test_path):
             os.makedirs(test_path)
-        for i in range(partitions):
-            test_partition_path = test_path + "/partition" + str(i+1)
-            if (node <= i):
-                # link
-                if test == "speed_up":
-                    os.symlink(save_path + "/" + str(i+1) + "." + str(node) + "_partition_ghcnd_all_xml_gz", test_partition_path)
-                if test == "batch_scale_up":
-                    os.symlink(save_path + "/" + str(partitions) + "." + str(node) + "_partition_ghcnd_all_xml_gz", test_partition_path)
-            else:
-                # fake directories
-                os.makedirs(test_partition_path + "/sensors")
-                os.makedirs(test_partition_path + "/stations")
+        for i in range(virtual_partitions):
+            # one virtual partition per disk
+            for j in range(len(base_paths)):
+                for index, path in enumerate(partition_list):
+                    offset = partitions * j
+                    test_partition_path = test_path + "/partition" + str(i + 1) + "_disk" + str(j + 1)
+                    if not os.path.isdir(test_partition_path):
+                        os.makedirs(test_partition_path)
+                    if (node <= i):
+                        if test == "speed_up":
+                            group = partitions / (i + 1)
+                        elif test == "batch_scale_up":
+                            group = partitions / virtual_partitions
+                        else:
+                            group = -1
+                        # link
+                        if (group) * node + offset <= index and index < (group) * (node + 1) + offset:
+                            os.symlink(path, test_partition_path + "/index" + str(index))
+                    else:
+                        # fake directories
+                        os.makedirs(test_partition_path + "/sensors")
+                        os.makedirs(test_partition_path + "/stations")
             
         
     # Once the initial data has been generated, the data can be copied into a set number of partitions. 
-    def copy_to_n_partitions(self, save_path, partitions):
+    def copy_to_n_partitions(self, save_path, partitions, base_paths=[]):
+        if (len(base_paths) == 0):
+            return
         
         # Initialize the partition paths.
-        partition_paths = []
-        for i in range(0, partitions):
-            new_partition_path = save_path.replace("1.0_partition", str(partitions) + "." + str(i) + "_partition")
-            partition_paths.append(new_partition_path)
-            
+        partition_sizes = []
+        partition_paths = get_partition_paths(partitions, base_paths)
+        for path in partition_paths:
+            partition_sizes.append(0)
             # Make sure the xml folder is available.
-            if not os.path.isdir(new_partition_path):
-                os.makedirs(new_partition_path)
+            if not os.path.isdir(path):
+                os.makedirs(path)
 
-        # copy stations and sensors into each partition round robin
+        # copy stations and sensors into each partition
         current_partition = 0
         csv_sorted = self.get_csv_in_partition_order()
-        for item in csv_sorted:
-            row_contents = item.rsplit(self.SEPERATOR)
-            file_name = row_contents[self.INDEX_DATA_FILE_NAME]
-            station_id = os.path.basename(file_name).split('.')[0]
-
-            # Copy station files
-            for type in ("sensors", "stations"):
-                file_path = build_base_save_folder(save_path, station_id, type)
-                new_file_path = build_base_save_folder(partition_paths[current_partition], station_id, type)
-                if os.path.isdir(file_path):
-                    distutils.dir_util.copy_tree(file_path, new_file_path)
+        for item, size in csv_sorted.iteritems():
+            station_id = item.split('.')[0]
+            # Update partition bases on smallest current size.
+            current_partition = partition_sizes.index(min(partition_sizes))
             
-            # Update partition
-            current_partition += 1
-            if current_partition >= partitions:
-                current_partition = 0
+            # Copy sensor files
+            type = "sensors"
+            file_path = build_base_save_folder(save_path, station_id, type) + station_id
+            new_file_path = build_base_save_folder(partition_paths[current_partition], station_id, type) + station_id
+            if os.path.isdir(file_path):
+                distutils.dir_util.copy_tree(file_path, new_file_path)
+            partition_sizes[current_partition] += size
 
+        
+            # Copy station files
+            type = "stations"
+            file_path = build_base_save_folder(save_path, station_id, type) + station_id + ".xml"
+            new_file_base = build_base_save_folder(partition_paths[current_partition], station_id, type)
+            new_file_path = new_file_base + station_id + ".xml"
+            if os.path.isfile(file_path):
+                if not os.path.isdir(new_file_base):
+                    os.makedirs(new_file_base)
+                shutil.copyfile(file_path, new_file_path)
+    
     def get_csv_in_partition_order(self):
         self.open_progress_data()
         row_count = len(self.progress_data)
@@ -156,7 +179,7 @@ class WeatherDataFiles:
             csv_dict[file_name] = folder_data
         
         # New sorted list.
-        return sorted(csv_dict, key=csv_dict.get, reverse=True)
+        return OrderedDict(sorted(csv_dict.items(), key=lambda x: x[1], reverse=True))
         
     def get_file_row(self, file_name):
         for i in range(0, len(self.progress_data)):
@@ -323,3 +346,13 @@ class WeatherDataFiles:
             elif self.type == "station" and (columns[self.INDEX_DATA_STATION_STATUS].strip() != self.DATA_FILE_DOWNLOADED or self.data_reset):
                 break
         return columns[self.INDEX_DATA_FILE_NAME]
+    
+def get_partition_paths(partitions, base_paths):        
+    partition_paths = []
+    for i in range(0, partitions):
+        for j in range(0, len(base_paths)):
+            new_partition_path = base_paths[j] + "partitions/" + str(len(base_paths)) + "disk/d" + str(j) +"_p" + str(partitions) + "_i" + str(i) + "/"
+            partition_paths.append(new_partition_path)
+    return partition_paths
+
+
