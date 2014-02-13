@@ -18,8 +18,6 @@ package org.apache.vxquery.runtime.functions.bool;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -28,6 +26,7 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.dataflow.common.data.accessors.IFrameTupleReference;
 
 public class AndScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -39,20 +38,32 @@ public class AndScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalar
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        return new AbstractTaggedValueArgumentScalarEvaluator(args) {
-            private final BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-
-            @Override
-            protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                for (TaggedValuePointable arg : args) {
-                    arg.getValue(bp);
-                    if (!bp.getBoolean()) {
-                        XDMConstants.setFalse(result);
-                        return;
-                    }
-                }
-                XDMConstants.setTrue(result);
-            }
-        };
+        return new AndScalarEvaluator(args);
     }
+
+    private class AndScalarEvaluator implements IScalarEvaluator {
+        private final IScalarEvaluator[] args;
+
+        private final BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
+
+        private final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+
+        public AndScalarEvaluator(IScalarEvaluator[] args) {
+            this.args = args;
+        }
+
+        @Override
+        public final void evaluate(IFrameTupleReference tuple, IPointable result) throws AlgebricksException {
+            for (int i = 0; i < args.length; ++i) {
+                args[i].evaluate(tuple, tvp);
+                tvp.getValue(bp);
+                if (!bp.getBoolean()) {
+                    XDMConstants.setFalse(result);
+                    return;
+                }
+            }
+            XDMConstants.setTrue(result);
+        }
+    }
+
 }
