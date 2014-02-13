@@ -49,6 +49,10 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
+        return new FnBooleanScalarEvaluator(args);
+    }
+
+    private class FnBooleanScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
         final SequencePointable seqp = new SequencePointable();
         final LongPointable lp = (LongPointable) LongPointable.FACTORY.createPointable();
         final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
@@ -58,107 +62,110 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
         final DoublePointable dp = (DoublePointable) DoublePointable.FACTORY.createPointable();
         final FloatPointable fp = (FloatPointable) FloatPointable.FACTORY.createPointable();
         final UTF8StringPointable utf8p = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        return new AbstractTaggedValueArgumentScalarEvaluator(args) {
-            @Override
-            protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                TaggedValuePointable tvp = args[0];
-                boolean booleanResult = true;
-                switch (tvp.getTag()) {
-                    case ValueTag.SEQUENCE_TAG: {
-                        tvp.getValue(seqp);
-                        if (seqp.getEntryCount() == 0) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
 
-                    case ValueTag.XS_BOOLEAN_TAG: {
-                        result.set(tvp);
-                        return;
-                    }
+        public FnBooleanScalarEvaluator(IScalarEvaluator[] args) {
+            super(args);
+        }
 
-                    case ValueTag.XS_DECIMAL_TAG: {
-                        tvp.getValue(decp);
-                        if (decp.longValue() == 0) {
-                            booleanResult = false;
-                        }
-                        break;
+        @Override
+        protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+            TaggedValuePointable tvp = args[0];
+            boolean booleanResult = true;
+            switch (tvp.getTag()) {
+                case ValueTag.SEQUENCE_TAG: {
+                    tvp.getValue(seqp);
+                    if (seqp.getEntryCount() == 0) {
+                        booleanResult = false;
                     }
-
-                    case ValueTag.XS_INTEGER_TAG:
-                    case ValueTag.XS_LONG_TAG:
-                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_UNSIGNED_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_LONG_TAG: {
-                        tvp.getValue(lp);
-                        if (lp.longValue() == 0) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
-
-                    case ValueTag.XS_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_SHORT_TAG: {
-                        tvp.getValue(ip);
-                        if (ip.intValue() == 0) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
-
-                    case ValueTag.XS_SHORT_TAG:
-                    case ValueTag.XS_UNSIGNED_BYTE_TAG: {
-                        tvp.getValue(sp);
-                        if (sp.shortValue() == 0) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
-
-                    case ValueTag.XS_BYTE_TAG: {
-                        tvp.getValue(bp);
-                        if (bp.byteValue() == 0) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
-
-                    case ValueTag.XS_DOUBLE_TAG: {
-                        tvp.getValue(dp);
-                        if (dp.doubleValue() == 0 || Double.isNaN(dp.doubleValue())) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
-
-                    case ValueTag.XS_FLOAT_TAG: {
-                        tvp.getValue(fp);
-                        if (fp.floatValue() == 0 || Float.isNaN(fp.floatValue())) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
-
-                    case ValueTag.XS_ANY_URI_TAG:
-                    case ValueTag.XS_STRING_TAG: {
-                        tvp.getValue(utf8p);
-                        if (utf8p.getUTFLength() == 0) {
-                            booleanResult = false;
-                        }
-                        break;
-                    }
-                    default:
-                        throw new SystemException(ErrorCode.FORG0006);
+                    break;
                 }
-                if (booleanResult) {
-                    XDMConstants.setTrue(result);
-                } else {
-                    XDMConstants.setFalse(result);
+
+                case ValueTag.XS_BOOLEAN_TAG: {
+                    result.set(tvp);
+                    return;
                 }
+
+                case ValueTag.XS_DECIMAL_TAG: {
+                    tvp.getValue(decp);
+                    if (decp.longValue() == 0) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+
+                case ValueTag.XS_INTEGER_TAG:
+                case ValueTag.XS_LONG_TAG:
+                case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+                case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+                case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+                case ValueTag.XS_POSITIVE_INTEGER_TAG:
+                case ValueTag.XS_UNSIGNED_INT_TAG:
+                case ValueTag.XS_UNSIGNED_LONG_TAG: {
+                    tvp.getValue(lp);
+                    if (lp.longValue() == 0) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+
+                case ValueTag.XS_INT_TAG:
+                case ValueTag.XS_UNSIGNED_SHORT_TAG: {
+                    tvp.getValue(ip);
+                    if (ip.intValue() == 0) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+
+                case ValueTag.XS_SHORT_TAG:
+                case ValueTag.XS_UNSIGNED_BYTE_TAG: {
+                    tvp.getValue(sp);
+                    if (sp.shortValue() == 0) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+
+                case ValueTag.XS_BYTE_TAG: {
+                    tvp.getValue(bp);
+                    if (bp.byteValue() == 0) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+
+                case ValueTag.XS_DOUBLE_TAG: {
+                    tvp.getValue(dp);
+                    if (dp.doubleValue() == 0 || Double.isNaN(dp.doubleValue())) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+
+                case ValueTag.XS_FLOAT_TAG: {
+                    tvp.getValue(fp);
+                    if (fp.floatValue() == 0 || Float.isNaN(fp.floatValue())) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+
+                case ValueTag.XS_ANY_URI_TAG:
+                case ValueTag.XS_STRING_TAG: {
+                    tvp.getValue(utf8p);
+                    if (utf8p.getUTFLength() == 0) {
+                        booleanResult = false;
+                    }
+                    break;
+                }
+                default:
+                    throw new SystemException(ErrorCode.FORG0006);
             }
-        };
+            if (booleanResult) {
+                XDMConstants.setTrue(result);
+            } else {
+                XDMConstants.setFalse(result);
+            }
+        }
     }
 }
