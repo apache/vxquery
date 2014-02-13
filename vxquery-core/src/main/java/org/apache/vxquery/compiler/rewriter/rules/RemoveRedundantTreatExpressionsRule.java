@@ -16,27 +16,11 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import java.util.List;
-
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
-import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
-import org.apache.vxquery.context.RootStaticContextImpl;
-import org.apache.vxquery.context.StaticContextImpl;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.functions.BuiltinOperators;
-import org.apache.vxquery.functions.Function;
+import org.apache.vxquery.runtime.functions.type.SequenceTypeMatcher;
 import org.apache.vxquery.types.SequenceType;
 
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
-import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 
 /**
  * The rule searches for where the xquery treat function is used. When the
@@ -62,67 +46,22 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  * @author prestonc
  */
 
-public class RemoveRedundantTreatExpressionsRule implements IAlgebraicRewriteRule {
-    final StaticContextImpl dCtx = new StaticContextImpl(RootStaticContextImpl.INSTANCE);
-    final int ARG_DATA = 0;
-    final int ARG_TYPE = 1;
+public class RemoveRedundantTreatExpressionsRule extends AbstractRemoveRedundantTypeExpressionsRule {
+    final SequenceTypeMatcher stm = new SequenceTypeMatcher();
+
+    protected FunctionIdentifier getSearchFunction() {
+        return BuiltinOperators.TREAT.getFunctionIdentifier();
+    }
 
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean safeToReplace(SequenceType sTypeArg, SequenceType sTypeOutput) {
+        if (sTypeArg != null) {
+            stm.setSequenceType(sTypeArg);
+            if (sTypeOutput != null && stm.isSubType(sTypeOutput)) {
+                // Same type.
+                return true;
+            }
+        }
         return false;
     }
-
-    @Override
-    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
-            throws AlgebricksException {
-        boolean modified = false;
-        List<Mutable<ILogicalExpression>> expressions = OperatorToolbox.getExpression(opRef);
-        for (Mutable<ILogicalExpression> expression : expressions) {
-            if (processTreatExpression(expression)) {
-                modified = true;
-            }
-        }
-        return modified;
-    }
-
-    private boolean processTreatExpression(Mutable<ILogicalExpression> search) {
-        boolean modified = false;
-        Mutable<ILogicalExpression> treatM = ExpressionToolbox.findFunctionExpression(search,
-                BuiltinOperators.TREAT.getFunctionIdentifier());
-        if (treatM != null) {
-            // Get input function
-            AbstractFunctionCallExpression treatFunction = (AbstractFunctionCallExpression) treatM.getValue();
-            Mutable<ILogicalExpression> argDataM = treatFunction.getArguments().get(ARG_DATA);
-            
-            // Find the input return type.
-            SequenceType inputSequenceType = null;
-            Function function = ExpressionToolbox.getBuiltIn(argDataM);
-            if (function == null) {
-                return false;
-            } else {
-                inputSequenceType = function.getSignature().getReturnType();
-            }
-
-            // Find the treat type.
-            ILogicalExpression argType = treatFunction.getArguments().get(ARG_TYPE).getValue();
-            if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-                return false;
-            }
-            TaggedValuePointable tvp = new TaggedValuePointable();
-            ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
-
-            IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-            tvp.getValue(pTypeCode);
-            SequenceType sType = dCtx.lookupSequenceType(pTypeCode.getInteger());
-
-            // remove
-            if (inputSequenceType != null && inputSequenceType.equals(sType)) {
-                treatM.setValue(argDataM.getValue());
-                modified = true;
-                processTreatExpression(argDataM);
-            }
-        }
-        return modified;
-    }
-
 }

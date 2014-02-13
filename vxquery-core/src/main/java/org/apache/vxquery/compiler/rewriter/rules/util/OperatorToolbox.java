@@ -16,8 +16,8 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules.util;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
 
@@ -26,8 +26,11 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractBinaryJoinOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractScanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractUnnestOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
 
 public class OperatorToolbox {
 
@@ -44,7 +47,7 @@ public class OperatorToolbox {
         }
         return opRef;
     }
-    
+
     public static AbstractLogicalOperator findLastSubplanOperator(AbstractLogicalOperator op) {
         AbstractLogicalOperator next;
         while (op.getOperatorTag() != LogicalOperatorTag.NESTEDTUPLESOURCE) {
@@ -56,8 +59,8 @@ public class OperatorToolbox {
         }
         return op;
     }
-    
-    public static List<Mutable<ILogicalExpression>> getExpression(Mutable<ILogicalOperator> opRef) {
+
+    public static List<Mutable<ILogicalExpression>> getExpressions(Mutable<ILogicalOperator> opRef) {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         List<Mutable<ILogicalExpression>> result = new ArrayList<Mutable<ILogicalExpression>>();
         switch (op.getOperatorTag()) {
@@ -67,11 +70,65 @@ public class OperatorToolbox {
                 AbstractAssignOperator aao = (AbstractAssignOperator) op;
                 result.addAll(aao.getExpressions());
                 break;
+            case INNERJOIN:
+            case LEFTOUTERJOIN:
+                AbstractBinaryJoinOperator abjo = (AbstractBinaryJoinOperator) op;
+                result.add(abjo.getCondition());
+                break;
+            case SELECT:
+                SelectOperator so = (SelectOperator) op;
+                result.add(so.getCondition());
+                break;
             case UNNEST:
             case UNNEST_MAP:
                 AbstractUnnestOperator auo = (AbstractUnnestOperator) op;
                 result.add(auo.getExpressionRef());
                 break;
+            case CLUSTER:
+            case DATASOURCESCAN:
+            case DISTINCT:
+            case DISTRIBUTE_RESULT:
+            case EMPTYTUPLESOURCE:
+            case EXCHANGE:
+            case EXTENSION_OPERATOR:
+            case GROUP:
+            case INDEX_INSERT_DELETE:
+            case INSERT_DELETE:
+            case LIMIT:
+            case NESTEDTUPLESOURCE:
+            case ORDER:
+            case PARTITIONINGSPLIT:
+            case PROJECT:
+            case REPLICATE:
+            case SCRIPT:
+            case SINK:
+            case SUBPLAN:
+            case UNIONALL:
+            case UPDATE:
+            case WRITE:
+            case WRITE_RESULT:
+            default:
+                // TODO Not yet implemented.
+                break;
+        }
+        return result;
+    }
+
+    public static Mutable<ILogicalExpression> getExpressionOf(Mutable<ILogicalOperator> opRef, LogicalVariable lv) {
+        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
+        switch (op.getOperatorTag()) {
+            case AGGREGATE:
+            case ASSIGN:
+            case RUNNINGAGGREGATE:
+                AbstractAssignOperator aao = (AbstractAssignOperator) op;
+                if (!aao.getVariables().contains(lv)) {
+                    return null;
+                }
+                return aao.getExpressions().get(aao.getVariables().indexOf(lv));
+            case UNNEST:
+            case UNNEST_MAP:
+                AbstractUnnestOperator ano = (AbstractUnnestOperator) op;
+                return ano.getExpressionRef();
             case CLUSTER:
             case DATASOURCESCAN:
             case DISTINCT:
@@ -99,11 +156,11 @@ public class OperatorToolbox {
             case WRITE:
             case WRITE_RESULT:
             default:
+                // TODO Not yet implemented.
                 break;
         }
-        return result;
+        return null;
     }
-
 
     public static Mutable<ILogicalOperator> findProducerOf(Mutable<ILogicalOperator> opRef, LogicalVariable lv) {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
@@ -122,15 +179,16 @@ public class OperatorToolbox {
                     }
                 }
                 break;
+            case DATASOURCESCAN:
             case UNNEST:
             case UNNEST_MAP:
-                AbstractUnnestOperator auo = (AbstractUnnestOperator) op;
-                if (auo.getVariables().contains(lv)) {
+                AbstractScanOperator aso = (AbstractScanOperator) op;
+                if (aso.getVariables().contains(lv)) {
                     return opRef;
                 }
                 for (Mutable<ILogicalOperator> input : op.getInputs()) {
                     Mutable<ILogicalOperator> opInput = findProducerOf(input, lv);
-                     if (opInput != null) {
+                    if (opInput != null) {
                         return opInput;
                     }
                 }
@@ -139,7 +197,6 @@ public class OperatorToolbox {
             case NESTEDTUPLESOURCE:
                 return null;
             case CLUSTER:
-            case DATASOURCESCAN:
             case DISTINCT:
             case DISTRIBUTE_RESULT:
             case EXCHANGE:
@@ -163,7 +220,13 @@ public class OperatorToolbox {
             case WRITE:
             case WRITE_RESULT:
             default:
-                // TODO Not yet implemented.
+                // Skip operators and go look at input.
+                for (Mutable<ILogicalOperator> input : op.getInputs()) {
+                    Mutable<ILogicalOperator> opInput = findProducerOf(input, lv);
+                    if (opInput != null) {
+                        return opInput;
+                    }
+                }
                 break;
         }
         return null;

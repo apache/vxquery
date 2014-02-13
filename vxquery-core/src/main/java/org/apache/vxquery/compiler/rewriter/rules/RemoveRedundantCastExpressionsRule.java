@@ -16,28 +16,24 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.functions.BuiltinOperators;
-import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
-import org.apache.vxquery.runtime.functions.cast.CastToFloatOperation;
-import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 
 /**
- * The rule searches for where the xquery promote function is used. When the
- * expression's return type matches the promote expression type, the promote is
+ * The rule searches for where the xquery cast function is used. When the
+ * expression's return type matches the treat expression type, the cast is
  * removed.
  * 
  * <pre>
  * Before
  * 
  *   plan__parent
- *   %OPERATOR( $v1 : promote( \@input_expression, \@type_expression ) )
+ *   %OPERATOR( $v1 : cast( \@input_expression, \@type_expression ) )
  *   plan__child
  *   
- *   Where promote \@type_expression is the same as the return type of \@input_expression.
+ *   Where treat \@type_expression is the same as the return type of \@input_expression.
  *   
  * After 
  * 
@@ -49,25 +45,16 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
  * @author prestonc
  */
 
-public class RemoveRedundantPromoteExpressionsRule extends AbstractRemoveRedundantTypeExpressionsRule {
-    @Override
+public class RemoveRedundantCastExpressionsRule extends AbstractRemoveRedundantTypeExpressionsRule {
     protected FunctionIdentifier getSearchFunction() {
-        return BuiltinOperators.PROMOTE.getFunctionIdentifier();
+        return BuiltinOperators.CAST.getFunctionIdentifier();
     }
 
     @Override
     public boolean safeToReplace(SequenceType sTypeArg, SequenceType sTypeOutput) {
-        if (sTypeArg != null) {
-            if (sTypeArg.getItemType() != BuiltinTypeRegistry.XS_DOUBLE
-                    && sTypeArg.getItemType() != BuiltinTypeRegistry.XS_FLOAT
-                    && sTypeArg.getItemType() != BuiltinTypeRegistry.XS_STRING) {
-                // These types can not be promoted.
-                return true;
-            }
-            if (sTypeOutput != null && sTypeOutput.equals(sTypeArg)) {
-                // Same type.
-                return true;
-            }
+        if (sTypeArg != null && sTypeOutput != null && sTypeOutput.equals(sTypeArg)) {
+            // Same type.
+            return true;
         }
         return false;
     }
