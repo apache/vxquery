@@ -25,7 +25,7 @@ def main(argv):
     except getopt.GetoptError:
         print 'The file options for build_saxon_collection_xml.py were not correctly specified.'
         print 'To see a full list of options try:'
-        print '  $ python push_benchmark.py -h'
+        print '  $ python build_saxon_collection_xml.py -h'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
