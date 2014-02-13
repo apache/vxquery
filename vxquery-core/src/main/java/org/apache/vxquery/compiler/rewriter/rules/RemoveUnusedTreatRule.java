@@ -106,7 +106,7 @@ public class RemoveUnusedTreatRule implements IAlgebraicRewriteRule {
         if (treatArg2.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
             return false;
         }
-        TaggedValuePointable tvp = new TaggedValuePointable();
+        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         getConstantAsPointable((ConstantExpression) treatArg2, tvp);
 
         IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
@@ -124,7 +124,7 @@ public class RemoveUnusedTreatRule implements IAlgebraicRewriteRule {
                     .getValue();
             if (expressionConstant.getExpressionTag() == LogicalExpressionTag.CONSTANT) {
                 // Check constant against type supplied.
-                TaggedValuePointable tvp2 = new TaggedValuePointable();
+                TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
                 getConstantAsPointable((ConstantExpression) expressionConstant, tvp2);
 
                 SequenceTypeMatcher stm = new SequenceTypeMatcher();

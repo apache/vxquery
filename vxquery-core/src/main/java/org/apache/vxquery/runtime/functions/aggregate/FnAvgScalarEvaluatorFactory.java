@@ -36,7 +36,6 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -51,7 +50,6 @@ public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
             throws AlgebricksException {
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final SequencePointable seqp = new SequencePointable();
-        final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         final TaggedValuePointable tvpNext = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -72,8 +70,7 @@ public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                     } else {
                         // Add up the sequence.
                         for (int j = 0; j < seqLen; ++j) {
-                            seqp.getEntry(j, p);
-                            tvpNext.set(p.getByteArray(), p.getStartOffset(), p.getLength());
+                            seqp.getEntry(j, tvpNext);
                             if (j == 0) {
                                 // Init.
                                 tvpSum.set(tvpNext);

@@ -164,7 +164,7 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
         if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
             return false;
         }
-        TaggedValuePointable tvp = new TaggedValuePointable();
+        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
 
         IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();

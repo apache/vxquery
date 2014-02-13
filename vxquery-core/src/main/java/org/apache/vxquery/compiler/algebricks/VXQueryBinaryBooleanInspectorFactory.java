@@ -29,7 +29,7 @@ public class VXQueryBinaryBooleanInspectorFactory implements IBinaryBooleanInspe
 
     @Override
     public IBinaryBooleanInspector createBinaryBooleanInspector(IHyracksTaskContext ctx) {
-        final TaggedValuePointable tvp = new TaggedValuePointable();
+        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
         return new IBinaryBooleanInspector() {
             @Override

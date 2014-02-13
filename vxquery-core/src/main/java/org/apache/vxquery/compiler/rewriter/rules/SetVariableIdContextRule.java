@@ -33,6 +33,9 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 public class SetVariableIdContextRule implements IAlgebraicRewriteRule {
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+        if (context.checkIfInDontApplySet(this, opRef.getValue())) {
+            return false;
+        }
         int variableId = 0;
 
         // TODO Move the setVarCounter to the compiler after the translator has run.
@@ -54,6 +57,7 @@ public class SetVariableIdContextRule implements IAlgebraicRewriteRule {
         if (context.getVarCounter() <= variableId) {
             context.setVarCounter(variableId + 1);
         }
+        context.addToDontApplySet(this, opRef.getValue());
         return false;
     }
 

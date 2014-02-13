@@ -33,7 +33,7 @@ public abstract class AbstractTaggedValueArgumentAggregateEvaluator implements I
         this.args = args;
         tvps = new TaggedValuePointable[args.length];
         for (int i = 0; i < tvps.length; ++i) {
-            tvps[i] = new TaggedValuePointable();
+            tvps[i] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         }
     }
 

@@ -37,6 +37,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 public class SetCollectionDataSourceRule extends AbstractCollectionRule {
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+        if (context.checkIfInDontApplySet(this, opRef.getValue())) {
+            return false;
+        }
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
         String collectionName = getCollectionName(opRef);
 
@@ -49,6 +52,8 @@ public class SetCollectionDataSourceRule extends AbstractCollectionRule {
             VXQueryCollectionDataSource ds = new VXQueryCollectionDataSource(collectionId, collectionName,
                     types.toArray());
             vxqueryContext.putCollectionDataSourceMap(collectionName, ds);
+            
+            context.addToDontApplySet(this, opRef.getValue());
         }
         return false;
     }

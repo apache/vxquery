@@ -41,8 +41,8 @@ public class VXQueryComparatorFactoryProvider implements IBinaryComparatorFactor
 
         @Override
         public IBinaryComparator createBinaryComparator() {
-            final TaggedValuePointable tvp1 = new TaggedValuePointable();
-            final TaggedValuePointable tvp2 = new TaggedValuePointable();
+            final TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+            final TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
             return new IBinaryComparator() {
                 @Override
                 public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {

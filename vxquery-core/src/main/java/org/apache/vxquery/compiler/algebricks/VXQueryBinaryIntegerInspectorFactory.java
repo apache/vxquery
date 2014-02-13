@@ -29,7 +29,7 @@ public class VXQueryBinaryIntegerInspectorFactory implements IBinaryIntegerInspe
 
     @Override
     public IBinaryIntegerInspector createBinaryIntegerInspector(IHyracksTaskContext ctx) {
-        final TaggedValuePointable tvp = new TaggedValuePointable();
+        final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         return new IBinaryIntegerInspector() {
             @Override
