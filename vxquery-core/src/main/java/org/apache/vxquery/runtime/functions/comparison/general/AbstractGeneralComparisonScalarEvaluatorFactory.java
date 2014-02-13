@@ -62,6 +62,7 @@ import org.apache.vxquery.runtime.functions.cast.CastToUnsignedShortOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToUntypedAtomicOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToYMDurationOperation;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
+import org.apache.vxquery.runtime.functions.util.AtomizeHelper;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -90,6 +91,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
         final ArrayBackedValueStorage abvsInner2 = new ArrayBackedValueStorage();
         final DataOutput dOutInner2 = abvsInner2.getDataOutput();
 
+        final AtomizeHelper ah = new AtomizeHelper();
         final FunctionHelper.TypedPointables tp1 = new FunctionHelper.TypedPointables();
         final FunctionHelper.TypedPointables tp2 = new FunctionHelper.TypedPointables();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
@@ -186,25 +188,29 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                 boolean tagTransformed1 = false, tagTransformed2 = false;
                 abvsInner1.reset();
                 abvsInner2.reset();
-                TaggedValuePointable tvpTransform1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                TaggedValuePointable tvpTransform2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                TaggedValuePointable tvpTransform1 = (TaggedValuePointable) TaggedValuePointable.FACTORY
+                        .createPointable();
+                TaggedValuePointable tvpTransform2 = (TaggedValuePointable) TaggedValuePointable.FACTORY
+                        .createPointable();
                 tvpTransform1.set(tvpArg1);
                 tvpTransform2.set(tvpArg2);
                 int tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform1.getTag());
                 int tid2 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform2.getTag());
-                
+
                 // Converted tags
-                TaggedValuePointable tvpCompare1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                TaggedValuePointable tvpCompare2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                TaggedValuePointable tvpCompare1 = (TaggedValuePointable) TaggedValuePointable.FACTORY
+                        .createPointable();
+                TaggedValuePointable tvpCompare2 = (TaggedValuePointable) TaggedValuePointable.FACTORY
+                        .createPointable();
                 try {
                     // Converts node tree's into untyped atomic values that can then be compared as atomic items.
                     if (tid1 == ValueTag.NODE_TREE_TAG && tid2 == ValueTag.NODE_TREE_TAG) {
-                        FunctionHelper.atomize(tvpArg1, tvpTransform1);
-                        FunctionHelper.atomize(tvpArg2, tvpTransform2);
+                        ah.atomize(tvpArg1, ppool, tvpTransform1);
+                        ah.atomize(tvpArg2, ppool, tvpTransform2);
                         tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform1.getTag());
                         tid2 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform2.getTag());
                     } else if (tid1 == ValueTag.NODE_TREE_TAG) {
-                        FunctionHelper.atomize(tvpArg1, tvpTransform1);
+                        ah.atomize(tvpArg1, ppool, tvpTransform1);
                         tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform1.getTag());
                     } else if (tid2 == ValueTag.NODE_TREE_TAG) {
                         FunctionHelper.atomize(tvpArg2, tvpTransform2);

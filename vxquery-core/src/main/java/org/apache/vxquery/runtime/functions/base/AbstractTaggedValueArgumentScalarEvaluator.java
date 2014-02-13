@@ -16,6 +16,8 @@
  */
 package org.apache.vxquery.runtime.functions.base;
 
+import org.apache.vxquery.datamodel.accessors.PointablePool;
+import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.exceptions.SystemException;
 
@@ -28,6 +30,8 @@ public abstract class AbstractTaggedValueArgumentScalarEvaluator implements ISca
     private final IScalarEvaluator[] args;
 
     private final TaggedValuePointable[] tvps;
+    
+    protected final PointablePool ppool = PointablePoolFactory.INSTANCE.createPointablePool();
 
     public AbstractTaggedValueArgumentScalarEvaluator(IScalarEvaluator[] args) {
         this.args = args;

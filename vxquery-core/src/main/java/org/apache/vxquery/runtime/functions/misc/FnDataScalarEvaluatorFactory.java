@@ -26,6 +26,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.AtomizeHelper;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -45,38 +46,46 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
+        return new FnDataScalarEvaluator(args);
+    }
+
+    private class FnDataScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+        final AtomizeHelper ah = new AtomizeHelper();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
         final SequencePointable seq = new SequencePointable();
         final TaggedValuePointable p = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tempTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        return new AbstractTaggedValueArgumentScalarEvaluator(args) {
-            @Override
-            protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                try {
-                    abvs.reset();
-                    sb.reset(abvs);
-                    TaggedValuePointable tvp = args[0];
-                    if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                        tvp.getValue(seq);
-                        int seqLen = seq.getEntryCount();
-                        for (int j = 0; j < seqLen; ++j) {
-                            seq.getEntry(j, p);
-                            FunctionHelper.atomize(p, tempTVP);
-                            sb.addItem(tempTVP);
-                        }
-                    } else {
-                        FunctionHelper.atomize(tvp, tempTVP);
+
+        public FnDataScalarEvaluator(IScalarEvaluator[] args) {
+            super(args);
+        }
+
+        @Override
+        protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+            try {
+                abvs.reset();
+                sb.reset(abvs);
+                TaggedValuePointable tvp = args[0];
+                if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp.getValue(seq);
+                    int seqLen = seq.getEntryCount();
+                    for (int j = 0; j < seqLen; ++j) {
+                        seq.getEntry(j, p);
+                        ah.atomize(p, ppool, tempTVP);
                         sb.addItem(tempTVP);
                     }
-                    sb.finish();
-                    result.set(abvs);
-                } catch (IOException e) {
-                    throw new SystemException(ErrorCode.SYSE0001);
+                } else {
+                    ah.atomize(tvp, ppool, tempTVP);
+                    sb.addItem(tempTVP);
                 }
+                sb.finish();
+                result.set(abvs);
+            } catch (IOException e) {
+                throw new SystemException(ErrorCode.SYSE0001);
             }
+        }
 
-       };
     }
 
 }

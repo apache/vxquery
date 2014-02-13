@@ -16,6 +16,8 @@
  */
 package org.apache.vxquery.runtime.functions.base;
 
+import org.apache.vxquery.datamodel.accessors.PointablePool;
+import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.exceptions.SystemException;
 
@@ -29,11 +31,13 @@ public abstract class AbstractTaggedValueArgumentUnnestingEvaluator implements I
 
     protected final TaggedValuePointable[] tvps;
 
+    protected final PointablePool ppool = PointablePoolFactory.INSTANCE.createPointablePool();
+
     public AbstractTaggedValueArgumentUnnestingEvaluator(IScalarEvaluator[] args) {
         this.args = args;
         tvps = new TaggedValuePointable[args.length];
         for (int i = 0; i < tvps.length; ++i) {
-            tvps[i] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+            tvps[i] = new TaggedValuePointable();
         }
     }
 
