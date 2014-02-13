@@ -35,20 +35,26 @@ import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 public abstract class AbstractPathStepScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final SequenceBuilder seqb;
 
+    private final NodeSubTreeBuilder nstb;
+    
     protected final NodeTreePointable ntp;
 
     private final ArrayBackedValueStorage nodeAbvs;
 
     protected final TaggedValuePointable itemTvp;
 
+    private final TaggedValuePointable node;
+    
     private INodeFilter filter;
-
+    
     public AbstractPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args);
+        nstb = new NodeSubTreeBuilder();
         ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
         seqb = new SequenceBuilder();
         nodeAbvs = new ArrayBackedValueStorage();
         itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        node = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     }
 
     protected void setNodeTest(SequenceType sType) {
@@ -64,7 +70,6 @@ public abstract class AbstractPathStepScalarEvaluator extends AbstractTaggedValu
 
     protected void setNodeToResult(IPointable result) throws IOException {
         nodeAbvs.reset();
-        NodeSubTreeBuilder nstb = new NodeSubTreeBuilder();
         nstb.reset(nodeAbvs);
         nstb.setChildNode(ntp, itemTvp);
         nstb.finish();
@@ -72,7 +77,6 @@ public abstract class AbstractPathStepScalarEvaluator extends AbstractTaggedValu
     }
 
     protected void appendNodeToResult() throws IOException {
-        TaggedValuePointable node = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         setNodeToResult(node);
         seqb.addItem(node);
     }
