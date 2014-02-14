@@ -16,15 +16,21 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -65,7 +71,7 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  * 
  * @author prestonc
  */
-public class ConsolidateDataScanUnnestRule extends AbstractUsedVariablesProcessingRule {
+public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRule {
     final StaticContextImpl dCtx = new StaticContextImpl(RootStaticContextImpl.INSTANCE);
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
@@ -90,20 +96,11 @@ public class ConsolidateDataScanUnnestRule extends AbstractUsedVariablesProcessi
         DataSourceScanOperator datascan = (DataSourceScanOperator) op2;
 
         if (!usedVariables.contains(datascan.getVariables())) {
-            // Check to see if the unnest expression is a child function.
-            ILogicalExpression logicalExpression = (ILogicalExpression) unnest.getExpressionRef().getValue();
-            if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return false;
-            }
-            AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-            Function functionInfo = (Function) functionCall.getFunctionInfo();
-            if (!functionInfo.getFunctionIdentifier().equals(BuiltinOperators.CHILD.getFunctionIdentifier())) {
-                return false;
-            }
-
             // Find all child functions.
             VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) datascan.getDataSource();
-            updateDataSource(ds, unnest.getExpressionRef());
+            if (!updateDataSource(ds, unnest.getExpressionRef())) {
+                return false;
+            }
 
             // Replace unnest with noop assign. Keeps variable chain.
             Mutable<ILogicalExpression> varExp = ExpressionToolbox.findVariableExpression(unnest.getExpressionRef(),
@@ -123,29 +120,17 @@ public class ConsolidateDataScanUnnestRule extends AbstractUsedVariablesProcessi
      * @param ds
      * @param expression
      */
-    private void updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
-        ILogicalExpression logicalExpression = (ILogicalExpression) expression.getValue();
-        if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return;
+    private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
+        boolean added = false;
+        List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+        ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
+        for (int i = finds.size(); i > 0; --i) {
+            int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
+            if (typeId > 0) {
+                ds.addChildSeq(typeId);
+                added = true;
+            }
         }
-        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        Function functionInfo = (Function) functionCall.getFunctionInfo();
-        if (!functionInfo.getFunctionIdentifier().equals(BuiltinOperators.CHILD.getFunctionIdentifier())) {
-            return;
-        }
-        // Traverse down child function nesting.
-        updateDataSource(ds, functionCall.getArguments().get(ARG_DATA));
-
-        // Add the child type parameter to data source.
-        ILogicalExpression argType = functionCall.getArguments().get(ARG_TYPE).getValue();
-        if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-            return;
-        }
-        TaggedValuePointable tvp = new TaggedValuePointable();
-        ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
-
-        IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        tvp.getValue(pTypeCode);
-        ds.addChildSeq(pTypeCode.getInteger());
+        return added;
     }
 }

@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConsolidateDataScanUnnestRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
@@ -30,6 +30,7 @@ import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubpla
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushMapOperatorDownThroughProductRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantPromoteExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantTreatExpressionsRule;
@@ -44,6 +45,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.BreakSelectIntoConjunctsRul
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ComplexJoinInferenceRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ConsolidateAssignsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ConsolidateSelectsRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.CopyLimitDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.EliminateSubplanRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.EnforceStructuralPropertiesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ExtractCommonOperatorsRule;
@@ -57,7 +59,6 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRul
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceProjectsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PullSelectOutOfEqJoin;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.CopyLimitDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectIntoDataSourceScanRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectDownRule;
@@ -111,14 +112,11 @@ public class RewriteRuleset {
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
+        // Adds child steps to the data source scan.
         normalization.add(new ConsolidateUnnestsRule());
+        normalization.add(new PushChildIntoDataScanRule());
 
-        normalization.add(new RemoveRedundantTreatExpressionsRule());
-        normalization.add(new RemoveRedundantDataExpressionsRule());
-        normalization.add(new RemoveRedundantPromoteExpressionsRule());
-
-        normalization.add(new ConsolidateDataScanUnnestRule());
-
+        // Improvement for scalar child expressions
         normalization.add(new EliminateSubplanForSingleItemsRule());
         return normalization;
     }
@@ -158,6 +156,7 @@ public class RewriteRuleset {
         xquery.add(new InlineVariablesRule());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
+        // Clean up
         xquery.add(new RemoveRedundantVariablesRule());
         xquery.add(new RemoveUnusedAssignAndAggregateRule());
         return xquery;
@@ -168,6 +167,10 @@ public class RewriteRuleset {
         normalization.add(new RemoveRedundantTreatExpressionsRule());
         normalization.add(new RemoveRedundantDataExpressionsRule());
         normalization.add(new RemoveRedundantPromoteExpressionsRule());
+        normalization.add(new RemoveRedundantCastExpressionsRule());
+        // Clean up
+        normalization.add(new RemoveRedundantVariablesRule());
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
         return normalization;
     }
 
