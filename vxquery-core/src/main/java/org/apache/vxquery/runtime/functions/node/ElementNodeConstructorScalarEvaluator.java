@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.vxquery.datamodel.accessors.PointablePool;
-import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
@@ -58,8 +56,6 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
 
     private final SequencePointable seqp;
 
-    private final PointablePool ppool;
-
     public ElementNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
         enb = new ElementNodeBuilder();
@@ -69,7 +65,6 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         cqp = (CodedQNamePointable) CodedQNamePointable.FACTORY.createPointable();
         strp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        ppool = PointablePoolFactory.INSTANCE.createPointablePool();
     }
 
     @Override

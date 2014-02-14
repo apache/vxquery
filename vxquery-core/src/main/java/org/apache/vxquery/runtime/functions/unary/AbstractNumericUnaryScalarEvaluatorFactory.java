@@ -17,7 +17,6 @@
 package org.apache.vxquery.runtime.functions.unary;
 
 import java.io.DataOutput;
-import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -26,7 +25,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper.TypedPointables;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -87,7 +85,7 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
                                 case ValueTag.XS_BYTE_TAG:
                                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                                     abvsInteger.reset();
-                                    getIntegerPointable(tp, tvp, dOutInteger);
+                                    FunctionHelper.getIntegerPointable(tvp, ppool, dOutInteger);
                                     longp.set(abvsInteger.getByteArray(), abvsInteger.getStartOffset() + 1,
                                             LongPointable.TYPE_TRAITS.getFixedLength());
                             }
@@ -113,46 +111,6 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
                 throw new SystemException(ErrorCode.XPTY0004);
-            }
-
-            private void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOut)
-                    throws SystemException, IOException {
-                long value;
-                switch (tvp.getTag()) {
-                    case ValueTag.XS_INTEGER_TAG:
-                    case ValueTag.XS_LONG_TAG:
-                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_UNSIGNED_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_LONG_TAG:
-                        tvp.getValue(tp.longp);
-                        value = tp.longp.longValue();
-                        break;
-
-                    case ValueTag.XS_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_SHORT_TAG:
-                        tvp.getValue(tp.intp);
-                        value = tp.intp.longValue();
-                        break;
-
-                    case ValueTag.XS_SHORT_TAG:
-                    case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                        tvp.getValue(tp.shortp);
-                        value = tp.shortp.longValue();
-                        break;
-
-                    case ValueTag.XS_BYTE_TAG:
-                        tvp.getValue(tp.bytep);
-                        value = tp.bytep.longValue();
-                        break;
-
-                    default:
-                        value = 0;
-                }
-                dOut.write(ValueTag.XS_INTEGER_TAG);
-                dOut.writeLong(value);
             }
 
             private int getBaseTypeForArithmetics(int tid) throws SystemException {

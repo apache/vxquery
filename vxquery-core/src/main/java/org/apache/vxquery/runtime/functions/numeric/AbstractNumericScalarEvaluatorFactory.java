@@ -100,7 +100,7 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
                                 case ValueTag.XS_BYTE_TAG:
                                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                                     abvsInteger.reset();
-                                    getIntegerPointable(tp, tvp, dOutInteger);
+                                    FunctionHelper.getIntegerPointable(tvp, dOutInteger);
                                     longp.set(abvsInteger.getByteArray(), abvsInteger.getStartOffset() + 1,
                                             LongPointable.TYPE_TRAITS.getFixedLength());
                             }
@@ -126,46 +126,6 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
                 throw new SystemException(ErrorCode.XPTY0004);
-            }
-
-            private void getIntegerPointable(TypedPointables tp, TaggedValuePointable tvp, DataOutput dOut)
-                    throws SystemException, IOException {
-                long value;
-                switch (tvp.getTag()) {
-                    case ValueTag.XS_INTEGER_TAG:
-                    case ValueTag.XS_LONG_TAG:
-                    case ValueTag.XS_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
-                    case ValueTag.XS_POSITIVE_INTEGER_TAG:
-                    case ValueTag.XS_UNSIGNED_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_LONG_TAG:
-                        tvp.getValue(tp.longp);
-                        value = tp.longp.longValue();
-                        break;
-
-                    case ValueTag.XS_INT_TAG:
-                    case ValueTag.XS_UNSIGNED_SHORT_TAG:
-                        tvp.getValue(tp.intp);
-                        value = tp.intp.longValue();
-                        break;
-
-                    case ValueTag.XS_SHORT_TAG:
-                    case ValueTag.XS_UNSIGNED_BYTE_TAG:
-                        tvp.getValue(tp.shortp);
-                        value = tp.shortp.longValue();
-                        break;
-
-                    case ValueTag.XS_BYTE_TAG:
-                        tvp.getValue(tp.bytep);
-                        value = tp.bytep.longValue();
-                        break;
-
-                    default:
-                        value = 0;
-                }
-                dOut.write(ValueTag.XS_INTEGER_TAG);
-                dOut.writeLong(value);
             }
 
             private int getBaseTypeForArithmetics(int tid) throws SystemException {
