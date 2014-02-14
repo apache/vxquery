@@ -78,6 +78,13 @@ public class DictionaryBuilder {
         tempOut = new DataOutputStream(tempStringData);
         tempStringPointable = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
     }
+    
+    public void reset() {
+        stringEndOffsets.clear();
+        sortedSlotIndexes.clear();
+        dataBuffer.reset();
+        tempStringData.reset();
+    }
 
     public void write(ArrayBackedValueStorage abvs) throws IOException {
         DataOutput out = abvs.getDataOutput();

@@ -162,6 +162,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     @Override
     public void startDocument() throws SAXException {
         try {
+            db.reset();
+            docABVS.reset();
             docb.reset(docABVS);
             if (createNodeIds) {
                 docb.setLocalNodeId(nodeIdCounter++);

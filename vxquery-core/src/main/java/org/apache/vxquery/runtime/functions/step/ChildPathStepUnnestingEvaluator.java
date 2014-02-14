@@ -16,24 +16,29 @@
  */
 package org.apache.vxquery.runtime.functions.step;
 
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluatorFactory;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluator;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
 
-public class ChildPathStepUnnestingEvaluatorFactory extends AbstractTaggedValueArgumentUnnestingEvaluatorFactory {
-    private static final long serialVersionUID = 1L;
+public class ChildPathStepUnnestingEvaluator extends AbstractTaggedValueArgumentUnnestingEvaluator {
+    final ChildPathStepUnnesting childPathStep;
 
-    public ChildPathStepUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public ChildPathStepUnnestingEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
+        childPathStep = new ChildPathStepUnnesting(ctx, ppool);
+    }
+
+    public boolean step(IPointable result) throws AlgebricksException {
+        return childPathStep.step(result);
     }
 
     @Override
-    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
-        return new ChildPathStepUnnestingEvaluator(ctx, args);
+    protected void init(TaggedValuePointable[] args) throws SystemException {
+        childPathStep.init(args);
     }
 }

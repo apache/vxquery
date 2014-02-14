@@ -16,6 +16,7 @@
  */
 package org.apache.vxquery.metadata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +32,10 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.properties.RandomPartitioning
 import edu.uci.ics.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
 
 public class VXQueryCollectionDataSource implements IDataSource<String> {
+    private static final String DELIMITER = "\\|";
     private final int dataSourceId;
     private final String collectionName;
+    private final String[] collectionPartitions;
     private final List<Integer> childSeq;
     private int totalDataSources;
 
@@ -43,6 +46,7 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
     public VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
         this.collectionName = file;
+        collectionPartitions = collectionName.split(DELIMITER);
         this.types = types;
         final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(new RandomPartitioningProperty(
                 new CollectionFileDomain(collectionName)), new ArrayList<ILocalStructuralProperty>());
@@ -65,6 +69,14 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
 
     public int getDataSourceId() {
         return dataSourceId;
+    }
+
+    public String[] getPartitions() {
+        return collectionPartitions;
+    }
+    
+    public int getPartitionCount() {
+        return collectionPartitions.length;
     }
 
     @Override

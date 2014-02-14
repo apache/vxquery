@@ -20,9 +20,36 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XMLParser {
+    XMLReader parser;
+    SAXContentHandler handler;
+
+    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider) throws HyracksDataException {
+        try {
+            parser = XMLReaderFactory.createXMLReader();
+            handler = new SAXContentHandler(attachTypes, idProvider);
+            parser.setContentHandler(handler);
+            parser.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
+        } catch (Exception e) {
+            throw new HyracksDataException(e.toString());
+        }
+    }
+
+    public void parseInputSource(InputSource in, ArrayBackedValueStorage abvs) throws HyracksDataException {
+        try {
+            parser.parse(in);
+            handler.write(abvs);
+        } catch (Exception e) {
+            throw new HyracksDataException(e.toString());
+        }
+    }
+
+    public void reset() throws SystemException {
+    }
+
     public static void parseInputSource(InputSource in, ArrayBackedValueStorage abvs, boolean attachTypes,
             ITreeNodeIdProvider idProvider) throws SystemException {
         XMLReader parser;

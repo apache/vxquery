@@ -31,20 +31,17 @@ import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class ChildPathStepScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
-    private final SequenceBuilder seqb;
+    private final SequenceBuilder seqb = new SequenceBuilder();
 
-    private final ArrayBackedValueStorage seqAbvs;
+    private final ArrayBackedValueStorage seqAbvs = new ArrayBackedValueStorage();
 
-    private final TaggedValuePointable itemTvp;
+    private final ChildPathStepUnnesting childPathStep;
 
-    private final ChildPathStep childPathStep;
+    private final TaggedValuePointable itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
     public ChildPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args);
-        seqb = new SequenceBuilder();
-        seqAbvs = new ArrayBackedValueStorage();
-        itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        childPathStep = new ChildPathStep(ctx);
+        childPathStep = new ChildPathStepUnnesting(ctx, ppool);
     }
 
     @Override

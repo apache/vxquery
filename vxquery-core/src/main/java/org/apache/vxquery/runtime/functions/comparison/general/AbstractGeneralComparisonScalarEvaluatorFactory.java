@@ -213,7 +213,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                         ah.atomize(tvpArg1, ppool, tvpTransform1);
                         tid1 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform1.getTag());
                     } else if (tid2 == ValueTag.NODE_TREE_TAG) {
-                        FunctionHelper.atomize(tvpArg2, tvpTransform2);
+                        ah.atomize(tvpArg2, ppool, tvpTransform2);
                         tid2 = FunctionHelper.getBaseTypeForGeneralComparisons(tvpTransform2.getTag());
                     }
 
