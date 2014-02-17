@@ -19,9 +19,7 @@ package org.apache.vxquery.datamodel.builders.nodes;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.vxquery.util.GrowableIntArray;

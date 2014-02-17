@@ -29,6 +29,31 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
+/*
+ * NodeTree {
+ *  NodeTreeHeader header;
+ *  NodeId nodeId?;
+ *  Dictionary dictionary?;
+ *  ElementNode rootNode;
+ * }
+ * 
+ * ElementHeader (padded) {
+ *  bit nodeIdExists;
+ *  bit dictionaryExists;
+ *  bit headerTypeExists;
+ * }
+ * 
+ * NodeId {
+ *  int32 id;
+ * }
+ * 
+ * Dictionary {
+ *  int32 numberOfItems
+ *  int32[numberOfItems] lengthOfItem
+ *  int32[numberOfItems] sortedItemIndex
+ *  bytes[] itemData
+ * }
+ */
 public class NodeTreePointable extends AbstractPointable {
     public static final int HEADER_NODEID_EXISTS_MASK = (1 << 0);
     public static final int HEADER_DICTIONARY_EXISTS_MASK = (1 << 1);
