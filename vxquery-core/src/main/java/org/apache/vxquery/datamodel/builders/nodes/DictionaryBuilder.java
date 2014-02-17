@@ -19,6 +19,10 @@ package org.apache.vxquery.datamodel.builders.nodes;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.vxquery.util.GrowableIntArray;
 
@@ -40,9 +44,7 @@ public class DictionaryBuilder {
 
     private final ByteArrayAccessibleOutputStream tempStringData;
 
-    private final DataOutput tempOut;
-
-    private final UTF8StringPointable tempStringPointable;
+    private final TreeMap<String, Integer> hashSlotIndexes;
 
     private final IValueReferenceVector sortedStringsVector = new IValueReferenceVector() {
         @Override
@@ -75,15 +77,15 @@ public class DictionaryBuilder {
         dataBuffer = new ByteArrayAccessibleOutputStream();
         dataBufferOut = new DataOutputStream(dataBuffer);
         tempStringData = new ByteArrayAccessibleOutputStream();
-        tempOut = new DataOutputStream(tempStringData);
-        tempStringPointable = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        hashSlotIndexes = new TreeMap<String, Integer>();
     }
-    
+
     public void reset() {
         stringEndOffsets.clear();
         sortedSlotIndexes.clear();
         dataBuffer.reset();
         tempStringData.reset();
+        hashSlotIndexes.clear();
     }
 
     public void write(ArrayBackedValueStorage abvs) throws IOException {
@@ -96,23 +98,34 @@ public class DictionaryBuilder {
         for (int i = 0; i < entryCount; ++i) {
             out.writeInt(entryOffsets[i]);
         }
-        int[] sortedOffsets = sortedSlotIndexes.getArray();
-        for (int i = 0; i < entryCount; ++i) {
-            out.writeInt(sortedOffsets[i]);
+        if (hashSlotIndexes.isEmpty()) {
+            int[] sortedOffsets = sortedSlotIndexes.getArray();
+            for (int i = 0; i < entryCount; ++i) {
+                out.writeInt(sortedOffsets[i]);
+            }
+        } else {
+            for (Entry<String, Integer> me : hashSlotIndexes.entrySet()) {
+                out.writeInt((Integer) me.getValue());
+            }
         }
         out.write(dataBuffer.getByteArray(), 0, dataBuffer.size());
         IntegerPointable.setInteger(abvs.getByteArray(), sizeOffset, abvs.getLength() - sizeOffset);
     }
 
     public int lookup(String str) {
-        tempStringData.reset();
-        try {
-            tempOut.writeUTF(str);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+        Integer slotIndex = hashSlotIndexes.get(str);
+        if (slotIndex == null) {
+            try {
+                dataBufferOut.writeUTF(str);
+                slotIndex = stringEndOffsets.getSize();
+                dataBufferOut.writeInt(slotIndex);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+            stringEndOffsets.append(dataBuffer.size());
+            hashSlotIndexes.put(str, slotIndex);
         }
-        tempStringPointable.set(tempStringData.getByteArray(), 0, tempStringData.size());
-        return lookup(tempStringPointable);
+        return slotIndex;
     }
 
     public int lookup(UTF8StringPointable str) {
