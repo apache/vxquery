@@ -73,14 +73,14 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
             // Find the input return type.
             inputSequenceType = ExpressionToolbox.getOutputSequenceType(opRef, argFirstM, dCtx);
 
-            // Find the treat type.
+            // Find the argument type.
             SequenceType sTypeArg = null;
             if (hasTypeArgument()) {
-                sTypeArg = ExpressionToolbox.getTypeExpressionTypeArguement(searchM, dCtx);
+                sTypeArg = ExpressionToolbox.getTypeExpressionTypeArgument(searchM, dCtx);
             }
 
             // remove
-            if (safeToReplace(sTypeArg, inputSequenceType)) {
+            if (matchesAllInstancesOf(sTypeArg, inputSequenceType)) {
                 searchM.setValue(argFirstM.getValue());
                 modified = true;
             }
@@ -88,7 +88,7 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
         return modified;
     }
 
-    public abstract boolean safeToReplace(SequenceType sTypeArg, SequenceType sTypeOutput);
+    public abstract boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput);
 
     public boolean hasTypeArgument() {
         return true;

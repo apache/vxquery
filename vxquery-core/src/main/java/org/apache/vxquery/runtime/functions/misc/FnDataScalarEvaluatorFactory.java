@@ -27,7 +27,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.AtomizeHelper;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -49,7 +48,7 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
         return new FnDataScalarEvaluator(args);
     }
 
-    private class FnDataScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+    private static class FnDataScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
         final AtomizeHelper ah = new AtomizeHelper();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();

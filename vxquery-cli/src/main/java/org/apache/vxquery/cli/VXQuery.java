@@ -117,9 +117,9 @@ public class VXQuery {
         }
         VXQuery vxq = new VXQuery(opts);
         vxq.execute();
-        Date end = new Date();
         // if -timing argument passed, show the starting and ending times
         if (opts.timing) {
+            Date end = new Date();
             message = "Execution time: " + (end.getTime() - start.getTime()) + "ms";
             System.out.println(message);
             timing.add(message);
@@ -254,9 +254,9 @@ public class VXQuery {
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId);
             compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
-            end = new Date();
             // if -timing argument passed, show the starting and ending times
             if (opts.timing) {
+                end = new Date();
                 message = "Compile time: " + (end.getTime() - start.getTime()) + "ms";
                 System.out.println(message);
                 timing.add(message);
@@ -276,9 +276,9 @@ public class VXQuery {
             for (int i = 0; i < opts.repeatExec; ++i) {
                 start = new Date();
                 runJob(js, writer);
-                end = new Date();
                 // if -timing argument passed, show the starting and ending times
                 if (opts.timing) {
+                    end = new Date();
                     if ((i + 1) > 3) {
                         totalTiming += end.getTime() - start.getTime();
                     }

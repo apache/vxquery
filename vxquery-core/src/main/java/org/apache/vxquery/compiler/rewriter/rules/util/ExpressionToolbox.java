@@ -171,7 +171,7 @@ public class ExpressionToolbox {
         return pTypeCode.getInteger();
     }
 
-    public static SequenceType getTypeExpressionTypeArguement(Mutable<ILogicalExpression> searchM,
+    public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM,
             StaticContextImpl dCtx) {
         int typeId = getTypeExpressionTypeArgument(searchM);
         if (typeId > 0) {
@@ -192,7 +192,7 @@ public class ExpressionToolbox {
                     return null;
                 } else if (function.getFunctionIdentifier().equals(BuiltinOperators.CAST.getFunctionIdentifier())) {
                     // Special case since case has multiple type outputs.
-                    return ExpressionToolbox.getTypeExpressionTypeArguement(argFirstM, dCtx);
+                    return ExpressionToolbox.getTypeExpressionTypeArgument(argFirstM, dCtx);
                 } else {
                     return function.getSignature().getReturnType();
                 }
@@ -212,6 +212,7 @@ public class ExpressionToolbox {
                 if (variableOp.getOperatorTag() == LogicalOperatorTag.DATASOURCESCAN) {
                     return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
                 }
+                // TODO Consider support for other operators. i.e. Assign.
         }
         return null;
     }

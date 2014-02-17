@@ -56,7 +56,7 @@ public class RemoveRedundantPromoteExpressionsRule extends AbstractRemoveRedunda
     }
 
     @Override
-    public boolean safeToReplace(SequenceType sTypeArg, SequenceType sTypeOutput) {
+    public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {
         if (sTypeArg != null) {
             if (sTypeArg.getItemType() != BuiltinTypeRegistry.XS_DOUBLE
                     && sTypeArg.getItemType() != BuiltinTypeRegistry.XS_FLOAT

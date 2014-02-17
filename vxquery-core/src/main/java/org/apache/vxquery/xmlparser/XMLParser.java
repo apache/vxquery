@@ -14,8 +14,6 @@
  */
 package org.apache.vxquery.xmlparser;
 
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -44,24 +42,6 @@ public class XMLParser {
             handler.write(abvs);
         } catch (Exception e) {
             throw new HyracksDataException(e.toString());
-        }
-    }
-
-    public void reset() throws SystemException {
-    }
-
-    public static void parseInputSource(InputSource in, ArrayBackedValueStorage abvs, boolean attachTypes,
-            ITreeNodeIdProvider idProvider) throws SystemException {
-        XMLReader parser;
-        try {
-            parser = XMLReaderFactory.createXMLReader();
-            SAXContentHandler handler = new SAXContentHandler(attachTypes, idProvider);
-            parser.setContentHandler(handler);
-            parser.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
-            parser.parse(in);
-            handler.write(abvs);
-        } catch (Exception e) {
-            throw new SystemException(ErrorCode.FODC0002, e, in.getSystemId());
         }
     }
 }

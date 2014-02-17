@@ -54,11 +54,10 @@ public class RemoveRedundantTreatExpressionsRule extends AbstractRemoveRedundant
     }
 
     @Override
-    public boolean safeToReplace(SequenceType sTypeArg, SequenceType sTypeOutput) {
+    public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {
         if (sTypeArg != null) {
             stm.setSequenceType(sTypeArg);
             if (sTypeOutput != null && stm.isSubType(sTypeOutput)) {
-                // Same type.
                 return true;
             }
         }

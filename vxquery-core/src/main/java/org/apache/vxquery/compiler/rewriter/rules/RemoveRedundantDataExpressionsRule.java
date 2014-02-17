@@ -53,7 +53,7 @@ public class RemoveRedundantDataExpressionsRule extends AbstractRemoveRedundantT
         return false;
     }
 
-    public boolean safeToReplace(SequenceType sTypeArg, SequenceType sTypeOutput) {
+    public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {
         if (sTypeOutput != null && sTypeOutput.getItemType().isAtomicType()) {
             return true;
         }

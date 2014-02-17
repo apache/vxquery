@@ -51,7 +51,7 @@ public class RemoveRedundantCastExpressionsRule extends AbstractRemoveRedundantT
     }
 
     @Override
-    public boolean safeToReplace(SequenceType sTypeArg, SequenceType sTypeOutput) {
+    public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {
         if (sTypeArg != null && sTypeOutput != null && sTypeOutput.equals(sTypeArg)) {
             // Same type.
             return true;
