@@ -41,7 +41,7 @@ public class OrScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
         return new OrScalarEvaluator(args);
     }
 
-    private class OrScalarEvaluator implements IScalarEvaluator {
+    private static class OrScalarEvaluator implements IScalarEvaluator {
         private final IScalarEvaluator[] args;
 
         private final BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();

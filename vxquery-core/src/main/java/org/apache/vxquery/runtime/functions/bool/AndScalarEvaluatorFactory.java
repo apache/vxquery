@@ -41,7 +41,7 @@ public class AndScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalar
         return new AndScalarEvaluator(args);
     }
 
-    private class AndScalarEvaluator implements IScalarEvaluator {
+    private static class AndScalarEvaluator implements IScalarEvaluator {
         private final IScalarEvaluator[] args;
 
         private final BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
