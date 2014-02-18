@@ -63,10 +63,9 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
     protected boolean rewritePreOnePass(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
         boolean modified = processOperator(opRef, context);
-
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-        VariableUtilities.getUsedVariables(op, usedVariables);
 
+        // Descend into nested plans merging unnest along the way.
         if (op.hasNestedPlans()) {
             AbstractOperatorWithNestedPlans opwnp = (AbstractOperatorWithNestedPlans) op;
             for (ILogicalPlan rootPlans : opwnp.getNestedPlans()) {
@@ -77,6 +76,9 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
                 }
             }
         }
+
+        // Only add variables after operator is used.
+        VariableUtilities.getUsedVariables(op, usedVariables);
 
         // Descend into children merging unnest along the way.
         if (op.hasInputs()) {
