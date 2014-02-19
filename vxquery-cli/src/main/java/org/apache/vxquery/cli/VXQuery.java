@@ -169,8 +169,8 @@ public class VXQuery {
      * @throws Exception
      */
     private void runQueries() throws IOException, SystemException, Exception {
-        Date start;
-        Date end;
+        Date start = null;
+        Date end = null;
         for (String query : opts.arguments) {
             String qStr = slurp(query);
             if (opts.showQuery) {
@@ -248,7 +248,7 @@ public class VXQuery {
                 }
             };
 
-            start = new Date();
+            start = opts.timing ? new Date() : null;
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
@@ -274,7 +274,7 @@ public class VXQuery {
             PrintWriter writer = new PrintWriter(System.out, true);
             // Repeat execution for number of times provided in -repeatexec argument
             for (int i = 0; i < opts.repeatExec; ++i) {
-                start = new Date();
+                start = opts.timing ? new Date() : null;
                 runJob(js, writer);
                 // if -timing argument passed, show the starting and ending times
                 if (opts.timing) {
