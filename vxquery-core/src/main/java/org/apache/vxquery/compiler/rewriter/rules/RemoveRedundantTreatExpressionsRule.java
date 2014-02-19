@@ -57,7 +57,7 @@ public class RemoveRedundantTreatExpressionsRule extends AbstractRemoveRedundant
     public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {
         if (sTypeArg != null) {
             stm.setSequenceType(sTypeArg);
-            if (sTypeOutput != null && stm.isSubType(sTypeOutput)) {
+            if (sTypeOutput != null && stm.matchesAllInstances(sTypeOutput)) {
                 return true;
             }
         }

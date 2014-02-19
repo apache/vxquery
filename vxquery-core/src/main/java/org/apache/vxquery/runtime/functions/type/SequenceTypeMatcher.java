@@ -153,7 +153,7 @@ public class SequenceTypeMatcher {
         return false;
     }
 
-    public boolean isSubType(SequenceType testST) {
+    public boolean matchesAllInstances(SequenceType testST) {
         Quantifier stq = sequenceType.getQuantifier();
         ItemType it = sequenceType.getItemType();
         if (stq.isSubQuantifier(testST.getQuantifier())) {
