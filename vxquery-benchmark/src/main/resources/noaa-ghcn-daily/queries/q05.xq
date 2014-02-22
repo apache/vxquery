@@ -10,7 +10,7 @@ fn:min(
     
     let $date := xs:date(fn:substring(xs:string(fn:data($r/date)), 0, 11))
     where $s/id eq $r/station
-        and (some $x in $s/locationLabels satisfies ($x/type eq "ST" and $x/displayName eq "Oregon”))
+        and (some $x in $s/locationLabels satisfies ($x/type eq "ST" and $x/displayName eq "Oregon"))
         and $r/dataType eq "TMIN" 
         and fn:year-from-date($date) eq 2001
     return $r/value
