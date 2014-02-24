@@ -347,12 +347,15 @@ class WeatherDataFiles:
                 break
         return columns[self.INDEX_DATA_FILE_NAME]
     
-def get_partition_paths(partitions, base_paths):        
+def get_partition_paths(partitions, base_paths, key = "partitions"):        
     partition_paths = []
     for i in range(0, partitions):
         for j in range(0, len(base_paths)):
-            new_partition_path = base_paths[j] + "partitions/" + str(len(base_paths)) + "disk/d" + str(j) +"_p" + str(partitions) + "_i" + str(i) + "/"
+            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions, i) + "/"
             partition_paths.append(new_partition_path)
     return partition_paths
+
+def get_partition_folder(disks, partitions, index):        
+    return "d" + str(disks) +"_p" + str(partitions) + "_i" + str(index)
 
 
