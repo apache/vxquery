@@ -51,10 +51,10 @@ class WeatherConfig:
     # Node Specific Functions
     # --------------------------------------------------------------------------
     def get_node_ip(self, node):
-        return self.get_text(node.getElementsByTagName("ip_address")[0])
+        return self.get_text(node.getElementsByTagName("cluster_ip")[0])
 
     def get_node_name(self, node):
-        return self.get_text(node.getElementsByTagName("name")[0])
+        return self.get_text(node.getElementsByTagName("id")[0])
 
     
     # --------------------------------------------------------------------------

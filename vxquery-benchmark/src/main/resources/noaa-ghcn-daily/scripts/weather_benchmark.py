@@ -23,7 +23,6 @@ import socket
 
 from weather_config import *
 from weather_data_files import *
-from collections import OrderedDict
 
 # Weather data files created to manage the conversion process.
 # Allows partition and picking up where you left off.
@@ -143,29 +142,6 @@ class WeatherBenchmark:
     def get_partition_folders(self, base_path):
         glob.glob(base_path + "partitions/d*_p*_i*")
             
-#         test_data_path = self.base_path + "/" + self.test + "/data"
-#         if not os.path.isdir(test_data_path):
-#             os.makedirs(test_data_path)
-#     
-#         if self.test == "local_speed_up":
-#             for i in range(virtual_partitions):
-#                 # one virtual partition per disk
-#                 split = 0
-#                 for j in range(len(base_paths)):
-#                     # for each disk look at each partition
-#                     for index, path in enumerate(partition_list):
-#                         offset = partitions * j
-#                         group = partitions / (i + 1)
-#                         
-#                         if (group) * split + offset <= index and index < (group) * (split + 1) + offset:
-#                             split += 1
-#                         
-#                         test_partition_path = test_data_path + "/p" + str(i + 1) + ".i" + str(split) + ".d" + str(j + 1)
-#                         if not os.path.isdir(test_partition_path):
-#                             os.makedirs(test_partition_path)
-#                         os.symlink(path, test_partition_path + "/index" + str(index))
-        
-
     def copy_query_files(self):
         for test in self.dataset.get_tests():
             if test in self.BENCHMARK_LOCAL_TESTS:
@@ -215,12 +191,10 @@ class WeatherBenchmark:
                     sys.stdout.write(line.replace(self.QUERY_REPLACEMENT_KEY + collection, replace_string))
                     
     def get_number_of_slices(self):
-        print self.dataset
         if len(self.dataset.get_tests()) == 0:
             print "No test has been defined in config file."
         else:
             for test in self.dataset.get_tests():
-                print "test = " + test
                 if test in self.BENCHMARK_LOCAL_TESTS:
                     return get_local_virtual_partitions(self.partitions)
                 elif test in self.BENCHMARK_CLUSTER_TESTS:

@@ -17,10 +17,10 @@
 <data xmlns="data">
     <name>Local Example</name>
     <save_path>/data</save_path>
-    <package>all</package>
+    <package>ghcnd_all</package>
     <node>
-        <name>localhost</name>
-        <ip_address>127.0.0.1</ip_address>
+        <id>localhost</id>
+        <cluster_ip>127.0.0.1</cluster_ip>
     </node>
     <dataset>
         <name>tiny</name>

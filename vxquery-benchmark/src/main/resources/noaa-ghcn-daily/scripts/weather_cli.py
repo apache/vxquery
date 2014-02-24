@@ -34,7 +34,6 @@ COMPRESSED = False
 def main(argv):
     append = False
     max_records = 0
-    package = "ghcnd_gsn"
     process_file_name = ""
     reset = False
     section = "all"
@@ -79,7 +78,7 @@ def main(argv):
                 print 'Error: Argument must be a file name for --file (-f).'
                 sys.exit()
         elif opt in ('-l', "--locality"):
-            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "test_links",  "queries", "statistics"):
+            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "test_links", "queries", "statistics"):
                 section = arg
             else:
                 print 'Error: Argument must be a string for --locality (-l) and a valid locality.'
@@ -89,12 +88,6 @@ def main(argv):
                 max_records = int(arg)
             else:
                 print 'Error: Argument must be an integer for --max_station_files (-m).'
-                sys.exit()
-        elif opt in ('-p', "--package"):
-            if arg in ("all", "gsn", "hcn"):
-                package = "ghcnd_" + arg
-            else:
-                print 'Error: Argument must be an string for one of the known weather packages: "all", "gsn", "hcn"'
                 sys.exit()
         elif opt == '-r':
             reset = True
@@ -137,7 +130,7 @@ def main(argv):
         download.download_all_files(reset)
 
         # Unzip the required file.
-        download.unzip_package(package, reset)
+        download.unzip_package(config.get_package(), reset)
 
 
     # Create some basic paths for save files and references.

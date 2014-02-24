@@ -17,26 +17,26 @@
 <data xmlns="data">
     <name>Cluster Example</name>
     <save_path>/data</save_path>
-    <package>all</package>
+    <package>ghcnd_all</package>
     <node>
-        <name>machine1</name>
-        <ip_address>127.0.0.1</ip_address>
+        <id>machine1</id>
+        <cluster_ip>127.0.0.1</cluster_ip>
     </node>
     <node>
-        <name>machine2</name>
-        <ip_address>127.0.0.2</ip_address>
+        <id>machine2</id>
+        <cluster_ip>127.0.0.2</cluster_ip>
     </node>
     <node>
-        <name>machine3</name>
-        <ip_address>127.0.0.3</ip_address>
+        <id>machine3</id>
+        <cluster_ip>127.0.0.3</cluster_ip>
     </node>
     <node>
-        <name>machine4</name>
-        <ip_address>127.0.0.4</ip_address>
+        <id>machine4</id>
+        <cluster_ip>127.0.0.4</cluster_ip>
     </node>
     <node>
-        <name>machine5</name>
-        <ip_address>127.0.0.5</ip_address>
+        <id>machine5</id>
+        <cluster_ip>127.0.0.5</cluster_ip>
     </node>
     <dataset>
         <name>tiny-1drive</name>
