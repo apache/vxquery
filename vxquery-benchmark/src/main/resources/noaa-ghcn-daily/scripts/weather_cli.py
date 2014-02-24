@@ -21,6 +21,7 @@ from weather_data_files import *
 from weather_download_files import *
 from weather_convert_to_xml import *
 from weather_config import *
+from weather_benchmark import *
 
 DEBUG_OUTPUT = False
 COMPRESSED = False
@@ -78,7 +79,7 @@ def main(argv):
                 print 'Error: Argument must be a file name for --file (-f).'
                 sys.exit()
         elif opt in ('-l', "--locality"):
-            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "test_links", "statistics"):
+            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "test_links",  "queries", "statistics"):
                 section = arg
             else:
                 print 'Error: Argument must be a string for --locality (-l) and a valid locality.'
@@ -205,26 +206,27 @@ def main(argv):
         dataset_folder = "/dataset-" + dataset.get_name()
         progress_file = config.get_save_path() + dataset_folder + "/_data_progress.csv"
         data = WeatherDataFiles(ghcnd_data_dly_path, progress_file)
+
         base_paths = []
         for paths in dataset.get_save_paths():
             base_paths.append(paths + dataset_folder + "/")
-
+        benchmark = WeatherBenchmark(base_paths, dataset.get_partitions(), dataset, config.get_node_machine_list())
+        
         if section in ("all", "partition"):
-            for partition in dataset.get_partitions():
-                print 'Processing the partition section (' + dataset.get_name() + ':d' + str(len(base_paths)) + ':p' + str(partition) + ').'
-                data.reset()
-                data.copy_to_n_partitions(xml_data_save_path, partition, base_paths)
+            slices = benchmark.get_number_of_slices()
+            print 'Processing the partition section (' + dataset.get_name() + ':d' + str(len(base_paths)) + ':s' + str(slices) + ').'
+            data.reset()
+            data.copy_to_n_partitions(xml_data_save_path, slices, base_paths)
     
         if section in ("all", "test_links"):
             # TODO determine current node 
-            if test and partitions > 0 and virtual_partitions > 0 and nodes > -1:
-                print 'Processing the test links section.'
-                data.reset()
-                data.create_test_links(config.get_save_path(), xml_data_save_path, test, nodes, partitions, virtual_partitions, base_paths)
-            else:
-                print 'Error: Not enough information for this section.'
-                sys.exit()
+            print 'Processing the test links section (' + dataset.get_name() + ').'
+            benchmark.build_data_links(xml_data_save_path)
 
+        if section in ("all", "queries"):
+            print 'Processing the queries section (' + dataset.get_name() + ').'
+            benchmark.copy_query_files()
+    
 #     if section in ("statistics"):
 #         print 'Processing the statistics section.'
 #         data.print_progress_file_stats(convert)

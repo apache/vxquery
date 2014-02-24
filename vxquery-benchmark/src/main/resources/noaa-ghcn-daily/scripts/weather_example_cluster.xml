@@ -15,27 +15,42 @@
   limitations under the License.
 -->
 <data xmlns="data">
-    <name>Local Example</name>
+    <name>Cluster Example</name>
     <save_path>/data</save_path>
     <package>all</package>
     <node>
-        <name>localhost</name>
+        <name>machine1</name>
         <ip_address>127.0.0.1</ip_address>
     </node>
+    <node>
+        <name>machine2</name>
+        <ip_address>127.0.0.2</ip_address>
+    </node>
+    <node>
+        <name>machine3</name>
+        <ip_address>127.0.0.3</ip_address>
+    </node>
+    <node>
+        <name>machine4</name>
+        <ip_address>127.0.0.4</ip_address>
+    </node>
+    <node>
+        <name>machine5</name>
+        <ip_address>127.0.0.5</ip_address>
+    </node>
     <dataset>
-        <name>tiny</name>
-        <test>local_speed_up</test>
+        <name>tiny-1drive</name>
+        <test>speed_up</test>
+        <test>batch_scale_out</test>
         <save_path>/data</save_path>
-        <partitions_per_path>1</partitions_per_path>
-        <partitions_per_path>2</partitions_per_path>
         <partitions_per_path>4</partitions_per_path>
-        <partitions_per_path>8</partitions_per_path>
     </dataset>
     <dataset>
-        <name>small</name>
-        <test>local_speed_up</test>
+        <name>small-2drives</name>
+        <test>speed_up</test>
+        <test>batch_scale_out</test>
         <save_path>/data</save_path>
-        <partitions_per_path>4</partitions_per_path>
-        <partitions_per_path>8</partitions_per_path>
+        <save_path>/data2</save_path>
+        <partitions_per_path>2</partitions_per_path>
     </dataset>
 </data>
