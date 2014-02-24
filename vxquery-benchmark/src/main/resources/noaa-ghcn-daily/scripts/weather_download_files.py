@@ -65,7 +65,7 @@ def report_download_status(count, block, size):
     line_size = 50
     erase = "\b" * line_size
     sys.stdout.write(erase)
-    report = get_report_line( (float(count) * block / size), line_size)
+    report = get_report_line((float(count) * block / size), line_size)
     sys.stdout.write(report)
 
 # Creates a string to be used in reporting the percentage done.

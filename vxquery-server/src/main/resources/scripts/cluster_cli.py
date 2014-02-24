@@ -59,7 +59,7 @@ def main(argv):
                 else:
                     deploy_path = arg
             else:
-                print 'Error: Argument must be a file name for --folder (-f).'
+                print 'Error: Argument must be a file name for --deploy_folder (-d).'
                 sys.exit()
 
     # Required fields to run the script.

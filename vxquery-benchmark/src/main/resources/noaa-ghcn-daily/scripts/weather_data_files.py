@@ -92,38 +92,6 @@ class WeatherDataFiles:
             self.close_progress_data(True)
         self.reset()
         
-    def create_test_links(self, save_path, xml_save_path, test, node, partitions, virtual_partitions, base_paths=[]):
-        if (len(base_paths) == 0):
-            base_paths.append(os.path.dirname(save_path))
-        partition_list = sorted(get_partition_paths(partitions, base_paths))
-        
-        test_path = save_path + "/" + test
-        if not os.path.isdir(test_path):
-            os.makedirs(test_path)
-        for i in range(virtual_partitions):
-            # one virtual partition per disk
-            for j in range(len(base_paths)):
-                for index, path in enumerate(partition_list):
-                    offset = partitions * j
-                    test_partition_path = test_path + "/partition" + str(i + 1) + "_disk" + str(j + 1)
-                    if not os.path.isdir(test_partition_path):
-                        os.makedirs(test_partition_path)
-                    if (node <= i):
-                        if test == "speed_up":
-                            group = partitions / (i + 1)
-                        elif test == "batch_scale_up":
-                            group = partitions / virtual_partitions
-                        else:
-                            group = -1
-                        # link
-                        if (group) * node + offset <= index and index < (group) * (node + 1) + offset:
-                            os.symlink(path, test_partition_path + "/index" + str(index))
-                    else:
-                        # fake directories
-                        os.makedirs(test_partition_path + "/sensors")
-                        os.makedirs(test_partition_path + "/stations")
-            
-        
     # Once the initial data has been generated, the data can be copied into a set number of partitions. 
     def copy_to_n_partitions(self, save_path, partitions, base_paths=[]):
         if (len(base_paths) == 0):
@@ -347,7 +315,7 @@ class WeatherDataFiles:
                 break
         return columns[self.INDEX_DATA_FILE_NAME]
     
-def get_partition_paths(partitions, base_paths, key = "partitions"):        
+def get_partition_paths(partitions, base_paths, key="partitions"):        
     partition_paths = []
     for i in range(0, partitions):
         for j in range(0, len(base_paths)):
@@ -356,6 +324,6 @@ def get_partition_paths(partitions, base_paths, key = "partitions"):
     return partition_paths
 
 def get_partition_folder(disks, partitions, index):        
-    return "d" + str(disks) +"_p" + str(partitions) + "_i" + str(index)
+    return "d" + str(disks) + "_p" + str(partitions) + "_i" + str(index)
 
 
