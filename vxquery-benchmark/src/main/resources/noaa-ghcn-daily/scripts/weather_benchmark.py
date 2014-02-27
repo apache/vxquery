@@ -35,8 +35,9 @@ class WeatherBenchmark:
 
     QUERY_REPLACEMENT_KEY = "/tmp/1.0_partition_ghcnd_all_xml/"
     QUERY_MASTER_FOLDER = "../queries/"
-    QUERY_FILE_LIST = ["q00.xq", "q01.xq", "q02.xq", "q03.xq", "q04.xq", "q05.xq"] 
-    BENCHMARK_LOCAL_TESTS = ["local_speed_up"] 
+    QUERY_FILE_LIST = ["q00.xq", "q01.xq", "q02.xq", "q03.xq"] 
+#     QUERY_FILE_LIST = ["q00.xq", "q01.xq", "q02.xq", "q03.xq", "q04.xq", "q05.xq"] 
+    BENCHMARK_LOCAL_TESTS = ["local_speed_up", "local_batch_scale_out"] 
     BENCHMARK_CLUSTER_TESTS = ["speed_up", "batch_scale_out"] 
     QUERY_COLLECTIONS = ["sensors", "stations"]
 
@@ -68,12 +69,8 @@ class WeatherBenchmark:
             # Match link paths to real data paths.
             offset = 0
             group_size = len(data_paths) / len(link_base_paths)
-            print "g " + str(group_size)
-            print link_base_paths
-            print data_paths
             for link_index, link_path in enumerate(link_base_paths):
                 for data_index, data_path in  enumerate(data_paths):
-                    print index, offset, group_size, link_index, data_index
                     if offset <= data_index and data_index < offset + group_size:
                         self.add_collection_links_for(data_path, link_path, data_index)
                 offset += group_size
@@ -161,8 +158,8 @@ class WeatherBenchmark:
                 os.makedirs(query_path)
         
             # Copy query files.
-            node_partitions = get_partition_paths(partitions, self.base_paths, "data_links/" + test + "/" + str(i) + "nodes")
-            self.copy_and_replace_query(query_path, node_partitions)
+            partition_paths = get_partition_paths(partitions, self.base_paths, "data_links/" + test + "/" + str(i) + "nodes")
+            self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_local_query_files(self, test):
         for i in self.partitions:
@@ -172,7 +169,8 @@ class WeatherBenchmark:
                 os.makedirs(query_path)
     
             # Copy query files.
-            self.copy_and_replace_query(query_path, get_partition_paths(i, self.base_paths))
+            partition_paths = get_partition_paths(i, self.base_paths, "data_links/" + test)
+            self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_and_replace_query(self, query_path, replacement_list):
         '''Copy the query files over to the query_path and replace the path
