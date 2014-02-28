@@ -110,6 +110,10 @@ class WeatherDataFiles:
         current_partition = 0
         csv_sorted = self.get_csv_in_partition_order()
         for item, size in csv_sorted.iteritems():
+            if size < 0:
+                print "The progress file does not have the sensor size data saved."
+                return
+            
             station_id = item.split('.')[0]
             # Update partition bases on smallest current size.
             current_partition = partition_sizes.index(min(partition_sizes))
