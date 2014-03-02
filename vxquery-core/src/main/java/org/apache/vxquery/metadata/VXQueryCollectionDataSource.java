@@ -16,7 +16,6 @@
  */
 package org.apache.vxquery.metadata;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
