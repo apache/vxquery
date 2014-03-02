@@ -130,11 +130,11 @@ class WeatherBenchmark:
     
     def add_collection_links_for(self, real_path, link_path, index):
         for collection in self.QUERY_COLLECTIONS:
-            collection_path = link_path + "/" + collection
+            collection_path = link_path + collection + "/"
             if not os.path.isdir(collection_path):
                 os.makedirs(collection_path)
             if index >= 0:
-                os.symlink(real_path + "/" + collection, collection_path + "/index" + str(index))
+                os.symlink(real_path + collection + "/", collection_path + "index" + str(index))
             
     def get_partition_folders(self, base_path):
         glob.glob(base_path + "partitions/d*_p*_i*")
@@ -158,7 +158,7 @@ class WeatherBenchmark:
                 os.makedirs(query_path)
         
             # Copy query files.
-            partition_paths = get_partition_paths(partitions, self.base_paths, "data_links/" + test + "/" + str(i) + "nodes")
+            partition_paths = get_cluster_link_paths_for_node(i, self.base_paths, "data_links/" + test)
             self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_local_query_files(self, test):
@@ -205,12 +205,16 @@ class WeatherBenchmark:
 def get_cluster_link_paths(nodes, base_paths, key="partitions"):        
     link_paths = []
     for i in range(0, nodes):
-        for j in range(0, len(base_paths)):
-            new_link_path = base_paths[j] + key + "/" + str(i) + "nodes/"
-            link_paths.append(new_link_path)
+        new_link_path = get_cluster_link_paths_for_node(i, base_paths, key)
+        link_paths.extend(new_link_path)
     return link_paths
 
-
+def get_cluster_link_paths_for_node(node_id, base_paths, key="partitions"):        
+    link_paths = []
+    for j in range(0, len(base_paths)):
+        new_link_path = base_paths[j] + key + "/" + str(node_id) + "nodes/"
+        link_paths.append(new_link_path)
+    return link_paths
 
 def get_local_query_path(base_paths, test, partition):        
     return base_paths[0] + "queries/" + test + "/" + get_local_query_folder(len(base_paths), partition) + "/"

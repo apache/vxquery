@@ -23,16 +23,7 @@
         <cluster_ip>127.0.0.1</cluster_ip>
     </node>
     <dataset>
-        <name>tiny</name>
-        <test>local_speed_up</test>
-        <save_path>/data</save_path>
-        <partitions_per_path>1</partitions_per_path>
-        <partitions_per_path>2</partitions_per_path>
-        <partitions_per_path>4</partitions_per_path>
-        <partitions_per_path>8</partitions_per_path>
-    </dataset>
-    <dataset>
-        <name>small</name>
+        <name>tiny-example</name>
         <test>local_speed_up</test>
         <save_path>/data</save_path>
         <partitions_per_path>1</partitions_per_path>
