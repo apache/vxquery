@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.InlineNestedVariablesRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
@@ -153,7 +154,7 @@ public class RewriteRuleset {
         xquery.add(new SimpleUnnestToProductRule());
         xquery.add(new PushMapOperatorDownThroughProductRule());
         xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
-        xquery.add(new InlineVariablesRule());
+        xquery.add(new InlineNestedVariablesRule());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
         // Clean up
