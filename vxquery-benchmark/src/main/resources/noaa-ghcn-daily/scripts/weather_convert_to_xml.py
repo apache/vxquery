@@ -472,7 +472,7 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
     # Station data
     def download_station_data(self, station_id, token, reset = False):
         import time
-        time.sleep(5)
+        time.sleep(10)
         # Make sure the station folder is available.
         ghcnd_xml_station_path = self.get_base_folder(station_id, "stations")
         if not os.path.isdir(ghcnd_xml_station_path):
