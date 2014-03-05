@@ -63,6 +63,7 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
     private boolean processTypeExpression(Mutable<ILogicalOperator> opRef, Mutable<ILogicalExpression> search) {
         boolean modified = false;
         SequenceType inputSequenceType;
+        SequenceType sTypeArg;
         functionList.clear();
         ExpressionToolbox.findAllFunctionExpressions(search, getSearchFunction(), functionList);
         for (Mutable<ILogicalExpression> searchM : functionList) {
@@ -74,7 +75,7 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
             inputSequenceType = ExpressionToolbox.getOutputSequenceType(opRef, argFirstM, dCtx);
 
             // Find the argument type.
-            SequenceType sTypeArg = null;
+            sTypeArg = null;
             if (hasTypeArgument()) {
                 sTypeArg = ExpressionToolbox.getTypeExpressionTypeArgument(searchM, dCtx);
             }
