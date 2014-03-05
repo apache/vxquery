@@ -20,6 +20,7 @@ import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
@@ -58,18 +59,22 @@ public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTagge
                 if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
                     tvp.getValue(seqp);
                     int seqLen = seqp.getEntryCount();
-                    for (int j = 0; j < seqLen; ++j) {
-                        seqp.getEntry(j, p);
-                        tvpNext.set(p.getByteArray(), p.getStartOffset(), p.getLength());
-                        if (j == 0) {
-                            // Init.
-                            tvpReturn.set(tvpNext);
+                    if (seqLen == 0) {
+                        XDMConstants.setEmptySequence(result);
+                    } else {
+                        for (int j = 0; j < seqLen; ++j) {
+                            seqp.getEntry(j, p);
+                            tvpNext.set(p.getByteArray(), p.getStartOffset(), p.getLength());
+                            if (j == 0) {
+                                // Init.
+                                tvpReturn.set(tvpNext);
+                            }
+                            if (FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvpNext, tvpReturn, dCtx)) {
+                                tvpReturn.set(tvpNext);
+                            }
                         }
-                        if (FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvpNext, tvpReturn, dCtx)) {
-                            tvpReturn.set(tvpNext);
-                        }
+                        result.set(tvpReturn);
                     }
-                    result.set(tvpReturn);
                 } else {
                     result.set(tvp);
                 }
