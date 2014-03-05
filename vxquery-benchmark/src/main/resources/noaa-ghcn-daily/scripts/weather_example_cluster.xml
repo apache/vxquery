@@ -43,7 +43,7 @@
         <test>speed_up</test>
         <test>batch_scale_out</test>
         <save_path>/data</save_path>
-        <partitions_per_path>4</partitions_per_path>
+        <partitions_per_path>1</partitions_per_path>
     </dataset>
     <dataset>
         <name>small-2drives</name>
@@ -51,6 +51,6 @@
         <test>batch_scale_out</test>
         <save_path>/data</save_path>
         <save_path>/data2</save_path>
-        <partitions_per_path>2</partitions_per_path>
+        <partitions_per_path>1</partitions_per_path>
     </dataset>
 </data>
