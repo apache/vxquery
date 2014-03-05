@@ -119,7 +119,7 @@ def main(argv):
     
     # Required fields to run the script.
     if config.get_save_path() == "" or not os.path.exists(config.get_save_path()):
-        print 'Error: The save directory option must be supplied: --save_directory (-d).'
+        print 'Error: The save directory option must be supplied in the config file.'
         sys.exit()
 
     # Set up downloads folder.

@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import glob
 import os.path
 import linecache
 import distutils.core
@@ -135,9 +134,6 @@ class WeatherBenchmark:
             if index >= 0:
                 os.symlink(real_path + collection + "/", collection_path + "index" + str(index))
             
-    def get_partition_folders(self, base_path):
-        glob.glob(base_path + "partitions/d*_p*_i*")
-            
     def copy_query_files(self):
         for test in self.dataset.get_tests():
             if test in self.BENCHMARK_LOCAL_TESTS:
@@ -149,6 +145,8 @@ class WeatherBenchmark:
                 exit()
             
     def copy_cluster_query_files(self, test):
+        '''Determine the data_link path for cluster query files and copy with
+        new location for collection.'''
         partitions = self.dataset.get_partitions()[0]
         for i in range(len(self.nodes)):
             query_path = get_cluster_query_path(self.base_paths, test, i)
@@ -161,6 +159,8 @@ class WeatherBenchmark:
             self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_local_query_files(self, test):
+        '''Determine the data_link path for local query files and copy with
+        new location for collection.'''
         for i in self.partitions:
             query_path = get_local_query_path(self.base_paths, test, i)
         
