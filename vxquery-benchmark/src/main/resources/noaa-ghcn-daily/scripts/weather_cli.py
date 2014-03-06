@@ -127,10 +127,12 @@ def main(argv):
     if section in ("all", "download"):
         print 'Processing the download section.'
         download = WeatherDownloadFiles(download_path)
-        download.download_all_files(reset)
+        download.download_ghcnd_files(reset)
+        download.download_mshr_files(reset)
 
         # Unzip the required file.
-        download.unzip_package(config.get_package(), reset)
+        download.unzip_ghcnd_package(config.get_package(), reset)
+        download.unzip_mshr_files(reset)
 
 
     # Create some basic paths for save files and references.

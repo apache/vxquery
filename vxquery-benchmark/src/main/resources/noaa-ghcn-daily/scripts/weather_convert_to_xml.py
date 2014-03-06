@@ -18,12 +18,74 @@ import textwrap
 from datetime import date
 import os
 import gzip
+from collections import OrderedDict
 
 # Custom modules.
-from weather_dly_config import *
+from weather_config_ghcnd import *
+from weather_config_mshr import *
 from weather_download_files import *
 
 class WeatherConvertToXML:
+    
+    STATES = OrderedDict({
+        'AK': 'Alaska',
+        'AL': 'Alabama',
+        'AR': 'Arkansas',
+        'AS': 'American Samoa',
+        'AZ': 'Arizona',
+        'CA': 'California',
+        'CO': 'Colorado',
+        'CT': 'Connecticut',
+        'DC': 'District of Columbia',
+        'DE': 'Delaware',
+        'FL': 'Florida',
+        'GA': 'Georgia',
+        'GU': 'Guam',
+        'HI': 'Hawaii',
+        'IA': 'Iowa',
+        'ID': 'Idaho',
+        'IL': 'Illinois',
+        'IN': 'Indiana',
+        'KS': 'Kansas',
+        'KY': 'Kentucky',
+        'LA': 'Louisiana',
+        'MA': 'Massachusetts',
+        'MD': 'Maryland',
+        'ME': 'Maine',
+        'MI': 'Michigan',
+        'MN': 'Minnesota',
+        'MO': 'Missouri',
+        'MP': 'Northern Mariana Islands',
+        'MS': 'Mississippi',
+        'MT': 'Montana',
+        'NA': 'National',
+        'NC': 'North Carolina',
+        'ND': 'North Dakota',
+        'NE': 'Nebraska',
+        'NH': 'New Hampshire',
+        'NJ': 'New Jersey',
+        'NM': 'New Mexico',
+        'NV': 'Nevada',
+        'NY': 'New York',
+        'OH': 'Ohio',
+        'OK': 'Oklahoma',
+        'OR': 'Oregon',
+        'PA': 'Pennsylvania',
+        'PR': 'Puerto Rico',
+        'RI': 'Rhode Island',
+        'SC': 'South Carolina',
+        'SD': 'South Dakota',
+        'TN': 'Tennessee',
+        'TX': 'Texas',
+        'UT': 'Utah',
+        'VA': 'Virginia',
+        'VI': 'Virgin Islands',
+        'VT': 'Vermont',
+        'WA': 'Washington',
+        'WI': 'Wisconsin',
+        'WV': 'West Virginia',
+        'WY': 'Wyoming'
+    })
     
     MONTHS = [
         "January",
@@ -51,6 +113,9 @@ class WeatherConvertToXML:
         self.ghcnd_countries = base_path + '/ghcnd-countries.txt'
         self.ghcnd_states = base_path + '/ghcnd-states.txt'
         self.ghcnd_stations = base_path + '/ghcnd-stations.txt'
+
+        # MSHR support files.
+        self.mshr_stations = base_path + '/mshr_enhanced_201402.txt'
         
     def set_token(self, token):
         self.token = token
@@ -109,7 +174,7 @@ class WeatherConvertToXML:
         row = file_stream.readline()
         return self.process_station_data(row)
 
-    def process_sensor_file(self, file_name, max_files, sensor_max = 99):
+    def process_sensor_file(self, file_name, max_files, sensor_max=99):
         print "Processing sensor file: " + file_name
         file_stream = open(file_name, 'r')
     
@@ -164,16 +229,29 @@ class WeatherConvertToXML:
                 <credit_URL>http://www.ncdc.noaa.gov/</credit_URL>
             """)
     
-    def default_xml_web_service_start(self, total_records):
+    def default_xml_web_service_start(self):
         field_xml = ""
         field_xml += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+        return field_xml
+    
+    def default_xml_data_start(self, total_records):
+        field_xml = ""
         field_xml += "<dataCollection pageCount=\"1\" totalCount=\"" + str(total_records) + "\">\n"
+        return field_xml
+    
+    def default_xml_station_start(self):
+        field_xml = ""
+        field_xml = "<stationCollection pageSize=\"100\" pageCount=\"1\" totalCount=\"1\">\n"
         return field_xml
     
     def default_xml_field_date(self, report_date, indent=2):
         field_xml = ""
         field_xml += self.get_indent_space(indent) + "<date>" + str(report_date.year) + "-" + str(report_date.month).zfill(2) + "-" + str(report_date.day).zfill(2) + "T00:00:00.000</date>\n"
         return field_xml
+    
+    def get_date_from_field(self, row, field):
+        report_date = self.get_field_from_definition(row, field)
+        return str(report_date.year) + "-" + str(report_date.month).zfill(2) + "-" + str(report_date.day).zfill(2)
     
     def default_xml_field_date_iso8601(self, report_date):
         field_xml = ""
@@ -241,6 +319,72 @@ class WeatherConvertToXML:
     
         return field_xml
     
+    def default_xml_mshr_station_additional(self, station_id):
+        """The web service station data is generate from the MSHR data supplemented with GHCN-Daily."""
+        station_mshr_row = ""
+        stations_mshr_file = open(self.mshr_stations, 'r')
+        for line in stations_mshr_file:
+            if station_id == self.get_field_from_definition(line, MSHR_FIELDS['GHCND_ID']).strip():
+                station_mshr_row = line
+                break
+        
+        if station_mshr_row == "":
+            return ""
+
+        additional_xml = ""
+
+        county = self.get_field_from_definition(station_mshr_row, MSHR_FIELDS['COUNTY']).strip()
+        if county != "":
+            additional_xml += self.default_xml_location_labels("CNTY", "FIPS:-9999", county)
+            
+        country_code = self.get_field_from_definition(station_mshr_row, MSHR_FIELDS['FIPS_COUNTRY_CODE']).strip()
+        country_name = self.get_field_from_definition(station_mshr_row, MSHR_FIELDS['FIPS_COUNTRY_NAME']).strip()
+        if country_code != "" and country_name != "":
+            additional_xml += self.default_xml_location_labels("CNTRY", "FIPS:"+country_code, country_name)
+        
+        return additional_xml
+
+    def default_xml_location_labels(self, type, id, display_name):
+        label_xml = ""
+        label_xml += self.default_xml_start_tag("locationLabels", 2)
+        label_xml += self.default_xml_element("type", type, 3)
+        label_xml += self.default_xml_element("id", id, 3)
+        label_xml += self.default_xml_element("displayName", display_name, 3)
+        label_xml += self.default_xml_end_tag("locationLabels", 2)
+        return label_xml
+        
+
+    def default_xml_web_service_station(self, station_id):
+        """The web service station data is generate from available historical sources."""
+        station_ghcnd_row = ""
+        stations_ghcnd_file = open(self.ghcnd_stations, 'r')
+        for line in stations_ghcnd_file:
+            if station_id == self.get_field_from_definition(line, STATIONS_FIELDS['ID']):
+                station_ghcnd_row = line
+                break
+    
+        xml_station = ""
+        xml_station += self.default_xml_start_tag("station", 1)
+        
+        xml_station += self.default_xml_element("id", "GHCND:" + station_id, 2)
+        xml_station += self.default_xml_element("displayName", self.get_field_from_definition(station_ghcnd_row, STATIONS_FIELDS['NAME']).strip(), 2)
+        xml_station += self.default_xml_element("latitude", self.get_field_from_definition(station_ghcnd_row, STATIONS_FIELDS['LATITUDE']).strip(), 2)
+        xml_station += self.default_xml_element("longitude", self.get_field_from_definition(station_ghcnd_row, STATIONS_FIELDS['LONGITUDE']).strip(), 2)
+        
+        elevation = self.get_field_from_definition(station_ghcnd_row, STATIONS_FIELDS['ELEVATION']).strip()
+        if elevation != "-999.9":
+            xml_station += self.default_xml_element("elevation", elevation, 2)
+        
+        state_code = self.get_field_from_definition(station_ghcnd_row, STATIONS_FIELDS['STATE']).strip()
+        if state_code != "":
+            xml_station += self.default_xml_location_labels("ST", "FIPS:" + str(self.STATES.keys().index(state_code)), self.STATES[state_code])
+        
+        # Add the MSHR data to the station generated information.
+        xml_station += self.default_xml_mshr_station_additional(station_id)
+            
+        xml_station += self.default_xml_end_tag("station", 1)
+        return xml_station
+        
     def default_xml_day_reading_as_field(self, row, day):
         day_index = DLY_FIELD_DAY_OFFSET + ((day - 1) * DLY_FIELD_DAY_FIELDS)
         value = self.get_dly_field(row, day_index);
@@ -306,8 +450,14 @@ class WeatherConvertToXML:
         return textwrap.dedent("""\
             </ghcnd_observation>""")
 
-    def default_xml_web_service_end(self):
-        return "</dataCollection>"
+    def default_xml_data_end(self):
+        return self.default_xml_end_tag("dataCollection", 0)
+
+    def default_xml_station_end(self):
+        return self.default_xml_end_tag("stationCollection", 0)
+
+    def default_xml_element(self, tag, data, indent=1):
+        return self.get_indent_space(indent) + "<" + tag + ">" + data + "</" + tag + ">\n"
 
     def default_xml_start_tag(self, tag, indent=1):
         return self.get_indent_space(indent) + "<" + tag + ">\n"
@@ -434,9 +584,11 @@ class WeatherMonthlyXMLFile(WeatherConvertToXML):
             return 0
 
 class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
+    """The web service class details how to create files similar to the NOAA web service."""
     skip_downloading = False
     # Station data
     def process_station_data(self, row):
+        """Adds a single station record file either from downloading the data or generating a similar record."""
         station_id = self.get_dly_field(row, DLY_FIELD_ID)
         download = 0
         if self.token is not "" and not self.skip_downloading:
@@ -444,15 +596,20 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
             if download == 0:
                 self.skip_downloading = True
         
-        # If not downloaded generate.
+        # If not downloaded, generate.
         if download != 0:
             return download
         else:
             # Information for each daily file.
-            station_xml_file = self.default_xml_start()
-            station_xml_file += self.default_xml_field_station(station_id)
-            station_xml_file += self.default_xml_end()
+            station_xml_file = self.default_xml_web_service_start()
+            station_xml_file += self.default_xml_station_start()
+            station_xml_file += self.default_xml_web_service_station(station_id)
+            station_xml_file += self.default_xml_station_end()
             
+            # Remove white space.
+            station_xml_file = station_xml_file.replace("\n", "");
+            station_xml_file = station_xml_file.replace(self.get_indent_space(1), "");
+
             # Make sure the station folder is available.
             ghcnd_xml_station_path = self.get_base_folder(station_id, "stations")
             if not os.path.isdir(ghcnd_xml_station_path):
@@ -470,9 +627,10 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
                 return 0
 
     # Station data
-    def download_station_data(self, station_id, token, reset = False):
+    def download_station_data(self, station_id, token, reset=False):
+        """Downloads the station data from the web service."""
         import time
-        time.sleep(10)
+        time.sleep(2)
         # Make sure the station folder is available.
         ghcnd_xml_station_path = self.get_base_folder(station_id, "stations")
         if not os.path.isdir(ghcnd_xml_station_path):
@@ -506,6 +664,7 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
 
     # Sensor data
     def process_one_month_sensor_set(self, records, page):
+        """Generates records for a station using the web service xml layout."""
         found_data = False        
         year = int(self.get_dly_field(records[0], DLY_FIELD_YEAR))
         month = int(self.get_dly_field(records[0], DLY_FIELD_MONTH))
@@ -535,7 +694,7 @@ class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
             except ValueError:
                 pass
 
-        daily_xml_file = self.default_xml_web_service_start(count) + daily_xml_file + self.default_xml_web_service_end()
+        daily_xml_file = self.default_xml_web_service_start() + self.default_xml_data_start(count) + daily_xml_file + self.default_xml_data_end()
         daily_xml_file = daily_xml_file.replace("\n", "");
         daily_xml_file = daily_xml_file.replace(self.get_indent_space(1), "");
 

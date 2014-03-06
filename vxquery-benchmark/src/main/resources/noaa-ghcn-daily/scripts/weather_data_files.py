@@ -92,8 +92,8 @@ class WeatherDataFiles:
             self.close_progress_data(True)
         self.reset()
         
-    # Once the initial data has been generated, the data can be copied into a set number of partitions. 
     def copy_to_n_partitions(self, save_path, partitions, base_paths=[]):
+        """Once the initial data has been generated, the data can be copied into a set number of partitions. """
         if (len(base_paths) == 0):
             return
         
