@@ -68,7 +68,9 @@ class WeatherBenchmark:
             offset = 0
             group_size = len(data_paths) / len(link_base_paths)
             for link_index, link_path in enumerate(link_base_paths):
-                for data_index, data_path in  enumerate(data_paths):
+                if os.path.isdir(link_path):
+                    shutil.rmtree(link_path)
+                for data_index, data_path in enumerate(data_paths):
                     if offset <= data_index and data_index < offset + group_size:
                         self.add_collection_links_for(data_path, link_path, data_index)
                 offset += group_size
@@ -134,38 +136,34 @@ class WeatherBenchmark:
             if index >= 0:
                 os.symlink(real_path + collection + "/", collection_path + "index" + str(index))
             
-    def copy_query_files(self):
+    def copy_query_files(self, reset):
         for test in self.dataset.get_tests():
             if test in self.BENCHMARK_LOCAL_TESTS:
-                self.copy_local_query_files(test)
+                self.copy_local_query_files(test, reset)
             elif test in self.BENCHMARK_CLUSTER_TESTS:
-                self.copy_cluster_query_files(test)
+                self.copy_cluster_query_files(test, reset)
             else:
                 print "Unknown test."
                 exit()
             
-    def copy_cluster_query_files(self, test):
+    def copy_cluster_query_files(self, test, reset):
         '''Determine the data_link path for cluster query files and copy with
         new location for collection.'''
         partitions = self.dataset.get_partitions()[0]
         for i in range(len(self.nodes)):
             query_path = get_cluster_query_path(self.base_paths, test, i)
-        
-            if not os.path.isdir(query_path):
-                os.makedirs(query_path)
+            prepare_path(query_path, reset)
         
             # Copy query files.
             partition_paths = get_cluster_link_paths_for_node(i, self.base_paths, "data_links/" + test)
             self.copy_and_replace_query(query_path, partition_paths)
 
-    def copy_local_query_files(self, test):
+    def copy_local_query_files(self, test, reset):
         '''Determine the data_link path for local query files and copy with
         new location for collection.'''
         for i in self.partitions:
             query_path = get_local_query_path(self.base_paths, test, i)
-        
-            if not os.path.isdir(query_path):
-                os.makedirs(query_path)
+            prepare_path(query_path, reset)
     
             # Copy query files.
             partition_paths = get_partition_paths(i, self.base_paths, "data_links/" + test)
@@ -199,7 +197,6 @@ class WeatherBenchmark:
                 else:
                     print "Unknown test."
                     exit()
-
 
 def get_cluster_link_paths(nodes, base_paths, key="partitions"):        
     link_paths = []

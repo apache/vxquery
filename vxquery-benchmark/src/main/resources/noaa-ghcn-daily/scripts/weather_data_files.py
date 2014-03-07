@@ -92,7 +92,7 @@ class WeatherDataFiles:
             self.close_progress_data(True)
         self.reset()
         
-    def copy_to_n_partitions(self, save_path, partitions, base_paths=[]):
+    def copy_to_n_partitions(self, save_path, partitions, base_paths, reset):
         """Once the initial data has been generated, the data can be copied into a set number of partitions. """
         if (len(base_paths) == 0):
             return
@@ -103,8 +103,7 @@ class WeatherDataFiles:
         for path in partition_paths:
             partition_sizes.append(0)
             # Make sure the xml folder is available.
-            if not os.path.isdir(path):
-                os.makedirs(path)
+            prepare_path(path, reset)
 
         # copy stations and sensors into each partition
         current_partition = 0
@@ -125,7 +124,6 @@ class WeatherDataFiles:
             if os.path.isdir(file_path):
                 distutils.dir_util.copy_tree(file_path, new_file_path)
             partition_sizes[current_partition] += size
-
         
             # Copy station files
             type = "stations"
@@ -319,6 +317,7 @@ class WeatherDataFiles:
                 break
         return columns[self.INDEX_DATA_FILE_NAME]
     
+    
 def get_partition_paths(partitions, base_paths, key="partitions"):        
     partition_paths = []
     for i in range(0, partitions):
@@ -330,4 +329,11 @@ def get_partition_paths(partitions, base_paths, key="partitions"):
 def get_partition_folder(disks, partitions, index):        
     return "d" + str(disks) + "_p" + str(partitions) + "_i" + str(index)
 
+def prepare_path(path, reset):
+    """Ensures the directory is available. If reset, then its a brand new directory."""
+    if os.path.isdir(path) and reset:
+        shutil.rmtree(path)
+                
+    if not os.path.isdir(path):
+        os.makedirs(path)
 
