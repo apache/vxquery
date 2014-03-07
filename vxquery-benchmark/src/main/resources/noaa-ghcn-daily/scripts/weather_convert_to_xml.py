@@ -376,7 +376,7 @@ class WeatherConvertToXML:
             xml_station += self.default_xml_element("elevation", elevation, 2)
         
         state_code = self.get_field_from_definition(station_ghcnd_row, STATIONS_FIELDS['STATE']).strip()
-        if state_code != "":
+        if state_code != "" and state_code in self.STATES:
             xml_station += self.default_xml_location_labels("ST", "FIPS:" + str(self.STATES.keys().index(state_code)), self.STATES[state_code])
         
         # Add the MSHR data to the station generated information.

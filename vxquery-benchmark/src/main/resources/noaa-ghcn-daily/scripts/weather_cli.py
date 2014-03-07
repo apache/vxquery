@@ -211,7 +211,7 @@ def main(argv):
             slices = benchmark.get_number_of_slices()
             print 'Processing the partition section (' + dataset.get_name() + ':d' + str(len(base_paths)) + ':s' + str(slices) + ').'
             data.reset()
-            data.copy_to_n_partitions(xml_data_save_path, slices, base_paths)
+            data.copy_to_n_partitions(xml_data_save_path, slices, base_paths, reset)
     
         if section in ("all", "test_links"):
             # TODO determine current node 
@@ -220,7 +220,7 @@ def main(argv):
 
         if section in ("all", "queries"):
             print 'Processing the queries section (' + dataset.get_name() + ').'
-            benchmark.copy_query_files()
+            benchmark.copy_query_files(reset)
     
 #     if section in ("statistics"):
 #         print 'Processing the statistics section.'
