@@ -33,6 +33,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFactoryProvider;
+import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFamilyProvider;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
@@ -115,6 +116,7 @@ public class XMLQueryCompiler {
             }
         });
         builder.setHashFunctionFactoryProvider(VXQueryBinaryHashFunctionFactoryProvider.INSTANCE);
+        builder.setHashFunctionFamilyProvider(VXQueryBinaryHashFunctionFamilyProvider.INSTANCE);
         builder.setTypeTraitProvider(new ITypeTraitProvider() {
             @Override
             public ITypeTraits getTypeTrait(Object type) {
@@ -196,9 +198,9 @@ public class XMLQueryCompiler {
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
                 RewriteRuleset.buildXQueryNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
-                RewriteRuleset.buildNestedDataSourceRuleCollection()));
-        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
                 RewriteRuleset.buildRedundantExpressionNormalizationRuleCollection()));
+        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
+                RewriteRuleset.buildNestedDataSourceRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqOnceCtrl,
                 RewriteRuleset.buildTypeInferenceRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,

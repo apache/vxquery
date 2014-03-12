@@ -146,8 +146,16 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     }
 
     @Override
-    public IFunctionInfo lookupFunction(FunctionIdentifier fid) {
-        return null;
+    public IFunctionInfo lookupFunction(final FunctionIdentifier fid) {
+        return new IFunctionInfo() {
+            @Override
+            public FunctionIdentifier getFunctionIdentifier() {
+                return fid;
+            }
+            public boolean isFunctional() {
+                return true;
+            }
+        };
     }
 
     @Override

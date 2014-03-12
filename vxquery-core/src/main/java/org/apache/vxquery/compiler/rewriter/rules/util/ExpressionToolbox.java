@@ -78,6 +78,18 @@ public class ExpressionToolbox {
         return null;
     }
 
+    public static void findVariableExpressions(Mutable<ILogicalExpression> mutableLe, List<Mutable<ILogicalExpression>> finds) {
+        ILogicalExpression le = mutableLe.getValue();
+        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+            finds.add(mutableLe);
+        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+                findVariableExpressions(argExp, finds);
+            }
+        }
+    }
+
     public static Mutable<ILogicalExpression> findLastFunctionExpression(Mutable<ILogicalExpression> mutableLe) {
         ILogicalExpression le = mutableLe.getValue();
         if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
@@ -180,12 +192,12 @@ public class ExpressionToolbox {
     }
 
     public static SequenceType getOutputSequenceType(Mutable<ILogicalOperator> opRef,
-            Mutable<ILogicalExpression> argFirstM, StaticContextImpl dCtx) {
+            Mutable<ILogicalExpression> argFirstM, StaticContext dCtx) {
         ILogicalExpression argFirstLe = argFirstM.getValue();
         switch (argFirstLe.getExpressionTag()) {
             case FUNCTION_CALL:
                 // Only process defined functions.
-                Function function = ExpressionToolbox.getBuiltIn(argFirstM);
+                Function function = ExpressionToolbox.getBuiltIn(argFirstM, dCtx);
                 if (function == null) {
                     return null;
                 } else if (function.getFunctionIdentifier().equals(BuiltinOperators.CAST.getFunctionIdentifier())) {

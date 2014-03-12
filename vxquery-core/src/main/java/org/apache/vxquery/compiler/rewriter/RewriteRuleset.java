@@ -20,6 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.InlineNestedVariablesRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
@@ -30,7 +32,9 @@ import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequen
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
 import org.apache.vxquery.compiler.rewriter.rules.PushMapOperatorDownThroughProductRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantPromoteExpressionsRule;
@@ -147,32 +151,38 @@ public class RewriteRuleset {
     }
 
     /**
+     * Remove expressions known to be redundant.
+     */
+    public final static List<IAlgebraicRewriteRule> buildRedundantExpressionNormalizationRuleCollection() {
+        List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
+        normalization.add(new InlineNestedVariablesRule());
+        normalization.add(new RemoveRedundantTreatExpressionsRule());
+        normalization.add(new RemoveRedundantDataExpressionsRule());
+        normalization.add(new RemoveRedundantPromoteExpressionsRule());
+        normalization.add(new RemoveRedundantCastExpressionsRule());
+        normalization.add(new ConvertToAlgebricksExpressionsRule());
+        normalization.add(new RemoveRedundantBooleanExpressionsRule());
+        // Clean up
+        normalization.add(new RemoveRedundantVariablesRule());
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        return normalization;
+    }
+
+    /**
      * When a nested data sources exist, convert the plan to use the join operator.
      */
     public final static List<IAlgebraicRewriteRule> buildNestedDataSourceRuleCollection() {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();
+        xquery.add(new BreakSelectIntoConjunctsRule());
         xquery.add(new SimpleUnnestToProductRule());
         xquery.add(new PushMapOperatorDownThroughProductRule());
         xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
-        xquery.add(new InlineNestedVariablesRule());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
         // Clean up
         xquery.add(new RemoveRedundantVariablesRule());
         xquery.add(new RemoveUnusedAssignAndAggregateRule());
         return xquery;
-    }
-
-    public final static List<IAlgebraicRewriteRule> buildRedundantExpressionNormalizationRuleCollection() {
-        List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
-        normalization.add(new RemoveRedundantTreatExpressionsRule());
-        normalization.add(new RemoveRedundantDataExpressionsRule());
-        normalization.add(new RemoveRedundantPromoteExpressionsRule());
-        normalization.add(new RemoveRedundantCastExpressionsRule());
-        // Clean up
-        normalization.add(new RemoveRedundantVariablesRule());
-        normalization.add(new RemoveUnusedAssignAndAggregateRule());
-        return normalization;
     }
 
     public final static List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
@@ -239,6 +249,7 @@ public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildPhysicalRewritesAllLevelsRuleCollection() {
         List<IAlgebraicRewriteRule> physicalPlanRewrites = new LinkedList<IAlgebraicRewriteRule>();
         physicalPlanRewrites.add(new PullSelectOutOfEqJoin());
+        physicalPlanRewrites.add(new PushFunctionsOntoEqJoinBranches());
         physicalPlanRewrites.add(new SetAlgebricksPhysicalOperatorsRule());
         physicalPlanRewrites.add(new EnforceStructuralPropertiesRule());
         physicalPlanRewrites.add(new PushProjectDownRule());
@@ -254,6 +265,7 @@ public class RewriteRuleset {
 
     public final static List<IAlgebraicRewriteRule> prepareForJobGenRuleCollection() {
         List<IAlgebraicRewriteRule> prepareForJobGenRewrites = new LinkedList<IAlgebraicRewriteRule>();
+        prepareForJobGenRewrites.add(new ConvertFromAlgebricksExpressionsRule());
         prepareForJobGenRewrites.add(new IsolateHyracksOperatorsRule(
                 HeuristicOptimizer.hyraxOperatorsBelowWhichJobGenIsDisabled));
         prepareForJobGenRewrites.add(new ExtractCommonOperatorsRule());
