@@ -18,8 +18,11 @@ package org.apache.vxquery.compiler.rewriter.rules.util;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.functions.BuiltinFunctions;
@@ -78,7 +81,8 @@ public class ExpressionToolbox {
         return null;
     }
 
-    public static void findVariableExpressions(Mutable<ILogicalExpression> mutableLe, List<Mutable<ILogicalExpression>> finds) {
+    public static void findVariableExpressions(Mutable<ILogicalExpression> mutableLe,
+            List<Mutable<ILogicalExpression>> finds) {
         ILogicalExpression le = mutableLe.getValue();
         if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
             finds.add(mutableLe);
@@ -144,14 +148,15 @@ public class ExpressionToolbox {
         }
     }
 
-    public static Function getBuiltIn(Mutable<ILogicalExpression> mutableLe) {
+    public static Function getBuiltIn(Mutable<ILogicalExpression> mutableLe, StaticContext rootContext) {
         ILogicalExpression le = mutableLe.getValue();
         if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
             AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            for (Function function : BuiltinFunctions.FUNCTION_COLLECTION) {
-                if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
-                    return function;
-                }
+            FunctionIdentifier fid = afce.getFunctionIdentifier();
+            QName functionName = new QName(fid.getNamespace(), fid.getName());
+            Function found = rootContext.lookupFunction(functionName, fid.getArity());
+            if (found != null) {
+                return found;
             }
             for (Function function : BuiltinOperators.OPERATOR_COLLECTION) {
                 if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
@@ -182,7 +187,7 @@ public class ExpressionToolbox {
         return pTypeCode.getInteger();
     }
 
-    public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM, StaticContextImpl dCtx) {
+    public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM, StaticContext dCtx) {
         int typeId = getTypeExpressionTypeArgument(searchM);
         if (typeId > 0) {
             return dCtx.lookupSequenceType(typeId);
