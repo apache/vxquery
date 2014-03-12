@@ -93,4 +93,3 @@ INVENTORY_FIELDS.append(['LONGITUDE', 22, 30, 'Real'])
 INVENTORY_FIELDS.append(['ELEMENT', 32, 35, 'Character'])
 INVENTORY_FIELDS.append(['FIRSTYEAR', 37, 40, 'Integer'])
 INVENTORY_FIELDS.append(['LASTYEAR', 42, 45, 'Integer'])
-
