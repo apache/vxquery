@@ -53,7 +53,7 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
     }
 
     private static class FnBooleanScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
-        final SequencePointable seqp = new SequencePointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final LongPointable lp = (LongPointable) LongPointable.FACTORY.createPointable();
         final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         final ShortPointable sp = (ShortPointable) ShortPointable.FACTORY.createPointable();

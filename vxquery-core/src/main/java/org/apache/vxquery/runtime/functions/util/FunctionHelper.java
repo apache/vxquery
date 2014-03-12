@@ -1200,6 +1200,7 @@ public class FunctionHelper {
 
     public static boolean isDerivedFromString(int tid) {
         switch (tid) {
+            case ValueTag.XS_UNTYPED_ATOMIC_TAG:
             case ValueTag.XS_STRING_TAG:
             case ValueTag.XS_NORMALIZED_STRING_TAG:
             case ValueTag.XS_TOKEN_TAG:
