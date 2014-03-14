@@ -34,7 +34,8 @@ class WeatherBenchmark:
 
     QUERY_REPLACEMENT_KEY = "/tmp/1.0_partition_ghcnd_all_xml/"
     QUERY_MASTER_FOLDER = "../queries/"
-    QUERY_FILE_LIST = ["q00.xq", "q01.xq", "q02.xq", "q03.xq", "q04.xq", "q05.xq"] 
+    QUERY_FILE_LIST = ["q00.xq", "q01.xq", "q02.xq", "q03.xq", "q04.xq", "q05.xq", "q06.xq"] 
+    QUERY_UTILITY_LIST = ["sensor_count.xq", "station_count.xq", "q04_sensor.xq", "q04_station.xq", "q05_sensor.xq", "q05_station.xq", "q06_sensor.xq"] 
     BENCHMARK_LOCAL_TESTS = ["local_speed_up", "local_batch_scale_out"] 
     BENCHMARK_CLUSTER_TESTS = ["speed_up", "batch_scale_out"] 
     QUERY_COLLECTIONS = ["sensors", "stations"]
@@ -47,40 +48,73 @@ class WeatherBenchmark:
         self.dataset = dataset
         self.nodes = nodes
         
-    def build_data_links(self, xml_save_path):
+    def print_partition_scheme(self, xml_save_path):
         if (len(self.base_paths) == 0):
             return
         for test in self.dataset.get_tests():
             if test in self.BENCHMARK_LOCAL_TESTS:
-                self.build_local_data_links(test, xml_save_path)
+                self.print_local_partition_schemes(test, xml_save_path)
             elif test in self.BENCHMARK_CLUSTER_TESTS:
-                self.build_cluster_data_links(test, xml_save_path)
+                self.print_cluster_partition_schemes(test, xml_save_path)
             else:
                 print "Unknown test."
                 exit()
             
-    def build_local_data_links(self, test, xml_save_path):
-        virtual_partitions = get_local_virtual_partitions(self.partitions)
-        data_paths = get_partition_paths(virtual_partitions, self.base_paths)
+    def print_local_partition_schemes(self, test, xml_save_path):
         for i in self.partitions:
-            link_base_paths = get_partition_paths(i, self.base_paths, "data_links/" + test)
-            # Match link paths to real data paths.
-            offset = 0
-            group_size = len(data_paths) / len(link_base_paths)
-            for link_index, link_path in enumerate(link_base_paths):
-                if os.path.isdir(link_path):
-                    shutil.rmtree(link_path)
-                for data_index, data_path in enumerate(data_paths):
-                    if offset <= data_index and data_index < offset + group_size:
-                        self.add_collection_links_for(data_path, link_path, data_index)
-                offset += group_size
+            scheme = self.get_local_partition_scheme(test, xml_save_path, i)
+            virtual_partitions = get_local_virtual_partitions(self.partitions)
+            self.print_partition_schemes(virtual_partitions, scheme, test, i)
+        
+    def print_cluster_partition_schemes(self, test, xml_save_path):
+        scheme = self.get_cluster_partition_scheme(test, xml_save_path)
+        virtual_partitions = get_cluster_virtual_partitions(self.nodes, self.partitions)
+        self.print_partition_schemes(virtual_partitions, scheme, test, 0)
+        
+    def print_partition_schemes(self, virtual_partitions, scheme, test, partitions):
+        print
+        print "---------------- Partition Scheme --------------------"
+        print "    Test: " + test
+        print "    Virtual Partitions: " + str(virtual_partitions)
+        print "    Disks: " + str(len(self.base_paths))
+        print "    Partitions: " + str(partitions)
+        
+        if len(scheme) > 0:
+            folder_length = len(scheme[0][3]) + 5
+            row_format = "{:>5} {:>5} {:<" + str(folder_length) + "} {:<" + str(folder_length) + "}"
+            HEADER = ("Index", "Link", "Data Path", "Link Path")
+            print row_format.format(*HEADER)
+            for row in scheme:
+                print row_format.format(*row)
+            print
+        else:
+            print "    Scheme is EMPTY."
+
+    def get_local_partition_scheme(self, test, xml_save_path, partition):
+        scheme = []
+        virtual_partitions = get_local_virtual_partitions(self.partitions)
+        data_schems = get_partition_scheme(virtual_partitions, self.base_paths)
+        
+        link_base_schemes = get_partition_scheme(partition, self.base_paths, "data_links/" + test)
+        # Match link paths to real data paths.
+        offset = 0
+        group_size = len(data_schemes) / len(link_base_schemes)
+        for link_disk, link_virtual, link_index, link_path in enumerate(link_base_schemes):
+            for data_disk, data_virtual, data_index, data_path in enumerate(data_schemes):
+                if test == "local_speed_up" and offset <= data_index and data_index < offset + group_size:
+                    scheme.append([data_index, link_index, data_path, link_path])
+                elif test == "local_batch_scale_out" and data_index == link_index:
+                    scheme.append([data_index, link_index, data_path, link_path])
+            offset += group_size
+        return scheme
     
-    def build_cluster_data_links(self, test, xml_save_path):
+    def get_cluster_partition_scheme(self, test, xml_save_path):
         node_index = self.get_current_node_index()
         if node_index == -1:
             print "Unknown host."
             return 
         
+        scheme = []
         virtual_partitions = get_cluster_virtual_partitions(self.nodes, self.partitions)
         data_paths = get_partition_paths(virtual_partitions, self.base_paths)
         link_base_paths = get_cluster_link_paths(len(self.nodes), self.base_paths, "data_links/" + test)
@@ -88,8 +122,6 @@ class WeatherBenchmark:
         # Match link paths to real data paths.
         link_base_paths.sort()
         for link_index, link_path in enumerate(link_base_paths):
-            if os.path.isdir(link_path):
-                shutil.rmtree(link_path)
             # Prep
             link_offset = link_index % len(self.nodes)
             disk_offset = link_index // len(self.nodes)
@@ -111,8 +143,33 @@ class WeatherBenchmark:
             data_paths.sort()
             for data_index, data_path in enumerate(data_paths):
                 if has_data and node_offset <= data_index and data_index < node_offset + group_size:
-                    self.add_collection_links_for(data_path, link_path, data_index)
-            self.add_collection_links_for("", link_path, -1)
+                    scheme.append([data_index, link_index, data_path, link_path])
+            scheme.append([-1, link_index, "", link_path])
+        return scheme
+    
+    def build_data_links(self, xml_save_path):
+        if (len(self.base_paths) == 0):
+            return
+        for test in self.dataset.get_tests():
+            if test in self.BENCHMARK_LOCAL_TESTS:
+                for i in self.partitions:
+                    scheme = self.get_local_partition_scheme(test, xml_save_path, i)
+                    self.build_data_links_scheme(scheme)
+            elif test in self.BENCHMARK_CLUSTER_TESTS:
+                scheme = self.get_cluster_partition_scheme(test, xml_save_path)
+                self.build_data_links_scheme(scheme)
+            else:
+                print "Unknown test."
+                exit()
+    
+    def build_data_links_scheme(self, scheme):
+        """Build all the data links based on the scheme information."""
+        link_path_cleared = []
+        for (data_index, partition, data_path, link_path) in scheme:
+            if link_path not in link_path_cleared and os.path.isdir(link_path):
+                shutil.rmtree(link_path)
+                link_path_cleared.append(link_path)
+            self.add_collection_links_for(data_path, link_path, data_index)
     
     def get_current_node_index(self):
         found = False
@@ -172,7 +229,7 @@ class WeatherBenchmark:
     def copy_and_replace_query(self, query_path, replacement_list):
         '''Copy the query files over to the query_path and replace the path
         for the where the collection data is located.'''
-        for query_file in self.QUERY_FILE_LIST:
+        for query_file in self.QUERY_FILE_LIST + self.QUERY_UTILITY_LIST:
             shutil.copyfile(self.QUERY_MASTER_FOLDER + query_file, query_path + query_file)
         
             # Make a search replace for each collection.
