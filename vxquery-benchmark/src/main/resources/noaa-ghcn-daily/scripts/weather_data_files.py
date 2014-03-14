@@ -318,13 +318,26 @@ class WeatherDataFiles:
         return columns[self.INDEX_DATA_FILE_NAME]
     
     
+# Index values of each field details.
+PARTITION_INDEX_DISK = 0
+PARTITION_INDEX_VIRTUAL = 1
+PARTITION_INDEX = 2
+PARTITION_INDEX_PATH = 3
+PARTITION_HEADER = ("Disk", "Virtual", "Index", "Path")
+            
 def get_partition_paths(partitions, base_paths, key="partitions"):        
     partition_paths = []
+    for scheme in get_partition_scheme(partitions, base_paths, key):
+        partition_paths.append(scheme[PARTITION_INDEX_PATH])
+    return partition_paths
+
+def get_partition_scheme(partitions, base_paths, key="partitions"):        
+    partition_scheme = []
     for i in range(0, partitions):
         for j in range(0, len(base_paths)):
             new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions, i) + "/"
-            partition_paths.append(new_partition_path)
-    return partition_paths
+            partition_scheme.append((j, partitions, i, new_partition_path))
+    return partition_scheme
 
 def get_partition_folder(disks, partitions, index):        
     return "d" + str(disks) + "_p" + str(partitions) + "_i" + str(index)

@@ -24,7 +24,6 @@ from weather_config import *
 from weather_benchmark import *
 
 DEBUG_OUTPUT = False
-COMPRESSED = False
 
 #
 # Weather conversion for GHCN-DAILY files to xml.
@@ -42,7 +41,7 @@ def main(argv):
     xml_config_path = ""
     
     try:
-        opts, args = getopt.getopt(argv, "acf:hl:m:ruvw:x:", ["file=", "locality=", "max_station_files=", "web_service=", "xml_config="])
+        opts, args = getopt.getopt(argv, "af:hl:m:ruvw:x:", ["file=", "locality=", "max_station_files=", "web_service=", "xml_config="])
     except getopt.GetoptError:
         print 'The file options for weather_cli.py were not correctly specified.'
         print 'To see a full list of options try:'
@@ -52,10 +51,9 @@ def main(argv):
         if opt == '-h':
             print 'Converting weather daily files to xml options:'
             print '    -a        Append the results to the progress file.'
-            print '    -c        Compress the produced XML file with .gz.'
             print '    -f (str)  The file name of a specific station to process.'
             print '              * Helpful when testing a single stations XML file output.'
-            print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, statistics).'
+            print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, partition_scheme, statistics).'
             print '    -m (int)  Limits the number of files created for each station.'
             print '              * Helpful when testing to make sure all elements are supported for each station.'
             print '              Alternate form: --max_station_files=(int)'
@@ -67,9 +65,6 @@ def main(argv):
             sys.exit()
         elif opt in ('-a', "--append"):
             append = True
-        elif opt == '-c':
-            global COMPRESSED
-            COMPRESSED = True
         elif opt in ('-f', "--file"):
             # check if file exists.
             if os.path.exists(arg):
@@ -78,7 +73,7 @@ def main(argv):
                 print 'Error: Argument must be a file name for --file (-f).'
                 sys.exit()
         elif opt in ('-l', "--locality"):
-            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "test_links", "queries", "statistics"):
+            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "partition_scheme", "test_links", "queries", "statistics"):
                 section = arg
             else:
                 print 'Error: Argument must be a string for --locality (-l) and a valid locality.'
@@ -144,7 +139,7 @@ def main(argv):
         os.makedirs(xml_data_save_path)
 
     # Set up the XML build objects.
-    convert = WeatherWebServiceMonthlyXMLFile(download_path, xml_data_save_path, COMPRESSED, DEBUG_OUTPUT)
+    convert = WeatherWebServiceMonthlyXMLFile(download_path, xml_data_save_path, DEBUG_OUTPUT)
     progress_file = xml_data_save_path + "_data_progress.csv"
     data = WeatherDataFiles(ghcnd_data_dly_path, progress_file)
     if section in ("all", "progress_file"):
@@ -207,15 +202,19 @@ def main(argv):
             base_paths.append(paths + dataset_folder + "/")
         benchmark = WeatherBenchmark(base_paths, dataset.get_partitions(), dataset, config.get_node_machine_list())
         
-        if section in ("all", "partition"):
+        if section in ("all", "partition", "partition_scheme"):
             slices = benchmark.get_number_of_slices()
             print 'Processing the partition section (' + dataset.get_name() + ':d' + str(len(base_paths)) + ':s' + str(slices) + ').'
             data.reset()
-            data.copy_to_n_partitions(xml_data_save_path, slices, base_paths, reset)
+            if section == "partition_scheme":
+                benchmark.print_partition_scheme(xml_data_save_path)
+            else:
+                data.copy_to_n_partitions(xml_data_save_path, slices, base_paths, reset)
     
         if section in ("all", "test_links"):
             # TODO determine current node 
             print 'Processing the test links section (' + dataset.get_name() + ').'
+            benchmark.print_partition_scheme(xml_data_save_path)
             benchmark.build_data_links(xml_data_save_path)
 
         if section in ("all", "queries"):

@@ -17,7 +17,6 @@
 import textwrap
 from datetime import date
 import os
-import gzip
 from collections import OrderedDict
 
 # Custom modules.
@@ -104,9 +103,8 @@ class WeatherConvertToXML:
     
     token = ""
     
-    def __init__(self, base_path, save_path, compressed, debug_output):
+    def __init__(self, base_path, save_path, debug_output):
         self.save_path = save_path
-        self.compressed = compressed
         self.debug_output = debug_output
 
         # Extra support files.
@@ -134,14 +132,9 @@ class WeatherConvertToXML:
             print str(field[FIELD_INDEX_NAME]) + " = '" + row[(field[FIELD_INDEX_START] - 1):field[FIELD_INDEX_END]] + "'"
     
     def save_file(self, filename, contents):
-        if self.compressed:
-            filename = filename + '.gz'
-            file = gzip.open(filename, 'wb')
-        else:
-            file = open(filename, 'w')
+        file = open(filename, 'w')
         file.write(contents)
         file.close()
-        
         return filename
     
     def get_folder_size(self, folder_name):
