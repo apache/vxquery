@@ -62,7 +62,7 @@ public class InlineNestedVariablesRule extends InlineVariablesRule {
         }
 
         boolean modified = false;
-        // Descend into nested plans removing projects on the way.
+        // Descend into nested plans inlining along the way.
         if (op.hasNestedPlans()) {
             AbstractOperatorWithNestedPlans nestedOp = (AbstractOperatorWithNestedPlans) op;
             for (ILogicalPlan nestedPlan : nestedOp.getNestedPlans()) {
@@ -74,7 +74,7 @@ public class InlineNestedVariablesRule extends InlineVariablesRule {
             }
         }
 
-        // Descend into children removing projects on the way.
+        // Descend into children inlining along on the way.
         for (Mutable<ILogicalOperator> inputOpRef : op.getInputs()) {
             if (inlineVariables(inputOpRef, context)) {
                 modified = true;
