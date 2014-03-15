@@ -1,14 +1,14 @@
-(: XQuery Join Aggregate Query :)
-(: Self join with all stations.                                               :)
-let $sensor_collection1 := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
-for $r1 in collection($sensor_collection1)/dataCollection/data
+(: XQuery Self Join Query :)
+(: Self join with all stations finding the difference in min and max       :)
+(: temperature.                                                            :)
+let $sensor_collection_min := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
+for $r_min in collection($sensor_collection_min)/dataCollection/data
 
-let $sensor_collection2 := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
-for $r2 in collection($sensor_collection2)/dataCollection/data
+let $sensor_collection_max := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
+for $r_max in collection($sensor_collection_max)/dataCollection/data
 
-let $date1 := xs:date(fn:substring(xs:string(fn:data($r1/date)), 0, 11))
-let $date2 := xs:date(fn:substring(xs:string(fn:data($r2/date)), 0, 11))
-where $r1/station eq $r2/station
-    and fn:year-from-date($date1) gt 2000
-    and fn:year-from-date($date2) gt 2000
-return ($r1/value, $r2/value) 
+where $r_min/station eq $r_max/station
+    and $r_min/date eq $r_max/date
+    and $r_min/dataType eq "TMIN"
+    and $r_max/dataType eq "TMAX"
+return ($r_max/value, $r_min/value, $r_max/value - $r_min/value)
