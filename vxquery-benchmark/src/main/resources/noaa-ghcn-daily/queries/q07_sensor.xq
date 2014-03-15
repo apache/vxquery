@@ -5,6 +5,6 @@ count(
     for $r in collection($sensor_collection)/dataCollection/data
     
     where $r/dataType eq "TMAX" 
-        and xs:dateTime(fn:data($r/date)) eq xs:dateTime("2000-01-01T00:00:00.000")
+    	and fn:year-from-dateTime(xs:dateTime(fn:data($r/date))) eq 2000
     return $r
 )

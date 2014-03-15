@@ -34,8 +34,8 @@ class WeatherBenchmark:
 
     QUERY_REPLACEMENT_KEY = "/tmp/1.0_partition_ghcnd_all_xml/"
     QUERY_MASTER_FOLDER = "../queries/"
-    QUERY_FILE_LIST = ["q00.xq", "q01.xq", "q02.xq", "q03.xq", "q04.xq", "q05.xq", "q06.xq"] 
-    QUERY_UTILITY_LIST = ["sensor_count.xq", "station_count.xq", "q04_sensor.xq", "q04_station.xq", "q05_sensor.xq", "q05_station.xq", "q06_sensor.xq"] 
+    QUERY_FILE_LIST = ["q00.xq", "q01.xq", "q02.xq", "q03.xq", "q04.xq", "q05.xq", "q06.xq", "q07.xq"] 
+    QUERY_UTILITY_LIST = ["sensor_count.xq", "station_count.xq", "q04_sensor.xq", "q04_station.xq", "q05_sensor.xq", "q05_station.xq", "q06_tmin.xq", "q06_tmax.xq", "q07_sensor.xq", "q07_station.xq"] 
     BENCHMARK_LOCAL_TESTS = ["local_speed_up", "local_batch_scale_out"] 
     BENCHMARK_CLUSTER_TESTS = ["speed_up", "batch_scale_out"] 
     QUERY_COLLECTIONS = ["sensors", "stations"]
