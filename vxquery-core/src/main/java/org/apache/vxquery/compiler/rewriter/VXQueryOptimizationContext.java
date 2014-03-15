@@ -38,6 +38,8 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
     private final Map<ILogicalOperator, Cardinality> cardinalityOperatorMap = new HashMap<ILogicalOperator, Cardinality>();
 
     private final Map<String, VXQueryCollectionDataSource> dataSourceScanMap = new HashMap<String, VXQueryCollectionDataSource>();
+    private int totalDataSources = 0;
+    private int collectionId = 0;
 
     public VXQueryOptimizationContext(int varCounter, IExpressionEvalSizeComputer expressionEvalSizeComputer,
             IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
@@ -61,6 +63,18 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
 
     public void putCollectionDataSourceMap(String collectionName, VXQueryCollectionDataSource ds) {
         this.dataSourceScanMap.put(collectionName, ds);
+    }
+
+    public void incrementTotalDataSources() {
+        totalDataSources++;
+    }
+
+    public int getTotalDataSources() {
+        return totalDataSources;
+    }
+
+    public int newCollectionId() {
+        return ++collectionId;
     }
 
     public Cardinality getCardinalityOperatorMap(ILogicalOperator op) {

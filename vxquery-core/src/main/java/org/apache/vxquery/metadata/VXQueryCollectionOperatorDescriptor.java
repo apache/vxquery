@@ -30,7 +30,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.step.ChildPathStepOperatorDescriptor;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
-import org.apache.vxquery.xmlparser.SAXContentHandler;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 import org.xml.sax.InputSource;
