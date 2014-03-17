@@ -57,7 +57,7 @@ public class VXQueryConstantValue implements IAlgebricksConstantValue {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append(type).append("(bytes[").append(value.length).append("] = [").append(Hex.encodeHexString(value))
+        buffer.append(type).append(" (bytes[").append(value.length).append("] = [").append(Hex.encodeHexString(value))
                 .append("])");
         return buffer.toString();
     }

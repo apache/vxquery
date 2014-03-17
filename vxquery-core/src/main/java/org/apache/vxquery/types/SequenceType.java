@@ -148,6 +148,6 @@ public final class SequenceType implements Serializable {
     }
 
     public String toString() {
-        return String.valueOf(itemType) + " " + quantifier;
+        return String.valueOf(itemType) + Quantifier.toString(quantifier);
     }
 }

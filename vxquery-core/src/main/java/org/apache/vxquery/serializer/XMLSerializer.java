@@ -79,7 +79,7 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
-    private void printTaggedValuePointable(PrintStream ps, TaggedValuePointable tvp) {
+    public void printTaggedValuePointable(PrintStream ps, TaggedValuePointable tvp) {
         byte tag = tvp.getTag();
         switch ((int) tag) {
             case ValueTag.XS_ANY_URI_TAG:

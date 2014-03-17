@@ -14,6 +14,9 @@
  */
 package org.apache.vxquery.compiler.algebricks.prettyprint;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
@@ -22,6 +25,7 @@ import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.functions.BuiltinOperators;
+import org.apache.vxquery.serializer.XMLSerializer;
 import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -30,6 +34,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.StatefulFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.UnnestingFunctionCallExpression;
@@ -43,16 +48,35 @@ public class VXQueryLogicalExpressionPrettyPrintVisitor implements ILogicalExpre
     StaticContext ctx;
     IntegerPointable ip;
     TaggedValuePointable tvp;
+    XMLSerializer serializer;
 
     public VXQueryLogicalExpressionPrettyPrintVisitor(StaticContext ctx) {
         this.ctx = ctx;
         this.ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         this.tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        this.serializer = new XMLSerializer();
     }
 
     @Override
     public String visitConstantExpression(ConstantExpression expr, Integer indent) throws AlgebricksException {
-        return expr.toString();
+        IAlgebricksConstantValue value = expr.getValue();
+        if (value instanceof VXQueryConstantValue) {
+            VXQueryConstantValue vxqValue = (VXQueryConstantValue) value;
+            tvp.set(vxqValue.getValue(), 0, vxqValue.getValue().length);
+
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(os);
+
+            serializer.printTaggedValuePointable(ps, tvp);
+
+            try {
+                return vxqValue.getType() + ": " + os.toString("UTF8");
+            } catch (UnsupportedEncodingException e) {
+                // print stack trace and return the default
+                e.printStackTrace();
+            }
+        }
+        return value.toString();
     }
 
     @Override

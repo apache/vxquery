@@ -218,7 +218,9 @@ public final class BuiltinTypeRegistry {
         types[BuiltinTypeConstants.XS_NOTATION_TYPE_ID] = XS_NOTATION;
 
         typeNames = new QName[BuiltinTypeConstants.BUILTIN_TYPE_COUNT];
+        typeNames[BuiltinTypeConstants.XS_ANY_TYPE_ID] = BuiltinTypeQNames.XS_ANY_TYPE_QNAME;
         typeNames[BuiltinTypeConstants.XS_ANY_SIMPLE_TYPE_ID] = BuiltinTypeQNames.XS_ANY_SIMPLE_TYPE_QNAME;
+        typeNames[BuiltinTypeConstants.XS_UNTYPED_TYPE_ID] = BuiltinTypeQNames.XS_UNTYPED_QNAME;
         typeNames[BuiltinTypeConstants.XS_ANY_ATOMIC_TYPE_ID] = BuiltinTypeQNames.XS_ANY_ATOMIC_TYPE_QNAME;
         typeNames[BuiltinTypeConstants.XS_STRING_TYPE_ID] = BuiltinTypeQNames.XS_STRING_TYPE_QNAME;
         typeNames[BuiltinTypeConstants.XS_NORMALIZED_STRING_TYPE_ID] = BuiltinTypeQNames.XS_NORMALIZED_STRING_TYPE_QNAME;

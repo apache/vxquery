@@ -36,4 +36,9 @@ public final class AnyItemType implements ItemType {
     public boolean equals(Object other) {
         return other instanceof AnyItemType;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(BuiltinTypeRegistry.INSTANCE.getTypeName(BuiltinTypeConstants.XS_ANY_TYPE_ID));
+    }
 }

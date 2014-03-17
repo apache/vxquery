@@ -103,4 +103,15 @@ public enum Quantifier {
     public boolean allowsRepeating() {
         return this == QUANT_PLUS || this == QUANT_STAR;
     }
+    
+    public static String toString(Quantifier q) {
+        switch (q) {
+            case QUANT_ONE: return " ";
+            case QUANT_PLUS: return "+";
+            case QUANT_QUESTION: return "?";
+            case QUANT_STAR: return "*";
+            case QUANT_ZERO: return "-";
+        }
+        throw new IllegalArgumentException();
+    }
 }
