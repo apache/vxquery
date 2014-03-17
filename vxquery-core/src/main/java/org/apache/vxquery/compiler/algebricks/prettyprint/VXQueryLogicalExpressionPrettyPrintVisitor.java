@@ -49,12 +49,16 @@ public class VXQueryLogicalExpressionPrettyPrintVisitor implements ILogicalExpre
     IntegerPointable ip;
     TaggedValuePointable tvp;
     XMLSerializer serializer;
+    ByteArrayOutputStream os;
+    PrintStream ps;
 
     public VXQueryLogicalExpressionPrettyPrintVisitor(StaticContext ctx) {
         this.ctx = ctx;
         this.ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         this.tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         this.serializer = new XMLSerializer();
+        this.os = new ByteArrayOutputStream();
+        this.ps = new PrintStream(os);
     }
 
     @Override
@@ -63,17 +67,15 @@ public class VXQueryLogicalExpressionPrettyPrintVisitor implements ILogicalExpre
         if (value instanceof VXQueryConstantValue) {
             VXQueryConstantValue vxqValue = (VXQueryConstantValue) value;
             tvp.set(vxqValue.getValue(), 0, vxqValue.getValue().length);
-
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(os);
-
             serializer.printTaggedValuePointable(ps, tvp);
-
             try {
                 return vxqValue.getType() + ": " + os.toString("UTF8");
             } catch (UnsupportedEncodingException e) {
                 // print stack trace and return the default
                 e.printStackTrace();
+            } finally {
+                ps.flush();
+                os.reset();
             }
         }
         return value.toString();
