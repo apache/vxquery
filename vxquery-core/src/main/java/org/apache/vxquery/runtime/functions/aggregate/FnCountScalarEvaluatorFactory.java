@@ -43,7 +43,7 @@ public class FnCountScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final SequencePointable seqp = new SequencePointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {

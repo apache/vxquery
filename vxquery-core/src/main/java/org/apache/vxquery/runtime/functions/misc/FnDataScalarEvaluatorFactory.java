@@ -52,7 +52,7 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
         final AtomizeHelper ah = new AtomizeHelper();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
-        final SequencePointable seq = new SequencePointable();
+        final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable p = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tempTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
