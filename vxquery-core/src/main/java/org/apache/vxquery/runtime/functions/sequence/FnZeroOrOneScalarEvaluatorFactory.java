@@ -40,7 +40,7 @@ public class FnZeroOrOneScalarEvaluatorFactory extends AbstractTaggedValueArgume
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final SequencePointable seqp = new SequencePointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {

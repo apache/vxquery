@@ -49,7 +49,7 @@ public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        final SequencePointable seqp = new SequencePointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpNext = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
