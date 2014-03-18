@@ -515,6 +515,20 @@
         <return type="xs:boolean"/>
     </operator>
 
+    <!-- fn:avg-local($arg as xs:anyAtomicType*) as xs:anyAtomicType? -->
+    <operator name="opext:avg-local">
+        <param name="arg" type="xs:anyAtomicType*"/>
+        <return type="xs:anyAtomicType?"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.AvgLocalAggregateEvaluatorFactory"/>
+    </operator>
+
+    <!-- fn:avg-global($arg as xs:anyAtomicType*) as xs:anyAtomicType? -->
+    <operator name="opext:avg-global">
+        <param name="arg" type="xs:anyAtomicType*"/>
+        <return type="xs:anyAtomicType?"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.AvgGlobalAggregateEvaluatorFactory"/>
+    </operator>
+
     <!-- opext:ordered($arg as item()*) as item()* -->
     <operator name="opext:ordered">
         <param name="arg" type="item()*"/>
