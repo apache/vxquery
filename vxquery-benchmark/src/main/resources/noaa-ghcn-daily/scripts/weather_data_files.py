@@ -99,7 +99,7 @@ class WeatherDataFiles:
         
         # Initialize the partition paths.
         partition_sizes = []
-        partition_paths = get_partition_paths(partitions, base_paths)
+        partition_paths = get_partition_paths(0, partitions, base_paths)
         for path in partition_paths:
             partition_sizes.append(0)
             # Make sure the xml folder is available.
@@ -319,24 +319,25 @@ class WeatherDataFiles:
     
     
 # Index values of each field details.
-PARTITION_INDEX_DISK = 0
-PARTITION_INDEX_VIRTUAL = 1
-PARTITION_INDEX = 2
-PARTITION_INDEX_PATH = 3
-PARTITION_HEADER = ("Disk", "Virtual", "Index", "Path")
+PARTITION_INDEX_NODE = 0
+PARTITION_INDEX_DISK = 1
+PARTITION_INDEX_VIRTUAL = 2
+PARTITION_INDEX = 3
+PARTITION_INDEX_PATH = 4
+PARTITION_HEADER = ("Node", "Disk", "Virtual", "Index", "Path")
             
-def get_partition_paths(partitions, base_paths, key="partitions"):        
+def get_partition_paths(node_id, partitions, base_paths, key="partitions"):        
     partition_paths = []
-    for scheme in get_partition_scheme(partitions, base_paths, key):
+    for scheme in get_partition_scheme(node_id, partitions, base_paths, key):
         partition_paths.append(scheme[PARTITION_INDEX_PATH])
     return partition_paths
 
-def get_partition_scheme(partitions, base_paths, key="partitions"):        
+def get_partition_scheme(node_id, partitions, base_paths, key="partitions"):        
     partition_scheme = []
     for i in range(0, partitions):
         for j in range(0, len(base_paths)):
             new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions, i) + "/"
-            partition_scheme.append((j, partitions, i, new_partition_path))
+            partition_scheme.append((node_id, j, partitions, i, new_partition_path))
     return partition_scheme
 
 def get_partition_folder(disks, partitions, index):        
