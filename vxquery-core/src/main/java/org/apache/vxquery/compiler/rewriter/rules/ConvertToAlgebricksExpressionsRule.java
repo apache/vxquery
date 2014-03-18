@@ -38,6 +38,29 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
+/**
+ * The rule searches for where the XQuery function are used in place of Algebricks builtin function. 
+ * The combination the boolean XQuery function and the XQuery equivalent function are replace with 
+ * the Algebricks builtin function  .
+ * 
+ * <pre>
+ * Before
+ * 
+ *   plan__parent
+ *   %OPERATOR( $v1 : boolean(xquery_function( \@input_expression ) ) )
+ *   plan__child
+ *   
+ *   Where xquery_function creates an atomic value.
+ *   
+ * After 
+ * 
+ *   plan__parent
+ *   %OPERATOR( $v1 : algebricks_function( \@input_expression ) )
+ *   plan__child
+ * </pre>
+ * 
+ * @author prestonc
+ */
 public class ConvertToAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
     final List<Mutable<ILogicalExpression>> functionList = new ArrayList<Mutable<ILogicalExpression>>();
 
