@@ -18,12 +18,9 @@ package org.apache.vxquery.compiler.rewriter.rules.util;
 
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.functions.BuiltinOperators;
@@ -148,15 +145,14 @@ public class ExpressionToolbox {
         }
     }
 
-    public static Function getBuiltIn(Mutable<ILogicalExpression> mutableLe, StaticContext rootContext) {
+    public static Function getBuiltIn(Mutable<ILogicalExpression> mutableLe) {
         ILogicalExpression le = mutableLe.getValue();
         if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
             AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            FunctionIdentifier fid = afce.getFunctionIdentifier();
-            QName functionName = new QName(fid.getNamespace(), fid.getName());
-            Function found = rootContext.lookupFunction(functionName, fid.getArity());
-            if (found != null) {
-                return found;
+            for (Function function : BuiltinFunctions.FUNCTION_COLLECTION) {
+                if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
+                    return function;
+                }
             }
             for (Function function : BuiltinOperators.OPERATOR_COLLECTION) {
                 if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
@@ -202,7 +198,7 @@ public class ExpressionToolbox {
         switch (argFirstLe.getExpressionTag()) {
             case FUNCTION_CALL:
                 // Only process defined functions.
-                Function function = ExpressionToolbox.getBuiltIn(argFirstM, dCtx);
+                Function function = ExpressionToolbox.getBuiltIn(argFirstM);
                 if (function == null) {
                     return null;
                 } else if (function.getFunctionIdentifier().equals(BuiltinOperators.CAST.getFunctionIdentifier())) {
