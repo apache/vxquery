@@ -28,6 +28,11 @@ public final class CommentType extends AbstractNodeType {
     }
 
     @Override
+    public String toString() {
+        return "comment";
+    }
+
+    @Override
     public int hashCode() {
         return CommentType.class.hashCode();
     }

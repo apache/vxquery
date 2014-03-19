@@ -47,6 +47,19 @@ public final class ElementType extends AbstractNodeType {
     }
 
     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("element(");
+        sb.append(nameTest != null ? nameTest : "*");
+        if (contentType != null) {
+            sb.append(", ").append(contentType);
+        }
+        if (nilled) {
+            sb.append(", nilled");
+        }
+        return sb.append(")").toString();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -78,10 +91,5 @@ public final class ElementType extends AbstractNodeType {
         if (nilled != other.nilled)
             return false;
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return "NodeTest(" + nameTest + ", " + contentType + ", nilled = " + nilled + ")";
     }
 }

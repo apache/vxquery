@@ -53,6 +53,11 @@ public final class AnyType implements ComplexType {
     }
 
     @Override
+    public String toString() {
+        return String.valueOf(BuiltinTypeRegistry.INSTANCE.getTypeName(getTypeId()));
+    }
+
+    @Override
     public int hashCode() {
         return AnyType.class.hashCode();
     }

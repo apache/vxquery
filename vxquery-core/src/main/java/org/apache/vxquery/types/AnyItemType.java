@@ -28,6 +28,11 @@ public final class AnyItemType implements ItemType {
     }
 
     @Override
+    public String toString() {
+        return "item";
+    }
+
+    @Override
     public int hashCode() {
         return AnyItemType.class.hashCode();
     }
@@ -35,10 +40,5 @@ public final class AnyItemType implements ItemType {
     @Override
     public boolean equals(Object other) {
         return other instanceof AnyItemType;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(BuiltinTypeRegistry.INSTANCE.getTypeName(BuiltinTypeConstants.XS_ANY_TYPE_ID));
     }
 }

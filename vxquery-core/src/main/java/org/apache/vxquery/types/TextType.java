@@ -28,6 +28,11 @@ public final class TextType extends AbstractNodeType {
     }
 
     @Override
+    public String toString() {
+        return "text";
+    }
+
+    @Override
     public int hashCode() {
         return TextType.class.hashCode();
     }

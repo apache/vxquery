@@ -28,6 +28,11 @@ public final class AnyNodeType extends AbstractNodeType {
     }
 
     @Override
+    public String toString() {
+        return "node";
+    }
+
+    @Override
     public int hashCode() {
         return AnyNodeType.class.hashCode();
     }

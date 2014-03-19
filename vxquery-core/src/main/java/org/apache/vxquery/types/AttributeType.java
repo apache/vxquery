@@ -42,6 +42,16 @@ public final class AttributeType extends AbstractNodeType {
     }
 
     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("attribute(");
+        sb.append(nameTest != null ? nameTest : "*");
+        if (contentType != null) {
+            sb.append(", ").append(contentType);
+        }
+        return sb.append(")").toString();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

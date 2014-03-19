@@ -236,9 +236,8 @@ public class VXQuery {
 
                 private StringBuilder appendPrettyPlan(StringBuilder sb, Module module) {
                     try {
-                        StaticContext ctx = module.getCompilerControlBlock().getStaticContext();
                         ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(
-                                ctx);
+                                module.getModuleContext());
                         LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
                         PlanPrettyPrinter.printPlan(module.getBody(), sb, v, 0);
                     } catch (AlgebricksException e) {

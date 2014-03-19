@@ -96,21 +96,7 @@ public class VXQueryLogicalExpressionPrettyPrintVisitor implements ILogicalExpre
     @Override
     public String visitScalarFunctionCallExpression(ScalarFunctionCallExpression expr, Integer indent)
             throws AlgebricksException {
-        assert expr.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL;
-
-        StringBuilder sb = new StringBuilder();
-
-        FunctionIdentifier fi = expr.getFunctionIdentifier();
-        if (identifiesTypeOperator(fi)) {
-            final ILogicalExpression typeEx = expr.getArguments().get(1).getValue();
-            assert typeEx.getExpressionTag() == LogicalExpressionTag.CONSTANT;
-            SequenceType type = getSequenceType((ConstantExpression) typeEx);
-            sb.append(fi + " <" + type + ">, Args:");
-            appendArgument(sb, expr.getArguments().get(0), indent + 2);
-        } else {
-            appendFunction(sb, expr, indent);
-        }
-        return sb.toString();
+        return appendFunction(new StringBuilder(), expr, indent).toString();
     }
 
     @Override
@@ -133,10 +119,35 @@ public class VXQueryLogicalExpressionPrettyPrintVisitor implements ILogicalExpre
                 || BuiltinOperators.INSTANCE_OF.getFunctionIdentifier().equals(fi);
     }
 
+    protected boolean identifiesPathStep(FunctionIdentifier fi) {
+        return BuiltinOperators.CHILD.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.ATTRIBUTE.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.ANCESTOR.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.ANCESTOR_OR_SELF.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.DESCENDANT.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.DESCENDANT_OR_SELF.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.PARENT.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.FOLLOWING.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.FOLLOWING_SIBLING.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.PRECEDING.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.PRECEDING_SIBLING.getFunctionIdentifier().equals(fi)
+                || BuiltinOperators.SELF.getFunctionIdentifier().equals(fi);
+    }
+
     protected StringBuilder appendFunction(StringBuilder sb, AbstractFunctionCallExpression expr, Integer indent)
             throws AlgebricksException {
-        sb.append("function-call: " + expr.getFunctionIdentifier() + ", Args:");
-        appendArguments(sb, expr.getArguments(), indent + 2);
+        assert expr.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL;
+        FunctionIdentifier fi = expr.getFunctionIdentifier();
+        if (identifiesTypeOperator(fi) || identifiesPathStep(fi)) {
+            final ILogicalExpression typeEx = expr.getArguments().get(1).getValue();
+            assert typeEx.getExpressionTag() == LogicalExpressionTag.CONSTANT;
+            SequenceType type = getSequenceType((ConstantExpression) typeEx);
+            sb.append(fi + " <" + type + ">, Args:");
+            appendArgument(sb, expr.getArguments().get(0), indent + 2);
+        } else {
+            sb.append("function-call: " + fi + ", Args:");
+            appendArguments(sb, expr.getArguments(), indent + 2);            
+        }
         return sb;
     }
 

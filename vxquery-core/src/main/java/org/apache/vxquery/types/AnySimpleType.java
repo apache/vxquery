@@ -53,6 +53,11 @@ public final class AnySimpleType implements SimpleType {
     }
 
     @Override
+    public String toString() {
+        return String.valueOf(BuiltinTypeRegistry.INSTANCE.getTypeName(getTypeId()));
+    }
+
+    @Override
     public int hashCode() {
         return AnySimpleType.class.hashCode();
     }

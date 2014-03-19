@@ -35,6 +35,13 @@ public final class DocumentType extends AbstractNodeType {
     }
 
     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("document(");
+        sb.append(elementType != null ? elementType : "*");
+        return sb.append(")").toString();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

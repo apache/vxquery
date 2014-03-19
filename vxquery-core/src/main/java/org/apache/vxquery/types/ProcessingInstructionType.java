@@ -18,6 +18,8 @@ package org.apache.vxquery.types;
 
 import java.util.Arrays;
 
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+
 public final class ProcessingInstructionType extends AbstractNodeType {
     public static final ProcessingInstructionType ANYPI = new ProcessingInstructionType(null);
 
@@ -34,6 +36,15 @@ public final class ProcessingInstructionType extends AbstractNodeType {
 
     public byte[] getTarget() {
         return target;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("processing-instruction(");
+        if (target != null) {
+            UTF8StringPointable.toString(sb, target, 0);
+        }
+        return sb.append(")").toString();
     }
 
     @Override
