@@ -18,7 +18,7 @@ package org.apache.vxquery.runtime.factory.hashfunction;
 
 import edu.uci.ics.hyracks.api.dataflow.value.IBinaryHashFunction;
 import edu.uci.ics.hyracks.api.dataflow.value.IBinaryHashFunctionFactory;
-import edu.uci.ics.hyracks.data.std.accessors.UTF8StringBinaryHashFunctionFamily;
+import edu.uci.ics.hyracks.data.std.accessors.MurmurHash3BinaryHashFunctionFamily;
 
 public class VXQueryRawBinaryHashFunctionFactory implements IBinaryHashFunctionFactory {
     private static final long serialVersionUID = 1L;
@@ -32,7 +32,7 @@ public class VXQueryRawBinaryHashFunctionFactory implements IBinaryHashFunctionF
     @Override
     public IBinaryHashFunction createBinaryHashFunction() {
 
-        return UTF8StringBinaryHashFunctionFamily.INSTANCE.createBinaryHashFunction(1);
+        return MurmurHash3BinaryHashFunctionFamily.INSTANCE.createBinaryHashFunction(1);
 
     }
 
