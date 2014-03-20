@@ -41,6 +41,7 @@ import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
+import org.json.JSONException;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -187,7 +188,12 @@ public class VXQuery {
                 public void notifyCodegenResult(Module module) {
                     if (opts.showRP) {
                         JobSpecification jobSpec = module.getHyracksJobSpecification();
-                        System.err.println(jobSpec.toString());
+                        try {
+                            System.err.println(jobSpec.toJSON().toString(2));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            System.err.println(jobSpec.toString());
+                        }
                     }
                 }
 
