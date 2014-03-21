@@ -32,7 +32,7 @@ public class VXQueryRawBinaryHashFunctionFactory implements IBinaryHashFunctionF
     @Override
     public IBinaryHashFunction createBinaryHashFunction() {
 
-        return MurmurHash3BinaryHashFunctionFamily.INSTANCE.createBinaryHashFunction(1);
+        return MurmurHash3BinaryHashFunctionFamily.INSTANCE.createBinaryHashFunction(0);
 
     }
 
