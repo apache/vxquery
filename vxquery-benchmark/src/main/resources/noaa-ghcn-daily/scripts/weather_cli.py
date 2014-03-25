@@ -53,7 +53,7 @@ def main(argv):
             print '    -a        Append the results to the progress file.'
             print '    -f (str)  The file name of a specific station to process.'
             print '              * Helpful when testing a single stations XML file output.'
-            print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, partition_scheme, statistics).'
+            print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, partition_scheme, inventory, statistics).'
             print '    -m (int)  Limits the number of files created for each station.'
             print '              * Helpful when testing to make sure all elements are supported for each station.'
             print '              Alternate form: --max_station_files=(int)'
@@ -73,7 +73,7 @@ def main(argv):
                 print 'Error: Argument must be a file name for --file (-f).'
                 sys.exit()
         elif opt in ('-l', "--locality"):
-            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "partition_scheme", "test_links", "queries", "statistics"):
+            if arg in ("download", "progress_file", "sensor_build", "station_build", "partition", "partition_scheme", "test_links", "queries", "inventory", "statistics"):
                 section = arg
             else:
                 print 'Error: Argument must be a string for --locality (-l) and a valid locality.'
@@ -221,6 +221,10 @@ def main(argv):
             print 'Processing the queries section (' + dataset.get_name() + ').'
             benchmark.copy_query_files(reset)
     
+    if section in ("inventory"):
+        print 'Processing the inventory section.'
+        convert.process_inventory_file()
+                  
 #     if section in ("statistics"):
 #         print 'Processing the statistics section.'
 #         data.print_progress_file_stats(convert)

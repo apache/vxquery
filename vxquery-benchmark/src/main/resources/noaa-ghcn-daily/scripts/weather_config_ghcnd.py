@@ -86,10 +86,10 @@ STATES_FIELDS['CODE'] = ['CODE', 1, 2, 'Character']
 STATES_FIELDS['NAME'] = ['NAME', 4, 50, 'Character']
 
 # Details about the row.
-INVENTORY_FIELDS = []
-INVENTORY_FIELDS.append(['ID', 1, 11, 'Character'])
-INVENTORY_FIELDS.append(['LATITUDE', 13, 20, 'Real'])
-INVENTORY_FIELDS.append(['LONGITUDE', 22, 30, 'Real'])
-INVENTORY_FIELDS.append(['ELEMENT', 32, 35, 'Character'])
-INVENTORY_FIELDS.append(['FIRSTYEAR', 37, 40, 'Integer'])
-INVENTORY_FIELDS.append(['LASTYEAR', 42, 45, 'Integer'])
+INVENTORY_FIELDS = {}
+INVENTORY_FIELDS['ID'] = ['ID', 1, 11, 'Character']
+INVENTORY_FIELDS['LATITUDE'] = ['LATITUDE', 13, 20, 'Real']
+INVENTORY_FIELDS['LONGITUDE'] = ['LONGITUDE', 22, 30, 'Real']
+INVENTORY_FIELDS['ELEMENT'] = ['ELEMENT', 32, 35, 'Character']
+INVENTORY_FIELDS['FIRSTYEAR'] = ['FIRSTYEAR', 37, 40, 'Integer']
+INVENTORY_FIELDS['LASTYEAR'] = ['LASTYEAR', 42, 45, 'Integer']
