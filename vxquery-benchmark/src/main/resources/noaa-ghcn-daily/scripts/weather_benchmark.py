@@ -140,7 +140,7 @@ class WeatherBenchmark:
                 print "Unknown test."
                 return
             group_size = group_size / link_virtual
-            node_offset = group_size * (node_index * local_virtual_partitions)
+            node_offset = group_size * (node_index * partition)
             node_offset += group_size * link_index
             has_data = True
             if link_node < node_index:
