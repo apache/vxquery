@@ -109,9 +109,10 @@ class WeatherConvertToXML:
 
         # Extra support files.
         self.ghcnd_countries = base_path + '/ghcnd-countries.txt'
+        self.ghcnd_inventory = base_path + '/ghcnd-inventory.txt'
         self.ghcnd_states = base_path + '/ghcnd-states.txt'
         self.ghcnd_stations = base_path + '/ghcnd-stations.txt'
-
+        
         # MSHR support files.
         self.mshr_stations = base_path + '/mshr_enhanced_201402.txt'
         
@@ -160,6 +161,36 @@ class WeatherConvertToXML:
     def get_base_folder(self, station_id, data_type="sensors"):
         return build_base_save_folder(self.save_path, station_id, data_type) 
     
+    def process_inventory_file(self):
+        print "Processing inventory file"
+        file_stream = open(self.ghcnd_inventory, 'r')
+        
+        csv_header = ['ID', 'SENSORS', 'SENSORS_COUNT',  'MAX_YEARS', 'TOTAL_YEARS_FOR_ALL_SENSORS']
+        row = file_stream.readline()
+        csv_inventory = {}
+        for row in file_stream:
+            id = self.get_field_from_definition(row, INVENTORY_FIELDS['ID'])
+            sensor_id = self.get_field_from_definition(row, INVENTORY_FIELDS['ELEMENT'])
+            start = int(self.get_field_from_definition(row, INVENTORY_FIELDS['FIRSTYEAR']))
+            end = int(self.get_field_from_definition(row, INVENTORY_FIELDS['LASTYEAR']))
+            if id in csv_inventory:
+                new_count = str(int(csv_inventory[id][2]) + 1)
+                new_max = str(max(int(csv_inventory[id][3]), (end - start)))
+                new_total = str(int(csv_inventory[id][3]) + end - start)
+                csv_inventory[id] = [id, (csv_inventory[id][1] + "," + sensor_id), new_count, new_max, new_total]
+            else:
+                csv_inventory[id] = [id, sensor_id, str(1), str(end - start), str(end - start)]
+                
+        path = self.save_path + "/inventory.csv"
+        self.save_csv_file(path, csv_inventory, csv_header)
+    
+    def save_csv_file(self, path, csv_inventory, header):
+        csv_content = "|".join(header) + "\n"
+        for row_id in csv_inventory:
+            csv_content += "|".join(csv_inventory[row_id]) + "\n"
+        self.save_file(path, csv_content)
+        
+
     def process_station_file(self, file_name):
         print "Processing station file: " + file_name
         file_stream = open(file_name, 'r')
@@ -333,7 +364,7 @@ class WeatherConvertToXML:
         country_code = self.get_field_from_definition(station_mshr_row, MSHR_FIELDS['FIPS_COUNTRY_CODE']).strip()
         country_name = self.get_field_from_definition(station_mshr_row, MSHR_FIELDS['FIPS_COUNTRY_NAME']).strip()
         if country_code != "" and country_name != "":
-            additional_xml += self.default_xml_location_labels("CNTRY", "FIPS:"+country_code, country_name)
+            additional_xml += self.default_xml_location_labels("CNTRY", "FIPS:" + country_code, country_name)
         
         return additional_xml
 
