@@ -105,6 +105,60 @@ class WeatherDataFiles:
             # Make sure the xml folder is available.
             prepare_path(path, reset)
 
+        import fnmatch
+        import os
+        
+        # copy stations and sensors into each partition
+        current_sensor_partition = 0
+        current_station_partition = 0
+        self.open_progress_data()
+        row_count = len(self.progress_data)
+        for row in range(0, row_count):
+            row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
+            file_name = row_contents[self.INDEX_DATA_FILE_NAME]
+            station_id = os.path.basename(file_name).split('.')[0]
+               
+            # Copy sensor files
+            type = "sensors"
+            file_path = build_base_save_folder(save_path, station_id, type) + station_id
+            for root, dirnames, filenames in os.walk(file_path):
+                for filename in fnmatch.filter(filenames, '*.xml'):
+                    xml_path = os.path.join(root, filename)
+                    new_file_base = build_base_save_folder(partition_paths[current_sensor_partition], station_id, type) + station_id
+                    if not os.path.isdir(new_file_base):
+                        os.makedirs(new_file_base)
+                    shutil.copyfile(xml_path, new_file_base + "/" + filename)
+                    current_sensor_partition += 1
+                    if current_sensor_partition >= len(partition_paths):
+                        current_sensor_partition = 0
+            
+            # Copy station files
+            type = "stations"
+            file_path = build_base_save_folder(save_path, station_id, type) + station_id + ".xml"
+            new_file_base = build_base_save_folder(partition_paths[current_station_partition], station_id, type)
+            new_file_path = new_file_base + station_id + ".xml"
+            if os.path.isfile(file_path):
+                if not os.path.isdir(new_file_base):
+                    os.makedirs(new_file_base)
+                shutil.copyfile(file_path, new_file_path)
+            current_station_partition += 1
+            if current_station_partition >= len(partition_paths):
+                current_station_partition = 0
+
+    
+    def copy_to_n_partitions_by_station(self, save_path, partitions, base_paths, reset):
+        """Once the initial data has been generated, the data can be copied into a set number of partitions. """
+        if (len(base_paths) == 0):
+            return
+        
+        # Initialize the partition paths.
+        partition_sizes = []
+        partition_paths = get_partition_paths(0, partitions, base_paths)
+        for path in partition_paths:
+            partition_sizes.append(0)
+            # Make sure the xml folder is available.
+            prepare_path(path, reset)
+
         # copy stations and sensors into each partition
         current_partition = 0
         csv_sorted = self.get_csv_in_partition_order()
