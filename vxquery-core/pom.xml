@@ -176,122 +176,87 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.1</version>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>algebricks-common</artifactId>
-      <version>${hyracks.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>algebricks-core</artifactId>
-      <version>${hyracks.version}</version>
+      <artifactId>algebricks-compiler</artifactId>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>algebricks-data</artifactId>
-      <version>${hyracks.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>algebricks-rewriter</artifactId>
-      <version>${hyracks.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>algebricks-runtime</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-api</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-data-std</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-dataflow-common</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
 
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-dataflow-std</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ant</groupId>
       <artifactId>ant-trax</artifactId>
-      <version>1.6.5</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>stax2-api</artifactId>
-      <version>3.0.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>woodstox-core-asl</artifactId>
-      <version>4.0.6</version>
     </dependency>
 
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>serializer</artifactId>
-      <version>2.7.1</version>
     </dependency>
 
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
-      <version>2.9.1</version>
     </dependency>
 
     <dependency>
       <groupId>activemq</groupId>
       <artifactId>activemq-transport-xstream</artifactId>
-      <version>2.1</version>
     </dependency>
 
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.3.1</version>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>1.3.2</version>
     </dependency>
 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.4</version>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.7</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

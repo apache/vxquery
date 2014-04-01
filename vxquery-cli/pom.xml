@@ -90,31 +90,41 @@
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-api</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
-    
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-client</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-cc</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.uci.ics.hyracks</groupId>
+      <artifactId>hyracks-control-nc</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>algebricks-common</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>algebricks-core</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-control-common</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-dataflow-std</artifactId>
-      <version>${hyracks.version}</version>
     </dependency>
   </dependencies>
 

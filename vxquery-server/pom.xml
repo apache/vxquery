@@ -131,17 +131,11 @@
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-control-cc</artifactId>
-      <version>${hyracks.version}</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>edu.uci.ics.hyracks</groupId>
       <artifactId>hyracks-control-nc</artifactId>
-      <version>${hyracks.version}</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 
