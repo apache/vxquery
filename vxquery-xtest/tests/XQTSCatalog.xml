@@ -148,6 +148,11 @@
 <!ENTITY GhcndPartition1Queries SYSTEM "cat/GhcndPartition1Queries.xml">
 <!ENTITY GhcndPartition2Queries SYSTEM "cat/GhcndPartition2Queries.xml">
 <!ENTITY GhcndPartition4Queries SYSTEM "cat/GhcndPartition4Queries.xml">
+
+<!ENTITY CollectionPartition1Queries SYSTEM "cat/CollectionPartition1Queries.xml">
+<!ENTITY CollectionPartition2Queries SYSTEM "cat/CollectionPartition2Queries.xml">
+<!ENTITY CollectionPartition4Queries SYSTEM "cat/CollectionPartition4Queries.xml">
+
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -950,6 +955,21 @@
          &GhcndPartition1Queries;
          &GhcndPartition2Queries;
          &GhcndPartition4Queries;
+      </test-group>
+   </test-group>
+   <test-group name="CollectionPartitionQueries" featureOwner="Preston Carman">
+      <GroupInfo>
+         <title>Collection Partition Queries</title>
+         <description/>
+      </GroupInfo>
+      <test-group name="ParallelExecutionTests" featureOwner="Preston Carman">
+         <GroupInfo>
+            <title>Parallel Execution Tests</title>
+            <description/>
+         </GroupInfo>
+         &CollectionPartition1Queries;
+         &CollectionPartition2Queries;
+         &CollectionPartition4Queries;
       </test-group>
    </test-group>
 </test-suite>
