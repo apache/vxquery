@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><stationCollection pageSize="100" pageCount="1" totalCount="1"><station><id>GHCND:AS000000003</id><displayName>Station 3</displayName><latitude>-30.000</latitude><longitude>30.000</longitude><locationLabels><type>CNTRY</type><id>FIPS:AS</id><displayName>AUSTRALIA</displayName></locationLabels></station></stationCollection>
