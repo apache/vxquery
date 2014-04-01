@@ -1,0 +1,54 @@
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="GhcndPartition4Queries" featureOwner="VXQuery">
+   <GroupInfo>
+      <title>GHCND Partition 4</title>
+      <description/>
+   </GroupInfo>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q00" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q00 from the weather benchmark with 4 partitions.</description>
+      <query name="q00" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q00.txt</output-file>
+   </test-case>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q01" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q01 from the weather benchmark with 4 partitions.</description>
+      <query name="q01" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q01.txt</output-file>
+   </test-case>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q02" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q02 from the weather benchmark with 4 partitions.</description>
+      <query name="q02" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q02.txt</output-file>
+   </test-case>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q03" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q03 from the weather benchmark with 4 partitions.</description>
+      <query name="q03" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q03.txt</output-file>
+   </test-case>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q04" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q04 from the weather benchmark with 4 partitions.</description>
+      <query name="q04" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q04.txt</output-file>
+   </test-case>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q05" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q05 from the weather benchmark with 4 partitions.</description>
+      <query name="q05" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q05.txt</output-file>
+   </test-case>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q06" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q06 from the weather benchmark with 4 partitions.</description>
+      <query name="q06" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q06.txt</output-file>
+   </test-case>
+   <test-case is-XPath2="true" name="ghcnd-partition-4-q07" FilePath="Ghcnd/partition-4/" scenario="runtime-error" Creator="Preston Carman">
+      <description>Execution of q07 from the weather benchmark with 4 partitions.</description>
+      <query name="q07" date="2014-04-01"/>
+      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
+      <output-file role="principal" compare="Text">q07.txt</output-file>
+   </test-case>
+</test-group>
