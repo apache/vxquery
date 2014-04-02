@@ -37,7 +37,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class TestCaseFactory {
     private TestConfiguration tConfig;
     private Map<String, File> srcMap;
-    private String xqtsBase;
+    private File catalog;
+    private String baseDirectory;
     private TestRunnerFactory trf;
     private ExecutorService eSvc;
     private TestCase tc;
@@ -51,8 +52,9 @@ public class TestCaseFactory {
     private int currPathLen;
     int count;
 
-    public TestCaseFactory(String xqtsBase, TestRunnerFactory trf, ExecutorService eSvc, XTestOptions opts) {
-        this.xqtsBase = xqtsBase;
+    public TestCaseFactory(String catalog, TestRunnerFactory trf, ExecutorService eSvc, XTestOptions opts) {
+        this.catalog = new File(catalog);
+        this.baseDirectory = this.catalog.getParent();
         this.trf = trf;
         tConfig = new TestConfiguration();
         tConfig.options = opts;
@@ -82,10 +84,10 @@ public class TestCaseFactory {
             @Override
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
                 URL url = new URL(systemId);
-                return new InputSource(xqtsBase + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
+                return new InputSource(baseDirectory + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
             }
         });
-        parser.parse(new InputSource(new FileReader(new File(xqtsBase, "XQTSCatalog.xml"))));
+        parser.parse(new InputSource(new FileReader(catalog)));
         return count;
     }
 
@@ -208,7 +210,7 @@ public class TestCaseFactory {
                     File srcFile = new File(tConfig.testRoot, atts.getValue("", "FileName"));
                     srcMap.put(id, srcFile);
                 } else if ("test-suite".equals(localName)) {
-                    tConfig.testRoot = new File(new File(xqtsBase).getCanonicalFile(), atts.getValue("",
+                    tConfig.testRoot = new File(new File(baseDirectory).getCanonicalFile(), atts.getValue("",
                             "SourceOffsetPath"));
                     tConfig.xqueryQueryOffsetPath = new File(tConfig.testRoot, atts.getValue("",
                             "XQueryQueryOffsetPath"));

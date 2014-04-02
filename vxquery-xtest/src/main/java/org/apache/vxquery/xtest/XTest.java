@@ -78,7 +78,7 @@ public class XTest {
         });
         trf = new TestRunnerFactory(opts);
         trf.registerReporters(reporters);
-        TestCaseFactory tcf = new TestCaseFactory(opts.xqtsBase, trf, eSvc, opts);
+        TestCaseFactory tcf = new TestCaseFactory(opts.catalog, trf, eSvc, opts);
         count = tcf.process();
     }
 

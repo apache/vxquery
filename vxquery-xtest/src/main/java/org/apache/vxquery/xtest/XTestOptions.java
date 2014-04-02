@@ -23,8 +23,8 @@ public class XTestOptions {
     @Option(name = "-port", required = false, usage = "Port for web server to listen on")
     int port;
 
-    @Option(name = "-xqtsbase", required = true, usage = "XQTS Base Directory")
-    String xqtsBase;
+    @Option(name = "-catalog", required = true, usage = "Test Catalog XML")
+    String catalog;
 
     @Option(name = "-threads", required = false, usage = "Number of threads")
     int threads;
