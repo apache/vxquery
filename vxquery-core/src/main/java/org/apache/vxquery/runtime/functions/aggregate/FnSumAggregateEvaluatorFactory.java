@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
@@ -44,56 +43,36 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
 
     @Override
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
-        final ArrayBackedValueStorage abvsCount = new ArrayBackedValueStorage();
-        final DataOutput dOutCount = abvsCount.getDataOutput();
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
         final AddOperation aOp = new AddOperation();
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
-            long count;
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+
+            // TODO Check if the second argument is supplied as the zero value.
 
             @Override
             public void init() throws AlgebricksException {
-                count = 0;
+                try {
+                    abvsSum.reset();
+                    dOutSum.write(ValueTag.XS_INTEGER_TAG);
+                    dOutSum.writeLong(0);
+                    tvpSum.set(abvsSum);
+                } catch (IOException e) {
+                    throw new AlgebricksException(e.toString());
+                }
             }
 
             @Override
             public void finish(IPointable result) throws AlgebricksException {
-                // TODO What is returned when step is never called. Since the second argument is the zero value.
-                if (count == 0) {
-                    // No argument return an integer.
-                    try {
-                        abvsCount.reset();
-                        dOutCount.write(ValueTag.XS_INTEGER_TAG);
-                        dOutCount.writeLong(0);
-                        result.set(abvsCount);
-                    } catch (Exception e) {
-                        
-                        throw new AlgebricksException(e);
-                    }
-                } else {
-                    result.set(tvpSum);
-                }
+                result.set(tvpSum);
             }
 
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp = args[0];
-                if (count == 0) {
-                    // Init.
-                    try {
-                        abvsSum.reset();
-                        dOutSum.write(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength());
-                        tvpSum.set(abvsSum);
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e.toString());
-                    }
-                } else {
-                    FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum);
-                }
-                count++;
+                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum);
             }
         };
     }
