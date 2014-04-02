@@ -26,7 +26,6 @@ import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
-import org.apache.vxquery.runtime.functions.arithmetic.DivideOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
@@ -48,10 +47,12 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
     @Override
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
         final TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+        final ArrayBackedValueStorage abvsCount = new ArrayBackedValueStorage();
+        final DataOutput dOutCount = abvsCount.getDataOutput();
+        final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
+        final DataOutput dOutSum = abvsSum.getDataOutput();
         final ArrayBackedValueStorage abvsSeq = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
-        final DataOutput dOut = abvs.getDataOutput();
         final AddOperation aOp = new AddOperation();
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
@@ -70,10 +71,10 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
                 } else {
                     // Set count as a TaggedValuePointable.
                     try {
-                        abvs.reset();
-                        dOut.write(ValueTag.XS_INTEGER_TAG);
-                        dOut.writeLong(count);
-                        tvpCount.set(abvs);
+                        abvsCount.reset();
+                        dOutCount.write(ValueTag.XS_INTEGER_TAG);
+                        dOutCount.writeLong(count);
+                        tvpCount.set(abvsCount);
 
                         // Save intermediate result.
                         abvsSeq.reset();
@@ -93,7 +94,13 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
                 TaggedValuePointable tvp = args[0];
                 if (count == 0) {
                     // Init.
-                    tvpSum.set(tvp);
+                    try {
+                        abvsSum.reset();
+                        dOutSum.write(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength());
+                        tvpSum.set(abvsSum);
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e.toString());
+                    }
                 } else {
                     FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum);
                 }
