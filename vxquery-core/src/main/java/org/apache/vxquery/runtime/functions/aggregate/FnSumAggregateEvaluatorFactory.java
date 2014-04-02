@@ -17,9 +17,11 @@
 package org.apache.vxquery.runtime.functions.aggregate;
 
 import java.io.DataOutput;
+import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
@@ -42,8 +44,10 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
 
     @Override
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
-        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final DataOutput dOut = abvs.getDataOutput();
+        final ArrayBackedValueStorage abvsCount = new ArrayBackedValueStorage();
+        final DataOutput dOutCount = abvsCount.getDataOutput();
+        final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
+        final DataOutput dOutSum = abvsSum.getDataOutput();
         final AddOperation aOp = new AddOperation();
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
@@ -61,11 +65,12 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
                 if (count == 0) {
                     // No argument return an integer.
                     try {
-                        abvs.reset();
-                        dOut.write(ValueTag.XS_INTEGER_TAG);
-                        dOut.writeLong(0);
-                        result.set(abvs);
+                        abvsCount.reset();
+                        dOutCount.write(ValueTag.XS_INTEGER_TAG);
+                        dOutCount.writeLong(0);
+                        result.set(abvsCount);
                     } catch (Exception e) {
+                        
                         throw new AlgebricksException(e);
                     }
                 } else {
@@ -78,7 +83,13 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
                 TaggedValuePointable tvp = args[0];
                 if (count == 0) {
                     // Init.
-                    tvpSum.set(tvp);
+                    try {
+                        abvsSum.reset();
+                        dOutSum.write(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength());
+                        tvpSum.set(abvsSum);
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e.toString());
+                    }
                 } else {
                     FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum);
                 }
