@@ -39,8 +39,10 @@ import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
+import org.omg.SendingContext.RunTime;
 
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
+import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
 import edu.uci.ics.hyracks.algebricks.compiler.api.HeuristicCompilerFactoryBuilder;
@@ -78,7 +80,7 @@ public class XMLQueryCompiler {
     private final ICompilerFactory cFactory;
 
     private final VXQueryMetadataProvider mdProvider;
-    
+
     private LogicalOperatorPrettyPrintVisitor pprinter;
 
     private ModuleNode moduleNode;
@@ -145,10 +147,9 @@ public class XMLQueryCompiler {
             }
         });
         builder.setNullWriterFactory(new VXQueryNullWriterFactory());
-        builder.setClusterLocations(new AlgebricksAbsolutePartitionConstraint(nodeList));
+        mdProvider = new VXQueryMetadataProvider(nodeList);
+        builder.setClusterLocations(mdProvider.getClusterLocations());
         cFactory = builder.create();
-        mdProvider = new VXQueryMetadataProvider();
-        mdProvider.setNodeList(nodeList);
     }
 
     public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel)

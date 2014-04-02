@@ -52,7 +52,7 @@ import edu.uci.ics.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
     String[] nodeList;
 
-    public void setNodeList(String[] nodeList) {
+    public VXQueryMetadataProvider(String[] nodeList) {
         this.nodeList = nodeList;
     }
 
@@ -74,7 +74,15 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
     }
 
-    public AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
+    public AlgebricksPartitionConstraint getClusterLocations() {
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        if (availableProcessors < 1) {
+            availableProcessors = 1;
+        }
+        return getClusterLocations(nodeList, availableProcessors);
+    }
+
+    private static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
         ArrayList<String> locs = new ArrayList<String>();
         for (String node : nodeList) {
             for (int j = 0; j < partitions; j++) {
@@ -152,6 +160,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             public FunctionIdentifier getFunctionIdentifier() {
                 return fid;
             }
+
             public boolean isFunctional() {
                 return true;
             }
