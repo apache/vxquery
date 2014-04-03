@@ -3,28 +3,24 @@
       <title>GHCND Count Partition 1</title>
       <description/>
    </GroupInfo>
-   <test-case is-XPath2="true" name="ghcnd-count-partition-1-q02" FilePath="GhcndCount/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="ghcnd-count-partition-1-q02" FilePath="GhcndCount/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q02 from the weather benchmark with 1 partition.</description>
       <query name="q02_count" date="2014-04-01"/>
-      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
-      <output-file role="principal" compare="Text">q02_count.txt</output-file>
+      <output-file compare="Text">q02_count.txt</output-file>
    </test-case>
-   <test-case is-XPath2="true" name="ghcnd-count-partition-1-q03" FilePath="GhcndCount/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="ghcnd-count-partition-1-q03" FilePath="GhcndCount/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q03 from the weather benchmark with 1 partition.</description>
       <query name="q03_count" date="2014-04-01"/>
-      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
-      <output-file role="principal" compare="Text">q03_count.txt</output-file>
+      <output-file compare="Text">q03_count.txt</output-file>
    </test-case>
-   <test-case is-XPath2="true" name="ghcnd-count-partition-1-q05" FilePath="GhcndCount/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="ghcnd-count-partition-1-q05" FilePath="GhcndCount/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q05 from the weather benchmark with 1 partition.</description>
       <query name="q05_count" date="2014-04-01"/>
-      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
-      <output-file role="principal" compare="Text">q05_count.txt</output-file>
+      <output-file compare="Text">q05_count.txt</output-file>
    </test-case>
-   <test-case is-XPath2="true" name="ghcnd-count-partition-1-q07" FilePath="GhcndCount/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="ghcnd-count-partition-1-q07" FilePath="GhcndCount/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q07 from the weather benchmark with 1 partition.</description>
       <query name="q07_count" date="2014-04-01"/>
-      <input-file role="principal-data" variable="input-context1">emptydoc</input-file>
-      <output-file role="principal" compare="Text">q07_count.txt</output-file>
+      <output-file compare="Text">q07_count.txt</output-file>
    </test-case>
 </test-group>

@@ -8,22 +8,22 @@
       <query name="avg" date="2014-04-01"/>
       <output-file compare="Text">avg.txt</output-file>
    </test-case>
-   <test-case is-XPath2="true" name="aggregate-partition-1-count" FilePath="Aggregate/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="aggregate-partition-1-count" FilePath="Aggregate/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q02 from the weather benchmark with 1 partition.</description>
       <query name="count" date="2014-04-01"/>
       <output-file compare="Text">count.txt</output-file>
    </test-case>
-   <test-case is-XPath2="true" name="aggregate-partition-1-min" FilePath="Aggregate/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="aggregate-partition-1-min" FilePath="Aggregate/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q05 from the weather benchmark with 1 partition.</description>
       <query name="min" date="2014-04-01"/>
       <output-file compare="Text">min.txt</output-file>
    </test-case>
-   <test-case is-XPath2="true" name="aggregate-partition-1-max" FilePath="Aggregate/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="aggregate-partition-1-max" FilePath="Aggregate/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q07 from the weather benchmark with 1 partition.</description>
       <query name="max" date="2014-04-01"/>
       <output-file compare="Text">max.txt</output-file>
    </test-case>
-   <test-case is-XPath2="true" name="aggregate-partition-1-sum" FilePath="Aggregate/Partition-1/" scenario="runtime-error" Creator="Preston Carman">
+   <test-case name="aggregate-partition-1-sum" FilePath="Aggregate/Partition-1/" Creator="Preston Carman">
       <description>Count records returned for q03 from the weather benchmark with 1 partition.</description>
       <query name="sum" date="2014-04-01"/>
       <output-file compare="Text">sum.txt</output-file>
