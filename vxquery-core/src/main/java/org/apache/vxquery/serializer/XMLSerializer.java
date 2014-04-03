@@ -369,14 +369,16 @@ public class XMLSerializer implements IPrinter {
                 printSequence(ps, seqp);
             }
 
-            ps.append('>');
             enp.getChildrenSequence(ntp, seqp);
             if (seqp.getByteArray() != null) {
+                ps.append('>');
                 printSequence(ps, seqp);
+                ps.append("</");
+                printPrefixedQName(ps, cqp, utf8sp);
+                ps.append('>');
+            } else {
+                ps.append("/>");
             }
-            ps.append("</");
-            printPrefixedQName(ps, cqp, utf8sp);
-            ps.append('>');
         } finally {
             pp.giveBack(seqp);
             pp.giveBack(utf8sp);
