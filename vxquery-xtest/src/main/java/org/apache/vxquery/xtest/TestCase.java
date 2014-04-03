@@ -19,6 +19,7 @@ package org.apache.vxquery.xtest;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,10 @@ public class TestCase {
 
     public File getExternalVariableBinding(QName varName) {
         return extVars.get(varName);
+    }
+
+    public Map<String, File> getSourceFileMap() {
+        return Collections.unmodifiableMap(tConfig.sourceFileMap);
     }
 
     public void setExpectedError(String error) {

@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
@@ -36,7 +34,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 public class TestCaseFactory {
     private TestConfiguration tConfig;
-    private Map<String, File> srcMap;
     private File catalog;
     private String baseDirectory;
     private TestRunnerFactory trf;
@@ -66,7 +63,6 @@ public class TestCaseFactory {
         if (opts.exclude != null) {
             this.exclude = Pattern.compile(opts.exclude);
         }
-        srcMap = new HashMap<String, File>();
         try {
             currPathLen = new File(".").getCanonicalPath().length();
         } catch (IOException e) {
@@ -121,11 +117,11 @@ public class TestCaseFactory {
             String str = buffer.toString();
             buffer = null;
             if (nextVariable != null) {
-                if (srcMap.get(str) == null) {
+                if (tConfig.sourceFileMap.get(str) == null) {
                     System.err.println(tc.getXQueryFile());
                     System.err.println(str);
                 }
-                tc.addExternalVariableBinding(new QName(nextVariable), srcMap.get(str));
+                tc.addExternalVariableBinding(new QName(nextVariable), tConfig.sourceFileMap.get(str));
             } else if (expectedError) {
                 tc.setExpectedError(str);
             } else if (outputFile) {
@@ -208,7 +204,7 @@ public class TestCaseFactory {
                 } else if ("source".equals(localName)) {
                     String id = atts.getValue("", "ID");
                     File srcFile = new File(tConfig.testRoot, atts.getValue("", "FileName"));
-                    srcMap.put(id, srcFile);
+                    tConfig.sourceFileMap.put(id, srcFile);
                 } else if ("test-suite".equals(localName)) {
                     tConfig.testRoot = new File(new File(baseDirectory).getCanonicalFile(), atts.getValue("",
                             "SourceOffsetPath"));

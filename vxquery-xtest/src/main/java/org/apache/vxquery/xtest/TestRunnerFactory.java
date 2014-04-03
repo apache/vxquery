@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.namespace.QName;
 
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
@@ -116,7 +119,7 @@ public class TestRunnerFactory {
                         Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
                                 RootStaticContextImpl.INSTANCE), new ResultSetId(testCase.getXQueryDisplayName()
-                                .hashCode()));
+                                .hashCode()), testCase.getSourceFileMap());
                         compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                         JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
 

@@ -16,9 +16,6 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
@@ -76,11 +73,8 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
         if (collectionName != null) {
             // Build the new operator and update the query plan.
             int collectionId = vxqueryContext.newCollectionId();
-            List<Object> types = new ArrayList<Object>();
-            types.add(SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
-
-            VXQueryCollectionDataSource ds = new VXQueryCollectionDataSource(collectionId, collectionName,
-                    types.toArray());
+            VXQueryCollectionDataSource ds = VXQueryCollectionDataSource.create(collectionId, collectionName,
+                    SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
             if (ds != null) {
                 ds.setTotalDataSources(vxqueryContext.getTotalDataSources());
 

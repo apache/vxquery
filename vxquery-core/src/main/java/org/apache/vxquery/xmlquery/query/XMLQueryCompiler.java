@@ -79,8 +79,6 @@ public class XMLQueryCompiler {
 
     private final ICompilerFactory cFactory;
 
-    private final VXQueryMetadataProvider mdProvider;
-
     private LogicalOperatorPrettyPrintVisitor pprinter;
 
     private ModuleNode moduleNode;
@@ -91,9 +89,12 @@ public class XMLQueryCompiler {
 
     private int frameSize;
 
+    private String[] nodeList;
+
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         this.frameSize = frameSize;
+        this.nodeList = nodeList;
         HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
                 new IOptimizationContextFactory() {
                     @Override
@@ -147,8 +148,7 @@ public class XMLQueryCompiler {
             }
         });
         builder.setNullWriterFactory(new VXQueryNullWriterFactory());
-        mdProvider = new VXQueryMetadataProvider(nodeList);
-        builder.setClusterLocations(mdProvider.getClusterLocations());
+        builder.setClusterLocations(VXQueryMetadataProvider.getClusterLocations(nodeList));
         cFactory = builder.create();
     }
 
@@ -159,6 +159,7 @@ public class XMLQueryCompiler {
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
         pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(module
                 .getModuleContext()));
+        VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap());
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);

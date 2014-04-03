@@ -256,7 +256,7 @@ public class VXQuery {
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
-                    resultSetId);
+                    resultSetId, null);
             compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
             // if -timing argument passed, show the starting and ending times
             if (opts.timing) {

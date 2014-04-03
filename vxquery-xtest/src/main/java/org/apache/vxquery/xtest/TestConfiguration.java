@@ -17,6 +17,8 @@
 package org.apache.vxquery.xtest;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestConfiguration {
     XTestOptions options;
@@ -30,4 +32,6 @@ public class TestConfiguration {
     String xqueryFileExtension;
 
     String xqueryxFileExtension;
+
+    Map<String, File> sourceFileMap = new HashMap<String, File>();
 }
