@@ -39,10 +39,7 @@ import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
-import org.omg.SendingContext.RunTime;
 
-import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
-import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
 import edu.uci.ics.hyracks.algebricks.compiler.api.HeuristicCompilerFactoryBuilder;
@@ -92,6 +89,11 @@ public class XMLQueryCompiler {
     private String[] nodeList;
 
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize) {
+        this(listener, nodeList, frameSize, -1);
+    }
+
+    public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize,
+            int availableProcessors) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         this.frameSize = frameSize;
         this.nodeList = nodeList;
@@ -148,7 +150,11 @@ public class XMLQueryCompiler {
             }
         });
         builder.setNullWriterFactory(new VXQueryNullWriterFactory());
-        builder.setClusterLocations(VXQueryMetadataProvider.getClusterLocations(nodeList));
+        if (availableProcessors < 1) {
+            builder.setClusterLocations(VXQueryMetadataProvider.getClusterLocations(nodeList));
+        } else {
+            builder.setClusterLocations(VXQueryMetadataProvider.getClusterLocations(nodeList, availableProcessors));
+        }
         cFactory = builder.create();
     }
 
@@ -157,8 +163,8 @@ public class XMLQueryCompiler {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
-        pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(module
-                .getModuleContext()));
+        pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(
+                module.getModuleContext()));
         VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap());
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);

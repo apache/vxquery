@@ -390,7 +390,7 @@ public class VXQuery {
     }
 
     /**
-     * Shuts down the virtual cluster, alongwith all nodes and node execution, network and queue managers.
+     * Shuts down the virtual cluster, along with all nodes and node execution, network and queue managers.
      * 
      * @throws Exception
      */
@@ -417,6 +417,9 @@ public class VXQuery {
      * Helper class with fields and methods to handle all command line options
      */
     private static class CmdLineOptions {
+        @Option(name = "-available-processors", usage = "Number of available processors. (default java's available processors)")
+        public int availableProcessors = -1;
+
         @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController")
         public String clientNetIpAddress = null;
 

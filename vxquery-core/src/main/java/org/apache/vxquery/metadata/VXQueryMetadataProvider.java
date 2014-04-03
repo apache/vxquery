@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -98,7 +96,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         return getClusterLocations(nodeList, availableProcessors);
     }
 
-    private static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
+    public static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
         ArrayList<String> locs = new ArrayList<String>();
         for (String node : nodeList) {
             for (int j = 0; j < partitions; j++) {
