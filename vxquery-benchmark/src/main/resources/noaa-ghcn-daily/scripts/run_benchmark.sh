@@ -34,13 +34,13 @@ fi
 
 for j in $(find ${1} -name '*q??.xq')
 do
-	if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]] 
-	then
-		echo "Running query: ${j}"
-		log_file="$(basename ${j}).$(date +%Y%m%d).log"
-		log_base_path=$(dirname ${j/queries/query_logs})
-		mkdir -p ${log_base_path}
-		time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -frame-size 10000 -repeatexec 10 > ${log_base_path}/${log_file} 2>&1
-	fi;
+    if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]] 
+    then
+        echo "Running query: ${j}"
+        log_file="$(basename ${j}).$(date +%Y%m%d).log"
+        log_base_path=$(dirname ${j/queries/query_logs})
+        mkdir -p ${log_base_path}
+        time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -frame-size 10000 -repeatexec 10 > ${log_base_path}/${log_file} 2>&1
+    fi;
 done
 
