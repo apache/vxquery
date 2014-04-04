@@ -40,6 +40,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.StatefulFunctionC
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.UnnestingFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 import edu.uci.ics.hyracks.algebricks.core.algebra.visitors.ILogicalExpressionVisitor;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
@@ -90,7 +91,23 @@ public class VXQueryLogicalExpressionPrettyPrintVisitor implements ILogicalExpre
     @Override
     public String visitAggregateFunctionCallExpression(AggregateFunctionCallExpression expr, Integer indent)
             throws AlgebricksException {
-        return appendFunction(new StringBuilder(), expr, indent).toString();
+        if (expr.isTwoStep()) {
+            IFunctionInfo step1Agg = expr.getStepOneAggregate();
+            String step1 = (step1Agg != null ? step1Agg.getFunctionIdentifier().toString() : "null");
+            IFunctionInfo step2Agg = expr.getStepTwoAggregate();
+            String step2 = (step2Agg != null ? step2Agg.getFunctionIdentifier().toString() : "null");
+            StringBuilder sb = new StringBuilder();
+            sb.append("function-call: [" + step1 + "|" + step2 + "], Args:");
+            appendArguments(sb, expr.getArguments(), indent + 2);
+            return sb.toString();
+        } else if (expr.getFunctionInfo() == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("function-call: [null], Args:");
+            appendArguments(sb, expr.getArguments(), indent + 2);
+            return sb.toString();
+        } else {
+            return appendFunction(new StringBuilder(), expr, indent).toString();
+        }
     }
 
     @Override
@@ -138,15 +155,16 @@ public class VXQueryLogicalExpressionPrettyPrintVisitor implements ILogicalExpre
             throws AlgebricksException {
         assert expr.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL;
         FunctionIdentifier fi = expr.getFunctionIdentifier();
-        if (identifiesTypeOperator(fi) || identifiesPathStep(fi)) {
-            final ILogicalExpression typeEx = expr.getArguments().get(1).getValue();
+        List<Mutable<ILogicalExpression>> args = expr.getArguments();
+        if ((identifiesTypeOperator(fi) || identifiesPathStep(fi)) && args.size() > 1) {
+            final ILogicalExpression typeEx = args.get(1).getValue();
             assert typeEx.getExpressionTag() == LogicalExpressionTag.CONSTANT;
             SequenceType type = getSequenceType((ConstantExpression) typeEx);
             sb.append(fi + " <" + type + ">, Args:");
-            appendArgument(sb, expr.getArguments().get(0), indent + 2);
+            appendArgument(sb, args.get(0), indent + 2);
         } else {
             sb.append("function-call: " + fi + ", Args:");
-            appendArguments(sb, expr.getArguments(), indent + 2);            
+            appendArguments(sb, args, indent + 2);
         }
         return sb;
     }
