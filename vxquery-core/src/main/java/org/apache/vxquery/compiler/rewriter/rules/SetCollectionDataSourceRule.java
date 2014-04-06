@@ -18,10 +18,6 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
-import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
-import org.apache.vxquery.types.AnyItemType;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
@@ -38,17 +34,8 @@ public class SetCollectionDataSourceRule extends AbstractCollectionRule {
             return false;
         }
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String collectionName = getCollectionName(opRef);
-
-        // Build the new collection.
-        if (collectionName != null && vxqueryContext.getCollectionDataSourceMap(collectionName) == null) {
-            int collectionId = vxqueryContext.getCollectionDataSourceMapSize() + 1;
-            VXQueryCollectionDataSource ds = VXQueryCollectionDataSource.create(collectionId, collectionName,
-                    SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
-            vxqueryContext.putCollectionDataSourceMap(collectionName, ds);
-            
-            context.addToDontApplySet(this, opRef.getValue());
-        }
+        vxqueryContext.incrementTotalDataSources();
+        context.addToDontApplySet(this, opRef.getValue());
         return false;
     }
 }
