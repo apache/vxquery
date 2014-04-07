@@ -253,7 +253,7 @@ public class VXQuery {
             };
 
             start = opts.timing ? new Date() : null;
-            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize);
+            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize, opts.availableProcessors);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId, null);
