@@ -27,8 +27,9 @@ import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
+import org.apache.vxquery.exceptions.VXQueryParseException;
 import org.apache.vxquery.runtime.functions.step.ChildPathStepOperatorDescriptor;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -121,9 +122,24 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 // Now add new field.
                 abvsFileNode.reset();
                 try {
-                    FunctionHelper.readInDocFromString(file, in, abvsFileNode, parser);
-                } catch (Exception e) {
-                    throw new HyracksDataException(e);
+                    parser.parseFile(file, in, abvsFileNode);
+                } catch (VXQueryFileNotFoundException e) {
+                    String message = "The file (" + nodeId + ":" + file.getAbsolutePath() + ") can not be found.";
+                    HyracksDataException hde = new HyracksDataException(message, e.getCause());
+                    hde.setNodeId(nodeId);
+                    throw hde;
+                } catch (VXQueryParseException e) {
+                    String message = "The file (" + nodeId + ":" + file.getAbsolutePath()
+                            + ") throw a SAXException durring parsing.";
+                    HyracksDataException hde = new HyracksDataException(message, e.getCause());
+                    hde.setNodeId(nodeId);
+                    throw hde;
+                } catch (HyracksDataException e) {
+                    String message = "The file (" + nodeId + ":" + file.getAbsolutePath()
+                            + ") throw the following error during parsing: " + e.getMessage();
+                    HyracksDataException hde = new HyracksDataException(message, e.getCause());
+                    hde.setNodeId(nodeId);
+                    throw hde;
                 }
 
                 TaggedValuePointable tvp = ppool.takeOne(TaggedValuePointable.class);
