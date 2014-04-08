@@ -26,21 +26,38 @@
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "" q03
 #
 
+CLUSTER_COUNT=5
+
 if [ -z "${1}" ]
 then
     echo "Please supply a directory for query files to be found."
     exit
 fi
 
-for j in $(find ${1} -name '*q??.xq')
-do
-    if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]] 
-    then
-        echo "Running query: ${j}"
-        log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
-        log_base_path=$(dirname ${j/queries/query_logs})
-        mkdir -p ${log_base_path}
-    	time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size 10000 -repeatexec 10 > ${log_base_path}/${log_file} 2>&1
-    fi;
+# Run queries for each number of nodes.
+for (( i = 0; i < ${CLUSTER_COUNT}; i++ ))
+do 
+	echo "Starting ${i} cluster nodes"
+	python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${i}nodes.xml -a start
+	
+	for j in $(find ${1} -name '*q??.xq')
+	do
+		# Only work with i nodes.
+		if [[ "${j}" =~ "${i}nodes" ]] 
+		then
+			# Only run for specified queries.
+			if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]] 
+			then
+				echo "Running query: ${j}"
+				log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
+				log_base_path=$(dirname ${j/queries/query_logs})
+				mkdir -p ${log_base_path}
+				time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size 10000 -repeatexec 10 > ${log_base_path}/${log_file} 2>&1
+			fi;
+		fi;
+	done
+	
+	# Stop cluster.
+	python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${i}nodes.xml -a stop
 done
 
