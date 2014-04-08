@@ -27,8 +27,6 @@ import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
-import org.apache.vxquery.exceptions.VXQueryParseException;
 import org.apache.vxquery.runtime.functions.step.ChildPathStepOperatorDescriptor;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
