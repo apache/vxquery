@@ -123,23 +123,9 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 abvsFileNode.reset();
                 try {
                     parser.parseFile(file, in, abvsFileNode);
-                } catch (VXQueryFileNotFoundException e) {
-                    String message = "The file (" + nodeId + ":" + file.getAbsolutePath() + ") can not be found.";
-                    HyracksDataException hde = new HyracksDataException(message, e.getCause());
-                    hde.setNodeId(nodeId);
-                    throw hde;
-                } catch (VXQueryParseException e) {
-                    String message = "The file (" + nodeId + ":" + file.getAbsolutePath()
-                            + ") throw a SAXException durring parsing.";
-                    HyracksDataException hde = new HyracksDataException(message, e.getCause());
-                    hde.setNodeId(nodeId);
-                    throw hde;
                 } catch (HyracksDataException e) {
-                    String message = "The file (" + nodeId + ":" + file.getAbsolutePath()
-                            + ") throw the following error during parsing: " + e.getMessage();
-                    HyracksDataException hde = new HyracksDataException(message, e.getCause());
-                    hde.setNodeId(nodeId);
-                    throw hde;
+                    e.setNodeId(nodeId);
+                    throw e;
                 }
 
                 TaggedValuePointable tvp = ppool.takeOne(TaggedValuePointable.class);

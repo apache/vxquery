@@ -18,12 +18,24 @@ package org.apache.vxquery.exceptions;
 
 import java.io.File;
 
-public class VXQueryFileNotFoundException extends VXQueryDataException {
+import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
+
+public class VXQueryDataException extends HyracksDataException {
 
     private static final long serialVersionUID = 1L;
 
-    public VXQueryFileNotFoundException(Exception ex, File file) {
-        super("The file ([nodeId]:[path]) can not be found.", ex, file);
+    private File file;
+
+    public VXQueryDataException(String message, Exception ex, File file) {
+        super(message, ex);
+        this.file = file;
     }
 
+    @Override
+    public String getMessage() {
+        String message = super.getMessage();
+        message = message.replaceAll("\\[nodeId\\]", getNodeId());
+        message = message.replaceAll("\\[path\\]", file.getAbsolutePath());
+        return message;
+    }
 }

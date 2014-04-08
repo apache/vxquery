@@ -46,7 +46,6 @@ public class XMLParser {
         }
     }
 
-
     public void parseFile(File file, InputSource in, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
             if (file.getName().toLowerCase().endsWith(".xml.gz")) {
@@ -57,9 +56,9 @@ public class XMLParser {
             parser.parse(in);
             handler.write(abvs);
         } catch (FileNotFoundException e) {
-            throw new VXQueryFileNotFoundException(e);
+            throw new VXQueryFileNotFoundException(e, file);
         } catch (SAXException e) {
-            throw new VXQueryParseException(e);
+            throw new VXQueryParseException(e, file);
         } catch (IOException e) {
             throw new HyracksDataException(e);
         }
