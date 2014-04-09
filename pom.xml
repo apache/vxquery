@@ -408,6 +408,14 @@
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <version>0.7</version>
+        <configuration>
+          <excludes>
+            <exclude>.gitignore</exclude>
+            <exclude>.git/**/*</exclude>
+          </excludes>
+          <numUnapprovedLicenses>0</numUnapprovedLicenses>
+          <maxmemory>2g</maxmemory>
+        </configuration>
       </plugin>
       <plugin>
         <inherited>true</inherited>
