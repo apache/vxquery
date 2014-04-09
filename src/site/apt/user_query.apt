@@ -25,22 +25,22 @@ sh ./apache-vxquery-X.Y-incubating/vxquery-cli/target/appassembler/bin/vxq
 * Command Line Options
 
 ----------------------------------------
- -O N                       : Optimization Level. Default: Full Optimization
- -available-processors N    : Number of available processors. (default java's available processors)
- -client-net-ip-address VAL : IP Address of the ClusterController
- -client-net-port N         : Port of the ClusterController (default 1098)
- -compileonly               : Compile the query and stop
- -frame-size N              : Frame size in bytes. (default 65536)
- -local-node-controllers N  : Number of local node controllers (default 1)
- -repeatexec N              : Number of times to repeat execution
- -showast                   : Show abstract syntax tree
- -showoet                   : Show optimized expression tree
- -showquery                 : Show query string
- -showrp                    : Show Runtime plan
- -showtet                   : Show translated expression tree
- -timing                    : Produce timing information
- ----------------------------------------
- 
+-O N                       : Optimization Level. Default: Full Optimization
+-available-processors N    : Number of available processors. (default java's available processors)
+-client-net-ip-address VAL : IP Address of the ClusterController
+-client-net-port N         : Port of the ClusterController (default 1098)
+-compileonly               : Compile the query and stop
+-frame-size N              : Frame size in bytes. (default 65536)
+-local-node-controllers N  : Number of local node controllers (default 1)
+-repeatexec N              : Number of times to repeat execution
+-showast                   : Show abstract syntax tree
+-showoet                   : Show optimized expression tree
+-showquery                 : Show query string
+-showrp                    : Show Runtime plan
+-showtet                   : Show translated expression tree
+-timing                    : Produce timing information
+----------------------------------------
+
 * Java Options
 
 ----------------------------------------
