@@ -24,19 +24,19 @@ Data XML and Node Types
 *--------------------------------+----------------------+---------------+
 | <<Data Type>>                  | <<Pointable Name>>   | <<Data Size>> |
 *--------------------------------+----------------------+---------------:
-| Attribute Nodes                | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/AttributeNodePointable.java}AttributeNodePointable}}      |    1 + length |
+| Attribute Nodes                | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/AttributeNodePointable.java}AttributeNodePointable}}      |    1 + length |
 *--------------------------------+----------------------+---------------:
-| Document Nodes                 | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/DocumentNodePointable.java}DocumentNodePointable}}      |    1 + length |
+| Document Nodes                 | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/DocumentNodePointable.java}DocumentNodePointable}}      |    1 + length |
 *--------------------------------+----------------------+---------------:
-| Element Nodes                  | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/ElementNodePointable.java}ElementNodePointable}}      |    1 + length |
+| Element Nodes                  | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/ElementNodePointable.java}ElementNodePointable}}      |    1 + length |
 *--------------------------------+----------------------+---------------:
-| Node Tree Nodes                | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/NodeTreePointable.java}NodeTreePointable}}      |    1 + length |
+| Node Tree Nodes                | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/NodeTreePointable.java}NodeTreePointable}}      |    1 + length |
 *--------------------------------+----------------------+---------------:
-| Processing Instruction Nodes   | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/PINodePointable.java}PINodePointable}}      |    1 + length |
+| Processing Instruction Nodes   | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/PINodePointable.java}PINodePointable}}      |    1 + length |
 *--------------------------------+----------------------+---------------:
-| Comment Nodes                  | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
+| Comment Nodes                  | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
 *--------------------------------+----------------------+---------------:
-| Text Nodes                     | {{{https://svn.apache.org/repos/asf/incubator/vxquery/trunk/vxquery/vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
+| Text Nodes                     | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
 *--------------------------------+----------------------+---------------:
 
 
