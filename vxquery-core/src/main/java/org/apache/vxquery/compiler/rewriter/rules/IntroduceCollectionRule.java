@@ -19,6 +19,9 @@ package org.apache.vxquery.compiler.rewriter.rules;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.types.AnyItemType;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
@@ -69,9 +72,11 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
 
         if (collectionName != null) {
             // Build the new operator and update the query plan.
-            VXQueryCollectionDataSource ds = vxqueryContext.getCollectionDataSourceMap(collectionName);
+            int collectionId = vxqueryContext.newCollectionId();
+            VXQueryCollectionDataSource ds = VXQueryCollectionDataSource.create(collectionId, collectionName,
+                    SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
             if (ds != null) {
-                ds.setTotalDataSources(vxqueryContext.getCollectionDataSourceMapSize());
+                ds.setTotalDataSources(vxqueryContext.getTotalDataSources());
 
                 // Known to be true because of collection name.
                 AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();

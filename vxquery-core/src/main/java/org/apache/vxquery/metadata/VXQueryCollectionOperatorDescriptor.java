@@ -28,9 +28,7 @@ import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.step.ChildPathStepOperatorDescriptor;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
-import org.apache.vxquery.xmlparser.SAXContentHandler;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 import org.xml.sax.InputSource;
@@ -122,9 +120,10 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 // Now add new field.
                 abvsFileNode.reset();
                 try {
-                    FunctionHelper.readInDocFromString(file, in, abvsFileNode, parser);
-                } catch (Exception e) {
-                    throw new HyracksDataException(e);
+                    parser.parseFile(file, in, abvsFileNode);
+                } catch (HyracksDataException e) {
+                    e.setNodeId(nodeId);
+                    throw e;
                 }
 
                 TaggedValuePointable tvp = ppool.takeOne(TaggedValuePointable.class);

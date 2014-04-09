@@ -19,13 +19,9 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.zip.GZIPInputStream;
 
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
@@ -60,6 +56,7 @@ import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
 import org.xml.sax.InputSource;
 
+import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
@@ -1200,6 +1197,7 @@ public class FunctionHelper {
 
     public static boolean isDerivedFromString(int tid) {
         switch (tid) {
+            case ValueTag.XS_UNTYPED_ATOMIC_TAG:
             case ValueTag.XS_STRING_TAG:
             case ValueTag.XS_NORMALIZED_STRING_TAG:
             case ValueTag.XS_TOKEN_TAG:
@@ -1236,26 +1234,15 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, XMLParser parser) throws SystemException {
-        String fName = getStringFromPointable(stringp, bbis, di);
-        File file = new File(fName);
-        readInDocFromString(file, in, abvs, parser);
-    }
-
-    public static void readInDocFromString(File file, InputSource in, ArrayBackedValueStorage abvs, XMLParser parser)
-            throws SystemException {
+            DataInputStream di, ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+        String fName;
         try {
-            if (file.getName().toLowerCase().endsWith(".xml.gz")) {
-                in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-            } else {
-                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
-            }
-            parser.parseInputSource(in, abvs);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("The file (" + file.getName() + ") does not exist.");
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
+            fName = getStringFromPointable(stringp, bbis, di);
+        } catch (SystemException e) {
+            throw new HyracksDataException(e);
         }
+        File file = new File(fName);
+        parser.parseFile(file, in, abvs);
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,

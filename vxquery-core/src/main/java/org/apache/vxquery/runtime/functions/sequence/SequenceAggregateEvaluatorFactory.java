@@ -48,7 +48,7 @@ public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgume
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final GrowableIntArray slots = new GrowableIntArray();
         final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
-        final SequencePointable seq = new SequencePointable();
+        final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             @Override

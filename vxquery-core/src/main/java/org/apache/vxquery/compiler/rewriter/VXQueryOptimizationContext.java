@@ -20,7 +20,6 @@ import java.util.Map;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinality.Cardinality;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
-import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
 
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
@@ -37,7 +36,8 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
     private final Map<ILogicalOperator, HashMap<Integer, UniqueNodes>> uniqueNodesOperatorVariableMap = new HashMap<ILogicalOperator, HashMap<Integer, UniqueNodes>>();
     private final Map<ILogicalOperator, Cardinality> cardinalityOperatorMap = new HashMap<ILogicalOperator, Cardinality>();
 
-    private final Map<String, VXQueryCollectionDataSource> dataSourceScanMap = new HashMap<String, VXQueryCollectionDataSource>();
+    private int totalDataSources = 0;
+    private int collectionId = 0;
 
     public VXQueryOptimizationContext(int varCounter, IExpressionEvalSizeComputer expressionEvalSizeComputer,
             IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
@@ -47,20 +47,16 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
                 nullableTypeComputer, physicalOptimizationConfig, prettyPrintVisitor);
     }
 
-    public VXQueryCollectionDataSource getCollectionDataSourceMap(String collectionName) {
-        if (dataSourceScanMap.containsKey(collectionName)) {
-            return dataSourceScanMap.get(collectionName);
-        } else {
-            return null;
-        }
+    public void incrementTotalDataSources() {
+        totalDataSources++;
     }
 
-    public int getCollectionDataSourceMapSize() {
-        return dataSourceScanMap.size();
+    public int getTotalDataSources() {
+        return totalDataSources;
     }
 
-    public void putCollectionDataSourceMap(String collectionName, VXQueryCollectionDataSource ds) {
-        this.dataSourceScanMap.put(collectionName, ds);
+    public int newCollectionId() {
+        return ++collectionId;
     }
 
     public Cardinality getCardinalityOperatorMap(ILogicalOperator op) {

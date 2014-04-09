@@ -37,8 +37,9 @@ public class IterateUnnestingEvaluatorFactory extends AbstractTaggedValueArgumen
     }
 
     @Override
-    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws AlgebricksException {
-        final SequencePointable seqp = new SequencePointable();
+    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
             private int index;
             private int seqLength;

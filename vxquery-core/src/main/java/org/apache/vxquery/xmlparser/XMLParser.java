@@ -14,7 +14,17 @@
  */
 package org.apache.vxquery.xmlparser;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
+
+import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
+import org.apache.vxquery.exceptions.VXQueryParseException;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -36,12 +46,22 @@ public class XMLParser {
         }
     }
 
-    public void parseInputSource(InputSource in, ArrayBackedValueStorage abvs) throws HyracksDataException {
+    public void parseFile(File file, InputSource in, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
+            if (file.getName().toLowerCase().endsWith(".xml.gz")) {
+                in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
+            } else {
+                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
+            }
             parser.parse(in);
             handler.write(abvs);
-        } catch (Exception e) {
-            throw new HyracksDataException(e.toString());
+        } catch (FileNotFoundException e) {
+            throw new VXQueryFileNotFoundException(e, file);
+        } catch (SAXException e) {
+            throw new VXQueryParseException(e, file);
+        } catch (IOException e) {
+            throw new HyracksDataException(e);
         }
     }
+
 }

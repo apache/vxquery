@@ -42,7 +42,8 @@ class WeatherConfig:
             name = self.get_dataset_name(node)
             save_paths = self.get_dataset_save_paths(node)
             partitions = self.get_dataset_partitions(node)
-            nodes.append(Dataset(name, save_paths, partitions))
+            tests = self.get_dataset_tests(node)
+            nodes.append(Dataset(name, save_paths, partitions, tests))
         return nodes
 
 
@@ -50,10 +51,10 @@ class WeatherConfig:
     # Node Specific Functions
     # --------------------------------------------------------------------------
     def get_node_ip(self, node):
-        return self.get_text(node.getElementsByTagName("ip_address")[0])
+        return self.get_text(node.getElementsByTagName("cluster_ip")[0])
 
     def get_node_name(self, node):
-        return self.get_text(node.getElementsByTagName("name")[0])
+        return self.get_text(node.getElementsByTagName("id")[0])
 
     
     # --------------------------------------------------------------------------
@@ -64,15 +65,21 @@ class WeatherConfig:
 
     def get_dataset_save_paths(self, node):
         paths = []
-        for node in node.getElementsByTagName("save_path"):
-            paths.append(self.get_text(node))
+        for item in node.getElementsByTagName("save_path"):
+            paths.append(self.get_text(item))
         return paths
 
     def get_dataset_partitions(self, node):
         paths = []
-        for node in node.getElementsByTagName("partitions_per_path"):
-            paths.append(int(self.get_text(node)))
+        for item in node.getElementsByTagName("partitions_per_path"):
+            paths.append(int(self.get_text(item)))
         return paths
+
+    def get_dataset_tests(self, node):
+        tests = []
+        for item in node.getElementsByTagName("test"):
+            tests.append(self.get_text(item))
+        return tests
 
     def get_text(self, xml_node):
         rc = []
@@ -96,10 +103,11 @@ class Machine:
         return self.id + "(" + self.ip + ")"
     
 class Dataset:
-    def __init__(self, name, save_paths, partitions):
+    def __init__(self, name, save_paths, partitions, tests):
         self.name = name
         self.save_paths = save_paths
         self.partitions = partitions
+        self.tests = tests
     
     def get_name(self):
         return self.name
@@ -109,6 +117,9 @@ class Dataset:
     
     def get_partitions(self):
         return self.partitions
+    
+    def get_tests(self):
+        return self.tests
     
     def __repr__(self):
         return self.name + ":" + str(self.save_paths) + ":" + str(self.partitions)

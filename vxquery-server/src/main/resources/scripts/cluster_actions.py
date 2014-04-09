@@ -87,52 +87,52 @@ class ClusterActions:
         # Push the information out to each server.    
         print "  - Add new file."
         remove_tar_command = "rm " + tar_file + ""
-        self.run_remote_command(machine.get_username(), machine.get_ip(), remove_tar_command)
-        copy_command = "scp " + tar_file + " " + machine.get_username() + "@" + machine.get_ip() + ":"
+        self.run_remote_command(machine.get_username(), machine.get_id(), remove_tar_command)
+        copy_command = "scp " + tar_file + " " + machine.get_username() + "@" + machine.get_id() + ":"
         subprocess.call(copy_command, shell=True)
         
         print "  - Expand new file."
         base_folder = tar_file.split('.')[0]
         remove_folder_command = "rm -rf " + base_folder + ""
-        self.run_remote_command(machine.get_username(), machine.get_ip(), remove_folder_command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), remove_folder_command)
         unpack_command = "tar -zxf " + tar_file + ""
-        self.run_remote_command(machine.get_username(), machine.get_ip(), unpack_command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), unpack_command)
         # Make the bin files executable.
         chmod_command = "chmod u+x " + base_folder + "/target/appassembler/bin/vxq*"
-        self.run_remote_command(machine.get_username(), machine.get_ip(), chmod_command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), chmod_command)
         chmod_command = "chmod u+x " + base_folder + "/target/appassembler/bin/*.sh"
-        self.run_remote_command(machine.get_username(), machine.get_ip(), chmod_command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), chmod_command)
         
         print "  - Server clean up."
-        self.run_remote_command(machine.get_username(), machine.get_ip(), remove_tar_command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), remove_tar_command)
         
     
     def start_cc(self, machine):
         print "Start Cluster Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()
         command = "./vxquery-server/target/appassembler/bin/startcc.sh " + machine.get_ip()
-        self.run_remote_command(machine.get_username(), machine.get_ip(), command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), command)
     
     def start_nc(self, machine, cc):
         print "Start Node Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()
         command = "./vxquery-server/target/appassembler/bin/startnc.sh " + cc.get_ip() + " " + machine.get_ip() + " " + machine.get_id()
-        self.run_remote_command(machine.get_username(), machine.get_ip(), command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), command)
 
     def stop_cc(self, machine):
         print "Stop Cluster Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()
         command = "./vxquery-server/target/appassembler/bin/stopcc.sh " + machine.get_username()
-        self.run_remote_command(machine.get_username(), machine.get_ip(), command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), command)
     
     def stop_nc(self, machine):
         print "Stop Node Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()
         command = "./vxquery-server/target/appassembler/bin/stopnc.sh " + machine.get_username()
-        self.run_remote_command(machine.get_username(), machine.get_ip(), command)
+        self.run_remote_command(machine.get_username(), machine.get_id(), command)
         
-    def run_remote_command(self, username, ip_address, command):
-        remote_command = "ssh -x " + username + "@" + ip_address + " '" + command + "' "
+    def run_remote_command(self, username, host, command):
+        remote_command = "ssh -x " + username + "@" + host + " '" + command + "' "
 #         print remote_command
         os.system(remote_command)
 

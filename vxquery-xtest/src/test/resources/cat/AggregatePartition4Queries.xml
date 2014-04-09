@@ -1,0 +1,48 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="AggregatePartition4Queries" featureOwner="VXQuery">
+   <GroupInfo>
+      <title>Aggregate Partition 4</title>
+      <description/>
+   </GroupInfo>
+   <test-case name="aggregate-partition-4-avg" FilePath="Aggregate/Partition-4/" Creator="Preston Carman">
+      <description>Count records returned for q02 from the weather benchmark with 4 partition.</description>
+      <query name="avg" date="2014-04-01"/>
+      <output-file compare="Text">avg.txt</output-file>
+   </test-case>
+   <test-case name="aggregate-partition-4-count" FilePath="Aggregate/Partition-4/" Creator="Preston Carman">
+      <description>Count records returned for q02 from the weather benchmark with 4 partition.</description>
+      <query name="count" date="2014-04-01"/>
+      <output-file compare="Text">count.txt</output-file>
+   </test-case>
+   <test-case name="aggregate-partition-4-min" FilePath="Aggregate/Partition-4/" Creator="Preston Carman">
+      <description>Count records returned for q05 from the weather benchmark with 4 partition.</description>
+      <query name="min" date="2014-04-01"/>
+      <output-file compare="Text">min.txt</output-file>
+   </test-case>
+   <test-case name="aggregate-partition-4-max" FilePath="Aggregate/Partition-4/" Creator="Preston Carman">
+      <description>Count records returned for q07 from the weather benchmark with 4 partition.</description>
+      <query name="max" date="2014-04-01"/>
+      <output-file compare="Text">max.txt</output-file>
+   </test-case>
+   <test-case name="aggregate-partition-4-sum" FilePath="Aggregate/Partition-4/" Creator="Preston Carman">
+      <description>Count records returned for q03 from the weather benchmark with 4 partition.</description>
+      <query name="sum" date="2014-04-01"/>
+      <output-file compare="Text">sum.txt</output-file>
+   </test-case>
+</test-group>

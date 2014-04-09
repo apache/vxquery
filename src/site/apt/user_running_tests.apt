@@ -26,6 +26,7 @@ sh ./apache-vxquery-X.Y-incubating/vxquery/vxquery-xtest/target/appassembler/bin
 
 ----------------------------------------
  -O N            : Optimization Level
+ -catalog VAL    : Test Catalog XML
  -exclude VAL    : Exclude filter regular expression
  -htmlreport VAL : HTML Report output file
  -include VAL    : Include filter regular expression
@@ -35,7 +36,6 @@ sh ./apache-vxquery-X.Y-incubating/vxquery/vxquery-xtest/target/appassembler/bin
  -threads N      : Number of threads
  -v              : Verbose
  -xmlreport VAL  : XML Report output file
- -xqtsbase VAL   : XQTS Base Directory
 ----------------------------------------
  
 * Java Options
@@ -70,7 +70,7 @@ $ cd ..
   * run the tests, and
 
 ----------------------------------------
-JAVA_OPTS="-Xmx1024m  -Djava.util.logging.config.file=/path/to/logging.properties" sh ./apache-vxquery-X.Y-incubating/vxquery-xtest/target/appassembler/bin/xtest -xqtsbase xqts -htmlreport /tmp/full_report.html
+JAVA_OPTS="-Xmx1024m  -Djava.util.logging.config.file=/path/to/logging.properties" sh ./apache-vxquery-X.Y-incubating/vxquery-xtest/target/appassembler/bin/xtest -catalog xqts/XQTSCatalog.xml -htmlreport /tmp/full_report.html
 ----------------------------------------
 
   * view the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.

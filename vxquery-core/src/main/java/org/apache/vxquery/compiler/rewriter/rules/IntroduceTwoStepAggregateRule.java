@@ -16,10 +16,15 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.functions.BuiltinOperators;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
@@ -27,6 +32,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -50,6 +57,9 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  *   if (af1 == count) aggregate operating settings:
  *     Step 1: count
  *     Step 2: sum
+ *   if (af1 == avg) aggregate operating settings:
+ *     Step 1: avg-local
+ *     Step 2: avg-global
  *   if (af1 in (max, min, sum)) aggregate operating settings:
  *     Step 1: af1
  *     Step 2: af1
@@ -58,6 +68,21 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * @author prestonc
  */
 public class IntroduceTwoStepAggregateRule implements IAlgebraicRewriteRule {
+    final Map<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>> AGGREGATE_MAP = new HashMap<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>>();
+
+    public IntroduceTwoStepAggregateRule() {
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_AVG_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
+                BuiltinOperators.AVG_LOCAL, BuiltinOperators.AVG_GLOBAL));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
+                BuiltinFunctions.FN_COUNT_1, BuiltinFunctions.FN_SUM_1));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
+                BuiltinFunctions.FN_MAX_1, BuiltinFunctions.FN_MAX_1));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
+                BuiltinFunctions.FN_MIN_1, BuiltinFunctions.FN_MIN_1));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
+                BuiltinFunctions.FN_SUM_1, BuiltinFunctions.FN_SUM_1));
+    }
+
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         // Check if aggregate function.
@@ -74,41 +99,14 @@ public class IntroduceTwoStepAggregateRule implements IAlgebraicRewriteRule {
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
 
-        if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier())) {
+        if (AGGREGATE_MAP.containsKey(functionCall.getFunctionIdentifier())) {
             AggregateFunctionCallExpression aggregateFunctionCall = (AggregateFunctionCallExpression) functionCall;
             if (aggregateFunctionCall.isTwoStep()) {
                 return false;
             }
             aggregateFunctionCall.setTwoStep(true);
-            aggregateFunctionCall.setStepOneAggregate(BuiltinFunctions.FN_COUNT_1);
-            aggregateFunctionCall.setStepTwoAggregate(BuiltinFunctions.FN_SUM_1);
-            return true;
-        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier())) {
-            AggregateFunctionCallExpression aggregateFunctionCall = (AggregateFunctionCallExpression) functionCall;
-            if (aggregateFunctionCall.isTwoStep()) {
-                return false;
-            }
-            aggregateFunctionCall.setTwoStep(true);
-            aggregateFunctionCall.setStepOneAggregate(BuiltinFunctions.FN_MAX_1);
-            aggregateFunctionCall.setStepTwoAggregate(BuiltinFunctions.FN_MAX_1);
-            return true;
-        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier())) {
-            AggregateFunctionCallExpression aggregateFunctionCall = (AggregateFunctionCallExpression) functionCall;
-            if (aggregateFunctionCall.isTwoStep()) {
-                return false;
-            }
-            aggregateFunctionCall.setTwoStep(true);
-            aggregateFunctionCall.setStepOneAggregate(BuiltinFunctions.FN_MIN_1);
-            aggregateFunctionCall.setStepTwoAggregate(BuiltinFunctions.FN_MIN_1);
-            return true;
-        } else if (functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier())) {
-            AggregateFunctionCallExpression aggregateFunctionCall = (AggregateFunctionCallExpression) functionCall;
-            if (aggregateFunctionCall.isTwoStep()) {
-                return false;
-            }
-            aggregateFunctionCall.setTwoStep(true);
-            aggregateFunctionCall.setStepOneAggregate(BuiltinFunctions.FN_SUM_1);
-            aggregateFunctionCall.setStepTwoAggregate(BuiltinFunctions.FN_SUM_1);
+            aggregateFunctionCall.setStepOneAggregate(AGGREGATE_MAP.get(functionCall.getFunctionIdentifier()).first);
+            aggregateFunctionCall.setStepTwoAggregate(AGGREGATE_MAP.get(functionCall.getFunctionIdentifier()).second);
             return true;
         }
         return false;

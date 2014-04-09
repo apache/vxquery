@@ -48,8 +48,8 @@ public class FnInsertBeforeScalarEvaluatorFactory extends AbstractTaggedValueArg
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
-        final SequencePointable seq = new SequencePointable();
-        final SequencePointable seq2 = new SequencePointable();
+        final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final SequencePointable seq2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {

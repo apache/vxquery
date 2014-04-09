@@ -19,7 +19,10 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
@@ -45,6 +48,7 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
         final AbstractValueComparisonOperation aOp = createValueComparisonOperation();
         final TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
 
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
@@ -59,24 +63,37 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
 
             @Override
             public void finish(IPointable result) throws AlgebricksException {
-                result.set(abvs);
+                if (count == 0) {
+                    XDMConstants.setEmptySequence(result);
+                } else {
+                    result.set(abvs);
+                }
             }
 
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
-                if (count != 0) {
-                    tvp2.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                }
-                if (count == 0 || FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvp1, tvp2, dCtx)) {
-                    try {
-                        abvs.reset();
-                        dOut.write(tvp1.getByteArray(), tvp1.getStartOffset(), tvp1.getLength());
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
+                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+                    // The local aggregate did not find a value so the global aggregate is receiving a empty sequence.
+                    tvp1.getValue(seqp);
+                    int seqLen = seqp.getEntryCount();
+                    if (seqLen != 0) {
+                        throw new SystemException(ErrorCode.FORG0006);
                     }
+                } else {
+                    if (count != 0) {
+                        tvp2.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
+                    }
+                    if (count == 0 || FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvp1, tvp2, dCtx)) {
+                        try {
+                            abvs.reset();
+                            dOut.write(tvp1.getByteArray(), tvp1.getStartOffset(), tvp1.getLength());
+                        } catch (IOException e) {
+                            throw new SystemException(ErrorCode.SYSE0001, e);
+                        }
+                    }
+                    count++;
                 }
-                count++;
             }
 
         };

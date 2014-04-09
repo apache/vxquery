@@ -48,7 +48,7 @@ public class FnRemoveScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
-        final SequencePointable seq = new SequencePointable();
+        final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {

@@ -135,7 +135,7 @@ public class SimpleXQueryTest {
     private static void runTestInternal(String testName, String query) throws Exception {
         XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, 65536);
         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
-                new ResultSetId(System.nanoTime()));
+                new ResultSetId(System.nanoTime()), null);
         compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE);
     }
 }

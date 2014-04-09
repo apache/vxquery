@@ -1,0 +1,3 @@
+<data><date>2002-02-02T00:00:00.000</date><dataType>TMIN</dataType><station>GHCND:US000000002</station><value>12.5</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data>
+<data><date>2002-02-02T00:00:00.000</date><dataType>TMAX</dataType><station>GHCND:US000000002</station><value>32</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data>
+<data><date>2002-02-02T00:00:00.000</date><dataType>PRCP</dataType><station>GHCND:US000000002</station><value>20</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data>

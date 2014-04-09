@@ -48,7 +48,7 @@ public class FnSumScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        final SequencePointable seqp = new SequencePointable();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         final TaggedValuePointable tvpNext = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();

@@ -16,7 +16,6 @@
  */
 package org.apache.vxquery.metadata;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
     private static final String DELIMITER = "\\|";
     private final int dataSourceId;
     private final String collectionName;
-    private final String[] collectionPartitions;
+    private String[] collectionPartitions;
     private final List<Integer> childSeq;
     private int totalDataSources;
 
@@ -43,7 +42,11 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
 
     private IDataSourcePropertiesProvider propProvider;
 
-    public VXQueryCollectionDataSource(int id, String file, Object[] types) {
+    public static VXQueryCollectionDataSource create(int id, String file, Object type) {
+        return new VXQueryCollectionDataSource(id, file, new Object[] { type });
+    }
+
+    private VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
         this.collectionName = file;
         collectionPartitions = collectionName.split(DELIMITER);
@@ -75,6 +78,10 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
         return collectionPartitions;
     }
     
+    public void setPartitions(String[] collectionPartitions) {
+        this.collectionPartitions = collectionPartitions;
+    }
+
     public int getPartitionCount() {
         return collectionPartitions.length;
     }

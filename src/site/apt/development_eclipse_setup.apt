@@ -52,31 +52,30 @@ Eclipse Setup
     development.
 
 ----------------------------------------
-$ git clone https://code.google.com/p/hyracks/ hyracks_for_vxquery
-$ cd hyracks_for_vxquery
-$ git checkout -b ecarm002/vxquery_compatibility origin/ecarm002/vxquery_compatibility
-$ mvn install -DskipTests
+$ git clone https://code.google.com/p/hyracks/
+$ cd hyracks
+$ mvn install
 $ cd ..
 ----------------------------------------
 
-    Finally, from Eclipse's File menu "import" the Maven Hyracks project you have just downloaded 
-    through SVN.
+    The mvn "-DskipTests" option can be used to save about 20 minutes, but will skip the verification tests.
+
+    Finally, from Eclipse's File menu "import" the Maven Hyracks project you have just downloaded through git.
 
   [[1]] Import VXQuery Code Base
 
     The VXQuery code base must be installed so eclipse has full access. Similar to the Hyracks
-    installation, VXQuery needs to be downloaded from Apache's SVN repository.
+    installation, VXQuery needs to be downloaded from Apache's git repository.
 
 ----------------------------------------
-$ svn checkout https://svn.apache.org/repos/asf/incubator/vxquery/trunk/ apache_vxquery_incubating
+$ git clone https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git apache-vxquery
 (Accept the certificate information for *.apache.org.)
-$ cd apache_vxquery_incubating/vxquery
-$ mvn package -DskipTests
-$ cd ../..
+$ cd apache-vxquery
+$ mvn package
+$ cd ..
 ----------------------------------------
  
-    Finally, from Eclipse's File menu "import" the Maven VXQuery project you have just downloaded 
-    through SVN. 
+    Finally, from Eclipse's File menu "import" the Maven VXQuery project you have just downloaded through git. 
     
   [[1]] Additional Project Configuration
     

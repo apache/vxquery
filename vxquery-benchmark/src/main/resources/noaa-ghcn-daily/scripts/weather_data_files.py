@@ -92,56 +92,81 @@ class WeatherDataFiles:
             self.close_progress_data(True)
         self.reset()
         
-    def create_test_links(self, save_path, xml_save_path, test, node, partitions, virtual_partitions, base_paths=[]):
-        if (len(base_paths) == 0):
-            base_paths.append(os.path.dirname(save_path))
-        partition_list = sorted(get_partition_paths(partitions, base_paths))
-        
-        test_path = save_path + "/" + test
-        if not os.path.isdir(test_path):
-            os.makedirs(test_path)
-        for i in range(virtual_partitions):
-            # one virtual partition per disk
-            for j in range(len(base_paths)):
-                for index, path in enumerate(partition_list):
-                    offset = partitions * j
-                    test_partition_path = test_path + "/partition" + str(i + 1) + "_disk" + str(j + 1)
-                    if not os.path.isdir(test_partition_path):
-                        os.makedirs(test_partition_path)
-                    if (node <= i):
-                        if test == "speed_up":
-                            group = partitions / (i + 1)
-                        elif test == "batch_scale_up":
-                            group = partitions / virtual_partitions
-                        else:
-                            group = -1
-                        # link
-                        if (group) * node + offset <= index and index < (group) * (node + 1) + offset:
-                            os.symlink(path, test_partition_path + "/index" + str(index))
-                    else:
-                        # fake directories
-                        os.makedirs(test_partition_path + "/sensors")
-                        os.makedirs(test_partition_path + "/stations")
-            
-        
-    # Once the initial data has been generated, the data can be copied into a set number of partitions. 
-    def copy_to_n_partitions(self, save_path, partitions, base_paths=[]):
+    def copy_to_n_partitions(self, save_path, partitions, base_paths, reset):
+        """Once the initial data has been generated, the data can be copied into a set number of partitions. """
         if (len(base_paths) == 0):
             return
         
         # Initialize the partition paths.
         partition_sizes = []
-        partition_paths = get_partition_paths(partitions, base_paths)
+        partition_paths = get_partition_paths(0, partitions, base_paths)
         for path in partition_paths:
             partition_sizes.append(0)
             # Make sure the xml folder is available.
-            if not os.path.isdir(path):
-                os.makedirs(path)
+            prepare_path(path, reset)
+
+        import fnmatch
+        import os
+        
+        # copy stations and sensors into each partition
+        current_sensor_partition = 0
+        current_station_partition = 0
+        self.open_progress_data()
+        row_count = len(self.progress_data)
+        for row in range(0, row_count):
+            row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
+            file_name = row_contents[self.INDEX_DATA_FILE_NAME]
+            station_id = os.path.basename(file_name).split('.')[0]
+               
+            # Copy sensor files
+            type = "sensors"
+            file_path = build_base_save_folder(save_path, station_id, type) + station_id
+            for root, dirnames, filenames in os.walk(file_path):
+                for filename in fnmatch.filter(filenames, '*.xml'):
+                    xml_path = os.path.join(root, filename)
+                    new_file_base = build_base_save_folder(partition_paths[current_sensor_partition], station_id, type) + station_id
+                    if not os.path.isdir(new_file_base):
+                        os.makedirs(new_file_base)
+                    shutil.copyfile(xml_path, new_file_base + "/" + filename)
+                    current_sensor_partition += 1
+                    if current_sensor_partition >= len(partition_paths):
+                        current_sensor_partition = 0
+            
+            # Copy station files
+            type = "stations"
+            file_path = build_base_save_folder(save_path, station_id, type) + station_id + ".xml"
+            new_file_base = build_base_save_folder(partition_paths[current_station_partition], station_id, type)
+            new_file_path = new_file_base + station_id + ".xml"
+            if os.path.isfile(file_path):
+                if not os.path.isdir(new_file_base):
+                    os.makedirs(new_file_base)
+                shutil.copyfile(file_path, new_file_path)
+            current_station_partition += 1
+            if current_station_partition >= len(partition_paths):
+                current_station_partition = 0
+
+    
+    def copy_to_n_partitions_by_station(self, save_path, partitions, base_paths, reset):
+        """Once the initial data has been generated, the data can be copied into a set number of partitions. """
+        if (len(base_paths) == 0):
+            return
+        
+        # Initialize the partition paths.
+        partition_sizes = []
+        partition_paths = get_partition_paths(0, partitions, base_paths)
+        for path in partition_paths:
+            partition_sizes.append(0)
+            # Make sure the xml folder is available.
+            prepare_path(path, reset)
 
         # copy stations and sensors into each partition
         current_partition = 0
         csv_sorted = self.get_csv_in_partition_order()
         for item, size in csv_sorted.iteritems():
+            if size < 0:
+                print "The progress file does not have the sensor size data saved."
+                return
+            
             station_id = item.split('.')[0]
             # Update partition bases on smallest current size.
             current_partition = partition_sizes.index(min(partition_sizes))
@@ -153,7 +178,6 @@ class WeatherDataFiles:
             if os.path.isdir(file_path):
                 distutils.dir_util.copy_tree(file_path, new_file_path)
             partition_sizes[current_partition] += size
-
         
             # Copy station files
             type = "stations"
@@ -347,12 +371,37 @@ class WeatherDataFiles:
                 break
         return columns[self.INDEX_DATA_FILE_NAME]
     
-def get_partition_paths(partitions, base_paths):        
+    
+# Index values of each field details.
+PARTITION_INDEX_NODE = 0
+PARTITION_INDEX_DISK = 1
+PARTITION_INDEX_VIRTUAL = 2
+PARTITION_INDEX = 3
+PARTITION_INDEX_PATH = 4
+PARTITION_HEADER = ("Node", "Disk", "Virtual", "Index", "Path")
+            
+def get_partition_paths(node_id, partitions, base_paths, key="partitions"):        
     partition_paths = []
-    for i in range(0, partitions):
-        for j in range(0, len(base_paths)):
-            new_partition_path = base_paths[j] + "partitions/" + str(len(base_paths)) + "disk/d" + str(j) +"_p" + str(partitions) + "_i" + str(i) + "/"
-            partition_paths.append(new_partition_path)
+    for scheme in get_partition_scheme(node_id, partitions, base_paths, key):
+        partition_paths.append(scheme[PARTITION_INDEX_PATH])
     return partition_paths
 
+def get_partition_scheme(node_id, partitions, base_paths, key="partitions"):        
+    partition_scheme = []
+    for i in range(0, partitions):
+        for j in range(0, len(base_paths)):
+            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions, i) + "/"
+            partition_scheme.append((node_id, j, partitions, i, new_partition_path))
+    return partition_scheme
+
+def get_partition_folder(disks, partitions, index):        
+    return "d" + str(disks) + "_p" + str(partitions) + "_i" + str(index)
+
+def prepare_path(path, reset):
+    """Ensures the directory is available. If reset, then its a brand new directory."""
+    if os.path.isdir(path) and reset:
+        shutil.rmtree(path)
+                
+    if not os.path.isdir(path):
+        os.makedirs(path)
 

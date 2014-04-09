@@ -19,9 +19,11 @@ import os.path
 import shutil
 import tarfile
 import urllib
+import zipfile
 
 # Custom modules.
-from weather_dly_config import *
+from weather_config_ghcnd import *
+from weather_config_mshr import *
 
 class WeatherDownloadFiles:
 
@@ -32,14 +34,18 @@ class WeatherDownloadFiles:
             os.makedirs(save_path)
 
 
-    # Download the complete list
-    def download_all_files(self, reset=False):
+    def download_ghcnd_files(self, reset=False):
+        """Download the complete list."""
         for file_name in FILE_NAMES:
             url = BASE_DOWNLOAD_URL + file_name
             self.download_file(url, reset)
 
-    # Download the file, unless it exists.
+    def download_mshr_files(self, reset=False):
+        for url in MSHR_URLS:
+            self.download_file(url, reset)
+
     def download_file(self, url, reset=False):
+        """Download the file, unless it exists."""
         file_name = self.save_path + "/" + url.split('/')[-1]
 
         if not os.path.isfile(file_name) or reset:
@@ -47,8 +53,8 @@ class WeatherDownloadFiles:
             urllib.urlretrieve(url, file_name, report_download_status)
             print
 
-    # Unzip the package file, unless it exists.
-    def unzip_package(self, package, reset=False):
+    def unzip_ghcnd_package(self, package, reset=False):
+        """Unzip the package file, unless it exists."""
         file_name = self.save_path + "/" + package + ".tar.gz"
         unzipped_path = self.save_path + "/" + package
         
@@ -60,16 +66,25 @@ class WeatherDownloadFiles:
             tar_file = tarfile.open(file_name, 'r:gz')
             tar_file.extractall(unzipped_path)
  
-# Report download status.
+    def unzip_mshr_files(self, reset=False):
+        """Unzip the package file, unless it exists."""
+        for url in MSHR_URLS:
+            if url.endswith('.zip'):
+                file_name = self.save_path + "/" + url.split('/')[-1]
+                print "Unzipping: " + file_name
+                with zipfile.ZipFile(file_name, 'r') as myzip:
+                    myzip.extractall(self.save_path)
+ 
 def report_download_status(count, block, size):
+    """Report download status."""
     line_size = 50
     erase = "\b" * line_size
     sys.stdout.write(erase)
-    report = get_report_line( (float(count) * block / size), line_size)
+    report = get_report_line((float(count) * block / size), line_size)
     sys.stdout.write(report)
 
-# Creates a string to be used in reporting the percentage done.
 def get_report_line(percentage, line_size):
+    """Creates a string to be used in reporting the percentage done."""
     report = ""
     for i in range(0, line_size):
         if (float(i) / line_size < percentage):
@@ -78,8 +93,8 @@ def get_report_line(percentage, line_size):
             report += "-"
     return report
             
-# Download the file, unless it exists.
 def download_file_save_as(url, new_file_name, reset=False):
+    """Download the file, unless it exists."""
     if not os.path.isfile(new_file_name) or reset:
         print "Downloading: " + url
         urllib.urlretrieve(url, new_file_name, report_download_status)

@@ -48,7 +48,12 @@ public class VXQueryComparatorFactoryProvider implements IBinaryComparatorFactor
                 public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
                     tvp1.set(b1, s1, l1);
                     tvp2.set(b2, s2, l2);
-                    return 0;
+                    for (int i = 0; i < l1 && i < l2; ++i) {
+                        if (b1[s1 + i] != b2[s2 + i]) {
+                            return b1[s1 + i] - b2[s2 + i];
+                        }
+                    }
+                    return l1 - l2;
                 }
             };
         }

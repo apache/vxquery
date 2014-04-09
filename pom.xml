@@ -47,9 +47,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery/branches/vxquery_0_2_staging</developerConnection>
-    <url>https://svn.apache.org/repos/asf/incubator/vxquery</url>
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</developerConnection>
+    <url>https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</url>
   </scm>
 
   <issueManagement>
@@ -554,13 +554,21 @@
         <configuration>
           <linkOnly>true</linkOnly>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-          <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/vxquery</developerConnection>
+          <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</developerConnection>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <version>0.7</version>
+        <configuration>
+          <excludes>
+            <exclude>.gitignore</exclude>
+            <exclude>.git/**/*</exclude>
+          </excludes>
+          <numUnapprovedLicenses>0</numUnapprovedLicenses>
+          <maxmemory>2g</maxmemory>
+        </configuration>
       </plugin>
       <plugin>
         <inherited>true</inherited>

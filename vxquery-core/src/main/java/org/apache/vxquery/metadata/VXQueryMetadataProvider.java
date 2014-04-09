@@ -16,9 +16,11 @@
  */
 package org.apache.vxquery.metadata;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
@@ -51,9 +53,11 @@ import edu.uci.ics.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
     String[] nodeList;
+    Map<String, File> sourceFileMap;
 
-    public void setNodeList(String[] nodeList) {
+    public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap) {
         this.nodeList = nodeList;
+        this.sourceFileMap = sourceFileMap;
     }
 
     @Override
@@ -67,6 +71,16 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             IOperatorSchema opSchema, IVariableTypeEnvironment typeEnv, JobGenContext context,
             JobSpecification jobSpec, Object implConfig) throws AlgebricksException {
         VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
+        if (sourceFileMap != null) {
+            final int len = ds.getPartitions().length;
+            String[] collectionPartitions = new String[len];
+            for (int i = 0; i < len; ++i) {
+                String partition = ds.getPartitions()[i];
+                File mapped = sourceFileMap.get(partition);
+                collectionPartitions[i] = mapped != null ? mapped.toString() : partition;
+            }
+            ds.setPartitions(collectionPartitions);
+        }
         RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
         IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc);
 
@@ -74,7 +88,15 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
     }
 
-    public AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
+    public static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList) {
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        if (availableProcessors < 1) {
+            availableProcessors = 1;
+        }
+        return getClusterLocations(nodeList, availableProcessors);
+    }
+
+    public static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
         ArrayList<String> locs = new ArrayList<String>();
         for (String node : nodeList) {
             for (int j = 0; j < partitions; j++) {
@@ -146,8 +168,17 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     }
 
     @Override
-    public IFunctionInfo lookupFunction(FunctionIdentifier fid) {
-        return null;
+    public IFunctionInfo lookupFunction(final FunctionIdentifier fid) {
+        return new IFunctionInfo() {
+            @Override
+            public FunctionIdentifier getFunctionIdentifier() {
+                return fid;
+            }
+
+            public boolean isFunctional() {
+                return true;
+            }
+        };
     }
 
     @Override

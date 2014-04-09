@@ -20,8 +20,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
-import org.apache.vxquery.context.RootStaticContextImpl;
-import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.functions.BuiltinOperators;
@@ -33,13 +32,13 @@ import org.apache.vxquery.types.SequenceType;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
 public class ExpressionToolbox {
@@ -77,6 +76,19 @@ public class ExpressionToolbox {
             }
         }
         return null;
+    }
+
+    public static void findVariableExpressions(Mutable<ILogicalExpression> mutableLe,
+            List<Mutable<ILogicalExpression>> finds) {
+        ILogicalExpression le = mutableLe.getValue();
+        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+            finds.add(mutableLe);
+        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+                findVariableExpressions(argExp, finds);
+            }
+        }
     }
 
     public static Mutable<ILogicalExpression> findLastFunctionExpression(Mutable<ILogicalExpression> mutableLe) {
@@ -171,8 +183,7 @@ public class ExpressionToolbox {
         return pTypeCode.getInteger();
     }
 
-    public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM,
-            StaticContextImpl dCtx) {
+    public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM, StaticContext dCtx) {
         int typeId = getTypeExpressionTypeArgument(searchM);
         if (typeId > 0) {
             return dCtx.lookupSequenceType(typeId);
@@ -182,7 +193,7 @@ public class ExpressionToolbox {
     }
 
     public static SequenceType getOutputSequenceType(Mutable<ILogicalOperator> opRef,
-            Mutable<ILogicalExpression> argFirstM, StaticContextImpl dCtx) {
+            Mutable<ILogicalExpression> argFirstM, StaticContext dCtx) {
         ILogicalExpression argFirstLe = argFirstM.getValue();
         switch (argFirstLe.getExpressionTag()) {
             case FUNCTION_CALL:
@@ -209,10 +220,17 @@ public class ExpressionToolbox {
                     return null;
                 }
                 AbstractLogicalOperator variableOp = (AbstractLogicalOperator) variableProducer.getValue();
-                if (variableOp.getOperatorTag() == LogicalOperatorTag.DATASOURCESCAN) {
-                    return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
+                switch (variableOp.getOperatorTag()) {
+                    case DATASOURCESCAN:
+                        return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
+                    case UNNEST:
+                        UnnestOperator unnest = (UnnestOperator) variableOp;
+                        return getOutputSequenceType(variableProducer, unnest.getExpressionRef(), dCtx);
+                    default:
+                        // TODO Consider support for other operators. i.e. Assign.
+                        break;
                 }
-                // TODO Consider support for other operators. i.e. Assign.
+
         }
         return null;
     }

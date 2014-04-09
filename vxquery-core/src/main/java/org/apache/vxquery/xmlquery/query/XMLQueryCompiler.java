@@ -33,14 +33,15 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFactoryProvider;
+import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFamilyProvider;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
 
-import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.NotImplementedException;
 import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
 import edu.uci.ics.hyracks.algebricks.compiler.api.HeuristicCompilerFactoryBuilder;
 import edu.uci.ics.hyracks.algebricks.compiler.api.ICompiler;
@@ -76,8 +77,6 @@ public class XMLQueryCompiler {
 
     private final ICompilerFactory cFactory;
 
-    private final VXQueryMetadataProvider mdProvider;
-    
     private LogicalOperatorPrettyPrintVisitor pprinter;
 
     private ModuleNode moduleNode;
@@ -88,9 +87,17 @@ public class XMLQueryCompiler {
 
     private int frameSize;
 
+    private String[] nodeList;
+
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize) {
+        this(listener, nodeList, frameSize, -1);
+    }
+
+    public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize,
+            int availableProcessors) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         this.frameSize = frameSize;
+        this.nodeList = nodeList;
         HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
                 new IOptimizationContextFactory() {
                     @Override
@@ -115,6 +122,7 @@ public class XMLQueryCompiler {
             }
         });
         builder.setHashFunctionFactoryProvider(VXQueryBinaryHashFunctionFactoryProvider.INSTANCE);
+        builder.setHashFunctionFamilyProvider(VXQueryBinaryHashFunctionFamilyProvider.INSTANCE);
         builder.setTypeTraitProvider(new ITypeTraitProvider() {
             @Override
             public ITypeTraits getTypeTrait(Object type) {
@@ -142,11 +150,19 @@ public class XMLQueryCompiler {
                 return null;
             }
         });
+        builder.setNullableTypeComputer(new INullableTypeComputer() {
+            @Override
+            public Object makeNullableType(Object type) throws AlgebricksException {
+                throw new NotImplementedException("NullableTypeComputer is not implented");
+            }
+        });
         builder.setNullWriterFactory(new VXQueryNullWriterFactory());
-        builder.setClusterLocations(new AlgebricksAbsolutePartitionConstraint(nodeList));
+        if (availableProcessors < 1) {
+            builder.setClusterLocations(VXQueryMetadataProvider.getClusterLocations(nodeList));
+        } else {
+            builder.setClusterLocations(VXQueryMetadataProvider.getClusterLocations(nodeList, availableProcessors));
+        }
         cFactory = builder.create();
-        mdProvider = new VXQueryMetadataProvider();
-        mdProvider.setNodeList(nodeList);
     }
 
     public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel)
@@ -154,8 +170,9 @@ public class XMLQueryCompiler {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
-        pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(module
-                .getModuleContext()));
+        pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(
+                module.getModuleContext()));
+        VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap());
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);
@@ -196,9 +213,9 @@ public class XMLQueryCompiler {
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
                 RewriteRuleset.buildXQueryNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
-                RewriteRuleset.buildNestedDataSourceRuleCollection()));
-        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
                 RewriteRuleset.buildRedundantExpressionNormalizationRuleCollection()));
+        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
+                RewriteRuleset.buildNestedDataSourceRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqOnceCtrl,
                 RewriteRuleset.buildTypeInferenceRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,

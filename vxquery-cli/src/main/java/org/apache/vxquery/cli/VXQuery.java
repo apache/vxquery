@@ -33,7 +33,6 @@ import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressi
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
-import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
@@ -41,6 +40,7 @@ import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
+import org.json.JSONException;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -187,7 +187,12 @@ public class VXQuery {
                 public void notifyCodegenResult(Module module) {
                     if (opts.showRP) {
                         JobSpecification jobSpec = module.getHyracksJobSpecification();
-                        System.err.println(jobSpec.toString());
+                        try {
+                            System.err.println(jobSpec.toJSON().toString(2));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            System.err.println(jobSpec.toString());
+                        }
                     }
                 }
 
@@ -248,10 +253,10 @@ public class VXQuery {
             };
 
             start = opts.timing ? new Date() : null;
-            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize);
+            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize, opts.availableProcessors);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
-                    resultSetId);
+                    resultSetId, null);
             compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
             // if -timing argument passed, show the starting and ending times
             if (opts.timing) {
@@ -385,7 +390,7 @@ public class VXQuery {
     }
 
     /**
-     * Shuts down the virtual cluster, alongwith all nodes and node execution, network and queue managers.
+     * Shuts down the virtual cluster, along with all nodes and node execution, network and queue managers.
      * 
      * @throws Exception
      */
@@ -412,6 +417,9 @@ public class VXQuery {
      * Helper class with fields and methods to handle all command line options
      */
     private static class CmdLineOptions {
+        @Option(name = "-available-processors", usage = "Number of available processors. (default java's available processors)")
+        public int availableProcessors = -1;
+
         @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController")
         public String clientNetIpAddress = null;
 

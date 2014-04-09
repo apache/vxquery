@@ -47,7 +47,7 @@ public class FnReverseScalarEvaluatorFactory extends AbstractTaggedValueArgument
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
-        final SequencePointable seq = new SequencePointable();
+        final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override

@@ -16,6 +16,9 @@
  */
 package org.apache.vxquery.compiler;
 
+import java.io.File;
+import java.util.Map;
+
 import org.apache.vxquery.context.StaticContext;
 
 import edu.uci.ics.hyracks.api.dataset.ResultSetId;
@@ -25,9 +28,12 @@ public class CompilerControlBlock {
  
     private ResultSetId resultSetId;
 
-    public CompilerControlBlock(StaticContext ctx, ResultSetId resultSetId) {
+    private Map<String, File> sourceFileMap;
+
+    public CompilerControlBlock(StaticContext ctx, ResultSetId resultSetId, Map<String, File> sourceFileMap) {
         this.ctx = ctx;
         this.resultSetId = resultSetId;
+        this.sourceFileMap = sourceFileMap;
     }
 
     public StaticContext getStaticContext() {
@@ -36,5 +42,9 @@ public class CompilerControlBlock {
 
     public ResultSetId getResultSetId() {
         return resultSetId;
+    }
+
+    public Map<String, File> getSourceFileMap() {
+        return sourceFileMap;
     }
 }
