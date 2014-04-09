@@ -39,7 +39,6 @@ sh ./apache-vxquery-X.Y-incubating/vxquery-cli/target/appassembler/bin/vxq
  -showrp                    : Show Runtime plan
  -showtet                   : Show translated expression tree
  -timing                    : Produce timing information
- -x                         : Bind an external variable
  ----------------------------------------
  
 * Java Options
