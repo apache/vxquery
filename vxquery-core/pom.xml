@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery</artifactId>
-    <version>0.3-incubating</version>
+    <version>0.3-incubating-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-vxquery-core</artifactId>
@@ -148,7 +148,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore></ignore>
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -161,7 +161,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore></ignore>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
