@@ -32,6 +32,7 @@
         <include>**/NOTICE</include>
         <include>**/README</include>
         <include>**/src/**</include>
+        <include>**/results/**</include>
         <include>**/pom.xml</include>
         <include>**/build*.xml</include>
         <include>**/findbugs*.xml</include>
