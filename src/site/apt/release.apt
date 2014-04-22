@@ -157,7 +157,7 @@ $ mvn site site:deploy
 
 ---
 $ cd ../site
-$ svn add [all new files]
+$ svn st | awk '/\?/ { print $2 }' | xargs svn add # add all new files
 $ svn ci -m"updated site"
 $ cd -
 ---
