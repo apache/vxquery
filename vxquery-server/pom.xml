@@ -32,7 +32,7 @@
     <site>
       <id>vxquery.website</id>
       <name>VXQuery Website</name>
-      <url>file:../../site/vxquery-server/</url>
+      <url>file:../site/vxquery-server/</url>
     </site>
   </distributionManagement>
 

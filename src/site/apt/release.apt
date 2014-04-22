@@ -17,18 +17,44 @@ Releasing Apache VXQuery
 
 * One time steps
 
+  * set up directory structure
+
+    There usually are 3 directories at the same level
+
+    * the source directory <<<incubator-vxquery>>>,
+
+    * the <<<site>>> directory, and
+
+    * the distribution directory <<<dist>>>.
+
+    The source directory is version-controlled by <<<git>>>, the other two
+    are version controlled by <<<svn>>>.
+    While the source directory and the distribution directory can have
+    arbitrary names and locations, the <<<site>>> directory has to be called
+    <<<site>>> and it needs to be at the same level as the source directory
+    to enable site deployment.
+
+    Assuming that the source directory is available one can create the
+    directory structure by going to the directory that contains the
+    source directory and checking out the distribution and site
+    directories:
+
+---
+$ svn co https://dist.apache.org/repos/dist/release/incubator/vxquery dist
+$ svn co https://svn.apache.org/repos/asf/incubator/vxquery/site
+---
+
   * add your key to the <<<KEYS>>> file
+
+    Change into the <<<dist>>> directory and run
 
 ---
 (gpg --list-sigs <your name> && gpg2 --armor --export <your name>) >> KEYS
 ---
 
-  * check the new <<<KEYS>>> file into the VXQuery distribution directory
+    and then check the new <<<KEYS>>> file into svn
 
 ---
-$ svn co https://dist.apache.org/repos/dist/release/incubator/vxquery
-$ cd vxquery
-$ cp [path to KEYS file] .
 $ svn ci -m "add [YOUR NAME]'s key to KEYS file"
 ---
 
@@ -121,15 +147,7 @@ $ mvn release:perform
 
   * update the <<<site>>> branch in git from the from the release-tag
 
-  * get site from svn (the site directory needs to be at <<<../site>>> from the git root directory)
-
----
-$ cd ..
-$ svn co https://svn.apache.org/repos/asf/incubator/vxquery/site
-$ cd -
----
-
-  * build a new site
+  * build a new site and deploy it to <<<../site>>>
 
 ---
 $ mvn site site:deploy
@@ -139,6 +157,7 @@ $ mvn site site:deploy
 
 ---
 $ cd ../site
+$ svn add [all new files]
 $ svn ci -m"updated site"
 $ cd -
 ---
