@@ -25,6 +25,8 @@
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "-client-net-ip-address 169.235.27.138"
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "" q03
 #
+REPEAT=5
+FRAME_SIZE=10000
 
 if [ -z "${1}" ]
 then
@@ -40,7 +42,7 @@ do
         log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
         log_base_path=$(dirname ${j/queries/query_logs})
         mkdir -p ${log_base_path}
-    	time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size 10000 -repeatexec 10 > ${log_base_path}/${log_file} 2>&1
+        time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
     fi;
 done
 
