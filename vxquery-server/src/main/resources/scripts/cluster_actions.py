@@ -109,14 +109,14 @@ class ClusterActions:
     
     def start_cc(self, machine):
         print "Start Cluster Controller."
-        print "  " + machine.get_id() + " " + machine.get_ip()
-        command = "./vxquery-server/target/appassembler/bin/startcc.sh " + machine.get_ip()
+        print "  " + machine.get_id() + " " + machine.get_ip() + ":" + machine.get_port()
+        command = "./vxquery-server/target/appassembler/bin/startcc.sh " + machine.get_ip() + " \"" + machine.get_port() + "\" \"" + machine.get_java_opts() + "\""
         self.run_remote_command(machine.get_username(), machine.get_id(), command)
     
     def start_nc(self, machine, cc):
         print "Start Node Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()
-        command = "./vxquery-server/target/appassembler/bin/startnc.sh " + cc.get_ip() + " " + machine.get_ip() + " " + machine.get_id()
+        command = "./vxquery-server/target/appassembler/bin/startnc.sh " + machine.get_id() + " " + machine.get_ip() + " " + cc.get_ip() + " \"" + cc.get_port() + "\" \"" + machine.get_java_opts() + "\""
         self.run_remote_command(machine.get_username(), machine.get_id(), command)
 
     def stop_cc(self, machine):

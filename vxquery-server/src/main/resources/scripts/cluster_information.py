@@ -23,65 +23,91 @@ class ClusterInformation:
         self.config = parse(self.cluster_xml_file)
 
     def get_username(self):
-        return self.get_text(self.config.getElementsByTagName("username")[0])
+        return get_tag_text(self.config, "username")
 
-    # Depricated
-    def get_master_node_ip(self):
-        master_node = self.config.getElementsByTagName("master_node")[0]
-        return self.get_cluster_ip(master_node)
-
-    # Depricated
-    def get_node_ip_list(self):
-        nodes = []
-        for node in self.config.getElementsByTagName("node"):
-            nodes.append(self.get_cluster_ip(node))
-        return nodes
+    def get_java_opts(self):
+        return get_tag_text(self.config, "java_opts")
 
     def get_master_node_machine(self):
         master_node = self.config.getElementsByTagName("master_node")[0]
-        id = self.get_cluster_id(master_node)
-        ip = self.get_cluster_ip(master_node)
+        id = NodeXmlReader.get_cluster_id(master_node)
+        ip = NodeXmlReader.get_cluster_ip(master_node)
+        port = NodeXmlReader.get_cluster_port(master_node)
+        java_opts = NodeXmlReader.get_java_opts(master_node)
+        if java_opts is "":
+            java_opts = self.get_java_opts()
         username = self.get_username()
-        return Machine(id, ip, username)
+        return Machine(id, ip, username, port, java_opts)
 
     def get_node_machine_list(self):
         nodes = []
         username = self.get_username()
         for node in self.config.getElementsByTagName("node"):
-            id = self.get_cluster_id(node)
-            ip = self.get_cluster_ip(node)
-            nodes.append(Machine(id, ip, username))
+            id = NodeXmlReader.get_cluster_id(node)
+            ip = NodeXmlReader.get_cluster_ip(node)
+            java_opts = NodeXmlReader.get_java_opts(node)
+            if java_opts is "":
+                java_opts = self.get_java_opts()
+            nodes.append(Machine(id, ip, username, "", java_opts))
         return nodes
 
-    # --------------------------------------------------------------------------
-    # Node Specific Functions
-    # --------------------------------------------------------------------------
-    def get_cluster_ip(self, node):
-        return self.get_text(node.getElementsByTagName("cluster_ip")[0])
+class NodeXmlReader(object):
+    ''' --------------------------------------------------------------------------
+     Node Specific Functions
+    -------------------------------------------------------------------------- '''
+    @staticmethod
+    def get_cluster_id(node):
+        return get_tag_text(node, "id")
 
-    def get_cluster_id(self, node):
-        return self.get_text(node.getElementsByTagName("id")[0])
+    @staticmethod
+    def get_cluster_ip(node):
+        return get_tag_text(node, "cluster_ip")
 
-    def get_text(self, xml_node):
-        rc = []
-        for node in xml_node.childNodes:
-            if node.nodeType == node.TEXT_NODE:
-                rc.append(node.data)
-        return ''.join(rc)
+    @staticmethod
+    def get_cluster_port(node):
+        return get_tag_text(node, "cluster_port")
+
+    @staticmethod
+    def get_java_opts(node):
+        return get_tag_text(node, "java_opts")
+
+def get_tag_text(xml_node, tag):
+    values = xml_node.getElementsByTagName(tag)
+    if len(values) > 0:
+        return get_text(values[0])
+    else:
+        return ""
+
+def get_text(xml_node):
+    rc = []
+    for node in xml_node.childNodes:
+        if node.nodeType == node.TEXT_NODE:
+            rc.append(node.data)
+    return ''.join(rc)
 
 class Machine:
+    java_opts = ""
     log_path = ""
+    port = ""
     
-    def __init__(self, id, ip, username):
+    def __init__(self, id, ip, username, port="", java_opts=""):
         self.id = id
         self.ip = ip
         self.username = username
+        self.port = port
+        self.java_opts = java_opts
     
     def get_id(self):
         return self.id
     
     def get_ip(self):
         return self.ip
+    
+    def get_java_opts(self):
+        return self.java_opts
+    
+    def get_port(self):
+        return self.port
     
     def get_username(self):
         return self.username
