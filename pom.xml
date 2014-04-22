@@ -198,7 +198,7 @@
     <site>
       <id>vxquery.website</id>
       <name>VXQuery Website</name>
-      <url>file:../../site/</url>
+      <url>file:../site/</url>
     </site>
   </distributionManagement>
 
