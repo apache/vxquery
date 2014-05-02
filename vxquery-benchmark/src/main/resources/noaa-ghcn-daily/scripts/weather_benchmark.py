@@ -186,28 +186,28 @@ class WeatherBenchmark:
             return
         for test in self.dataset.get_tests():
             if test in self.BENCHMARK_LOCAL_TESTS:
-                if 1 in self.partitions and len(self.base_paths) > 1:
-                    scheme = self.build_data_links_local_zero_partition(test)
-                    self.build_data_links_scheme(scheme)
                 for i in self.partitions:
                     scheme = self.get_local_partition_scheme(test, i)
                     self.build_data_links_scheme(scheme)
-            elif test in self.BENCHMARK_CLUSTER_TESTS:
                 if 1 in self.partitions and len(self.base_paths) > 1:
-                    scheme = self.build_data_links_cluster_zero_partition(test)
-                    self.build_data_links_scheme(scheme)
+                    scheme = self.build_data_links_local_zero_partition(test)
+                    self.build_data_links_scheme(scheme, False)
+            elif test in self.BENCHMARK_CLUSTER_TESTS:
                 for i in self.partitions:
                     scheme = self.get_cluster_partition_scheme(test, i)
                     self.build_data_links_scheme(scheme)
+                if 1 in self.partitions and len(self.base_paths) > 1:
+                    scheme = self.build_data_links_cluster_zero_partition(test)
+                    self.build_data_links_scheme(scheme, False)
             else:
                 print "Unknown test."
                 exit()
     
-    def build_data_links_scheme(self, scheme):
+    def build_data_links_scheme(self, scheme, reset = True):
         """Build all the data links based on the scheme information."""
         link_path_cleared = []
         for (data_disk, data_index, partition, data_path, link_path) in scheme:
-            if link_path not in link_path_cleared and os.path.isdir(link_path):
+            if link_path not in link_path_cleared and os.path.isdir(link_path) and reset:
                 shutil.rmtree(link_path)
                 link_path_cleared.append(link_path)
             self.add_collection_links_for(data_path, link_path, data_index)
@@ -215,17 +215,10 @@ class WeatherBenchmark:
     def build_data_links_cluster_zero_partition(self, test):
         """Build a scheme for all data in one symbolically linked folder. (0 partition)"""
         scheme = []
-        index = 0
-        current_node = 0
         link_base_schemes = get_cluster_link_scheme(len(self.nodes), 1, self.base_paths, "data_links/" + test)
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
             new_link_path = self.get_zero_partition_path(link_node, "data_links/" + test + "/" + str(link_node) + "nodes")
-            scheme.append([0, index, 0, link_path, new_link_path])
-            if current_node is not link_node:
-                current_node = link_node
-                index = 0
-            else:
-                index += 1
+            scheme.append([0, link_disk, 0, link_path, new_link_path])
         return scheme
 
     def build_data_links_local_zero_partition(self, test):
@@ -249,7 +242,7 @@ class WeatherBenchmark:
         found = False
         node_index = 0
         for machine in self.nodes:
-            if socket.gethostname() == machine.get_node_name():
+            if socket.gethostname().startswith(machine.get_node_name()):
                 found = True
                 break
             node_index += 1
@@ -262,10 +255,13 @@ class WeatherBenchmark:
     def add_collection_links_for(self, real_path, link_path, index):
         for collection in self.QUERY_COLLECTIONS:
             collection_path = link_path + collection + "/"
+            collection_index = collection_path + "index" + str(index)
             if not os.path.isdir(collection_path):
                 os.makedirs(collection_path)
             if index >= 0:
-                os.symlink(real_path + collection + "/", collection_path + "index" + str(index))
+                if os.path.islink(collection_index):
+                    os.unlink(collection_index)
+                os.symlink(real_path + collection + "/", collection_index)
             
     def copy_query_files(self, reset):
         for test in self.dataset.get_tests():
