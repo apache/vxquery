@@ -188,7 +188,7 @@ class WeatherBenchmark:
             if test in self.BENCHMARK_LOCAL_TESTS:
                 for i in self.partitions:
                     scheme = self.get_local_partition_scheme(test, i)
-                    self.build_data_links_scheme(scheme)
+                    self.build_data_links_scheme(scheme, False)
                 if 1 in self.partitions and len(self.base_paths) > 1:
                     scheme = self.build_data_links_local_zero_partition(test)
                     self.build_data_links_scheme(scheme, False)
