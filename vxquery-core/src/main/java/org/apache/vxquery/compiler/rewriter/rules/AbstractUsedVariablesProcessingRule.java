@@ -54,13 +54,20 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
         if (hasRun) {
             return false;
         }
-        usedVariables.clear();
-        boolean modified = rewritePreOnePass(opRef, context);
+        boolean modified = false;
+        boolean modified_last_pass;
+        do {
+            usedVariables.clear();
+            modified_last_pass = rewritePreTrackingUsedVariables(opRef, context);
+            if (modified_last_pass) {
+                modified = modified_last_pass;
+            }
+        } while (modified_last_pass);
         hasRun = true;
         return modified;
     }
 
-    protected boolean rewritePreOnePass(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+    protected boolean rewritePreTrackingUsedVariables(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
         boolean modified = processOperator(opRef, context);
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
@@ -70,7 +77,7 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
             AbstractOperatorWithNestedPlans opwnp = (AbstractOperatorWithNestedPlans) op;
             for (ILogicalPlan rootPlans : opwnp.getNestedPlans()) {
                 for (Mutable<ILogicalOperator> inputOpRef : rootPlans.getRoots()) {
-                    if (rewritePreOnePass(inputOpRef, context)) {
+                    if (rewritePreTrackingUsedVariables(inputOpRef, context)) {
                         modified = true;
                     }
                 }
@@ -83,7 +90,7 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
         // Descend into children merging unnest along the way.
         if (op.hasInputs()) {
             for (Mutable<ILogicalOperator> inputOpRef : op.getInputs()) {
-                if (rewritePreOnePass(inputOpRef, context)) {
+                if (rewritePreTrackingUsedVariables(inputOpRef, context)) {
                     modified = true;
                 }
             }
