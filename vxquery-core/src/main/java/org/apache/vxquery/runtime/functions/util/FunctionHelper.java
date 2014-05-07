@@ -54,7 +54,6 @@ import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
-import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
@@ -1233,8 +1232,8 @@ public class FunctionHelper {
         System.err.println(" printUTF8String END");
     }
 
-    public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+    public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis, DataInputStream di,
+            ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
         String fName;
         try {
             fName = getStringFromPointable(stringp, bbis, di);
@@ -1242,7 +1241,7 @@ public class FunctionHelper {
             throw new HyracksDataException(e);
         }
         File file = new File(fName);
-        parser.parseFile(file, in, abvs);
+        parser.parseFile(file, abvs);
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,

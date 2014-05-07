@@ -27,7 +27,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -49,7 +48,6 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final InputSource in = new InputSource();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
@@ -73,7 +71,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
                 }
 
                 try {
-                    FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs, null);
+                    FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, null);
                     XDMConstants.setTrue(result);
                 } catch (Exception e) {
                     XDMConstants.setFalse(result);

@@ -30,13 +30,11 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
-import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
-import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -53,7 +51,6 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final InputSource in = new InputSource();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
@@ -81,7 +78,7 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 try {
                     // Only one document should be parsed so its ok to have a unique parser.
                     XMLParser parser = new XMLParser(false, nodeIdProvider);
-                    FunctionHelper.readInDocFromPointable(stringp, in, bbis, di, abvs, parser);
+                    FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }

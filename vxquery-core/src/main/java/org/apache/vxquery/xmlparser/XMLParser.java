@@ -32,21 +32,23 @@ import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XMLParser {
-    XMLReader parser;
-    SAXContentHandler handler;
-
+    final XMLReader parser;
+    final SAXContentHandler handler;
+    final InputSource in;
+    
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider) throws HyracksDataException {
         try {
             parser = XMLReaderFactory.createXMLReader();
             handler = new SAXContentHandler(attachTypes, idProvider);
             parser.setContentHandler(handler);
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
+            in = new InputSource();
         } catch (Exception e) {
             throw new HyracksDataException(e.toString());
         }
     }
 
-    public void parseFile(File file, InputSource in, ArrayBackedValueStorage abvs) throws HyracksDataException {
+    public void parseFile(File file, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
             if (file.getName().toLowerCase().endsWith(".xml.gz")) {
                 in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));

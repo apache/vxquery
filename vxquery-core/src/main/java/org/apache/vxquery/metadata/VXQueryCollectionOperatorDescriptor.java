@@ -31,7 +31,6 @@ import org.apache.vxquery.runtime.functions.step.ChildPathStepOperatorDescriptor
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
-import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
@@ -72,7 +71,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final int fieldOutputCount = recordDescProvider.getOutputRecordDescriptor(getActivityId(), 0).getFieldCount();
         final ByteBuffer frame = ctx.allocateFrame();
         final FrameTupleAppender appender = new FrameTupleAppender(ctx.getFrameSize(), fieldOutputCount);
-        final InputSource in = new InputSource();
         final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
@@ -120,7 +118,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 // Now add new field.
                 abvsFileNode.reset();
                 try {
-                    parser.parseFile(file, in, abvsFileNode);
+                    parser.parseFile(file, abvsFileNode);
                 } catch (HyracksDataException e) {
                     e.setNodeId(nodeId);
                     throw e;
