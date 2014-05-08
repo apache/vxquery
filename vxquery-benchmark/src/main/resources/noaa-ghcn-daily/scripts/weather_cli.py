@@ -209,13 +209,16 @@ def main(argv):
             if section == "partition_scheme":
                 benchmark.print_partition_scheme()
             else:
-                data.copy_to_n_partitions(xml_data_save_path, slices, base_paths, reset)
+                if dataset.get_partition_type() == "large_files":
+                    data.build_to_n_partition_files(xml_data_save_path, slices, base_paths, reset)
+                else:
+                    data.copy_to_n_partitions(xml_data_save_path, slices, base_paths, reset)
     
         if section in ("all", "test_links"):
             # TODO determine current node 
             print 'Processing the test links section (' + dataset.get_name() + ').'
             benchmark.print_partition_scheme()
-            benchmark.build_data_links()
+            benchmark.build_data_links(reset)
 
         if section in ("all", "queries"):
             print 'Processing the queries section (' + dataset.get_name() + ').'

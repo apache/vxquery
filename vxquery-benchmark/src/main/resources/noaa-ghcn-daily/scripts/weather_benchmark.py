@@ -32,6 +32,8 @@ from weather_data_files import *
 #   logs/
 class WeatherBenchmark:
 
+    DATA_LINKS_FOLDER = "data_links/"
+    LARGE_FILE_ROOT_TAG = WeatherDataFiles.LARGE_FILE_ROOT_TAG
     QUERY_REPLACEMENT_KEY = "/tmp/1.0_partition_ghcnd_all_xml/"
     QUERY_MASTER_FOLDER = "../queries/"
     QUERY_FILE_LIST = [
@@ -125,7 +127,7 @@ class WeatherBenchmark:
         scheme = []
         virtual_partitions = get_local_virtual_partitions(self.partitions)
         data_schemes = get_partition_scheme(0, virtual_partitions, self.base_paths)
-        link_base_schemes = get_partition_scheme(0, partition, self.base_paths, "data_links/" + test)
+        link_base_schemes = get_partition_scheme(0, partition, self.base_paths, self.DATA_LINKS_FOLDER + test)
 
         # Match link paths to real data paths.
         group_size = len(data_schemes) / len(link_base_schemes)
@@ -154,7 +156,7 @@ class WeatherBenchmark:
         local_virtual_partitions = get_local_virtual_partitions(self.partitions)
         virtual_partitions = get_cluster_virtual_partitions(self.nodes, self.partitions)
         data_schemes = get_partition_scheme(node_index, virtual_partitions, self.base_paths)
-        link_base_schemes = get_cluster_link_scheme(len(self.nodes), partition, self.base_paths, "data_links/" + test)
+        link_base_schemes = get_cluster_link_scheme(len(self.nodes), partition, self.base_paths, self.DATA_LINKS_FOLDER + test)
 
         # Match link paths to real data paths.
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
@@ -181,59 +183,57 @@ class WeatherBenchmark:
             scheme.append([link_disk, -1, link_index, "", link_path])
         return scheme
     
-    def build_data_links(self):
+    def build_data_links(self, reset):
         if (len(self.base_paths) == 0):
             return
+        if reset:
+            shutil.rmtree(self.base_paths[0] + self.DATA_LINKS_FOLDER)
         for test in self.dataset.get_tests():
             if test in self.BENCHMARK_LOCAL_TESTS:
                 for i in self.partitions:
                     scheme = self.get_local_partition_scheme(test, i)
-                    self.build_data_links_scheme(scheme, False)
+                    self.build_data_links_scheme(scheme)
                 if 1 in self.partitions and len(self.base_paths) > 1:
                     scheme = self.build_data_links_local_zero_partition(test)
-                    self.build_data_links_scheme(scheme, False)
+                    self.build_data_links_scheme(scheme)
             elif test in self.BENCHMARK_CLUSTER_TESTS:
                 for i in self.partitions:
                     scheme = self.get_cluster_partition_scheme(test, i)
                     self.build_data_links_scheme(scheme)
                 if 1 in self.partitions and len(self.base_paths) > 1:
                     scheme = self.build_data_links_cluster_zero_partition(test)
-                    self.build_data_links_scheme(scheme, False)
+                    self.build_data_links_scheme(scheme)
             else:
                 print "Unknown test."
                 exit()
     
-    def build_data_links_scheme(self, scheme, reset = True):
-        """Build all the data links based on the scheme information."""
-        link_path_cleared = []
+    def build_data_links_scheme(self, scheme):
+        '''Build all the data links based on the scheme information.'''
         for (data_disk, data_index, partition, data_path, link_path) in scheme:
-            if link_path not in link_path_cleared and os.path.isdir(link_path) and reset:
-                shutil.rmtree(link_path)
-                link_path_cleared.append(link_path)
             self.add_collection_links_for(data_path, link_path, data_index)
     
     def build_data_links_cluster_zero_partition(self, test):
-        """Build a scheme for all data in one symbolically linked folder. (0 partition)"""
+        '''Build a scheme for all data in one symbolically linked folder. (0 partition)'''
         scheme = []
-        link_base_schemes = get_cluster_link_scheme(len(self.nodes), 1, self.base_paths, "data_links/" + test)
+        link_base_schemes = get_cluster_link_scheme(len(self.nodes), 1, self.base_paths, self.DATA_LINKS_FOLDER + test)
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
-            new_link_path = self.get_zero_partition_path(link_node, "data_links/" + test + "/" + str(link_node) + "nodes")
+            new_link_path = self.get_zero_partition_path(link_node, self.DATA_LINKS_FOLDER + test + "/" + str(link_node) + "nodes")
             scheme.append([0, link_disk, 0, link_path, new_link_path])
         return scheme
 
     def build_data_links_local_zero_partition(self, test):
-        """Build a scheme for all data in one symbolically linked folder. (0 partition)"""
+        '''Build a scheme for all data in one symbolically linked folder. (0 partition)'''
         scheme = []
         index = 0
-        link_base_schemes = get_partition_scheme(0, 1, self.base_paths, "data_links/" + test)
+        link_base_schemes = get_partition_scheme(0, 1, self.base_paths, self.DATA_LINKS_FOLDER + test)
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
-            new_link_path = self.get_zero_partition_path(link_node, "data_links/" + test)
+            new_link_path = self.get_zero_partition_path(link_node, self.DATA_LINKS_FOLDER + test)
             scheme.append([0, index, 0, link_path, new_link_path])
             index += 1
         return scheme
 
     def get_zero_partition_path(self, node, key):
-        """Return a partition path for the zero partition."""
+        '''Return a partition path for the zero partition.'''
         base_path = self.base_paths[0]
         new_link_path = get_partition_scheme(node, 1, [base_path], key)[0][PARTITION_INDEX_PATH]
         return new_link_path.replace("p1", "p0")
@@ -282,7 +282,7 @@ class WeatherBenchmark:
                 prepare_path(query_path, reset)
             
                 # Copy query files.
-                new_link_path = self.get_zero_partition_path(n, "data_links/" + test + "/" + str(n) + "nodes")
+                new_link_path = self.get_zero_partition_path(n, self.DATA_LINKS_FOLDER + test + "/" + str(n) + "nodes")
                 self.copy_and_replace_query(query_path, [new_link_path])
         for n in range(len(self.nodes)):
             for p in self.partitions:
@@ -290,7 +290,7 @@ class WeatherBenchmark:
                 prepare_path(query_path, reset)
             
                 # Copy query files.
-                partition_paths = get_partition_paths(n, p, self.base_paths, "data_links/" + test + "/" + str(n) + "nodes")
+                partition_paths = get_partition_paths(n, p, self.base_paths, self.DATA_LINKS_FOLDER + test + "/" + str(n) + "nodes")
                 self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_local_query_files(self, test, reset):
@@ -301,14 +301,14 @@ class WeatherBenchmark:
             prepare_path(query_path, reset)
     
             # Copy query files.
-            new_link_path = self.get_zero_partition_path(0, "data_links/" + test)
+            new_link_path = self.get_zero_partition_path(0, self.DATA_LINKS_FOLDER + test)
             self.copy_and_replace_query(query_path, [new_link_path])
         for p in self.partitions:
             query_path = get_local_query_path(self.base_paths, test, p)
             prepare_path(query_path, reset)
     
             # Copy query files.
-            partition_paths = get_partition_paths(0, p, self.base_paths, "data_links/" + test)
+            partition_paths = get_partition_paths(0, p, self.base_paths, self.DATA_LINKS_FOLDER + test)
             self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_and_replace_query(self, query_path, replacement_list):
@@ -326,6 +326,13 @@ class WeatherBenchmark:
                 replace_string = self.SEPERATOR.join(replacement_list_with_type)
                 for line in fileinput.input(query_path + query_file, True):
                     sys.stdout.write(line.replace(self.QUERY_REPLACEMENT_KEY + collection, replace_string))
+                    
+            # Make a search replace for partition type.
+            if self.dataset.get_partition_type() == "large_files":
+                for line in fileinput.input(query_path + query_file, True):
+                    sys.stdout.write(line.replace("/stationCollection", "/" + self.LARGE_FILE_ROOT_TAG + "/stationCollection"))
+                for line in fileinput.input(query_path + query_file, True):
+                    sys.stdout.write(line.replace("/dataCollection", "/" + self.LARGE_FILE_ROOT_TAG + "/dataCollection"))
                     
     def get_number_of_slices(self):
         if len(self.dataset.get_tests()) == 0:
