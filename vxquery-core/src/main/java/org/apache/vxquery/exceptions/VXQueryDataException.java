@@ -29,6 +29,7 @@ public class VXQueryDataException extends HyracksDataException {
     public VXQueryDataException(String message, Exception ex, File file) {
         super(message, ex);
         this.file = file;
+        setStackTrace(ex.getStackTrace());
     }
 
     @Override
