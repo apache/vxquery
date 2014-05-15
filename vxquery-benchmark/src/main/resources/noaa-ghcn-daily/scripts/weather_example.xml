@@ -26,6 +26,7 @@
         <name>tiny-example</name>
         <test>local_speed_up</test>
         <save_path>/data</save_path>
+        <partition_type>small_files</partition_type>
         <partitions_per_path>1</partitions_per_path>
         <partitions_per_path>2</partitions_per_path>
         <partitions_per_path>4</partitions_per_path>

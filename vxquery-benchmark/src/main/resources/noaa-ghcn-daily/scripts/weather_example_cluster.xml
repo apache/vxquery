@@ -43,6 +43,7 @@
         <test>speed_up</test>
         <test>batch_scale_out</test>
         <save_path>/data</save_path>
+        <partition_type>small_files</partition_type>
         <partitions_per_path>1</partitions_per_path>
     </dataset>
     <dataset>
@@ -51,6 +52,7 @@
         <test>batch_scale_out</test>
         <save_path>/data</save_path>
         <save_path>/data2</save_path>
+        <partition_type>large_files</partition_type>
         <partitions_per_path>1</partitions_per_path>
     </dataset>
 </data>
