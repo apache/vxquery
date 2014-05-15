@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<site>
+<people>
+<person id="person0">
+<name>Jaak Tempesti</name>
+<emailaddress>mailto:Tempesti@labs.com</emailaddress>
+<phone>+0 (873) 14873867</phone>
+<homepage>http://www.labs.com/~Tempesti</homepage>
+<creditcard>5048 5813 2703 8253</creditcard>
+<watches>
+<watch open_auction="open_auction0"/>
+</watches>
+</person>
+</people>
+</site>
