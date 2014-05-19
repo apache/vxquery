@@ -34,6 +34,8 @@ then
     exit
 fi
 
+export JAVA_OPTS="$JAVA_OPTS -server -Xmx8G -XX:+HeapDumpOnOutOfMemoryError"
+
 for j in $(find ${1} -name '*q??.xq')
 do
     if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]] 
