@@ -16,9 +16,11 @@ package org.apache.vxquery.xmlparser;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.nodes.AbstractNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
@@ -30,6 +32,10 @@ import org.apache.vxquery.datamodel.builders.nodes.PINodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.types.BuiltinTypeQNames;
+import org.apache.vxquery.types.ElementType;
+import org.apache.vxquery.types.NameTest;
+import org.apache.vxquery.types.NodeType;
+import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.query.XQueryConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -37,47 +43,79 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
+import edu.uci.ics.hyracks.api.comm.IFrameWriter;
+import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
+import edu.uci.ics.hyracks.dataflow.common.comm.util.FrameUtils;
 
 public class SAXContentHandler implements ContentHandler, LexicalHandler {
-    private final ArrayBackedValueStorage docABVS;
+    private final AttributeNodeBuilder anb;
 
-    private final boolean createNodeIds;
+    private FrameTupleAppender appender;
 
     private final boolean attachTypes;
 
-    private final ITreeNodeIdProvider nodeIdProvider;
+    private final StringBuilder buffer;
 
-    private final ArrayBackedValueStorage tempABVS;
+    private String[] childLocalName = null;
 
-    private final DocumentNodeBuilder docb;
-
-    private final TextNodeBuilder tnb;
+    private String[] childUri = null;
 
     private final CommentNodeBuilder cnb;
 
-    private final PINodeBuilder pinb;
-
-    private final AttributeNodeBuilder anb;
+    private final boolean createNodeIds;
 
     private final DictionaryBuilder db;
 
-    private final StringBuilder buffer;
+    private int depth = 0;
+
+    private final ArrayBackedValueStorage docABVS;
+
+    private final DocumentNodeBuilder docb;
+
+    private final ArrayBackedValueStorage elementABVS;
 
     private final List<ElementNodeBuilder> enbStack;
 
+    private ByteBuffer frame;
+
     private final List<ElementNodeBuilder> freeENBList;
+
+    private FrameTupleAccessor fta;
 
     private int nodeIdCounter;
 
+    private final ITreeNodeIdProvider nodeIdProvider;
+
     private boolean pendingText;
+
+    private final PINodeBuilder pinb;
+
+    private final ArrayBackedValueStorage resultABVS;
+
+    private boolean[] subElement = null;
+
+    private int t;
+
+    private final ArrayBackedValueStorage tempABVS;
+
+    private final TextNodeBuilder tnb;
+
+    private final TaggedValuePointable tvp;
+
+    private IFrameWriter writer;
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider) {
         docABVS = new ArrayBackedValueStorage();
-        this.createNodeIds = nodeIdProvider != null;
+        elementABVS = new ArrayBackedValueStorage();
+        resultABVS = new ArrayBackedValueStorage();
+        tempABVS = new ArrayBackedValueStorage();
+        createNodeIds = nodeIdProvider != null;
         this.attachTypes = attachTypes;
         this.nodeIdProvider = nodeIdProvider;
-        this.tempABVS = new ArrayBackedValueStorage();
         docb = new DocumentNodeBuilder();
         tnb = new TextNodeBuilder();
         cnb = new CommentNodeBuilder();
@@ -88,6 +126,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         enbStack = new ArrayList<ElementNodeBuilder>();
         freeENBList = new ArrayList<ElementNodeBuilder>();
         pendingText = false;
+        tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     }
 
     @Override
@@ -102,6 +141,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             flushText();
             docb.endChildrenChunk();
             docb.finish();
+            if (subElement == null) {
+                writeElement();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
@@ -115,6 +157,14 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
             enb.endChildrenChunk();
             endChildInParent(enb);
+
+            if (foundChildPathStep()) {
+                writeElement();
+            }
+            if (subElement != null && depth <= subElement.length) {
+                subElement[depth - 1] = false;
+            }
+            depth--;
             freeENB(enb);
         } catch (IOException e) {
             e.printStackTrace();
@@ -178,12 +228,22 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void startElement(String uri, String localName, String name, Attributes atts) throws SAXException {
+        depth++;
+        // Check path step if it exists.
+        if (subElement != null && depth <= subElement.length) {
+            if (uri.compareTo(childUri[depth - 1]) == 0) {
+                if (localName.compareTo(childLocalName[depth - 1]) == 0) {
+                    subElement[depth - 1] = true;
+                }
+            }
+        }
+
         try {
             flushText();
             int idx = name.indexOf(':');
             String prefix = idx < 0 ? "" : name.substring(0, idx);
             ElementNodeBuilder enb = createENB();
-            startChildInParent(enb);
+            startChildInParent(enb, foundChildPathStep());
             int uriCode = db.lookup(uri);
             int localNameCode = db.lookup(localName);
             int prefixCode = db.lookup(prefix);
@@ -296,7 +356,60 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public void startEntity(String name) throws SAXException {
     }
 
-    public void write(ArrayBackedValueStorage abvs) throws IOException {
+    public void setChildPathSteps(List<SequenceType> childSeq) {
+        //        this.childSeq = childSeq;
+        if (!childSeq.isEmpty()) {
+            subElement = new boolean[childSeq.size()];
+            childUri = new String[childSeq.size()];
+            childLocalName = new String[childSeq.size()];
+        }
+
+        int index = 0;
+        for (SequenceType sType : childSeq) {
+            NodeType nodeType = (NodeType) sType.getItemType();
+            ElementType eType = (ElementType) nodeType;
+            NameTest nameTest = eType.getNameTest();
+            childUri[index] = getStringFromBytes(nameTest.getUri());
+            childLocalName[index] = getStringFromBytes(nameTest.getLocalName());;
+            index++;
+        }
+    }
+
+    public void setupElementWriter(ByteBuffer frame, FrameTupleAppender appender, IFrameWriter writer,
+            FrameTupleAccessor fta, int t) throws IOException {
+        this.frame = frame;
+        this.appender = appender;
+        this.writer = writer;
+        this.fta = fta;
+        this.t = t;
+    }
+
+    public void writeElement() throws IOException {
+        resultABVS.reset();
+        DataOutput out = resultABVS.getDataOutput();
+        out.write(ValueTag.NODE_TREE_TAG);
+        byte header = NodeTreePointable.HEADER_DICTIONARY_EXISTS_MASK;
+        if (attachTypes) {
+            header |= NodeTreePointable.HEADER_TYPE_EXISTS_MASK;
+        }
+        if (createNodeIds) {
+            header |= NodeTreePointable.HEADER_NODEID_EXISTS_MASK;
+        }
+        out.write(header);
+        if (createNodeIds) {
+            out.writeInt(nodeIdProvider.getId());
+        }
+        db.write(resultABVS);
+        if (subElement == null) {
+            out.write(docABVS.getByteArray(), docABVS.getStartOffset(), docABVS.getLength());
+        } else {
+            out.write(elementABVS.getByteArray(), elementABVS.getStartOffset(), elementABVS.getLength());
+        }
+        tvp.set(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
+        addNodeToTuple(tvp, t);
+    }
+
+    public void writeDocument(ArrayBackedValueStorage abvs) throws IOException {
         DataOutput out = abvs.getDataOutput();
         out.write(ValueTag.NODE_TREE_TAG);
         byte header = NodeTreePointable.HEADER_DICTIONARY_EXISTS_MASK;
@@ -330,8 +443,15 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     private void startChildInParent(AbstractNodeBuilder anb) throws IOException {
+        startChildInParent(anb, false);
+    }
+
+    private void startChildInParent(AbstractNodeBuilder anb, boolean track) throws IOException {
         if (enbStack.isEmpty()) {
             docb.startChild(anb);
+        } else if (track) {
+            elementABVS.reset();
+            anb.reset(elementABVS);
         } else {
             peekENBStackTop().startChild(anb);
         }
@@ -344,4 +464,51 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             peekENBStackTop().endChild(anb);
         }
     }
+
+    private void addNodeToTuple(TaggedValuePointable result, int t) throws HyracksDataException {
+        // Send to the writer.
+        if (!addNodeToTupleAppender(result, t)) {
+            FrameUtils.flushFrame(frame, writer);
+            appender.reset(frame, true);
+            if (!addNodeToTupleAppender(result, t)) {
+                throw new HyracksDataException("Could not write frame (SAXContentHandler.addNodeToTuple).");
+            }
+        }
+    }
+
+    private boolean addNodeToTupleAppender(TaggedValuePointable result, int t) throws HyracksDataException {
+        // First copy all new fields over.
+        if (fta.getFieldCount() > 0) {
+            for (int f = 0; f < fta.getFieldCount(); ++f) {
+                if (!appender.appendField(fta, t, f)) {
+                    return false;
+                }
+            }
+        }
+        return appender.appendField(result.getByteArray(), result.getStartOffset(), result.getLength());
+    }
+
+    private String getStringFromBytes(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        UTF8StringPointable.toString(sb, bytes, 0);
+        return sb.toString();
+    }
+
+    /**
+     * Determines if the correct path step is active.
+     */
+    private boolean foundChildPathStep() {
+        if (subElement.length != depth) {
+            // Not the correct depth.
+            return false;
+        }
+        for (boolean b : subElement) {
+            if (!b) {
+                // Found a path step that did not match.
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

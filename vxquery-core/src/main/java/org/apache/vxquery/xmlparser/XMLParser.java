@@ -19,23 +19,29 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
 import org.apache.vxquery.exceptions.VXQueryParseException;
+import org.apache.vxquery.types.SequenceType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import edu.uci.ics.hyracks.api.comm.IFrameWriter;
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
 
 public class XMLParser {
     final XMLReader parser;
     final SAXContentHandler handler;
     final InputSource in;
-    
+
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider) throws HyracksDataException {
         try {
             parser = XMLReaderFactory.createXMLReader();
@@ -56,7 +62,27 @@ public class XMLParser {
                 in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
             }
             parser.parse(in);
-            handler.write(abvs);
+            handler.writeDocument(abvs);
+        } catch (FileNotFoundException e) {
+            throw new VXQueryFileNotFoundException(e, file);
+        } catch (SAXException e) {
+            throw new VXQueryParseException(e, file);
+        } catch (IOException e) {
+            throw new HyracksDataException(e);
+        }
+    }
+
+    public void parseOutElements(File file, ByteBuffer frame, FrameTupleAppender appender, IFrameWriter writer,
+            FrameTupleAccessor fta, int t, List<SequenceType> childSeq) throws HyracksDataException {
+        try {
+            if (file.getName().toLowerCase().endsWith(".xml.gz")) {
+                in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
+            } else {
+                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
+            }
+            handler.setChildPathSteps(childSeq);
+            handler.setupElementWriter(frame, appender, writer, fta, t);
+            parser.parse(in);
         } catch (FileNotFoundException e) {
             throw new VXQueryFileNotFoundException(e, file);
         } catch (SAXException e) {
