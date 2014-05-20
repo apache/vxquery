@@ -96,6 +96,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     private final ArrayBackedValueStorage resultABVS;
 
+    private boolean writeMode;
+
     private boolean[] subElement = null;
 
     private int t;
@@ -127,49 +129,54 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         freeENBList = new ArrayList<ElementNodeBuilder>();
         pendingText = false;
         tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        writeMode = false;
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        buffer.append(ch, start, length);
-        pendingText = true;
+        if (writeMode) {
+            buffer.append(ch, start, length);
+            pendingText = true;
+        }
     }
 
     @Override
     public void endDocument() throws SAXException {
-        try {
-            flushText();
-            docb.endChildrenChunk();
-            docb.finish();
-            if (subElement == null) {
+        if (writeMode) {
+            try {
+                flushText();
+                docb.endChildrenChunk();
+                docb.finish();
                 writeElement();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SAXException(e);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new SAXException(e);
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
-        try {
-            flushText();
-            ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
-            enb.endChildrenChunk();
-            endChildInParent(enb);
+        if (writeMode) {
+            try {
+                flushText();
+                ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
+                enb.endChildrenChunk();
+                endChildInParent(enb);
 
-            if (foundChildPathStep()) {
-                writeElement();
+                if (foundChildPathStep()) {
+                    writeElement();
+                }
+                if (subElement != null && depth <= subElement.length) {
+                    subElement[depth - 1] = false;
+                }
+                freeENB(enb);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SAXException(e);
             }
-            if (subElement != null && depth <= subElement.length) {
-                subElement[depth - 1] = false;
-            }
-            depth--;
-            freeENB(enb);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new SAXException(e);
         }
+        depth--;
     }
 
     @Override
@@ -182,22 +189,24 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void processingInstruction(String target, String data) throws SAXException {
-        try {
-            flushText();
-            startChildInParent(pinb);
-            tempABVS.reset();
-            tempABVS.getDataOutput().writeUTF(target);
-            if (createNodeIds) {
-                pinb.setLocalNodeId(nodeIdCounter++);
+        if (writeMode) {
+            try {
+                flushText();
+                startChildInParent(pinb);
+                tempABVS.reset();
+                tempABVS.getDataOutput().writeUTF(target);
+                if (createNodeIds) {
+                    pinb.setLocalNodeId(nodeIdCounter++);
+                }
+                pinb.setTarget(tempABVS);
+                tempABVS.reset();
+                tempABVS.getDataOutput().writeUTF(data);
+                pinb.setContent(tempABVS);
+                endChildInParent(pinb);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SAXException(e);
             }
-            pinb.setTarget(tempABVS);
-            tempABVS.reset();
-            tempABVS.getDataOutput().writeUTF(data);
-            pinb.setContent(tempABVS);
-            endChildInParent(pinb);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new SAXException(e);
         }
     }
 
@@ -211,15 +220,20 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void startDocument() throws SAXException {
+        if (subElement == null) {
+            writeMode = true;
+        }
         try {
             db.reset();
             docABVS.reset();
-            docb.reset(docABVS);
-            if (createNodeIds) {
-                docb.setLocalNodeId(nodeIdCounter++);
+            if (writeMode) {
+                docb.reset(docABVS);
+                if (createNodeIds) {
+                    docb.setLocalNodeId(nodeIdCounter++);
+                }
+                docb.startChildrenChunk();
+                flushText();
             }
-            docb.startChildrenChunk();
-            flushText();
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
@@ -238,58 +252,65 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             }
         }
 
-        try {
-            flushText();
-            int idx = name.indexOf(':');
-            String prefix = idx < 0 ? "" : name.substring(0, idx);
-            ElementNodeBuilder enb = createENB();
-            startChildInParent(enb, foundChildPathStep());
-            int uriCode = db.lookup(uri);
-            int localNameCode = db.lookup(localName);
-            int prefixCode = db.lookup(prefix);
-            enb.setName(uriCode, localNameCode, prefixCode);
-            if (attachTypes) {
-                int typeUriCode = db.lookup(XQueryConstants.XS_NSURI);
-                int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_STR);
-                int typePrefixCode = db.lookup(XQueryConstants.XS_PREFIX);
-                enb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
-            }
-            if (createNodeIds) {
-                enb.setLocalNodeId(nodeIdCounter++);
-            }
-            enb.startAttributeChunk();
-            final int nAttrs = atts.getLength();
-            for (int i = 0; i < nAttrs; ++i) {
-                String aName = atts.getQName(i);
-                int aIdx = aName.indexOf(':');
-                int aPrefixCode = db.lookup(aIdx < 0 ? "" : aName.substring(0, aIdx));
-                int aLocalNameCode = db.lookup(atts.getLocalName(i));
-                int aUriCode = db.lookup(atts.getURI(i));
-                String aValue = atts.getValue(i);
-                tempABVS.reset();
-                DataOutput tempOut = tempABVS.getDataOutput();
-                tempOut.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
-                tempOut.writeUTF(aValue);
-                enb.startAttribute(anb);
-                anb.setName(aUriCode, aLocalNameCode, aPrefixCode);
+        boolean start = foundChildPathStep();
+        if (start) {
+            writeMode = true;
+        }
+
+        if (writeMode) {
+            try {
+                flushText();
+                int idx = name.indexOf(':');
+                String prefix = idx < 0 ? "" : name.substring(0, idx);
+                ElementNodeBuilder enb = createENB();
+                startChildInParent(enb, start);
+                int uriCode = db.lookup(uri);
+                int localNameCode = db.lookup(localName);
+                int prefixCode = db.lookup(prefix);
+                enb.setName(uriCode, localNameCode, prefixCode);
                 if (attachTypes) {
                     int typeUriCode = db.lookup(XQueryConstants.XS_NSURI);
-                    int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_ATOMIC_STR);
+                    int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_STR);
                     int typePrefixCode = db.lookup(XQueryConstants.XS_PREFIX);
-                    anb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
+                    enb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
                 }
                 if (createNodeIds) {
-                    anb.setLocalNodeId(nodeIdCounter++);
+                    enb.setLocalNodeId(nodeIdCounter++);
                 }
-                anb.setValue(tempABVS);
-                enb.endAttribute(anb);
+                enb.startAttributeChunk();
+                final int nAttrs = atts.getLength();
+                for (int i = 0; i < nAttrs; ++i) {
+                    String aName = atts.getQName(i);
+                    int aIdx = aName.indexOf(':');
+                    int aPrefixCode = db.lookup(aIdx < 0 ? "" : aName.substring(0, aIdx));
+                    int aLocalNameCode = db.lookup(atts.getLocalName(i));
+                    int aUriCode = db.lookup(atts.getURI(i));
+                    String aValue = atts.getValue(i);
+                    tempABVS.reset();
+                    DataOutput tempOut = tempABVS.getDataOutput();
+                    tempOut.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
+                    tempOut.writeUTF(aValue);
+                    enb.startAttribute(anb);
+                    anb.setName(aUriCode, aLocalNameCode, aPrefixCode);
+                    if (attachTypes) {
+                        int typeUriCode = db.lookup(XQueryConstants.XS_NSURI);
+                        int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_ATOMIC_STR);
+                        int typePrefixCode = db.lookup(XQueryConstants.XS_PREFIX);
+                        anb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
+                    }
+                    if (createNodeIds) {
+                        anb.setLocalNodeId(nodeIdCounter++);
+                    }
+                    anb.setValue(tempABVS);
+                    enb.endAttribute(anb);
+                }
+                enb.endAttributeChunk();
+                enb.startChildrenChunk();
+                enbStack.add(enb);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SAXException(e);
             }
-            enb.endAttributeChunk();
-            enb.startChildrenChunk();
-            enbStack.add(enb);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new SAXException(e);
         }
     }
 
@@ -299,21 +320,23 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void comment(char[] ch, int start, int length) throws SAXException {
-        try {
-            flushText();
-            startChildInParent(cnb);
-            buffer.append(ch, start, length);
-            tempABVS.reset();
-            tempABVS.getDataOutput().writeUTF(buffer.toString());
-            if (createNodeIds) {
-                cnb.setLocalNodeId(nodeIdCounter++);
+        if (writeMode) {
+            try {
+                flushText();
+                startChildInParent(cnb);
+                buffer.append(ch, start, length);
+                tempABVS.reset();
+                tempABVS.getDataOutput().writeUTF(buffer.toString());
+                if (createNodeIds) {
+                    cnb.setLocalNodeId(nodeIdCounter++);
+                }
+                cnb.setValue(tempABVS);
+                endChildInParent(cnb);
+                buffer.delete(0, buffer.length());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SAXException(e);
             }
-            cnb.setValue(tempABVS);
-            endChildInParent(cnb);
-            buffer.delete(0, buffer.length());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new SAXException(e);
         }
     }
 
@@ -407,6 +430,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
         tvp.set(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
         addNodeToTuple(tvp, t);
+        writeMode = false;
     }
 
     public void writeDocument(ArrayBackedValueStorage abvs) throws IOException {
@@ -447,11 +471,11 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     private void startChildInParent(AbstractNodeBuilder anb, boolean track) throws IOException {
-        if (enbStack.isEmpty()) {
-            docb.startChild(anb);
-        } else if (track) {
+        if (track) {
             elementABVS.reset();
             anb.reset(elementABVS);
+        } else if (enbStack.isEmpty()) {
+            docb.startChild(anb);
         } else {
             peekENBStackTop().startChild(anb);
         }
