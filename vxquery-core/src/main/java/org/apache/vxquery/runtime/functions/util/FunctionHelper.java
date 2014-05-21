@@ -1232,8 +1232,8 @@ public class FunctionHelper {
         System.err.println(" printUTF8String END");
     }
 
-    public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis, DataInputStream di,
-            ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+    public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
+            DataInputStream di, ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
         String fName;
         try {
             fName = getStringFromPointable(stringp, bbis, di);

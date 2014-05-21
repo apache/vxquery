@@ -71,20 +71,16 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        final List<SequenceType> childSequenceTypes = new ArrayList<SequenceType>();
 
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
-        final XMLParser parser = new XMLParser(false, nodeIdProvider);;
+        final XMLParser parser = new XMLParser(false, nodeIdProvider, frame, appender, childSeq,
+                dCtx.getStaticContext());
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
             public void open() throws HyracksDataException {
                 appender.reset(frame, true);
                 writer.open();
-
-                for (int typeCode : childSeq) {
-                    childSequenceTypes.add(dCtx.getStaticContext().lookupSequenceType(typeCode));
-                }
             }
 
             @Override
@@ -100,7 +96,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         Iterator<File> it = FileUtils.iterateFiles(collectionDirectory, new VXQueryIOFileFilter(),
                                 TrueFileFilter.INSTANCE);
                         while (it.hasNext()) {
-                            parser.parseOutElements(it.next(), frame, appender, writer, fta, t, childSequenceTypes);
+                            parser.parseOutElements(it.next(), writer, fta, t);
                         }
                     }
                 } else {

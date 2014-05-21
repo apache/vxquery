@@ -96,7 +96,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     private final ArrayBackedValueStorage resultABVS;
 
-    private boolean writeMode;
+    private boolean skipping;
 
     private boolean[] subElement = null;
 
@@ -129,12 +129,20 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         freeENBList = new ArrayList<ElementNodeBuilder>();
         pendingText = false;
         tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        writeMode = false;
+        skipping = true;
+    }
+
+    public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, ByteBuffer frame,
+            FrameTupleAppender appender, List<SequenceType> childSequenceTypes) {
+        this(attachTypes, nodeIdProvider);
+        this.frame = frame;
+        this.appender = appender;
+        setChildPathSteps(childSequenceTypes);
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (writeMode) {
+        if (!skipping) {
             buffer.append(ch, start, length);
             pendingText = true;
         }
@@ -142,12 +150,14 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void endDocument() throws SAXException {
-        if (writeMode) {
+        if (!skipping) {
             try {
                 flushText();
                 docb.endChildrenChunk();
                 docb.finish();
-                writeElement();
+                if (frame != null && appender != null) {
+                    writeElement();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new SAXException(e);
@@ -155,22 +165,25 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
     }
 
+    private void endElementChildPathStep() throws IOException {
+        if (foundFirstNonSkippedElement()) {
+            writeElement();
+        }
+        if (subElement != null && depth <= subElement.length) {
+            subElement[depth - 1] = false;
+        }
+    }
+
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
-        if (writeMode) {
+        if (!skipping) {
             try {
                 flushText();
                 ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
                 enb.endChildrenChunk();
                 endChildInParent(enb);
-
-                if (foundChildPathStep()) {
-                    writeElement();
-                }
-                if (subElement != null && depth <= subElement.length) {
-                    subElement[depth - 1] = false;
-                }
                 freeENB(enb);
+                endElementChildPathStep();
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new SAXException(e);
@@ -189,7 +202,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void processingInstruction(String target, String data) throws SAXException {
-        if (writeMode) {
+        if (!skipping) {
             try {
                 flushText();
                 startChildInParent(pinb);
@@ -221,43 +234,47 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     @Override
     public void startDocument() throws SAXException {
         if (subElement == null) {
-            writeMode = true;
+            skipping = false;
         }
-        try {
-            db.reset();
-            docABVS.reset();
-            if (writeMode) {
+        db.reset();
+        docABVS.reset();
+        if (!skipping) {
+            try {
                 docb.reset(docABVS);
                 if (createNodeIds) {
                     docb.setLocalNodeId(nodeIdCounter++);
                 }
                 docb.startChildrenChunk();
                 flushText();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SAXException(e);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new SAXException(e);
         }
     }
 
-    @Override
-    public void startElement(String uri, String localName, String name, Attributes atts) throws SAXException {
-        depth++;
-        // Check path step if it exists.
+    private boolean startElementChildPathStep(String uri, String localName) {
         if (subElement != null && depth <= subElement.length) {
+            // Check path step if it exists.
             if (uri.compareTo(childUri[depth - 1]) == 0) {
                 if (localName.compareTo(childLocalName[depth - 1]) == 0) {
                     subElement[depth - 1] = true;
                 }
             }
         }
-
-        boolean start = foundChildPathStep();
+        boolean start = foundFirstNonSkippedElement();
         if (start) {
-            writeMode = true;
+            skipping = false;
         }
+        return start;
+    }
 
-        if (writeMode) {
+    @Override
+    public void startElement(String uri, String localName, String name, Attributes atts) throws SAXException {
+        depth++;
+        boolean start = startElementChildPathStep(uri, localName);
+
+        if (!skipping) {
             try {
                 flushText();
                 int idx = name.indexOf(':');
@@ -320,7 +337,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void comment(char[] ch, int start, int length) throws SAXException {
-        if (writeMode) {
+        if (!skipping) {
             try {
                 flushText();
                 startChildInParent(cnb);
@@ -379,7 +396,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public void startEntity(String name) throws SAXException {
     }
 
-    public void setChildPathSteps(List<SequenceType> childSeq) {
+    private void setChildPathSteps(List<SequenceType> childSeq) {
         //        this.childSeq = childSeq;
         if (!childSeq.isEmpty()) {
             subElement = new boolean[childSeq.size()];
@@ -398,10 +415,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
     }
 
-    public void setupElementWriter(ByteBuffer frame, FrameTupleAppender appender, IFrameWriter writer,
-            FrameTupleAccessor fta, int t) throws IOException {
-        this.frame = frame;
-        this.appender = appender;
+    public void setupElementWriter(IFrameWriter writer, FrameTupleAccessor fta, int t) {
         this.writer = writer;
         this.fta = fta;
         this.t = t;
@@ -430,7 +444,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
         tvp.set(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
         addNodeToTuple(tvp, t);
-        writeMode = false;
+        skipping = true;
     }
 
     public void writeDocument(ArrayBackedValueStorage abvs) throws IOException {
@@ -470,8 +484,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         startChildInParent(anb, false);
     }
 
-    private void startChildInParent(AbstractNodeBuilder anb, boolean track) throws IOException {
-        if (track) {
+    private void startChildInParent(AbstractNodeBuilder anb, boolean startNewElement) throws IOException {
+        if (startNewElement) {
             elementABVS.reset();
             anb.reset(elementABVS);
         } else if (enbStack.isEmpty()) {
@@ -521,8 +535,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     /**
      * Determines if the correct path step is active.
      */
-    private boolean foundChildPathStep() {
-        if (subElement.length != depth) {
+    private boolean foundFirstNonSkippedElement() {
+        if (subElement == null || subElement.length != depth) {
             // Not the correct depth.
             return false;
         }

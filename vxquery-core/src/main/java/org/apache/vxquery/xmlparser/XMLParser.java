@@ -20,9 +20,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
 import org.apache.vxquery.exceptions.VXQueryParseException;
 import org.apache.vxquery.types.SequenceType;
@@ -43,9 +45,23 @@ public class XMLParser {
     final InputSource in;
 
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider) throws HyracksDataException {
+        this(attachTypes, idProvider, null, null, null, null);
+    }
+
+    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, ByteBuffer frame,
+            FrameTupleAppender appender, List<Integer> childSeq, StaticContext staticContext)
+            throws HyracksDataException {
         try {
             parser = XMLReaderFactory.createXMLReader();
-            handler = new SAXContentHandler(attachTypes, idProvider);
+            if (frame == null || appender == null) {
+                handler = new SAXContentHandler(attachTypes, idProvider);
+            } else {
+                List<SequenceType> childSequenceTypes = new ArrayList<SequenceType>();
+                for (int typeCode : childSeq) {
+                    childSequenceTypes.add(staticContext.lookupSequenceType(typeCode));
+                }
+                handler = new SAXContentHandler(attachTypes, idProvider, frame, appender, childSequenceTypes);
+            }
             parser.setContentHandler(handler);
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
             in = new InputSource();
@@ -72,16 +88,15 @@ public class XMLParser {
         }
     }
 
-    public void parseOutElements(File file, ByteBuffer frame, FrameTupleAppender appender, IFrameWriter writer,
-            FrameTupleAccessor fta, int t, List<SequenceType> childSeq) throws HyracksDataException {
+    public void parseOutElements(File file, IFrameWriter writer, FrameTupleAccessor fta, int t)
+            throws HyracksDataException {
         try {
             if (file.getName().toLowerCase().endsWith(".xml.gz")) {
                 in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
             } else {
                 in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
             }
-            handler.setChildPathSteps(childSeq);
-            handler.setupElementWriter(frame, appender, writer, fta, t);
+            handler.setupElementWriter(writer, fta, t);
             parser.parse(in);
         } catch (FileNotFoundException e) {
             throw new VXQueryFileNotFoundException(e, file);

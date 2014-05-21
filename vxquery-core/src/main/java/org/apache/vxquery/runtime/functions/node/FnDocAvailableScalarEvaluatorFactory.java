@@ -27,6 +27,9 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.XMLParser;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -52,6 +55,8 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
+        final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -69,9 +74,10 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
                 if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
-
+                tvp.getValue(stringp);
                 try {
-                    FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, null);
+                    XMLParser parser = new XMLParser(false, nodeIdProvider);
+                    FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
                     XDMConstants.setTrue(result);
                 } catch (Exception e) {
                     XDMConstants.setFalse(result);
