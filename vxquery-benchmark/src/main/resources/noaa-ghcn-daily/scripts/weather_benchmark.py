@@ -227,6 +227,8 @@ class WeatherBenchmark:
         index = 0
         link_base_schemes = get_partition_scheme(0, 1, self.base_paths, self.DATA_LINKS_FOLDER + test)
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
+            if test == "local_batch_scale_out" and index > 0:
+                continue
             new_link_path = self.get_zero_partition_path(link_node, self.DATA_LINKS_FOLDER + test)
             scheme.append([0, index, 0, link_path, new_link_path])
             index += 1
