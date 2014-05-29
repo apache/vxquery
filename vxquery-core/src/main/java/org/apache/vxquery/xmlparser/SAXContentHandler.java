@@ -181,7 +181,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
                 flushText();
                 ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
                 enb.endChildrenChunk();
-                endChildInParent(enb);
+                endChildInParent(enb, foundFirstNonSkippedElement());
                 freeENB(enb);
                 endElementChildPathStep();
             } catch (IOException e) {
@@ -496,7 +496,13 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     private void endChildInParent(AbstractNodeBuilder anb) throws IOException {
-        if (enbStack.isEmpty()) {
+        endChildInParent(anb, false);
+    }
+
+    private void endChildInParent(AbstractNodeBuilder anb, boolean endNewElement) throws IOException {
+        if (endNewElement) {
+            anb.finish();
+        } else if (enbStack.isEmpty()) {
             docb.endChild(anb);
         } else {
             peekENBStackTop().endChild(anb);
@@ -509,7 +515,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             FrameUtils.flushFrame(frame, writer);
             appender.reset(frame, true);
             if (!addNodeToTupleAppender(result, t)) {
-                throw new HyracksDataException("Could not write frame (SAXContentHandler.addNodeToTuple).");
+                throw new HyracksDataException("Could not write frame.");
             }
         }
     }
