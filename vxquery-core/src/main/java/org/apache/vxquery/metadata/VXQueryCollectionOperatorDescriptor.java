@@ -18,14 +18,14 @@ package org.apache.vxquery.metadata;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -48,6 +48,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private short totalDataSources;
     private String[] collectionPartitions;
     private List<Integer> childSeq;
+    protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
 
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryCollectionDataSource ds,
             RecordDescriptor rDesc) {
@@ -96,12 +97,16 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         Iterator<File> it = FileUtils.iterateFiles(collectionDirectory, new VXQueryIOFileFilter(),
                                 TrueFileFilter.INSTANCE);
                         while (it.hasNext()) {
-                            parser.parseOutElements(it.next(), writer, fta, t);
+                            File xmlDocument = it.next();
+                            if (LOGGER.isLoggable(Level.INFO)) {
+                                LOGGER.info("Starting to read XML document: " + xmlDocument.getAbsolutePath());
+                            }
+                            parser.parseOutElements(xmlDocument, writer, fta, t);
                         }
                     }
                 } else {
-                    throw new HyracksDataException(
-                            "Invalid directory parameter passed to collection (VXQueryCollectionOperatorDescriptor.nextFrame).");
+                    throw new HyracksDataException("Invalid directory parameter ("
+                            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
                 }
             }
 
