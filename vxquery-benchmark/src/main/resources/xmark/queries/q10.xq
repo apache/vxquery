@@ -17,10 +17,10 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../data/people/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
 for $i in distinct-values(collection($collection1)/site/people/person/profile/interest/@category)
 let $p :=
-  let $collection2 := "../data/people/"
+  let $collection2 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
   for $t in collection($collection2)/site/people/person 
   where $t/profile/interest/@category = $i
   return

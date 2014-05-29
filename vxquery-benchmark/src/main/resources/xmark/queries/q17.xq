@@ -17,7 +17,7 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../data/people/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
 for $p in collection($collection1)/site/people/person
 where empty($p/homepage/text())
 return <person name="{$p/name/text()}"/>

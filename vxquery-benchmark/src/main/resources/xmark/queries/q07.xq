@@ -17,7 +17,7 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection := "../data/"
+let $collection := "vxquery-benchmark/src/main/resources/xmark/data/"
 for $p in collection($collection)/site
 return
   count($p//description) + count($p//annotation) + count($p//emailaddress)

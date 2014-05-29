@@ -21,7 +21,7 @@
   <preferred>
     {
       count(
-        let $collection1 := "../data/people/"
+        let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
         for $b in collection($collection1)/site/people/person/profile[@income >= 100000]
         return $b
       )
@@ -30,7 +30,7 @@
   <standard>
     {
       count(
-        let $collection2 := "../data/people/"
+        let $collection2 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
          for $c in collection($collection2)/site/people/person/profile[@income < 100000 and @income >= 30000]
          return $c
       )
@@ -39,7 +39,7 @@
   <challenge>
     {
       count(
-        let $collection3 := "../data/people/"
+        let $collection3 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
         for $d in collection($collection3)/site/people/person/profile[@income < 30000]
         return $d
       )
@@ -48,7 +48,7 @@
   <na>
     {
       count(
-        let $collection4 := "../data/people/"
+        let $collection4 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
         for $p in collection($collection4)/site/people/person
         where empty($p/profile/@income)
         return $p

@@ -23,6 +23,6 @@ declare function local:convert($v as xs:decimal?) as xs:decimal?
   2.20371 * $v (: convert Dfl to Euro :)
 };
 
-let $collection1 := "../data/open_auctions/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/open_auctions/"
 for $i in collection($collection1)/site/open_auctions/open_auction
 return local:convert(zero-or-one($i/reserve))

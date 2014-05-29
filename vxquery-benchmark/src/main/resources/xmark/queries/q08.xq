@@ -17,10 +17,10 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../data/people/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
 for $p in collection($collection1)/site/people/person
 let $a :=
-  let $collection2 := "../data/closed_auctions/"
+  let $collection2 := "vxquery-benchmark/src/main/resources/xmark/data/closed_auctions/"
   for $t in collection($collection2)/site/closed_auctions/closed_auction
   where $t/buyer/@person = $p/@id
   return $t

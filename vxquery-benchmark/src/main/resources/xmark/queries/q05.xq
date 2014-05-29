@@ -18,7 +18,7 @@
 (: XMark Query see README.md for full details. :)
 
 count(
-  let $collection := "../data/closed_auctions/"
+  let $collection := "vxquery-benchmark/src/main/resources/xmark/data/closed_auctions/"
   for $i in collection($collection)/site/closed_auctions/closed_auction
   where $i/price/text() >= 40
   return $i/price

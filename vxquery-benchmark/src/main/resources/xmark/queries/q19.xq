@@ -17,7 +17,7 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../data/regions/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/regions/"
 for $b in collection($collection1)/site/regions/*/item
 let $k := $b/name/text()
 order by zero-or-one($b/location) ascending empty greatest

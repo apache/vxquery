@@ -17,6 +17,6 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection := "../query/regions/"
+let $collection := "vxquery-benchmark/src/main/resources/xmark/data/regions/"
 for $b in collection($collection)/site/regions
 return count($b/*/item)

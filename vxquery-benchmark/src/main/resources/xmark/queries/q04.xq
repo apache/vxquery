@@ -17,7 +17,7 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection := "../data/open_auctions/"
+let $collection := "vxquery-benchmark/src/main/resources/xmark/data/open_auctions/"
 for $b in collection($collection)/site/open_auctions/open_auction
 where
   some $pr1 in $b/bidder/personref[@person = "person20"],

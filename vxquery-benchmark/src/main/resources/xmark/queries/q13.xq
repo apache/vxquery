@@ -17,6 +17,6 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../data/regions/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/regions/"
 for $i in collection($collection1)/site/regions/australia/item
 return <item name="{$i/name/text()}">{$i/description}</item>

@@ -17,10 +17,10 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../query/people/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/people/"
 for $p in collection($collection1)/site/people/person 
 let $l :=
-  let $collection2 := "../query/open_auctions/"
+  let $collection2 := "vxquery-benchmark/src/main/resources/xmark/data/open_auctions/"
   for $i in collection($collection2)/site/open_auctions/open_auction/initial
   where $p/profile/@income > 5000 * exactly-one($i/text())
   return $i

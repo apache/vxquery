@@ -17,7 +17,7 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection := "../query/people/"
+let $collection := "vxquery-benchmark/src/main/resources/xmark/data/people/"
 for $b in collection($collection)/site/people/person
 where $b/@id = "person0"
 return $b/name/text()

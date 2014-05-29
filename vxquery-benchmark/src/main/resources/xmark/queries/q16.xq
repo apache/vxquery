@@ -17,7 +17,7 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../data/closed_auctions/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/closed_auctions/"
 for $a in collection($collection1)/site/closed_auctions/closed_auction
 where
   not(

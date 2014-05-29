@@ -17,7 +17,7 @@
 
 (: XMark Query see README.md for full details. :)
 
-let $collection1 := "../data/"
+let $collection1 := "vxquery-benchmark/src/main/resources/xmark/data/"
 for $i in collection($collection1)/site//item
 where contains(string(exactly-one($i/description)), "gold")
 return $i/name/text()
