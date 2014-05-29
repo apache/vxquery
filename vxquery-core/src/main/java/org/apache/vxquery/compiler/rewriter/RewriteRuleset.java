@@ -138,7 +138,7 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Find assign for scalar aggregate function.
-        normalization.add(new ConvertAssignToAggregateRule());
+        // normalization.add(new ConvertAssignToAggregateRule());
 
         // Use two step aggregate operators if possible.
         normalization.add(new IntroduceTwoStepAggregateRule());

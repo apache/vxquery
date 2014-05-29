@@ -1538,8 +1538,8 @@ public class XMLQueryTranslator {
         SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
         XQueryVariable forVar = new XQueryVariable(XMLQueryCompilerConstants.DOT_VAR_NAME, forVarType, forLVar);
         tCtx.varScope.registerVariable(forVar);
-        XQueryVariable posVar = new XQueryVariable(XMLQueryCompilerConstants.POS_VAR_NAME, SequenceType.create(
-                BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE), posLVar);
+        SequenceType posVarType = SequenceType.create(BuiltinTypeRegistry.XS_INTEGER, Quantifier.QUANT_ONE);
+        XQueryVariable posVar = new XQueryVariable(XMLQueryCompilerConstants.POS_VAR_NAME, posVarType, posLVar);
         tCtx.varScope.registerVariable(posVar);
         unnest.getInputs().add(mutable(tCtx.op));
         tCtx.op = unnest;

@@ -374,12 +374,6 @@ public class VXQuery {
         ccConfig.clusterNetIpAddress = "127.0.0.1";
         ccConfig.clusterNetPort = 39001;
         ccConfig.profileDumpPeriod = 10000;
-        File outDir = new File("target/ClusterController");
-        outDir.mkdirs();
-        File ccRoot = File.createTempFile(VXQuery.class.getName(), ".data", outDir);
-        ccRoot.delete();
-        ccRoot.mkdir();
-        ccConfig.ccRoot = ccRoot.getAbsolutePath();
         cc = new ClusterControllerService(ccConfig);
         cc.start();
 
