@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -51,7 +52,7 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
         final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
         final DataOutput dOutInner = abvsInner.getDataOutput();
         final CastToStringOperation castToString = new CastToStringOperation();
-        final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
+        final TypedPointables tp = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override

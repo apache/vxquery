@@ -21,6 +21,7 @@ import java.io.DataOutput;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -53,18 +54,23 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
         final AbstractValueComparisonOperation aOp = createValueComparisonOperation();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        
+
         final ArrayBackedValueStorage abvsInteger1 = new ArrayBackedValueStorage();
         final DataOutput dOutInteger1 = abvsInteger1.getDataOutput();
         final ArrayBackedValueStorage abvsInteger2 = new ArrayBackedValueStorage();
         final DataOutput dOutInteger2 = abvsInteger2.getDataOutput();
+
+        final TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
                 TaggedValuePointable tvp2 = args[1];
-                
+
                 if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
                     tvp1.getValue(seqp);
                     if (seqp.getEntryCount() == 0) {
@@ -81,7 +87,7 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                     }
                     throw new SystemException(ErrorCode.XPTY0004);
                 }
-                
+
                 boolean booleanResult = transformThenCompareTaggedValues(aOp, tvp1, tvp2, dCtx);
                 try {
                     abvs.reset();
@@ -95,36 +101,33 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
 
             protected boolean transformThenCompareTaggedValues(AbstractValueComparisonOperation aOp,
                     TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
-                TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-
                 try {
                     if (tvp1.getTag() == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         // Only need to change tag since the storage is the same for untyped atomic and string.
                         tvp1.getByteArray()[0] = ValueTag.XS_STRING_TAG;
-                        tvp1new = tvp1;
+                        tvp1new.set(tvp1);
                     } else if (FunctionHelper.isDerivedFromInteger(tvp1.getTag())) {
                         abvsInteger1.reset();
                         FunctionHelper.getIntegerPointable(tvp1, dOutInteger1);
                         tvp1new.set(abvsInteger1.getByteArray(), abvsInteger1.getStartOffset(),
                                 LongPointable.TYPE_TRAITS.getFixedLength() + 1);
                     } else {
-                        tvp1new = tvp1;
+                        tvp1new.set(tvp1);
                     }
                     if (tvp2.getTag() == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         // Only need to change tag since the storage is the same for untyped atomic and string.
                         tvp2.getByteArray()[0] = ValueTag.XS_STRING_TAG;
-                        tvp2new = tvp2;
+                        tvp2new.set(tvp2);
                     } else if (FunctionHelper.isDerivedFromInteger(tvp2.getTag())) {
                         abvsInteger2.reset();
                         FunctionHelper.getIntegerPointable(tvp2, dOutInteger2);
                         tvp2new.set(abvsInteger2.getByteArray(), abvsInteger2.getStartOffset(),
                                 LongPointable.TYPE_TRAITS.getFixedLength() + 1);
                     } else {
-                        tvp2new = tvp2;
+                        tvp2new.set(tvp2);
                     }
 
-                    return FunctionHelper.compareTaggedValues(aOp, tvp1new, tvp2new, dCtx);
+                    return FunctionHelper.compareTaggedValues(aOp, tvp1new, tvp2new, dCtx, tp1, tp2);
                 } catch (SystemException se) {
                     throw se;
                 } catch (Exception e) {

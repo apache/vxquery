@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -59,6 +60,8 @@ public class FnIndexOfScalarEvaluatorFactory extends AbstractTaggedValueArgument
         final AbstractValueComparisonOperation aOp = new ValueEqComparisonOperation();
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -75,7 +78,7 @@ public class FnIndexOfScalarEvaluatorFactory extends AbstractTaggedValueArgument
                         for (int j = 0; j < seqLen; ++j) {
                             seq.getEntry(j, p);
                             tvp.set(p.getByteArray(), p.getStartOffset(), p.getLength());
-                            if (FunctionHelper.compareTaggedValues(aOp, tvp, tvp2, dCtx)) {
+                            if (FunctionHelper.compareTaggedValues(aOp, tvp, tvp2, dCtx, tp1, tp2)) {
                                 abvsInner.reset();
                                 dOutInner.write(ValueTag.XS_INTEGER_TAG);
                                 dOutInner.writeLong(j + 1);
@@ -83,7 +86,7 @@ public class FnIndexOfScalarEvaluatorFactory extends AbstractTaggedValueArgument
                             }
                         }
                     } else {
-                        if (FunctionHelper.compareTaggedValues(aOp, tvp1, tvp2, dCtx)) {
+                        if (FunctionHelper.compareTaggedValues(aOp, tvp1, tvp2, dCtx, tp1, tp2)) {
                             abvsInner.reset();
                             dOutInner.write(ValueTag.XS_INTEGER_TAG);
                             dOutInner.writeLong(1);

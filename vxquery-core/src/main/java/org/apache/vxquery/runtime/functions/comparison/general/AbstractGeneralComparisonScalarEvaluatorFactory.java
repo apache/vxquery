@@ -21,6 +21,7 @@ import java.io.DataOutput;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -92,8 +93,8 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
         final DataOutput dOutInner2 = abvsInner2.getDataOutput();
 
         final AtomizeHelper ah = new AtomizeHelper();
-        final FunctionHelper.TypedPointables tp1 = new FunctionHelper.TypedPointables();
-        final FunctionHelper.TypedPointables tp2 = new FunctionHelper.TypedPointables();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final SequencePointable seqp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final SequencePointable seqp2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
@@ -259,7 +260,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
-                return FunctionHelper.compareTaggedValues(aOp, tvpCompare1, tvpCompare2, dCtx);
+                return FunctionHelper.compareTaggedValues(aOp, tvpCompare1, tvpCompare2, dCtx, tp1, tp2);
             }
 
             private void getCastToOperator(int tid) {

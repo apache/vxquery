@@ -20,13 +20,13 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -48,7 +48,7 @@ public class FnNumberScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         final CastToDoubleOperation castToDouble = new CastToDoubleOperation();
-        final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
+        final TypedPointables tp = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -69,7 +69,7 @@ public class FnNumberScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             tvp1.getValue(tp.boolp);
                             castToDouble.convertBoolean(tp.boolp, dOut);
                             break;
-                        //                        case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                        // case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                         case ValueTag.XS_INTEGER_TAG:
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
                         case ValueTag.XS_NEGATIVE_INTEGER_TAG:
@@ -81,7 +81,7 @@ public class FnNumberScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             tvp1.getValue(tp.longp);
                             castToDouble.convertInteger(tp.longp, dOut);
                             break;
-                        //                        case ValueTag.XS_DAY_TIME_DURATION_TAG:
+                        // case ValueTag.XS_DAY_TIME_DURATION_TAG:
                         case ValueTag.XS_INT_TAG:
                         case ValueTag.XS_UNSIGNED_SHORT_TAG:
                             tvp1.getValue(tp.intp);

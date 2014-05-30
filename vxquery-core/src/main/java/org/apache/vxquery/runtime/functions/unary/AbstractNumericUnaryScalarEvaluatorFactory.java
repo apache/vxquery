@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.unary;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -52,7 +53,7 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
             final DataOutput dOut = abvs.getDataOutput();
             final ArrayBackedValueStorage abvsInteger = new ArrayBackedValueStorage();
             final DataOutput dOutInteger = abvsInteger.getDataOutput();
-            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
+            final TypedPointables tp = new TypedPointables();
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
