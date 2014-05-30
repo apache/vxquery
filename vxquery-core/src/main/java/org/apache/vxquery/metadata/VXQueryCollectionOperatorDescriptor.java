@@ -98,8 +98,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                 TrueFileFilter.INSTANCE);
                         while (it.hasNext()) {
                             File xmlDocument = it.next();
-                            if (LOGGER.isLoggable(Level.INFO)) {
-                                LOGGER.info("Starting to read XML document: " + xmlDocument.getAbsolutePath());
+                            if (LOGGER.isLoggable(Level.FINE)) {
+                                LOGGER.fine("Starting to read XML document: " + xmlDocument.getAbsolutePath());
                             }
                             parser.parseOutElements(xmlDocument, writer, fta, t);
                         }
