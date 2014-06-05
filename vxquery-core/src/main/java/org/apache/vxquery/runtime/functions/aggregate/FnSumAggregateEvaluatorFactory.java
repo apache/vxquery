@@ -65,6 +65,11 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
             }
 
             @Override
+            public void finishPartial(IPointable result) throws AlgebricksException {
+                finish(result);
+            }
+
+            @Override
             public void finish(IPointable result) throws AlgebricksException {
                 result.set(tvpSum);
             }

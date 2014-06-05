@@ -78,6 +78,11 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
             }
 
             @Override
+            public void finishPartial(IPointable result) throws AlgebricksException {
+                finish(result);
+            }
+
+            @Override
             public void finish(IPointable result) throws AlgebricksException {
                 tvpCount.getValue(longp);
                 if (longp.getLong() == 0) {

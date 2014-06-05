@@ -594,7 +594,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <hyracks.version>0.2.11</hyracks.version>
+    <hyracks.version>0.2.12-SNAPSHOT</hyracks.version>
   </properties>
 
   <modules>

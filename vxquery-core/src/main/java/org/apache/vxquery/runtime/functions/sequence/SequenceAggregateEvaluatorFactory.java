@@ -59,6 +59,11 @@ public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgume
             }
 
             @Override
+            public void finishPartial(IPointable result) throws AlgebricksException {
+                finish(result);
+            }
+
+            @Override
             public void finish(IPointable result) throws AlgebricksException {
                 if (slots.getSize() != 1) {
                     try {
@@ -70,7 +75,7 @@ public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgume
                 } else {
                     result.set(dataArea);
                 }
-           }
+            }
 
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {

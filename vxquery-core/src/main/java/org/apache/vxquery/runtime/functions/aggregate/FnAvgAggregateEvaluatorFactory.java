@@ -64,6 +64,11 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
             }
 
             @Override
+            public void finishPartial(IPointable result) throws AlgebricksException {
+                finish(result);
+            }
+
+            @Override
             public void finish(IPointable result) throws AlgebricksException {
                 if (count == 0) {
                     XDMConstants.setEmptySequence(result);

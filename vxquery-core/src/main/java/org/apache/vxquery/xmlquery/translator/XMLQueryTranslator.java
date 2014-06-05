@@ -882,7 +882,7 @@ public class XMLQueryTranslator {
         if (qeNode.getQuant() == QuantifierType.EVERY) {
             satExpr = sfce(BuiltinFunctions.FN_NOT_1, satExpr);
         }
-        SelectOperator select = new SelectOperator(mutable(satExpr));
+        SelectOperator select = new SelectOperator(mutable(satExpr), false, null);
         select.getInputs().add(mutable(tCtx.op));
         tCtx.op = select;
         List<LogicalVariable> vars = new ArrayList<LogicalVariable>();
@@ -1021,7 +1021,8 @@ public class XMLQueryTranslator {
                         LogicalVariable forLVar = newLogicalVariable();
                         LogicalVariable posLVar = fvdNode.getPosVar() != null ? newLogicalVariable() : null;
                         UnnestOperator unnest = new UnnestOperator(forLVar,
-                                mutable(ufce(BuiltinOperators.ITERATE, seq)), posLVar, null);
+                                mutable(ufce(BuiltinOperators.ITERATE, seq)), posLVar, BuiltinTypeRegistry.XS_INTEGER,
+                                new VXQueryPositionWriter());
                         SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
                         if (fvdNode.getType() != null) {
                             forVarType = createSequenceType(fvdNode.getType());
@@ -1061,7 +1062,7 @@ public class XMLQueryTranslator {
                     WhereClauseNode wcNode = (WhereClauseNode) cNode;
                     ILogicalExpression condExpr = sfce(BuiltinFunctions.FN_BOOLEAN_1,
                             vre(translateExpression(wcNode.getCondition(), tCtx)));
-                    SelectOperator select = new SelectOperator(mutable(condExpr));
+                    SelectOperator select = new SelectOperator(mutable(condExpr), false, null);
                     select.getInputs().add(mutable(tCtx.op));
                     tCtx.op = select;
                     break;
@@ -1496,7 +1497,7 @@ public class XMLQueryTranslator {
                         ILogicalExpression boolTest = sfce(BuiltinFunctions.FN_BOOLEAN_1, vre(pLVar));
 
                         SelectOperator select = new SelectOperator(mutable(sfce(BuiltinOperators.IF_THEN_ELSE, tTest,
-                                posTest, boolTest)));
+                                posTest, boolTest)), false, null);
                         select.getInputs().add(mutable(tCtx.op));
                         tCtx.op = select;
                         ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
@@ -1534,7 +1535,7 @@ public class XMLQueryTranslator {
         LogicalVariable forLVar = newLogicalVariable();
         LogicalVariable posLVar = newLogicalVariable();
         UnnestOperator unnest = new UnnestOperator(forLVar, mutable(ufce(BuiltinOperators.ITERATE, vre(seqLVar))),
-                posLVar, null);
+                posLVar, BuiltinTypeRegistry.XS_INTEGER, new VXQueryPositionWriter());
         SequenceType forVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
         XQueryVariable forVar = new XQueryVariable(XMLQueryCompilerConstants.DOT_VAR_NAME, forVarType, forLVar);
         tCtx.varScope.registerVariable(forVar);
