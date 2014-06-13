@@ -57,6 +57,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
         final DataInputStream di = new DataInputStream(bbis);
         final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
+        final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -76,7 +77,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
                 }
                 tvp.getValue(stringp);
                 try {
-                    XMLParser parser = new XMLParser(false, nodeIdProvider);
+                    XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
                     FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
                     XDMConstants.setTrue(result);
                 } catch (Exception e) {

@@ -74,7 +74,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
 
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
-        final XMLParser parser = new XMLParser(false, nodeIdProvider, frame, appender, childSeq,
+        final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, frame, appender, childSeq,
                 dCtx.getStaticContext());
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
@@ -92,7 +92,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 
                 // Go through each tuple.
                 if (collectionDirectory.isDirectory()) {
-                    for (int t = 0; t < fta.getTupleCount(); ++t) {
+                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
                         @SuppressWarnings("unchecked")
                         Iterator<File> it = FileUtils.iterateFiles(collectionDirectory, new VXQueryIOFileFilter(),
                                 TrueFileFilter.INSTANCE);
@@ -101,7 +101,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             if (LOGGER.isLoggable(Level.FINE)) {
                                 LOGGER.fine("Starting to read XML document: " + xmlDocument.getAbsolutePath());
                             }
-                            parser.parseOutElements(xmlDocument, writer, fta, t);
+                            parser.parseElements(xmlDocument, writer, fta, tupleIndex);
                         }
                     }
                 } else {

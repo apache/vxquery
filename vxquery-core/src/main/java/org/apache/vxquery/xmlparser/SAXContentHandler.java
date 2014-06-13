@@ -52,63 +52,42 @@ import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.FrameUtils;
 
 public class SAXContentHandler implements ContentHandler, LexicalHandler {
+    // XML node builders
     private final AttributeNodeBuilder anb;
-
-    private FrameTupleAppender appender;
-
-    private final boolean attachTypes;
-
-    private final StringBuilder buffer;
-
-    private String[] childLocalName = null;
-
-    private String[] childUri = null;
-
     private final CommentNodeBuilder cnb;
-
-    private final boolean createNodeIds;
-
     private final DictionaryBuilder db;
-
-    private int depth = 0;
-
-    private final ArrayBackedValueStorage docABVS;
-
     private final DocumentNodeBuilder docb;
-
-    private final ArrayBackedValueStorage elementABVS;
-
+    private final PINodeBuilder pinb;
+    private final TextNodeBuilder tnb;
     private final List<ElementNodeBuilder> enbStack;
-
-    private ByteBuffer frame;
-
     private final List<ElementNodeBuilder> freeENBList;
 
+    // Frame writing variables
+    private FrameTupleAppender appender;
+    private ByteBuffer frame;
     private FrameTupleAccessor fta;
+    private int tupleIndex;
+    private IFrameWriter writer;
 
-    private int nodeIdCounter;
-
-    private final ITreeNodeIdProvider nodeIdProvider;
-
-    private boolean pendingText;
-
-    private final PINodeBuilder pinb;
-
-    private final ArrayBackedValueStorage resultABVS;
-
+    // Element writing and path step variables
     private boolean skipping;
-
+    private String[] childLocalName = null;
+    private String[] childUri = null;
     private boolean[] subElement = null;
-
-    private int t;
-
-    private final ArrayBackedValueStorage tempABVS;
-
-    private final TextNodeBuilder tnb;
-
     private final TaggedValuePointable tvp;
 
-    private IFrameWriter writer;
+    // Basic tracking and setting variables
+    private final boolean attachTypes;
+    private final StringBuilder buffer;
+    private final boolean createNodeIds;
+    private int depth = 0;
+    private final ArrayBackedValueStorage docABVS;
+    private final ArrayBackedValueStorage elementABVS;
+    private boolean pendingText;
+    private int nodeIdCounter;
+    private final ITreeNodeIdProvider nodeIdProvider;
+    private final ArrayBackedValueStorage resultABVS;
+    private final ArrayBackedValueStorage tempABVS;
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider) {
         docABVS = new ArrayBackedValueStorage();
@@ -140,56 +119,80 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         setChildPathSteps(childSequenceTypes);
     }
 
+    private void setChildPathSteps(List<SequenceType> childSeq) {
+        if (!childSeq.isEmpty()) {
+            subElement = new boolean[childSeq.size()];
+            childUri = new String[childSeq.size()];
+            childLocalName = new String[childSeq.size()];
+        }
+
+        int index = 0;
+        for (SequenceType sType : childSeq) {
+            NodeType nodeType = (NodeType) sType.getItemType();
+            ElementType eType = (ElementType) nodeType;
+            NameTest nameTest = eType.getNameTest();
+            childUri[index] = getStringFromBytes(nameTest.getUri());
+            childLocalName[index] = getStringFromBytes(nameTest.getLocalName());;
+            ++index;
+        }
+    }
+
+    public void setupElementWriter(IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex) {
+        this.writer = writer;
+        this.fta = fta;
+        this.tupleIndex = tupleIndex;
+    }
+
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (!skipping) {
-            buffer.append(ch, start, length);
-            pendingText = true;
+        if (skipping) {
+            return;
         }
+        buffer.append(ch, start, length);
+        pendingText = true;
     }
 
     @Override
     public void endDocument() throws SAXException {
-        if (!skipping) {
-            try {
-                flushText();
-                docb.endChildrenChunk();
-                docb.finish();
-                if (frame != null && appender != null) {
-                    writeElement();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new SAXException(e);
+        if (skipping) {
+            return;
+        }
+        try {
+            flushText();
+            docb.endChildrenChunk();
+            docb.finish();
+            if (frame != null && appender != null) {
+                writeElement();
             }
-        }
-    }
-
-    private void endElementChildPathStep() throws IOException {
-        if (foundFirstNonSkippedElement()) {
-            writeElement();
-        }
-        if (subElement != null && depth <= subElement.length) {
-            subElement[depth - 1] = false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SAXException(e);
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
-        if (!skipping) {
-            try {
-                flushText();
-                ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
-                enb.endChildrenChunk();
-                endChildInParent(enb, foundFirstNonSkippedElement());
-                freeENB(enb);
-                endElementChildPathStep();
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new SAXException(e);
-            }
+        if (skipping) {
+            return;
         }
-        depth--;
+        try {
+            boolean nonSkipped = foundFirstNonSkippedElement();
+            flushText();
+            ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
+            enb.endChildrenChunk();
+            endChildInParent(enb, nonSkipped);
+            freeENB(enb);
+            if (nonSkipped) {
+                writeElement();
+            }
+            if (subElement != null && depth <= subElement.length) {
+                subElement[depth - 1] = false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SAXException(e);
+        }
+        --depth;
     }
 
     @Override
@@ -202,24 +205,25 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void processingInstruction(String target, String data) throws SAXException {
-        if (!skipping) {
-            try {
-                flushText();
-                startChildInParent(pinb);
-                tempABVS.reset();
-                tempABVS.getDataOutput().writeUTF(target);
-                if (createNodeIds) {
-                    pinb.setLocalNodeId(nodeIdCounter++);
-                }
-                pinb.setTarget(tempABVS);
-                tempABVS.reset();
-                tempABVS.getDataOutput().writeUTF(data);
-                pinb.setContent(tempABVS);
-                endChildInParent(pinb);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new SAXException(e);
+        if (skipping) {
+            return;
+        }
+        try {
+            flushText();
+            startChildInParent(pinb);
+            tempABVS.reset();
+            tempABVS.getDataOutput().writeUTF(target);
+            if (createNodeIds) {
+                pinb.setLocalNodeId(nodeIdCounter++);
             }
+            pinb.setTarget(tempABVS);
+            tempABVS.reset();
+            tempABVS.getDataOutput().writeUTF(data);
+            pinb.setContent(tempABVS);
+            endChildInParent(pinb);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SAXException(e);
         }
     }
 
@@ -238,18 +242,19 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
         db.reset();
         docABVS.reset();
-        if (!skipping) {
-            try {
-                docb.reset(docABVS);
-                if (createNodeIds) {
-                    docb.setLocalNodeId(nodeIdCounter++);
-                }
-                docb.startChildrenChunk();
-                flushText();
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new SAXException(e);
+        if (skipping) {
+            return;
+        }
+        try {
+            docb.reset(docABVS);
+            if (createNodeIds) {
+                docb.setLocalNodeId(nodeIdCounter++);
             }
+            docb.startChildrenChunk();
+            flushText();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SAXException(e);
         }
     }
 
@@ -271,63 +276,64 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void startElement(String uri, String localName, String name, Attributes atts) throws SAXException {
-        depth++;
+        ++depth;
         boolean start = startElementChildPathStep(uri, localName);
 
-        if (!skipping) {
-            try {
-                flushText();
-                int idx = name.indexOf(':');
-                String prefix = idx < 0 ? "" : name.substring(0, idx);
-                ElementNodeBuilder enb = createENB();
-                startChildInParent(enb, start);
-                int uriCode = db.lookup(uri);
-                int localNameCode = db.lookup(localName);
-                int prefixCode = db.lookup(prefix);
-                enb.setName(uriCode, localNameCode, prefixCode);
+        if (skipping) {
+            return;
+        }
+        try {
+            flushText();
+            int idx = name.indexOf(':');
+            String prefix = idx < 0 ? "" : name.substring(0, idx);
+            ElementNodeBuilder enb = createENB();
+            startChildInParent(enb, start);
+            int uriCode = db.lookup(uri);
+            int localNameCode = db.lookup(localName);
+            int prefixCode = db.lookup(prefix);
+            enb.setName(uriCode, localNameCode, prefixCode);
+            if (attachTypes) {
+                int typeUriCode = db.lookup(XQueryConstants.XS_NSURI);
+                int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_STR);
+                int typePrefixCode = db.lookup(XQueryConstants.XS_PREFIX);
+                enb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
+            }
+            if (createNodeIds) {
+                enb.setLocalNodeId(nodeIdCounter++);
+            }
+            enb.startAttributeChunk();
+            final int nAttrs = atts.getLength();
+            for (int i = 0; i < nAttrs; ++i) {
+                String aName = atts.getQName(i);
+                int aIdx = aName.indexOf(':');
+                int aPrefixCode = db.lookup(aIdx < 0 ? "" : aName.substring(0, aIdx));
+                int aLocalNameCode = db.lookup(atts.getLocalName(i));
+                int aUriCode = db.lookup(atts.getURI(i));
+                String aValue = atts.getValue(i);
+                tempABVS.reset();
+                DataOutput tempOut = tempABVS.getDataOutput();
+                tempOut.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
+                tempOut.writeUTF(aValue);
+                enb.startAttribute(anb);
+                anb.setName(aUriCode, aLocalNameCode, aPrefixCode);
                 if (attachTypes) {
                     int typeUriCode = db.lookup(XQueryConstants.XS_NSURI);
-                    int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_STR);
+                    int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_ATOMIC_STR);
                     int typePrefixCode = db.lookup(XQueryConstants.XS_PREFIX);
-                    enb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
+                    anb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
                 }
                 if (createNodeIds) {
-                    enb.setLocalNodeId(nodeIdCounter++);
+                    anb.setLocalNodeId(nodeIdCounter++);
                 }
-                enb.startAttributeChunk();
-                final int nAttrs = atts.getLength();
-                for (int i = 0; i < nAttrs; ++i) {
-                    String aName = atts.getQName(i);
-                    int aIdx = aName.indexOf(':');
-                    int aPrefixCode = db.lookup(aIdx < 0 ? "" : aName.substring(0, aIdx));
-                    int aLocalNameCode = db.lookup(atts.getLocalName(i));
-                    int aUriCode = db.lookup(atts.getURI(i));
-                    String aValue = atts.getValue(i);
-                    tempABVS.reset();
-                    DataOutput tempOut = tempABVS.getDataOutput();
-                    tempOut.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
-                    tempOut.writeUTF(aValue);
-                    enb.startAttribute(anb);
-                    anb.setName(aUriCode, aLocalNameCode, aPrefixCode);
-                    if (attachTypes) {
-                        int typeUriCode = db.lookup(XQueryConstants.XS_NSURI);
-                        int typeLocalNameCode = db.lookup(BuiltinTypeQNames.UNTYPED_ATOMIC_STR);
-                        int typePrefixCode = db.lookup(XQueryConstants.XS_PREFIX);
-                        anb.setType(typeUriCode, typeLocalNameCode, typePrefixCode);
-                    }
-                    if (createNodeIds) {
-                        anb.setLocalNodeId(nodeIdCounter++);
-                    }
-                    anb.setValue(tempABVS);
-                    enb.endAttribute(anb);
-                }
-                enb.endAttributeChunk();
-                enb.startChildrenChunk();
-                enbStack.add(enb);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new SAXException(e);
+                anb.setValue(tempABVS);
+                enb.endAttribute(anb);
             }
+            enb.endAttributeChunk();
+            enb.startChildrenChunk();
+            enbStack.add(enb);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SAXException(e);
         }
     }
 
@@ -337,23 +343,24 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void comment(char[] ch, int start, int length) throws SAXException {
-        if (!skipping) {
-            try {
-                flushText();
-                startChildInParent(cnb);
-                buffer.append(ch, start, length);
-                tempABVS.reset();
-                tempABVS.getDataOutput().writeUTF(buffer.toString());
-                if (createNodeIds) {
-                    cnb.setLocalNodeId(nodeIdCounter++);
-                }
-                cnb.setValue(tempABVS);
-                endChildInParent(cnb);
-                buffer.delete(0, buffer.length());
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new SAXException(e);
+        if (skipping) {
+            return;
+        }
+        try {
+            flushText();
+            startChildInParent(cnb);
+            buffer.append(ch, start, length);
+            tempABVS.reset();
+            tempABVS.getDataOutput().writeUTF(buffer.toString());
+            if (createNodeIds) {
+                cnb.setLocalNodeId(nodeIdCounter++);
             }
+            cnb.setValue(tempABVS);
+            endChildInParent(cnb);
+            buffer.delete(0, buffer.length());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SAXException(e);
         }
     }
 
@@ -396,31 +403,6 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public void startEntity(String name) throws SAXException {
     }
 
-    private void setChildPathSteps(List<SequenceType> childSeq) {
-        //        this.childSeq = childSeq;
-        if (!childSeq.isEmpty()) {
-            subElement = new boolean[childSeq.size()];
-            childUri = new String[childSeq.size()];
-            childLocalName = new String[childSeq.size()];
-        }
-
-        int index = 0;
-        for (SequenceType sType : childSeq) {
-            NodeType nodeType = (NodeType) sType.getItemType();
-            ElementType eType = (ElementType) nodeType;
-            NameTest nameTest = eType.getNameTest();
-            childUri[index] = getStringFromBytes(nameTest.getUri());
-            childLocalName[index] = getStringFromBytes(nameTest.getLocalName());;
-            index++;
-        }
-    }
-
-    public void setupElementWriter(IFrameWriter writer, FrameTupleAccessor fta, int t) {
-        this.writer = writer;
-        this.fta = fta;
-        this.t = t;
-    }
-
     public void writeElement() throws IOException {
         resultABVS.reset();
         DataOutput out = resultABVS.getDataOutput();
@@ -443,7 +425,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             out.write(elementABVS.getByteArray(), elementABVS.getStartOffset(), elementABVS.getLength());
         }
         tvp.set(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
-        addNodeToTuple(tvp, t);
+        addNodeToTuple(tvp, tupleIndex);
         skipping = true;
     }
 

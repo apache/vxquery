@@ -43,14 +43,16 @@ public class XMLParser {
     final XMLReader parser;
     final SAXContentHandler handler;
     final InputSource in;
+    final String nodeId;
 
-    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider) throws HyracksDataException {
-        this(attachTypes, idProvider, null, null, null, null);
+    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId) throws HyracksDataException {
+        this(attachTypes, idProvider, nodeId, null, null, null, null);
     }
 
-    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, ByteBuffer frame,
+    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId, ByteBuffer frame,
             FrameTupleAppender appender, List<Integer> childSeq, StaticContext staticContext)
             throws HyracksDataException {
+        this.nodeId = nodeId;
         try {
             parser = XMLReaderFactory.createXMLReader();
             if (frame == null || appender == null) {
@@ -70,7 +72,7 @@ public class XMLParser {
         }
     }
 
-    public void parseFile(File file, ArrayBackedValueStorage abvs) throws HyracksDataException {
+    public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
             if (file.getName().toLowerCase().endsWith(".xml.gz")) {
                 in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
@@ -80,15 +82,21 @@ public class XMLParser {
             parser.parse(in);
             handler.writeDocument(abvs);
         } catch (FileNotFoundException e) {
-            throw new VXQueryFileNotFoundException(e, file);
+            HyracksDataException hde = new VXQueryFileNotFoundException(e, file);
+            hde.setNodeId(nodeId);
+            throw hde;
         } catch (SAXException e) {
-            throw new VXQueryParseException(e, file);
+            HyracksDataException hde = new VXQueryParseException(e, file);
+            hde.setNodeId(nodeId);
+            throw hde;
         } catch (IOException e) {
-            throw new HyracksDataException(e);
+            HyracksDataException hde = new HyracksDataException(e);
+            hde.setNodeId(nodeId);
+            throw hde;
         }
     }
 
-    public void parseOutElements(File file, IFrameWriter writer, FrameTupleAccessor fta, int t)
+    public void parseElements(File file, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
             throws HyracksDataException {
         try {
             if (file.getName().toLowerCase().endsWith(".xml.gz")) {
@@ -96,14 +104,20 @@ public class XMLParser {
             } else {
                 in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
             }
-            handler.setupElementWriter(writer, fta, t);
+            handler.setupElementWriter(writer, fta, tupleIndex);
             parser.parse(in);
         } catch (FileNotFoundException e) {
-            throw new VXQueryFileNotFoundException(e, file);
+            HyracksDataException hde = new VXQueryFileNotFoundException(e, file);
+            hde.setNodeId(nodeId);
+            throw hde;
         } catch (SAXException e) {
-            throw new VXQueryParseException(e, file);
+            HyracksDataException hde = new VXQueryParseException(e, file);
+            hde.setNodeId(nodeId);
+            throw hde;
         } catch (IOException e) {
-            throw new HyracksDataException(e);
+            HyracksDataException hde = new HyracksDataException(e);
+            hde.setNodeId(nodeId);
+            throw hde;
         }
     }
 

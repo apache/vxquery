@@ -19,7 +19,7 @@ Running the Test Suite
 * Command
 
 ----------------------------------------
-sh ./apache-vxquery-X.Y-incubating/vxquery/vxquery-xtest/target/appassembler/bin/xtest
+sh ./vxquery/vxquery-xtest/target/appassembler/bin/xtest
 ----------------------------------------
 
 * Command Line Options
@@ -70,7 +70,18 @@ $ cd ..
   * run the tests, and
 
 ----------------------------------------
-JAVA_OPTS="-Xmx1024m  -Djava.util.logging.config.file=/path/to/logging.properties" sh ./apache-vxquery-X.Y-incubating/vxquery-xtest/target/appassembler/bin/xtest -catalog xqts/XQTSCatalog.xml -htmlreport /tmp/full_report.html
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog xqts/XQTSCatalog.xml -htmlreport /tmp/full_report.html
 ----------------------------------------
 
   * view the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.
+  * Add JAVA_OPTS for additional java parameters.
+
+* VXQuery Test Suite
+
+  The VXQuery test suite focuses on parallel processing tests used in our weather benchmark.
+  
+----------------------------------------
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/src/test/resources/VXQueryCatalog.xml -htmlreport /tmp/full_report.html
+----------------------------------------
+  
+  

@@ -1190,7 +1190,7 @@ public class FunctionHelper {
             throw new HyracksDataException(e);
         }
         File file = new File(fName);
-        parser.parseFile(file, abvs);
+        parser.parseDocument(file, abvs);
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,

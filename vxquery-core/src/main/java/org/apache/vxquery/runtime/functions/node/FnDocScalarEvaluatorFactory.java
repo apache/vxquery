@@ -57,6 +57,7 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final DataInputStream di = new DataInputStream(bbis);
         final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
+        final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -77,7 +78,7 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 tvp.getValue(stringp);
                 try {
                     // Only one document should be parsed so its ok to have a unique parser.
-                    XMLParser parser = new XMLParser(false, nodeIdProvider);
+                    XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
                     FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);

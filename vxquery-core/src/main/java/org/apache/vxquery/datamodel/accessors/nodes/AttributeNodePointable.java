@@ -32,6 +32,12 @@ import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
  *  NodeId nodeId?;
  *  TaggedValue value;
  * }
+ * 
+ * NamePtr {
+ *  Integer PrefixCode;
+ *  Integer NamespaceCode;
+ *  Integer LocalCode;
+ * }
  */
 public class AttributeNodePointable extends AbstractPointable {
     private static final int LOCAL_NODE_ID_SIZE = 4;
