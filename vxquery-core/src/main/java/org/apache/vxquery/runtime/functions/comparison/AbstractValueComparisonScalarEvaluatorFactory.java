@@ -108,7 +108,7 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                         tvp1new.set(tvp1);
                     } else if (FunctionHelper.isDerivedFromInteger(tvp1.getTag())) {
                         abvsInteger1.reset();
-                        FunctionHelper.getIntegerPointable(tvp1, dOutInteger1);
+                        FunctionHelper.getIntegerPointable(tvp1, dOutInteger1, tp1);
                         tvp1new.set(abvsInteger1.getByteArray(), abvsInteger1.getStartOffset(),
                                 LongPointable.TYPE_TRAITS.getFixedLength() + 1);
                     } else {
@@ -120,7 +120,7 @@ public abstract class AbstractValueComparisonScalarEvaluatorFactory extends
                         tvp2new.set(tvp2);
                     } else if (FunctionHelper.isDerivedFromInteger(tvp2.getTag())) {
                         abvsInteger2.reset();
-                        FunctionHelper.getIntegerPointable(tvp2, dOutInteger2);
+                        FunctionHelper.getIntegerPointable(tvp2, dOutInteger2, tp2);
                         tvp2new.set(abvsInteger2.getByteArray(), abvsInteger2.getStartOffset(),
                                 LongPointable.TYPE_TRAITS.getFixedLength() + 1);
                     } else {

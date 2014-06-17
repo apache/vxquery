@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
@@ -52,7 +53,9 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
         final ArrayBackedValueStorage abvsSeq = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
         final AddOperation aOp = new AddOperation();
-
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
+        
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             long count;
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -103,7 +106,7 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp = args[0];
-                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum);
+                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum, tp1, tp2);
                 count++;
             }
         };

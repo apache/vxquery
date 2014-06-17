@@ -86,7 +86,7 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
                                 case ValueTag.XS_BYTE_TAG:
                                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                                     abvsInteger.reset();
-                                    FunctionHelper.getIntegerPointable(tvp, dOutInteger);
+                                    FunctionHelper.getIntegerPointable(tvp, dOutInteger, tp);
                                     longp.set(abvsInteger.getByteArray(), abvsInteger.getStartOffset() + 1,
                                             LongPointable.TYPE_TRAITS.getFixedLength());
                             }

@@ -53,15 +53,14 @@ import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 public class FunctionHelper {
 
     public static void arithmeticOperation(AbstractArithmeticOperation aOp, DynamicContext dCtx,
-            TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result) throws SystemException {
+            TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result, TypedPointables tp1,
+            TypedPointables tp2) throws SystemException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         final ArrayBackedValueStorage abvsArgument1 = new ArrayBackedValueStorage();
         final DataOutput dOutArgument1 = abvsArgument1.getDataOutput();
         final ArrayBackedValueStorage abvsArgument2 = new ArrayBackedValueStorage();
         final DataOutput dOutArgument2 = abvsArgument2.getDataOutput();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
         final CastToDoubleOperation castToDouble = new CastToDoubleOperation();
 
         abvs.reset();
@@ -85,7 +84,7 @@ public class FunctionHelper {
                 case ValueTag.XS_BYTE_TAG:
                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                     abvsArgument1.reset();
-                    getIntegerPointable(tvp1, dOutArgument1);
+                    getIntegerPointable(tvp1, dOutArgument1, tp1);
                     longp1.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset() + 1,
                             LongPointable.TYPE_TRAITS.getFixedLength());
                     break;
@@ -118,7 +117,7 @@ public class FunctionHelper {
                 case ValueTag.XS_BYTE_TAG:
                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                     abvsArgument2.reset();
-                    getIntegerPointable(tvp2, dOutArgument2);
+                    getIntegerPointable(tvp2, dOutArgument2, tp2);
                     longp2.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset() + 1,
                             LongPointable.TYPE_TRAITS.getFixedLength());
                     break;
@@ -932,9 +931,8 @@ public class FunctionHelper {
         }
     }
 
-    public static void getDoublePointable(TaggedValuePointable tvp, DataOutput dOut) throws SystemException,
-            IOException {
-        TypedPointables tp = new TypedPointables();
+    public static void getDoublePointable(TaggedValuePointable tvp, DataOutput dOut, TypedPointables tp)
+            throws SystemException, IOException {
         double value;
         switch (tvp.getTag()) {
             case ValueTag.XS_DECIMAL_TAG:
@@ -988,9 +986,8 @@ public class FunctionHelper {
         dOut.writeDouble(value);
     }
 
-    public static void getIntegerPointable(TaggedValuePointable tvp, DataOutput dOut) throws SystemException,
-            IOException {
-        TypedPointables tp = new TypedPointables();
+    public static void getIntegerPointable(TaggedValuePointable tvp, DataOutput dOut, TypedPointables tp)
+            throws SystemException, IOException {
         long value;
         switch (tvp.getTag()) {
             case ValueTag.XS_INTEGER_TAG:
@@ -1032,9 +1029,8 @@ public class FunctionHelper {
     /**
      * Get the local node id from a tagged value pointable when available.
      */
-    public static int getLocalNodeId(TaggedValuePointable tvp1) {
+    public static int getLocalNodeId(TaggedValuePointable tvp1, TypedPointables tp) {
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final TypedPointables tp = new TypedPointables();
         int localNodeId = -1;
         if (tvp1.getTag() == ValueTag.NODE_TREE_TAG) {
             tvp1.getValue(tp.ntp);
@@ -1194,9 +1190,8 @@ public class FunctionHelper {
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,
-            TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
+            TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1,
+            TypedPointables tp2) throws SystemException {
         TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
@@ -1214,7 +1209,7 @@ public class FunctionHelper {
                 tvp1new.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset(),
                         DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
             } else if (isDerivedFromInteger(tvp1.getTag())) {
-                getIntegerPointable(tvp1, dOutArgument1);
+                getIntegerPointable(tvp1, dOutArgument1, tp1);
                 tvp1new.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset(),
                         LongPointable.TYPE_TRAITS.getFixedLength() + 1);
             } else {
@@ -1227,7 +1222,7 @@ public class FunctionHelper {
                 tvp2new.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset(),
                         DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
             } else if (isDerivedFromInteger(tvp2.getTag())) {
-                getIntegerPointable(tvp2, dOutArgument2);
+                getIntegerPointable(tvp2, dOutArgument2, tp1);
                 tvp2new.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset(),
                         LongPointable.TYPE_TRAITS.getFixedLength() + 1);
             } else {

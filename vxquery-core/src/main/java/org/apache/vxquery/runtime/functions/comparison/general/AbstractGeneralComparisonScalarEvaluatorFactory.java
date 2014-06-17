@@ -240,7 +240,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                     if (!tagTransformed1) {
                         tvpCompare1.set(tvpTransform1);
                         if (FunctionHelper.isDerivedFromDouble(tvpCompare1.getTag())) {
-                            FunctionHelper.getDoublePointable(tvpTransform1, dOutInner1);
+                            FunctionHelper.getDoublePointable(tvpTransform1, dOutInner1, tp1);
                             tvpCompare1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(),
                                     DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
                             tagTransformed1 = true;
@@ -249,7 +249,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                     if (!tagTransformed2) {
                         tvpCompare2.set(tvpTransform2);
                         if (FunctionHelper.isDerivedFromDouble(tvpCompare2.getTag())) {
-                            FunctionHelper.getDoublePointable(tvpTransform2, dOutInner2);
+                            FunctionHelper.getDoublePointable(tvpTransform2, dOutInner2, tp2);
                             tvpCompare2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(),
                                     DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
                             tagTransformed2 = true;

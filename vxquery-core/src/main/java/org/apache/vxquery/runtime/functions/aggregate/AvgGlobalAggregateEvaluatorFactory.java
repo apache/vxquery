@@ -20,6 +20,7 @@ import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -56,7 +57,9 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
         final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpArg = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
+        
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
             TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -90,7 +93,7 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
                 } else {
                     // Set count as a TaggedValuePointable.
                     try {
-                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum);
+                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum, tp1, tp2);
                         result.set(tvpSum);
                     } catch (Exception e) {
                         throw new AlgebricksException(e);
@@ -109,9 +112,9 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
                         return;
                     } else if (seqLen == 2) {
                         seq.getEntry(0, tvpArg);
-                        FunctionHelper.arithmeticOperation(aOp, dCtx, tvpArg, tvpCount, tvpCount);
+                        FunctionHelper.arithmeticOperation(aOp, dCtx, tvpArg, tvpCount, tvpCount, tp1, tp2);
                         seq.getEntry(1, tvpArg);
-                        FunctionHelper.arithmeticOperation(aOp, dCtx, tvpArg, tvpSum, tvpSum);
+                        FunctionHelper.arithmeticOperation(aOp, dCtx, tvpArg, tvpSum, tvpSum, tp1, tp2);
                     } else {
                         throw new SystemException(ErrorCode.SYSE0001);
                     }

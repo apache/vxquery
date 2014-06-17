@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
@@ -50,6 +51,8 @@ public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTagge
         final TaggedValuePointable tvpReturn = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpNext = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -69,7 +72,7 @@ public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTagge
                                 // Init.
                                 tvpReturn.set(tvpNext);
                             }
-                            if (FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvpNext, tvpReturn, dCtx)) {
+                            if (FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvpNext, tvpReturn, dCtx, tp1, tp2)) {
                                 tvpReturn.set(tvpNext);
                             }
                         }

@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -49,6 +50,8 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
         final AbstractValueComparisonOperation aOp = createValueComparisonOperation();
         final TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
@@ -89,7 +92,7 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
                     if (count != 0) {
                         tvp2.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                     }
-                    if (count == 0 || FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvp1, tvp2, dCtx)) {
+                    if (count == 0 || FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvp1, tvp2, dCtx, tp1, tp2)) {
                         try {
                             abvs.reset();
                             dOut.write(tvp1.getByteArray(), tvp1.getStartOffset(), tvp1.getLength());

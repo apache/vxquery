@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
@@ -46,6 +47,8 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
         final AddOperation aOp = new AddOperation();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -77,7 +80,7 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp = args[0];
-                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum);
+                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum, tp1, tp2);
             }
         };
     }

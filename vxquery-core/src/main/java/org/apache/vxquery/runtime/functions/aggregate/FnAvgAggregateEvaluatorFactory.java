@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -53,6 +54,8 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
         final DataOutput dOutCount = abvsCount.getDataOutput();
         final AddOperation aOp = new AddOperation();
         final DivideOperation aOpDivide = new DivideOperation();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             long count;
@@ -80,7 +83,7 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
                         dOutCount.writeLong(count);
                         tvpCount.set(abvsCount);
 
-                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum);
+                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum, tp1, tp2);
                         result.set(tvpSum);
                     } catch (Exception e) {
                         throw new AlgebricksException(e);
@@ -101,7 +104,7 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
                         throw new SystemException(ErrorCode.SYSE0001, e.toString());
                     }
                 } else {
-                    FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum);
+                    FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum, new TypedPointables(), new TypedPointables());
                 }
                 count++;
             }
