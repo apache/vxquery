@@ -40,6 +40,7 @@ for j in $(find ${1} -name '*q??.xq')
 do
     if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]] 
     then
+    	date
         echo "Running query: ${j}"
         log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
         log_base_path=$(dirname ${j/queries/query_logs})

@@ -38,9 +38,8 @@ fi
 VXQUERY_HOME=`pwd`
 NCLOGS_DIR=${VXQUERY_HOME}/logs
 
-#Remove the logs dir
-rm -rf $NCLOGS_DIR
-mkdir $NCLOGS_DIR
+# logs dir
+mkdir -p $NCLOGS_DIR
 
 # Set up the options for the cc.
 NC_OPTIONS=" -cc-host ${CCHOST} -cluster-net-ip-address ${IPADDR}  -data-ip-address ${IPADDR} -result-ip-address ${IPADDR}  -node-id ${NODEID} "
@@ -51,4 +50,4 @@ fi
 
 
 #Launch hyracks nc
-${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerync ${NC_OPTIONS} &> ${NCLOGS_DIR}/nc.log &
+${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerync ${NC_OPTIONS} &> ${NCLOGS_DIR}/nc_$(date +%Y%m%d%H%M).log &

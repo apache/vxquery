@@ -36,9 +36,8 @@ fi
 VXQUERY_HOME=`pwd`
 CCLOGS_DIR=${VXQUERY_HOME}/logs
 
-#Remove the logs dir
-rm -rf ${CCLOGS_DIR}
-mkdir ${CCLOGS_DIR}
+# logs dir
+mkdir -p ${CCLOGS_DIR}
 
 # Set up the options for the cc.
 CC_OPTIONS=" -client-net-ip-address ${CCHOST} -cluster-net-ip-address ${CCHOST} "
@@ -48,4 +47,4 @@ then
 fi
 
 #Launch hyracks cc script without toplogy
-${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerycc ${CC_OPTIONS} &> ${CCLOGS_DIR}/cc.log &
+${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerycc ${CC_OPTIONS} &> ${CCLOGS_DIR}/cc_$(date +%Y%m%d%H%M).log &

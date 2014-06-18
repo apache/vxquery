@@ -57,6 +57,7 @@ do
         # Only run for specified queries.
         if [ -z "${4}" ] || [[ "${j}" =~ "${4}" ]]
         then
+        	date
             echo "Running query: ${j}"
             log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
             log_base_path=$(dirname ${j/queries/query_logs})
