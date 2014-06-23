@@ -80,7 +80,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     private final boolean attachTypes;
     private final StringBuilder buffer;
     private final boolean createNodeIds;
-    private int depth = 0;
+    private int depth;
     private final ArrayBackedValueStorage docABVS;
     private final ArrayBackedValueStorage elementABVS;
     private boolean pendingText;
@@ -90,30 +90,39 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     private final ArrayBackedValueStorage tempABVS;
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider) {
-        docABVS = new ArrayBackedValueStorage();
-        elementABVS = new ArrayBackedValueStorage();
-        resultABVS = new ArrayBackedValueStorage();
-        tempABVS = new ArrayBackedValueStorage();
-        createNodeIds = nodeIdProvider != null;
-        this.attachTypes = attachTypes;
-        this.nodeIdProvider = nodeIdProvider;
-        docb = new DocumentNodeBuilder();
-        tnb = new TextNodeBuilder();
-        cnb = new CommentNodeBuilder();
-        pinb = new PINodeBuilder();
+        // XML node builders
         anb = new AttributeNodeBuilder();
+        cnb = new CommentNodeBuilder();
         db = new DictionaryBuilder();
-        buffer = new StringBuilder();
+        docb = new DocumentNodeBuilder();
+        pinb = new PINodeBuilder();
+        tnb = new TextNodeBuilder();
         enbStack = new ArrayList<ElementNodeBuilder>();
         freeENBList = new ArrayList<ElementNodeBuilder>();
-        pendingText = false;
-        tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        
+        // Element writing and path step variables
         skipping = true;
+        tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+            
+        // Basic tracking and setting variables
+        this.attachTypes = attachTypes;
+        buffer = new StringBuilder();
+        createNodeIds = nodeIdProvider != null;
+        depth = 0;
+        docABVS = new ArrayBackedValueStorage();
+        elementABVS = new ArrayBackedValueStorage();
+        pendingText = false;
+        nodeIdCounter = 0;
+        this.nodeIdProvider = nodeIdProvider;
+        resultABVS = new ArrayBackedValueStorage();
+        tempABVS = new ArrayBackedValueStorage();
     }
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, ByteBuffer frame,
             FrameTupleAppender appender, List<SequenceType> childSequenceTypes) {
         this(attachTypes, nodeIdProvider);
+
+        // Frame writing variables
         this.frame = frame;
         this.appender = appender;
         setChildPathSteps(childSequenceTypes);
@@ -170,9 +179,16 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
     }
 
+    private void endElementChildPathStep() throws IOException {
+        if (subElement != null && depth <= subElement.length) {
+            subElement[depth - 1] = false;
+        }
+    }
+
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
         if (skipping) {
+            --depth;
             return;
         }
         try {
@@ -185,9 +201,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             if (nonSkipped) {
                 writeElement();
             }
-            if (subElement != null && depth <= subElement.length) {
-                subElement[depth - 1] = false;
-            }
+            endElementChildPathStep();
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
