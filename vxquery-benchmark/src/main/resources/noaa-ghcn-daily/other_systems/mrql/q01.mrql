@@ -1,0 +1,5 @@
+select (r)
+from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"})
+where text(r.dataType) = "AWND"
+    and toInt(text(r.value)) > 491.744
+;

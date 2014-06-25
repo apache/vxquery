@@ -1,0 +1,8 @@
+count(
+    select (r)
+    from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"}),
+        t in source(xml, "sample_xml/gsn_stations.xml", {"station"}),
+        l in t.locationLabels
+    where text(l.displayName) = "WASHINGTON"
+)
+;

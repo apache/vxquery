@@ -1,0 +1,8 @@
+sum(
+    select (toInt(text(r.value)))
+    from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"})
+    where text(r.station) = "GHCND:USW00014771"
+        and toInt(substring(text(r.date), 0, 4)) = 1999
+        and text(r.dataType) = "PRCP"
+) / 10
+;

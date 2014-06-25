@@ -1,0 +1,7 @@
+count(
+    select (t)
+    from t in source(xml, "sample_xml/gsn_stations.xml", {"station"}),
+        l in t.locationLabels
+    where text(l.id) = "FIPS:US"
+)
+;
