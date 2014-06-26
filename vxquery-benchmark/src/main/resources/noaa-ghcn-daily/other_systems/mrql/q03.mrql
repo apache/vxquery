@@ -2,6 +2,5 @@ max(
     select (toInt(text(r.value)))
     from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"})
     where text(r.dataType) = "TMAX"
-        and toInt(substring(text(r.date), 0, 4)) = 1999
 ) / 10
 ;
