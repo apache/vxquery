@@ -1,9 +1,0 @@
-select (r)
-from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"}),
-    t in source(xml, "sample_xml/gsn_stations.xml", {"station"}),
-    l in t.locationLabels
-where text(t.id) = text(r.station) 
-    and text(r.date) = "1976-07-04T00:00:00.000"
-    and text(r.dataType) = "TMAX"
-    and text(l.displayName) = "WASHINGTON"
-;

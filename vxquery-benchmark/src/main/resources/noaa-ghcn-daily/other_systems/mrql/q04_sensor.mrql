@@ -1,5 +1,0 @@
-select (r)
-from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"})
-where text(r.date) = "1976-07-04T00:00:00.000"
-  and text(r.dataType) = "TMAX"
-;
