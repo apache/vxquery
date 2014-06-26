@@ -25,8 +25,8 @@
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "-client-net-ip-address 169.235.27.138"
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "" q03
 #
-REPEAT=5
-FRAME_SIZE=10000
+
+CLUSTER_COUNT=5
 
 if [ -z "${1}" ]
 then
@@ -34,39 +34,30 @@ then
     exit
 fi
 
-if [ -z "${2}" ]
-then
-    echo "Please the number of nodes (start at 0)."
-    exit
-fi
-
-# Run queries for the specified number of nodes.
-echo "Starting ${2} cluster nodes"
-python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${2}nodes.xml -a start
-
-# wait for cluster to finish setting up  
-sleep 5
-
-export JAVA_OPTS="$JAVA_OPTS -server -Xmx8G -XX:+HeapDumpOnOutOfMemoryError -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/benchmark_logging.properties"
-
-for j in $(find ${1} -name '*q??.xq')
-do
-    # Only work with i nodes.
-    if [[ "${j}" =~ "${2}nodes" ]]
-    then
-        # Only run for specified queries.
-        if [ -z "${4}" ] || [[ "${j}" =~ "${4}" ]]
-        then
-        	date
-            echo "Running query: ${j}"
-            log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
-            log_base_path=$(dirname ${j/queries/query_logs})
-            mkdir -p ${log_base_path}
-            time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${3} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
-        fi;
-    fi;
-done
+# Run queries for each number of nodes.
+for (( i = 0; i < ${CLUSTER_COUNT}; i++ ))
+do 
+    echo "Starting ${i} cluster nodes"
+    python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${i}nodes.xml -a start
     
-# Stop cluster.
-python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${2}nodes.xml -a stop
+    for j in $(find ${1} -name '*q??.xq')
+    do
+        # Only work with i nodes.
+        if [[ "${j}" =~ "${i}nodes" ]]
+        then
+            # Only run for specified queries.
+            if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]]
+            then
+                echo "Running query: ${j}"
+                log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
+                log_base_path=$(dirname ${j/queries/query_logs})
+                mkdir -p ${log_base_path}
+                time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size 10000 -repeatexec 10 > ${log_base_path}/${log_file} 2>&1
+            fi;
+        fi;
+    done
+    
+    # Stop cluster.
+    python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${i}nodes.xml -a stop
+done
 

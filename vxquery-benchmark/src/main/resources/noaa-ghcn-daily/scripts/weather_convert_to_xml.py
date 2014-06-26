@@ -150,6 +150,10 @@ class WeatherConvertToXML:
         # Default
         return 0
     
+    def process_one_day(self, records, report_date, page):
+        # Default
+        return 0
+    
     def process_station_data(self, row):
         # Default
         return 0
@@ -161,7 +165,7 @@ class WeatherConvertToXML:
         print "Processing inventory file"
         file_stream = open(self.ghcnd_inventory, 'r')
         
-        csv_header = ['ID', 'SENSORS', 'SENSORS_COUNT', 'MAX_YEARS', 'TOTAL_YEARS_FOR_ALL_SENSORS']
+        csv_header = ['ID', 'SENSORS', 'SENSORS_COUNT',  'MAX_YEARS', 'TOTAL_YEARS_FOR_ALL_SENSORS']
         row = file_stream.readline()
         csv_inventory = {}
         for row in file_stream:
@@ -239,6 +243,16 @@ class WeatherConvertToXML:
     def convert_c2f(self, c):
         return (9 / 5 * c) + 32
     
+    def default_xml_start(self):
+        return textwrap.dedent("""\
+            <?xml version="1.0" encoding="ISO-8859-1"?>
+            <ghcnd_observation version="1.0"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <credit>NOAA's National Climatic Data Center (NCDC)</credit>
+                <credit_URL>http://www.ncdc.noaa.gov/</credit_URL>
+            """)
+    
     def default_xml_web_service_start(self):
         field_xml = ""
         field_xml += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
@@ -257,6 +271,76 @@ class WeatherConvertToXML:
     def default_xml_field_date(self, report_date, indent=2):
         field_xml = ""
         field_xml += self.get_indent_space(indent) + "<date>" + str(report_date.year) + "-" + str(report_date.month).zfill(2) + "-" + str(report_date.day).zfill(2) + "T00:00:00.000</date>\n"
+        return field_xml
+    
+    def get_date_from_field(self, row, field):
+        report_date = self.get_field_from_definition(row, field)
+        return str(report_date.year) + "-" + str(report_date.month).zfill(2) + "-" + str(report_date.day).zfill(2)
+    
+    def default_xml_field_date_iso8601(self, report_date):
+        field_xml = ""
+        field_xml += "    <observation_date>" + self.MONTHS[report_date.month - 1] + " " + str(report_date.day) + ", " + str(report_date.year) + "</observation_date>\n"
+        field_xml += "    <observation_date_iso8601>" + report_date.isoformat() + "</observation_date_iso8601>\n"
+        return field_xml
+    
+    def default_xml_field_date_year(self, year):
+        field_xml = ""
+        field_xml += "    <observation_year>" + str(year) + "</observation_year>\n"
+        return field_xml
+
+    def default_xml_field_date_month(self, month):
+        field_xml = ""
+        field_xml += "    <observation_month>" + str(month) + "</observation_month>\n"
+        return field_xml
+
+    def default_xml_field_date_day(self, day):
+        field_xml = ""
+        field_xml += "            <observation_day>" + str(day) + "</observation_day>\n"
+        return field_xml
+    
+    def default_xml_field_station_id(self, station_id, indent=2):
+        field_xml = ""
+        field_xml += self.get_indent_space(indent) + "<station_id>" + station_id + "</station_id>\n"
+        return field_xml
+    
+    def default_xml_field_station(self, station_id):
+        station_row = ""
+        stations_file = open(self.ghcnd_stations, 'r')
+        
+        for line in stations_file:
+            if station_id == self.get_field_from_definition(line, STATIONS_FIELDS['ID']):
+                station_row = line
+                break
+        
+        field_xml = ""
+        field_xml += "    <station_id>" + station_id + "</station_id>\n"
+        field_xml += "    <location>\n"
+        field_xml += "        <latitude>" + self.get_field_from_definition(station_row, STATIONS_FIELDS['LATITUDE']).strip() + "</latitude>\n"
+        field_xml += "        <longitude>" + self.get_field_from_definition(station_row, STATIONS_FIELDS['LONGITUDE']).strip() + "</longitude>\n"
+        
+        elevation = self.get_field_from_definition(station_row, STATIONS_FIELDS['ELEVATION']).strip()
+        if elevation != "-999.9":
+            field_xml += "        <elevation>" + elevation + "</elevation>\n"
+        
+        field_xml += "    </location>\n"
+        field_xml += "    <name>" + self.get_field_from_definition(station_row, STATIONS_FIELDS['NAME']).strip() + "</name>\n"
+    
+        state = self.get_field_from_definition(station_row, STATIONS_FIELDS['STATE'])
+        if state.strip():
+            field_xml += "    <state>" + state + "</state>\n"
+    
+        gsn = self.get_field_from_definition(station_row, STATIONS_FIELDS['GSNFLAG'])
+        if gsn.strip():
+            field_xml += "    <gsn />\n"
+    
+        hcn = self.get_field_from_definition(station_row, STATIONS_FIELDS['HCNFLAG'])
+        if hcn.strip():
+            field_xml += "    <hcn />\n"
+    
+        wmoid = self.get_field_from_definition(station_row, STATIONS_FIELDS['WMOID'])
+        if wmoid.strip():
+            field_xml += "    <wmoid id=\"" + wmoid + "\" />\n"
+    
         return field_xml
     
     def default_xml_mshr_station_additional(self, station_id):
@@ -408,6 +492,120 @@ class WeatherConvertToXML:
     def get_indent_space(self, indent):
         return (" " * (4 * indent))
     
+class WeatherDailyXMLFile(WeatherConvertToXML):
+    def process_one_month_sensor_set(self, records, page):
+        year = int(self.get_dly_field(records[0], DLY_FIELD_YEAR))
+        month = int(self.get_dly_field(records[0], DLY_FIELD_MONTH))
+    
+        station_id = self.get_dly_field(records[0], DLY_FIELD_ID)
+        
+        count = 0
+        for day in range(1, 32):
+            try:
+                # TODO find out what is a valid python date range? 1889?
+                # Attempt to see if this is valid date.
+                report_date = date(year, month, day)
+                save_file_name = self.process_one_day(records, report_date, page)
+                if save_file_name is not "":
+                    count = count + 1
+                    if self.debug_output:
+                        print "Wrote file: " + save_file_name
+            except ValueError:
+                if self.debug_output:
+                    print "Error: Not a valid date (" + str(month) + "/" + str(day) + "/" + str(year) + ") for " + station_id + "."
+                pass
+        return count
+
+    def process_one_day(self, records, report_date, page):
+        station_id = self.get_dly_field(records[0], DLY_FIELD_ID)
+        found_data = False
+                
+        # Information for each daily file.
+        daily_xml_file = self.default_xml_start()
+        daily_xml_file += self.default_xml_field_station(station_id)
+        daily_xml_file += self.default_xml_field_date_iso8601(report_date)
+        daily_xml_file += self.default_xml_start_tag("sensors")
+        for record in records:
+            record_xml_snip = self.default_xml_day_reading_as_field(record, report_date.day)
+            if record_xml_snip is not "":
+                found_data = True
+            daily_xml_file += record_xml_snip
+        daily_xml_file += self.default_xml_end_tag("sensors")
+        daily_xml_file += self.default_xml_end()
+        
+        if not found_data:
+            return ""
+        
+        # Make sure the station folder is available.
+        ghcnd_xml_station_path = self.get_base_folder(station_id) + "/" + station_id + "/" + str(report_date.year) + "/"
+        if not os.path.isdir(ghcnd_xml_station_path):
+            os.makedirs(ghcnd_xml_station_path)
+        
+        # Save XML string to disk.
+        save_file_name = ghcnd_xml_station_path + build_sensor_save_filename(station_id, report_date, page)
+        save_file_name = self.save_file(save_file_name, daily_xml_file)
+                
+        return save_file_name
+    
+class WeatherMonthlyXMLFile(WeatherConvertToXML):
+    def process_one_month_sensor_set(self, records, page):
+        found_data = False        
+        year = int(self.get_dly_field(records[0], DLY_FIELD_YEAR))
+        month = int(self.get_dly_field(records[0], DLY_FIELD_MONTH))
+    
+        station_id = self.get_dly_field(records[0], DLY_FIELD_ID)
+
+        # Information for each daily file.
+        daily_xml_file = self.default_xml_start()
+        daily_xml_file += self.default_xml_field_station(station_id)
+        daily_xml_file += self.default_xml_field_date_year(year)
+        daily_xml_file += self.default_xml_field_date_month(month)
+        daily_xml_file += self.default_xml_start_tag("readings")
+        
+        for day in range(1, 32):
+            try:
+                # TODO find out what is a valid python date range? 1889?
+                # Attempt to see if this is valid date.
+                report_date = date(year, month, day)
+                found_daily_data = False
+                record_xml_snip = ""
+
+                for record in records:
+                    record_xml_snip += self.default_xml_day_reading_as_field(record, report_date.day)
+                    if record_xml_snip is not "":
+                        found_data = True
+                        found_daily_data = True
+
+                if found_daily_data:
+                    daily_xml_file += self.default_xml_start_tag("reading", 2)
+                    daily_xml_file += self.default_xml_field_date_day(day)
+                    daily_xml_file += record_xml_snip
+                    daily_xml_file += self.default_xml_end_tag("reading", 2)
+                
+            except ValueError:
+                pass
+
+        daily_xml_file += self.default_xml_end_tag("readings")
+        daily_xml_file += self.default_xml_end()
+
+        if not found_data:
+            return 0
+
+        # Make sure the station folder is available.
+        ghcnd_xml_station_path = self.get_base_folder(station_id) + "/" + station_id + "/" + str(report_date.year) + "/"
+        if not os.path.isdir(ghcnd_xml_station_path):
+            os.makedirs(ghcnd_xml_station_path)
+                
+        # Save XML string to disk.
+        save_file_name = ghcnd_xml_station_path + build_sensor_save_filename(station_id, report_date, page)
+        save_file_name = self.save_file(save_file_name, daily_xml_file)
+
+        if save_file_name is not "":
+            if self.debug_output:
+                print "Wrote file: " + save_file_name
+            return 1
+        else:
+            return 0
 
 class WeatherWebServiceMonthlyXMLFile(WeatherConvertToXML):
     """The web service class details how to create files similar to the NOAA web service."""

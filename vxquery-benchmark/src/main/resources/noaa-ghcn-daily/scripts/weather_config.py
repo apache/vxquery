@@ -41,10 +41,9 @@ class WeatherConfig:
         for node in self.config.getElementsByTagName("dataset"):
             name = self.get_dataset_name(node)
             save_paths = self.get_dataset_save_paths(node)
-            partition_type = self.get_dataset_partition_type(node)
             partitions = self.get_dataset_partitions(node)
             tests = self.get_dataset_tests(node)
-            nodes.append(Dataset(name, save_paths, partition_type, partitions, tests))
+            nodes.append(Dataset(name, save_paths, partitions, tests))
         return nodes
 
 
@@ -69,9 +68,6 @@ class WeatherConfig:
         for item in node.getElementsByTagName("save_path"):
             paths.append(self.get_text(item))
         return paths
-
-    def get_dataset_partition_type(self, node):
-        return self.get_text(node.getElementsByTagName("partition_type")[0])
 
     def get_dataset_partitions(self, node):
         paths = []
@@ -107,11 +103,10 @@ class Machine:
         return self.id + "(" + self.ip + ")"
     
 class Dataset:
-    def __init__(self, name, save_paths, partition_type, partitions, tests):
+    def __init__(self, name, save_paths, partitions, tests):
         self.name = name
         self.save_paths = save_paths
         self.partitions = partitions
-        self.partition_type = partition_type
         self.tests = tests
     
     def get_name(self):
@@ -122,9 +117,6 @@ class Dataset:
     
     def get_partitions(self):
         return self.partitions
-    
-    def get_partition_type(self):
-        return self.partition_type
     
     def get_tests(self):
         return self.tests
