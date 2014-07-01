@@ -13,7 +13,7 @@
 ~~ See the License for the specific language governing permissions and
 ~~ limitations under the License.
 
-Releasing Apache VXQuery
+Releasing Apache VXQuery\x99
 
 * One time steps
 
@@ -122,7 +122,7 @@ $ mvn release:prepare -DdryRun=true
 $ java -jar ~/Downloads/apache-rat-0.10/apache-rat-0.10.jar -d . -E .rat-excludes
 ---
 
-  * check (and fix) the content of the <<<NOTICE>>> file (especially the date)
+  * check (and fix) the content of the <<<LICENSE>>> and <<<NOTICE>>> files (especially the date) and the copyright dates in changed files
 
   * release to the staging repository
 

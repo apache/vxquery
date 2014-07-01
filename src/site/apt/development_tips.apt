@@ -33,7 +33,7 @@ Developer Tips
   
   []
   
-  In VXQuery the TaggedValuePointable is used to read a result from this byte
+  In Apache VXQuery\x99 the TaggedValuePointable is used to read a result from this byte
   array. The first byte defines the data type and alerts us to what pointable
   to use for reading the rest of the data.
 
