@@ -17,7 +17,7 @@ Data XML and Node Types
 
   XML is used as the data source for XQuery and must be parsed into Hyracks data. Each
   node type defined in XPath and XQuery can be mapped into pointable defined in Apache 
-  VXQuery.
+  VXQuery\x99.
 
 * XPath Node Types
 
