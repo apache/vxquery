@@ -1,0 +1,6 @@
+max(
+    select (toInt(text(r.value)))
+    from r in source(xml, "sample_xml/hcn_sensors.xml", {"data"})
+    where text(r.dataType) = "TMAX"
+) / 10
+;

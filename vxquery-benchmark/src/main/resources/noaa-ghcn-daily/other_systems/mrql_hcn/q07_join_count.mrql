@@ -1,0 +1,10 @@
+count(
+    select (toInt(text(rtmax.value))-toInt(text(rtmin.value)))
+    from rtmax in source(xml, "sample_xml/hcn_sensors.xml", {"data"}),
+        rtmin in source(xml, "sample_xml/hcn_sensors.xml", {"data"})
+    where text(rtmax.date) = text(rtmin.date)
+        and text(rtmax.station) = text(rtmin.station)
+        and text(r.dataType) = "TMAX"
+        and text(r.dataType) = "TMIN"
+)
+;

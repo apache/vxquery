@@ -1,0 +1,7 @@
+count(
+    select (t.displayName)
+    from t in source(xml, "sample_xml/hcn_stations.xml", {"station"}),
+        l in t.locationLabels
+    where text(l.displayName) = "WASHINGTON"
+)
+;

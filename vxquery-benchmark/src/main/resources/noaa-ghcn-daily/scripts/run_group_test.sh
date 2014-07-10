@@ -17,19 +17,28 @@
 # limitations under the License.
 #
 
+DATASET="dataset-hcn-d2"
 cluster_ip=${1}
 
-for n in 2 1 0
+for n in 4 
 do
-    for t in "batch_scale_out" "speed_up"
+    #for t in "batch_scale_out" "speed_up"
+    for t in "batch_scale_out"
+    #for t in "speed_up"
     do 
-        for p in 2 1
+        for p in 0  
         do 
             for c in 4
             do 
                 echo " ==== node ${n} test ${t} partition ${p} cores ${c} ===="
-                sh noaa-ghcn-daily/scripts/run_benchmark_cluster.sh weather_data/dataset-small-d2/queries/${t}/${n}nodes/d2_p${p}/ ${n} "-client-net-ip-address ${cluster_ip} -available-processors ${c}"
+                sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/run_benchmark_cluster.sh weather_data/${DATASET}/queries/${t}/${n}nodes/d2_p${p}/ ${n} "-client-net-ip-address ${cluster_ip} -available-processors ${c}"
             done
         done
     done
 done
+
+SUBJECT="Benchmark Group Tests Finished"
+EMAIL="ecarm002@ucr.edu"
+/bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
+Completed all tests in the predefined group for ${DATASET}.
+EOM

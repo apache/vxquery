@@ -27,6 +27,7 @@
 #
 REPEAT=5
 FRAME_SIZE=10000
+BUFFER_SIZE=8192
 
 if [ -z "${1}" ]
 then
@@ -47,7 +48,7 @@ python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-serve
 # wait for cluster to finish setting up  
 sleep 5
 
-export JAVA_OPTS="$JAVA_OPTS -server -Xmx8G -XX:+HeapDumpOnOutOfMemoryError -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/benchmark_logging.properties"
+export JAVA_OPTS="$JAVA_OPTS -server -Xmx1G -XX:+HeapDumpOnOutOfMemoryError -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/benchmark_logging.properties"
 
 for j in $(find ${1} -name '*q??.xq')
 do
@@ -62,7 +63,7 @@ do
             log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
             log_base_path=$(dirname ${j/queries/query_logs})
             mkdir -p ${log_base_path}
-            time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${3} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
+            time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${3} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
         fi;
     fi;
 done
@@ -70,3 +71,8 @@ done
 # Stop cluster.
 python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${2}nodes.xml -a stop
 
+SUBJECT="Benchmark Cluster Tests Finished"
+EMAIL="ecarm002@ucr.edu"
+/bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
+Completed all tests in folder ${1} for a ${2} node cluster.
+EOM

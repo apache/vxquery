@@ -1,8 +1,8 @@
 select (n, d, v)
-from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"}),
+from r in source(xml, "sample_xml/hcn_sensors.xml", {"data"}),
     d in r.date,
     v in r.value,
-    t in source(xml, "sample_xml/gsn_stations.xml", {"station"}),
+    t in source(xml, "sample_xml/hcn_stations.xml", {"station"}),
     n in t.displayName,
     l in t.locationLabels
 where text(t.id) = text(r.station) 
