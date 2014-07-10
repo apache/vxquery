@@ -50,6 +50,10 @@
                   <mainClass>org.apache.vxquery.xtest.Main</mainClass>
                   <name>xtest</name>
                 </program>
+                <program>
+                  <mainClass>org.apache.vxquery.xtest.util.DiskPerformance</mainClass>
+                  <name>diskperformance</name>
+                </program>
               </programs>
               <repositoryLayout>flat</repositoryLayout>
               <repositoryName>lib</repositoryName>

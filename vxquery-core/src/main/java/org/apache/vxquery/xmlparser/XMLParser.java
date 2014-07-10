@@ -14,6 +14,7 @@
  */
 package org.apache.vxquery.xmlparser;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,7 +23,6 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
@@ -44,6 +44,7 @@ public class XMLParser {
     final SAXContentHandler handler;
     final InputSource in;
     final String nodeId;
+    final int buffer_size;
 
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId) throws HyracksDataException {
         this(attachTypes, idProvider, nodeId, null, null, null, null);
@@ -52,9 +53,12 @@ public class XMLParser {
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId, ByteBuffer frame,
             FrameTupleAppender appender, List<Integer> childSeq, StaticContext staticContext)
             throws HyracksDataException {
+        buffer_size = Integer.parseInt(System.getProperty("vxquery.buffer_size"));
         this.nodeId = nodeId;
         try {
             parser = XMLReaderFactory.createXMLReader();
+            
+            System.out.println("XMLReader buffer:" +parser.getProperty("http://apache.org/xml/properties/input-buffer-size"));
             if (frame == null || appender == null) {
                 handler = new SAXContentHandler(attachTypes, idProvider);
             } else {
@@ -74,11 +78,7 @@ public class XMLParser {
 
     public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
-            if (file.getName().toLowerCase().endsWith(".xml.gz")) {
-                in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-            } else {
-                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
-            }
+            in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), buffer_size));
             parser.parse(in);
             handler.writeDocument(abvs);
         } catch (FileNotFoundException e) {
@@ -99,11 +99,7 @@ public class XMLParser {
     public void parseElements(File file, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
             throws HyracksDataException {
         try {
-            if (file.getName().toLowerCase().endsWith(".xml.gz")) {
-                in.setCharacterStream(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-            } else {
-                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
-            }
+            in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), buffer_size));
             handler.setupElementWriter(writer, fta, tupleIndex);
             parser.parse(in);
         } catch (FileNotFoundException e) {

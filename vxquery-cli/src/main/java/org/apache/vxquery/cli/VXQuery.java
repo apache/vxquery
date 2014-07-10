@@ -148,6 +148,8 @@ public class VXQuery {
      * @throws Exception
      */
     private void execute() throws Exception {
+        System.setProperty("vxquery.buffer_size",Integer.toString(opts.bufferSize));
+        
         if (opts.clientNetIpAddress != null) {
             hcc = new HyracksConnection(opts.clientNetIpAddress, opts.clientNetPort);
             runQueries();
@@ -445,6 +447,9 @@ public class VXQuery {
 
         @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
         public int frameSize = 65536;
+
+        @Option(name = "-buffer-size", usage = "Read file buffer size in bytes. (default 512)")
+        public int bufferSize = 512;
 
         @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;

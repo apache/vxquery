@@ -24,9 +24,9 @@ DATASET="hcn"
 for n in `seq 0 7`
 #for n in 0
 do
-	date
-	echo "Running q0${n} on ${DATASET} for MRQL."
-	time for i in {1..${REPEAT}}; do ~/mrql/incubator-mrql/bin/mrql -dist -nodes 5 ~/vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_${DATASET}/q0${n}.mrql >> weather_data/mrql/query_logs/${DATASET}/q0${n}.mrql.log 2>&1; done; 
+    date
+    echo "Running q0${n} on ${DATASET} for MRQL."
+    time for i in {1..${REPEAT}}; do ~/mrql/incubator-mrql/bin/mrql -dist -nodes 5 ~/vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_${DATASET}/q0${n}.mrql >> weather_data/mrql/query_logs/${DATASET}/q0${n}.mrql.log 2>&1; done; 
 done
 
 SUBJECT="MRQL Tests Finished (${DATASET})"
