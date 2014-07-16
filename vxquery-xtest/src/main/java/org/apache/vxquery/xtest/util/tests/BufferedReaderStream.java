@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 public class BufferedReaderStream extends AbstractDiskTest {
     @Override
     public String getMessage() {
-        return "Buffered Reader - Stream\t\t";
+        return "Buffered Reader - Stream";
     }
 
     @Override
@@ -34,10 +34,13 @@ public class BufferedReaderStream extends AbstractDiskTest {
             f = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
         }
         int b;
+        long byteCount = 0L;
         long checkSum = 0L;
-        while ((b = f.read()) != -1)
+        while ((b = f.read()) != -1) {
             checkSum += b;
+            byteCount++;
+        }
         f.close();
-        return checkSum;
+        return byteCount;
     }
 }

@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 public class ParsedCharacterStream extends AbstractDiskTest {
     @Override
     public String getMessage() {
-        return "Parsed - Character Stream\t\t";
+        return "Parsed - Character Stream";
     }
 
     @Override

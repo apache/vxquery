@@ -99,11 +99,11 @@ public class DiskPerformance {
         testFilesIt = cTestFiles.iterator();
     }
 
-    public String getNextFile() {
+    public File getNextFile() {
         if (!testFilesIt.hasNext()) {
             testFilesIt = cTestFiles.iterator();
         }
-        return testFilesIt.next().getAbsolutePath();
+        return testFilesIt.next();
     }
 
     private byte[] createUTF8String(String str) {
@@ -145,19 +145,21 @@ public class DiskPerformance {
         dp.setDirectory(args[0]);
 
         ArrayList<Class> tests = new ArrayList<Class>();
-        // Character Streams
+        // Parsed Character Streams
         tests.add(ParsedBufferedCharacterStream.class);
-        tests.add(BufferedParsedCharacterStream.class);
-        tests.add(ParsedCharacterStream.class);
-        tests.add(BufferedReaderBufferedStream.class);
-        tests.add(BufferedReaderStream.class);
-        tests.add(ReaderBufferedStream.class);
-        tests.add(ReaderStream.class);
+        //        tests.add(BufferedParsedCharacterStream.class);
+        //        tests.add(ParsedCharacterStream.class);
+        // Parsed Byte Streams
+        //        tests.add(ParsedBufferedByteStream.class);
+        //        tests.add(ParsedByteStream.class);
+        // Character Streams
+        //        tests.add(BufferedReaderBufferedStream.class);
+        //        tests.add(BufferedReaderStream.class);
+        //        tests.add(ReaderBufferedStream.class);
+        //        tests.add(ReaderStream.class);
         // Byte Streams
-        tests.add(ParsedBufferedByteStream.class);
-        tests.add(ParsedByteStream.class);
-        tests.add(BufferedStream.class);
-        tests.add(Stream.class);
+        //        tests.add(BufferedStream.class);
+        //        tests.add(Stream.class);
 
         System.out.println("------");
         System.out.println("Started Test Group: " + new Date());
@@ -173,7 +175,7 @@ public class DiskPerformance {
                         runThreadTest(testClass, dp, threads, bufferSize);
                     } else {
                         IDiskTest test = testClass.newInstance();
-                        test.setFilename(dp.getNextFile());
+                        test.setFile(dp.getNextFile());
                         test.setBufferSize(bufferSize);
                         test.setParser(dp.parser);
                         test.run();
@@ -185,20 +187,19 @@ public class DiskPerformance {
                 }
 
             }
-            System.out.println("------");
         }
 
     }
 
-    static <T> void runThreadTest(Class<T> testType, DiskPerformance dp, int threads, int bufferSize) throws InstantiationException,
-            IllegalAccessException {
+    static <T> void runThreadTest(Class<T> testType, DiskPerformance dp, int threads, int bufferSize)
+            throws InstantiationException, IllegalAccessException {
         ExecutorService es = Executors.newCachedThreadPool();
         ArrayList<IDiskTest> threadTests = new ArrayList<IDiskTest>();
         for (int i = 0; i < threads; ++i) {
             threadTests.add((IDiskTest) testType.newInstance());
         }
         for (IDiskTest test : threadTests) {
-            test.setFilename(dp.getNextFile());
+            test.setFile(dp.getNextFile());
             test.setBufferSize(bufferSize);
             test.setParser(dp.getNewParser().first);
             es.execute((Runnable) test);
@@ -209,6 +210,6 @@ public class DiskPerformance {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Completed thread batch: " + new Date());
+//        System.out.println("Completed thread batch: " + new Date());
     }
 }

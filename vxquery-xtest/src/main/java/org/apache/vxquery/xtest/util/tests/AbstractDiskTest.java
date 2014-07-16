@@ -14,9 +14,10 @@
  */
 package org.apache.vxquery.xtest.util.tests;
 
+import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.xml.sax.XMLReader;
 
@@ -25,16 +26,12 @@ abstract class AbstractDiskTest implements IDiskTest, Runnable {
     private int bufferSize;
     protected XMLReader parser;
 
-    public AbstractDiskTest() {
+    public void setFile(File file) {
+        this.filename = file.getAbsolutePath();
     }
 
-    public AbstractDiskTest(String filename, int bufferSize) {
-        setFilename(filename);
-        setBufferSize(bufferSize);
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public String getPrintFilename() {
+        return filename.substring(filename.length() - 20);
     }
 
     public void setBufferSize(int bufferSize) {
@@ -50,22 +47,37 @@ abstract class AbstractDiskTest implements IDiskTest, Runnable {
     }
 
     public void run() {
-        OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-        System.out.printf(filename + "\t" + getMessage() + " - Starting%n");
+        long size = -1;
+        //        System.out.printf(getPrintFilename() + "\t" + getMessage() + " - Starting%n");
         long start = System.nanoTime();
         try {
-            long checkSum = test(filename, bufferSize);
+            size = test(filename, bufferSize);
         } catch (IOException e) {
             e.printStackTrace();
         }
         long end = System.nanoTime();
+        long timeDelta = end - start;
+        double speed = 0;
+        if (size > 0) {
+            speed = (size * 1e3) / timeDelta;
+        }
         // System.out.printf("checkSum: %d%n", checkSum);
-        System.out.printf(filename + "\t" + getMessage() + "%.2f MB/s", 1024 * 1e9 / (end - start));
+        //        System.out.printf(getPrintFilename() + "\t" + getMessage() + "%.1f ms\t%.2f MB/s\t%.2f MB/s",
+        //                (timeDelta) / 1e6, 1024 * 1024 * 1e6 / (timeDelta), speed);
+        // CSV output of the results.
+        try {
+            System.out.printf("%s,", InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        System.out.printf("%s,%s,%.1f,%.2f", filename, getMessage(), (timeDelta) / 1e6,
+                1024 * 1024 * 1e6 / (timeDelta), speed);
         if (isBuffered() && bufferSize > 0) {
-            System.out.printf("\t%.1f KB buffer", bufferSize / 1024.0);
+            System.out.printf(",%.1f", bufferSize / 1024.0);
+        } else {
+            System.out.printf(",0");
         }
         System.out.println();
-        System.out.printf("%.2f%% load average last minute%n", os.getSystemLoadAverage());
     }
 
     public boolean isBuffered() {

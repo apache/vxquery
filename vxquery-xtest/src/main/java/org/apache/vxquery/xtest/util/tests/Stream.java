@@ -20,7 +20,7 @@ import java.io.IOException;
 public class Stream extends AbstractDiskTest {
     @Override
     public String getMessage() {
-        return "Stream\t\t\t\t\t\t";
+        return "Stream";
     }
 
     @Override
@@ -32,10 +32,13 @@ public class Stream extends AbstractDiskTest {
     public long test(String filename, int bufferSize) throws IOException {
         FileInputStream f = new FileInputStream(filename);
         int b;
+        long byteCount = 0L;
         long checkSum = 0L;
-        while ((b = f.read()) != -1)
+        while ((b = f.read()) != -1) {
             checkSum += b;
+            byteCount++;
+        }
         f.close();
-        return checkSum;
+        return byteCount;
     }
 }

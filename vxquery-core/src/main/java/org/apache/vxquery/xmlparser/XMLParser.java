@@ -44,7 +44,7 @@ public class XMLParser {
     final SAXContentHandler handler;
     final InputSource in;
     final String nodeId;
-    final int buffer_size;
+    final int bufferSize;
 
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId) throws HyracksDataException {
         this(attachTypes, idProvider, nodeId, null, null, null, null);
@@ -53,12 +53,10 @@ public class XMLParser {
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId, ByteBuffer frame,
             FrameTupleAppender appender, List<Integer> childSeq, StaticContext staticContext)
             throws HyracksDataException {
-        buffer_size = Integer.parseInt(System.getProperty("vxquery.buffer_size"));
+        bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size"));
         this.nodeId = nodeId;
         try {
             parser = XMLReaderFactory.createXMLReader();
-            
-            System.out.println("XMLReader buffer:" +parser.getProperty("http://apache.org/xml/properties/input-buffer-size"));
             if (frame == null || appender == null) {
                 handler = new SAXContentHandler(attachTypes, idProvider);
             } else {
@@ -78,7 +76,11 @@ public class XMLParser {
 
     public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
-            in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), buffer_size));
+            if (bufferSize > 0) {
+                in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize));
+            } else {
+                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
+            }
             parser.parse(in);
             handler.writeDocument(abvs);
         } catch (FileNotFoundException e) {
@@ -99,7 +101,11 @@ public class XMLParser {
     public void parseElements(File file, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
             throws HyracksDataException {
         try {
-            in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), buffer_size));
+            if (bufferSize > 0) {
+                in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize));
+            } else {
+                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
+            }
             handler.setupElementWriter(writer, fta, tupleIndex);
             parser.parse(in);
         } catch (FileNotFoundException e) {

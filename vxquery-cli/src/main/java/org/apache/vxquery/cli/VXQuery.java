@@ -448,8 +448,8 @@ public class VXQuery {
         @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
         public int frameSize = 65536;
 
-        @Option(name = "-buffer-size", usage = "Read file buffer size in bytes. (default 512)")
-        public int bufferSize = 512;
+        @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
+        public int bufferSize = -1;
 
         @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;
