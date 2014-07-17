@@ -150,62 +150,56 @@ class WeatherDataFiles:
         
         XML_START = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
         
-        # Initialize the partition paths.
         partition_paths = get_partition_paths(0, partitions, base_paths)
-        sensors_partition_files = []
-        stations_partition_files = []
-        for path in partition_paths:
-            # Make sure the xml folder is available.
-            prepare_path(path, reset)
-            prepare_path(path + "sensors/", False)
-            prepare_path(path + "stations/", False)
-            sensors_partition_files.append(open(path + "sensors/partition.xml", 'w'))
-            stations_partition_files.append(open(path + "stations/partition.xml", 'w'))
-    
-        for row in range(0, len(partition_paths)):
-            sensors_partition_files[row].write(XML_START + "<" + self.LARGE_FILE_ROOT_TAG + ">\n")
-            stations_partition_files[row].write(XML_START + "<" + self.LARGE_FILE_ROOT_TAG + ">\n")
 
         import fnmatch
         import os
         
-        # copy stations and sensors into each partition
-        current_sensor_partition = 0
-        current_station_partition = 0
-        self.open_progress_data()
-        row_count = len(self.progress_data)
-        for row in range(0, row_count):
-            row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
-            file_name = row_contents[self.INDEX_DATA_FILE_NAME]
-            station_id = os.path.basename(file_name).split('.')[0]
-               
-            # Copy sensor files
-            type = "sensors"
-            file_path = build_base_save_folder(save_path, station_id, type) + station_id
-            for root, dirnames, filenames in os.walk(file_path):
-                for filename in fnmatch.filter(filenames, '*.xml'):
-                    xml_path = os.path.join(root, filename)
-                    xml_data = file_get_contents(xml_path).replace(XML_START, "") + "\n"
-                    sensors_partition_files[current_sensor_partition].write(xml_data)
-                    current_sensor_partition += 1
-                    if current_sensor_partition >= len(sensors_partition_files):
-                        current_sensor_partition = 0
-            
-            # Copy station files
-            type = "stations"
-            file_path = build_base_save_folder(save_path, station_id, type) + station_id + ".xml"
-            xml_path = os.path.join(root, file_path)
-            xml_data = file_get_contents(xml_path).replace(XML_START, "") + "\n"
-            stations_partition_files[current_station_partition].write(xml_data)
-            current_station_partition += 1
-            if current_station_partition >= len(partition_paths):
-                current_station_partition = 0
+        for path in partition_paths:
+            prepare_path(path, reset)
+
+        # Initialize the partition paths.
+        types = ["sensors", "stations"]
+        for type in types:
+            partition_files = []
+            for path in partition_paths:
+                # Make sure the xml folder is available.
+                prepare_path(path + type + "/", False)
+                partition_files.append(open(path + type + "/partition.xml", 'w'))
+                partition_files[-1].write(XML_START + "<" + self.LARGE_FILE_ROOT_TAG + ">\n")
+
+            # copy into each partition
+            current_partition = 0
+            self.open_progress_data()
+            row_count = len(self.progress_data)
+            for row in range(0, row_count):
+                row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
+                file_name = row_contents[self.INDEX_DATA_FILE_NAME]
+                station_id = os.path.basename(file_name).split('.')[0]
                 
-        for row in range(0, len(partition_paths)):
-            sensors_partition_files[row].write("</" + self.LARGE_FILE_ROOT_TAG + ">\n")
-            sensors_partition_files[row].close()
-            stations_partition_files[row].write("</" + self.LARGE_FILE_ROOT_TAG + ">\n")
-            stations_partition_files[row].close()
+                # Copy files
+                if type == "sensors":
+                    file_path = build_base_save_folder(save_path, station_id, type) + station_id
+                    for root, dirnames, filenames in os.walk(file_path):
+                        for filename in fnmatch.filter(filenames, '*.xml'):
+                            xml_path = os.path.join(root, filename)
+                            xml_data = file_get_contents(xml_path).replace(XML_START, "") + "\n"
+                            partition_files[current_partition].write(xml_data)
+                            current_partition += 1
+                            if current_partition >= len(partition_files):
+                                current_partition = 0
+                elif type == "stations":
+                    file_path = build_base_save_folder(save_path, station_id, type) + station_id + ".xml"
+                    xml_path = os.path.join(root, file_path)
+                    xml_data = file_get_contents(xml_path).replace(XML_START, "") + "\n"
+                    partition_files[current_partition].write(xml_data)
+                    current_partition += 1
+                    if current_partition >= len(partition_paths):
+                        current_partition = 0
+
+            for row in range(0, len(partition_paths)):
+                partition_files[row].write("</" + self.LARGE_FILE_ROOT_TAG + ">\n")
+                partition_files[row].close()
 
     def get_file_row(self, file_name):
         for i in range(0, len(self.progress_data)):
@@ -388,12 +382,13 @@ def get_partition_paths(node_id, partitions, base_paths, key="partitions"):
         partition_paths.append(scheme[PARTITION_INDEX_PATH])
     return partition_paths
 
-def get_partition_scheme(node_id, partitions, base_paths, key="partitions"):        
+def get_partition_scheme(node_id, virtual_partitions, base_paths, key="partitions"):        
     partition_scheme = []
-    for i in range(0, partitions):
+    partitions_per_disk = virtual_partitions / len(base_paths)
+    for i in range(0, partitions_per_disk):
         for j in range(0, len(base_paths)):
-            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions, i) + "/"
-            partition_scheme.append((node_id, j, partitions, i, new_partition_path))
+            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions_per_disk, i) + "/"
+            partition_scheme.append((node_id, j, partitions_per_disk, i, new_partition_path))
     return partition_scheme
 
 def get_partition_folder(disks, partitions, index):        

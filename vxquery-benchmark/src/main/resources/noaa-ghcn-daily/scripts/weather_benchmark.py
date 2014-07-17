@@ -47,6 +47,7 @@ class WeatherBenchmark:
                        "q07.xq"
                        ] 
     QUERY_UTILITY_LIST = [
+                          "no_result.xq",
                           "sensor_count.xq",
                           "station_count.xq",
                           "q04_join_count.xq",
@@ -92,6 +93,7 @@ class WeatherBenchmark:
     def print_local_partition_schemes(self, test):
         node_index = 0
         virtual_partitions = get_local_virtual_partitions(self.partitions)
+        virtual_partitions_per_disk = virtual_partitions / len(self.base_paths)
         for p in self.partitions:
             scheme = self.get_local_partition_scheme(test, p)
             self.print_partition_schemes(virtual_partitions, scheme, test, p, node_index)
@@ -99,6 +101,7 @@ class WeatherBenchmark:
     def print_cluster_partition_schemes(self, test):
         node_index = self.get_current_node_index()
         virtual_partitions = get_cluster_virtual_partitions(self.nodes, self.partitions)
+        virtual_partitions_per_disk = virtual_partitions / len(self.base_paths)
         for p in self.partitions:
             scheme = self.get_cluster_partition_scheme(test, p)
             self.print_partition_schemes(virtual_partitions, scheme, test, p, node_index)
@@ -112,7 +115,7 @@ class WeatherBenchmark:
         print "    Partitions: " + str(partitions)
         print "    Node Id: " + str(node_id)
         
-        if len(scheme) > 0:
+        if isinstance(scheme, (tuple, list, dict, set)) and len(scheme) > 0:
             folder_length = len(scheme[0][3]) + 5
             row_format = "{:>5} {:>5} {:>5} {:<" + str(folder_length) + "} {:<" + str(folder_length) + "}"
             HEADER = ("Disk", "Index", "Link", "Data Path", "Link Path")
@@ -127,7 +130,7 @@ class WeatherBenchmark:
         scheme = []
         virtual_partitions = get_local_virtual_partitions(self.partitions)
         data_schemes = get_partition_scheme(0, virtual_partitions, self.base_paths)
-        link_base_schemes = get_partition_scheme(0, partition, self.base_paths, self.DATA_LINKS_FOLDER + test)
+        link_base_schemes = get_partition_scheme(0, virtual_partitions, self.base_paths, self.DATA_LINKS_FOLDER + test)
 
         # Match link paths to real data paths.
         group_size = len(data_schemes) / len(link_base_schemes)
@@ -155,20 +158,20 @@ class WeatherBenchmark:
         scheme = []
         local_virtual_partitions = get_local_virtual_partitions(self.partitions)
         virtual_partitions = get_cluster_virtual_partitions(self.nodes, self.partitions)
+        virtual_partitions_per_disk = virtual_partitions / len(self.base_paths)
         data_schemes = get_partition_scheme(node_index, virtual_partitions, self.base_paths)
-        link_base_schemes = get_cluster_link_scheme(len(self.nodes), partition, self.base_paths, self.DATA_LINKS_FOLDER + test)
+        link_base_schemes = get_cluster_link_scheme(len(self.nodes), virtual_partitions, self.base_paths, self.DATA_LINKS_FOLDER + test)
 
         # Match link paths to real data paths.
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
             # Prep
             if test == "speed_up":
-                group_size = virtual_partitions / (link_node + 1)
+                group_size = virtual_partitions_per_disk / (link_node + 1)
             elif test == "batch_scale_out":
-                group_size = virtual_partitions / len(self.nodes)
+                group_size = virtual_partitions_per_disk / len(self.nodes)
             else:
                 print "Unknown test."
                 return
-            group_size = group_size / link_virtual
             node_offset = group_size * (node_index * partition)
             node_offset += group_size * link_index
             has_data = True

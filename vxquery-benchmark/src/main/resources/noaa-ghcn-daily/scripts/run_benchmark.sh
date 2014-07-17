@@ -27,7 +27,7 @@
 #
 REPEAT=5
 FRAME_SIZE=10000
-BUFFER_SIZE=$((8*1024*1024))
+BUFFER_SIZE=$((32*1024*1024))
 
 if [ -z "${1}" ]
 then
@@ -46,9 +46,10 @@ do
         log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
         log_base_path=$(dirname ${j/queries/query_logs})
         mkdir -p ${log_base_path}
-        time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
+        time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
+        #time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
         echo "Buffer Size: ${BUFFER_SIZE}" >> ${log_base_path}/${log_file}
-        echo "Frame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
+        #echo "Frame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
     fi;
 done
 
