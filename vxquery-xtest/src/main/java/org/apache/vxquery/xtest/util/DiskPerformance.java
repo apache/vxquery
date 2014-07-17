@@ -210,6 +210,6 @@ public class DiskPerformance {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        System.out.println("Completed thread batch: " + new Date());
+        //        System.out.println("Completed thread batch: " + new Date());
     }
 }

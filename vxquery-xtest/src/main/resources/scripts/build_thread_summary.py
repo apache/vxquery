@@ -91,14 +91,14 @@ def main(argv):
                         for i, v in enumerate(fields_indexes):
                             if (len(line) <= v):
                                 print 'Bad file: ' + filename
-                                break
+                                exit()
                             else:
                                 if (float(line[v]) < fields_min[i]):
                                     fields_min[i] = float(line[v])
                                 if (fields_max[i] < float(line[v])):
                                     fields_max[i] = float(line[v])
                                 fields_sum[i] += float(line[v])
-                                poll_count += 1
+                        poll_count += 1
                     count += 1
                     
             # Build data row
