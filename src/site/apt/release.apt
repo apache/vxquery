@@ -21,7 +21,7 @@ Releasing Apache VXQuery\x99
 
     There usually are 3 directories at the same level
 
-    * the source directory <<<incubator-vxquery>>>,
+    * the source directory <<<vxquery>>>,
 
     * the <<<site>>> directory, and
 
@@ -40,8 +40,8 @@ Releasing Apache VXQuery\x99
     directories:
 
 ---
-$ svn co https://dist.apache.org/repos/dist/release/incubator/vxquery dist
-$ svn co https://svn.apache.org/repos/asf/incubator/vxquery/site
+$ svn co https://dist.apache.org/repos/dist/release/vxquery dist
+$ svn co https://svn.apache.org/repos/asf/vxquery/site
 ---
 
   * add your key to the <<<KEYS>>> file
@@ -141,7 +141,7 @@ $ mvn release:perform
 
   * after successful vote promote staging repository {{{https://repository.apache.org/}https://repository.apache.org/}}
 
-  * add new source artifacts (archive + signature + hashes) to svn {{{https://dist.apache.org/repos/dist/release/incubator/vxquery}https://dist.apache.org/repos/dist/release/incubator/vxquery}} and remove old release dirctory
+  * add new source artifacts (archive + signature + hashes) to svn {{{https://dist.apache.org/repos/dist/release/vxquery}https://dist.apache.org/repos/dist/release/vxquery}} and remove old release dirctory
 
   * commit changes to svn
 
@@ -177,7 +177,7 @@ $ cd -
 ~~ ** Undo release plugin:
 ~~
 ~~ ---
-~~ $ svn merge -r 1526098:1524606 https://svn.apache.org/repos/asf/incubator/vxquery/branches/vxquery_0_2_staging
-~~ $ svn del -m "re-releasing build" https://svn.apache.org/repos/asf/incubator/vxquery/tags/apache-vxquery-0.2-incubating
+~~ $ svn merge -r 1526098:1524606 https://svn.apache.org/repos/asf/vxquery/branches/vxquery_0_2_staging
+~~ $ svn del -m "re-releasing build" https://svn.apache.org/repos/asf/vxquery/tags/apache-vxquery-0.2-incubating
 ~~ ---
 
