@@ -30,7 +30,7 @@
   <packaging>pom</packaging>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
-  <url>http://incubator.apache.org/vxquery/</url>
+  <url>http://vxquery.apache.org/</url>
 
   <organization>
     <name>Apache Software Foundation</name>
@@ -47,10 +47,10 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</developerConnection>
-    <url>https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
+    <url>https://git-wip-us.apache.org/repos/asf/vxquery.git</url>
+    <tag>apache-vxquery-0.3-incubating</tag>
   </scm>
 
   <issueManagement>
@@ -69,35 +69,13 @@
       <organization />
       <timezone />
     </developer>
-    <developer>
-      <id>jochen</id>
-      <name>Jochen Wiedmann</name>
-      <email />
-      <roles>
-        <role>Mentor</role>
-      </roles>
-      <organization />
-      <timezone />
-    </developer>
-    <developer>
-      <id>marvin</id>
-      <name>Marvin Humphrey</name>
-      <email />
-      <roles>
-        <role>Mentor</role>
-      </roles>
-      <organization />
-      <timezone />
-    </developer>
 
     <developer>
       <id>cezar</id>
       <name>Cezar Andrei</name>
       <email />
       <roles>
-        <role>Project Manager</role>
         <role>Architect</role>
-        <role>Champion</role>
       </roles>
       <organization />
       <timezone>-6</timezone>
@@ -137,7 +115,7 @@
       <name>Till Westmann</name>
       <email />
       <roles>
-        <role>Project Manager</role>
+        <role>Chair</role>
         <role>Architect</role>
       </roles>
       <organization />
@@ -148,49 +126,27 @@
       <name>Vinayak Borkar</name>
       <email />
       <roles>
-        <role>Project Manager</role>
         <role>Architect</role>
       </roles>
       <organization />
       <timezone>-8</timezone>
     </developer>
-
-    <developer>
-      <id>radup</id>
-      <name>Radu Preotiuc</name>
-      <email />
-      <roles>
-        <role>Mentor (dormant)</role>
-      </roles>
-      <organization />
-      <timezone />
-    </developer>
-    <developer>
-      <id>sanjiva</id>
-      <name>Sanjiva Weerawarana</name>
-      <email />
-      <roles>
-        <role>Mentor (dormant)</role>
-      </roles>
-      <organization />
-      <timezone />
-    </developer>
   </developers>
 
   <mailingLists>
     <mailingList>
-      <name>VXQuery-dev</name>
-      <subscribe>vxquery-dev-subscribe@incubator.apache.org</subscribe>
-      <unsubscribe>vxquery-dev-unsubscribe@incubator.apache.org</unsubscribe>
-      <post>vxquery-dev@incubator.apache.org</post>
-      <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-dev/</archive>
+      <name>dev</name>
+      <subscribe>dev-subscribe@vxquery.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@vxquery.apache.org</unsubscribe>
+      <post>dev@vxquery.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/vxquery-dev/</archive>
     </mailingList>
     <mailingList>
-      <name>VXQuery-commits</name>
-      <subscribe>vxquery-commits-subscribe@incubator.apache.org</subscribe>
-      <unsubscribe>vxquery-commits-unsubscribe@incubator.apache.org</unsubscribe>
-      <post>vxquery-commits@incubator.apache.org</post>
-      <archive>http://mail-archives.apache.org/mod_mbox/incubator-vxquery-commits/</archive>
+      <name>commits</name>
+      <subscribe>commits-subscribe@vxquery.apache.org</subscribe>
+      <unsubscribe>commits-unsubscribe@vxquery.apache.org</unsubscribe>
+      <post>commits@vxquery.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/vxquery-commits/</archive>
     </mailingList>
   </mailingLists>
 
@@ -463,25 +419,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-site</id>
-            <phase>pre-site</phase>
-            <configuration>
-              <target>
-                <ant antfile="build-site.xml" target="build">
-                  <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
-                </ant>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <!-- We override the configuration plugin to override the descriptor to use for building
@@ -563,7 +500,7 @@
         <configuration>
           <linkOnly>true</linkOnly>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-          <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-vxquery.git</developerConnection>
+          <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
         </configuration>
       </plugin>
       <plugin>
