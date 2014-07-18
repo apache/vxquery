@@ -50,29 +50,29 @@ Developer Tips
 *-------------------------+----------------------+---------------:
 | xs:byte                 | BytePointable        |             1 |
 *-------------------------+----------------------+---------------:
-| xs:date                 | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
+| xs:date                 | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:dateTime             | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDateTimePointable.java}XSDateTimePointable}}  |            12 |
+| xs:dateTime             | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDateTimePointable.java}XSDateTimePointable}}  |            12 |
 *-------------------------+----------------------+---------------:
 | xs:dayTimeDuration      | LongPointable        |             8 |
 *-------------------------+----------------------+---------------:
-| xs:decimal              | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDecimalPointable.java}XSDecimalPointable}}   |             9 |
+| xs:decimal              | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDecimalPointable.java}XSDecimalPointable}}   |             9 |
 *-------------------------+----------------------+---------------:
 | xs:double               | DoublePointable      |             8 |
 *-------------------------+----------------------+---------------:
-| xs:duration             | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDurationPointable.java}XSDurationPointable}}  |            12 |
+| xs:duration             | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDurationPointable.java}XSDurationPointable}}  |            12 |
 *-------------------------+----------------------+---------------:
 | xs:float                | FloatPointable       |             4 |
 *-------------------------+----------------------+---------------:
-| xs:gDay                 | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
+| xs:gDay                 | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gMonth               | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
+| xs:gMonth               | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gMonthDay            | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
+| xs:gMonthDay            | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gYear                | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
+| xs:gYear                | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
-| xs:gYearMonth           | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
+| xs:gYearMonth           | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSDatePointable.java}XSDatePointable}}      |             6 |
 *-------------------------+----------------------+---------------:
 | xs:int                  | IntegerPointable     |             4 |
 *-------------------------+----------------------+---------------:
@@ -88,7 +88,7 @@ Developer Tips
 *-------------------------+----------------------+---------------:
 | xs:short                | ShortPointable       |             2 |
 *-------------------------+----------------------+---------------:
-| xs:time                 | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSTimePointable.java}XSTimePointable}}      |             8 |
+| xs:time                 | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSTimePointable.java}XSTimePointable}}      |             8 |
 *-------------------------+----------------------+---------------:
 | xs:unsignedByte         | ShortPointable       |             2 |
 *-------------------------+----------------------+---------------:
@@ -119,13 +119,13 @@ Developer Tips
 *-------------------------+----------------------+---------------:
 | xs:anyURI               | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
-| xs:base64Binary         | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSBinaryPointable.java}XSBinaryPointable}}    |    2 + length |
+| xs:base64Binary         | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSBinaryPointable.java}XSBinaryPointable}}    |    2 + length |
 *-------------------------+----------------------+---------------:
-| xs:hexBinary            | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSBinaryPointable.java}XSBinaryPointable}}    |    2 + length |
+| xs:hexBinary            | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSBinaryPointable.java}XSBinaryPointable}}    |    2 + length |
 *-------------------------+----------------------+---------------:
 | xs:NOTATION             | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
-| xs:QName                | {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSQNamePointable.java}XSQNamePointable}}     |    6 + length |
+| xs:QName                | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/atomic/XSQNamePointable.java}XSQNamePointable}}     |    6 + length |
 *-------------------------+----------------------+---------------:
 | xs:string               | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
@@ -139,19 +139,19 @@ Developer Tips
   an end of string value. Stacking iterators can be used to alter the string
   into a desired form.
   
-  * {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/ICharacterIterator.java}ICharacterIterator}}
+  * {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/ICharacterIterator.java}ICharacterIterator}}
    
-  * {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/LowerCaseCharacterIterator.java}LowerCaseStringCharacterIterator}}
+  * {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/LowerCaseCharacterIterator.java}LowerCaseStringCharacterIterator}}
    
-  * {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringAfterCharacterIterator.java}SubstringAfterStringCharacterIterator}}
+  * {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringAfterCharacterIterator.java}SubstringAfterStringCharacterIterator}}
    
-  * {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringBeforeCharacterIterator.java}SubstringBeforeStringCharacterIterator}}
+  * {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringBeforeCharacterIterator.java}SubstringBeforeStringCharacterIterator}}
    
-  * {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringCharacterIterator.java}SubstringStringCharacterIterator}}
+  * {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/SubstringCharacterIterator.java}SubstringStringCharacterIterator}}
    
-  * {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/UTF8StringCharacterIterator.java}UTF8StringCharacterIterator}}
+  * {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/UTF8StringCharacterIterator.java}UTF8StringCharacterIterator}}
 
-  * {{{https://git-wip-us.apache.org/repos/asf?p=incubator-vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/UpperCaseCharacterIterator.java}UpperCaseStringCharacterIterator}}
+  * {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/runtime/functions/strings/UpperCaseCharacterIterator.java}UpperCaseStringCharacterIterator}}
   
 * Array Backed Value Store
 
