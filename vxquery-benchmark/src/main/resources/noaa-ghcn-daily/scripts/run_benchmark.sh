@@ -26,7 +26,7 @@
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "" q03
 #
 REPEAT=5
-FRAME_SIZE=10000
+FRAME_SIZE=$((8*1024))
 BUFFER_SIZE=$((32*1024*1024))
 
 if [ -z "${1}" ]
@@ -46,15 +46,20 @@ do
         log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
         log_base_path=$(dirname ${j/queries/query_logs})
         mkdir -p ${log_base_path}
-        time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
-        #time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
+        time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
         echo "Buffer Size: ${BUFFER_SIZE}" >> ${log_base_path}/${log_file}
-        #echo "Frame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
+        echo "Frame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
     fi;
 done
 
-SUBJECT="Benchmark Tests Finished"
-EMAIL="ecarm002@ucr.edu"
-/bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
-Completed all tests in folder ${1}.
-EOM
+if which programname >/dev/null;
+then
+    echo "Sending out e-mail notification."
+    SUBJECT="Benchmark Tests Finished"
+    EMAIL="ecarm002@ucr.edu"
+    /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
+    Completed all tests in folder ${1}.
+    EOM
+else
+    echo "No mail command to use."
+fi;

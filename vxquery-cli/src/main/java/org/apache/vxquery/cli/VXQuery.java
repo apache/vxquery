@@ -83,7 +83,6 @@ public class VXQuery {
     private static long sumSquaredTiming;
     private static long minTiming = Long.MAX_VALUE;
     private static long maxTiming = Long.MIN_VALUE;
-    private static byte TIMING_QUERIES_TO_IGNORE = 2;
 
     /**
      * Constructor to use command line options passed.
@@ -124,9 +123,9 @@ public class VXQuery {
         if (opts.timing) {
             Date end = new Date();
             timingMessage("Execution time: " + (end.getTime() - start.getTime()) + " ms");
-            if (opts.repeatExec > TIMING_QUERIES_TO_IGNORE) {
-                long mean = sumTiming / (opts.repeatExec - TIMING_QUERIES_TO_IGNORE);
-                double sd = Math.sqrt(sumSquaredTiming / (opts.repeatExec - new Byte(TIMING_QUERIES_TO_IGNORE).doubleValue()) - mean * mean);
+            if (opts.repeatExec > opts.timingIgnoreQueries) {
+                long mean = sumTiming / (opts.repeatExec - opts.timingIgnoreQueries);
+                double sd = Math.sqrt(sumSquaredTiming / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue()) - mean * mean);
                 timingMessage("Average execution time: " + mean + " ms");
                 timingMessage("Standard deviation: " + String.format( "%.4f", sd));
                 timingMessage("Coefficient of variation: " + String.format( "%.4f", (sd / mean)));
@@ -290,7 +289,7 @@ public class VXQuery {
                 if (opts.timing) {
                     end = new Date();
                     long currentRun = end.getTime() - start.getTime();
-                    if ((i + 1) > TIMING_QUERIES_TO_IGNORE) {
+                    if ((i + 1) > opts.timingIgnoreQueries) {
                         sumTiming += currentRun;
                         sumSquaredTiming += currentRun * currentRun;
                         if (currentRun < minTiming) {
@@ -434,22 +433,22 @@ public class VXQuery {
      */
     private static class CmdLineOptions {
         @Option(name = "-available-processors", usage = "Number of available processors. (default java's available processors)")
-        public int availableProcessors = -1;
+        private int availableProcessors = -1;
 
         @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController")
-        public String clientNetIpAddress = null;
+        private String clientNetIpAddress = null;
 
         @Option(name = "-client-net-port", usage = "Port of the ClusterController (default 1098)")
-        public int clientNetPort = 1098;
+        private int clientNetPort = 1098;
 
         @Option(name = "-local-node-controllers", usage = "Number of local node controllers (default 1)")
-        public int localNodeControllers = 1;
+        private int localNodeControllers = 1;
 
         @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
-        public int frameSize = 65536;
+        private int frameSize = 65536;
 
         @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
-        public int bufferSize = -1;
+        private int bufferSize = -1;
 
         @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;
@@ -477,6 +476,9 @@ public class VXQuery {
 
         @Option(name = "-timing", usage = "Produce timing information")
         private boolean timing;
+
+        @Option(name = "-timing-ignore-queries", usage = "Ignore the first X number of quereies.")
+        private int timingIgnoreQueries = 2;
 
         @Option(name = "-x", usage = "Bind an external variable")
         private Map<String, String> bindings = new HashMap<String, String>();

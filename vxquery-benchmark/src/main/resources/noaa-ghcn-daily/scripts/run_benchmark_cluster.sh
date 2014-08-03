@@ -25,8 +25,9 @@
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "-client-net-ip-address 169.235.27.138"
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "" q03
 #
+CLUSTER="uci"
 REPEAT=5
-FRAME_SIZE=10000
+FRAME_SIZE=$((8*1024))
 BUFFER_SIZE=$((32*1024*1024))
 
 if [ -z "${1}" ]
@@ -43,7 +44,7 @@ fi
 
 # Run queries for the specified number of nodes.
 echo "Starting ${2} cluster nodes"
-python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${2}nodes.xml -a start
+python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${CLUSTER}/${2}nodes.xml -a start
 
 # wait for cluster to finish setting up  
 sleep 5
@@ -63,19 +64,24 @@ do
             log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
             log_base_path=$(dirname ${j/queries/query_logs})
             mkdir -p ${log_base_path}
-            #time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${3} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
-            time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${3} -timing -showquery -showoet -showrp -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
+            time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${3} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
             echo "\nBuffer Size: ${BUFFER_SIZE}" >> ${log_base_path}/${log_file}
-            #echo "\nFrame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
+            echo "\nFrame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
         fi;
     fi;
 done
     
 # Stop cluster.
-python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${2}nodes.xml -a stop
+python vxquery-server/src/main/resources/scripts/cluster_cli.py -c vxquery-server/src/main/resources/conf/${CLUSTER}/${2}nodes.xml -a stop
 
-SUBJECT="Benchmark Cluster Tests Finished"
-EMAIL="ecarm002@ucr.edu"
-/bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
-Completed all tests in folder ${1} for a ${2} node cluster.
-EOM
+if which programname >/dev/null;
+then
+    echo "Sending out e-mail notification."
+    SUBJECT="Benchmark Cluster Tests Finished"
+    EMAIL="ecarm002@ucr.edu"
+    /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
+    Completed all tests in folder ${1} for a ${2} node cluster using ${HOSTNAME}.
+    EOM
+else
+    echo "No mail command to use."
+fi;

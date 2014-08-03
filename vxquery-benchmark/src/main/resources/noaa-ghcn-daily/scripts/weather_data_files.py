@@ -376,19 +376,28 @@ PARTITION_INDEX = 3
 PARTITION_INDEX_PATH = 4
 PARTITION_HEADER = ("Node", "Disk", "Virtual", "Index", "Path")
             
-def get_partition_paths(node_id, partitions, base_paths, key="partitions"):        
+def get_partition_paths(node_id, partitions, base_paths, key="partitions"):
     partition_paths = []
     for scheme in get_partition_scheme(node_id, partitions, base_paths, key):
         partition_paths.append(scheme[PARTITION_INDEX_PATH])
     return partition_paths
 
-def get_partition_scheme(node_id, virtual_partitions, base_paths, key="partitions"):        
-    partition_scheme = []
+def get_partition_scheme(node_id, virtual_partitions, base_paths, key="partitions"):
     partitions_per_disk = virtual_partitions / len(base_paths)
-    for i in range(0, partitions_per_disk):
+    return get_disk_partition_scheme(node_id, partitions_per_disk, base_paths, key)
+
+def get_disk_partition_paths(node_id, partitions, base_paths, key="partitions"):
+    partition_paths = []
+    for scheme in get_disk_partition_scheme(node_id, partitions, base_paths, key):
+        partition_paths.append(scheme[PARTITION_INDEX_PATH])
+    return partition_paths
+
+def get_disk_partition_scheme(node_id, virtual_disk_partitions, base_paths, key="partitions"):
+    partition_scheme = []
+    for i in range(0, virtual_disk_partitions):
         for j in range(0, len(base_paths)):
-            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions_per_disk, i) + "/"
-            partition_scheme.append((node_id, j, partitions_per_disk, i, new_partition_path))
+            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, virtual_disk_partitions, i) + "/"
+            partition_scheme.append((node_id, j, virtual_disk_partitions, i, new_partition_path))
     return partition_scheme
 
 def get_partition_folder(disks, partitions, index):        

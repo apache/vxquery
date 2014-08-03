@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class XMLParser {
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId, ByteBuffer frame,
             FrameTupleAppender appender, List<Integer> childSeq, StaticContext staticContext)
             throws HyracksDataException {
-        bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size"));
+        bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1"));
         this.nodeId = nodeId;
         try {
             parser = XMLReaderFactory.createXMLReader();
@@ -76,13 +77,16 @@ public class XMLParser {
 
     public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
+            Reader input;
             if (bufferSize > 0) {
-                in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize));
+                input = new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize);
             } else {
-                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
+                input = new InputStreamReader(new FileInputStream(file));
             }
+            in.setCharacterStream(input);
             parser.parse(in);
             handler.writeDocument(abvs);
+            input.close();
         } catch (FileNotFoundException e) {
             HyracksDataException hde = new VXQueryFileNotFoundException(e, file);
             hde.setNodeId(nodeId);
@@ -101,13 +105,17 @@ public class XMLParser {
     public void parseElements(File file, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
             throws HyracksDataException {
         try {
+            Reader input;
             if (bufferSize > 0) {
-                in.setCharacterStream(new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize));
+                input = new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize);
+//                System.err.println("buffer size: " + bufferSize);
             } else {
-                in.setCharacterStream(new InputStreamReader(new FileInputStream(file)));
+                input = new InputStreamReader(new FileInputStream(file));
             }
+            in.setCharacterStream(input);
             handler.setupElementWriter(writer, fta, tupleIndex);
             parser.parse(in);
+            input.close();
         } catch (FileNotFoundException e) {
             HyracksDataException hde = new VXQueryFileNotFoundException(e, file);
             hde.setNodeId(nodeId);

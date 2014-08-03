@@ -53,7 +53,7 @@ def main(argv):
             print '    -a        Append the results to the progress file.'
             print '    -f (str)  The file name of a specific station to process.'
             print '              * Helpful when testing a single stations XML file output.'
-            print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, partition_scheme, inventory, statistics).'
+            print '    -l (str)  Select the locality of the scripts execution (download, progress_file, sensor_build, station_build, partition, partition_scheme, test_links, queries, inventory, statistics).'
             print '    -m (int)  Limits the number of files created for each station.'
             print '              * Helpful when testing to make sure all elements are supported for each station.'
             print '              Alternate form: --max_station_files=(int)'
@@ -203,7 +203,7 @@ def main(argv):
         benchmark = WeatherBenchmark(base_paths, dataset.get_partitions(), dataset, config.get_node_machine_list())
         
         if section in ("all", "partition", "partition_scheme"):
-            slices = benchmark.get_number_of_slices()
+            slices = benchmark.get_number_of_slices_per_disk()
             print 'Processing the partition section (' + dataset.get_name() + ':d' + str(len(base_paths)) + ':s' + str(slices) + ').'
             data.reset()
             if section == "partition_scheme":

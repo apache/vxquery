@@ -1,0 +1,6 @@
+max(
+    select (toFloat(text(r.value)))
+    from r in source(xml, "sample_xml/nano_sensors.xml", {"data"})
+    where text(r.dataType) = "TMAX"
+) / 10
+;

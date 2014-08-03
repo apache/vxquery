@@ -92,19 +92,17 @@ class WeatherBenchmark:
             
     def print_local_partition_schemes(self, test):
         node_index = 0
-        virtual_partitions = get_local_virtual_partitions(self.partitions)
-        virtual_partitions_per_disk = virtual_partitions / len(self.base_paths)
+        virtual_disk_partitions = get_local_virtual_disk_partitions(self.partitions)
         for p in self.partitions:
             scheme = self.get_local_partition_scheme(test, p)
-            self.print_partition_schemes(virtual_partitions, scheme, test, p, node_index)
+            self.print_partition_schemes(virtual_disk_partitions, scheme, test, p, node_index)
         
     def print_cluster_partition_schemes(self, test):
         node_index = self.get_current_node_index()
-        virtual_partitions = get_cluster_virtual_partitions(self.nodes, self.partitions)
-        virtual_partitions_per_disk = virtual_partitions / len(self.base_paths)
+        virtual_disk_partitions = get_cluster_virtual_disk_partitions(self.nodes, self.partitions)
         for p in self.partitions:
             scheme = self.get_cluster_partition_scheme(test, p)
-            self.print_partition_schemes(virtual_partitions, scheme, test, p, node_index)
+            self.print_partition_schemes(virtual_disk_partitions, scheme, test, p, node_index)
         
     def print_partition_schemes(self, virtual_partitions, scheme, test, partitions, node_id):
         print
@@ -128,7 +126,7 @@ class WeatherBenchmark:
 
     def get_local_partition_scheme(self, test, partition):
         scheme = []
-        virtual_partitions = get_local_virtual_partitions(self.partitions)
+        virtual_partitions = get_local_virtual_disk_partitions(self.partitions)
         data_schemes = get_partition_scheme(0, virtual_partitions, self.base_paths)
         link_base_schemes = get_partition_scheme(0, virtual_partitions, self.base_paths, self.DATA_LINKS_FOLDER + test)
 
@@ -156,28 +154,27 @@ class WeatherBenchmark:
             return 
         
         scheme = []
-        local_virtual_partitions = get_local_virtual_partitions(self.partitions)
-        virtual_partitions = get_cluster_virtual_partitions(self.nodes, self.partitions)
-        virtual_partitions_per_disk = virtual_partitions / len(self.base_paths)
-        data_schemes = get_partition_scheme(node_index, virtual_partitions, self.base_paths)
-        link_base_schemes = get_cluster_link_scheme(len(self.nodes), virtual_partitions, self.base_paths, self.DATA_LINKS_FOLDER + test)
+        virtual_disk_partitions = get_cluster_virtual_disk_partitions(self.nodes, self.partitions)
+        data_schemes = get_disk_partition_scheme(node_index, virtual_disk_partitions, self.base_paths)
+        link_base_schemes = get_cluster_link_scheme(len(self.nodes), partition, self.base_paths, self.DATA_LINKS_FOLDER + test)
 
         # Match link paths to real data paths.
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
             # Prep
             if test == "speed_up":
-                group_size = virtual_partitions_per_disk / (link_node + 1)
+                group_size = virtual_disk_partitions / (link_node + 1) / partition
             elif test == "batch_scale_out":
-                group_size = virtual_partitions_per_disk / len(self.nodes)
+                group_size = virtual_disk_partitions / len(self.nodes) / partition
             else:
                 print "Unknown test."
                 return
-            node_offset = group_size * (node_index * partition)
+            
+            node_offset = group_size * node_index * partition
             node_offset += group_size * link_index
             has_data = True
             if link_node < node_index:
                 has_data = False
-                
+    
             # Make links
             for date_node, data_disk, data_virtual, data_index, data_path in data_schemes:
                 if has_data and data_disk == link_disk \
@@ -295,7 +292,7 @@ class WeatherBenchmark:
                 prepare_path(query_path, reset)
             
                 # Copy query files.
-                partition_paths = get_partition_paths(n, p, self.base_paths, self.DATA_LINKS_FOLDER + test + "/" + str(n) + "nodes")
+                partition_paths = get_disk_partition_paths(n, p, self.base_paths, self.DATA_LINKS_FOLDER + test + "/" + str(n) + "nodes")
                 self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_local_query_files(self, test, reset):
@@ -313,7 +310,7 @@ class WeatherBenchmark:
             prepare_path(query_path, reset)
     
             # Copy query files.
-            partition_paths = get_partition_paths(0, p, self.base_paths, self.DATA_LINKS_FOLDER + test)
+            partition_paths = get_disk_partition_paths(0, p, self.base_paths, self.DATA_LINKS_FOLDER + test)
             self.copy_and_replace_query(query_path, partition_paths)
 
     def copy_and_replace_query(self, query_path, replacement_list):
@@ -339,15 +336,15 @@ class WeatherBenchmark:
                 for line in fileinput.input(query_path + query_file, True):
                     sys.stdout.write(line.replace("/dataCollection", "/" + self.LARGE_FILE_ROOT_TAG + "/dataCollection"))
                     
-    def get_number_of_slices(self):
+    def get_number_of_slices_per_disk(self):
         if len(self.dataset.get_tests()) == 0:
             print "No test has been defined in config file."
         else:
             for test in self.dataset.get_tests():
                 if test in self.BENCHMARK_LOCAL_TESTS:
-                    return get_local_virtual_partitions(self.partitions)
+                    return get_local_virtual_disk_partitions(self.partitions)
                 elif test in self.BENCHMARK_CLUSTER_TESTS:
-                    return get_cluster_virtual_partitions(self.nodes, self.partitions)
+                    return get_cluster_virtual_disk_partitions(self.nodes, self.partitions)
                 else:
                     print "Unknown test."
                     exit()
@@ -355,7 +352,7 @@ class WeatherBenchmark:
 def get_cluster_link_scheme(nodes, partition, base_paths, key="partitions"):        
     link_paths = []
     for n in range(0, nodes):
-        new_link_path = get_partition_scheme(n, partition, base_paths, key + "/" + str(n) + "nodes")
+        new_link_path = get_disk_partition_scheme(n, partition, base_paths, key + "/" + str(n) + "nodes")
         link_paths.extend(new_link_path)
     return link_paths
 
@@ -368,12 +365,12 @@ def get_local_query_folder(disks, partitions):
 def get_cluster_query_path(base_paths, test, partition, nodes):        
     return base_paths[0] + "queries/" + test + "/" + str(nodes) + "nodes/" + get_local_query_folder(len(base_paths), partition) + "/"
 
-def get_cluster_virtual_partitions(nodes, partitions):
-    vp = get_local_virtual_partitions(partitions)
-    vn = calculate_partitions(range(len(nodes), 0, -1))
+def get_cluster_virtual_disk_partitions(nodes, partitions):
+    vp = get_local_virtual_disk_partitions(partitions)
+    vn = calculate_partitions(range(1, len(nodes)+1, 1))
     return vp * vn
 
-def get_local_virtual_partitions(partitions):
+def get_local_virtual_disk_partitions(partitions):
     return calculate_partitions(partitions)
 
 def calculate_partitions(list):

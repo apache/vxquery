@@ -29,8 +29,14 @@ do
     time for i in {1..${REPEAT}}; do ~/mrql/incubator-mrql/bin/mrql -dist -nodes 5 ~/vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_${DATASET}/q0${n}.mrql >> weather_data/mrql/query_logs/${DATASET}/q0${n}.mrql.log 2>&1; done; 
 done
 
-SUBJECT="MRQL Tests Finished (${DATASET})"
-EMAIL="ecarm002@ucr.edu"
-/bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
-Completed all MRQL tests on ${DATASET}.
-EOM
+if which programname >/dev/null;
+then
+    echo "Sending out e-mail notification."
+    SUBJECT="MRQL Tests Finished (${DATASET})"
+    EMAIL="ecarm002@ucr.edu"
+    /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
+    Completed all MRQL tests on ${DATASET}.
+    EOM
+else
+    echo "No mail command to use."
+fi;

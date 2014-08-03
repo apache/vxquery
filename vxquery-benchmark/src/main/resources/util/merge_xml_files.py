@@ -43,7 +43,7 @@ def main(argv):
     except getopt.GetoptError:
         print 'The file options for list_xml_files.py were not correctly specified.'
         print 'To see a full list of options try:'
-        print '  $ python list_xml_files.py -h'
+        print '  $ python merge_xml_files.py -f /path/to/folder -s new.xml -t sensors'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':

@@ -1,0 +1,10 @@
+avg(
+    select (toFloat(text(rtmax.value))-toFloat(text(rtmin.value)))
+    from rtmax in source(xml, "sample_xml/nano_sensors.xml", {"data"}),
+        rtmin in source(xml, "sample_xml/nano_sensors.xml", {"data"})
+    where text(rtmax.date) = text(rtmin.date)
+        and text(rtmax.station) = text(rtmin.station)
+        and text(rtmax.dataType) = "TMAX"
+        and text(rtmin.dataType) = "TMIN"
+) / 10
+;
