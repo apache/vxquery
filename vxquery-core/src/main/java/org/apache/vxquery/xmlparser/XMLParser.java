@@ -108,7 +108,6 @@ public class XMLParser {
             Reader input;
             if (bufferSize > 0) {
                 input = new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize);
-//                System.err.println("buffer size: " + bufferSize);
             } else {
                 input = new InputStreamReader(new FileInputStream(file));
             }
