@@ -1,0 +1,10 @@
+select (n, d, v)
+from sensors in source(xml, "sample_xml/gsn_sensors.xml", {"data"}),
+    d in sensors.date,
+    v in sensors.value,
+    stations in source(xml, "sample_xml/gsn_stations.xml", {"station"}),
+    n in stations.displayName,
+where text(stations.id) = text(sensors.station) 
+    and toInt(substring(text(d), 0, 4)) = 2000
+    and text(sensors.dataType) = "TMAX"
+;

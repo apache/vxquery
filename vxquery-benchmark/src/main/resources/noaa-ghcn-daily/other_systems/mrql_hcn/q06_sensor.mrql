@@ -1,0 +1,7 @@
+count(
+    select (r.date, r.value)
+    from r in source(xml, "sample_xml/hcn_sensors.xml", {"data"})
+    where toInt(substring(text(r.date), 0, 4)) = 2000
+        and text(r.dataType) = "TMAX"
+)
+;

@@ -1,0 +1,5 @@
+select (r)
+from r in source(xml, "sample_xml/nano_sensors.xml", {"data"})
+where text(r.dataType) = "AWND"
+    and toFloat(text(r.value)) > 491.744
+;

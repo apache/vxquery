@@ -14,14 +14,16 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-
-(: XQuery Aggregate Query :)
-(: Find the annual precipitation (PRCP) for a Seattle using the airport       :)
-(: station (USW00024233) for 1999.                                            :)
+(:
+XQuery Aggregate Query
+----------------------
+Find the annual precipitation (PRCP) for a Syracuse, NY using the airport
+weather station (USW00014771) report for 1999.                                     
+:)
 fn:sum(
     let $collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($collection)/dataCollection/data
-    where $r/station eq "GHCND:USW00024233" 
+    where $r/station eq "GHCND:USW00014771" 
         and $r/dataType eq "PRCP" 
         and fn:year-from-dateTime(xs:dateTime(fn:data($r/date))) eq 1999
     return $r/value

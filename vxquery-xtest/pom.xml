@@ -50,6 +50,10 @@
                   <mainClass>org.apache.vxquery.xtest.Main</mainClass>
                   <name>xtest</name>
                 </program>
+                <program>
+                  <mainClass>org.apache.vxquery.xtest.util.DiskPerformance</mainClass>
+                  <name>diskperformance</name>
+                </program>
               </programs>
               <repositoryLayout>flat</repositoryLayout>
               <repositoryName>lib</repositoryName>
@@ -61,12 +65,41 @@
           </execution>
         </executions>
       </plugin>
-      <!--
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-xtest-scripts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/appassembler/bin</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources/scripts</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-xtest-conf</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/appassembler/conf</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources/conf</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
-      -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>

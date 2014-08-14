@@ -1,0 +1,6 @@
+count(
+    select (rtmin)
+    from rtmin in source(xml, "sample_xml/gsn_sensors.xml", {"data"})
+    where text(r.dataType) = "TMIN"
+)
+;

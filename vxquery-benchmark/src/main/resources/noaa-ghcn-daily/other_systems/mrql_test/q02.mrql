@@ -1,0 +1,8 @@
+sum(
+    select (toFloat(text(r.value)))
+    from r in source(xml, "sample_xml/nano_sensors.xml", {"data"})
+    where text(r.station) = "GHCND:US000000002"
+        and toInt(substring(text(r.date), 0, 4)) = 2002
+        and text(r.dataType) = "PRCP"
+) / 10
+;

@@ -105,7 +105,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         }
                     }
                 } else {
-                    throw new HyracksDataException("Invalid directory parameter ("
+                    throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
                             + collectionDirectory.getAbsolutePath() + ") passed to collection.");
                 }
             }

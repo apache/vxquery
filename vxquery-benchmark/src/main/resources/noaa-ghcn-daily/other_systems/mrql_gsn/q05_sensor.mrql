@@ -1,0 +1,7 @@
+count(
+    select (toInt(text(r.value)))
+    from r in source(xml, "sample_xml/gsn_sensors.xml", {"data"})
+    where toInt(substring(text(r.date), 0, 4)) = 2001
+        and text(r.dataType) = "TMIN"
+)
+;

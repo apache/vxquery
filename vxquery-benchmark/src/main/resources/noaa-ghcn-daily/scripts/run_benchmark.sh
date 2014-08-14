@@ -25,6 +25,9 @@
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "-client-net-ip-address 169.235.27.138"
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "" q03
 #
+REPEAT=5
+FRAME_SIZE=$((8*1024))
+BUFFER_SIZE=$((32*1024*1024))
 
 if [ -z "${1}" ]
 then
@@ -32,15 +35,31 @@ then
     exit
 fi
 
+export JAVA_OPTS="$JAVA_OPTS -server -Xmx8G -XX:+HeapDumpOnOutOfMemoryError -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/benchmark_logging.properties"
+
 for j in $(find ${1} -name '*q??.xq')
 do
     if [ -z "${3}" ] || [[ "${j}" =~ "${3}" ]] 
     then
+        date
         echo "Running query: ${j}"
         log_file="$(basename ${j}).$(date +%Y%m%d%H%M).log"
         log_base_path=$(dirname ${j/queries/query_logs})
         mkdir -p ${log_base_path}
-    	time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size 10000 -repeatexec 10 > ${log_base_path}/${log_file} 2>&1
+        time sh ./vxquery-cli/target/appassembler/bin/vxq ${j} ${2} -timing -showquery -showoet -showrp -frame-size ${FRAME_SIZE} -buffer-size ${BUFFER_SIZE} -repeatexec ${REPEAT} > ${log_base_path}/${log_file} 2>&1
+        echo "Buffer Size: ${BUFFER_SIZE}" >> ${log_base_path}/${log_file}
+        echo "Frame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
     fi;
 done
 
+if which programname >/dev/null;
+then
+    echo "Sending out e-mail notification."
+    SUBJECT="Benchmark Tests Finished"
+    EMAIL="ecarm002@ucr.edu"
+    /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
+    Completed all tests in folder ${1}.
+    EOM
+else
+    echo "No mail command to use."
+fi;

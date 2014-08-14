@@ -14,21 +14,27 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<data xmlns="data">
-    <name>Local Example</name>
-    <save_path>/data</save_path>
-    <package>ghcnd_all</package>
-    <node>
-        <id>localhost</id>
-        <cluster_ip>127.0.0.1</cluster_ip>
-    </node>
-    <dataset>
-        <name>tiny-example</name>
-        <test>local_speed_up</test>
-        <save_path>/data</save_path>
-        <partitions_per_path>1</partitions_per_path>
-        <partitions_per_path>2</partitions_per_path>
-        <partitions_per_path>4</partitions_per_path>
-        <partitions_per_path>8</partitions_per_path>
-    </dataset>
-</data>
+
+NOAA GHCN-Daily Benchmark
+=====================
+
+# Introduction
+
+The NOAA has hosted DAILY GLOBAL HISTORICAL CLIMATOLOGY NETWORK (GHCN-DAILY) 
+.dat files. Weather.gov has an RSS/XML feed that gives current weather sensor 
+readings. Using the RSS feed as a template, the GHCN-DAILY historical 
+information is used to generate past RSS feed XML documents. The process allows 
+testing on a large set of information with out having to continually monitor 
+the weather.gov site for all the weather details for years.
+
+# Detailed Description
+
+Detailed GHDN-DAILY information: 
+<http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt>
+
+# Folders
+
+ * conf
+ * other_systems
+ * queries
+ * scripts

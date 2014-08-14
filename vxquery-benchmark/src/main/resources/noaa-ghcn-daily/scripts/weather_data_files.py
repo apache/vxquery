@@ -26,6 +26,8 @@ from collections import OrderedDict
 # Allows partition and picking up where you left off.
 class WeatherDataFiles:
 
+    LARGE_FILE_ROOT_TAG = "root"
+
     INDEX_DATA_FILE_NAME = 0
     INDEX_DATA_SENSORS_STATUS = 1
     INDEX_DATA_STATION_STATUS = 2
@@ -51,13 +53,9 @@ class WeatherDataFiles:
         self.current = self.DATA_FILE_START_INDEX
         self.progress_data = []
 
-        
-    def get_file_list(self):
-        return glob.glob(self.base_path + "/*" + self.DATA_FILE_EXTENSION)
-
     def get_file_list_iterator(self):
+        """Return the list of files one at a time."""
         return glob.iglob(self.base_path + "/*" + self.DATA_FILE_EXTENSION)
-
 
     # Save Functions
     def build_progress_file(self, options, convert):
@@ -98,10 +96,8 @@ class WeatherDataFiles:
             return
         
         # Initialize the partition paths.
-        partition_sizes = []
         partition_paths = get_partition_paths(0, partitions, base_paths)
         for path in partition_paths:
-            partition_sizes.append(0)
             # Make sure the xml folder is available.
             prepare_path(path, reset)
 
@@ -145,66 +141,66 @@ class WeatherDataFiles:
             if current_station_partition >= len(partition_paths):
                 current_station_partition = 0
 
-    
-    def copy_to_n_partitions_by_station(self, save_path, partitions, base_paths, reset):
-        """Once the initial data has been generated, the data can be copied into a set number of partitions. """
+    def build_to_n_partition_files(self, save_path, partitions, base_paths, reset):
+        """Once the initial data has been generated, the data can be divided into partitions 
+        and stored in single files.
+        """
         if (len(base_paths) == 0):
             return
         
-        # Initialize the partition paths.
-        partition_sizes = []
+        XML_START = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        
         partition_paths = get_partition_paths(0, partitions, base_paths)
+
+        import fnmatch
+        import os
+        
         for path in partition_paths:
-            partition_sizes.append(0)
-            # Make sure the xml folder is available.
             prepare_path(path, reset)
 
-        # copy stations and sensors into each partition
-        current_partition = 0
-        csv_sorted = self.get_csv_in_partition_order()
-        for item, size in csv_sorted.iteritems():
-            if size < 0:
-                print "The progress file does not have the sensor size data saved."
-                return
-            
-            station_id = item.split('.')[0]
-            # Update partition bases on smallest current size.
-            current_partition = partition_sizes.index(min(partition_sizes))
-            
-            # Copy sensor files
-            type = "sensors"
-            file_path = build_base_save_folder(save_path, station_id, type) + station_id
-            new_file_path = build_base_save_folder(partition_paths[current_partition], station_id, type) + station_id
-            if os.path.isdir(file_path):
-                distutils.dir_util.copy_tree(file_path, new_file_path)
-            partition_sizes[current_partition] += size
-        
-            # Copy station files
-            type = "stations"
-            file_path = build_base_save_folder(save_path, station_id, type) + station_id + ".xml"
-            new_file_base = build_base_save_folder(partition_paths[current_partition], station_id, type)
-            new_file_path = new_file_base + station_id + ".xml"
-            if os.path.isfile(file_path):
-                if not os.path.isdir(new_file_base):
-                    os.makedirs(new_file_base)
-                shutil.copyfile(file_path, new_file_path)
-    
-    def get_csv_in_partition_order(self):
-        self.open_progress_data()
-        row_count = len(self.progress_data)
-        
-        # Get the dictionary of all the files and data sizes.
-        csv_dict = dict()
-        for row in range(0, row_count):
-            row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
-            file_name = row_contents[self.INDEX_DATA_FILE_NAME]
-            folder_data = int(row_contents[self.INDEX_DATA_FOLDER_DATA])
-            
-            csv_dict[file_name] = folder_data
-        
-        # New sorted list.
-        return OrderedDict(sorted(csv_dict.items(), key=lambda x: x[1], reverse=True))
-        
+        # Initialize the partition paths.
+        types = ["sensors", "stations"]
+        for type in types:
+            partition_files = []
+            for path in partition_paths:
+                # Make sure the xml folder is available.
+                prepare_path(path + type + "/", False)
+                partition_files.append(open(path + type + "/partition.xml", 'w'))
+                partition_files[-1].write(XML_START + "<" + self.LARGE_FILE_ROOT_TAG + ">\n")
+
+            # copy into each partition
+            current_partition = 0
+            self.open_progress_data()
+            row_count = len(self.progress_data)
+            for row in range(0, row_count):
+                row_contents = self.progress_data[row].rsplit(self.SEPERATOR)
+                file_name = row_contents[self.INDEX_DATA_FILE_NAME]
+                station_id = os.path.basename(file_name).split('.')[0]
+                
+                # Copy files
+                if type == "sensors":
+                    file_path = build_base_save_folder(save_path, station_id, type) + station_id
+                    for root, dirnames, filenames in os.walk(file_path):
+                        for filename in fnmatch.filter(filenames, '*.xml'):
+                            xml_path = os.path.join(root, filename)
+                            xml_data = file_get_contents(xml_path).replace(XML_START, "") + "\n"
+                            partition_files[current_partition].write(xml_data)
+                            current_partition += 1
+                            if current_partition >= len(partition_files):
+                                current_partition = 0
+                elif type == "stations":
+                    file_path = build_base_save_folder(save_path, station_id, type) + station_id + ".xml"
+                    xml_path = os.path.join(root, file_path)
+                    xml_data = file_get_contents(xml_path).replace(XML_START, "") + "\n"
+                    partition_files[current_partition].write(xml_data)
+                    current_partition += 1
+                    if current_partition >= len(partition_paths):
+                        current_partition = 0
+
+            for row in range(0, len(partition_paths)):
+                partition_files[row].write("</" + self.LARGE_FILE_ROOT_TAG + ">\n")
+                partition_files[row].close()
+
     def get_file_row(self, file_name):
         for i in range(0, len(self.progress_data)):
             if self.progress_data[i].startswith(file_name):
@@ -380,18 +376,28 @@ PARTITION_INDEX = 3
 PARTITION_INDEX_PATH = 4
 PARTITION_HEADER = ("Node", "Disk", "Virtual", "Index", "Path")
             
-def get_partition_paths(node_id, partitions, base_paths, key="partitions"):        
+def get_partition_paths(node_id, partitions, base_paths, key="partitions"):
     partition_paths = []
     for scheme in get_partition_scheme(node_id, partitions, base_paths, key):
         partition_paths.append(scheme[PARTITION_INDEX_PATH])
     return partition_paths
 
-def get_partition_scheme(node_id, partitions, base_paths, key="partitions"):        
+def get_partition_scheme(node_id, virtual_partitions, base_paths, key="partitions"):
+    partitions_per_disk = virtual_partitions / len(base_paths)
+    return get_disk_partition_scheme(node_id, partitions_per_disk, base_paths, key)
+
+def get_disk_partition_paths(node_id, partitions, base_paths, key="partitions"):
+    partition_paths = []
+    for scheme in get_disk_partition_scheme(node_id, partitions, base_paths, key):
+        partition_paths.append(scheme[PARTITION_INDEX_PATH])
+    return partition_paths
+
+def get_disk_partition_scheme(node_id, virtual_disk_partitions, base_paths, key="partitions"):
     partition_scheme = []
-    for i in range(0, partitions):
+    for i in range(0, virtual_disk_partitions):
         for j in range(0, len(base_paths)):
-            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, partitions, i) + "/"
-            partition_scheme.append((node_id, j, partitions, i, new_partition_path))
+            new_partition_path = base_paths[j] + key + "/" + get_partition_folder(j, virtual_disk_partitions, i) + "/"
+            partition_scheme.append((node_id, j, virtual_disk_partitions, i, new_partition_path))
     return partition_scheme
 
 def get_partition_folder(disks, partitions, index):        
@@ -405,3 +411,6 @@ def prepare_path(path, reset):
     if not os.path.isdir(path):
         os.makedirs(path)
 
+def file_get_contents(filename):
+    with open(filename) as f:
+        return f.read()
