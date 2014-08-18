@@ -32,13 +32,13 @@ public class VXQueryTest {
     private TestCase tc;
     private TestRunner tr;
 
-    // private final String CATALOG = "VXQueryCatalog.xml";
-    private static String CATALOG = "VXQuerySingleCatalog.xml";
+    private static String CATALOG = "VXQueryCatalog.xml";
 
     private static XTestOptions getOptions() {
         XTestOptions opts = new XTestOptions();
         opts.catalog = StringUtils.join(new String[] { "src", "test", "resources", CATALOG }, File.separator);
         opts.verbose = true;
+        opts.threads = 1;
         return opts;
     }
 
@@ -50,7 +50,6 @@ public class VXQueryTest {
 
     public VXQueryTest(TestCase tc) throws Exception {
         this.tc = tc;
-        System.err.println("Query: " + tc.getXQueryFile());
         tr = new TestRunner(getOptions());
     }
 
@@ -58,9 +57,6 @@ public class VXQueryTest {
     public void test() throws Exception {
         tr.open();
         TestCaseResult result = tr.run(tc);
-        System.err.println("result.result: " + result.result);
-        System.err.println("result.report: " + result.report);
-        System.err.println("result.state: " + result.state);
         switch (result.state) {
             case EXPECTED_ERROR_GOT_DIFFERENT_ERROR:
             case EXPECTED_ERROR_GOT_FAILURE:
