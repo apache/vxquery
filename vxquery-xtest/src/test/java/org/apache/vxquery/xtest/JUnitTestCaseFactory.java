@@ -14,29 +14,30 @@
  */
 package org.apache.vxquery.xtest;
 
-import java.util.concurrent.ExecutorService;
+import java.util.ArrayList;
+import java.util.Collection;
 
-public class TestCaseFactory extends AbstractTestCaseFactory {
+public class JUnitTestCaseFactory extends AbstractTestCaseFactory {
 
-    public TestRunnerFactory trf;
-    public ExecutorService eSvc;
+    private Collection<Object[]> testCases;
 
-    public TestCaseFactory(TestRunnerFactory trf, ExecutorService eSvc, XTestOptions opts) {
+    public JUnitTestCaseFactory(XTestOptions opts) {
         super(opts);
-        this.trf = trf;
-        this.eSvc = eSvc;
     }
 
     protected void submit(TestCase tc) {
         boolean toSubmit = include == null || include.matcher(tc.getXQueryDisplayName()).find();
         toSubmit = toSubmit && (exclude == null || !exclude.matcher(tc.getXQueryDisplayName()).find());
         if (toSubmit) {
-            if (opts.verbose) {
-                System.err.println(tc);
-            }
-            eSvc.submit(trf.createRunner(tc));
+            testCases.add(new Object[] { tc });
             ++count;
         }
+    }
+
+    public Collection<Object[]> getList() throws Exception {
+        testCases = new ArrayList<Object[]>();
+        this.process();
+        return testCases;
     }
 
 }

@@ -536,9 +536,9 @@
 
   <modules>
     <module>vxquery-core</module>
-    <module>vxquery-xtest</module>
-    <module>vxquery-benchmark</module>
     <module>vxquery-server</module>
     <module>vxquery-cli</module>
+    <module>vxquery-xtest</module>
+    <module>vxquery-benchmark</module>
   </modules>
 </project>

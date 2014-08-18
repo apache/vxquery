@@ -16,6 +16,8 @@
 */
 package org.apache.vxquery.xtest;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.Collection;
 
@@ -27,23 +29,53 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class VXQueryTest {
+    private TestCase tc;
+    private TestRunner tr;
 
-    private static final String PATH_QUERIES = StringUtils.join(new String[] { "Queries", "XQuery" + File.separator },
-            File.separator);
-    private static final String PATH_RESULTS = "ExpectedTestResults" + File.separator;
-    private static final String PATH_TESTS = "cat" + File.separator;
-    private static final String PATH_BASE = StringUtils.join(
-            new String[] { "src", "test", "resources" + File.separator }, File.separator);
+    // private final String CATALOG = "VXQueryCatalog.xml";
+    private static String CATALOG = "VXQuerySingleCatalog.xml";
+
+    private static XTestOptions getOptions() {
+        XTestOptions opts = new XTestOptions();
+        opts.catalog = StringUtils.join(new String[] { "src", "test", "resources", CATALOG }, File.separator);
+        opts.verbose = true;
+        return opts;
+    }
 
     @Parameters
     public static Collection<Object[]> tests() throws Exception {
-        return null;
+        JUnitTestCaseFactory jtcf = new JUnitTestCaseFactory(getOptions());
+        return jtcf.getList();
     }
 
-    public VXQueryTest() {
+    public VXQueryTest(TestCase tc) throws Exception {
+        this.tc = tc;
+        System.err.println("Query: " + tc.getXQueryFile());
+        tr = new TestRunner(getOptions());
     }
 
     @Test
     public void test() throws Exception {
+        tr.open();
+        TestCaseResult result = tr.run(tc);
+        System.err.println("result.result: " + result.result);
+        System.err.println("result.report: " + result.report);
+        System.err.println("result.state: " + result.state);
+        switch (result.state) {
+            case EXPECTED_ERROR_GOT_DIFFERENT_ERROR:
+            case EXPECTED_ERROR_GOT_FAILURE:
+            case EXPECTED_ERROR_GOT_RESULT:
+            case EXPECTED_RESULT_GOT_DIFFERENT_RESULT:
+            case EXPECTED_RESULT_GOT_ERROR:
+            case EXPECTED_RESULT_GOT_FAILURE:
+                fail(result.state + " (" + result.time + " ms): " + result.testCase.getXQueryDisplayName());
+                break;
+            case EXPECTED_ERROR_GOT_SAME_ERROR:
+            case EXPECTED_RESULT_GOT_SAME_RESULT:
+                break;
+            case NO_RESULT_FILE:
+                break;
+        }
+        tr.close();
     }
 }
