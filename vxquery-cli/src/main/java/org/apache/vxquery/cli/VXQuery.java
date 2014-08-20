@@ -125,10 +125,11 @@ public class VXQuery {
             timingMessage("Execution time: " + (end.getTime() - start.getTime()) + " ms");
             if (opts.repeatExec > opts.timingIgnoreQueries) {
                 long mean = sumTiming / (opts.repeatExec - opts.timingIgnoreQueries);
-                double sd = Math.sqrt(sumSquaredTiming / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue()) - mean * mean);
+                double sd = Math.sqrt(sumSquaredTiming
+                        / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue()) - mean * mean);
                 timingMessage("Average execution time: " + mean + " ms");
-                timingMessage("Standard deviation: " + String.format( "%.4f", sd));
-                timingMessage("Coefficient of variation: " + String.format( "%.4f", (sd / mean)));
+                timingMessage("Standard deviation: " + String.format("%.4f", sd));
+                timingMessage("Coefficient of variation: " + String.format("%.4f", (sd / mean)));
                 timingMessage("Minimum execution time: " + minTiming + " ms");
                 timingMessage("Maximum execution time: " + maxTiming + " ms");
             }
@@ -147,8 +148,8 @@ public class VXQuery {
      * @throws Exception
      */
     private void execute() throws Exception {
-        System.setProperty("vxquery.buffer_size",Integer.toString(opts.bufferSize));
-        
+        System.setProperty("vxquery.buffer_size", Integer.toString(opts.bufferSize));
+
         if (opts.clientNetIpAddress != null) {
             hcc = new HyracksConnection(opts.clientNetIpAddress, opts.clientNetPort);
             runQueries();
@@ -260,7 +261,7 @@ public class VXQuery {
 
             start = opts.timing ? new Date() : null;
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize,
-                    opts.availableProcessors);
+                    opts.availableProcessors, opts.joinHashSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId, null);
@@ -446,6 +447,9 @@ public class VXQuery {
 
         @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
         private int frameSize = 65536;
+
+        @Option(name = "-join-hash-size", usage = "Join hash size in bytes.")
+        private int joinHashSize = -1;
 
         @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
         private int bufferSize = -1;
