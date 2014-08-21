@@ -37,7 +37,7 @@ public class VXQueryTest {
     private static XTestOptions getOptions() {
         XTestOptions opts = new XTestOptions();
         opts.catalog = StringUtils.join(new String[] { "src", "test", "resources", CATALOG }, File.separator);
-        opts.verbose = true;
+        opts.verbose = false;
         opts.threads = 1;
         return opts;
     }

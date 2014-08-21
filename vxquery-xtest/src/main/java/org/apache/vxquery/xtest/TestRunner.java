@@ -133,7 +133,6 @@ public class TestRunner {
                 res.result.trim();
                 hcc.waitForCompletion(jobId);
             } catch (HyracksException e) {
-                e.printStackTrace();
                 Throwable t = e;
                 while (t.getCause() != null) {
                     t = t.getCause();
