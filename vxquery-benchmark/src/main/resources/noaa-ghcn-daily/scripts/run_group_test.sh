@@ -27,7 +27,7 @@ do
     for t in "batch_scale_out"
     #for t in "speed_up"
     do 
-        for p in 2 1 0 
+        for p in 2 
         do 
             for c in 4
             do 
