@@ -144,6 +144,7 @@
         </reportSets>
         <configuration>
           <linkOnly>true</linkOnly>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>
       </plugin>
       <plugin>

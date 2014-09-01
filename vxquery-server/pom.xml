@@ -153,8 +153,9 @@
           </reportSet>
         </reportSets>
         <configuration>
-            <linkOnly>true</linkOnly>
-        </configuration>            
+          <linkOnly>true</linkOnly>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>
