@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery</artifactId>
-    <version>0.4-incubating-SNAPSHOT</version>
+    <version>0.4</version>
   </parent>
 
   <artifactId>apache-vxquery-cli</artifactId>
@@ -83,7 +83,7 @@
     <dependency>
       <groupId>org.apache.vxquery</groupId>
       <artifactId>apache-vxquery-core</artifactId>
-      <version>0.4-incubating-SNAPSHOT</version>
+      <version>0.4</version>
       <scope>compile</scope>
     </dependency>
 
@@ -144,12 +144,13 @@
         </reportSets>
         <configuration>
           <linkOnly>true</linkOnly>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
-        <version>0.7</version>
+        <version>${apache-rat-plugin.version}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

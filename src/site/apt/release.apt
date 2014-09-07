@@ -104,22 +104,28 @@ $ svn ci -m "add [YOUR NAME]'s key to KEYS file"
 
 * Each time steps
 
+  * clean up
+
+---
+$ mvn clean
+---
+
+  * run rat (always do this on a clean source folder):
+
+---
+$ java -jar ~/Downloads/apache-rat-0.11/apache-rat-0.11.jar -d . -E .rat-excludes
+---
+
   * test your setup
 
 ---
-$ mvn clean install -Papache-release
+$ mvn install -Papache-release
 ---
 
   * dry run of the release process
 
 ---
 $ mvn release:prepare -DdryRun=true
----
-
-  * run rat:
-
----
-$ java -jar ~/Downloads/apache-rat-0.10/apache-rat-0.10.jar -d . -E .rat-excludes
 ---
 
   * check (and fix) the content of the <<<LICENSE>>> and <<<NOTICE>>> files (especially the date) and the copyright dates in changed files
@@ -135,9 +141,7 @@ $ mvn release:perform
 
   * check that the artifacts are available in the repository
 
-  * send out <<<[VOTE]>>> e-mail on vxquery-dev
-
-  * after success on vxquery-dev send out <<<[VOTE]>>> e-mail on general@i.a.o
+  * send out <<<[VOTE]>>> e-mail on dev@vxquery.apache.org
 
   * after successful vote promote staging repository {{{https://repository.apache.org/}https://repository.apache.org/}}
 
@@ -164,7 +168,7 @@ $ cd -
 
   * wait a few days for the mirroring of the release artifacts
 
-  * send <<<[ANNOUNCE]>>> e-mail to announce@a.o, general@i.a.o, and vxquery-dev
+  * send <<<[ANNOUNCE]>>> e-mail to announce@apache.org and dev@vxquery.apache.org
 
 * References
 
