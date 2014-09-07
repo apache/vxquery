@@ -42,7 +42,7 @@ limitations under the License.
     </menu>
 
     <menu name="Get VXQuery">
-      <item name="Download" href="http://www.apache.org/dyn/closer.cgi/incubator/vxquery/" />
+      <item name="Download" href="http://www.apache.org/dyn/closer.cgi/vxquery/" />
     </menu>
       
     <menu name="For Users">
