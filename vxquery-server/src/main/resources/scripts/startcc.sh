@@ -20,18 +20,31 @@
 hostname
 
 CCHOST=$1
+CCPORT=$2
+J_OPTS=$3
 
-#Export JAVA_HOME and JAVA_OPTS
-export JAVA_HOME=$JAVA_HOME
-export JAVA_OPTS=$CCJAVA_OPTS
+#Export JAVA_HOME
+export JAVA_HOME=${JAVA_HOME}
+
+# java opts added parameters
+if [ ! -z "${J_OPTS}" ]
+then
+    JAVA_OPTS="${JAVA_OPTS} ${J_OPTS}"
+    export JAVA_OPTS
+fi
 
 VXQUERY_HOME=`pwd`
 CCLOGS_DIR=${VXQUERY_HOME}/logs
 
-#Remove the logs dir
-rm -rf $CCLOGS_DIR
-mkdir $CCLOGS_DIR
+# logs dir
+mkdir -p ${CCLOGS_DIR}
 
+# Set up the options for the cc.
+CC_OPTIONS=" -client-net-ip-address ${CCHOST} -cluster-net-ip-address ${CCHOST} "
+if [ ! -z "${CCPORT}" ]
+then
+    CC_OPTIONS=" ${CC_OPTIONS} -cluster-net-port ${CCPORT} "
+fi
 
 #Launch hyracks cc script without toplogy
-${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerycc -client-net-ip-address $CCHOST -cluster-net-ip-address $CCHOST &> $CCLOGS_DIR/cc.log &
+${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerycc ${CC_OPTIONS} &> ${CCLOGS_DIR}/cc_$(date +%Y%m%d%H%M).log &

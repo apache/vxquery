@@ -14,21 +14,15 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<data xmlns="data">
-    <name>Local Example</name>
-    <save_path>/data</save_path>
-    <package>ghcnd_all</package>
-    <node>
-        <id>localhost</id>
-        <cluster_ip>127.0.0.1</cluster_ip>
-    </node>
-    <dataset>
-        <name>tiny-example</name>
-        <test>local_speed_up</test>
-        <save_path>/data</save_path>
-        <partitions_per_path>1</partitions_per_path>
-        <partitions_per_path>2</partitions_per_path>
-        <partitions_per_path>4</partitions_per_path>
-        <partitions_per_path>8</partitions_per_path>
-    </dataset>
-</data>
+
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="AggregatePartition1Queries" featureOwner="VXQuery">
+   <GroupInfo>
+      <title>Single Test</title>
+      <description/>
+   </GroupInfo>
+   <test-case name="simple-add" FilePath="Simple/" Creator="Preston Carman">
+      <description>Adds two numbers.</description>
+      <query name="add" date="2014-08-18"/>
+      <output-file compare="Text">add.txt</output-file>
+   </test-case>
+</test-group>

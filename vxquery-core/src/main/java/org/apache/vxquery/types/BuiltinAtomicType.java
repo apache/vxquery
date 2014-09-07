@@ -17,6 +17,7 @@
 package org.apache.vxquery.types;
 
 final class BuiltinAtomicType implements AtomicType {
+    private static final long serialVersionUID = 1L;
     private final int id;
     private final SchemaType baseType;
     private final DerivationProcess derivationProcess;

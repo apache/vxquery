@@ -34,6 +34,9 @@
 <!ENTITY GhcndCountPartition2Queries SYSTEM "cat/GhcndCountPartition2Queries.xml">
 <!ENTITY GhcndCountPartition4Queries SYSTEM "cat/GhcndCountPartition4Queries.xml">
 
+<!ENTITY SingleQuery SYSTEM "cat/SingleQuery.xml">
+<!ENTITY SingleAlternateQuery SYSTEM "cat/SingleAlternateQuery.xml">
+
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -78,6 +81,26 @@
        <description last-mod="2014-04-02">Collection of files</description>
      </source>
    </sources>
+   <test-group name="SingleQuery" featureOwner="Preston Carman">
+      <GroupInfo>
+         <title>Single Query</title>
+         <description/>
+      </GroupInfo>
+      <test-group name="SingleTestAdd" featureOwner="Preston Carman">
+         <GroupInfo>
+            <title>Single Test Add</title>
+            <description/>
+         </GroupInfo>
+         &SingleQuery;
+      </test-group>
+      <test-group name="SingleTestList" featureOwner="Preston Carman">
+         <GroupInfo>
+            <title>Single Test List</title>
+            <description/>
+         </GroupInfo>
+         &SingleAlternateQuery;
+      </test-group>
+   </test-group>
    <test-group name="AggregatePartitionQueries" featureOwner="Preston Carman">
       <GroupInfo>
          <title>Aggregate Partition Queries</title>

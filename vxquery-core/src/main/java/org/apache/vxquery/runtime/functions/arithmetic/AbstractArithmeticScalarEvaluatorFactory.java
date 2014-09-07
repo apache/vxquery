@@ -20,6 +20,7 @@ package org.apache.vxquery.runtime.functions.arithmetic;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -47,6 +48,8 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         final AbstractArithmeticOperation aOp = createArithmeticOperation();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -69,7 +72,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                     }
                     throw new SystemException(ErrorCode.XPTY0004);
                 }
-                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp1, tvp2, result);
+                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp1, tvp2, result, tp1, tp2);
             }
         };
     }

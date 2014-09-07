@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -27,7 +28,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -49,7 +49,7 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         final CastToStringOperation castToString = new CastToStringOperation();
-        final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
+        final TypedPointables tp = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override

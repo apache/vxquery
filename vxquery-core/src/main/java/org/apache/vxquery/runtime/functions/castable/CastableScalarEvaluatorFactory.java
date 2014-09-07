@@ -19,12 +19,12 @@ package org.apache.vxquery.runtime.functions.castable;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.type.AbstractTypeScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.SequenceType;
 
@@ -48,7 +48,7 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
         return new AbstractTypeScalarEvaluator(args, ctx) {
             final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
             final DataOutput dOut = abvs.getDataOutput();
-            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
+            final TypedPointables tp = new TypedPointables();
             AbstractCastableAsOperation aOp = new CastableAsStringOperation();
 
             @Override

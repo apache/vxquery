@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery</artifactId>
-    <version>0.3-incubating</version>
+    <version>0.4</version>
   </parent>
   
   <artifactId>apache-vxquery-benchmark</artifactId>
@@ -47,6 +47,27 @@
           </execution>          
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>copy-scripts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/appassembler/scripts</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -65,8 +86,9 @@
           </reportSet>
         </reportSets>
         <configuration>
-            <linkOnly>true</linkOnly>
-        </configuration>            
+          <linkOnly>true</linkOnly>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>

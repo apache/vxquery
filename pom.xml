@@ -26,7 +26,7 @@
 
   <groupId>org.apache.vxquery</groupId>
   <artifactId>apache-vxquery</artifactId>
-  <version>0.3-incubating</version>
+  <version>0.4</version>
   <packaging>pom</packaging>
   <name>VXQuery</name>
   <description>A Versatile XQuery Processor</description>
@@ -50,7 +50,7 @@
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
     <url>https://git-wip-us.apache.org/repos/asf/vxquery.git</url>
-    <tag>apache-vxquery-0.3-incubating</tag>
+    <tag>apache-vxquery-0.4</tag>
   </scm>
 
   <issueManagement>
@@ -506,7 +506,7 @@
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
-        <version>0.7</version>
+        <version>${apache-rat-plugin.version}</version>
         <configuration>
           <excludes>
             <exclude>.gitignore</exclude>
@@ -531,14 +531,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <hyracks.version>0.2.11</hyracks.version>
+    <hyracks.version>0.2.12</hyracks.version>
+    <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
   </properties>
 
   <modules>
     <module>vxquery-core</module>
-    <module>vxquery-xtest</module>
-    <module>vxquery-benchmark</module>
     <module>vxquery-server</module>
     <module>vxquery-cli</module>
+    <module>vxquery-xtest</module>
+    <module>vxquery-benchmark</module>
   </modules>
 </project>

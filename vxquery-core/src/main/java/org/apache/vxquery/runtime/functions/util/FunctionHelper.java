@@ -24,21 +24,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.api.IDate;
 import org.apache.vxquery.datamodel.api.ITime;
 import org.apache.vxquery.datamodel.api.ITimezone;
@@ -54,64 +41,26 @@ import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
-import org.xml.sax.InputSource;
 
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class FunctionHelper {
 
-    public static class TypedPointables {
-        // TODO Switch from this class to the PointablePool.
-        public BooleanPointable boolp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        public BytePointable bytep = (BytePointable) BytePointable.FACTORY.createPointable();
-        public DoublePointable doublep = (DoublePointable) DoublePointable.FACTORY.createPointable();
-        public FloatPointable floatp = (FloatPointable) FloatPointable.FACTORY.createPointable();
-        public IntegerPointable intp = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        public LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
-        public ShortPointable shortp = (ShortPointable) ShortPointable.FACTORY.createPointable();
-        public SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        public UTF8StringPointable utf8sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-
-        // XQuery Specific
-        public XSBinaryPointable binaryp = (XSBinaryPointable) XSBinaryPointable.FACTORY.createPointable();
-        public XSDatePointable datep = (XSDatePointable) XSDatePointable.FACTORY.createPointable();
-        public XSDateTimePointable datetimep = (XSDateTimePointable) XSDateTimePointable.FACTORY.createPointable();
-        public XSDecimalPointable decp = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        public XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
-        public XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
-        public XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
-
-        // XQuery Nodes
-        public AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY.createPointable();
-        public DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
-        public ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
-        public NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
-        public PINodePointable pinp = (PINodePointable) PINodePointable.FACTORY.createPointable();
-        public TextOrCommentNodePointable tocnp = (TextOrCommentNodePointable) TextOrCommentNodePointable.FACTORY
-                .createPointable();
-    }
-
     public static void arithmeticOperation(AbstractArithmeticOperation aOp, DynamicContext dCtx,
-            TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result) throws SystemException {
+            TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result, TypedPointables tp1,
+            TypedPointables tp2) throws SystemException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         final ArrayBackedValueStorage abvsArgument1 = new ArrayBackedValueStorage();
         final DataOutput dOutArgument1 = abvsArgument1.getDataOutput();
         final ArrayBackedValueStorage abvsArgument2 = new ArrayBackedValueStorage();
         final DataOutput dOutArgument2 = abvsArgument2.getDataOutput();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
         final CastToDoubleOperation castToDouble = new CastToDoubleOperation();
 
         abvs.reset();
@@ -135,7 +84,7 @@ public class FunctionHelper {
                 case ValueTag.XS_BYTE_TAG:
                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                     abvsArgument1.reset();
-                    getIntegerPointable(tvp1, dOutArgument1);
+                    getIntegerPointable(tvp1, dOutArgument1, tp1);
                     longp1.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset() + 1,
                             LongPointable.TYPE_TRAITS.getFixedLength());
                     break;
@@ -168,7 +117,7 @@ public class FunctionHelper {
                 case ValueTag.XS_BYTE_TAG:
                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                     abvsArgument2.reset();
-                    getIntegerPointable(tvp2, dOutArgument2);
+                    getIntegerPointable(tvp2, dOutArgument2, tp2);
                     longp2.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset() + 1,
                             LongPointable.TYPE_TRAITS.getFixedLength());
                     break;
@@ -508,10 +457,8 @@ public class FunctionHelper {
     }
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
-            TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
-
+            TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
+            throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -984,9 +931,8 @@ public class FunctionHelper {
         }
     }
 
-    public static void getDoublePointable(TaggedValuePointable tvp, DataOutput dOut) throws SystemException,
-            IOException {
-        TypedPointables tp = new TypedPointables();
+    public static void getDoublePointable(TaggedValuePointable tvp, DataOutput dOut, TypedPointables tp)
+            throws SystemException, IOException {
         double value;
         switch (tvp.getTag()) {
             case ValueTag.XS_DECIMAL_TAG:
@@ -1040,9 +986,8 @@ public class FunctionHelper {
         dOut.writeDouble(value);
     }
 
-    public static void getIntegerPointable(TaggedValuePointable tvp, DataOutput dOut) throws SystemException,
-            IOException {
-        TypedPointables tp = new TypedPointables();
+    public static void getIntegerPointable(TaggedValuePointable tvp, DataOutput dOut, TypedPointables tp)
+            throws SystemException, IOException {
         long value;
         switch (tvp.getTag()) {
             case ValueTag.XS_INTEGER_TAG:
@@ -1084,9 +1029,8 @@ public class FunctionHelper {
     /**
      * Get the local node id from a tagged value pointable when available.
      */
-    public static int getLocalNodeId(TaggedValuePointable tvp1) {
+    public static int getLocalNodeId(TaggedValuePointable tvp1, TypedPointables tp) {
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final TypedPointables tp = new TypedPointables();
         int localNodeId = -1;
         if (tvp1.getTag() == ValueTag.NODE_TREE_TAG) {
             tvp1.getValue(tp.ntp);
@@ -1233,7 +1177,7 @@ public class FunctionHelper {
         System.err.println(" printUTF8String END");
     }
 
-    public static void readInDocFromPointable(UTF8StringPointable stringp, InputSource in, ByteBufferInputStream bbis,
+    public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
             DataInputStream di, ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
         String fName;
         try {
@@ -1242,11 +1186,12 @@ public class FunctionHelper {
             throw new HyracksDataException(e);
         }
         File file = new File(fName);
-        parser.parseFile(file, in, abvs);
+        parser.parseDocument(file, abvs);
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,
-            TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx) throws SystemException {
+            TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1,
+            TypedPointables tp2) throws SystemException {
         TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
@@ -1255,18 +1200,16 @@ public class FunctionHelper {
         ArrayBackedValueStorage abvsArgument2 = new ArrayBackedValueStorage();
         DataOutput dOutArgument2 = abvsArgument2.getDataOutput();
         CastToDoubleOperation castToDouble = new CastToDoubleOperation();
-        UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
 
         try {
             abvsArgument1.reset();
             if (tvp1.getTag() == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-                tvp1.getValue(stringp);
-                castToDouble.convertUntypedAtomic(stringp, dOutArgument1);
+                tvp1.getValue(tp1.utf8sp);
+                castToDouble.convertUntypedAtomic(tp1.utf8sp, dOutArgument1);
                 tvp1new.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset(),
                         DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
             } else if (isDerivedFromInteger(tvp1.getTag())) {
-                getIntegerPointable(tvp1, dOutArgument1);
+                getIntegerPointable(tvp1, dOutArgument1, tp1);
                 tvp1new.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset(),
                         LongPointable.TYPE_TRAITS.getFixedLength() + 1);
             } else {
@@ -1274,19 +1217,19 @@ public class FunctionHelper {
             }
             abvsArgument2.reset();
             if (tvp2.getTag() == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
-                tvp2.getValue(stringp2);
-                castToDouble.convertUntypedAtomic(stringp2, dOutArgument2);
+                tvp2.getValue(tp2.utf8sp);
+                castToDouble.convertUntypedAtomic(tp2.utf8sp, dOutArgument2);
                 tvp2new.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset(),
                         DoublePointable.TYPE_TRAITS.getFixedLength() + 1);
             } else if (isDerivedFromInteger(tvp2.getTag())) {
-                getIntegerPointable(tvp2, dOutArgument2);
+                getIntegerPointable(tvp2, dOutArgument2, tp1);
                 tvp2new.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset(),
                         LongPointable.TYPE_TRAITS.getFixedLength() + 1);
             } else {
                 tvp2new = tvp2;
             }
 
-            return compareTaggedValues(aOp, tvp1new, tvp2new, dCtx);
+            return compareTaggedValues(aOp, tvp1new, tvp2new, dCtx, tp1, tp2);
         } catch (SystemException se) {
             throw se;
         } catch (Exception e) {

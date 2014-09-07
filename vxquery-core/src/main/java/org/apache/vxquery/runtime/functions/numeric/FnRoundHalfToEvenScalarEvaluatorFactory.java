@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -27,8 +28,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper.TypedPointables;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -59,7 +58,7 @@ public class FnRoundHalfToEvenScalarEvaluatorFactory extends AbstractTaggedValue
             final DataOutput dOut = abvs.getDataOutput();
             final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
             final DataOutput dOutInner = abvsInner.getDataOutput();
-            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
+            final TypedPointables tp = new TypedPointables();
             final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
             final CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
 

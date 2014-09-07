@@ -101,6 +101,7 @@ public class ConsolidateUnnestsRule extends AbstractUsedVariablesProcessingRule 
             // Move input for unnest2 into unnest1
             unnest1.getInputs().clear();
             unnest1.getInputs().addAll(unnest2.getInputs());
+            return true;
         }
         return false;
     }

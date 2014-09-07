@@ -51,6 +51,11 @@ public class FnCountAggregateEvaluatorFactory extends AbstractTaggedValueArgumen
             }
 
             @Override
+            public void finishPartial(IPointable result) throws AlgebricksException {
+                finish(result);
+            }
+
+            @Override
             public void finish(IPointable result) throws AlgebricksException {
                 try {
                     abvs.reset();

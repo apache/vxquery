@@ -17,11 +17,9 @@
 package org.apache.vxquery.runtime.functions.numeric;
 
 import java.io.DataOutput;
-import java.io.IOException;
 
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -29,7 +27,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper.TypedPointables;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -37,12 +34,7 @@ import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -61,7 +53,7 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
             final DataOutput dOut = abvs.getDataOutput();
             final ArrayBackedValueStorage abvsInteger = new ArrayBackedValueStorage();
             final DataOutput dOutInteger = abvsInteger.getDataOutput();
-            final FunctionHelper.TypedPointables tp = new FunctionHelper.TypedPointables();
+            final TypedPointables tp = new TypedPointables();
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
@@ -100,7 +92,7 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
                                 case ValueTag.XS_BYTE_TAG:
                                 case ValueTag.XS_UNSIGNED_BYTE_TAG:
                                     abvsInteger.reset();
-                                    FunctionHelper.getIntegerPointable(tvp, dOutInteger);
+                                    FunctionHelper.getIntegerPointable(tvp, dOutInteger, tp);
                                     longp.set(abvsInteger.getByteArray(), abvsInteger.getStartOffset() + 1,
                                             LongPointable.TYPE_TRAITS.getFixedLength());
                             }

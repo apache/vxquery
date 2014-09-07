@@ -21,6 +21,7 @@ import java.io.DataOutput;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -55,6 +56,8 @@ public class FnSumScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         final AddOperation aOp = new AddOperation();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -88,7 +91,7 @@ public class FnSumScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                                 // Init.
                                 tvpSum.set(tvpNext);
                             } else {
-                                FunctionHelper.arithmeticOperation(aOp, dCtx, tvpNext, tvpSum, tvpSum);
+                                FunctionHelper.arithmeticOperation(aOp, dCtx, tvpNext, tvpSum, tvpSum, tp1, tp2);
                             }
                         }
                         result.set(tvpSum);

@@ -78,9 +78,11 @@ public class VXQuery {
     private IHyracksDataset hds;
 
     private ResultSetId resultSetId;
-    private static List<String> timing;
-    private static int totalTiming;
-    private static String message;
+    private static List<String> timingMessages;
+    private static long sumTiming;
+    private static long sumSquaredTiming;
+    private static long minTiming = Long.MAX_VALUE;
+    private static long maxTiming = Long.MIN_VALUE;
 
     /**
      * Constructor to use command line options passed.
@@ -90,7 +92,7 @@ public class VXQuery {
      */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
-        timing = new ArrayList<String>();
+        timingMessages = new ArrayList<String>();
     }
 
     /**
@@ -120,16 +122,19 @@ public class VXQuery {
         // if -timing argument passed, show the starting and ending times
         if (opts.timing) {
             Date end = new Date();
-            message = "Execution time: " + (end.getTime() - start.getTime()) + "ms";
-            System.out.println(message);
-            timing.add(message);
-            if (opts.repeatExec > 3) {
-                message = "Average execution time: " + (totalTiming / (opts.repeatExec - 3)) + "ms";
-                System.out.println(message);
-                timing.add(message);
+            timingMessage("Execution time: " + (end.getTime() - start.getTime()) + " ms");
+            if (opts.repeatExec > opts.timingIgnoreQueries) {
+                long mean = sumTiming / (opts.repeatExec - opts.timingIgnoreQueries);
+                double sd = Math.sqrt(sumSquaredTiming
+                        / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue()) - mean * mean);
+                timingMessage("Average execution time: " + mean + " ms");
+                timingMessage("Standard deviation: " + String.format("%.4f", sd));
+                timingMessage("Coefficient of variation: " + String.format("%.4f", (sd / mean)));
+                timingMessage("Minimum execution time: " + minTiming + " ms");
+                timingMessage("Maximum execution time: " + maxTiming + " ms");
             }
             System.out.println("Timing Summary:");
-            for (String time : timing) {
+            for (String time : timingMessages) {
                 System.out.println("  " + time);
             }
         }
@@ -143,6 +148,8 @@ public class VXQuery {
      * @throws Exception
      */
     private void execute() throws Exception {
+        System.setProperty("vxquery.buffer_size", Integer.toString(opts.bufferSize));
+
         if (opts.clientNetIpAddress != null) {
             hcc = new HyracksConnection(opts.clientNetIpAddress, opts.clientNetPort);
             runQueries();
@@ -253,7 +260,8 @@ public class VXQuery {
             };
 
             start = opts.timing ? new Date() : null;
-            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize, opts.availableProcessors);
+            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize,
+                    opts.availableProcessors, opts.joinHashSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId, null);
@@ -261,9 +269,7 @@ public class VXQuery {
             // if -timing argument passed, show the starting and ending times
             if (opts.timing) {
                 end = new Date();
-                message = "Compile time: " + (end.getTime() - start.getTime()) + "ms";
-                System.out.println(message);
-                timing.add(message);
+                timingMessage("Compile time: " + (end.getTime() - start.getTime()) + " ms");
             }
             if (opts.compileOnly) {
                 continue;
@@ -283,12 +289,18 @@ public class VXQuery {
                 // if -timing argument passed, show the starting and ending times
                 if (opts.timing) {
                     end = new Date();
-                    if ((i + 1) > 3) {
-                        totalTiming += end.getTime() - start.getTime();
+                    long currentRun = end.getTime() - start.getTime();
+                    if ((i + 1) > opts.timingIgnoreQueries) {
+                        sumTiming += currentRun;
+                        sumSquaredTiming += currentRun * currentRun;
+                        if (currentRun < minTiming) {
+                            minTiming = currentRun;
+                        }
+                        if (maxTiming < currentRun) {
+                            maxTiming = currentRun;
+                        }
                     }
-                    message = "Job (" + (i + 1) + ") execution time: " + (end.getTime() - start.getTime()) + "ms";
-                    System.out.println(message);
-                    timing.add(message);
+                    timingMessage("Job (" + (i + 1) + ") execution time: " + currentRun + " ms");
                 }
             }
         }
@@ -364,12 +376,6 @@ public class VXQuery {
         ccConfig.clusterNetIpAddress = "127.0.0.1";
         ccConfig.clusterNetPort = 39001;
         ccConfig.profileDumpPeriod = 10000;
-        File outDir = new File("target/ClusterController");
-        outDir.mkdirs();
-        File ccRoot = File.createTempFile(VXQuery.class.getName(), ".data", outDir);
-        ccRoot.delete();
-        ccRoot.mkdir();
-        ccConfig.ccRoot = ccRoot.getAbsolutePath();
         cc = new ClusterControllerService(ccConfig);
         cc.start();
 
@@ -414,23 +420,39 @@ public class VXQuery {
     }
 
     /**
+     * Save and print out the timing message.
+     * 
+     * @param message
+     */
+    private static void timingMessage(String message) {
+        System.out.println(message);
+        timingMessages.add(message);
+    }
+
+    /**
      * Helper class with fields and methods to handle all command line options
      */
     private static class CmdLineOptions {
         @Option(name = "-available-processors", usage = "Number of available processors. (default java's available processors)")
-        public int availableProcessors = -1;
+        private int availableProcessors = -1;
 
         @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController")
-        public String clientNetIpAddress = null;
+        private String clientNetIpAddress = null;
 
         @Option(name = "-client-net-port", usage = "Port of the ClusterController (default 1098)")
-        public int clientNetPort = 1098;
+        private int clientNetPort = 1098;
 
         @Option(name = "-local-node-controllers", usage = "Number of local node controllers (default 1)")
-        public int localNodeControllers = 1;
+        private int localNodeControllers = 1;
 
         @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
-        public int frameSize = 65536;
+        private int frameSize = 65536;
+
+        @Option(name = "-join-hash-size", usage = "Join hash size in bytes.")
+        private int joinHashSize = -1;
+
+        @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
+        private int bufferSize = -1;
 
         @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;
@@ -458,6 +480,9 @@ public class VXQuery {
 
         @Option(name = "-timing", usage = "Produce timing information")
         private boolean timing;
+
+        @Option(name = "-timing-ignore-queries", usage = "Ignore the first X number of quereies.")
+        private int timingIgnoreQueries = 2;
 
         @Option(name = "-x", usage = "Bind an external variable")
         private Map<String, String> bindings = new HashMap<String, String>();

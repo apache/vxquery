@@ -1,4 +1,6 @@
 .gitignore
 .rat-excludes
+.project
+.classpath
 ExpectedTestResults
 xqts.txt

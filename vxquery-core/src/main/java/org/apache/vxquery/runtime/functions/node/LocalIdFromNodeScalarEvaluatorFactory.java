@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.node;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -46,6 +47,7 @@ public class LocalIdFromNodeScalarEvaluatorFactory extends AbstractTaggedValueAr
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
+        final TypedPointables tp = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -53,7 +55,7 @@ public class LocalIdFromNodeScalarEvaluatorFactory extends AbstractTaggedValueAr
                 TaggedValuePointable tvp1 = args[0];
                 // Only accept node trees as input.
                 try {
-                    int localNodeId = FunctionHelper.getLocalNodeId(tvp1);
+                    int localNodeId = FunctionHelper.getLocalNodeId(tvp1, tp);
                     if (localNodeId == -1) {
                         XDMConstants.setEmptySequence(result);
                     } else {

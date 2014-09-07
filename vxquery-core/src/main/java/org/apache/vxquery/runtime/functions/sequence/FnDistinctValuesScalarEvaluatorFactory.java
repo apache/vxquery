@@ -21,6 +21,7 @@ import java.io.IOException;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -59,6 +60,8 @@ public class FnDistinctValuesScalarEvaluatorFactory extends AbstractTaggedValueA
         final TaggedValuePointable tvpCheck = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final TypedPointables tp1 = new TypedPointables();
+        final TypedPointables tp2 = new TypedPointables();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -92,7 +95,7 @@ public class FnDistinctValuesScalarEvaluatorFactory extends AbstractTaggedValueA
                                 for (int k = j + 1; k < seqLen; ++k) {
                                     seq.getEntry(k, p);
                                     tvpCheck.set(p.getByteArray(), p.getStartOffset(), p.getLength());
-                                    if (FunctionHelper.compareTaggedValues(aOp, tvpDistinct, tvpCheck, dCtx)) {
+                                    if (FunctionHelper.compareTaggedValues(aOp, tvpDistinct, tvpCheck, dCtx, tp1, tp2)) {
                                         found = true;
                                         break;
                                     }
