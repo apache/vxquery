@@ -21,7 +21,7 @@ hostname
 
 USER=$1
 
-#Kill process
+# Kill process
 PID=`ps -ef|grep ${USER}|grep java|grep 'Dapp.name=vxquerync'|awk '{print $2}'`
 
 if [ "$PID" == "" ]; then

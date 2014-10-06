@@ -375,6 +375,7 @@ public class VXQuery {
         ccConfig.clientNetPort = 39000;
         ccConfig.clusterNetIpAddress = "127.0.0.1";
         ccConfig.clusterNetPort = 39001;
+        ccConfig.httpPort = 39002;
         ccConfig.profileDumpPeriod = 10000;
         cc = new ClusterControllerService(ccConfig);
         cc.start();

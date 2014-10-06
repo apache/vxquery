@@ -17,16 +17,12 @@
 # limitations under the License.
 #
 
-hostname
+CCHOST=$1
+CCPORT=$2
+J_OPTS=$3
 
-NODEID=$1
-IPADDR=$2
-CCHOST=$3
-CCPORT=$4
-J_OPTS=$5
-
-# Set JAVA_HOME
-export JAVA_HOME=$JAVA_HOME
+# Export JAVA_HOME
+export JAVA_HOME=${JAVA_HOME}
 
 # java opts added parameters
 if [ ! -z "${J_OPTS}" ]
@@ -36,18 +32,18 @@ then
 fi
 
 VXQUERY_HOME=`pwd`
-NCLOGS_DIR=${VXQUERY_HOME}/logs
+CCLOGS_DIR=${VXQUERY_HOME}/logs
 
 # logs dir
-mkdir -p $NCLOGS_DIR
+mkdir -p ${CCLOGS_DIR}
 
 # Set up the options for the cc.
-NC_OPTIONS=" -cc-host ${CCHOST} -cluster-net-ip-address ${IPADDR}  -data-ip-address ${IPADDR} -result-ip-address ${IPADDR}  -node-id ${NODEID} "
+CC_OPTIONS=" -client-net-ip-address ${CCHOST} "
 if [ ! -z "${CCPORT}" ]
 then
-	NC_OPTIONS=" ${NC_OPTIONS} -cc-port ${CCPORT} "
+    CC_OPTIONS=" ${CC_OPTIONS} -client-net-port ${CCPORT} "
 fi
 
-
-# Launch hyracks nc
-${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerync ${NC_OPTIONS} &> ${NCLOGS_DIR}/nc_$(date +%Y%m%d%H%M).log &
+# Launch hyracks cc script without toplogy
+echo "${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxqueryshutdown ${CC_OPTIONS} &> ${CCLOGS_DIR}/shutdown_$(date +%Y%m%d%H%M).log &"
+${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxqueryshutdown ${CC_OPTIONS} &> ${CCLOGS_DIR}/shutdown_$(date +%Y%m%d%H%M).log &

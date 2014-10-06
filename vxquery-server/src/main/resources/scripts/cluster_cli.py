@@ -39,10 +39,10 @@ def main(argv):
             sys.exit()
         elif opt in ('-a', "--action"):
             # check if file exists.
-            if arg in ('deploy', 'start', 'stop'):
+            if arg in ('deploy', 'start', 'stop', 'kill'):
                 action = arg
             else:
-                print 'Error: Argument must be a string ("deploy", "start", or "stop") for --action (-a).'
+                print 'Error: Argument must be a string ("deploy", "start", "stop", or "kill") for --action (-a).'
                 sys.exit()
         elif opt in ('-c', "--cluster"):
             # check if file exists.
@@ -72,6 +72,8 @@ def main(argv):
     if action == 'start':
         cluster.start()
     elif action == 'stop':
+        cluster.stop_cluster()
+    elif action == 'kill':
         cluster.stop()
     elif action == 'deploy':
         if deploy_path != "":

@@ -17,37 +17,28 @@
 # limitations under the License.
 #
 
-hostname
+REPEAT=${3}
+DATASET="hcn"
 
-NODEID=$1
-IPADDR=$2
-CCHOST=$3
-CCPORT=$4
-J_OPTS=$5
 
-# Set JAVA_HOME
-export JAVA_HOME=$JAVA_HOME
+mkdir -p ~/logs/saxon/
 
-# java opts added parameters
-if [ ! -z "${J_OPTS}" ]
+for j in $(find ${1} -name '*q??.xq')
+do
+    date
+    echo "Running Saxon query: ${j}"
+time for i in {1..${REPEAT}}; do JAVA_OPTS="-Xmx8g" java -cp saxon9he.jar net.sf.saxon.Query -t -repeat:${REPEAT} -q:${j} >> ~/logs/saxon/$(basename "${j}").log 2>&1; done; 
+done
+
+
+if which programname >/dev/null;
 then
-    JAVA_OPTS="${JAVA_OPTS} ${J_OPTS}"
-    export JAVA_OPTS
-fi
-
-VXQUERY_HOME=`pwd`
-NCLOGS_DIR=${VXQUERY_HOME}/logs
-
-# logs dir
-mkdir -p $NCLOGS_DIR
-
-# Set up the options for the cc.
-NC_OPTIONS=" -cc-host ${CCHOST} -cluster-net-ip-address ${IPADDR}  -data-ip-address ${IPADDR} -result-ip-address ${IPADDR}  -node-id ${NODEID} "
-if [ ! -z "${CCPORT}" ]
-then
-	NC_OPTIONS=" ${NC_OPTIONS} -cc-port ${CCPORT} "
-fi
-
-
-# Launch hyracks nc
-${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerync ${NC_OPTIONS} &> ${NCLOGS_DIR}/nc_$(date +%Y%m%d%H%M).log &
+    echo "Sending out e-mail notification."
+    SUBJECT="Saxon Tests Finished (${DATASET})"
+    EMAIL="ecarm002@ucr.edu"
+    /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
+    Completed all Saxon tests on ${DATASET}.
+    EOM
+else
+    echo "No mail command to use."
+fi;
