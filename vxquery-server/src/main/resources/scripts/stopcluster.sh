@@ -45,5 +45,4 @@ then
 fi
 
 # Launch hyracks cc script without toplogy
-echo "${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxqueryshutdown ${CC_OPTIONS} &> ${CCLOGS_DIR}/shutdown_$(date +%Y%m%d%H%M).log &"
 ${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxqueryshutdown ${CC_OPTIONS} &> ${CCLOGS_DIR}/shutdown_$(date +%Y%m%d%H%M).log &
