@@ -25,11 +25,14 @@ REPEAT=${3}
 DATASET="all"
 
 
+# Make log folder
+mkdir -p ~/disk1/weather_data/mrql/query_logs/${NODES}nodes/
+
 for j in $(find ${1} -name '*q??.mrql')
 do
     date
     echo "Running MRQL query: ${j}"
-    time for i in {1..${REPEAT}}; do ~/mrql/incubator-mrql/bin/mrql -dist -nodes ${NODES} ${j} ${DATASET}/sensors.xml ${DATASET}/stations.xml >> ~/disk1/weather_data/mrql/query_logs/$(basename "${j}").log 2>&1; done; 
+    time for i in {1..${REPEAT}}; do ~/mrql/incubator-mrql/bin/mrql -dist -nodes ${NODES} ${j} ${DATASET}/sensors/ ${DATASET}/stations/ >> ~/disk1/weather_data/mrql/query_logs/${NODES}nodes/$(basename "${j}").log 2>&1; done; 
 done
 
 
