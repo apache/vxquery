@@ -17,32 +17,21 @@
 # limitations under the License.
 #
 
-NODES=2
-REPEAT=1
-
-# Start Hadoop
-sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh
-
-# Prepare hadoop file system
-hadoop fs -mkdir all
-hadoop fs -mkdir all/sensors
-hadoop fs -mkdir all/stations
+if [ -z "${1}" ]
+then
+    echo "Please enter the node number."
+    exit
+fi
 
 
-# Upload test data
-n=0
-while [ ${n} -lt ${NODES} ];
-do
-    sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/load_node_file.sh ${n} &
-done
+# Add each sensor block
+cp saved/backups/mr/all_sensors_${1}.xml.gz disk1/hadoop/upload/
+gunzip disk1/hadoop/upload/all_sensors_${1}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/upload/all_sensors_${1}.xml all/sensors
+rm -f disk1/hadoop/upload/all_sensors_${1}.xml
 
-# After all files have been uploaded, continue.
-wait
-
-
-# Start test
-sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT}
-
-
-# Stop Hadoop
-sh saved/hadoop/hadoop-1.2.1/bin/stop-all.sh
+# Add each station block
+cp saved/backups/mr/all_stations_${1}.xml.gz disk1/hadoop/upload/
+gunzip disk1/hadoop/upload/all_stations_${1}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/upload/all_stations_${1}.xml all/stations
+rm -f disk1/hadoop/upload/all_stations_${1}.xml
