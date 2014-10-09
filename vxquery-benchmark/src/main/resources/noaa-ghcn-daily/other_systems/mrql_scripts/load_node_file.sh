@@ -23,15 +23,16 @@ then
     exit
 fi
 
+echo "Loading node ${1} data file in to cluster."
 
 # Add each sensor block
-cp saved/backups/mr/all_sensors_${1}.xml.gz disk1/hadoop/upload/
-gunzip disk1/hadoop/upload/all_sensors_${1}.xml.gz
-hadoop fs -copyFromLocal disk1/hadoop/upload/all_sensors_${1}.xml all/sensors
-rm -f disk1/hadoop/upload/all_sensors_${1}.xml
+cp saved/backups/mr/all_sensors_${1}.xml.gz disk1/hadoop/
+gunzip disk1/hadoop/all_sensors_${1}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/all_sensors_${1}.xml all/sensors
+rm -f disk1/hadoop/all_sensors_${1}.xml
 
 # Add each station block
-cp saved/backups/mr/all_stations_${1}.xml.gz disk1/hadoop/upload/
-gunzip disk1/hadoop/upload/all_stations_${1}.xml.gz
-hadoop fs -copyFromLocal disk1/hadoop/upload/all_stations_${1}.xml all/stations
-rm -f disk1/hadoop/upload/all_stations_${1}.xml
+cp saved/backups/mr/all_stations_${1}.xml.gz disk1/hadoop/
+gunzip disk1/hadoop/all_stations_${1}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/all_stations_${1}.xml all/stations
+rm -f disk1/hadoop/all_stations_${1}.xml

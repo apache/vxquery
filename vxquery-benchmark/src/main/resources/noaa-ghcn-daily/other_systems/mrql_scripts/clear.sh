@@ -17,12 +17,8 @@
 # limitations under the License.
 #
 
-# Hadoop data reset
-hadoop namenode -format
-
 # Remove data
 rm -rf disk1/hadoop/data
 rm -rf disk2/hadoop/data
 rm -rf disk1/hadoop/tmp
 rm -rf disk1/hadoop/logs
-

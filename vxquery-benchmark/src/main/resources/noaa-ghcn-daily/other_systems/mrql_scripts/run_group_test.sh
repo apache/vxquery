@@ -17,27 +17,35 @@
 # limitations under the License.
 #
 
-NODES=2
+if [ -z "${1}" ]
+then
+    echo "Please enter the number of nodes."
+    exit
+fi
+
+NODES=${1}
 REPEAT=1
 
 # Start Hadoop
 sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh
 
+sleep 10
+
 # Prepare hadoop file system
 hadoop fs -mkdir all
+hadoop fs -ls 
 hadoop fs -mkdir all/sensors
 hadoop fs -mkdir all/stations
+hadoop fs -ls all
 
 
 # Upload test data
-n=0
-while [ ${n} -lt ${NODES} ];
+COUNTER=0
+while [ ${COUNTER} -lt ${NODES} ];
 do
-    sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/load_node_file.sh ${n} &
+    sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/load_node_file.sh ${COUNTER}
+    let COUNTER=COUNTER+1 
 done
-
-# After all files have been uploaded, continue.
-wait
 
 
 # Start test
