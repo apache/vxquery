@@ -81,19 +81,6 @@ public class CardinalityRuleToolbox {
                 break;
 
             // The following operators' analysis has not yet been implemented.
-            case CLUSTER:
-            case DISTINCT:
-            case EXTENSION_OPERATOR:
-            case INDEX_INSERT_DELETE:
-            case INSERT_DELETE:
-            case PARTITIONINGSPLIT:
-            case REPLICATE:
-            case RUNNINGAGGREGATE:
-            case SCRIPT:
-            case SINK:
-            case UNIONALL:
-            case UNNEST_MAP:
-            case UPDATE:
             default:
                 throw new RuntimeException("Operator (" + op.getOperatorTag()
                         + ") has not been implemented in rewrite rule.");

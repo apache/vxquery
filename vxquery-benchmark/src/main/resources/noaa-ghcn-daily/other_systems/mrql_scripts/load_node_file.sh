@@ -19,20 +19,29 @@
 
 if [ -z "${1}" ]
 then
-    echo "Please enter the node number."
+    echo "Please enter the data set as the first argument."
     exit
 fi
 
-echo "Loading node ${1} data file in to cluster."
+if [ -z "${2}" ]
+then
+    echo "Please enter the node number as the second argument."
+    exit
+fi
+
+DATASET=${1}
+NODES=${2}
+
+echo "Loading ${NODES} node ${DATASET} data file in to cluster."
 
 # Add each sensor block
-cp saved/backups/mr/all_sensors_${1}.xml.gz disk1/hadoop/
-gunzip disk1/hadoop/all_sensors_${1}.xml.gz
-hadoop fs -copyFromLocal disk1/hadoop/all_sensors_${1}.xml all/sensors
-rm -f disk1/hadoop/all_sensors_${1}.xml
+cp saved/backups/mr/${DATASET}_sensors_${NODES}.xml.gz disk1/hadoop/
+gunzip disk1/hadoop/${DATASET}_sensors_${NODES}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/${DATASET}_sensors_${NODES}.xml ${DATASET}/sensors
+rm -f disk1/hadoop/${DATASET}_sensors_${NODES}.xml
 
 # Add each station block
-cp saved/backups/mr/all_stations_${1}.xml.gz disk1/hadoop/
-gunzip disk1/hadoop/all_stations_${1}.xml.gz
-hadoop fs -copyFromLocal disk1/hadoop/all_stations_${1}.xml all/stations
-rm -f disk1/hadoop/all_stations_${1}.xml
+cp saved/backups/mr/${DATASET}_stations_${NODES}.xml.gz disk1/hadoop/
+gunzip disk1/hadoop/${DATASET}_stations_${NODES}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/${DATASET}_stations_${NODES}.xml ${DATASET}/stations
+rm -f disk1/hadoop/${DATASET}_stations_${NODES}.xml

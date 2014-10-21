@@ -19,11 +19,18 @@
 
 if [ -z "${1}" ]
 then
-    echo "Please enter the number of nodes."
+    echo "Please enter the data set as the first argument."
     exit
 fi
 
-NODES=${1}
+if [ -z "${2}" ]
+then
+    echo "Please enter the node number as the second argument."
+    exit
+fi
+
+DATASET=${1}
+NODES=${2}
 REPEAT=1
 
 # Start Hadoop
@@ -32,24 +39,26 @@ sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh
 sleep 10
 
 # Prepare hadoop file system
-hadoop fs -mkdir all
+hadoop fs -mkdir ${DATASET}
 hadoop fs -ls 
-hadoop fs -mkdir all/sensors
-hadoop fs -mkdir all/stations
-hadoop fs -ls all
+hadoop fs -mkdir ${DATASET}/sensors
+hadoop fs -mkdir ${DATASET}/stations
+hadoop fs -ls ${DATASET}
+
+hadoop balancer
 
 
 # Upload test data
 COUNTER=0
 while [ ${COUNTER} -lt ${NODES} ];
 do
-    sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/load_node_file.sh ${COUNTER}
+    sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/load_node_file.sh ${DATASET} ${COUNTER}
     let COUNTER=COUNTER+1 
 done
 
 
 # Start test
-sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT}
+sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET}
 
 
 # Stop Hadoop

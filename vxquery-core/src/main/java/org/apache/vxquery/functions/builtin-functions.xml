@@ -125,6 +125,7 @@
     <function name="fn:collection">
         <param name="arg" type="xs:string?"/>
         <return type="node()*"/>
+        <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
     
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:integer?  -->

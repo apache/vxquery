@@ -15,13 +15,13 @@
   limitations under the License.
 -->
 <cluster xmlns="cluster">
-	<name>local</name>
+    <name>local</name>
     <username>joe</username>
-	<master_node>
-		<id>master</id>
-		<client_ip>128.195.52.177</client_ip>
-    	<cluster_ip>192.168.100.0</cluster_ip>
-	</master_node>
+    <master_node>
+        <id>master</id>
+        <client_ip>128.195.52.177</client_ip>
+        <cluster_ip>192.168.100.0</cluster_ip>
+    </master_node>
     <node>
         <id>nodeA</id>
         <cluster_ip>192.168.100.1</cluster_ip>

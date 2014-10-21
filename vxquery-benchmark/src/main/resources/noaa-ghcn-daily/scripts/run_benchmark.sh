@@ -52,7 +52,7 @@ do
         echo "\nBuffer Size: ${BUFFER_SIZE}" >> ${log_base_path}/${log_file}
         echo "\nFrame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
         echo "\nJoin Hash Size: ${JOIN_HASH_SIZE}" >> ${log_base_path}/${log_file}
-        fi;
+    fi;
 done
 
 if which programname >/dev/null;

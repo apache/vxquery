@@ -22,7 +22,7 @@
 
 NODES=${2}
 REPEAT=${3}
-DATASET="all"
+DATASET=${4}
 
 
 # Make log folder
