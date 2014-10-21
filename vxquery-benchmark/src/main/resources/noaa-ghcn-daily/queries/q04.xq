@@ -15,9 +15,11 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: XQuery Join Query :)
-(: Find all the weather readings for Washington state for a specific day    :)
-(: 1976/7/4.                                                                  :)
+(:
+XQuery Join Query
+-------------------
+Find all the weather readings for Washington state for a specific day 1976/7/4. 
+:)
 let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
 for $s in collection($station_collection)/stationCollection/station
 

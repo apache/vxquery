@@ -62,6 +62,10 @@ class ClusterActions:
         time.sleep(5)
         self.start_all_ncs()
     
+    def stop_cluster(self):
+        machine = self.ci.get_master_node_machine()
+        self.stop_cc_and_all_ncs(machine)
+    
     def stop(self):
         self.stop_all_ncs()
         time.sleep(2)
@@ -109,16 +113,22 @@ class ClusterActions:
     
     def start_cc(self, machine):
         print "Start Cluster Controller."
-        print "  " + machine.get_id() + " " + machine.get_ip() + ":" + machine.get_port()
-        command = "./vxquery-server/target/appassembler/bin/startcc.sh " + machine.get_ip() + " \"" + machine.get_port() + "\" \"" + machine.get_java_opts() + "\""
+        print "  " + machine.get_id() + " " + machine.get_client_ip() + ":" + machine.get_client_port()
+        command = "./vxquery-server/target/appassembler/bin/startcc.sh " + machine.get_client_ip() + " \"" + machine.get_client_port() + "\" \"" + machine.get_java_opts() + "\""
         self.run_remote_command(machine.get_username(), machine.get_id(), command)
     
     def start_nc(self, machine, cc):
         print "Start Node Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()
-        command = "./vxquery-server/target/appassembler/bin/startnc.sh " + machine.get_id() + " " + machine.get_ip() + " " + cc.get_ip() + " \"" + cc.get_port() + "\" \"" + machine.get_java_opts() + "\""
+        command = "./vxquery-server/target/appassembler/bin/startnc.sh " + machine.get_id() + " " + machine.get_ip() + " " + cc.get_client_ip() + " \"" + cc.get_client_port() + "\" \"" + machine.get_java_opts() + "\""
         self.run_remote_command(machine.get_username(), machine.get_id(), command)
 
+    def stop_cc_and_all_ncs(self, machine):
+        print "Stop Cluster and Node Controllers."
+        print "  " + machine.get_id() + " " + machine.get_client_ip() + ":" + machine.get_client_port()
+        command = "./vxquery-server/target/appassembler/bin/stopcluster.sh " + machine.get_client_ip() + " \"" + machine.get_client_port() + "\" \"" + machine.get_java_opts() + "\""
+        self.run_remote_command(machine.get_username(), machine.get_id(), command)
+    
     def stop_cc(self, machine):
         print "Stop Cluster Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()

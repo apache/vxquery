@@ -26,6 +26,7 @@
 # run_benchmark.sh ./noaa-ghcn-daily/benchmarks/local_speed_up/queries/ "" q03
 #
 REPEAT=5
+IGNORE=2
 FRAME_SIZE=$((8*1024))
 BUFFER_SIZE=$((32*1024*1024))
 JOIN_HASH_SIZE=-1
@@ -51,7 +52,7 @@ do
         echo "\nBuffer Size: ${BUFFER_SIZE}" >> ${log_base_path}/${log_file}
         echo "\nFrame Size: ${FRAME_SIZE}" >> ${log_base_path}/${log_file}
         echo "\nJoin Hash Size: ${JOIN_HASH_SIZE}" >> ${log_base_path}/${log_file}
-        fi;
+    fi;
 done
 
 if which programname >/dev/null;

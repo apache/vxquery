@@ -32,12 +32,13 @@ class ClusterInformation:
         master_node = self.config.getElementsByTagName("master_node")[0]
         id = NodeXmlReader.get_cluster_id(master_node)
         ip = NodeXmlReader.get_cluster_ip(master_node)
-        port = NodeXmlReader.get_cluster_port(master_node)
+        client_ip = NodeXmlReader.get_client_ip(master_node)
+        client_port = NodeXmlReader.get_client_port(master_node)
         java_opts = NodeXmlReader.get_java_opts(master_node)
         if java_opts is "":
             java_opts = self.get_java_opts()
         username = self.get_username()
-        return Machine(id, ip, username, port, java_opts)
+        return Machine(id, ip, username, client_ip, client_port, java_opts)
 
     def get_node_machine_list(self):
         nodes = []
@@ -48,7 +49,7 @@ class ClusterInformation:
             java_opts = NodeXmlReader.get_java_opts(node)
             if java_opts is "":
                 java_opts = self.get_java_opts()
-            nodes.append(Machine(id, ip, username, "", java_opts))
+            nodes.append(Machine(id, ip, username, "", "", java_opts))
         return nodes
 
 class NodeXmlReader(object):
@@ -64,8 +65,12 @@ class NodeXmlReader(object):
         return get_tag_text(node, "cluster_ip")
 
     @staticmethod
-    def get_cluster_port(node):
-        return get_tag_text(node, "cluster_port")
+    def get_client_ip(node):
+        return get_tag_text(node, "client_ip")
+
+    @staticmethod
+    def get_client_port(node):
+        return get_tag_text(node, "client_port")
 
     @staticmethod
     def get_java_opts(node):
@@ -90,11 +95,12 @@ class Machine:
     log_path = ""
     port = ""
     
-    def __init__(self, id, ip, username, port="", java_opts=""):
+    def __init__(self, id, ip, username, client_ip="", client_port="", java_opts=""):
         self.id = id
         self.ip = ip
         self.username = username
-        self.port = port
+        self.client_ip = client_ip
+        self.client_port = client_port
         self.java_opts = java_opts
     
     def get_id(self):
@@ -106,8 +112,11 @@ class Machine:
     def get_java_opts(self):
         return self.java_opts
     
-    def get_port(self):
-        return self.port
+    def get_client_ip(self):
+        return self.client_ip
+    
+    def get_client_port(self):
+        return self.client_port
     
     def get_username(self):
         return self.username

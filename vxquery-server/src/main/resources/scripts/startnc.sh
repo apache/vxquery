@@ -25,7 +25,7 @@ CCHOST=$3
 CCPORT=$4
 J_OPTS=$5
 
-#Set JAVA_HOME
+# Set JAVA_HOME
 export JAVA_HOME=$JAVA_HOME
 
 # java opts added parameters
@@ -49,5 +49,5 @@ then
 fi
 
 
-#Launch hyracks nc
+# Launch hyracks nc
 ${VXQUERY_HOME}/vxquery-server/target/appassembler/bin/vxquerync ${NC_OPTIONS} &> ${NCLOGS_DIR}/nc_$(date +%Y%m%d%H%M).log &

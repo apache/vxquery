@@ -119,9 +119,9 @@ class WeatherBenchmark:
 
     def get_local_partition_scheme(self, test, partition):
         scheme = []
-        virtual_partitions = get_local_virtual_disk_partitions(self.partitions)
-        data_schemes = get_partition_scheme(0, virtual_partitions, self.base_paths)
-        link_base_schemes = get_partition_scheme(0, virtual_partitions, self.base_paths, self.DATA_LINKS_FOLDER + test)
+        virtual_disk_partitions = get_local_virtual_disk_partitions(self.partitions)
+        data_schemes = get_disk_partition_scheme(0, virtual_disk_partitions, self.base_paths)
+        link_base_schemes = get_disk_partition_scheme(0, partition, self.base_paths, self.DATA_LINKS_FOLDER + test)
 
         # Match link paths to real data paths.
         group_size = len(data_schemes) / len(link_base_schemes)
@@ -218,7 +218,7 @@ class WeatherBenchmark:
         '''Build a scheme for all data in one symbolically linked folder. (0 partition)'''
         scheme = []
         index = 0
-        link_base_schemes = get_partition_scheme(0, 1, self.base_paths, self.DATA_LINKS_FOLDER + test)
+        link_base_schemes = get_disk_partition_scheme(0, 1, self.base_paths, self.DATA_LINKS_FOLDER + test)
         for link_node, link_disk, link_virtual, link_index, link_path in link_base_schemes:
             if test == "local_batch_scale_out" and index > 0:
                 continue
@@ -230,7 +230,7 @@ class WeatherBenchmark:
     def get_zero_partition_path(self, node, key):
         '''Return a partition path for the zero partition.'''
         base_path = self.base_paths[0]
-        new_link_path = get_partition_scheme(node, 1, [base_path], key)[0][PARTITION_INDEX_PATH]
+        new_link_path = get_disk_partition_scheme(node, 1, [base_path], key)[0][PARTITION_INDEX_PATH]
         return new_link_path.replace("p1", "p0")
         
     def get_current_node_index(self):

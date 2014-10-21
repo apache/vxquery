@@ -84,29 +84,6 @@ public class OperatorToolbox {
                 AbstractUnnestOperator auo = (AbstractUnnestOperator) op;
                 result.add(auo.getExpressionRef());
                 break;
-            case CLUSTER:
-            case DATASOURCESCAN:
-            case DISTINCT:
-            case DISTRIBUTE_RESULT:
-            case EMPTYTUPLESOURCE:
-            case EXCHANGE:
-            case EXTENSION_OPERATOR:
-            case GROUP:
-            case INDEX_INSERT_DELETE:
-            case INSERT_DELETE:
-            case LIMIT:
-            case NESTEDTUPLESOURCE:
-            case ORDER:
-            case PARTITIONINGSPLIT:
-            case PROJECT:
-            case REPLICATE:
-            case SCRIPT:
-            case SINK:
-            case SUBPLAN:
-            case UNIONALL:
-            case UPDATE:
-            case WRITE:
-            case WRITE_RESULT:
             default:
                 // TODO Not yet implemented.
                 break;
@@ -129,32 +106,6 @@ public class OperatorToolbox {
             case UNNEST_MAP:
                 AbstractUnnestOperator ano = (AbstractUnnestOperator) op;
                 return ano.getExpressionRef();
-            case CLUSTER:
-            case DATASOURCESCAN:
-            case DISTINCT:
-            case DISTRIBUTE_RESULT:
-            case EMPTYTUPLESOURCE:
-            case EXCHANGE:
-            case EXTENSION_OPERATOR:
-            case GROUP:
-            case INDEX_INSERT_DELETE:
-            case INNERJOIN:
-            case INSERT_DELETE:
-            case LEFTOUTERJOIN:
-            case LIMIT:
-            case NESTEDTUPLESOURCE:
-            case ORDER:
-            case PARTITIONINGSPLIT:
-            case PROJECT:
-            case REPLICATE:
-            case SCRIPT:
-            case SELECT:
-            case SINK:
-            case SUBPLAN:
-            case UNIONALL:
-            case UPDATE:
-            case WRITE:
-            case WRITE_RESULT:
             default:
                 // TODO Not yet implemented.
                 break;
@@ -196,29 +147,6 @@ public class OperatorToolbox {
             case EMPTYTUPLESOURCE:
             case NESTEDTUPLESOURCE:
                 return null;
-            case CLUSTER:
-            case DISTINCT:
-            case DISTRIBUTE_RESULT:
-            case EXCHANGE:
-            case EXTENSION_OPERATOR:
-            case GROUP:
-            case INDEX_INSERT_DELETE:
-            case INNERJOIN:
-            case INSERT_DELETE:
-            case LEFTOUTERJOIN:
-            case LIMIT:
-            case ORDER:
-            case PARTITIONINGSPLIT:
-            case PROJECT:
-            case REPLICATE:
-            case SCRIPT:
-            case SELECT:
-            case SINK:
-            case SUBPLAN:
-            case UNIONALL:
-            case UPDATE:
-            case WRITE:
-            case WRITE_RESULT:
             default:
                 // Skip operators and go look at input.
                 for (Mutable<ILogicalOperator> input : op.getInputs()) {

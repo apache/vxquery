@@ -96,7 +96,7 @@ class WeatherDataFiles:
             return
         
         # Initialize the partition paths.
-        partition_paths = get_partition_paths(0, partitions, base_paths)
+        partition_paths = get_disk_partition_paths(0, partitions, base_paths)
         for path in partition_paths:
             # Make sure the xml folder is available.
             prepare_path(path, reset)
@@ -150,7 +150,7 @@ class WeatherDataFiles:
         
         XML_START = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
         
-        partition_paths = get_partition_paths(0, partitions, base_paths)
+        partition_paths = get_disk_partition_paths(0, partitions, base_paths)
 
         import fnmatch
         import os
@@ -375,16 +375,6 @@ PARTITION_INDEX_VIRTUAL = 2
 PARTITION_INDEX = 3
 PARTITION_INDEX_PATH = 4
 PARTITION_HEADER = ("Node", "Disk", "Virtual", "Index", "Path")
-            
-def get_partition_paths(node_id, partitions, base_paths, key="partitions"):
-    partition_paths = []
-    for scheme in get_partition_scheme(node_id, partitions, base_paths, key):
-        partition_paths.append(scheme[PARTITION_INDEX_PATH])
-    return partition_paths
-
-def get_partition_scheme(node_id, virtual_partitions, base_paths, key="partitions"):
-    partitions_per_disk = virtual_partitions / len(base_paths)
-    return get_disk_partition_scheme(node_id, partitions_per_disk, base_paths, key)
 
 def get_disk_partition_paths(node_id, partitions, base_paths, key="partitions"):
     partition_paths = []

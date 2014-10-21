@@ -24,7 +24,7 @@ XML_PREFIX = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root>' + "
 XML_SUFFIX = '</root>' + "\n"
 
 def find_files(directory, pattern):
-    for root, dirs, files in os.walk(directory):
+    for root, dirs, files in os.walk(directory, followlinks=True):
         for basename in files:
             if fnmatch.fnmatch(basename, pattern):
                 yield (root, basename)

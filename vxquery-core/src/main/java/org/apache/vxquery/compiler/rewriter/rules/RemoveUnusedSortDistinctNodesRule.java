@@ -384,8 +384,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 // Find the last operator to set a variable and call this function again.
                 SubplanOperator subplan = (SubplanOperator) op;
                 for (int index = 0; index < subplan.getNestedPlans().size(); index++) {
-                    AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(index)
-                            .getRoots().get(0).getValue();
+                    AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans()
+                            .get(index).getRoots().get(0).getValue();
                     updateVariableMap(lastOperator, cardinalityVariable, documentOrderVariables, uniqueNodesVariables,
                             vxqueryContext);
                 }
@@ -437,21 +437,6 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 break;
 
             // The following operators' analysis has not yet been implemented.
-            case CLUSTER:
-            case DISTINCT:
-            case EXTENSION_OPERATOR:
-            case GROUP:
-            case INDEX_INSERT_DELETE:
-            case INSERT_DELETE:
-            case LIMIT:
-            case PARTITIONINGSPLIT:
-            case REPLICATE:
-            case RUNNINGAGGREGATE:
-            case SCRIPT:
-            case SINK:
-            case UNIONALL:
-            case UNNEST_MAP:
-            case UPDATE:
             default:
                 throw new RuntimeException("Operator (" + op.getOperatorTag()
                         + ") has not been implemented in rewrite rule.");

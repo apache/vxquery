@@ -47,6 +47,10 @@
             <configuration>
               <programs>
                 <program>
+                  <mainClass>org.apache.vxquery.cli.VXQueryClusterShutdown</mainClass>
+                  <name>vxqueryshutdown</name>
+                </program>
+                <program>
                   <mainClass>edu.uci.ics.hyracks.control.cc.CCDriver</mainClass>
                   <name>vxquerycc</name>
                 </program>
