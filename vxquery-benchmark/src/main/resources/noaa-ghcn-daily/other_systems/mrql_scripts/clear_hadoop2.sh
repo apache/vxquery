@@ -17,33 +17,6 @@
 # limitations under the License.
 #
 
-# Examples
-# run_mrql_tests.sh mrql_all/ 1 2
-
-NODES=${2}
-REPEAT=${3}
-DATASET=${4}
-
-
-# Make log folder
-mkdir -p ~/disk1/weather_data/mrql/query_logs/${NODES}nodes/
-
-for j in $(find ${1} -name '*q??.mrql')
-do
-    date
-    echo "Running MRQL query: ${j}"
-    time for i in {1..${REPEAT}}; do ~/mrql/incubator-mrql/bin/mrql.flink -dist -nodes ${NODES} ${j} ${DATASET}/sensors/ ${DATASET}/stations/ >> ~/disk1/weather_data/mrql/query_logs/${NODES}nodes/$(basename "${j}").log 2>&1; done; 
-done
-
-
-if which programname >/dev/null;
-then
-    echo "Sending out e-mail notification."
-    SUBJECT="MRQL Tests Finished (${DATASET})"
-    EMAIL="ecarm002@ucr.edu"
-    /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
-    Completed all MRQL tests on ${DATASET}.
-    EOM
-else
-    echo "No mail command to use."
-fi;
+# Remove data
+rm -rf disk1/hadoop2/hdfs
+rm -rf disk2/hadoop2/hdfs
