@@ -74,6 +74,7 @@ sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog xqts/XQTSCatalog.xml -
 ----------------------------------------
 
   * view the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.
+
   * Add JAVA_OPTS for additional java parameters.
 
 * VXQuery Test Suite

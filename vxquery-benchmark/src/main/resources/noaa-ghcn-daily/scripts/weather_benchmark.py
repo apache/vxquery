@@ -48,16 +48,20 @@ class WeatherBenchmark:
                        ] 
     QUERY_UTILITY_LIST = [
                           "no_result.xq",
-                          "sensor_count.xq",
-                          "station_count.xq",
-                          "q04_sensor.xq",
-                          "q04_station.xq",
-                          "q05_sensor.xq",
-                          "q05_station.xq",
-                          "q06_sensor.xq",
-                          "q06_station.xq",
-                          "q07_tmin.xq",
-                          "q07_tmax.xq",
+                          "count_sensor.xq",
+                          "count_station.xq",
+                          "q04_count_join.xq",
+                          "q04_count_sensor.xq",
+                          "q04_count_station.xq",
+                          "q05_count_join.xq",
+                          "q05_count_sensor.xq",
+                          "q05_count_station.xq",
+                          "q06_count_join.xq",
+                          "q06_count_sensor.xq",
+                          "q06_count_station.xq",
+                          "q07_count_join.xq",
+                          "q07_count_tmin.xq",
+                          "q07_count_tmax.xq",
                           ] 
     BENCHMARK_LOCAL_TESTS = ["local_speed_up", "local_batch_scale_out"] 
     BENCHMARK_CLUSTER_TESTS = ["speed_up", "batch_scale_out"] 

@@ -17,6 +17,8 @@
 package org.apache.vxquery.runtime.functions.step;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
@@ -24,41 +26,34 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.step.NodeTestFilter.INodeFilter;
-import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
-public class ChildPathStepUnnesting extends AbstractForwardAxisPathStep {
+public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathStep {
+    private boolean testSelf;
     private int indexSeqArgs;
     private int seqArgsLength;
-    private int indexSequence;
-    private final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-    private final SequencePointable seqItem = (SequencePointable) SequencePointable.FACTORY.createPointable();
+    private List<Integer> indexSequence = new ArrayList<Integer>();
+    private List<Boolean> checkSelf = new ArrayList<Boolean>();
+
     private final SequencePointable seqNtp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpItem = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpNtp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpStep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    INodeFilter filter;
 
-    public ChildPathStepUnnesting(IHyracksTaskContext ctx, PointablePool pp) {
+    public DescendantOrSelfPathStepUnnesting(IHyracksTaskContext ctx, PointablePool pp, boolean testSelf) {
         super(ctx, pp);
+        this.testSelf = testSelf;
     }
 
     protected void init(TaggedValuePointable[] args) throws SystemException {
+        checkSelf.add(true);
         indexSeqArgs = 0;
-        indexSequence = 0;
+        indexSequence.add(0);
 
-        if (args[1].getTag() != ValueTag.XS_INT_TAG) {
-            throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
-        }
-        args[1].getValue(ip);
-        SequenceType sType = dCtx.getStaticContext().lookupSequenceType(ip.getInteger());
-        filter = NodeTestFilter.getNodeTestFilter(sType);
-
+        // Check the argument passed in as sequence or node tree.
         if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
             args[0].getValue(seqNtp);
             seqArgsLength = seqNtp.getEntryCount();
@@ -80,48 +75,93 @@ public class ChildPathStepUnnesting extends AbstractForwardAxisPathStep {
                 }
                 tvpNtp.getValue(ntp);
                 ntp.getRootNode(tvpStep);
-                if (stepNodeTree(tvpStep, 0, result)) {
+                if (processNodeTree(tvpStep, result)) {
                     return true;
                 }
+                // Next node tree in sequence.
                 indexSeqArgs++;
+                checkSelf.set(0, true);
             }
         } else {
             // Single node tree input.
             ntp.getRootNode(tvpStep);
-            if (stepNodeTree(tvpStep, 0, result)) {
+            if (processNodeTree(tvpStep, result)) {
                 return true;
             }
         }
         return false;
     }
 
+    private boolean processNodeTree(TaggedValuePointable rootTVP, IPointable result) throws AlgebricksException {
+        if (testSelf && checkSelf.get(0)) {
+            checkSelf.set(0, false);
+            tvpItem.set(rootTVP);
+            try {
+                setNodeToResult(tvpItem, result);
+                return true;
+            } catch (IOException e) {
+                String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
+                throw new AlgebricksException(description);
+            }
+        }
+
+        // Solve for descendants.
+        return stepNodeTree(rootTVP, 0, result);
+    }
+
     /**
-     * Find the next node to return.
+     * Search through all tree children and children's children.
+     * 
+     * @param nodePointable
+     * @throws SystemException
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
             throws AlgebricksException {
-        getSequence(tvpInput, seqItem);
-        int seqLength = seqItem.getEntryCount();
-        while (indexSequence < seqLength) {
-            // Get the next item
-            seqItem.getEntry(indexSequence, tvpItem);
-
-            // Test to see if the item fits the path step
-            if (filter.accept(ntp, tvpItem)) {
-                try {
-                    setNodeToResult(tvpItem, result);
-                    ++indexSequence;
-                    return true;
-                } catch (IOException e) {
-                    String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
-                    throw new AlgebricksException(description);
-                }
-            }
-            ++indexSequence;
+        // Set up next level tracking.
+        if (level + 1 >= indexSequence.size()) {
+            indexSequence.add(0);
         }
-        // Reset for next node tree.
-        indexSequence = 0;
-        return false;
-    }
+        if (level + 1 >= checkSelf.size()) {
+            checkSelf.add(true);
+        }
 
+        SequencePointable seqItem = pp.takeOne(SequencePointable.class);
+        try {
+            getSequence(tvpInput, seqItem);
+            int seqLength = seqItem.getEntryCount();
+            while (indexSequence.get(level) < seqLength) {
+                // Get the next item
+                seqItem.getEntry(indexSequence.get(level), tvpItem);
+
+                // Check current node
+                if (checkSelf.get(level)) {
+                    checkSelf.set(level, false);
+                    setNodeToResult(tvpItem, result);
+                    return true;
+                }
+                // Check children nodes
+                if (level + 1 < indexSequence.size()) {
+                    if (level + 1 < checkSelf.size()) {
+                        checkSelf.set(level + 1, true);
+                    }
+                    if (stepNodeTree(tvpItem, level + 1, result)) {
+                        return true;
+                    }
+                }
+                indexSequence.set(level, indexSequence.get(level) + 1);
+            }
+            // Reset for next node tree.
+            if (level == 0) {
+                indexSequence.set(level, 0);
+            } else {
+                indexSequence.remove(level);
+            }
+            return false;
+        } catch (IOException e) {
+            String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
+            throw new AlgebricksException(description);
+        } finally {
+            pp.giveBack(seqItem);
+        }
+    }
 }

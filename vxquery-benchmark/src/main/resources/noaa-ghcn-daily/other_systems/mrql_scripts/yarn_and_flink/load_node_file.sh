@@ -31,45 +31,17 @@ fi
 
 DATASET=${1}
 NODES=${2}
-REPEAT=1
-#DATA_FILES=${NODES}
-DATA_FILES=8
 
-# Start Hadoop
-sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh
+echo "Loading ${NODES} node ${DATASET} data file in to cluster."
 
-sleep 10
+# Add each sensor block
+cp saved/backups/mr/${DATASET}_sensors_${NODES}.xml.gz disk1/hadoop/
+gunzip disk1/hadoop/${DATASET}_sensors_${NODES}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/${DATASET}_sensors_${NODES}.xml ${DATASET}/sensors
+rm -f disk1/hadoop/${DATASET}_sensors_${NODES}.xml
 
-# Prepare hadoop file system
-hadoop fs -mkdir ${DATASET}
-hadoop fs -ls 
-hadoop fs -mkdir ${DATASET}/sensors
-hadoop fs -mkdir ${DATASET}/stations
-hadoop fs -ls ${DATASET}
-
-# Prepare hadoop file system 2
-hadoop fs -mkdir ${DATASET}2
-hadoop fs -ls 
-hadoop fs -mkdir ${DATASET}2/sensors
-hadoop fs -mkdir ${DATASET}2/stations
-hadoop fs -ls ${DATASET}2
-
-hadoop balancer
-
-
-# Upload test data
-COUNTER=0
-while [ ${COUNTER} -lt ${NODES} ];
-do
-    sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/load_node_file.sh ${DATASET} ${COUNTER}
-    let COUNTER=COUNTER+1 
-done
-
-
-# Start test
-sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh \
-        vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET}
-
-
-# Stop Hadoop
-sh saved/hadoop/hadoop-1.2.1/bin/stop-all.sh
+# Add each station block
+cp saved/backups/mr/${DATASET}_stations_${NODES}.xml.gz disk1/hadoop/
+gunzip disk1/hadoop/${DATASET}_stations_${NODES}.xml.gz
+hadoop fs -copyFromLocal disk1/hadoop/${DATASET}_stations_${NODES}.xml ${DATASET}/stations
+rm -f disk1/hadoop/${DATASET}_stations_${NODES}.xml

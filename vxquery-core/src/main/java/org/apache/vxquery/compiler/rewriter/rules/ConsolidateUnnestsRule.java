@@ -18,6 +18,7 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
+import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.functions.Function;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -45,7 +46,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  *   UNNEST( $v1 : uf1( $v0 ) )
  *   plan__child
  *   
- *   Where $v1 is not used in plan__parent.
+ *   Where $v1 is not used in plan__parent and uf1 is not a descendant expression.
  *   
  * After
  * 
@@ -85,6 +86,12 @@ public class ConsolidateUnnestsRule extends AbstractUsedVariablesProcessingRule 
             if (!functionInfo2.hasScalarEvaluatorFactory()) {
                 return false;
             }
+            // Exception for specific path expressions.
+            if (functionCall2.getFunctionIdentifier().equals(BuiltinOperators.DESCENDANT.getFunctionIdentifier())
+                    || functionCall2.getFunctionIdentifier().equals(
+                            BuiltinOperators.DESCENDANT_OR_SELF.getFunctionIdentifier())) {
+                return false;
+            }
 
             // Find unnest2 variable in unnest1
             Mutable<ILogicalExpression> unnest1Arg = ExpressionToolbox.findVariableExpression(
@@ -105,5 +112,4 @@ public class ConsolidateUnnestsRule extends AbstractUsedVariablesProcessingRule 
         }
         return false;
     }
-
 }

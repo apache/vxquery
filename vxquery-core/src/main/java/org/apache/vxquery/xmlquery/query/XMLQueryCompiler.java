@@ -113,7 +113,7 @@ public class XMLQueryCompiler {
                 });
         builder.getPhysicalOptimizationConfig().setFrameSize(this.frameSize);
         if (joinHashSize > 0) {
-            builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash(joinHashSize);
+            builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash(joinHashSize/this.frameSize);
         }
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());

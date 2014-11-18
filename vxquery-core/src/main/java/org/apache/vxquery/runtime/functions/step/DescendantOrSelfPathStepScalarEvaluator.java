@@ -95,16 +95,13 @@ public class DescendantOrSelfPathStepScalarEvaluator extends AbstractDescendantP
                 throw new SystemException(ErrorCode.SYSE0001);
         }
         itemTvp.set(rootTVP);
-        if (matches()) {
-            try {
-                appendNodeToResult();
-            } catch (IOException e) {
-                throw new SystemException(ErrorCode.SYSE0001, e);
-            }
+        try {
+            appendNodeToResult();
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
         }
 
         // Solve for descendants.
-        setNodeTest(SequenceType.create(ElementType.ANYELEMENT, Quantifier.QUANT_ONE));
         searchSubtree(rootTVP);
     }
 

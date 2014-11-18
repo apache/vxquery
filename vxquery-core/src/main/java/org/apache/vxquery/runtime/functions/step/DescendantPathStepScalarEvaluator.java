@@ -22,9 +22,6 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.types.ElementType;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
@@ -56,7 +53,6 @@ public class DescendantPathStepScalarEvaluator extends AbstractDescendantPathSte
             ntp.getRootNode(rootTVP);
 
             // Solve for descendants.
-            setNodeTest(SequenceType.create(ElementType.ANYELEMENT, Quantifier.QUANT_ONE));
             searchSubtree(rootTVP);
 
             seqb.finish();

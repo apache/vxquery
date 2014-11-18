@@ -906,6 +906,7 @@
         <param name="arg" type="node()*"/>
         <return type="node()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.step.DescendantOrSelfPathStepScalarEvaluatorFactory"/>
+        <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.step.DescendantOrSelfPathStepUnnestingEvaluatorFactory"/>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodesNOPropagationPolicy"/>
     </operator>
 

@@ -446,10 +446,10 @@ public class VXQuery {
         @Option(name = "-local-node-controllers", usage = "Number of local node controllers (default 1)")
         private int localNodeControllers = 1;
 
-        @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
+        @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65,536)")
         private int frameSize = 65536;
 
-        @Option(name = "-join-hash-size", usage = "Join hash size in bytes.")
+        @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default 67,108,864)")
         private int joinHashSize = -1;
 
         @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")

@@ -23,7 +23,6 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
@@ -79,9 +78,7 @@ public abstract class AbstractDescendantPathStepScalarEvaluator extends Abstract
                     seqp.getEntry(i, itemTvp);
                     // Only search element nodes.
                     if (itemTvp.getTag() == ValueTag.ELEMENT_NODE_TAG) {
-                        if (matches()) {
-                            appendNodeToResult();
-                        }
+                        appendNodeToResult();
                         // Now check this elements children.
                         TaggedValuePointable tvpTemp = (TaggedValuePointable) TaggedValuePointable.FACTORY
                                 .createPointable();
