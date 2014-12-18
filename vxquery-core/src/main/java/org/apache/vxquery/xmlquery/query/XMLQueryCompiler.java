@@ -119,6 +119,10 @@ public class XMLQueryCompiler {
             builder.getPhysicalOptimizationConfig().setMaxFramesLeftInputHybridHash(
                     (int) (maximumDataSize / this.frameSize));
         }
+
+        builder.getPhysicalOptimizationConfig().setMaxFramesLeftInputHybridHash(
+                (int) (60L * 1024 * 1048576 / this.frameSize));
+
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {
