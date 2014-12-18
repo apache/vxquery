@@ -389,6 +389,7 @@ public class VXQuery {
             ncConfig.dataIPAddress = "127.0.0.1";
             ncConfig.datasetIPAddress = "127.0.0.1";
             ncConfig.nodeId = "nc" + (i + 1);
+            ncConfig.ioDevices = "/tmp";
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
         }
@@ -450,7 +451,7 @@ public class VXQuery {
         private int frameSize = 65536;
 
         @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default 67,108,864)")
-        private int joinHashSize = -1;
+        private long joinHashSize = -1;
 
         @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
         private int bufferSize = -1;

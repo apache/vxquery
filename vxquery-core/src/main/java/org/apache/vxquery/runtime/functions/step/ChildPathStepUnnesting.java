@@ -43,6 +43,7 @@ public class ChildPathStepUnnesting extends AbstractForwardAxisPathStep {
     private final TaggedValuePointable tvpNtp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpStep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     INodeFilter filter;
+    int filterLookupID = -1;
 
     public ChildPathStepUnnesting(IHyracksTaskContext ctx, PointablePool pp) {
         super(ctx, pp);
@@ -56,9 +57,12 @@ public class ChildPathStepUnnesting extends AbstractForwardAxisPathStep {
             throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
         }
         args[1].getValue(ip);
-        SequenceType sType = dCtx.getStaticContext().lookupSequenceType(ip.getInteger());
-        filter = NodeTestFilter.getNodeTestFilter(sType);
-
+        if (ip.getInteger() != filterLookupID) {
+            filterLookupID = ip.getInteger();
+            SequenceType sType = dCtx.getStaticContext().lookupSequenceType(ip.getInteger());
+            filter = NodeTestFilter.getNodeTestFilter(sType);
+        }
+        
         if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
             args[0].getValue(seqNtp);
             seqArgsLength = seqNtp.getEntryCount();

@@ -32,8 +32,8 @@ fi
 DATASET=${1}
 NODES=${2}
 REPEAT=1
-#DATA_FILES=${NODES}
-DATA_FILES=8
+DATA_FILES=${NODES}
+#DATA_FILES=8
 
 # Start Hadoop
 sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh

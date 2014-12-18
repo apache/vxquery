@@ -1260,6 +1260,12 @@ public class FunctionHelper {
         }
     }
 
+    public static void writeCharArray(char[] ch, int start, int length, DataOutput dOut) {
+        for (int i = start; i < start + length; ++i) {
+            writeChar(ch[i], dOut);
+        }
+    }
+
     public static void writeDateAsString(IDate date, DataOutput dOut) {
         // Year
         writeNumberWithPadding(date.getYear(), 4, dOut);

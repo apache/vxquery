@@ -17,6 +17,6 @@
 count(
     select (rtmax)
     from rtmax in source(xml, args[0], {"data"})
-    where text(r.dataType) = "TMAX"
+    where text(rtmax.dataType) = "TMAX"
 )
 ;

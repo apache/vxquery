@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-count(
     select (rtmin)
     from rtmin in source(xml, args[0], {"data"})
-    where text(rtmin.dataType) = "TMIN"
-)
+    where text(r.dataType) = "TMIN"
 ;

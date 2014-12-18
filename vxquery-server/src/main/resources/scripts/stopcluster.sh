@@ -21,6 +21,10 @@ CCHOST=$1
 CCPORT=$2
 J_OPTS=$3
 
+#Import cluster properties
+MYDIR="$(dirname -- $0)"
+. ${MYDIR}/../conf/cluster.properties
+
 # Export JAVA_HOME
 export JAVA_HOME=${JAVA_HOME}
 
@@ -31,8 +35,14 @@ then
     export JAVA_OPTS
 fi
 
+# java opts added parameters Server cluster.properties
+if [ ! -z "${CCJAVA_OPTS}" ]
+then
+    JAVA_OPTS="${JAVA_OPTS} ${CCJAVA_OPTS}"
+    export JAVA_OPTS
+fi
+
 VXQUERY_HOME=`pwd`
-CCLOGS_DIR=${VXQUERY_HOME}/logs
 
 # logs dir
 mkdir -p ${CCLOGS_DIR}

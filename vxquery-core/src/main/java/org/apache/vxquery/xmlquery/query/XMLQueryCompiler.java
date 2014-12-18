@@ -94,7 +94,7 @@ public class XMLQueryCompiler {
     }
 
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize,
-            int availableProcessors, int joinHashSize) {
+            int availableProcessors, long joinHashSize) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         this.frameSize = frameSize;
         this.nodeList = nodeList;
@@ -113,8 +113,12 @@ public class XMLQueryCompiler {
                 });
         builder.getPhysicalOptimizationConfig().setFrameSize(this.frameSize);
         if (joinHashSize > 0) {
-            builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash(joinHashSize/this.frameSize);
+            builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash((int) (joinHashSize / this.frameSize));
         }
+
+        builder.getPhysicalOptimizationConfig().setMaxFramesLeftInputHybridHash(
+                (int) (60L * 1024 * 1048576 / this.frameSize));
+
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {

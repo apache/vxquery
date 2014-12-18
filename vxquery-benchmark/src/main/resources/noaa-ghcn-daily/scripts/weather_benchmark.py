@@ -59,9 +59,20 @@ class WeatherBenchmark:
                           "q06_count_join.xq",
                           "q06_count_sensor.xq",
                           "q06_count_station.xq",
+                          "q07_count_1940.xq",
+                          "q07_count_1960.xq",
+                          "q07_count_1980.xq",
+                          "q07_count_2000.xq",
                           "q07_count_join.xq",
+                          "q07_count_left.xq",
                           "q07_count_tmin.xq",
                           "q07_count_tmax.xq",
+                          "q07_data_tmin.xq",
+                          "q07_data_tmax.xq",
+                          "q07_filter_1940.xq",
+                          "q07_filter_1960.xq",
+                          "q07_filter_1980.xq",
+                          "q07_filter_2000.xq",
                           ] 
     BENCHMARK_LOCAL_TESTS = ["local_speed_up", "local_batch_scale_out"] 
     BENCHMARK_CLUSTER_TESTS = ["speed_up", "batch_scale_out"] 
@@ -364,7 +375,7 @@ def get_cluster_query_path(base_paths, test, partition, nodes):
 
 def get_cluster_virtual_disk_partitions(nodes, partitions):
     vp = get_local_virtual_disk_partitions(partitions)
-    vn = calculate_partitions(range(1, len(nodes)+1, 1))
+    vn = calculate_partitions(range(1, len(nodes) + 1, 1))
     return vp * vn
 
 def get_local_virtual_disk_partitions(partitions):

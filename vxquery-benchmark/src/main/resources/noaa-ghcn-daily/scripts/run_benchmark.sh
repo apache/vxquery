@@ -29,7 +29,7 @@ REPEAT=5
 IGNORE=2
 FRAME_SIZE=$((8*1024))
 BUFFER_SIZE=$((32*1024*1024))
-JOIN_HASH_SIZE=$(( 4 * (64*1024*1024) ))
+JOIN_HASH_SIZE=$(( 6 * (1024*1024*1024) / 8 ))
 
 if [ -z "${1}" ]
 then
@@ -37,7 +37,7 @@ then
     exit
 fi
 
-export JAVA_OPTS="$JAVA_OPTS -server -Xmx8G -XX:+HeapDumpOnOutOfMemoryError -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/benchmark_logging.properties"
+export JAVA_OPTS="$JAVA_OPTS -server -Xmx7G -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/testing_logging.properties"
 
 for j in $(find ${1} -name '*q??.xq')
 do

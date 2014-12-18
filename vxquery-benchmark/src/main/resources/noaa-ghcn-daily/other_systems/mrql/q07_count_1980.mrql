@@ -15,8 +15,16 @@
  * limitations under the License.
  */
 count(
-    select (rtmin)
-    from rtmin in source(xml, args[0], {"data"})
-    where text(rtmin.dataType) = "TMIN"
+    select (toInt(text(rtmax.value))-toInt(text(rtmin.value)))
+    from rtmax in source(xml, args[0], {"data"}),
+        dtmax in rtmax.date,
+        rtmin in source(xml, args[2], {"data"}),
+        dtmin in rtmin.date
+    where text(rtmax.date) = text(rtmin.date)
+        and text(rtmax.station) = text(rtmin.station)
+        and text(rtmax.dataType) = "TMAX"
+        and toInt(substring(text(dtmax), 0, 4)) > 1980
+        and text(rtmin.dataType) = "TMIN"
+        and toInt(substring(text(dtmin), 0, 4)) > 1980
 )
 ;

@@ -40,9 +40,11 @@ public class DictionaryBuilder {
 
     private final DataOutput dataBufferOut;
 
-    private final ByteArrayAccessibleOutputStream tempStringData;
+    private final ArrayBackedValueStorage cache;
 
     private final TreeMap<String, Integer> hashSlotIndexes;
+
+    private boolean cacheReady;
 
     private final IValueReferenceVector sortedStringsVector = new IValueReferenceVector() {
         @Override
@@ -74,16 +76,27 @@ public class DictionaryBuilder {
         sortedSlotIndexes = new GrowableIntArray();
         dataBuffer = new ByteArrayAccessibleOutputStream();
         dataBufferOut = new DataOutputStream(dataBuffer);
-        tempStringData = new ByteArrayAccessibleOutputStream();
+        cache = new ArrayBackedValueStorage();
         hashSlotIndexes = new TreeMap<String, Integer>();
+        cacheReady = false;
     }
 
     public void reset() {
         stringEndOffsets.clear();
         sortedSlotIndexes.clear();
         dataBuffer.reset();
-        tempStringData.reset();
         hashSlotIndexes.clear();
+        cacheReady = false;
+    }
+
+    public void writeFromCache(ArrayBackedValueStorage abvs) throws IOException {
+        if (!cacheReady) {
+            cache.reset();
+            write(cache);
+            cacheReady = true;
+        }
+        DataOutput out = abvs.getDataOutput();
+        out.write(cache.getByteArray(), cache.getStartOffset(), cache.getLength());
     }
 
     public void write(ArrayBackedValueStorage abvs) throws IOException {
@@ -122,6 +135,7 @@ public class DictionaryBuilder {
             }
             stringEndOffsets.append(dataBuffer.size());
             hashSlotIndexes.put(str, slotIndex);
+            cacheReady = false;
         }
         return slotIndex;
     }
@@ -141,6 +155,7 @@ public class DictionaryBuilder {
         }
         stringEndOffsets.append(dataBuffer.size());
         sortedSlotIndexes.insert(index, slotIndex);
+        cacheReady = false;
         return slotIndex;
     }
 }
