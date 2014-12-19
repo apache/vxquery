@@ -16,17 +16,15 @@
 */
 package org.apache.vxquery.runtime.functions.arithmetic;
 
-
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -45,11 +43,9 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final AbstractArithmeticOperation aOp = createArithmeticOperation();
-        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
+        final ArithmeticHelper aHelper = new ArithmeticHelper(createArithmeticOperation(), dCtx);
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -72,11 +68,10 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
                     }
                     throw new SystemException(ErrorCode.XPTY0004);
                 }
-                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp1, tvp2, result, tp1, tp2);
+                aHelper.compute(tvp1, tvp2, result);
             }
         };
     }
-
 
     protected abstract AbstractArithmeticOperation createArithmeticOperation();
 }

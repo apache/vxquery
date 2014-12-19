@@ -14,18 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.datamodel.builders.nodes;
+package org.apache.vxquery.datamodel.builders.atomic;
 
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 
+import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
 
-public class UTF8StringBuilder extends AbstractNodeBuilder {
+public class UTF8StringBuilder extends AbstractBuilder {
     private IMutableValueStorage mvs;
     private DataOutput out;
 

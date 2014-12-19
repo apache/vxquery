@@ -261,7 +261,7 @@ public class VXQuery {
 
             start = opts.timing ? new Date() : null;
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize,
-                    opts.availableProcessors, opts.joinHashSize);
+                    opts.availableProcessors, opts.joinHashSize, opts.maximumDataSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId, null);
@@ -452,6 +452,9 @@ public class VXQuery {
 
         @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default 67,108,864)")
         private long joinHashSize = -1;
+
+        @Option(name = "-maximum-data-size", usage = "Maximum possible data size in bytes. (default 150,323,855,000)")
+        private long maximumDataSize = -1;
 
         @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
         private int bufferSize = -1;

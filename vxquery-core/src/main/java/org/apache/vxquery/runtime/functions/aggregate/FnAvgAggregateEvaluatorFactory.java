@@ -29,6 +29,7 @@ import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.arithmetic.DivideOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -53,9 +54,9 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
         final ArrayBackedValueStorage abvsCount = new ArrayBackedValueStorage();
         final DataOutput dOutCount = abvsCount.getDataOutput();
         final AddOperation aOp = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOp, dCtx);
         final DivideOperation aOpDivide = new DivideOperation();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
+        final ArithmeticHelper divide = new ArithmeticHelper(aOpDivide, dCtx);
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             long count;
@@ -83,7 +84,7 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
                         dOutCount.writeLong(count);
                         tvpCount.set(abvsCount);
 
-                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum, tp1, tp2);
+                        divide.compute(tvpSum, tvpCount, tvpSum);
                         result.set(tvpSum);
                     } catch (Exception e) {
                         throw new AlgebricksException(e);
@@ -104,7 +105,7 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
                         throw new SystemException(ErrorCode.SYSE0001, e.toString());
                     }
                 } else {
-                    FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum, new TypedPointables(), new TypedPointables());
+                    add.compute(tvp, tvpSum, tvpSum);
                 }
                 count++;
             }

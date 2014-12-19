@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
+import org.apache.vxquery.datamodel.builders.atomic.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AbstractNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.CommentNodeBuilder;
@@ -30,7 +31,6 @@ import org.apache.vxquery.datamodel.builders.nodes.DocumentNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.ElementNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.PINodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
-import org.apache.vxquery.datamodel.builders.nodes.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.types.BuiltinTypeQNames;
 import org.apache.vxquery.types.ElementType;

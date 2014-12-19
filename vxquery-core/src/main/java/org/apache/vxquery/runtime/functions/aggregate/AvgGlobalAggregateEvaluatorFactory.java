@@ -29,6 +29,7 @@ import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.arithmetic.DivideOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -53,13 +54,14 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
         final AddOperation aOp = new AddOperation();
+        final ArithmeticHelper add1 = new ArithmeticHelper(aOp, dCtx);
+        final ArithmeticHelper add2 = new ArithmeticHelper(aOp, dCtx);
         final DivideOperation aOpDivide = new DivideOperation();
+        final ArithmeticHelper divide = new ArithmeticHelper(aOpDivide, dCtx);
         final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpArg = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
-        
+
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
             TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -93,7 +95,7 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
                 } else {
                     // Set count as a TaggedValuePointable.
                     try {
-                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum, tp1, tp2);
+                        divide.compute(tvpSum, tvpCount, tvpSum);
                         result.set(tvpSum);
                     } catch (Exception e) {
                         throw new AlgebricksException(e);
@@ -112,9 +114,9 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
                         return;
                     } else if (seqLen == 2) {
                         seq.getEntry(0, tvpArg);
-                        FunctionHelper.arithmeticOperation(aOp, dCtx, tvpArg, tvpCount, tvpCount, tp1, tp2);
+                        add1.compute(tvpArg, tvpCount, tvpCount);
                         seq.getEntry(1, tvpArg);
-                        FunctionHelper.arithmeticOperation(aOp, dCtx, tvpArg, tvpSum, tvpSum, tp1, tp2);
+                        add2.compute(tvpArg, tvpSum, tvpSum);
                     } else {
                         throw new SystemException(ErrorCode.SYSE0001);
                     }
