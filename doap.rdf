@@ -21,11 +21,11 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-  <Project rdf:about="http://vxquery.apapche.org/">
+  <Project rdf:about="http://vxquery.apache.org/">
     <created>2014-10-09</created>
     <license rdf:resource="http://spdx.org/licenses/Apache-2.0" />
     <name>Apache VXQuery</name>
-    <homepage rdf:resource="http://vxquery.apapche.org/" />
+    <homepage rdf:resource="http://vxquery.apache.org/" />
     <asfext:pmc rdf:resource="http://vxquery.apache.org" />
     <shortdesc>Apache VXQuery implements a parallel XML Query processor.</shortdesc>
     <description>Apache VXQuery will be a standards compliant XML Query processor implemented in Java. The focus is on the evaluation of queries on large amounts of XML data. Specifically the goal is to evaluate queries on large collections of relatively small XML documents. To achieve this queries will be evaluated on a cluster of shared nothing machines.</description>
