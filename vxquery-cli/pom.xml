@@ -14,152 +14,155 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache.vxquery</groupId>
-    <artifactId>apache-vxquery</artifactId>
-    <version>0.5-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>org.apache.vxquery</groupId>
+        <artifactId>apache-vxquery</artifactId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>apache-vxquery-cli</artifactId>
-  <packaging>jar</packaging>
-  <name>VXQuery CLI</name>
-  <description>Apache VXQuery Command-Line Utility</description>
+    <artifactId>apache-vxquery-cli</artifactId>
+    <packaging>jar</packaging>
+    <name>VXQuery CLI</name>
+    <description>Apache VXQuery Command-Line Utility</description>
 
-  <distributionManagement>
-    <site>
-      <id>vxquery.website</id>
-      <name>VXQuery Website</name>
-      <url>file:../site/vxquery-cli/</url>
-    </site>
-  </distributionManagement>
+    <distributionManagement>
+        <site>
+            <id>vxquery.website</id>
+            <name>VXQuery Website</name>
+            <url>file:../site/vxquery-cli/</url>
+        </site>
+    </distributionManagement>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>appassembler-maven-plugin</artifactId>
-        <version>1.3</version>
-        <executions>
-          <execution>
-            <configuration>
-              <programs>
-                <program>
-                  <mainClass>org.apache.vxquery.cli.VXQuery</mainClass>
-                  <name>vxq</name>
-                </program>
-              </programs>
-              <repositoryLayout>flat</repositoryLayout>
-              <repositoryName>lib</repositoryName>
-            </configuration>
-            <phase>package</phase>
-            <goals>
-              <goal>assemble</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <programs>
+                                <program>
+                                    <mainClass>org.apache.vxquery.cli.VXQuery</mainClass>
+                                    <name>vxq</name>
+                                </program>
+                            </programs>
+                            <repositoryLayout>flat</repositoryLayout>
+                            <repositoryName>lib</repositoryName>
+                        </configuration>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
       <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
       </plugin>
       -->
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-site</id>
-            <phase>none</phase>
-          </execution>          
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-site</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.vxquery</groupId>
-      <artifactId>apache-vxquery-core</artifactId>
-      <version>0.5-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.vxquery</groupId>
+            <artifactId>apache-vxquery-core</artifactId>
+            <version>0.5-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-api</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-api</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-client</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-client</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-control-cc</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-control-cc</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-control-nc</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-control-nc</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>algebricks-common</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>algebricks-common</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>algebricks-core</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>algebricks-core</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-control-common</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-control-common</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>edu.uci.ics.hyracks</groupId>
-      <artifactId>hyracks-dataflow-std</artifactId>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-dataflow-std</artifactId>
+        </dependency>
+    </dependencies>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>index</report>
-              <report>dependencies</report>
-              <report>plugins</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-        <configuration>
-          <linkOnly>true</linkOnly>
-          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>${apache-rat-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <notimestamp>true</notimestamp>
-          <maxmemory>2g</maxmemory>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>dependencies</report>
+                            <report>plugins</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+                <configuration>
+                    <linkOnly>true</linkOnly>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <version>${apache-rat-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <notimestamp>true</notimestamp>
+                    <maxmemory>2g</maxmemory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
