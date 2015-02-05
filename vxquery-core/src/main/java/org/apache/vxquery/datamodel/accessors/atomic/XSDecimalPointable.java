@@ -197,7 +197,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
 
     @Override
     public double doubleValue() {
-        return getDecimalValue() / Math.pow(10, getDecimalPlace());
+        return ((double) getDecimalValue()) / Math.pow(10, getDecimalPlace());
     }
 
 }

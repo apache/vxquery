@@ -32,8 +32,8 @@ public class FnCeilingOperation extends AbstractNumericOperation {
     @Override
     public void operateDecimal(XSDecimalPointable decp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DECIMAL_TAG);
-        dOut.write(decp.getDecimalPlace());
-        dOut.writeLong((long) Math.ceil(decp.getDecimalValue()));
+        dOut.write(0);
+        dOut.writeLong((long) Math.ceil(decp.doubleValue()));
     }
 
     @Override

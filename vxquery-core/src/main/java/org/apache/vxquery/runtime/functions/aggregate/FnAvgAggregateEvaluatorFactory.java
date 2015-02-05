@@ -20,7 +20,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -30,7 +29,6 @@ import org.apache.vxquery.runtime.functions.arithmetic.DivideOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluator;

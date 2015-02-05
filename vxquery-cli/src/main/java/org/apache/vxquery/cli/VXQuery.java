@@ -78,7 +78,7 @@ public class VXQuery {
     private IHyracksDataset hds;
 
     private ResultSetId resultSetId;
-    private static List<String> timingMessages;
+    private static List<String> timingMessages = new ArrayList<String>();
     private static long sumTiming;
     private static long sumSquaredTiming;
     private static long minTiming = Long.MAX_VALUE;
@@ -92,7 +92,6 @@ public class VXQuery {
      */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
-        timingMessages = new ArrayList<String>();
     }
 
     /**

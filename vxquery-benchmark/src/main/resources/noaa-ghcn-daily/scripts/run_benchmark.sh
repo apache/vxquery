@@ -37,7 +37,7 @@ then
     exit
 fi
 
-export JAVA_OPTS="$JAVA_OPTS -server -Xmx7G -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/testing_logging.properties"
+export JAVA_OPTS="$JAVA_OPTS -server -Xmx500M -Djava.util.logging.config.file=./vxquery-benchmark/src/main/resources/noaa-ghcn-daily/scripts/testing_logging.properties"
 
 for j in $(find ${1} -name '*q??.xq')
 do
