@@ -45,8 +45,8 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
-        final AddOperation aOp = new AddOperation();
-        final ArithmeticHelper add = new ArithmeticHelper(aOp, dCtx);
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();

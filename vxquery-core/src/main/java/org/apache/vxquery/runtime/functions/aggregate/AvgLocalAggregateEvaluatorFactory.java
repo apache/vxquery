@@ -51,8 +51,8 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
         final DataOutput dOutSum = abvsSum.getDataOutput();
         final ArrayBackedValueStorage abvsSeq = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
-        final AddOperation aOp = new AddOperation();
-        final ArithmeticHelper add = new ArithmeticHelper(aOp, dCtx);
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
         
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             long count;

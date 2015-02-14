@@ -1,0 +1,54 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Update the XQTS Results
+
+  VXQuery stores the latest XQTS result for the last release. 
+  The file can be used to verify that all the previous test still passing.
+  The following instructions show how to update the XQTS results file.
+
+* Instructions
+
+  * Verify current XQTS results are all passing before updating to the new XQTS test results.
+   The following command should produce all passing results.
+   They can be viewed at {{{file:///tmp/full_report_previous.html}file:///tmp/full_report_previous.html}}.
+
+----------------------------------------
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -htmlreport /tmp/full_report_previous.html -previous-test-results vxquery-xtest/results/xqts.txt
+----------------------------------------
+
+  * Remove the old results file.
+
+----------------------------------------
+rm vxquery-xtest/results/xqts.txt
+----------------------------------------
+
+  * Generate the new XQTS result file and save it in the text format.
+
+----------------------------------------
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -textreport vxquery-xtest/results/xqts_temp.txt
+----------------------------------------
+
+  * Sort the results so they can be compared with previous results.
+
+----------------------------------------
+sort vxquery-xtest/results/xqts_temp.txt --output=vxquery-xtest/results/xqts.txt
+----------------------------------------
+
+  * Clean up (remove) the temporary results files.
+
+----------------------------------------
+rm vxquery-xtest/results/xqts_temp.txt
+----------------------------------------

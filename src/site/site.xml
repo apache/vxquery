@@ -15,60 +15,85 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <project name="VXQuery">
-  <bannerLeft>
-    <name>VXQuery</name>
-    <src>images/VXQuery.png</src>
-    <href>http://vxquery.apache.org/</href>
-  </bannerLeft>
+    <bannerLeft>
+        <name>VXQuery</name>
+        <src>images/VXQuery.png</src>
+        <href>http://vxquery.apache.org/</href>
+    </bannerLeft>
 
-  <bannerRight>
-    <name>Apache Software Foundation</name>
-    <src>images/asf_logo_wide.png</src>
-    <href>http://www.apache.org/</href>
-  </bannerRight>
+    <bannerRight>
+        <name>Apache Software Foundation</name>
+        <src>images/asf_logo_wide.png</src>
+        <href>http://www.apache.org/</href>
+    </bannerRight>
 
-  <skin>
-    <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-fluido-skin</artifactId>
-    <version>1.3.1</version>
-  </skin>
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.3.1</version>
+    </skin>
 
-  <body>
-    <menu name="Apache Software Foundation">
-      <item name="Home" href="http://www.apache.org/"/>
-      <item name="Donate" href="http://www.apache.org/foundation/sponsorship.html"/>
-      <item name="Thanks" href="http://www.apache.org/foundation/thanks.html"/>
-      <item name="Security" href="http://www.apache.org/security/"/>
-    </menu>
+    <body>
+        <menu name="Apache Software Foundation">
+            <item
+                name="Home"
+                href="http://www.apache.org/" />
+            <item
+                name="Donate"
+                href="http://www.apache.org/foundation/sponsorship.html" />
+            <item
+                name="Thanks"
+                href="http://www.apache.org/foundation/thanks.html" />
+            <item
+                name="Security"
+                href="http://www.apache.org/security/" />
+        </menu>
 
-    <menu name="Get VXQuery">
-      <item name="Download" href="http://www.apache.org/dyn/closer.cgi/vxquery/" />
-    </menu>
-      
-    <menu name="For Users">
-      <item name="Installation" href="user_installation.html"/>
-      <item name="Executing a Query" href="user_query.html"/>
-      <item name="Running the Test Suite" href="user_running_tests.html"/>
-    </menu>
+        <menu name="Get VXQuery">
+            <item
+                name="Download"
+                href="http://www.apache.org/dyn/closer.cgi/vxquery/" />
+        </menu>
 
-    <menu name="For Developers">
-      <item name="Data Basic Types" href="development_tips.html"/>
-      <item name="Data XML and Node Types" href="development_xml_node_details.html"/>
-      <item name="Eclipse Setup" href="development_eclipse_setup.html"/>
-      <item name="Release steps" href="release.html"/>
-    </menu>
+        <menu name="For Users">
+            <item
+                name="Installation"
+                href="user_installation.html" />
+            <item
+                name="Executing a Query"
+                href="user_query.html" />
+            <item
+                name="Running the Test Suite"
+                href="user_running_tests.html" />
+        </menu>
 
-    <menu ref="reports"/>      
-    <menu ref="modules"/>
+        <menu name="For Developers">
+            <item
+                name="Data Basic Types"
+                href="development_tips.html" />
+            <item
+                name="Data XML and Node Types"
+                href="development_xml_node_details.html" />
+            <item
+                name="Eclipse Setup"
+                href="development_eclipse_setup.html" />
+            <item
+                name="Release steps"
+                href="release.html" />
+        </menu>
 
-    <footer>
-      <div class="row-fluid">Apache VXQuery, VXQuery, Apache, the Apache
-        feather logo, and the Apache VXQuery project logo are either
-        registered trademarks or trademarks of The Apache Software
-        Foundation in the United States and other countries.
-        All other marks mentioned may be trademarks or registered
-        trademarks of their respective owners.</div>
-    </footer>
-  </body>
+        <menu ref="reports" />
+        <menu ref="modules" />
+
+        <footer>
+            <div class="row-fluid">Apache VXQuery, VXQuery, Apache, the Apache
+                feather logo, and the Apache VXQuery project logo are either
+                registered trademarks or trademarks of The Apache Software
+                Foundation in the United States and other countries.
+                All other marks mentioned may be trademarks or registered
+                trademarks of their respective owners.
+            </div>
+        </footer>
+    </body>
 </project>
 

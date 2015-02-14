@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -388,7 +389,7 @@ public class VXQuery {
             ncConfig.dataIPAddress = "127.0.0.1";
             ncConfig.datasetIPAddress = "127.0.0.1";
             ncConfig.nodeId = "nc" + (i + 1);
-            ncConfig.ioDevices = "/tmp";
+            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString(); 
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
         }

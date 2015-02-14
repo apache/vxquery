@@ -14,10 +14,16 @@
  */
 package org.apache.vxquery.xtest;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
@@ -38,12 +44,18 @@ public abstract class AbstractTestCaseFactory {
     public TestCase tc;
     public Pattern include;
     public Pattern exclude;
+    public Set<String> previousTestResults;
     public XTestOptions opts;
     public String nextVariable;
     public boolean expectedError;
     public boolean outputFile;
     public int currPathLen;
     public int count;
+
+    static int TEST_NAME_INDEX = 0;
+    static int TEST_RESULT_INDEX = 1;
+    static List<String> PASSING_TESTS = Arrays.asList("EXPECTED_RESULT_GOT_SAME_RESULT",
+            "EXPECTED_ERROR_GOT_SAME_ERROR");
 
     public AbstractTestCaseFactory(XTestOptions opts) {
         System.err.println("opts.catalog: " + opts.catalog);
@@ -58,11 +70,37 @@ public abstract class AbstractTestCaseFactory {
         if (opts.exclude != null) {
             this.exclude = Pattern.compile(opts.exclude);
         }
+        if (opts.previousTestResults != null) {
+            this.previousTestResults = getPreviousTests(opts.previousTestResults);
+        } else {
+            this.previousTestResults = null;
+        }
         try {
             currPathLen = new File(".").getCanonicalPath().length();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static Set<String> getPreviousTests(String previousTestResults) {
+        Set<String> tests = new LinkedHashSet<String>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(previousTestResults));
+            String line;
+            String[] resultRow;
+            while ((line = br.readLine()) != null) {
+                resultRow = line.split(",");
+                if (PASSING_TESTS.contains(resultRow[TEST_RESULT_INDEX].trim())) {
+                    tests.add(resultRow[TEST_NAME_INDEX].trim());
+                }
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return tests;
     }
 
     public int process() throws Exception {
@@ -79,10 +117,21 @@ public abstract class AbstractTestCaseFactory {
                         + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
             }
         });
-        parser.parse(new InputSource(new FileReader(catalog)));
+        FileReader characterStream = new FileReader(catalog);
+        parser.parse(new InputSource(characterStream));
+        characterStream.close();
         return count;
     }
 
+    protected boolean submitTestCase(TestCase tc) {
+        boolean toSubmit = include == null || include.matcher(tc.getXQueryDisplayName()).find();
+        toSubmit = toSubmit && (exclude == null || !exclude.matcher(tc.getXQueryDisplayName()).find());
+        if (previousTestResults != null) {
+            toSubmit = previousTestResults.contains(tc.getXQueryDisplayName());
+        }
+        return toSubmit;
+    }
+    
     protected abstract void submit(TestCase tc);
 
     protected class Handler implements ContentHandler {

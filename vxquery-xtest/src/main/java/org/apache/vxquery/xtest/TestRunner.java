@@ -111,6 +111,7 @@ public class TestRunner {
                         testCase.getSourceFileMap());
                 compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                 JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
+                in.close();
 
                 DynamicContext dCtx = new DynamicContextImpl(compiler.getModule().getModuleContext());
                 spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));

@@ -32,11 +32,27 @@ public class VXQueryTest {
     private TestCase tc;
     private TestRunner tr;
 
-    private static String CATALOG = "VXQueryCatalog.xml";
+    private static String VXQUERY_CATALOG = StringUtils.join(new String[] { "src", "test", "resources",
+            "VXQueryCatalog.xml" }, File.separator);
+    private static String XQTS_CATALOG = StringUtils.join(new String[] { "test-suites", "xqts", "XQTSCatalog.xml" },
+            File.separator);
 
-    private static XTestOptions getOptions() {
+    private static boolean includeXqtsTests() {
+        return new File(XQTS_CATALOG).isFile();
+    }
+
+    private static XTestOptions getVXQueryOptions() {
         XTestOptions opts = new XTestOptions();
-        opts.catalog = StringUtils.join(new String[] { "src", "test", "resources", CATALOG }, File.separator);
+        opts.catalog = VXQUERY_CATALOG;
+        opts.verbose = false;
+        opts.threads = 1;
+        return opts;
+    }
+
+    private static XTestOptions getPreviousTestOptions() {
+        XTestOptions opts = new XTestOptions();
+        opts.catalog = XQTS_CATALOG;
+        opts.previousTestResults = StringUtils.join(new String[] { "results", "xqts.txt" }, File.separator);
         opts.verbose = false;
         opts.threads = 1;
         return opts;
@@ -44,13 +60,19 @@ public class VXQueryTest {
 
     @Parameters
     public static Collection<Object[]> tests() throws Exception {
-        JUnitTestCaseFactory jtcf = new JUnitTestCaseFactory(getOptions());
-        return jtcf.getList();
+        JUnitTestCaseFactory jtcf_vxquery = new JUnitTestCaseFactory(getVXQueryOptions());
+        Collection<Object[]> tests = jtcf_vxquery.getList();
+        if (includeXqtsTests()) {
+            JUnitTestCaseFactory jtcf_previous = new JUnitTestCaseFactory(getPreviousTestOptions());
+            tests.addAll(jtcf_previous.getList());
+        }
+
+        return tests;
     }
 
     public VXQueryTest(TestCase tc) throws Exception {
         this.tc = tc;
-        tr = new TestRunner(getOptions());
+        tr = new TestRunner(getVXQueryOptions());
     }
 
     @Test

@@ -51,9 +51,9 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
         final DataOutput dOutCount = abvsCount.getDataOutput();
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
-        final AddOperation aOp = new AddOperation();
-        final ArithmeticHelper add1 = new ArithmeticHelper(aOp, dCtx);
-        final ArithmeticHelper add2 = new ArithmeticHelper(aOp, dCtx);
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add1 = new ArithmeticHelper(aOpAdd, dCtx);
+        final ArithmeticHelper add2 = new ArithmeticHelper(aOpAdd, dCtx);
         final DivideOperation aOpDivide = new DivideOperation();
         final ArithmeticHelper divide = new ArithmeticHelper(aOpDivide, dCtx);
         final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();

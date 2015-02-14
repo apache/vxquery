@@ -20,14 +20,14 @@
       <title>Function and Operators on Numerics</title>
       <description/>
    </GroupInfo>
-   <test-case name="functions-and-operators-on-numerics-fn:abs" FilePath="Numerics/" Creator="Preston Carman">
+   <test-case name="functions-and-operators-on-numerics-fn_abs" FilePath="Numerics/" Creator="Preston Carman">
       <description>Query for fn:abs with all numeric types.</description>
-      <query name="fn:abs" date="2015-01-05"/>
-      <output-file compare="Text">fn:abs.txt</output-file>
+      <query name="fn_abs" date="2015-01-05"/>
+      <output-file compare="Text">fn_abs.txt</output-file>
    </test-case>
-   <test-case name="functions-and-operators-on-numerics-fn:ceiling" FilePath="Numerics/" Creator="Preston Carman">
+   <test-case name="functions-and-operators-on-numerics-fn_ceiling" FilePath="Numerics/" Creator="Preston Carman">
       <description>Query for fn:ceiling with all numeric types.</description>
-      <query name="fn:ceiling" date="2015-01-05"/>
-      <output-file compare="Text">fn:ceiling.txt</output-file>
+      <query name="fn_ceiling" date="2015-01-05"/>
+      <output-file compare="Text">fn_ceiling.txt</output-file>
    </test-case>
 </test-group>

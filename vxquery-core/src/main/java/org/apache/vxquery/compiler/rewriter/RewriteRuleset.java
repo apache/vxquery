@@ -20,19 +20,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.DelayMaterializationForJoinProbeRule;
-import org.apache.vxquery.compiler.rewriter.rules.InlineNestedVariablesRule;
-import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSingleItemsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
+import org.apache.vxquery.compiler.rewriter.rules.InlineNestedVariablesRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
@@ -43,7 +41,6 @@ import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesR
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedTreatRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
-import org.apache.vxquery.compiler.rewriter.rules.VXQueryExtractCommonOperatorsRule;
 
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;

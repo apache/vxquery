@@ -26,11 +26,9 @@ public class TestCaseFactory extends AbstractTestCaseFactory {
         this.trf = trf;
         this.eSvc = eSvc;
     }
-
+    
     protected void submit(TestCase tc) {
-        boolean toSubmit = include == null || include.matcher(tc.getXQueryDisplayName()).find();
-        toSubmit = toSubmit && (exclude == null || !exclude.matcher(tc.getXQueryDisplayName()).find());
-        if (toSubmit) {
+        if (submitTestCase(tc)) {
             if (opts.verbose) {
                 System.err.println(tc);
             }

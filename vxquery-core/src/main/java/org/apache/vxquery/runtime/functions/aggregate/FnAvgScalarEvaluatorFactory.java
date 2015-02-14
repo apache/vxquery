@@ -55,8 +55,8 @@ public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
-        final AddOperation aOp = new AddOperation();
-        final ArithmeticHelper add = new ArithmeticHelper(aOp, dCtx);
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
         final DivideOperation aOpDivide = new DivideOperation();
         final ArithmeticHelper divide = new ArithmeticHelper(aOpDivide, dCtx);
 

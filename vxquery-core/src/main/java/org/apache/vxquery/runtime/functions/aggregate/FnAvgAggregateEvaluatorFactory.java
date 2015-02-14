@@ -51,8 +51,8 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
         final DataOutput dOutSum = abvsSum.getDataOutput();
         final ArrayBackedValueStorage abvsCount = new ArrayBackedValueStorage();
         final DataOutput dOutCount = abvsCount.getDataOutput();
-        final AddOperation aOp = new AddOperation();
-        final ArithmeticHelper add = new ArithmeticHelper(aOp, dCtx);
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
         final DivideOperation aOpDivide = new DivideOperation();
         final ArithmeticHelper divide = new ArithmeticHelper(aOpDivide, dCtx);
 

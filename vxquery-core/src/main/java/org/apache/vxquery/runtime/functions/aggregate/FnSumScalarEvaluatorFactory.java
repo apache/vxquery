@@ -54,8 +54,8 @@ public class FnSumScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final TaggedValuePointable tvpNext = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
-        final AddOperation aOp = new AddOperation();
-        final ArithmeticHelper add = new ArithmeticHelper(aOp, dCtx);
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
