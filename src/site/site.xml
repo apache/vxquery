@@ -70,7 +70,7 @@ limitations under the License.
         <menu name="For Developers">
             <item
                 name="Data Basic Types"
-                href="development_tips.html" />
+                href="development_basic_data_types.html" />
             <item
                 name="Data XML and Node Types"
                 href="development_xml_node_details.html" />
@@ -80,6 +80,12 @@ limitations under the License.
             <item
                 name="Release steps"
                 href="release.html" />
+            <item
+                name="Update Local Git XQTS Results"
+                href="development_update_xqts_results.html" />
+            <item
+                name="XQuery Benchmarks"
+                href="development_benchmarks.html" />
         </menu>
 
         <menu ref="reports" />

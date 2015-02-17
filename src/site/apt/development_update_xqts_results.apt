@@ -22,11 +22,12 @@ Update the XQTS Results
 * Instructions
 
   * Verify current XQTS results are all passing before updating to the new XQTS test results.
-   The following command should produce all passing results.
-   They can be viewed at {{{file:///tmp/full_report_previous.html}file:///tmp/full_report_previous.html}}.
+  The XQTS should be located in "vxquery-xtest/test-suites/xqts", as explained in the {{{Running the Test Suite}http://vxquery.apache.org/user_running_tests.html}}
+  The following command should produce all passing results.
+  They can be viewed at {{{file:///tmp/previous_report.html}file:///tmp/previous_report.html}}.
 
 ----------------------------------------
-sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -htmlreport /tmp/full_report_previous.html -previous-test-results vxquery-xtest/results/xqts.txt
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -htmlreport /tmp/previous_report.html -previous-test-results vxquery-xtest/results/xqts.txt
 ----------------------------------------
 
   * Remove the old results file.

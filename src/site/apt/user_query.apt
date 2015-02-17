@@ -16,13 +16,22 @@
 Executing a Query
 
 
-* Command
+* Command On *nix Based Systems
 
 ----------------------------------------
 sh ./apache-vxquery-X.Y/vxquery-cli/target/appassembler/bin/vxq
 ----------------------------------------
 
+* Commands On Windows Based Systems
+
+----------------------------------------
+cd apache-vxquery-X.Y/vxquery-cli/target/appassembler/bin
+vxq.bat
+----------------------------------------
+
 * Command Line Options
+
+Command line options for all systems.
 
 ----------------------------------------
 -O N                       : Optimization Level. Default: Full Optimization

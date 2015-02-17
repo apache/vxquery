@@ -387,7 +387,7 @@ public class VXQuery {
             ncConfig.ccPort = 39001;
             ncConfig.clusterNetIPAddress = "127.0.0.1";
             ncConfig.dataIPAddress = "127.0.0.1";
-            ncConfig.datasetIPAddress = "127.0.0.1";
+            ncConfig.resultIPAddress = "127.0.0.1";
             ncConfig.nodeId = "nc" + (i + 1);
             ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString(); 
             ncs[i] = new NodeControllerService(ncConfig);

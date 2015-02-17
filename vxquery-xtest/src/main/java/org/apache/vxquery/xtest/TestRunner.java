@@ -88,7 +88,7 @@ public class TestRunner {
         ncConfig1.ccPort = 39001;
         ncConfig1.clusterNetIPAddress = "127.0.0.1";
         ncConfig1.dataIPAddress = "127.0.0.1";
-        ncConfig1.datasetIPAddress = "127.0.0.1";
+        ncConfig1.resultIPAddress = "127.0.0.1";
         ncConfig1.nodeId = "nc1";
         nc1 = new NodeControllerService(ncConfig1);
         nc1.start();
