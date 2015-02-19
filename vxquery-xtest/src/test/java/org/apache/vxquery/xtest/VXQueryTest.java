@@ -22,6 +22,8 @@ import java.io.File;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -75,9 +77,13 @@ public class VXQueryTest {
         tr = new TestRunner(getVXQueryOptions());
     }
 
+    @Before
+    public void beforeTest() throws Exception {
+        tr.open();
+    }
+
     @Test
     public void test() throws Exception {
-        tr.open();
         TestCaseResult result = tr.run(tc);
         switch (result.state) {
             case EXPECTED_ERROR_GOT_DIFFERENT_ERROR:
@@ -94,6 +100,11 @@ public class VXQueryTest {
             case NO_RESULT_FILE:
                 break;
         }
+    }
+
+    @After
+    public void afterTest() throws Exception {
         tr.close();
     }
+
 }

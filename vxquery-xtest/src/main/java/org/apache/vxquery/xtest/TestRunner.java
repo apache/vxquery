@@ -145,10 +145,20 @@ public class TestRunner {
                 }
                 throw e;
             }
-        } catch (SystemException e) {
-            res.error = e;
         } catch (Throwable e) {
-            res.error = e;
+            // Check for nested SystemExceptions.
+            Throwable error = e;
+            while (error != null) {
+                if (error instanceof SystemException) {
+                    res.error = error;
+                    break;
+                }
+                error = error.getCause();
+            }
+            // Default
+            if (res.error == null) {
+                res.error = e;
+            }
         } finally {
             try {
                 res.compare();
