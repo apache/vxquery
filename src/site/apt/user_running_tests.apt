@@ -24,7 +24,7 @@ sh ./vxquery/vxquery-xtest/target/appassembler/bin/xtest
 
 * Command On Windows Based Systems
 
-First navigate to "apache-vxquery-X.Y/vxquery-cli/target/appassembler/bin" and then run the following file.
+  First navigate to "apache-vxquery-X.Y/vxquery-cli/target/appassembler/bin" and then run the following file.
 
 ----------------------------------------
 xtest.bat
@@ -60,17 +60,17 @@ JAVA_OPTS="-Xmx1024m -Djava.util.logging.config.file=/path/to/logging.properties
 
   * VXQuery Test Suite
 
-  The VXQuery test suite focuses on parallel processing tests used in our weather benchmark.
+    The VXQuery test suite focuses on parallel processing tests used in our weather benchmark.
   
 ----------------------------------------
 sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/src/test/resources/VXQueryCatalog.xml -htmlreport /tmp/full_report.html
 ----------------------------------------
   
   * XQTS (XQuery Test Suite)
-  To run the complete XQTS on VXQuery.
+    To run the complete XQTS on VXQuery.
   
     * Create a folder to hold the XQTS. 
-    If you use "vxquery-xtest/test-suite/xqts", then maven will utilize the XQTS to verify VXQuery's passing functions during the build process.
+      If you use "vxquery-xtest/test-suite/xqts", then maven will utilize the XQTS to verify VXQuery's passing functions during the build process.
     
 ----------------------------------------
 $ mkdir -p vxquery-xtest/test-suite
@@ -103,11 +103,11 @@ sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-sui
     * Add JAVA_OPTS for additional java parameters.
 
   * XQTS (XQuery Test Suite) Option 2
-  The following command will run the XQTS for test that are known to pass in VXQuery.
-  The command is intend for developer to check their build and ensure all previous test continue to pass.
-  All the tests should pass.
+    The following command will run the XQTS for test that are known to pass in VXQuery.
+    The command is intend for developer to check their build and ensure all previous test continue to pass.
+    All the tests should pass.
 
-     * run the tests, and
+    * run the tests, and
 
 ----------------------------------------
 sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suite/xqts/XQTSCatalog.xml -htmlreport /tmp/previous_report.html  -previous-test-results vxquery-xtest/results/xqts.txt

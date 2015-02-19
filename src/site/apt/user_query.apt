@@ -31,7 +31,7 @@ vxq.bat
 
 * Command Line Options
 
-Command line options for all systems.
+  Command line options for all systems.
 
 ----------------------------------------
 -O N                       : Optimization Level. Default: Full Optimization
