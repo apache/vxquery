@@ -169,7 +169,7 @@ public class XMLQueryCompiler {
 
             @Override
             public boolean canBeNull(Object type) {
-                throw new NotImplementedException("NullableTypeComputer is not implented (canBeNull)");
+                return false;
             }
 
             @Override
