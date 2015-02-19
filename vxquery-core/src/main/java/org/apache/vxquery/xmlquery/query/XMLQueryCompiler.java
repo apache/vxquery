@@ -164,17 +164,17 @@ public class XMLQueryCompiler {
         builder.setNullableTypeComputer(new INullableTypeComputer() {
             @Override
             public Object makeNullableType(Object type) throws AlgebricksException {
-                throw new NotImplementedException("NullableTypeComputer is not implented");
+                throw new NotImplementedException("NullableTypeComputer is not implented (makeNullableType)");
             }
 
             @Override
             public boolean canBeNull(Object type) {
-                throw new NotImplementedException("NullableTypeComputer is not implented");
+                throw new NotImplementedException("NullableTypeComputer is not implented (canBeNull)");
             }
 
             @Override
             public Object getNonOptionalType(Object type) {
-                throw new NotImplementedException("NullableTypeComputer is not implented");
+                throw new NotImplementedException("NullableTypeComputer is not implented (getNonOptionalType)");
             }
         });
         builder.setNullWriterFactory(new VXQueryNullWriterFactory());

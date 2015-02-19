@@ -188,6 +188,7 @@
                     <excludes>
                         <exclude>**/ExpectedTestResults/**/*</exclude>
                         <exclude>**/xqts.txt</exclude>
+                        <exclude>test-suites/**/*</exclude>
                     </excludes>
                     <numUnapprovedLicenses>0</numUnapprovedLicenses>
                     <maxmemory>2g</maxmemory>
