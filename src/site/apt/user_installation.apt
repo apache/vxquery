@@ -17,7 +17,7 @@ Installation
 
 * Requirements
 
-  * Apache VXQuery\x99 source archive (apache-vxquery-X.Y.zip)
+  * Apache VXQuery\x99 source archive (apache-vxquery-X.Y-source-release.zip)
 
   * JDK >= 1.7
 
@@ -26,7 +26,7 @@ Installation
 * Steps
 
 --- 
-$ unzip apache-vxquery-X.Y.zip
+$ unzip apache-vxquery-X.Y-source-release.zip
 $ cd apache-vxquery-X.Y
 $ mvn package -DskipTests
 $ cd ..
