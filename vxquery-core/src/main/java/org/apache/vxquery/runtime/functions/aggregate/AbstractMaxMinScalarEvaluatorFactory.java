@@ -47,7 +47,7 @@ public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTagge
             throws AlgebricksException {
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        final AbstractValueComparisonOperation aOp = createValueComparisonOperation();
+        final AbstractValueComparisonOperation aOpComparison = createValueComparisonOperation();
         final TaggedValuePointable tvpReturn = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpNext = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
@@ -72,7 +72,8 @@ public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTagge
                                 // Init.
                                 tvpReturn.set(tvpNext);
                             }
-                            if (FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvpNext, tvpReturn, dCtx, tp1, tp2)) {
+                            if (FunctionHelper.transformThenCompareMinMaxTaggedValues(aOpComparison, tvpNext,
+                                    tvpReturn, dCtx, tp1, tp2)) {
                                 tvpReturn.set(tvpNext);
                             }
                         }

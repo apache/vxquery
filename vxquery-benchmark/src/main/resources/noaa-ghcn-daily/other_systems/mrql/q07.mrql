@@ -17,7 +17,7 @@
 avg(
     select (toInt(text(rtmax.value))-toInt(text(rtmin.value)))
     from rtmax in source(xml, args[0], {"data"}),
-        rtmin in source(xml, args[0], {"data"})
+        rtmin in source(xml, args[2], {"data"})
     where text(rtmax.date) = text(rtmin.date)
         and text(rtmax.station) = text(rtmin.station)
         and text(rtmax.dataType) = "TMAX"

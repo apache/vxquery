@@ -32,6 +32,8 @@ fi
 DATASET=${1}
 NODES=${2}
 REPEAT=1
+DATA_FILES=${NODES}
+#DATA_FILES=8
 
 # Start Hadoop
 sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh
@@ -44,6 +46,13 @@ hadoop fs -ls
 hadoop fs -mkdir ${DATASET}/sensors
 hadoop fs -mkdir ${DATASET}/stations
 hadoop fs -ls ${DATASET}
+
+# Prepare hadoop file system 2
+hadoop fs -mkdir ${DATASET}2
+hadoop fs -ls 
+hadoop fs -mkdir ${DATASET}2/sensors
+hadoop fs -mkdir ${DATASET}2/stations
+hadoop fs -ls ${DATASET}2
 
 hadoop balancer
 
@@ -58,7 +67,8 @@ done
 
 
 # Start test
-sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET}
+sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh \
+        vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET}
 
 
 # Stop Hadoop

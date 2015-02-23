@@ -88,7 +88,7 @@ public class TestRunner {
         ncConfig1.ccPort = 39001;
         ncConfig1.clusterNetIPAddress = "127.0.0.1";
         ncConfig1.dataIPAddress = "127.0.0.1";
-        ncConfig1.datasetIPAddress = "127.0.0.1";
+        ncConfig1.resultIPAddress = "127.0.0.1";
         ncConfig1.nodeId = "nc1";
         nc1 = new NodeControllerService(ncConfig1);
         nc1.start();
@@ -111,6 +111,7 @@ public class TestRunner {
                         testCase.getSourceFileMap());
                 compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                 JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
+                in.close();
 
                 DynamicContext dCtx = new DynamicContextImpl(compiler.getModule().getModuleContext());
                 spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
@@ -144,10 +145,20 @@ public class TestRunner {
                 }
                 throw e;
             }
-        } catch (SystemException e) {
-            res.error = e;
         } catch (Throwable e) {
-            res.error = e;
+            // Check for nested SystemExceptions.
+            Throwable error = e;
+            while (error != null) {
+                if (error instanceof SystemException) {
+                    res.error = error;
+                    break;
+                }
+                error = error.getCause();
+            }
+            // Default
+            if (res.error == null) {
+                res.error = e;
+            }
         } finally {
             try {
                 res.compare();

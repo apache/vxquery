@@ -47,7 +47,7 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
     }
 
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
-        final AbstractValueComparisonOperation aOp = createValueComparisonOperation();
+        final AbstractValueComparisonOperation aOpComparison = createValueComparisonOperation();
         final TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TypedPointables tp1 = new TypedPointables();
@@ -92,7 +92,9 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
                     if (count != 0) {
                         tvp2.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                     }
-                    if (count == 0 || FunctionHelper.transformThenCompareMinMaxTaggedValues(aOp, tvp1, tvp2, dCtx, tp1, tp2)) {
+                    if (count == 0
+                            || FunctionHelper.transformThenCompareMinMaxTaggedValues(aOpComparison, tvp1, tvp2, dCtx,
+                                    tp1, tp2)) {
                         try {
                             abvs.reset();
                             dOut.write(tvp1.getByteArray(), tvp1.getStartOffset(), tvp1.getLength());

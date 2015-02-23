@@ -90,11 +90,11 @@ public class XMLQueryCompiler {
     private String[] nodeList;
 
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize) {
-        this(listener, nodeList, frameSize, -1, -1);
+        this(listener, nodeList, frameSize, -1, -1, -1);
     }
 
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize,
-            int availableProcessors, int joinHashSize) {
+            int availableProcessors, long joinHashSize, long maximumDataSize) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         this.frameSize = frameSize;
         this.nodeList = nodeList;
@@ -113,8 +113,16 @@ public class XMLQueryCompiler {
                 });
         builder.getPhysicalOptimizationConfig().setFrameSize(this.frameSize);
         if (joinHashSize > 0) {
-            builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash(joinHashSize);
+            builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash((int) (joinHashSize / this.frameSize));
         }
+        if (maximumDataSize > 0) {
+            builder.getPhysicalOptimizationConfig().setMaxFramesLeftInputHybridHash(
+                    (int) (maximumDataSize / this.frameSize));
+        }
+
+        builder.getPhysicalOptimizationConfig().setMaxFramesLeftInputHybridHash(
+                (int) (60L * 1024 * 1048576 / this.frameSize));
+
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {
@@ -156,7 +164,17 @@ public class XMLQueryCompiler {
         builder.setNullableTypeComputer(new INullableTypeComputer() {
             @Override
             public Object makeNullableType(Object type) throws AlgebricksException {
-                throw new NotImplementedException("NullableTypeComputer is not implented");
+                throw new NotImplementedException("NullableTypeComputer is not implented (makeNullableType)");
+            }
+
+            @Override
+            public boolean canBeNull(Object type) {
+                return false;
+            }
+
+            @Override
+            public Object getNonOptionalType(Object type) {
+                throw new NotImplementedException("NullableTypeComputer is not implented (getNonOptionalType)");
             }
         });
         builder.setNullWriterFactory(new VXQueryNullWriterFactory());

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -78,7 +79,7 @@ public class VXQuery {
     private IHyracksDataset hds;
 
     private ResultSetId resultSetId;
-    private static List<String> timingMessages;
+    private static List<String> timingMessages = new ArrayList<String>();
     private static long sumTiming;
     private static long sumSquaredTiming;
     private static long minTiming = Long.MAX_VALUE;
@@ -92,7 +93,6 @@ public class VXQuery {
      */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
-        timingMessages = new ArrayList<String>();
     }
 
     /**
@@ -261,7 +261,7 @@ public class VXQuery {
 
             start = opts.timing ? new Date() : null;
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize,
-                    opts.availableProcessors, opts.joinHashSize);
+                    opts.availableProcessors, opts.joinHashSize, opts.maximumDataSize);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                     resultSetId, null);
@@ -387,8 +387,9 @@ public class VXQuery {
             ncConfig.ccPort = 39001;
             ncConfig.clusterNetIPAddress = "127.0.0.1";
             ncConfig.dataIPAddress = "127.0.0.1";
-            ncConfig.datasetIPAddress = "127.0.0.1";
+            ncConfig.resultIPAddress = "127.0.0.1";
             ncConfig.nodeId = "nc" + (i + 1);
+            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString(); 
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
         }
@@ -446,11 +447,14 @@ public class VXQuery {
         @Option(name = "-local-node-controllers", usage = "Number of local node controllers (default 1)")
         private int localNodeControllers = 1;
 
-        @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65536)")
+        @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65,536)")
         private int frameSize = 65536;
 
-        @Option(name = "-join-hash-size", usage = "Join hash size in bytes.")
-        private int joinHashSize = -1;
+        @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default 67,108,864)")
+        private long joinHashSize = -1;
+
+        @Option(name = "-maximum-data-size", usage = "Maximum possible data size in bytes. (default 150,323,855,000)")
+        private long maximumDataSize = -1;
 
         @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
         private int bufferSize = -1;

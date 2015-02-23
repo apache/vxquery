@@ -17,5 +17,6 @@
 
 = XQTS Text Results =
 
-The xqts.txt file holds the results from running the XQTS tests. The results
-have been sorted through the linux sort command.
+The xqts.txt file holds the sorted results from running the XQTS tests. 
+
+Check the Apache VXQuery website for instructions on how to update this file.

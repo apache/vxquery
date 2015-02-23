@@ -17,6 +17,6 @@
 count(
     select (rtmin)
     from rtmin in source(xml, args[0], {"data"})
-    where text(r.dataType) = "TMIN"
+    where text(rtmin.dataType) = "TMIN"
 )
 ;

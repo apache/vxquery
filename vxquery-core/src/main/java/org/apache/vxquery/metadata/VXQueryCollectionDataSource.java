@@ -113,4 +113,8 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
         return childSeq;
     }
 
+    @Override
+    public String toString() {
+        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + "]";
+    }
 }

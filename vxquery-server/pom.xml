@@ -78,7 +78,6 @@
                 <executions>
                     <execution>
                         <id>copy-scripts</id>
-            <!-- here the phase you need -->
                         <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -88,6 +87,21 @@
                             <resources>
                                 <resource>
                                     <directory>src/main/resources/scripts</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-conf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/appassembler/conf</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/conf</directory>
                                 </resource>
                             </resources>
                         </configuration>

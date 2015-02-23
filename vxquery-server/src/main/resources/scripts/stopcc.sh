@@ -21,6 +21,10 @@ hostname
 
 USER=$1
 
+#Import cluster properties
+MYDIR="$(dirname -- $0)"
+. ${MYDIR}/../conf/cluster.properties
+
 # Kill process
 PID=`ps -ef|grep ${USER}|grep java|grep 'Dapp.name=vxquerycc'|awk '{print $2}'`
 

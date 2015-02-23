@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
+import org.apache.vxquery.datamodel.builders.atomic.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AbstractNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.CommentNodeBuilder;
@@ -59,6 +60,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     private final DocumentNodeBuilder docb;
     private final PINodeBuilder pinb;
     private final TextNodeBuilder tnb;
+    private final UTF8StringBuilder utf8b;
     private final List<ElementNodeBuilder> enbStack;
     private final List<ElementNodeBuilder> freeENBList;
 
@@ -78,16 +80,14 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     // Basic tracking and setting variables
     private final boolean attachTypes;
-    private final StringBuilder buffer;
     private final boolean createNodeIds;
     private int depth;
-    private final ArrayBackedValueStorage docABVS;
-    private final ArrayBackedValueStorage elementABVS;
+    private final ArrayBackedValueStorage resultABVS;
     private boolean pendingText;
     private int nodeIdCounter;
     private final ITreeNodeIdProvider nodeIdProvider;
-    private final ArrayBackedValueStorage resultABVS;
     private final ArrayBackedValueStorage tempABVS;
+    private final ArrayBackedValueStorage textABVS;
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider) {
         // XML node builders
@@ -97,25 +97,24 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         docb = new DocumentNodeBuilder();
         pinb = new PINodeBuilder();
         tnb = new TextNodeBuilder();
+        utf8b = new UTF8StringBuilder();
         enbStack = new ArrayList<ElementNodeBuilder>();
         freeENBList = new ArrayList<ElementNodeBuilder>();
-        
+
         // Element writing and path step variables
         skipping = true;
         tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-            
+
         // Basic tracking and setting variables
         this.attachTypes = attachTypes;
-        buffer = new StringBuilder();
         createNodeIds = nodeIdProvider != null;
         depth = 0;
-        docABVS = new ArrayBackedValueStorage();
-        elementABVS = new ArrayBackedValueStorage();
+        resultABVS = new ArrayBackedValueStorage();
         pendingText = false;
         nodeIdCounter = 0;
         this.nodeIdProvider = nodeIdProvider;
-        resultABVS = new ArrayBackedValueStorage();
         tempABVS = new ArrayBackedValueStorage();
+        textABVS = new ArrayBackedValueStorage();
     }
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, ByteBuffer frame,
@@ -141,7 +140,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             ElementType eType = (ElementType) nodeType;
             NameTest nameTest = eType.getNameTest();
             childUri[index] = getStringFromBytes(nameTest.getUri());
-            childLocalName[index] = getStringFromBytes(nameTest.getLocalName());;
+            childLocalName[index] = getStringFromBytes(nameTest.getLocalName());
             ++index;
         }
     }
@@ -157,7 +156,12 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         if (skipping) {
             return;
         }
-        buffer.append(ch, start, length);
+        try {
+            utf8b.appendCharArray(ch, start, length);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SAXException(e);
+        }
         pendingText = true;
     }
 
@@ -255,12 +259,18 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             skipping = false;
         }
         db.reset();
-        docABVS.reset();
+        try {
+            textABVS.reset();
+            utf8b.reset(textABVS);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
         if (skipping) {
             return;
         }
         try {
-            docb.reset(docABVS);
+            resultABVS.reset();
+            docb.reset(resultABVS);
             if (createNodeIds) {
                 docb.setLocalNodeId(nodeIdCounter++);
             }
@@ -363,15 +373,15 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         try {
             flushText();
             startChildInParent(cnb);
-            buffer.append(ch, start, length);
-            tempABVS.reset();
-            tempABVS.getDataOutput().writeUTF(buffer.toString());
             if (createNodeIds) {
                 cnb.setLocalNodeId(nodeIdCounter++);
             }
-            cnb.setValue(tempABVS);
+            utf8b.appendCharArray(ch, start, length);
+            utf8b.finish();
+            cnb.setValue(textABVS);
             endChildInParent(cnb);
-            buffer.delete(0, buffer.length());
+            textABVS.reset();
+            utf8b.reset(textABVS);
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
@@ -381,14 +391,14 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     private void flushText() throws IOException {
         if (pendingText) {
             peekENBStackTop().startChild(tnb);
-            tempABVS.reset();
-            tempABVS.getDataOutput().writeUTF(buffer.toString());
             if (createNodeIds) {
                 tnb.setLocalNodeId(nodeIdCounter++);
             }
-            tnb.setValue(tempABVS);
+            utf8b.finish();
+            tnb.setValue(textABVS);
             peekENBStackTop().endChild(tnb);
-            buffer.delete(0, buffer.length());
+            textABVS.reset();
+            utf8b.reset(textABVS);
             pendingText = false;
         }
     }
@@ -418,8 +428,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     public void writeElement() throws IOException {
-        resultABVS.reset();
-        DataOutput out = resultABVS.getDataOutput();
+        tempABVS.reset();
+        DataOutput out = tempABVS.getDataOutput();
         out.write(ValueTag.NODE_TREE_TAG);
         byte header = NodeTreePointable.HEADER_DICTIONARY_EXISTS_MASK;
         if (attachTypes) {
@@ -432,13 +442,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         if (createNodeIds) {
             out.writeInt(nodeIdProvider.getId());
         }
-        db.write(resultABVS);
-        if (subElement == null) {
-            out.write(docABVS.getByteArray(), docABVS.getStartOffset(), docABVS.getLength());
-        } else {
-            out.write(elementABVS.getByteArray(), elementABVS.getStartOffset(), elementABVS.getLength());
-        }
-        tvp.set(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
+        db.writeFromCache(tempABVS);
+        out.write(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
+        tvp.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
         addNodeToTuple(tvp, tupleIndex);
         skipping = true;
     }
@@ -457,8 +463,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         if (createNodeIds) {
             out.writeInt(nodeIdProvider.getId());
         }
-        db.write(abvs);
-        out.write(docABVS.getByteArray(), docABVS.getStartOffset(), docABVS.getLength());
+        db.writeFromCache(abvs);
+        out.write(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
     }
 
     private ElementNodeBuilder createENB() {
@@ -482,8 +488,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     private void startChildInParent(AbstractNodeBuilder anb, boolean startNewElement) throws IOException {
         if (startNewElement) {
-            elementABVS.reset();
-            anb.reset(elementABVS);
+            resultABVS.reset();
+            anb.reset(resultABVS);
         } else if (enbStack.isEmpty()) {
             docb.startChild(anb);
         } else {

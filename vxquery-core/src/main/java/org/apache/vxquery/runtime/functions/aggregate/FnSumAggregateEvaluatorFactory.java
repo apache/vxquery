@@ -20,13 +20,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluator;
@@ -46,9 +45,8 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
-        final AddOperation aOp = new AddOperation();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
 
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -80,7 +78,7 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp = args[0];
-                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum, tp1, tp2);
+                add.compute(tvp, tvpSum, tvpSum);
             }
         };
     }

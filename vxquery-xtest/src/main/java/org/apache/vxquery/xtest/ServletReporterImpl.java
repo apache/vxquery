@@ -51,6 +51,6 @@ public class ServletReporterImpl extends AbstractHandler implements ResultReport
 
     @Override
     public void close() {
-
+        reporter.close();
     }
 }

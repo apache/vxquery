@@ -35,6 +35,9 @@ public class XTestOptions {
     @Option(name = "-exclude", required = false, usage = "Exclude filter regular expression")
     String exclude;
 
+    @Option(name = "-previous-test-results", required = false, usage = "File path to previous test results (text report output file)")
+    String previousTestResults;
+
     @Option(name = "-v", required = false, usage = "Verbose")
     boolean verbose;
 

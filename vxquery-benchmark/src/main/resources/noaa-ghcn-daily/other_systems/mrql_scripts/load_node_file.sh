@@ -38,10 +38,12 @@ echo "Loading ${NODES} node ${DATASET} data file in to cluster."
 cp saved/backups/mr/${DATASET}_sensors_${NODES}.xml.gz disk1/hadoop/
 gunzip disk1/hadoop/${DATASET}_sensors_${NODES}.xml.gz
 hadoop fs -copyFromLocal disk1/hadoop/${DATASET}_sensors_${NODES}.xml ${DATASET}/sensors
+hadoop fs -cp ${DATASET}/sensors/${DATASET}_sensors_${NODES}.xml ${DATASET}2/sensors/${DATASET}_sensors_${NODES}.xml 
 rm -f disk1/hadoop/${DATASET}_sensors_${NODES}.xml
 
 # Add each station block
 cp saved/backups/mr/${DATASET}_stations_${NODES}.xml.gz disk1/hadoop/
 gunzip disk1/hadoop/${DATASET}_stations_${NODES}.xml.gz
 hadoop fs -copyFromLocal disk1/hadoop/${DATASET}_stations_${NODES}.xml ${DATASET}/stations
+hadoop fs -cp ${DATASET}/stations/${DATASET}_stations_${NODES}.xml ${DATASET}2/stations/${DATASET}_stations_${NODES}.xml 
 rm -f disk1/hadoop/${DATASET}_stations_${NODES}.xml

@@ -101,7 +101,6 @@ public class HTMLFileReporterImpl implements ResultReporter {
                 writeHTML(out, createResultDir(reportFile));
                 out.flush();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

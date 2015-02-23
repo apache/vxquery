@@ -118,7 +118,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     public Pair<IPushRuntimeFactory, AlgebricksPartitionConstraint> getWriteFileRuntime(IDataSink sink,
             int[] printColumns, IPrinterFactory[] printerFactories, RecordDescriptor inputDesc)
             throws AlgebricksException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -126,15 +126,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             IDataSource<String> dataSource, IOperatorSchema propagatedSchema, List<LogicalVariable> keys,
             LogicalVariable payLoadVar, List<LogicalVariable> additionalNonKeyFields, JobGenContext context,
             JobSpecification jobSpec) throws AlgebricksException {
-        return null;
-    }
-
-    @Override
-    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getInsertRuntime(IDataSource<String> dataSource,
-            IOperatorSchema propagatedSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
-            LogicalVariable payLoadVar, List<LogicalVariable> additionalNonKeyFields, RecordDescriptor recordDesc,
-            JobGenContext context, JobSpecification jobSpec) throws AlgebricksException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -142,17 +134,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             IOperatorSchema propagatedSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
             LogicalVariable payLoadVar, List<LogicalVariable> additionalNonKeyFields, RecordDescriptor recordDesc,
             JobGenContext context, JobSpecification jobSpec) throws AlgebricksException {
-        return null;
-    }
-
-    @Override
-    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getIndexInsertRuntime(
-            IDataSourceIndex<String, String> dataSource, IOperatorSchema propagatedSchema,
-            IOperatorSchema[] inputSchemas, IVariableTypeEnvironment typeEnv, List<LogicalVariable> primaryKeys,
-            List<LogicalVariable> secondaryKeys, List<LogicalVariable> additionalNonKeyFields,
-            ILogicalExpression filterExpr, RecordDescriptor recordDesc, JobGenContext context, JobSpecification spec)
-            throws AlgebricksException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -162,7 +144,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             List<LogicalVariable> secondaryKeys, List<LogicalVariable> additionalNonKeyFields,
             ILogicalExpression filterExpr, RecordDescriptor recordDesc, JobGenContext context, JobSpecification spec)
             throws AlgebricksException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -206,6 +188,33 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         }
 
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(resultWriter, null);
+    }
+
+    @Override
+    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getInsertRuntime(IDataSource<String> dataSource,
+            IOperatorSchema propagatedSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
+            LogicalVariable payLoadVar, List<LogicalVariable> additionalNonKeyFields, RecordDescriptor recordDesc,
+            JobGenContext context, JobSpecification jobSpec, boolean bulkload) throws AlgebricksException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getIndexInsertRuntime(
+            IDataSourceIndex<String, String> dataSource, IOperatorSchema propagatedSchema,
+            IOperatorSchema[] inputSchemas, IVariableTypeEnvironment typeEnv, List<LogicalVariable> primaryKeys,
+            List<LogicalVariable> secondaryKeys, List<LogicalVariable> additionalNonKeyFields,
+            ILogicalExpression filterExpr, RecordDescriptor recordDesc, JobGenContext context, JobSpecification spec,
+            boolean bulkload) throws AlgebricksException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getTokenizerRuntime(
+            IDataSourceIndex<String, String> dataSource, IOperatorSchema propagatedSchema,
+            IOperatorSchema[] inputSchemas, IVariableTypeEnvironment typeEnv, List<LogicalVariable> primaryKeys,
+            List<LogicalVariable> secondaryKeys, ILogicalExpression filterExpr, RecordDescriptor recordDesc,
+            JobGenContext context, JobSpecification spec, boolean bulkload) throws AlgebricksException {
+        throw new UnsupportedOperationException();
     }
 
 }

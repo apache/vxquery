@@ -25,6 +25,10 @@ CCHOST=$3
 CCPORT=$4
 J_OPTS=$5
 
+#Import cluster properties
+MYDIR="$(dirname -- $0)"
+. ${MYDIR}/../conf/cluster.properties
+
 # Set JAVA_HOME
 export JAVA_HOME=$JAVA_HOME
 
@@ -35,18 +39,29 @@ then
     export JAVA_OPTS
 fi
 
+# java opts added parameters Server cluster.properties
+if [ ! -z "${NCJAVA_OPTS}" ]
+then
+    JAVA_OPTS="${JAVA_OPTS} ${NCJAVA_OPTS}"
+    export JAVA_OPTS
+fi
+
 VXQUERY_HOME=`pwd`
-NCLOGS_DIR=${VXQUERY_HOME}/logs
 
 # logs dir
 mkdir -p $NCLOGS_DIR
 
 # Set up the options for the cc.
 NC_OPTIONS=" -cc-host ${CCHOST} -cluster-net-ip-address ${IPADDR}  -data-ip-address ${IPADDR} -result-ip-address ${IPADDR}  -node-id ${NODEID} "
-if [ ! -z "${CCPORT}" ]
-then
+[ "${CCPORT}" ] {
 	NC_OPTIONS=" ${NC_OPTIONS} -cc-port ${CCPORT} "
-fi
+}
+
+[ "${NCOPTS}" ] {
+    NC_OPTIONS=" ${NC_OPTIONS} ${NCOPTS} "
+}
+
+echo "${JAVA_OPTS}" &> ${NCLOGS_DIR}/nc.log
 
 
 # Launch hyracks nc

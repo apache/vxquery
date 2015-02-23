@@ -20,20 +20,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.InlineNestedVariablesRule;
-import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSingleItemsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
+import org.apache.vxquery.compiler.rewriter.rules.InlineNestedVariablesRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
-import org.apache.vxquery.compiler.rewriter.rules.PushMapOperatorDownThroughProductRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
@@ -64,6 +62,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRul
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceProjectsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PullSelectOutOfEqJoin;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushMapOperatorDownThroughProductRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectIntoDataSourceScanRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectDownRule;
@@ -260,6 +259,7 @@ public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildPhysicalRewritesTopLevelRuleCollection() {
         List<IAlgebraicRewriteRule> physicalPlanRewrites = new LinkedList<IAlgebraicRewriteRule>();
         physicalPlanRewrites.add(new CopyLimitDownRule());
+        physicalPlanRewrites.add(new SetExecutionModeRule());
         return physicalPlanRewrites;
     }
 
@@ -269,10 +269,13 @@ public class RewriteRuleset {
         prepareForJobGenRewrites.add(new IsolateHyracksOperatorsRule(
                 HeuristicOptimizer.hyraxOperatorsBelowWhichJobGenIsDisabled));
         prepareForJobGenRewrites.add(new ExtractCommonOperatorsRule());
+//        prepareForJobGenRewrites.add(new VXQueryExtractCommonOperatorsRule());
+//        prepareForJobGenRewrites.add(new DelayMaterializationForJoinProbeRule());
         // Re-infer all types, so that, e.g., the effect of not-is-null is
         // propagated.
         prepareForJobGenRewrites.add(new PushProjectIntoDataSourceScanRule());
         prepareForJobGenRewrites.add(new ReinferAllTypesRule());
+        prepareForJobGenRewrites.add(new SetExecutionModeRule());
         return prepareForJobGenRewrites;
     }
 }

@@ -21,7 +21,6 @@ import java.io.DataOutput;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -30,7 +29,7 @@ import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.arithmetic.DivideOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -56,10 +55,10 @@ public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
-        final AddOperation aOp = new AddOperation();
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
         final DivideOperation aOpDivide = new DivideOperation();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
+        final ArithmeticHelper divide = new ArithmeticHelper(aOpDivide, dCtx);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -78,7 +77,7 @@ public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                                 // Init.
                                 tvpSum.set(tvpNext);
                             } else {
-                                FunctionHelper.arithmeticOperation(aOp, dCtx, tvpNext, tvpSum, tvpSum, tp1, tp2);
+                                add.compute(tvpNext, tvpSum, tvpSum);
                             }
                         }
 
@@ -92,7 +91,7 @@ public class FnAvgScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                             throw new SystemException(ErrorCode.SYSE0001, e);
                         }
 
-                        FunctionHelper.arithmeticOperation(aOpDivide, dCtx, tvpSum, tvpCount, tvpSum, tp1, tp2);
+                        divide.compute(tvpSum, tvpCount, tvpSum);
                         result.set(tvpSum);
                     }
                 } else {

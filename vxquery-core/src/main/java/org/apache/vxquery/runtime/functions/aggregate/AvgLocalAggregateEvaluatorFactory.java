@@ -19,7 +19,6 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import java.io.DataOutput;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
@@ -27,7 +26,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluator;
@@ -52,9 +51,8 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
         final DataOutput dOutSum = abvsSum.getDataOutput();
         final ArrayBackedValueStorage abvsSeq = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
-        final AddOperation aOp = new AddOperation();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
+        final AddOperation aOpAdd = new AddOperation();
+        final ArithmeticHelper add = new ArithmeticHelper(aOpAdd, dCtx);
         
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             long count;
@@ -106,7 +104,7 @@ public class AvgLocalAggregateEvaluatorFactory extends AbstractTaggedValueArgume
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
                 TaggedValuePointable tvp = args[0];
-                FunctionHelper.arithmeticOperation(aOp, dCtx, tvp, tvpSum, tvpSum, tp1, tp2);
+                add.compute(tvp, tvpSum, tvpSum);
                 count++;
             }
         };

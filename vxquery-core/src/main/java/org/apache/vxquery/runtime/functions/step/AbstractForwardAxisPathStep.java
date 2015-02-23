@@ -33,16 +33,16 @@ import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public abstract class AbstractChildPathStep {
+public abstract class AbstractForwardAxisPathStep {
     protected final DynamicContext dCtx;
     protected final PointablePool pp;
-    private final ArrayBackedValueStorage nodeAbvs = new ArrayBackedValueStorage();
     protected final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
+    private final ArrayBackedValueStorage nodeAbvs = new ArrayBackedValueStorage();
     private final DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
     private final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
     private final NodeSubTreeBuilder nstb = new NodeSubTreeBuilder();
 
-    public AbstractChildPathStep(IHyracksTaskContext ctx, PointablePool pp) {
+    public AbstractForwardAxisPathStep(IHyracksTaskContext ctx, PointablePool pp) {
         dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         this.pp = pp;
     }

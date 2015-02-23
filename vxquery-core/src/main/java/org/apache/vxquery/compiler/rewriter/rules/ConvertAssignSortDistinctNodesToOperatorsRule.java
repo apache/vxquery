@@ -203,7 +203,6 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         List<Pair<IOrder, Mutable<ILogicalExpression>>> orderArgs = new ArrayList<Pair<IOrder, Mutable<ILogicalExpression>>>();
         orderArgs.add(new Pair<IOrder, Mutable<ILogicalExpression>>(OrderOperator.ASC_ORDER, variableRef));
         OrderOperator oo = new OrderOperator(orderArgs);
-//        oo.setExecutionMode(AbstractLogicalOperator.ExecutionMode.LOCAL);
         return oo;
     }
 

@@ -70,9 +70,9 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
         // TODO double check that precision is not being lost.
         int diff = p - op;
         if (diff > 0) {
-            ov = Math.round(ov / Math.pow(10, diff));
+            ov = (long) (ov * Math.pow(10, diff));
         } else if (diff < 0) {
-            v = Math.round(v / Math.pow(10, diff));
+            v = (long) (v * Math.pow(10, Math.abs(diff)));
         }
 
         return v < ov ? -1 : (v > ov ? 1 : 0);
@@ -197,7 +197,7 @@ public class XSDecimalPointable extends AbstractPointable implements IHashable, 
 
     @Override
     public double doubleValue() {
-        return getDecimalValue() / Math.pow(10, getDecimalPlace());
+        return ((double) getDecimalValue()) / Math.pow(10, getDecimalPlace());
     }
 
 }

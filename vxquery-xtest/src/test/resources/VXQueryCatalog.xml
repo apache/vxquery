@@ -22,6 +22,8 @@
 <!ENTITY AggregatePartition2Queries SYSTEM "cat/AggregatePartition2Queries.xml">
 <!ENTITY AggregatePartition4Queries SYSTEM "cat/AggregatePartition4Queries.xml">
 
+<!ENTITY FunctionsAndOperatorsOnNumericsQueries SYSTEM "cat/FunctionsAndOperatorsOnNumericsQueries.xml">
+
 <!ENTITY GhcndPartition1Queries SYSTEM "cat/GhcndPartition1Queries.xml">
 <!ENTITY GhcndPartition2Queries SYSTEM "cat/GhcndPartition2Queries.xml">
 <!ENTITY GhcndPartition4Queries SYSTEM "cat/GhcndPartition4Queries.xml">
@@ -114,6 +116,19 @@
          &AggregatePartition1Queries;
          &AggregatePartition2Queries;
          &AggregatePartition4Queries;
+      </test-group>
+   </test-group>
+   <test-group name="FunctionsAndOperatorsOnNumericsQueries" featureOwner="Preston Carman">
+      <GroupInfo>
+         <title>Functions And Operators On Numerics Queries</title>
+         <description/>
+      </GroupInfo>
+      <test-group name="FunctionsAndOperatorsOnNumericsExecutionTests" featureOwner="Preston Carman">
+         <GroupInfo>
+            <title>Functions And Operators On Numerics Execution Tests</title>
+            <description/>
+         </GroupInfo>
+         &FunctionsAndOperatorsOnNumericsQueries;
       </test-group>
    </test-group>
    <test-group name="GhcndPartitionQueries" featureOwner="Preston Carman">

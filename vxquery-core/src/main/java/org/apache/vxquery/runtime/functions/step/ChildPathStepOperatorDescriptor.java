@@ -23,12 +23,7 @@ import java.util.List;
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.builders.nodes.NodeSubTreeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.step.NodeTestFilter.INodeFilter;
@@ -37,38 +32,15 @@ import org.apache.vxquery.types.SequenceType;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public class ChildPathStepOperatorDescriptor extends AbstractChildPathStep {
+public class ChildPathStepOperatorDescriptor extends AbstractForwardAxisPathStep {
     private List<INodeFilter> filter = new ArrayList<INodeFilter>();
     private int[] indexSequence;
-    private final ArrayBackedValueStorage nodeAbvs = new ArrayBackedValueStorage();
-    protected final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpItem = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    private final DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
-    private final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpStep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    private final NodeSubTreeBuilder nstb = new NodeSubTreeBuilder();
 
     public ChildPathStepOperatorDescriptor(IHyracksTaskContext ctx, PointablePool pp) {
         super(ctx, pp);
-    }
-
-    protected void getSequence(TaggedValuePointable tvp, SequencePointable seqp) {
-        switch (tvp.getTag()) {
-            case ValueTag.DOCUMENT_NODE_TAG:
-                tvp.getValue(dnp);
-                dnp.getContent(ntp, seqp);
-                return;
-
-            case ValueTag.ELEMENT_NODE_TAG:
-                tvp.getValue(enp);
-                if (enp.childrenChunkExists()) {
-                    enp.getChildrenSequence(ntp, seqp);
-                    return;
-                }
-        }
-        XDMConstants.setEmptySequence(seqp);
     }
 
     public void init(TaggedValuePointable tvp, List<Integer> typeCodes) throws SystemException {
@@ -89,14 +61,6 @@ public class ChildPathStepOperatorDescriptor extends AbstractChildPathStep {
             INodeFilter f = NodeTestFilter.getNodeTestFilter(sType);
             filter.add(f);
         }
-    }
-
-    protected void setNodeToResult(TaggedValuePointable tvpItem, IPointable result) throws IOException {
-        nodeAbvs.reset();
-        nstb.reset(nodeAbvs);
-        nstb.setChildNode(ntp, tvpItem);
-        nstb.finish();
-        result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
     }
 
     /**
