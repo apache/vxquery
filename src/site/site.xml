@@ -78,7 +78,7 @@ limitations under the License.
                 name="Eclipse Setup"
                 href="development_eclipse_setup.html" />
             <item
-                name="Release steps"
+                name="Release Steps"
                 href="release.html" />
             <item
                 name="Update Local Git XQTS Results"
