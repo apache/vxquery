@@ -63,8 +63,10 @@ JAVA_OPTS="-Xmx1024m -Djava.util.logging.config.file=/path/to/logging.properties
     The VXQuery test suite focuses on parallel processing tests used in our weather benchmark.
   
 ----------------------------------------
-sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/src/test/resources/VXQueryCatalog.xml -htmlreport /tmp/full_report.html
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/src/test/resources/VXQueryCatalog.xml -htmlreport /tmp/vxquery_report.html
 ----------------------------------------
+
+    * view the results at {{{file:///tmp/vxquery_report.html}file:///tmp/vxquery_report.html}}.
   
   * XQTS (XQuery Test Suite)
     To run the complete XQTS on VXQuery.
@@ -92,6 +94,12 @@ $ unzip ../XQTS_1_0_3.zip
 $ cd ..
 ----------------------------------------
 
+    * go back to the project root,
+
+----------------------------------------
+$ cd ../..
+----------------------------------------
+
     * run the tests, and
 
 ----------------------------------------
@@ -100,7 +108,7 @@ sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-sui
 
     * view the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.
 
-    * Add JAVA_OPTS for additional java parameters.
+    * Optional: Add JAVA_OPTS for additional java parameters.
 
   * XQTS (XQuery Test Suite) Option 2
     The following command will run the XQTS for test that are known to pass in VXQuery.
