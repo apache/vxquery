@@ -83,9 +83,9 @@ limitations under the License.
             <item
                 name="Update Local Git XQTS Results"
                 href="development_update_xqts_results.html" />
-            <item
+            <!-- <item
                 name="XQuery Benchmarks"
-                href="development_benchmarks.html" />
+                href="development_benchmarks.html" /> -->
         </menu>
 
         <menu ref="reports" />
