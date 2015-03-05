@@ -153,6 +153,8 @@ $ mvn release:perform
 
   * close the staging repository at {{{https://repository.apache.org/}https://repository.apache.org/}}
 
+    * Log into the website and look at the "Staging Repositories". You will be able to find the VXQuery repository and see the new release.
+
   * check that the artifacts are available in the repository
 
   * send out <<<[VOTE]>>> e-mail on dev@vxquery.apache.org
