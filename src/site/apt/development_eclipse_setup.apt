@@ -20,10 +20,14 @@ Eclipse Setup
 
 * Installation
 
+  * Install Java Development Kit (JDK) 1.7 or Later
+  
   * Install Classic Eclipse
 
   Follow the instruction for eclipse on from {{{http://www.eclipse.org}www.eclipse.org}} for 
   the "Classic" eclipse version.
+
+  * Install Apache Maven
 
   * Install Maven Integration (m2e)
   
