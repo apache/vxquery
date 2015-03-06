@@ -53,12 +53,12 @@ limitations under the License.
             <item
                 name="Download"
                 href="http://www.apache.org/dyn/closer.cgi/vxquery/" />
-            <item
-                name="Join the Community"
-                href="join_the_community.html" />
         </menu>
 
         <menu name="For Users">
+            <item
+                name="Get Started"
+                href="user_get_started.html" />
             <item
                 name="Installation"
                 href="user_installation.html" />
@@ -71,6 +71,9 @@ limitations under the License.
         </menu>
 
         <menu name="For Developers">
+            <item
+                name="Get Started"
+                href="developer_get_started.html" />
             <item
                 name="Data Handling"
                 href="development_data_handling.html" />
