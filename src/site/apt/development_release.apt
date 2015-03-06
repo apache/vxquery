@@ -153,7 +153,11 @@ $ mvn release:perform
 
   * close the staging repository at {{{https://repository.apache.org/}https://repository.apache.org/}}
 
-    * Log into the website and look at the "Staging Repositories". You will be able to find the VXQuery repository and see the new release.
+    * Log into the website and look at the "Staging Repositories". 
+    
+    * Find the VXQuery repository and click the "close" button.
+    
+    * Add a message: "Apache VXQuery X.Y-rc#"
 
   * check that the artifacts are available in the repository
 
@@ -161,7 +165,13 @@ $ mvn release:perform
 
     * {{{http://mail-archives.apache.org/mod_mbox/vxquery-dev/201409.mbox/%3CCAGZxfJUZDczuZR5jQResE4B7%2Bv4QQgwMpAd%2B-_Kt-U_RjCyReA%40mail.gmail.com%3E}example e-mail}} 
 
-  * after successful vote promote staging repository {{{https://repository.apache.org/}https://repository.apache.org/}}
+  * after successful vote release staging repository {{{https://repository.apache.org/}https://repository.apache.org/}}
+
+    * Log into the website and look at the "Staging Repositories". 
+    
+    * Find the VXQuery repository and click the "release" button.
+    
+    * Add a message: "Apache VXQuery X.Y Release"
 
   * add new source artifacts (archive + signature + hashes) to svn {{{https://dist.apache.org/repos/dist/release/vxquery}https://dist.apache.org/repos/dist/release/vxquery}} and remove old release dirctory
 
