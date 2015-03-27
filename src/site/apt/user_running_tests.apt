@@ -72,11 +72,11 @@ sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/src/test
     To run the complete XQTS on VXQuery.
   
     * Create a folder to hold the XQTS. 
-      If you use "vxquery-xtest/test-suite/xqts", then maven will utilize the XQTS to verify VXQuery's passing functions during the build process.
+      If you use "vxquery-xtest/test-suites/xqts", then maven will utilize the XQTS to verify VXQuery's passing functions during the build process.
     
 ----------------------------------------
-$ mkdir -p vxquery-xtest/test-suite
-$ cd vxquery-xtest/test-suite
+$ mkdir -p vxquery-xtest/test-suites
+$ cd vxquery-xtest/test-suites
 ----------------------------------------
     
     * Get the archive {{{http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip}XQTS_1_0_3.zip}} (e.g. using wget),
@@ -103,7 +103,7 @@ $ cd ../..
     * run the tests, and
 
 ----------------------------------------
-sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suite/xqts/XQTSCatalog.xml -htmlreport /tmp/full_report.html
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -htmlreport /tmp/full_report.html
 ----------------------------------------
 
     * view the results at {{{file:///tmp/full_report.html}file:///tmp/full_report.html}}.
@@ -118,7 +118,7 @@ sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-sui
     * run the tests, and
 
 ----------------------------------------
-sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suite/xqts/XQTSCatalog.xml -htmlreport /tmp/previous_report.html  -previous-test-results vxquery-xtest/results/xqts.txt
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -htmlreport /tmp/previous_report.html  -previous-test-results vxquery-xtest/results/xqts.txt
 ----------------------------------------
 
     * view the results at {{{file:///tmp/previous_report.html}file:///tmp/previous_report.html}}.

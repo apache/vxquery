@@ -117,9 +117,13 @@ public abstract class AbstractTestCaseFactory {
                         + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
             }
         });
-        FileReader characterStream = new FileReader(catalog);
-        parser.parse(new InputSource(characterStream));
-        characterStream.close();
+        try {
+            FileReader characterStream = new FileReader(catalog);
+            parser.parse(new InputSource(characterStream));
+            characterStream.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("Test Catalog has not been found: " + catalog.getAbsolutePath());
+        }
         return count;
     }
 
@@ -131,7 +135,7 @@ public abstract class AbstractTestCaseFactory {
         }
         return toSubmit;
     }
-    
+
     protected abstract void submit(TestCase tc);
 
     protected class Handler implements ContentHandler {

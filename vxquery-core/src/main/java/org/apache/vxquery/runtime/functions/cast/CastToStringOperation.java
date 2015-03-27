@@ -69,6 +69,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertBase64Binary(XSBinaryPointable binaryp, DataOutput dOut) throws SystemException, IOException {
         baaos.reset();
+        @SuppressWarnings("resource")
         Base64OutputStream b64os = new Base64OutputStream(baaos, true);
         b64os.write(binaryp.getByteArray(), binaryp.getStartOffset() + 2, binaryp.getLength() - 2);
 
