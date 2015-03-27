@@ -89,9 +89,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
 
     @Override
     public void convertInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        dOut.write(ValueTag.XS_DECIMAL_TAG);
-        dOut.write((byte) 0);
-        dOut.writeLong(longp.getLong());
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     @Override
@@ -179,57 +177,66 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
      * Derived Datatypes
      */
     public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(bytep, dOut);
+        writeIntegerAsDecimal(bytep, dOut);
     }
 
     public void convertInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(intp, dOut);
+        writeIntegerAsDecimal(intp, dOut);
     }
 
     public void convertLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(longp, dOut);
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     public void convertNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(longp, dOut);
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     public void convertNonNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(longp, dOut);
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     public void convertNonPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(longp, dOut);
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     public void convertPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(longp, dOut);
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     public void convertShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(shortp, dOut);
+        writeIntegerAsDecimal(shortp, dOut);
     }
 
     public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(shortp, dOut);
+        writeIntegerAsDecimal(shortp, dOut);
     }
 
     public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(longp, dOut);
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(longp, dOut);
+        writeIntegerAsDecimal(longp, dOut);
     }
 
     public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
-        writeDecimalValue(intp, dOut);
+        writeIntegerAsDecimal(intp, dOut);
     }
 
-    private void writeDecimalValue(INumeric numericp, DataOutput dOut) throws SystemException, IOException {
+    private void writeIntegerAsDecimal(INumeric numericp, DataOutput dOut) throws SystemException, IOException {
+        byte decimalPlace = 0;
+        long value = numericp.longValue();
+
+        // Normalize the value and take off trailing zeros.
+        while (value != 0 && value % 10 == 0) {
+            value /= 10;
+            --decimalPlace;
+        }
+
         dOut.write(ValueTag.XS_DECIMAL_TAG);
-        dOut.write((byte) 0);
-        dOut.writeLong(numericp.longValue());
+        dOut.write(decimalPlace);
+        dOut.writeLong(value);
     }
 
 }
