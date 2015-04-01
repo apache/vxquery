@@ -20,6 +20,9 @@ public class XTestOptions {
     @Option(name = "-O", required = false, usage = "Optimization Level")
     int optimizationLevel = Integer.MAX_VALUE;
 
+    @Option(name = "-frameSize", required = false, usage = "Setting frame size")
+    int frameSize = 65536;
+
     @Option(name = "-port", required = false, usage = "Port for web server to listen on")
     int port;
 
