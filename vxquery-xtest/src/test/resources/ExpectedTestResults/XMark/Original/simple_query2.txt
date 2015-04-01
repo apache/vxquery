@@ -1,0 +1,4 @@
+<catgraph>
+    <edge from="category0" to="category0"/>
+    <edge from="category0" to="category0"/>
+</catgraph>

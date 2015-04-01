@@ -1,0 +1,855 @@
+<?xml version="1.0" standalone="yes"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<site>
+<people>
+    <person id="person0">
+      <name>Vincent Ingolfsdottir</name>
+      <emailaddress>mailto:Ingolfsdottir@brandeis.edu</emailaddress>
+      <creditcard>7071 6205 8463 6581</creditcard>
+      <watches>
+        <watch open_auction="open_auction18"/>
+        <watch open_auction="open_auction22"/>
+      </watches>
+    </person>
+    <person id="person1">
+      <name>Greger Ohsie</name>
+      <emailaddress>mailto:Ohsie@airmail.net</emailaddress>
+      <address>
+        <street>80 Cater St</street>
+        <city>Austin</city>
+        <country>United States</country>
+        <province>West Virginia</province>
+        <zipcode>35</zipcode>
+      </address>
+    </person>
+    <person id="person2">
+      <name>Chikako Womann</name>
+      <emailaddress>mailto:Womann@dec.com</emailaddress>
+      <phone>+0 (686) 83606682</phone>
+      <profile income="31043.87">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>High School</education>
+        <business>Yes</business>
+        <age>36</age>
+      </profile>
+    </person>
+    <person id="person3">
+      <name>Tsz Kugler</name>
+      <emailaddress>mailto:Kugler@cti.gr</emailaddress>
+      <homepage>http://www.cti.gr/~Kugler</homepage>
+      <profile income="25994.41">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>Other</education>
+        <business>No</business>
+        <age>19</age>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction19"/>
+      </watches>
+    </person>
+    <person id="person4">
+      <name>Yongguang Haahr</name>
+      <emailaddress>mailto:Haahr@uregina.ca</emailaddress>
+      <address>
+        <street>21 Benantar St</street>
+        <city>San</city>
+        <country>United States</country>
+        <zipcode>24</zipcode>
+      </address>
+    </person>
+    <person id="person5">
+      <name>Hatim Legato</name>
+      <emailaddress>mailto:Legato@fernuni-hagen.de</emailaddress>
+      <phone>+0 (366) 11141912</phone>
+      <address>
+        <street>42 Fortenbach St</street>
+        <city>Providence</city>
+        <country>United States</country>
+        <zipcode>5</zipcode>
+      </address>
+      <homepage>http://www.fernuni-hagen.de/~Legato</homepage>
+      <watches>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction3"/>
+        <watch open_auction="open_auction20"/>
+        <watch open_auction="open_auction7"/>
+        <watch open_auction="open_auction11"/>
+        <watch open_auction="open_auction18"/>
+      </watches>
+    </person>
+    <person id="person6">
+      <name>Dunren Lotfi</name>
+      <emailaddress>mailto:Lotfi@umass.edu</emailaddress>
+      <phone>+0 (434) 17779776</phone>
+      <homepage>http://www.umass.edu/~Lotfi</homepage>
+      <creditcard>9897 9197 1704 5639</creditcard>
+      <watches>
+        <watch open_auction="open_auction2"/>
+        <watch open_auction="open_auction18"/>
+        <watch open_auction="open_auction14"/>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction1"/>
+        <watch open_auction="open_auction20"/>
+      </watches>
+    </person>
+    <person id="person7">
+      <name>Kasidit Munke</name>
+      <emailaddress>mailto:Munke@cnr.it</emailaddress>
+      <homepage>http://www.cnr.it/~Munke</homepage>
+      <creditcard>9741 9130 7082 9728</creditcard>
+      <profile income="59200.52">
+        <interest category="category0"/>
+        <gender>male</gender>
+        <business>Yes</business>
+        <age>53</age>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction8"/>
+        <watch open_auction="open_auction16"/>
+        <watch open_auction="open_auction1"/>
+        <watch open_auction="open_auction12"/>
+        <watch open_auction="open_auction21"/>
+        <watch open_auction="open_auction4"/>
+      </watches>
+    </person>
+    <person id="person8">
+      <name>Pedro Beeferman</name>
+      <emailaddress>mailto:Beeferman@ucsb.edu</emailaddress>
+      <homepage>http://www.ucsb.edu/~Beeferman</homepage>
+      <creditcard>3489 9078 5068 9645</creditcard>
+      <watches>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction13"/>
+        <watch open_auction="open_auction15"/>
+        <watch open_auction="open_auction6"/>
+        <watch open_auction="open_auction17"/>
+        <watch open_auction="open_auction4"/>
+      </watches>
+    </person>
+    <person id="person9">
+      <name>Esteban Aalborg</name>
+      <emailaddress>mailto:Aalborg@dec.com</emailaddress>
+      <creditcard>8174 1835 8007 3269</creditcard>
+    </person>
+    <person id="person10">
+      <name>Gururaj Pouyioutas</name>
+      <emailaddress>mailto:Pouyioutas@airmail.net</emailaddress>
+      <address>
+        <street>7 Podkolzin St</street>
+        <city>Richmond</city>
+        <country>United States</country>
+        <zipcode>34</zipcode>
+      </address>
+      <homepage>http://www.airmail.net/~Pouyioutas</homepage>
+      <profile income="25613.63">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>Other</education>
+        <gender>female</gender>
+        <business>Yes</business>
+      </profile>
+    </person>
+    <person id="person11">
+      <name>Helaman Eves</name>
+      <emailaddress>mailto:Eves@unl.edu</emailaddress>
+      <phone>+0 (719) 27997000</phone>
+      <address>
+        <street>69 Nachman St</street>
+        <city>Houston</city>
+        <country>United States</country>
+        <zipcode>17</zipcode>
+      </address>
+      <creditcard>7838 3291 6349 4837</creditcard>
+      <profile income="60275.75">
+        <education>College</education>
+        <gender>female</gender>
+        <business>Yes</business>
+      </profile>
+    </person>
+    <person id="person12">
+      <name>Arivind Pletch</name>
+      <emailaddress>mailto:Pletch@uwo.ca</emailaddress>
+      <phone>+0 (712) 85820911</phone>
+      <creditcard>1084 9330 2115 6226</creditcard>
+      <watches>
+        <watch open_auction="open_auction20"/>
+        <watch open_auction="open_auction13"/>
+        <watch open_auction="open_auction1"/>
+        <watch open_auction="open_auction12"/>
+        <watch open_auction="open_auction8"/>
+        <watch open_auction="open_auction2"/>
+      </watches>
+    </person>
+    <person id="person13">
+      <name>Mohan Ginesta</name>
+      <emailaddress>mailto:Ginesta@microsoft.com</emailaddress>
+      <address>
+        <street>25 Popp St</street>
+        <city>Veracruz</city>
+        <country>United States</country>
+        <zipcode>26</zipcode>
+      </address>
+      <homepage>http://www.microsoft.com/~Ginesta</homepage>
+    </person>
+    <person id="person14">
+      <name>Sakti Bein</name>
+      <emailaddress>mailto:Bein@uregina.ca</emailaddress>
+      <phone>+0 (600) 18469408</phone>
+      <address>
+        <street>50 Cornelio St</street>
+        <city>Greenville</city>
+        <country>United States</country>
+        <province>Vermont</province>
+        <zipcode>12</zipcode>
+      </address>
+      <homepage>http://www.uregina.ca/~Bein</homepage>
+      <profile income="12502.99">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>College</education>
+        <business>Yes</business>
+      </profile>
+    </person>
+    <person id="person15">
+      <name>Minkoo Couvreur</name>
+      <emailaddress>mailto:Couvreur@fsu.edu</emailaddress>
+      <phone>+0 (250) 41170596</phone>
+      <homepage>http://www.fsu.edu/~Couvreur</homepage>
+    </person>
+    <person id="person16">
+      <name>Daryl Paddon</name>
+      <emailaddress>mailto:Paddon@fernuni-hagen.de</emailaddress>
+      <phone>+0 (396) 57333574</phone>
+      <address>
+        <street>68 Berbec St</street>
+        <city>Salt</city>
+        <country>Nigeria</country>
+        <province>Reade</province>
+        <zipcode>30</zipcode>
+      </address>
+      <homepage>http://www.fernuni-hagen.de/~Paddon</homepage>
+      <creditcard>1606 9657 4298 6879</creditcard>
+      <watches>
+      </watches>
+    </person>
+    <person id="person17">
+      <name>Shauying Goullioud</name>
+      <emailaddress>mailto:Goullioud@tue.nl</emailaddress>
+      <phone>+153 (749) 15527098</phone>
+      <homepage>http://www.tue.nl/~Goullioud</homepage>
+      <creditcard>7580 2542 1950 7193</creditcard>
+    </person>
+    <person id="person18">
+      <name>Amar Takano</name>
+      <emailaddress>mailto:Takano@msn.com</emailaddress>
+      <creditcard>4771 6210 1031 5181</creditcard>
+      <profile income="32375.45">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <gender>male</gender>
+        <business>No</business>
+        <age>18</age>
+      </profile>
+    </person>
+    <person id="person19">
+      <name>Hrant Blumrich</name>
+      <emailaddress>mailto:Blumrich@acm.org</emailaddress>
+      <homepage>http://www.acm.org/~Blumrich</homepage>
+      <watches>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction20"/>
+        <watch open_auction="open_auction16"/>
+        <watch open_auction="open_auction23"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction6"/>
+      </watches>
+    </person>
+    <person id="person20">
+      <name>Mingsen Parisotto</name>
+      <emailaddress>mailto:Parisotto@wisc.edu</emailaddress>
+      <profile income="73015.33">
+        <interest category="category0"/>
+        <gender>male</gender>
+        <business>Yes</business>
+      </profile>
+    </person>
+    <person id="person21">
+      <name>Isamu Yeun</name>
+      <emailaddress>mailto:Yeun@ou.edu</emailaddress>
+      <address>
+        <street>95 Bleistein St</street>
+        <city>Newburgh</city>
+        <country>United States</country>
+        <province>West Virginia</province>
+        <zipcode>29</zipcode>
+      </address>
+      <homepage>http://www.ou.edu/~Yeun</homepage>
+      <profile income="77899.19">
+        <interest category="category0"/>
+        <education>Graduate School</education>
+        <gender>male</gender>
+        <business>Yes</business>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction19"/>
+      </watches>
+    </person>
+    <person id="person22">
+      <name>Seshu Messick</name>
+      <emailaddress>mailto:Messick@unl.edu</emailaddress>
+      <phone>+0 (411) 30157602</phone>
+      <address>
+        <street>40 Vanegas St</street>
+        <city>Denver</city>
+        <country>United States</country>
+        <province>Pennsylvania</province>
+        <zipcode>25</zipcode>
+      </address>
+      <creditcard>4196 5014 6271 4308</creditcard>
+    </person>
+    <person id="person23">
+      <name>Bjorn Berc</name>
+      <emailaddress>mailto:Berc@cas.cz</emailaddress>
+      <address>
+        <street>72 Erdi St</street>
+        <city>Palm</city>
+        <country>United States</country>
+        <province>Massachusetts</province>
+        <zipcode>19</zipcode>
+      </address>
+      <profile income="36962.42">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>Graduate School</education>
+        <gender>male</gender>
+        <business>Yes</business>
+      </profile>
+    </person>
+    <person id="person24">
+      <name>Charlotte Larab</name>
+      <emailaddress>mailto:Larab@sbphrd.com</emailaddress>
+      <phone>+0 (134) 59600334</phone>
+      <address>
+        <street>7 Snelling St</street>
+        <city>Butte</city>
+        <country>United States</country>
+        <province>Arkansas</province>
+        <zipcode>20</zipcode>
+      </address>
+      <homepage>http://www.sbphrd.com/~Larab</homepage>
+      <watches>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction7"/>
+        <watch open_auction="open_auction15"/>
+        <watch open_auction="open_auction8"/>
+        <watch open_auction="open_auction10"/>
+        <watch open_auction="open_auction19"/>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction6"/>
+        <watch open_auction="open_auction2"/>
+        <watch open_auction="open_auction0"/>
+        <watch open_auction="open_auction0"/>
+        <watch open_auction="open_auction4"/>
+        <watch open_auction="open_auction2"/>
+      </watches>
+    </person>
+    <person id="person25">
+      <name>Antoinette Byrne</name>
+      <emailaddress>mailto:Byrne@njit.edu</emailaddress>
+      <phone>+0 (698) 55702181</phone>
+      <homepage>http://www.njit.edu/~Byrne</homepage>
+      <creditcard>1376 6979 2272 3541</creditcard>
+    </person>
+    <person id="person26">
+      <name>Shui Roison</name>
+      <emailaddress>mailto:Roison@infomix.com</emailaddress>
+      <phone>+0 (393) 46361289</phone>
+      <profile income="102237.41">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <gender>female</gender>
+        <business>No</business>
+        <age>20</age>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction0"/>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction11"/>
+        <watch open_auction="open_auction21"/>
+      </watches>
+    </person>
+    <person id="person27">
+      <name>Wee Jupin</name>
+      <emailaddress>mailto:Jupin@edu.hk</emailaddress>
+      <profile income="9876.00">
+        <interest category="category0"/>
+        <gender>male</gender>
+        <business>No</business>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction13"/>
+        <watch open_auction="open_auction2"/>
+      </watches>
+    </person>
+    <person id="person28">
+      <name>Goo Hartrumpf</name>
+      <emailaddress>mailto:Hartrumpf@washington.edu</emailaddress>
+      <creditcard>4234 4210 6036 8205</creditcard>
+      <profile income="95921.73">
+        <business>Yes</business>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction7"/>
+        <watch open_auction="open_auction2"/>
+        <watch open_auction="open_auction3"/>
+      </watches>
+    </person>
+    <person id="person29">
+      <name>Mehrdad Shackell</name>
+      <emailaddress>mailto:Shackell@twsu.edu</emailaddress>
+      <phone>+0 (987) 3731206</phone>
+      <address>
+        <street>89 Meuter St</street>
+        <city>Mazatlan</city>
+        <country>United States</country>
+        <province>California</province>
+        <zipcode>25</zipcode>
+      </address>
+      <homepage>http://www.twsu.edu/~Shackell</homepage>
+      <creditcard>5738 4559 4880 1957</creditcard>
+      <watches>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction11"/>
+        <watch open_auction="open_auction10"/>
+        <watch open_auction="open_auction19"/>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction3"/>
+        <watch open_auction="open_auction2"/>
+        <watch open_auction="open_auction0"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction14"/>
+        <watch open_auction="open_auction8"/>
+        <watch open_auction="open_auction1"/>
+        <watch open_auction="open_auction10"/>
+        <watch open_auction="open_auction13"/>
+        <watch open_auction="open_auction21"/>
+      </watches>
+    </person>
+    <person id="person30">
+      <name>Jozo Rest</name>
+      <emailaddress>mailto:Rest@lante.com</emailaddress>
+      <phone>+0 (920) 76444901</phone>
+      <homepage>http://www.lante.com/~Rest</homepage>
+      <creditcard>3018 2384 5732 4659</creditcard>
+      <profile income="57699.99">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>College</education>
+        <business>No</business>
+        <age>43</age>
+      </profile>
+    </person>
+    <person id="person31">
+      <name>Debin Takano</name>
+      <emailaddress>mailto:Takano@pitt.edu</emailaddress>
+      <phone>+0 (687) 95848707</phone>
+      <address>
+        <street>6 Rinn St</street>
+        <city>Baltimore</city>
+        <country>Faroe Islands</country>
+        <zipcode>26</zipcode>
+      </address>
+      <creditcard>7948 7966 9333 5340</creditcard>
+      <watches>
+        <watch open_auction="open_auction11"/>
+        <watch open_auction="open_auction12"/>
+      </watches>
+    </person>
+    <person id="person32">
+      <name>Timo Bals</name>
+      <emailaddress>mailto:Bals@ncr.com</emailaddress>
+      <address>
+        <street>60 Poigne St</street>
+        <city>Augusta</city>
+        <country>Libyan Arab Jamahiriya</country>
+        <province>Shinozaki</province>
+        <zipcode>16</zipcode>
+      </address>
+    </person>
+    <person id="person33">
+      <name>Burra Souillard</name>
+      <emailaddress>mailto:Souillard@ucdavis.edu</emailaddress>
+      <address>
+        <street>34 Androutsopoulos St</street>
+        <city>Gulfport</city>
+        <country>United States</country>
+        <zipcode>5</zipcode>
+      </address>
+      <homepage>http://www.ucdavis.edu/~Souillard</homepage>
+      <profile income="59655.87">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>College</education>
+        <gender>female</gender>
+        <business>Yes</business>
+        <age>27</age>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction20"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction20"/>
+        <watch open_auction="open_auction18"/>
+        <watch open_auction="open_auction19"/>
+      </watches>
+    </person>
+    <person id="person34">
+      <name>Taokuan Sigal</name>
+      <emailaddress>mailto:Sigal@savera.com</emailaddress>
+      <phone>+0 (226) 81498838</phone>
+      <address>
+        <street>27 Kacprzyk St</street>
+        <city>Tri</city>
+        <country>United States</country>
+        <province>Idaho</province>
+        <zipcode>16</zipcode>
+      </address>
+      <creditcard>6329 1596 7682 8704</creditcard>
+      <profile income="67696.29">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>College</education>
+        <gender>male</gender>
+        <business>Yes</business>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction15"/>
+        <watch open_auction="open_auction2"/>
+        <watch open_auction="open_auction12"/>
+        <watch open_auction="open_auction16"/>
+        <watch open_auction="open_auction3"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction6"/>
+        <watch open_auction="open_auction6"/>
+      </watches>
+    </person>
+    <person id="person35">
+      <name>Keith Buford</name>
+      <emailaddress>mailto:Buford@uni-sb.de</emailaddress>
+      <phone>+0 (680) 82460558</phone>
+      <address>
+        <street>96 Bondorf St</street>
+        <city>Dothan</city>
+        <country>United States</country>
+        <province>North Carolina</province>
+        <zipcode>10</zipcode>
+      </address>
+      <homepage>http://www.uni-sb.de/~Buford</homepage>
+      <creditcard>6994 6747 3069 9901</creditcard>
+      <watches>
+      </watches>
+    </person>
+    <person id="person36">
+      <name>Joydeep Ghandeharizadeh</name>
+      <emailaddress>mailto:Ghandeharizadeh@itc.it</emailaddress>
+      <creditcard>2298 2055 2377 9809</creditcard>
+      <watches>
+      </watches>
+    </person>
+    <person id="person37">
+      <name>Jani Vecchi</name>
+      <emailaddress>mailto:Vecchi@ou.edu</emailaddress>
+      <creditcard>5296 9572 7958 9179</creditcard>
+      <watches>
+        <watch open_auction="open_auction15"/>
+        <watch open_auction="open_auction9"/>
+        <watch open_auction="open_auction5"/>
+      </watches>
+    </person>
+    <person id="person38">
+      <name>Hideko Kodaira</name>
+      <emailaddress>mailto:Kodaira@filemaker.com</emailaddress>
+      <homepage>http://www.filemaker.com/~Kodaira</homepage>
+      <profile income="9876.00">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>Other</education>
+        <gender>male</gender>
+        <business>No</business>
+      </profile>
+      <watches>
+      </watches>
+    </person>
+    <person id="person39">
+      <name>Maria Marceau</name>
+      <emailaddress>mailto:Marceau@uni-mannheim.de</emailaddress>
+      <creditcard>7617 7057 8043 7327</creditcard>
+      <profile income="81288.98">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>College</education>
+        <gender>male</gender>
+        <business>Yes</business>
+        <age>36</age>
+      </profile>
+    </person>
+    <person id="person40">
+      <name>Burke Bierbaum</name>
+      <emailaddress>mailto:Bierbaum@ask.com</emailaddress>
+      <phone>+0 (855) 17682013</phone>
+      <homepage>http://www.ask.com/~Bierbaum</homepage>
+      <creditcard>2089 5143 9485 3219</creditcard>
+    </person>
+    <person id="person41">
+      <name>Bokyung Biancardi</name>
+      <emailaddress>mailto:Biancardi@mitre.org</emailaddress>
+      <homepage>http://www.mitre.org/~Biancardi</homepage>
+      <creditcard>6362 7558 4605 7344</creditcard>
+      <profile income="90986.66">
+        <interest category="category0"/>
+        <education>High School</education>
+        <business>Yes</business>
+      </profile>
+    </person>
+    <person id="person42">
+      <name>Chu Takano</name>
+      <emailaddress>mailto:Takano@concentric.net</emailaddress>
+      <watches>
+        <watch open_auction="open_auction17"/>
+        <watch open_auction="open_auction8"/>
+        <watch open_auction="open_auction21"/>
+      </watches>
+    </person>
+    <person id="person43">
+      <name>Srinivasa d'Argence</name>
+      <emailaddress>mailto:d'Argence@umkc.edu</emailaddress>
+      <creditcard>6450 7871 1768 8470</creditcard>
+      <profile income="9876.00">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>Graduate School</education>
+        <gender>female</gender>
+        <business>No</business>
+        <age>42</age>
+      </profile>
+    </person>
+    <person id="person44">
+      <name>Williaam Seress</name>
+      <emailaddress>mailto:Seress@versata.com</emailaddress>
+      <phone>+0 (612) 13701001</phone>
+      <creditcard>8642 5861 5439 7488</creditcard>
+    </person>
+    <person id="person45">
+      <name>Violaine Sabharwal</name>
+      <emailaddress>mailto:Sabharwal@evergreen.edu</emailaddress>
+      <phone>+0 (56) 80076350</phone>
+      <address>
+        <street>12 Forcade St</street>
+        <city>Rio</city>
+        <country>United States</country>
+        <zipcode>18</zipcode>
+      </address>
+      <profile income="64262.77">
+        <interest category="category0"/>
+        <business>Yes</business>
+        <age>39</age>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction21"/>
+        <watch open_auction="open_auction2"/>
+        <watch open_auction="open_auction17"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction10"/>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction18"/>
+        <watch open_auction="open_auction7"/>
+        <watch open_auction="open_auction12"/>
+        <watch open_auction="open_auction20"/>
+      </watches>
+    </person>
+    <person id="person46">
+      <name>Piyush Hardjono</name>
+      <emailaddress>mailto:Hardjono@forth.gr</emailaddress>
+      <address>
+        <street>43 Kriewall St</street>
+        <city>Toronto</city>
+        <country>Burkina Faso</country>
+        <province>Budinsky</province>
+        <zipcode>26</zipcode>
+      </address>
+      <homepage>http://www.forth.gr/~Hardjono</homepage>
+      <profile income="26393.54">
+        <interest category="category0"/>
+        <gender>male</gender>
+        <business>Yes</business>
+        <age>19</age>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction10"/>
+        <watch open_auction="open_auction3"/>
+        <watch open_auction="open_auction23"/>
+        <watch open_auction="open_auction13"/>
+      </watches>
+    </person>
+    <person id="person47">
+      <name>Thang Murrill</name>
+      <emailaddress>mailto:Murrill@bellatlantic.net</emailaddress>
+      <watches>
+        <watch open_auction="open_auction11"/>
+        <watch open_auction="open_auction15"/>
+        <watch open_auction="open_auction13"/>
+        <watch open_auction="open_auction4"/>
+        <watch open_auction="open_auction8"/>
+        <watch open_auction="open_auction0"/>
+        <watch open_auction="open_auction8"/>
+        <watch open_auction="open_auction4"/>
+      </watches>
+    </person>
+    <person id="person48">
+      <name>Gnanamalar Laemmer</name>
+      <emailaddress>mailto:Laemmer@csufresno.edu</emailaddress>
+      <phone>+33 (360) 22862737</phone>
+      <homepage>http://www.csufresno.edu/~Laemmer</homepage>
+      <profile income="22790.42">
+        <interest category="category0"/>
+        <business>No</business>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction1"/>
+        <watch open_auction="open_auction5"/>
+      </watches>
+    </person>
+    <person id="person49">
+      <name>Jerri Keirsey</name>
+      <emailaddress>mailto:Keirsey@auth.gr</emailaddress>
+      <address>
+        <street>15 Gide St</street>
+        <city>Gothenburg</city>
+        <country>United States</country>
+        <zipcode>8</zipcode>
+      </address>
+      <homepage>http://www.auth.gr/~Keirsey</homepage>
+      <watches>
+        <watch open_auction="open_auction11"/>
+        <watch open_auction="open_auction13"/>
+        <watch open_auction="open_auction21"/>
+        <watch open_auction="open_auction23"/>
+        <watch open_auction="open_auction5"/>
+        <watch open_auction="open_auction19"/>
+        <watch open_auction="open_auction19"/>
+        <watch open_auction="open_auction2"/>
+        <watch open_auction="open_auction3"/>
+        <watch open_auction="open_auction14"/>
+        <watch open_auction="open_auction13"/>
+      </watches>
+    </person>
+    <person id="person50">
+      <name>Tibor Lease</name>
+      <emailaddress>mailto:Lease@gatech.edu</emailaddress>
+      <address>
+        <street>27 Desiderio St</street>
+        <city>Cody</city>
+        <country>United States</country>
+        <province>Montana</province>
+        <zipcode>15</zipcode>
+      </address>
+      <creditcard>6700 1398 1554 3577</creditcard>
+      <profile income="28888.68">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>College</education>
+        <gender>male</gender>
+        <business>Yes</business>
+      </profile>
+      <watches>
+        <watch open_auction="open_auction23"/>
+        <watch open_auction="open_auction23"/>
+        <watch open_auction="open_auction7"/>
+        <watch open_auction="open_auction4"/>
+        <watch open_auction="open_auction6"/>
+        <watch open_auction="open_auction3"/>
+        <watch open_auction="open_auction3"/>
+        <watch open_auction="open_auction18"/>
+        <watch open_auction="open_auction17"/>
+        <watch open_auction="open_auction23"/>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction23"/>
+        <watch open_auction="open_auction22"/>
+        <watch open_auction="open_auction10"/>
+        <watch open_auction="open_auction16"/>
+        <watch open_auction="open_auction9"/>
+      </watches>
+    </person>
+    <person id="person51">
+      <name>Hiroakira Mynard</name>
+      <emailaddress>mailto:Mynard@sfu.ca</emailaddress>
+    </person>
+    <person id="person52">
+      <name>Ravindranath Cappi</name>
+      <emailaddress>mailto:Cappi@ogi.edu</emailaddress>
+      <homepage>http://www.ogi.edu/~Cappi</homepage>
+      <profile income="15590.68">
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <interest category="category0"/>
+        <education>High School</education>
+        <business>No</business>
+      </profile>
+    </person>
+  </people>
+</site>

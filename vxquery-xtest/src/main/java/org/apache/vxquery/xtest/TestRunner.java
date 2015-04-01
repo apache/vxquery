@@ -52,8 +52,6 @@ import edu.uci.ics.hyracks.control.nc.NodeControllerService;
 import edu.uci.ics.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 
 public class TestRunner {
-    private static final int FRAME_SIZE = 65536;
-
     private static final Pattern EMBEDDED_SYSERROR_PATTERN = Pattern
             .compile("org\\.apache\\.vxquery\\.exceptions\\.SystemException: (\\p{javaUpperCase}{4}\\d{4})");
 
@@ -104,7 +102,7 @@ public class TestRunner {
         long start = System.currentTimeMillis();
         try {
             try {
-                XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, FRAME_SIZE);
+                XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, opts.frameSize);
                 Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                 CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
                         RootStaticContextImpl.INSTANCE), new ResultSetId(testCase.getXQueryDisplayName().hashCode()),

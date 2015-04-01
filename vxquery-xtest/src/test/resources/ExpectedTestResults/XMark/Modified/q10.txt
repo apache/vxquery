@@ -1,0 +1,440 @@
+<categorie>
+  <id>category0</id>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age>36</age>
+      <education>High School</education>
+      <revenu>31043.87</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Chikako Womann</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Womann@dec.com</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age>19</age>
+      <education>Other</education>
+      <revenu>25994.41</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Tsz Kugler</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Kugler@cti.gr</courrier>
+        <pagePerso>http://www.cti.gr/~Kugler</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age>53</age>
+      <education/>
+      <revenu>59200.52</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Kasidit Munke</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Munke@cnr.it</courrier>
+        <pagePerso>http://www.cnr.it/~Munke</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>9741 9130 7082 9728</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>female</sexe>
+      <age/>
+      <education>Other</education>
+      <revenu>25613.63</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Gururaj Pouyioutas</nom>
+      <rue>7 Podkolzin St</rue>
+      <ville>Richmond</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Pouyioutas@airmail.net</courrier>
+        <pagePerso>http://www.airmail.net/~Pouyioutas</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age/>
+      <education>College</education>
+      <revenu>12502.99</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Sakti Bein</nom>
+      <rue>50 Cornelio St</rue>
+      <ville>Greenville</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Bein@uregina.ca</courrier>
+        <pagePerso>http://www.uregina.ca/~Bein</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age>18</age>
+      <education/>
+      <revenu>32375.45</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Amar Takano</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Takano@msn.com</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>4771 6210 1031 5181</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age/>
+      <education/>
+      <revenu>73015.33</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Mingsen Parisotto</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Parisotto@wisc.edu</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age/>
+      <education>Graduate School</education>
+      <revenu>77899.19</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Isamu Yeun</nom>
+      <rue>95 Bleistein St</rue>
+      <ville>Newburgh</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Yeun@ou.edu</courrier>
+        <pagePerso>http://www.ou.edu/~Yeun</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age/>
+      <education>Graduate School</education>
+      <revenu>36962.42</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Bjorn Berc</nom>
+      <rue>72 Erdi St</rue>
+      <ville>Palm</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Berc@cas.cz</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>female</sexe>
+      <age>20</age>
+      <education/>
+      <revenu>102237.41</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Shui Roison</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Roison@infomix.com</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age/>
+      <education/>
+      <revenu>9876.00</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Wee Jupin</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Jupin@edu.hk</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age>43</age>
+      <education>College</education>
+      <revenu>57699.99</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Jozo Rest</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Rest@lante.com</courrier>
+        <pagePerso>http://www.lante.com/~Rest</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>3018 2384 5732 4659</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>female</sexe>
+      <age>27</age>
+      <education>College</education>
+      <revenu>59655.87</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Burra Souillard</nom>
+      <rue>34 Androutsopoulos St</rue>
+      <ville>Gulfport</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Souillard@ucdavis.edu</courrier>
+        <pagePerso>http://www.ucdavis.edu/~Souillard</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age/>
+      <education>College</education>
+      <revenu>67696.29</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Taokuan Sigal</nom>
+      <rue>27 Kacprzyk St</rue>
+      <ville>Tri</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Sigal@savera.com</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>6329 1596 7682 8704</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age/>
+      <education>Other</education>
+      <revenu>9876.00</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Hideko Kodaira</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Kodaira@filemaker.com</courrier>
+        <pagePerso>http://www.filemaker.com/~Kodaira</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age>36</age>
+      <education>College</education>
+      <revenu>81288.98</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Maria Marceau</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Marceau@uni-mannheim.de</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>7617 7057 8043 7327</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age/>
+      <education>High School</education>
+      <revenu>90986.66</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Bokyung Biancardi</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Biancardi@mitre.org</courrier>
+        <pagePerso>http://www.mitre.org/~Biancardi</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>6362 7558 4605 7344</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>female</sexe>
+      <age>42</age>
+      <education>Graduate School</education>
+      <revenu>9876.00</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Srinivasa d'Argence</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:d'Argence@umkc.edu</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>6450 7871 1768 8470</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age>39</age>
+      <education/>
+      <revenu>64262.77</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Violaine Sabharwal</nom>
+      <rue>12 Forcade St</rue>
+      <ville>Rio</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Sabharwal@evergreen.edu</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age>19</age>
+      <education/>
+      <revenu>26393.54</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Piyush Hardjono</nom>
+      <rue>43 Kriewall St</rue>
+      <ville>Toronto</ville>
+      <pays>Burkina Faso</pays>
+      <reseau>
+        <courrier>mailto:Hardjono@forth.gr</courrier>
+        <pagePerso>http://www.forth.gr/~Hardjono</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age/>
+      <education/>
+      <revenu>22790.42</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Gnanamalar Laemmer</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Laemmer@csufresno.edu</courrier>
+        <pagePerso>http://www.csufresno.edu/~Laemmer</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe>male</sexe>
+      <age/>
+      <education>College</education>
+      <revenu>28888.68</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Tibor Lease</nom>
+      <rue>27 Desiderio St</rue>
+      <ville>Cody</ville>
+      <pays>United States</pays>
+      <reseau>
+        <courrier>mailto:Lease@gatech.edu</courrier>
+        <pagePerso/>
+      </reseau>
+    </coordonnees>
+    <cartePaiement>6700 1398 1554 3577</cartePaiement>
+  </personne>
+  <personne>
+    <statistiques>
+      <sexe/>
+      <age/>
+      <education>High School</education>
+      <revenu>15590.68</revenu>
+    </statistiques>
+    <coordonnees>
+      <nom>Ravindranath Cappi</nom>
+      <rue/>
+      <ville/>
+      <pays/>
+      <reseau>
+        <courrier>mailto:Cappi@ogi.edu</courrier>
+        <pagePerso>http://www.ogi.edu/~Cappi</pagePerso>
+      </reseau>
+    </coordonnees>
+    <cartePaiement/>
+  </personne>
+</categorie>
