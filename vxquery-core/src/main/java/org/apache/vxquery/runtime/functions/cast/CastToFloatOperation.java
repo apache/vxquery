@@ -40,10 +40,6 @@ public class CastToFloatOperation extends AbstractCastToOperation {
     /*
      * All the positive powers of 10 that can be represented exactly in float.
      */
-    private static final float powersOf10upTo10[] = { 1.0e0f, 1.0e1f, 1.0e2f, 1.0e3f, 1.0e4f, 1.0e5f, 1.0e6f, 1.0e7f,
-            1.0e8f, 1.0e9f, 1.0e10f };
-    private static final float powersOf10from20to30[] = { 1.0e20f, 1.0e21f, 1.0e22f, 1.0e23f, 1.0e24f, 1.0e25f,
-            1.0e26f, 1.0e27f, 1.0e28f, 1.0e29f, 1.0e30f };
 
     @Override
     public void convertBoolean(BooleanPointable boolp, DataOutput dOut) throws SystemException, IOException {
@@ -83,10 +79,8 @@ public class CastToFloatOperation extends AbstractCastToOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         ICharacterIterator charIterator = new UTF8StringCharacterIterator(stringp);
         charIterator.reset();
-        byte decimalPlace = 0;
-        long value = 0;
         float valueFloat;
-        boolean pastDecimal = false, negativeValue = false;
+        boolean negativeValue = false;
         int c = ICharacterIterator.EOS_CHAR;
         int c2 = ICharacterIterator.EOS_CHAR;
         int c3 = ICharacterIterator.EOS_CHAR;
@@ -104,94 +98,31 @@ public class CastToFloatOperation extends AbstractCastToOperation {
             if (charIterator.next() != ICharacterIterator.EOS_CHAR) {
                 throw new SystemException(ErrorCode.FORG0001);
             } else if (c == Character.valueOf('I') && c2 == Character.valueOf('N') && c3 == Character.valueOf('F')) {
-                valueFloat = Float.NEGATIVE_INFINITY;
+                if (negativeValue) {
+                    valueFloat = Float.NEGATIVE_INFINITY;
+                } else {
+                    valueFloat = Float.POSITIVE_INFINITY;
+                }
             } else if (c == Character.valueOf('N') && c2 == Character.valueOf('a') && c3 == Character.valueOf('N')) {
                 valueFloat = Float.NaN;
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         } else {
-            // Read in the number.
-            do {
-                if (Character.isDigit(c)) {
-                    value = value * 10 - Character.getNumericValue(c);
-                    if (pastDecimal) {
-                        decimalPlace--;
-                    }
-                } else if (c == Character.valueOf('.') && pastDecimal == false) {
-                    pastDecimal = true;
-                } else if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
-                    break;
-                } else {
-                    throw new SystemException(ErrorCode.FORG0001);
-                }
-            } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
-
-            // Parse the exponent.
-            if (c == Character.valueOf('E') || c == Character.valueOf('e')) {
-                int moveOffset = 0;
-                boolean negativeOffset = false;
-                // Check for the negative sign.
-                c = charIterator.next();
-                if (c == Character.valueOf('-')) {
-                    negativeOffset = true;
-                    c = charIterator.next();
-                }
-                // Process the numeric value.
-                do {
-                    if (Character.isDigit(c)) {
-                        moveOffset = moveOffset * 10 + Character.getNumericValue(c);
-                    } else {
-                        throw new SystemException(ErrorCode.FORG0001);
-                    }
-                } while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR);
-                decimalPlace += (negativeOffset ? -moveOffset : moveOffset);
-            }
-
-            /*
-             * The following conditions to create the floating point value is using known valid float values.
-             * In addition, each one only needs one or two operations to get the float value, further minimizing
-             * possible errors. (Not perfect, but pretty good.)
-             */
-            valueFloat = (float) value;
-            if (decimalPlace == 0 || valueFloat == 0.0f) {
-                // No modification required to float value.
-            } else if (decimalPlace >= 0) {
-                if (decimalPlace <= 10) {
-                    valueFloat *= powersOf10upTo10[decimalPlace];
-                } else if (decimalPlace <= 20) {
-                    valueFloat *= powersOf10upTo10[10];
-                    valueFloat *= powersOf10upTo10[decimalPlace - 10];
-                } else if (decimalPlace <= 30) {
-                    valueFloat *= powersOf10from20to30[decimalPlace];
-                } else if (decimalPlace <= 38) {
-                    valueFloat *= powersOf10from20to30[10];
-                    valueFloat *= powersOf10upTo10[decimalPlace - 30];
-                }
-            } else {
-                if (decimalPlace >= -10) {
-                    valueFloat /= powersOf10upTo10[-decimalPlace];
-                } else if (decimalPlace >= -20) {
-                    valueFloat /= powersOf10upTo10[10];
-                    valueFloat /= powersOf10upTo10[-decimalPlace - 10];
-                } else if (decimalPlace >= -30) {
-                    valueFloat /= powersOf10from20to30[-decimalPlace];
-                } else if (decimalPlace >= -40) {
-                    valueFloat /= powersOf10from20to30[10];
-                    valueFloat /= powersOf10upTo10[-decimalPlace - 30];
-                } else if (decimalPlace >= -45) {
-                    valueFloat /= powersOf10from20to30[0];
-                    valueFloat /= powersOf10from20to30[-decimalPlace - 20];
-                }
+            // We create an object to keep the conversion algorithm simple and improve precision.
+            // While a better solution may be available this will hold us over until then.
+            StringBuilder sb = new StringBuilder();
+            stringp.toString(sb);
+            try {
+                valueFloat = Float.parseFloat(sb.toString());
+            } catch (NumberFormatException e) {
+                throw new SystemException(ErrorCode.FORG0001);
             }
         }
 
         dOut.write(ValueTag.XS_FLOAT_TAG);
-        if (valueFloat == 0.0f) {
-            dOut.writeFloat((negativeValue ? -0.0f : 0.0f));
-        } else {
-            dOut.writeFloat((negativeValue ? valueFloat : -valueFloat));
-        }
+        dOut.writeFloat(valueFloat);
+
     }
 
     @Override
