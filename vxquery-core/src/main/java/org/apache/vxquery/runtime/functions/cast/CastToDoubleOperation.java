@@ -92,14 +92,16 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
             if (charIterator.next() != ICharacterIterator.EOS_CHAR) {
                 throw new SystemException(ErrorCode.FORG0001);
             } else if (c == Character.valueOf('I') && c2 == Character.valueOf('N') && c3 == Character.valueOf('F')) {
-                valueDouble = Double.POSITIVE_INFINITY;
+                if (negativeValue) {
+                    valueDouble = Double.NEGATIVE_INFINITY;
+                } else {
+                    valueDouble = Double.POSITIVE_INFINITY;
+                }
             } else if (c == Character.valueOf('N') && c2 == Character.valueOf('a') && c3 == Character.valueOf('N')) {
                 valueDouble = Double.NaN;
             } else {
                 throw new SystemException(ErrorCode.FORG0001);
             }
-            dOut.write(ValueTag.XS_DOUBLE_TAG);
-            dOut.writeDouble((negativeValue ? -valueDouble : valueDouble));
         } else {
             // We create an object to keep the conversion algorithm simple and improve precision.
             // While a better solution may be available this will hold us over until then.
@@ -110,9 +112,9 @@ public class CastToDoubleOperation extends AbstractCastToOperation {
             } catch (NumberFormatException e) {
                 throw new SystemException(ErrorCode.FORG0001);
             }
-            dOut.write(ValueTag.XS_DOUBLE_TAG);
-            dOut.writeDouble(valueDouble);
         }
+        dOut.write(ValueTag.XS_DOUBLE_TAG);
+        dOut.writeDouble(valueDouble);
     }
 
     @Override

@@ -66,8 +66,12 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
                 throw new SystemException(ErrorCode.FORG0001);
             }
         }
+        if (Double.isNaN(doublep.getDouble()) || Double.isInfinite(doublep.getDouble())) {
+            throw new SystemException(ErrorCode.FORG0001);
+        }
         abvsInner.reset();
-        castToString.convertDoubleCanonical(doublep, dOutInner);
+        dOutInner.write(ValueTag.XS_STRING_TAG);
+        dOutInner.writeUTF(Double.toString(doublep.getDouble()));
         stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
         convertStringExtra(stringp, dOut, true);
     }
