@@ -55,9 +55,9 @@
       </foaf:Person>
     </maintainer>
     <asfext:implements><asfext:Standard>
-      <asfext:title>XQuery 1.0</asfext:title>
+      <asfext:title>XQuery 1.0: An XML Query Language</asfext:title>
       <asfext:body>W3C</asfext:body>
-      <asfext:id></asfext:id>
+      <asfext:id>XQuery 1.0</asfext:id>
       <asfext:url rdf:resource="http://www.w3.org/TR/xquery/"/>
     </asfext:Standard></asfext:implements>
   </Project>
