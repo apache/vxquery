@@ -63,6 +63,9 @@ limitations under the License.
                 name="Installation"
                 href="user_installation.html" />
             <item
+                name="Cluster Installation"
+                href="cluster_installation.html" />
+            <item
                 name="Executing a Query"
                 href="user_query.html" />
             <item
