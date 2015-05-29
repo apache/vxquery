@@ -33,10 +33,11 @@ import edu.uci.ics.hyracks.data.std.api.IPointable;
 
 public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathStep {
     private boolean testSelf;
+    private boolean printSelf;
     private int indexSeqArgs;
     private int seqArgsLength;
     private List<Integer> indexSequence = new ArrayList<Integer>();
-    private List<Boolean> checkSelf = new ArrayList<Boolean>();
+    private List<Integer> printedSequence = new ArrayList<Integer>();
 
     private final SequencePointable seqNtp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpItem = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -49,9 +50,10 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     }
 
     protected void init(TaggedValuePointable[] args) throws SystemException {
-        checkSelf.add(true);
+        printSelf = true;
         indexSeqArgs = 0;
         indexSequence.add(0);
+        printedSequence.add(0);
 
         // Check the argument passed in as sequence or node tree.
         if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
@@ -80,7 +82,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
                 }
                 // Next node tree in sequence.
                 indexSeqArgs++;
-                checkSelf.set(0, true);
+                printSelf = true;
             }
         } else {
             // Single node tree input.
@@ -93,8 +95,8 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     }
 
     private boolean processNodeTree(TaggedValuePointable rootTVP, IPointable result) throws AlgebricksException {
-        if (testSelf && checkSelf.get(0)) {
-            checkSelf.set(0, false);
+        if (testSelf && printSelf) {
+            printSelf = false;
             tvpItem.set(rootTVP);
             try {
                 setNodeToResult(tvpItem, result);
@@ -118,11 +120,9 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
             throws AlgebricksException {
         // Set up next level tracking.
-        if (level + 1 >= indexSequence.size()) {
+        if (level + 1 > indexSequence.size()) {
             indexSequence.add(0);
-        }
-        if (level + 1 >= checkSelf.size()) {
-            checkSelf.add(true);
+            printedSequence.add(0);
         }
 
         SequencePointable seqItem = pp.takeOne(SequencePointable.class);
@@ -134,16 +134,13 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
                 seqItem.getEntry(indexSequence.get(level), tvpItem);
 
                 // Check current node
-                if (checkSelf.get(level)) {
-                    checkSelf.set(level, false);
+                if (indexSequence.get(level) == printedSequence.get(level)) {
+                   printedSequence.set(level, printedSequence.get(level) + 1);
                     setNodeToResult(tvpItem, result);
                     return true;
                 }
                 // Check children nodes
-                if (level + 1 < indexSequence.size()) {
-                    if (level + 1 < checkSelf.size()) {
-                        checkSelf.set(level + 1, true);
-                    }
+                if (level + 1 <= indexSequence.size()) {
                     if (stepNodeTree(tvpItem, level + 1, result)) {
                         return true;
                     }
@@ -153,8 +150,10 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             // Reset for next node tree.
             if (level == 0) {
                 indexSequence.set(level, 0);
+                printedSequence.set(level, 0);
             } else {
                 indexSequence.remove(level);
+                printedSequence.remove(level);
             }
             return false;
         } catch (IOException e) {
