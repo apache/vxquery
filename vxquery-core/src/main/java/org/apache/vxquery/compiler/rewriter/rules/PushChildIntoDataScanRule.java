@@ -78,12 +78,7 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
 
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
-        AbstractLogicalOperator op0 = (AbstractLogicalOperator) opRef.getValue();
-        if (op0.getInputs().isEmpty()) {
-            return false;
-        }
-
-        AbstractLogicalOperator op1 = (AbstractLogicalOperator) op0.getInputs().get(0).getValue();
+        AbstractLogicalOperator op1 = (AbstractLogicalOperator) opRef.getValue();;
         if (op1.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
         }
@@ -107,8 +102,7 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
                     datascan.getVariables().get(0));
             AssignOperator noOp = new AssignOperator(unnest.getVariable(), varExp);
             noOp.getInputs().addAll(unnest.getInputs());
-            op0.getInputs().clear();
-            op0.getInputs().add(new MutableObject<ILogicalOperator>(noOp));
+            opRef.setValue(noOp);
             return true;
         }
         return false;

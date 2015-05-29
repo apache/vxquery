@@ -41,7 +41,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  * Before
  * 
  *   plan__parent
- *   UNNEST( $v2 : iterate( $v1 ) )
+ *   UNNEST( $v2 : exp($v1) )
  *   ASSIGN( $v1 : collection( $source ) )
  *   plan__child
  *   
@@ -54,12 +54,13 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  * After 
  * 
  *   plan__parent
- *   DATASCAN( collection( $source ) , $v2 )
+ *   UNNEST( $v2 : exp($v1) )
+ *   DATASCAN( collection( $source ) , $v1 )
  *   plan__child
  *   
  *   Where DATASCAN operator is configured to use the collection( $source) for 
- *   data represented by the “constant” and $v2 represents the xml document 
- *   node.
+ *   data represented by the "constant" and $v1 represents the xml document 
+ *   nodes from the collection.
  * </pre>
  * 
  * @author prestonc
@@ -81,12 +82,13 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
                 // Known to be true because of collection name.
                 AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
                 UnnestOperator unnest = (UnnestOperator) op;
-                AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
+                Mutable<ILogicalOperator> opRef2 = unnest.getInputs().get(0);
+                AbstractLogicalOperator op2 = (AbstractLogicalOperator) opRef2.getValue();
                 AssignOperator assign = (AssignOperator) op2;
 
-                DataSourceScanOperator opNew = new DataSourceScanOperator(unnest.getVariables(), ds);
+                DataSourceScanOperator opNew = new DataSourceScanOperator(assign.getVariables(), ds);
                 opNew.getInputs().addAll(assign.getInputs());
-                opRef.setValue(opNew);
+                opRef2.setValue(opNew);
                 return true;
             }
         }
