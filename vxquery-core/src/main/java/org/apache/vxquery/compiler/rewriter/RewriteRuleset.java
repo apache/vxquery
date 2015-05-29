@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConsolidateUnnestsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
@@ -39,6 +38,7 @@ import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantPromoteExpressi
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantTreatExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedTreatRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedUnnestIterateRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
 
@@ -117,7 +117,9 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Adds child steps to the data source scan.
-        normalization.add(new ConsolidateUnnestsRule());
+        // TODO Replace consolidate with a new child function that takes multiple paths.
+        //        normalization.add(new ConsolidateUnnestsRule());
+        normalization.add(new RemoveUnusedUnnestIterateRule());
         normalization.add(new PushChildIntoDataScanRule());
 
         // Improvement for scalar child expressions
@@ -269,8 +271,8 @@ public class RewriteRuleset {
         prepareForJobGenRewrites.add(new IsolateHyracksOperatorsRule(
                 HeuristicOptimizer.hyraxOperatorsBelowWhichJobGenIsDisabled));
         prepareForJobGenRewrites.add(new ExtractCommonOperatorsRule());
-//        prepareForJobGenRewrites.add(new VXQueryExtractCommonOperatorsRule());
-//        prepareForJobGenRewrites.add(new DelayMaterializationForJoinProbeRule());
+        //        prepareForJobGenRewrites.add(new VXQueryExtractCommonOperatorsRule());
+        //        prepareForJobGenRewrites.add(new DelayMaterializationForJoinProbeRule());
         // Re-infer all types, so that, e.g., the effect of not-is-null is
         // propagated.
         prepareForJobGenRewrites.add(new PushProjectIntoDataSourceScanRule());

@@ -42,6 +42,7 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
 
     protected List<LogicalVariable> usedVariables = new ArrayList<LogicalVariable>();
     protected boolean hasRun = false;
+    Mutable<ILogicalOperator> firstOpRef;
 
     @Override
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
@@ -51,8 +52,11 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
 
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
-        if (hasRun) {
+        opRef.getValue().getOperatorTag();
+        if (hasRun && !firstOpRef.equals(opRef)) {
             return false;
+        } else {
+            firstOpRef = opRef;
         }
         boolean modified = false;
         boolean modified_last_pass;

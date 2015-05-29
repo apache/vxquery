@@ -19,42 +19,43 @@ package org.apache.vxquery.runtime.functions.step;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DescendantPathStepScalarEvaluator extends AbstractDescendantPathStepScalarEvaluator {
-    private final TaggedValuePointable rootTVP;
+    private final SequenceBuilder seqb = new SequenceBuilder();
 
-    private final ArrayBackedValueStorage seqAbvs;
+    private final ArrayBackedValueStorage seqAbvs = new ArrayBackedValueStorage();
+
+    private final DescendantOrSelfPathStepUnnesting descendentOrSelfPathStep;
+
+    private final TaggedValuePointable itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
     public DescendantPathStepScalarEvaluator(IScalarEvaluator[] args, IHyracksTaskContext ctx) {
         super(args, ctx);
-        rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        seqAbvs = new ArrayBackedValueStorage();
+        descendentOrSelfPathStep = new DescendantOrSelfPathStepUnnesting(ctx, ppool, false);
     }
 
     @Override
     protected final void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         try {
-            if (args[0].getTag() != ValueTag.NODE_TREE_TAG) {
-                throw new SystemException(ErrorCode.SYSE0001);
-            }
-            args[0].getValue(ntp);
-
-            // Set up the result sequence and get the root node.
+            descendentOrSelfPathStep.init(args);
             seqAbvs.reset();
             seqb.reset(seqAbvs);
-            ntp.getRootNode(rootTVP);
-
-            // Solve for descendants.
-            searchSubtree(rootTVP);
-
+            try {
+                while (descendentOrSelfPathStep.step(itemTvp)) {
+                    seqb.addItem(itemTvp);
+                }
+            } catch (AlgebricksException e) {
+                throw new SystemException(ErrorCode.SYSE0001, e);
+            }
             seqb.finish();
             result.set(seqAbvs);
         } catch (IOException e) {

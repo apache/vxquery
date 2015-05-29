@@ -38,6 +38,7 @@ public abstract class AbstractForwardAxisPathStep {
     protected final PointablePool pp;
     protected final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
     private final ArrayBackedValueStorage nodeAbvs = new ArrayBackedValueStorage();
+    private final TaggedValuePointable tvpConvert = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
     private final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
     private final NodeSubTreeBuilder nstb = new NodeSubTreeBuilder();
@@ -61,7 +62,8 @@ public abstract class AbstractForwardAxisPathStep {
                     return;
                 }
         }
-        XDMConstants.setEmptySequence(seqp);
+        XDMConstants.setEmptySequence(tvpConvert);
+        tvpConvert.getValue(seqp);
     }
 
     protected void setNodeToResult(TaggedValuePointable tvpItem, IPointable result) throws IOException {
