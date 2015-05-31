@@ -17,6 +17,8 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
+import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
 import org.apache.vxquery.functions.BuiltinOperators;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -30,11 +32,12 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionC
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractScanOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 
 /**
- * The rule searches for an unnest operator (1) immediately following an unnest 
+ * The rule searches for an unnest operator (1) immediately following an unnest
  * or data scan operator (2). If the variable is only used in unnest (1) then
  * unnest (1) can be removed.
  * 
@@ -51,7 +54,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  * After
  * 
  *   plan__parent
- *   UNNEST( $v2 : $v )
+ *   ASSIGN( $v2 : $v1 )
+ *   UNNEST( $v1 : $v )
  *   plan__child
  * </pre>
  * 
@@ -78,8 +82,8 @@ public class RemoveUnusedUnnestIterateRule extends AbstractUsedVariablesProcessi
         }
 
         // Check to see if the expression is a variable.
-        ILogicalExpression logicalExpressionUnnest2 = (ILogicalExpression) functionCallUnnest1.getArguments().get(0)
-                .getValue();
+        Mutable<ILogicalExpression> logicalExpressionUnnestRef2 = functionCallUnnest1.getArguments().get(0);
+        ILogicalExpression logicalExpressionUnnest2 = (ILogicalExpression) logicalExpressionUnnestRef2.getValue();
         if (logicalExpressionUnnest2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
             return false;
         }
@@ -89,11 +93,14 @@ public class RemoveUnusedUnnestIterateRule extends AbstractUsedVariablesProcessi
         // Check if the input is an DATASCAN or UNNEST operator..
         Mutable<ILogicalOperator> opRef2 = unnest.getInputs().get(0);
         AbstractLogicalOperator op2 = (AbstractLogicalOperator) opRef2.getValue();
-        if (op2.getOperatorTag() == LogicalOperatorTag.UNNEST || op2.getOperatorTag() == LogicalOperatorTag.DATASOURCESCAN) {
+        if (op2.getOperatorTag() == LogicalOperatorTag.UNNEST
+                || op2.getOperatorTag() == LogicalOperatorTag.DATASOURCESCAN) {
             AbstractScanOperator aso = (AbstractScanOperator) op2;
             if (aso.getVariables().size() == 1 && aso.getVariables().contains(unnestInput)) {
-                aso.setVariables(unnest.getVariables());
-                opRef.setValue(aso);
+                // Add in a noop.
+                AssignOperator assign = new AssignOperator(unnest.getVariable(), logicalExpressionUnnestRef2);
+                assign.getInputs().addAll(unnest.getInputs());
+                opRef.setValue(assign);
                 return true;
             }
         }

@@ -23,10 +23,10 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.functions.BuiltinFunctions;
-import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
@@ -39,6 +39,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
@@ -81,45 +82,24 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
             return null;
         }
 
+        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+            return null;
+        }
+        VariableReferenceExpression vre = (VariableReferenceExpression) logicalExpression2;
+        Mutable<ILogicalOperator> opRef3 = OperatorToolbox.findProducerOf(opRef, vre.getVariableReference());
+
         // Get the string assigned to the collection function.
-        AbstractLogicalOperator op3 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
+        AbstractLogicalOperator op3 = (AbstractLogicalOperator) opRef3.getValue();
         if (op3.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
             AssignOperator assign2 = (AssignOperator) op3;
 
             // Check to see if the expression is a constant expression and type string.
-            ILogicalExpression logicalExpression2 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
-            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+            ILogicalExpression logicalExpression3 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
+            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
                 return null;
             }
-            ConstantExpression constantExpression = (ConstantExpression) logicalExpression2;
-            constantValue = (VXQueryConstantValue) constantExpression.getValue();
-            if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
-                return null;
-            }
-        } else if (op3.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE) {
-            ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
-            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return null;
-            }
-            AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
-            if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.PROMOTE.getFunctionIdentifier())) {
-                return null;
-            }
-
-            ILogicalExpression logicalExpression3 = (ILogicalExpression) functionCall2.getArguments().get(0).getValue();
-            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-                return null;
-            }
-            AbstractFunctionCallExpression functionCall3 = (AbstractFunctionCallExpression) logicalExpression3;
-            if (!functionCall3.getFunctionIdentifier().equals(BuiltinFunctions.FN_DATA_1.getFunctionIdentifier())) {
-                return null;
-            }
-
-            ILogicalExpression logicalExpression4 = (ILogicalExpression) functionCall3.getArguments().get(0).getValue();
-            if (logicalExpression4.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-                return null;
-            }
-            ConstantExpression constantExpression = (ConstantExpression) logicalExpression4;
+            ConstantExpression constantExpression = (ConstantExpression) logicalExpression3;
             constantValue = (VXQueryConstantValue) constantExpression.getValue();
             if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
                 return null;

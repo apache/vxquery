@@ -38,6 +38,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpressio
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
@@ -226,6 +228,14 @@ public class ExpressionToolbox {
                     case UNNEST:
                         UnnestOperator unnest = (UnnestOperator) variableOp;
                         return getOutputSequenceType(variableProducer, unnest.getExpressionRef(), dCtx);
+                    case ASSIGN:
+                        AssignOperator assign = (AssignOperator) variableOp;
+                        for (int i = 0; i < assign.getVariables().size(); ++i) {
+                            if (variableId.equals(assign.getVariables().get(i))) {
+                                return getOutputSequenceType(variableProducer, assign.getExpressions().get(i), dCtx);
+                            }
+                        }
+                        return null;
                     default:
                         // TODO Consider support for other operators. i.e. Assign.
                         break;
@@ -233,5 +243,18 @@ public class ExpressionToolbox {
 
         }
         return null;
+    }
+
+    public static boolean isFunctionExpression(Mutable<ILogicalExpression> mutableLe,
+            AbstractFunctionCallExpression afce) {
+        ILogicalExpression le = mutableLe.getValue();
+        if (le.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+            return false;
+        }
+        AbstractFunctionCallExpression fc = (AbstractFunctionCallExpression) le;
+        if (!fc.getFunctionIdentifier().equals(afce)) {
+            return false;
+        }
+        return true;
     }
 }
