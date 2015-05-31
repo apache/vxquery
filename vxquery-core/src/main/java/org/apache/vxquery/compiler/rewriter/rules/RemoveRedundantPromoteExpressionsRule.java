@@ -16,10 +16,7 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.functions.BuiltinOperators;
-import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
-import org.apache.vxquery.runtime.functions.cast.CastToFloatOperation;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.SequenceType;
 
@@ -64,9 +61,16 @@ public class RemoveRedundantPromoteExpressionsRule extends AbstractRemoveRedunda
                 // These types can not be promoted.
                 return true;
             }
-            if (sTypeOutput != null && sTypeOutput.equals(sTypeArg)) {
-                // Same type.
-                return true;
+            if (sTypeOutput != null) {
+                if (sTypeOutput.equals(sTypeArg)) {
+                    // Same type and quantifier.
+                    return true;
+                }
+                if (sTypeOutput.getItemType().equals(sTypeArg.getItemType())
+                        && sTypeArg.getQuantifier().isSubQuantifier(sTypeOutput.getQuantifier())) {
+                    // Same type and stronger quantifier.
+                    return true;
+                }
             }
         }
         return false;

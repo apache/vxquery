@@ -30,6 +30,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractBin
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractScanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractUnnestOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
 
 public class OperatorToolbox {
@@ -144,8 +145,10 @@ public class OperatorToolbox {
                     }
                 }
                 break;
-            case EMPTYTUPLESOURCE:
             case NESTEDTUPLESOURCE:
+                NestedTupleSourceOperator nts = (NestedTupleSourceOperator) op;
+                return findProducerOf(nts.getDataSourceReference(), lv);
+            case EMPTYTUPLESOURCE:
                 return null;
             default:
                 // Skip operators and go look at input.

@@ -42,23 +42,18 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  * 
  *   plan__parent
  *   UNNEST( $v2 : exp($v1) )
- *   ASSIGN( $v1 : collection( $source ) )
- *   plan__child
- *   
- *   Where $v1 is not used anywhere else in the plan and $source is:
- *   ASSIGN( $source : promote( data( constant ) ) )
- *    or
- *   ASSIGN( $source : promote( data( $v0 ) ) )
+ *   ASSIGN( $v1 : collection( $v0 ) )
  *   ASSIGN( $v0 : constant )
+ *   plan__child
  *   
  * After 
  * 
  *   plan__parent
  *   UNNEST( $v2 : exp($v1) )
- *   DATASCAN( collection( $source ) , $v1 )
+ *   DATASCAN( collection( $v0 ) , $v1 )
  *   plan__child
  *   
- *   Where DATASCAN operator is configured to use the collection( $source) for 
+ *   Where DATASCAN operator is configured to use the collection( $v0) for 
  *   data represented by the "constant" and $v1 represents the xml document 
  *   nodes from the collection.
  * </pre>
