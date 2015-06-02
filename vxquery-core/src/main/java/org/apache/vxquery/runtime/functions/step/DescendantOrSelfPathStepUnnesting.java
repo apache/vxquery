@@ -33,11 +33,11 @@ import edu.uci.ics.hyracks.data.std.api.IPointable;
 
 public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathStep {
     private boolean testSelf;
-    private boolean printSelf;
+    private boolean returnSelf;
     private int indexSeqArgs;
     private int seqArgsLength;
     private List<Integer> indexSequence = new ArrayList<Integer>();
-    private List<Integer> printedSequence = new ArrayList<Integer>();
+    private List<Integer> returnSequence = new ArrayList<Integer>();
 
     private final SequencePointable seqNtp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpItem = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -50,10 +50,10 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     }
 
     protected void init(TaggedValuePointable[] args) throws SystemException {
-        printSelf = true;
+        returnSelf = true;
         indexSeqArgs = 0;
         indexSequence.add(0);
-        printedSequence.add(0);
+        returnSequence.add(0);
 
         // Check the argument passed in as sequence or node tree.
         if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
@@ -82,7 +82,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
                 }
                 // Next node tree in sequence.
                 indexSeqArgs++;
-                printSelf = true;
+                returnSelf = true;
             }
         } else {
             // Single node tree input.
@@ -95,8 +95,8 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     }
 
     private boolean processNodeTree(TaggedValuePointable rootTVP, IPointable result) throws AlgebricksException {
-        if (testSelf && printSelf) {
-            printSelf = false;
+        if (testSelf && returnSelf) {
+            returnSelf = false;
             tvpItem.set(rootTVP);
             try {
                 setNodeToResult(tvpItem, result);
@@ -122,7 +122,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
         // Set up next level tracking.
         if (level + 1 > indexSequence.size()) {
             indexSequence.add(0);
-            printedSequence.add(0);
+            returnSequence.add(0);
         }
 
         SequencePointable seqItem = pp.takeOne(SequencePointable.class);
@@ -134,8 +134,8 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
                 seqItem.getEntry(indexSequence.get(level), tvpItem);
 
                 // Check current node
-                if (indexSequence.get(level) == printedSequence.get(level)) {
-                   printedSequence.set(level, printedSequence.get(level) + 1);
+                if (indexSequence.get(level) == returnSequence.get(level)) {
+                    returnSequence.set(level, returnSequence.get(level) + 1);
                     setNodeToResult(tvpItem, result);
                     return true;
                 }
@@ -150,10 +150,10 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             // Reset for next node tree.
             if (level == 0) {
                 indexSequence.set(level, 0);
-                printedSequence.set(level, 0);
+                returnSequence.set(level, 0);
             } else {
                 indexSequence.remove(level);
-                printedSequence.remove(level);
+                returnSequence.remove(level);
             }
             return false;
         } catch (IOException e) {
