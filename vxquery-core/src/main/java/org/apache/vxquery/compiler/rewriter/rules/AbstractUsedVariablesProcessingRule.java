@@ -52,7 +52,6 @@ public abstract class AbstractUsedVariablesProcessingRule implements IAlgebraicR
 
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
-        opRef.getValue().getOperatorTag();
         if (hasRun && !firstOpRef.equals(opRef)) {
             return false;
         } else {
