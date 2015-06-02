@@ -1048,7 +1048,7 @@ public class XMLQueryTranslator {
                     for (LetVarDeclNode lvdNode : lcNode.getVariables()) {
                         LogicalVariable seqVar = translateExpression(lvdNode.getSequence(), tCtx);
                         tCtx.pushVariableScope();
-                        SequenceType letVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_ONE);
+                        SequenceType letVarType = SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR);
                         if (lvdNode.getType() != null) {
                             letVarType = createSequenceType(lvdNode.getType());
                         }
