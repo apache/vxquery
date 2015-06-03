@@ -1,0 +1,12 @@
+<items person="59200.52">3</items>
+<items person="60275.75">3</items>
+<items person="73015.33">4</items>
+<items person="77899.19">6</items>
+<items person="102237.41">7</items>
+<items person="95921.73">7</items>
+<items person="57699.99">3</items>
+<items person="59655.87">3</items>
+<items person="67696.29">3</items>
+<items person="81288.98">7</items>
+<items person="90986.66">7</items>
+<items person="64262.77">3</items>

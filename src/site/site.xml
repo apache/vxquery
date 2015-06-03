@@ -57,6 +57,9 @@ limitations under the License.
 
         <menu name="For Users">
             <item
+                name="Get Started"
+                href="user_get_started.html" />
+            <item
                 name="Installation"
                 href="user_installation.html" />
             <item
@@ -68,6 +71,9 @@ limitations under the License.
         </menu>
 
         <menu name="For Developers">
+            <item
+                name="Get Started"
+                href="developer_get_started.html" />
             <item
                 name="Data Handling"
                 href="development_data_handling.html" />
@@ -81,14 +87,14 @@ limitations under the License.
                 name="Eclipse Setup"
                 href="development_eclipse_setup.html" />
             <item
-                name="Release steps"
-                href="release.html" />
+                name="Release Steps"
+                href="development_release.html" />
             <item
                 name="Update Local Git XQTS Results"
                 href="development_update_xqts_results.html" />
-            <item
+            <!-- <item
                 name="XQuery Benchmarks"
-                href="development_benchmarks.html" />
+                href="development_benchmarks.html" /> -->
         </menu>
 
         <menu ref="reports" />

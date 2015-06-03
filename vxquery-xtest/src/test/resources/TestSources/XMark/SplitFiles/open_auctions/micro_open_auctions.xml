@@ -1,0 +1,1944 @@
+<?xml version="1.0" standalone="yes"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<site>
+<open_auctions>
+    <open_auction id="open_auction0">
+      <initial>80.33</initial>
+      <reserve>177.13</reserve>
+      <bidder>
+        <date>02/17/1999</date>
+        <time>00:39:10</time>
+        <personref person="person10"/>
+        <increase>19.50</increase>
+      </bidder>
+      <bidder>
+        <date>01/23/2000</date>
+        <time>07:55:02</time>
+        <personref person="person25"/>
+        <increase>22.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/07/1999</date>
+        <time>21:18:49</time>
+        <personref person="person46"/>
+        <increase>27.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/21/2000</date>
+        <time>00:44:51</time>
+        <personref person="person47"/>
+        <increase>33.00</increase>
+      </bidder>
+      <bidder>
+        <date>08/14/1999</date>
+        <time>19:12:49</time>
+        <personref person="person20"/>
+        <increase>25.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/14/2001</date>
+        <time>22:43:25</time>
+        <personref person="person30"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/26/2001</date>
+        <time>14:13:00</time>
+        <personref person="person24"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>12/21/2000</date>
+        <time>16:39:49</time>
+        <personref person="person24"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>07/24/2000</date>
+        <time>19:55:32</time>
+        <personref person="person1"/>
+        <increase>54.00</increase>
+      </bidder>
+      <current>270.83</current>
+      <privacy>No</privacy>
+      <itemref item="item0"/>
+      <seller person="person19"/>
+      <annotation>
+        <author person="person29"/>
+        <description>
+          <parlist>
+            <listitem>
+              <text>
+                esquire yet mature collatine george company well stands
+                assistance grove while faulconbridge seel sweetly gouty slumber
+                interpreter wills adversary heretics vengeance comforts chose
+                quake gaunt hollow gentles nymph counterfeit <bold> whip
+                <keyword> beguild says depth ford fond book tune elements
+                preserv whatsoever </keyword> most strength knavery </bold>
+                mock invisible loyal altar passion ancient comply grandam
+                motions contempt gentleness brother reign prove glorious hopes
+                even dismiss mine whether leaden forgeries handkerchief test
+                princess wast ventidius wake highness wit friend reason divided
+                preventions crooked safe tombs ache rest main square incision
+                deliver senator decius citizens returns jot affects guide
+                wretches troilus proper thorns adventure ugly knowledge
+                confines justice raves exactly fortune neglected haste yielded
+                weaker dove mood <emph> since offence clawed door inspir
+                throughly troops </emph> helm rosencrantz tush sound quail
+                knock space needs eros tides half turning held thought tail
+                willing eldest plotted abominable desdemona innocents ready
+                leaving ability showing educational knots durst guns mate land
+                warrant refused lane shine smooth shadows dido iago offic
+                gentle import cousins kindled sums build griefs dat prithee 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                never remarkable agree cherubin likelihood lordship clergy
+                forerun bias gone bowls peasant famine detect <bold> corruption
+                </bold> last pretended odious confounds plain correction
+                carrion ends fair use conveyance simplicity obscur helmets
+                cried fast hereford exeunt government hunger yesterday employ
+                stir stab leontes doest wearied methoughts isle sojourn goblin
+                bobb trusty paris gallant down beast meat philippi dunghill
+                eyesight turns street margaret grizzled year mother crew myself
+                <bold> starve </bold> goodly brow tear coughing equally already
+                praised speaking constancy <keyword> praise gone minion
+                countryman suits boys rights </keyword> shuts intending orders
+                general curs ditch advantage murtherer goose <keyword>
+                thousands whipping victorious rosencrantz </keyword> request
+                says balthasar bred breathe kept expect sisters mistake speak
+                jog meeting absent lucius esteems fairly defending 
+              </text>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>9</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>02/15/1998</start>
+        <end>04/25/1999</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction1">
+      <initial>266.04</initial>
+      <reserve>566.77</reserve>
+      <bidder>
+        <date>05/11/1999</date>
+        <time>10:47:07</time>
+        <personref person="person30"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>06/28/1998</date>
+        <time>18:09:04</time>
+        <personref person="person1"/>
+        <increase>52.50</increase>
+      </bidder>
+      <current>323.04</current>
+      <itemref item="item2"/>
+      <seller person="person26"/>
+      <annotation>
+        <author person="person27"/>
+        <description>
+          <text>
+            appeared <bold> daff young account rivall wretched happier </bold>
+            empire mann mercutio coin dire charm snails apprehend prologue
+            seals <keyword> estates steal suppose strucken </keyword> left
+            richer detention tokens indeed wore alas flight meet thomas odd
+            ensue surmise shepherdess aunt hunted blam wrings period trip
+            effeminate mingle hurl vainglory freezes zounds salisbury woe
+            examine rapier manifest whatever breeding abide vengeance meet weed
+            publisher enemies <keyword> villain </keyword> sun 
+          </text>
+        </description>
+        <happiness>9</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>01/16/1999</start>
+        <end>02/06/1998</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction2">
+      <initial>31.95</initial>
+      <bidder>
+        <date>02/27/2000</date>
+        <time>03:39:24</time>
+        <personref person="person5"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/16/2001</date>
+        <time>01:40:25</time>
+        <personref person="person22"/>
+        <increase>27.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/23/2000</date>
+        <time>19:57:30</time>
+        <personref person="person41"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/17/2001</date>
+        <time>07:06:29</time>
+        <personref person="person6"/>
+        <increase>21.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/27/2001</date>
+        <time>00:29:19</time>
+        <personref person="person1"/>
+        <increase>3.00</increase>
+      </bidder>
+      <current>91.95</current>
+      <privacy>Yes</privacy>
+      <itemref item="item3"/>
+      <seller person="person30"/>
+      <annotation>
+        <author person="person32"/>
+        <description>
+          <parlist>
+            <listitem>
+              <parlist>
+                <listitem>
+                  <text>
+                    dullness juliet shapes simples couples marcus either wisely
+                    flood dwell wills employment drew begun red eschew destiny
+                    henceforward fairy rising 
+                  </text>
+                </listitem>
+                <listitem>
+                  <text>
+                    <emph> knew transmigrates <keyword> tempter </keyword> what
+                    dispossess <bold> testimonies </bold> when slop taking keep
+                    tongue brains frenchman </emph> steer 
+                  </text>
+                </listitem>
+                <listitem>
+                  <text>
+                    burst grieved prayers feasting despis patiently fix pardon
+                    jocund sink apish precisely <emph> almost dash fashion sup
+                    journey accommodations </emph> offendress season wherefore
+                    speechless maintains addition ding such simple warwick
+                    sentence lusty abhor degree raise preventions relish cry
+                    aumerle safety leg natural lord cradle worser fork bruised
+                    borrow feather perform esquire aught <emph> loathed article
+                    sing seem belly </emph> dedication bodes inform creep
+                    window eight tut cressid fight tortures quality trade wakes
+                    wipe undo beasts muscovites distracted change detested
+                    sparks smooth towards turk shifts <bold> speediest </bold>
+                    pardoning quite patient hospitable pilled burdens chang
+                    punish senate creature falling some collection passage ice
+                    too judas twelvemonth little increase madam pound raught
+                    roderigo flourish harms oratory sky mediation <emph> assign
+                    semblable blunt <bold> health imaginary height coctus
+                    </bold> odd ilion view </emph> palate vile belongs 
+                  </text>
+                </listitem>
+              </parlist>
+            </listitem>
+            <listitem>
+              <text>
+                criminal dreadful master <keyword> grace shaking brocas
+                appetites </keyword> double times loved ripping spurns garrison
+                earthly branches jude integrity kinswoman done ecstasy hungry
+                pow bill editions assistance bliss divinely jul its judge
+                toothache uplifted maim dislik leg struck dere dislike
+                preventions teeth twigs measures mightily incline apollo poem
+                appeas finding unfold soar messengers grieve cloud 
+              </text>
+            </listitem>
+            <listitem>
+              <parlist>
+                <listitem>
+                  <text>
+                    joan stamp spirit blister killing buckingham preventions
+                    rendered spring sentence vantage <bold> christian </bold>
+                    undertook editions doe penitent herein vat child obidicut
+                    fury <keyword> earnest depart windsor posture suffer greece
+                    glimpses whilst </keyword> shore forgot bind tributary
+                    pursu bachelor saying parley dwell due queens purposely
+                    rough cassius paul lord enter beat benefit fights
+                    commission sharp twelvemonth language hot court cup bodies
+                    cor redress frowning negligent block bravely beware <emph>
+                    duty shares aweary will third forbid power </emph> 
+                  </text>
+                </listitem>
+                <listitem>
+                  <text>
+                    bickerings eminence knows chiefest feel big unstained
+                    drumming mistaking stall <emph> moor </emph> wealth divers
+                    protector foremost actor palm hoarding patience moon
+                    misprizing profit followed fight accuse bail fortune
+                    pleaseth bleed hercules embrace denoted doting additions
+                    hundred ver plant committed vanity beds burthen marshal
+                    queasy yea smock worship sterile because long
+                    gloucestershire often gem ben deserve hinds precisely lands
+                    thee pernicious beast gives tricks duchess despair casement
+                    fly preventions slight orlando disdain swell large defects
+                    difference heads seemeth rode vouchsafe excess quoted
+                    temper untimely generation his injuries host <bold> alms
+                    ungain chance guile baby file puissant cassio event
+                    quillets wounded </bold> pastime hymn fever occupation
+                    election very image beauty prays desperately <bold> fogs
+                    tiber nym flower strict gesture praise wise grace </bold>
+                    impeach archbishop mar ventidius condemns drugs lightness
+                    pageant purposes date reeking orlando agrippa hatch light
+                    absence clouds antiquity heavy accusation anchor quake
+                    ancient nation fix came dreaded retired paint neglect thine
+                    desdemona enterprise monstrous man esteem observance else
+                    stars pyrrhus bonny bull scape victory benedick find
+                    precise whilst god 
+                  </text>
+                </listitem>
+                <listitem>
+                  <text>
+                    fields distemper abroad begun bout removed opportunity
+                    indirectly 
+                  </text>
+                </listitem>
+              </parlist>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>1</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>11/13/2001</start>
+        <end>02/01/1999</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction3">
+      <initial>25.05</initial>
+      <bidder>
+        <date>04/14/2001</date>
+        <time>11:45:54</time>
+        <personref person="person40"/>
+        <increase>10.50</increase>
+      </bidder>
+      <bidder>
+        <date>06/07/2000</date>
+        <time>06:52:10</time>
+        <personref person="person4"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>05/06/2000</date>
+        <time>01:01:08</time>
+        <personref person="person27"/>
+        <increase>15.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/26/2001</date>
+        <time>11:23:41</time>
+        <personref person="person38"/>
+        <increase>9.00</increase>
+      </bidder>
+      <bidder>
+        <date>09/24/2000</date>
+        <time>20:55:27</time>
+        <personref person="person26"/>
+        <increase>63.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/13/1999</date>
+        <time>21:45:36</time>
+        <personref person="person32"/>
+        <increase>18.00</increase>
+      </bidder>
+      <bidder>
+        <date>04/06/1998</date>
+        <time>22:11:36</time>
+        <personref person="person29"/>
+        <increase>46.50</increase>
+      </bidder>
+      <bidder>
+        <date>10/03/2000</date>
+        <time>09:32:41</time>
+        <personref person="person48"/>
+        <increase>13.50</increase>
+      </bidder>
+      <bidder>
+        <date>08/23/1998</date>
+        <time>22:55:32</time>
+        <personref person="person18"/>
+        <increase>22.50</increase>
+      </bidder>
+      <bidder>
+        <date>01/18/2000</date>
+        <time>07:06:56</time>
+        <personref person="person0"/>
+        <increase>34.50</increase>
+      </bidder>
+      <bidder>
+        <date>07/05/2000</date>
+        <time>07:13:13</time>
+        <personref person="person2"/>
+        <increase>19.50</increase>
+      </bidder>
+      <bidder>
+        <date>08/07/2001</date>
+        <time>07:02:23</time>
+        <personref person="person39"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/16/2001</date>
+        <time>09:31:44</time>
+        <personref person="person31"/>
+        <increase>15.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/20/1998</date>
+        <time>13:55:01</time>
+        <personref person="person24"/>
+        <increase>4.50</increase>
+      </bidder>
+      <current>304.05</current>
+      <itemref item="item5"/>
+      <seller person="person23"/>
+      <annotation>
+        <author person="person6"/>
+        <description>
+          <parlist>
+            <listitem>
+              <text>
+                blots eyes stone can hunted petticoat plainness edward
+                protection worst press witness knife private past polixenes
+                studied peers crown endure dress gentleman godliness legs
+                bidding far forswear amiss vain fellow allow grace admitted
+                heirs wakes domestic render call respecting glou commanders
+                practice northumberland being merrily mess politic <keyword>
+                preventions </keyword> cull bid anguish split grapple parthian
+                thick comforted knows tyrant hangs comment unless sake needle
+                bribes durst aloud attain ourselves thither 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                wherefore charmian confess handkerchief rue equity sue refuge
+                unprun baseness burns concludes merely seven purchased cited
+                place owl dusky titus ross exit rivers preventions spurs antony
+                yes corruption importeth definitive stop change sword stol wax
+                whores great stir <bold> helen </bold> hideous maintains stoop
+                those knew severally disdain shape julius serpent tower
+                medicine evils provost pleasure sufficient acquire soul happier
+                gentility likely blood warrant many weather umber wreck labour
+                staff arrest cool earnest five decree sentenc faint dog none
+                lawless minute unworthiest weary late call take fine fee ring
+                conceited grant skirts host amity read diligence force burden
+                ambitious constant brutus cured intend bawd kindle design
+                penance melodious guides <emph> enforc </emph> counsel round
+                spending marvellous each motion assurance ship yields 
+              </text>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>3</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>05/05/1999</start>
+        <end>12/08/1998</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction4">
+      <initial>61.17</initial>
+      <reserve>78.35</reserve>
+      <bidder>
+        <date>04/23/1998</date>
+        <time>10:25:52</time>
+        <personref person="person29"/>
+        <increase>4.50</increase>
+      </bidder>
+      <current>65.67</current>
+      <itemref item="item7"/>
+      <seller person="person24"/>
+      <annotation>
+        <author person="person21"/>
+        <description>
+          <parlist>
+            <listitem>
+              <text>
+                chafe half place snar probable pronounce young rigour fight
+                judas suspected duchess discovering standing orlando blind
+                errors waters flee than changes hair case lofty approved ebbs
+                trick want text perforce lance stir amity blest errand
+                advantage till adopts rebel hand skill marshal diomed flowers
+                rather complain excepting port fingers gentleness apt much here
+                suited pluck sounds recovered unadvised rememb fish thrice
+                things today branches worm fails vane sharp feeds <bold>
+                garland comfort eat thinks creep absent sheepcotes </bold>
+                veins either 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                ends account confusion event 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                frighting apollo dally husbands brothers flow courage accurst
+                hector prosperity business breather legate particular wars
+                performed affected sick 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                spider leaden consent shameful slew lusty disguis jul your all
+                <bold> discover </bold> deep sends tyrrel gapes bred fruitful
+                presentation wittol drums belie purposes twice organs contrary
+                hybla suffer future frame perilous dull reach weapons clerkly
+                confirmations approof ungor ladies whom cope legs voices
+                shepherd protest eternal prosperous fortinbras else truant
+                laertes hermione afflict peace therefore save one casualties
+                kiss translates cuts style holding spots delay suit interr
+                mouths offender wailing vantage returns remedy solemnity won
+                entreated rite congealment sly mayor his his fame tewksbury
+                limb blackness galleys mile praise roar leisure slowly leadeth
+                grievously disguiser controlled accus expecting out glance
+                beggarly angiers free interest mildest knocks forgot shortly
+                serv took title horrible utt banish breeds swimmer amongst
+                determine appear natures mount purple mind perceive partake
+                banishment founded art manners sought brass effect hogshead
+                highness any mud trees wilt judgment merchants heat gift romans
+                safe beat prerogative grows prescript ecstacy bite unlettered
+                amen <keyword> clerk alas </keyword> conjures despise cross
+                handkerchief repose harbour strange drift <emph> too </emph>
+                draws <emph> spell air </emph> 
+              </text>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>5</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>08/09/1999</start>
+        <end>02/18/1998</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction5">
+      <initial>4.92</initial>
+      <reserve>6.52</reserve>
+      <bidder>
+        <date>10/17/2001</date>
+        <time>23:29:43</time>
+        <personref person="person25"/>
+        <increase>4.50</increase>
+      </bidder>
+      <current>9.42</current>
+      <privacy>Yes</privacy>
+      <itemref item="item9"/>
+      <seller person="person24"/>
+      <annotation>
+        <author person="person15"/>
+        <description>
+          <text>
+            incidency plight sweet possible siege coals ask importune nephews
+            eke outrageous contrives seriously fighting belike monster deserves
+            apes begin audience warm wife displeasure <bold> earth </bold>
+            flies him article meed monstrous talents threat twice doth vein
+            dispose <emph> execute <bold> procurator frail rawer </bold>
+            carters pasture </emph> therefore then thursday believe words cost
+            warlike thought amount triumphed dust commonwealth heavy spread
+            leather voice blessed uncle usurer 
+          </text>
+        </description>
+        <happiness>4</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>12/06/2001</start>
+        <end>03/03/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction6">
+      <initial>7.85</initial>
+      <bidder>
+        <date>02/23/2001</date>
+        <time>14:56:15</time>
+        <personref person="person24"/>
+        <increase>24.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/24/1998</date>
+        <time>17:05:48</time>
+        <personref person="person12"/>
+        <increase>36.00</increase>
+      </bidder>
+      <current>67.85</current>
+      <itemref item="item10"/>
+      <seller person="person32"/>
+      <annotation>
+        <author person="person25"/>
+        <description>
+          <text>
+            small was happiness yourselves complexion shed cull alexandria
+            right enfranchisement that diest pembroke thrive people concerns
+            many princess misgoverning devilish fretted assur geffrey deceived
+            earthly strange speaks fore lack pocky christian goneril recreation
+            shifts kindness she perfection beasts knees scorn pillow childness
+            exchequer measur drawing when either horse eager visor confirmation
+            unkind although beat churlish archbishop discontents dreamt text
+            indeed govern alas fifth corrupted work <keyword> rose directly
+            epitaph presses world incapable idly profaneness indignation sullen
+            </keyword> assure woo dwarf lik vex vain seems goodman citadel
+            dares revel opportunity devout either wilful flattered determine
+            swift reform apparent taffety strike hither murther gracious remove
+            ambassador guil sicilia stronger accept crows any unlawful because
+            fishmonger elsinore habitation deeper next make news menace archers
+            doubts twenty ben <emph> rash confines </emph> portia pregnant girl
+            amaimon car lap letter prove wenches mars seldom modesty lenity
+            reflecting riddle wander chin polonius doomsday wretch paulina
+            expense counsels preventions narrow turning heard reported water
+            sicyon apemantus perchance fruit prove provision hour enraged
+            bending awe presented brain safety month followed arch kneels
+            supervise spite calamities trumpet bones utterly twenty preserve
+            turn swallowing questions hazard father touching burnt waking skies
+            hundred rags mightier tarrying john arts gerard aged injuries
+            stings everlasting instance fated part haught war appear credit
+            courtly mightiest strew sworn gladly reason cousin judgment doing
+            flowers levied shakespeare misery are sense cyprus residing norfolk
+            heirs sets breath issue difference <bold> like expounded </bold>
+            bills restore clock rub eight whisper leaves bora thereof detested
+            certain <keyword> amount empty </keyword> weakest <keyword> receiv
+            determine girdles ere goes </keyword> draught rose peace game
+            constable until princess pennyworth april chill for hast rul steed
+            coxcomb effeminate mistress mess tent object less ros flatter
+            pleasure opening heaven rash willow kindly selfsame liberty sit
+            wayward tomorrow preventions weakness yonder truster convey
+            considered owl goneril garments weep lark laer tie ill jars
+            patroclus lordship jet attorneys glistering bora rosalind bears
+            expire faults prevent iniquity holla brought marg darkly tickling
+            men please expend utter assist stroke fond liv whither jar scandal
+            bleed truly foggy moraler 
+          </text>
+        </description>
+        <happiness>6</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>01/10/1999</start>
+        <end>05/01/2001</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction7">
+      <initial>131.21</initial>
+      <reserve>296.07</reserve>
+      <bidder>
+        <date>02/10/1998</date>
+        <time>15:22:52</time>
+        <personref person="person22"/>
+        <increase>13.50</increase>
+      </bidder>
+      <current>144.71</current>
+      <privacy>No</privacy>
+      <itemref item="item12"/>
+      <seller person="person24"/>
+      <annotation>
+        <author person="person2"/>
+        <description>
+          <parlist>
+            <listitem>
+              <text>
+                renew standing chid waking shores bold promises nephew tempest
+                thing that book benedick kin indeed molten manhood smallest
+                <keyword> waste laugh wretched </keyword> treasure 
+              </text>
+            </listitem>
+            <listitem>
+              <parlist>
+                <listitem>
+                  <text>
+                    lamp hour 
+                  </text>
+                </listitem>
+                <listitem>
+                  <text>
+                    forget rusty direction sights whipt taste host ratcliff
+                    qualify counsel peace outside carving sight loss activity
+                    inherit govern bourn feast borne despise elizabeth mede
+                    lines phoebus suspected fatal tempt heaviness trespasses
+                    determine pay mean chronicle butt commission twine courtier
+                    burdens forgiveness thrives did hecate heap fort 
+                  </text>
+                </listitem>
+              </parlist>
+            </listitem>
+            <listitem>
+              <parlist>
+                <listitem>
+                  <text>
+                    scorn thee rid ask venture things drawing forgiven gallop
+                    spends portia rash peace 
+                  </text>
+                </listitem>
+                <listitem>
+                  <text>
+                    ourselves loss desert dumb apollo fawn clifford cudgeled
+                    night threw annoying furnish determin sooth doom videlicet
+                    itself witless fairly constancy sworn mark abundant hight
+                    apemantus oxford hastily poverty verse show lawyer borne
+                    cavaleiro wrestle armour saddle advis dissolution fled
+                    methought sinon abide 
+                  </text>
+                </listitem>
+                <listitem>
+                  <text>
+                    <bold> frankly breaks </bold> suck simply thing basket
+                    father lawful freedom domain resemble indifferent puff that
+                    name depravation bleeding mightily rose eyes quarrel
+                    instruments bones countercheck blaspheme laer hereford
+                    taffeta tire assured partly beard cries heathen harmless
+                    course western patiently down because qualify accused
+                    ordinary new gender malady rightly matters eros pure
+                    kneeling dissuade wiser carries wretch form discourse
+                    obeyed bear <bold> seas </bold> double fairer thames purse
+                    banishment return note forever fulvia iras nightingale
+                    triumphant egg circle six bench paid force plight athens
+                    prick mate fears offences semblance phrase alexandria
+                    measur accuser then millions courage messes <emph> field
+                    wreck willingly woman hor </emph> strong seasons detected
+                    <bold> hugh </bold> harmony choler goodly good <bold>
+                    revenues defence perchance hubert </bold> fills cupbearer
+                    roses spurn greens speedily lik you nevils matters combat
+                    the jaws remember shed design wot rumor nephew containing
+                    will army chivalrous wakes entrance hag along disposition
+                    lawyers alike bruised transported ape laurence punk penance
+                    belov too promise <bold> written shown meat poland pede
+                    hell grant controlment vacant aid <keyword> afresh
+                    </keyword> fun </bold> cue emperor sound mighty fairies
+                    several apparel any flock <keyword> harder party servants
+                    conveyance ladder </keyword> speeches town 
+                  </text>
+                </listitem>
+              </parlist>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>9</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>07/22/1999</start>
+        <end>10/17/1998</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction8">
+      <initial>15.06</initial>
+      <bidder>
+        <date>04/03/1999</date>
+        <time>16:41:20</time>
+        <personref person="person6"/>
+        <increase>19.50</increase>
+      </bidder>
+      <current>34.56</current>
+      <privacy>No</privacy>
+      <itemref item="item13"/>
+      <seller person="person27"/>
+      <annotation>
+        <author person="person14"/>
+        <description>
+          <text>
+            command gazing enter street foulness were napkin stage stol already
+            mus smiling unmeet wilful fecks escape walls rancour happily
+            muzzled weeps threaten inclination knave twinn departed standing
+            unarm anchors description offended purse chin shoulders leather
+            misbegotten side tailors falsehood fled room witch unbruis smote
+            iris quintain blank containing devilish saying aumerle preserve
+            gone rod mighty practice tarquin mates pol alexandria ladies
+            redeliver hall resolv cease adieu bees elegancy flint gage fishes
+            convey bird catesby turning assist tewksbury lov answered captive
+            viper complete votarist surplus catesby pilgrimage advice establish
+            graces calm master nonsuits endow shakes ladies party mistook past
+            dallying hallow remorse quarrelsome age breastplate replied grows
+            selfsame weeks kiss ancestors valiant dug any affair lacedaemon cue
+            hath cimber live forbearance duties himself guil dream confusion
+            belongs mock repair sport conjure stol smell women proclaimed stir
+            wall plausible wants vouchsafe boot load hung behold gloves
+            prisoner contents silver porridge climate sirrah pronounce gyves
+            serve irons turning wronger bade mine groans rise rise secure
+            unwise nobility something pedro came late gins eclipse clap sum
+            daylight impress roderigo beams liable tear reckon weeps frederick
+            out jests conduct tempt storm perus unmeritable tempt old sup
+            desist intellect true attending doublet waters abuses stained
+            muster rosencrantz columbine brother perfect beds yonder pitch boot
+            turk election sport ward drink six <emph> complexion this </emph>
+            resolution host conditions parent thread nor customs died hose
+            arise ascend commend insolence senators wittingly sell splinter
+            rites parents anger england arraign answer despise wants barbarous
+            broil mouth musty redress avoid <keyword> far tail blows </keyword>
+            forehead bohemia whither tells foe lolling choose practices
+            comments pleas messenger solemn slut banes abominable pleases
+            ground world court <keyword> heartily sempronius overcome knives
+            </keyword> broken modern stream qualities hated tender <keyword>
+            ourself </keyword> leon provided pleas spinners servant unworthy
+            affected unassail albany house breathe use 
+          </text>
+        </description>
+        <happiness>4</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>06/05/1998</start>
+        <end>07/03/2001</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction9">
+      <initial>141.61</initial>
+      <bidder>
+        <date>07/12/1998</date>
+        <time>14:43:31</time>
+        <personref person="person39"/>
+        <increase>76.50</increase>
+      </bidder>
+      <bidder>
+        <date>06/28/1999</date>
+        <time>15:06:59</time>
+        <personref person="person11"/>
+        <increase>10.50</increase>
+      </bidder>
+      <current>228.61</current>
+      <itemref item="item14"/>
+      <seller person="person25"/>
+      <annotation>
+        <author person="person2"/>
+        <description>
+          <parlist>
+            <listitem>
+              <text>
+                wreck moiety race obscure sprat affections dole motion
+                unwillingness cell chamber presume speed turns goose soil
+                modest ass cardinal hurt handiwork runaway idleness jupiter
+                shakespeare navarre hath write mastiffs when headborough
+                brandish fell arragon marcus silly frailty spirits are afeard
+                stinking live images yard alexas smil empire chronicle terms
+                hangs signior noblest shirt tybalt seacoal irons pound uncle
+                shady ophelia kissing speak perform torch our idle greater
+                royalty counted antonius impressure spoil hates clay lets
+                oppose ophelia recanter lungs spread understand poorly robb
+                footman sweetly abused thrift tents oph maintain aery ladyship
+                words finely weak pray rage 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                following porridge straws slay staff soul glou buckingham shot
+                trod cyclops <keyword> takes tongue marriage strives aught
+                smith whence </keyword> stanley tickling tall report slaves
+                trumpets ships 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                weakness wand remember good likes madness jaws <keyword> backs
+                blue </keyword> thoughts bury infinite milky sweating again
+                toll votarists ling freely left wilderness every sound tricks
+                direction that wall bruised are needy juliet hanged sake
+                wherefore richer swords nan anon time pleasures <keyword>
+                nobles dry thrown gaining shed </keyword> gent forms
+                astronomers browner thirty pierce proceed mixture letter men
+                dares treason methinks mocking feasted action three vacant
+                devil heads plucks peril language eve visitors <bold> silence
+                confess draweth stage cheer walks </bold> soldiers wonder maids
+                prithee states changes excursions seat senators fearful pander
+                inquire that rate piety enlargement defil harsh hark drift
+                friendship <keyword> dramatis </keyword> fantasy heart
+                submission mother execute 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                approve choler soldiership <emph> neck alliance preventions
+                forest few doth having </emph> preventions sever wait sits
+                condemn places officers rejoice rough hero living spend effect
+                ham tedious patches shows preventions <emph> gon </emph>
+                prosper caius rich flee princes leisure john contemplation
+                heavens curious people tenderly garb dishonour patches unto
+                france colour guilty mood woe murder show drop swan language
+                darkly overcame testimony jealous pump engage <bold> decreed
+                cacodemon thereof </bold> tent cat commendations windsor hem
+                whispers kings obtain worthy rich children tide stop child
+                wedding experienc dread age capitol care charmian eager own
+                dross straight gate overcharged dens alive quicken ensign mar
+                preys combating galen checks fitter chang skill theme flourish
+                rude squire forbear knew villainous constant wondrous mainmast
+                keep vent favor hoarding therefore places home dwell empire
+                career knight guess legs jointly mourner messengers epitaphs
+                thinking adieu sevennight thence hercules morning approach
+                niece troy amidst unlocked sides 
+              </text>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>6</happiness>
+      </annotation>
+      <quantity>2</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>06/19/1998</start>
+        <end>05/24/1999</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction10">
+      <initial>8.35</initial>
+      <reserve>41.78</reserve>
+      <bidder>
+        <date>01/03/2000</date>
+        <time>07:31:45</time>
+        <personref person="person9"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>01/02/2000</date>
+        <time>09:03:59</time>
+        <personref person="person29"/>
+        <increase>43.50</increase>
+      </bidder>
+      <bidder>
+        <date>08/08/2000</date>
+        <time>22:36:33</time>
+        <personref person="person33"/>
+        <increase>25.50</increase>
+      </bidder>
+      <bidder>
+        <date>03/08/1998</date>
+        <time>15:52:04</time>
+        <personref person="person39"/>
+        <increase>12.00</increase>
+      </bidder>
+      <current>95.35</current>
+      <itemref item="item16"/>
+      <seller person="person33"/>
+      <annotation>
+        <author person="person13"/>
+        <description>
+          <text>
+            sun fardels touchstone minikin <bold> sweat </bold> sleep obedient
+            praying <bold> difference </bold> choughs oxford course would
+            french glorious scar letters dissolve den pity thread coursers
+            close sacrament womanish sacrifice already gorge parts robes
+            preventions strange satisfied countermand pandarus winter moor
+            amaze labyrinth reaches marrying verg curtain ground diet wisdom
+            minority returns spit showed preventions crust fits pierce unlike
+            aside word college young gait sword sat cars spent shot older paid
+            making imaginations revellers vengeance already deeds vill woodcock
+            etc envious command nights rascals smell canker plenteous store
+            breathe health writing depeche white storms doctrine language
+            manners ladder varro endanger against turn memory besides under
+            betray new committed compel harmless turd remember divine deceit
+            rash strew sinn serv glances mayor shine importance ebbs presently
+            admir gives throne costard henceforth duchy countrymen fealty trash
+            contriving could beauty blaze romeo messenger try <keyword>
+            pestilence that isabel convert midnight frailty lap </keyword>
+            semblable most boarded discontent wrestle surfeiting diligence
+            advis daughters plains <emph> unwillingness each </emph> pepin
+            edgar egg pierce jacks who methought imperfect confound sirrah
+            <bold> plea lust hang </bold> requir great barred coward officers
+            gives first properly holy <bold> attaint </bold> 
+          </text>
+        </description>
+        <happiness>8</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>01/10/2001</start>
+        <end>08/20/1999</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction11">
+      <initial>25.93</initial>
+      <reserve>58.27</reserve>
+      <bidder>
+        <date>05/01/2000</date>
+        <time>09:35:54</time>
+        <personref person="person44"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>12/27/2001</date>
+        <time>01:56:42</time>
+        <personref person="person8"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>03/21/2001</date>
+        <time>23:09:16</time>
+        <personref person="person5"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>07/27/1999</date>
+        <time>04:02:52</time>
+        <personref person="person0"/>
+        <increase>40.50</increase>
+      </bidder>
+      <bidder>
+        <date>10/28/1999</date>
+        <time>02:12:59</time>
+        <personref person="person23"/>
+        <increase>7.50</increase>
+      </bidder>
+      <current>78.43</current>
+      <privacy>Yes</privacy>
+      <itemref item="item17"/>
+      <seller person="person23"/>
+      <annotation>
+        <author person="person24"/>
+        <description>
+          <text>
+            woman conspirator depart dangers slew sayest forsworn <keyword>
+            tenths leaving arrival </keyword> mer negligent <emph> also tie
+            assailed goddess lowly </emph> fine tragedian eringoes pedro gate
+            nameless dumain mocks produce knew buzz new dial depends asham
+            craft flame whirls defiled brothers unclasp <keyword> whore wast
+            </keyword> elbow entreated ado further <keyword> misfortune
+            fractions forsake hail approve dismiss </keyword> kindly armour
+            germans thence sound truer issue suitor design hills nice rack
+            shipped party lover spartan frowning truant laertes his opened shut
+            sorrows brief yet further humility breath silly wear minds welcome
+            fatal shirt insupportable disguised speaking unwisely coupled
+            lapwing unmeet box trail lechery pestiferous <emph> grossness antic
+            must unremovably highly </emph> atomies propertied thorns spits
+            pots renascence brows decline austere bond kind resign looks mirror
+            worse kind england corner rescu goest ruder vapours ships
+            preventions bitter betwixt approbation mind past ending gall true
+            niece hies lamb estates <keyword> staff rounds </keyword> according
+            rarely female bark bride roar peasants musicians confounding poise
+            frown from revenged egypt cicero <keyword> fortunes waiting
+            sleeping integrity </keyword> resolution alive loving dar weapons
+            fix rhodes rebel ague almost cries passion pardoner carbonado
+            called pyrrhus synod accuse suspects register heavily kin delay
+            stir leer loud finely greeting places witch map garden mightier
+            includes hunger <emph> spark purpose noses antonio </emph> warning
+            execrations innocent seek fashion run estates satisfaction buys
+            steed farewell part person grew donn fogs unseen jewel shortly
+            cheeks ungentle <keyword> times <bold> sacred satisfaction </bold>
+            </keyword> 
+          </text>
+        </description>
+        <happiness>3</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>08/16/2000</start>
+        <end>01/07/2001</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction12">
+      <initial>16.25</initial>
+      <reserve>145.17</reserve>
+      <bidder>
+        <date>06/10/2001</date>
+        <time>10:59:33</time>
+        <personref person="person38"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>02/25/1999</date>
+        <time>06:14:38</time>
+        <personref person="person36"/>
+        <increase>21.00</increase>
+      </bidder>
+      <bidder>
+        <date>03/17/2000</date>
+        <time>22:24:16</time>
+        <personref person="person18"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>05/14/1999</date>
+        <time>14:00:37</time>
+        <personref person="person22"/>
+        <increase>81.00</increase>
+      </bidder>
+      <bidder>
+        <date>03/01/2000</date>
+        <time>22:43:18</time>
+        <personref person="person2"/>
+        <increase>7.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/25/1999</date>
+        <time>14:44:53</time>
+        <personref person="person1"/>
+        <increase>1.50</increase>
+      </bidder>
+      <current>134.75</current>
+      <itemref item="item20"/>
+      <seller person="person30"/>
+      <annotation>
+        <author person="person33"/>
+        <description>
+          <text>
+            strongly since conceived hir courtesy above contend present hew
+            winters <bold> possession liege black throne daughters </bold> pole
+            feather sure boarish madness kiss emilia stayed lodging declin
+            malice adversities offends send eyne spite december rotten wisdom
+            brother offender thou recover sinews convenience heavings sorts
+            with remov <emph> envy </emph> drew favour gaging dutchman eldest
+            kills heavenly clamour florentines barbarism osiers almighty
+            thought perdition lady careful throw reasons special sits clears
+            rememb fine crying deceit capers caius grievously alone toil care
+            princely want torment gentleness sets sin anthony mind single safer
+            argal mountain polixenes rape obligation northumberland knocking
+            fact triumphant kinsman exhalations omnipotent maiden unborn
+            recovered weep sop composition diest restitution patience egypt
+            plain fill triumphing shifts pardon staff <bold> assay engirt
+            convey </bold> france before estimate teach aspiring worthy envy
+            pocket crier lusts authority willingly points legate particular
+            unwillingly overflow wood madman hastings prophesy yoke unto
+            salutation black <emph> teacher sectary should wrestled let pills
+            </emph> receive followers nonino retires quicken <bold> flood their
+            paltry </bold> therefore afford worthies demanded sestos unfold
+            near whale cat chastisement orchard bedrid tears contempt ocean
+            vile extracted devil slanderer timon relish ratcliff bourn arise
+            pow heaven hush desp transparent ros oppose match naked nurs saves
+            toys tore proud morsel cited skill adieus vanish edgar grandam
+            giddy kind offending bowels arrest trumpets swinstead <keyword>
+            state porter flesh <bold> york </bold> hid belov lands challenge
+            respect olives </keyword> intended liars below adam sweets wounding
+            already breast doting revenge mate testimony preventions cope
+            blinding pol willingly example provost scrimers was even scape
+            masks preventions recreant sea despite upbraids wrought amity the
+            thrown wits achiev prepare bite light manka throw <emph> commended
+            longing grace interr copyright mood flower loud brat yonder raised
+            flock </emph> hollow purest infinite <emph> learning truly </emph>
+            adder vile shaking quit triumphant avouch eliads ber treasury slip
+            sport sneak mean patches surviving rom senseless <keyword> inform
+            piece caught </keyword> forsook seal hearts brokers employment
+            ourselves stranger along deliver drew shillings states thousands
+            yield somerset trebonius collatium harsh <keyword> from </keyword>
+            between farewell frenchmen purple tyrannous affrights lights wisdom
+            expedient reg <emph> minded peer philip </emph> widow play hang
+            reproof thus boot dishonoured knife <keyword> banks </keyword>
+            botch obtain vengeance since stool goot banish early ambition fled
+            volume fiend folded maid liar feature undoing bow seemeth hereford
+            presentation night attempt knowing stall sins tarquinius paris suck
+            preventions cut harp renascence peter measure misprizing hush host
+            buck waste push delights helm each lift mantua almost throat inclin
+            dost maine weapon got book <emph> gentlewoman finger palace table
+            preventions </emph> calf dolabella derive looks punish borne
+            duellist true owen impression warlike urge maid gave sea constraint
+            patiently even brought <keyword> debosh nonprofit great queen
+            stomach <bold> swear extenuate cloak turn </bold> egypt bearing
+            short raise </keyword> breath encounter canst brokes empty quarrel
+            along treads himself nobly found chid worship words asunder 
+          </text>
+        </description>
+        <happiness>6</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>12/03/2001</start>
+        <end>01/11/2001</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction13">
+      <initial>84.06</initial>
+      <bidder>
+        <date>01/22/2000</date>
+        <time>13:45:59</time>
+        <personref person="person19"/>
+        <increase>24.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/12/2001</date>
+        <time>07:19:34</time>
+        <personref person="person15"/>
+        <increase>7.50</increase>
+      </bidder>
+      <bidder>
+        <date>10/16/1999</date>
+        <time>18:05:41</time>
+        <personref person="person0"/>
+        <increase>19.50</increase>
+      </bidder>
+      <bidder>
+        <date>06/19/1998</date>
+        <time>04:00:11</time>
+        <personref person="person7"/>
+        <increase>27.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/18/1999</date>
+        <time>17:49:55</time>
+        <personref person="person34"/>
+        <increase>19.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/01/2001</date>
+        <time>10:35:05</time>
+        <personref person="person3"/>
+        <increase>19.50</increase>
+      </bidder>
+      <bidder>
+        <date>09/24/1998</date>
+        <time>11:13:26</time>
+        <personref person="person35"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>01/23/2000</date>
+        <time>02:25:45</time>
+        <personref person="person47"/>
+        <increase>28.50</increase>
+      </bidder>
+      <current>234.06</current>
+      <privacy>Yes</privacy>
+      <itemref item="item21"/>
+      <seller person="person25"/>
+      <annotation>
+        <author person="person39"/>
+        <description>
+          <text>
+            bertram seat warlike giddy prepar trouble transshape admittance
+            deal profound brought about enemy shadow ourselves rheum bees hers
+            greeting abhor compos aggravate basilisk 
+          </text>
+        </description>
+        <happiness>1</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>05/16/2001</start>
+        <end>08/09/1999</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction14">
+      <initial>14.20</initial>
+      <bidder>
+        <date>04/26/2000</date>
+        <time>22:27:14</time>
+        <personref person="person41"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>07/04/2000</date>
+        <time>12:49:43</time>
+        <personref person="person4"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>03/09/1998</date>
+        <time>14:48:52</time>
+        <personref person="person48"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>07/14/2000</date>
+        <time>22:53:10</time>
+        <personref person="person36"/>
+        <increase>34.50</increase>
+      </bidder>
+      <bidder>
+        <date>11/06/2000</date>
+        <time>01:30:52</time>
+        <personref person="person5"/>
+        <increase>9.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/23/1998</date>
+        <time>12:28:56</time>
+        <personref person="person37"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>01/16/1999</date>
+        <time>10:07:54</time>
+        <personref person="person46"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>09/06/1998</date>
+        <time>08:06:44</time>
+        <personref person="person18"/>
+        <increase>31.50</increase>
+      </bidder>
+      <bidder>
+        <date>03/23/2000</date>
+        <time>09:43:17</time>
+        <personref person="person39"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/11/1999</date>
+        <time>15:34:26</time>
+        <personref person="person39"/>
+        <increase>18.00</increase>
+      </bidder>
+      <current>137.20</current>
+      <privacy>No</privacy>
+      <itemref item="item22"/>
+      <seller person="person25"/>
+      <annotation>
+        <author person="person8"/>
+        <description>
+          <text>
+            <keyword> redeem thickest wedded cloddy ladies pity </keyword> 
+          </text>
+        </description>
+        <happiness>8</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>01/08/1999</start>
+        <end>02/11/2001</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction15">
+      <initial>44.53</initial>
+      <reserve>64.11</reserve>
+      <bidder>
+        <date>02/25/1998</date>
+        <time>07:29:49</time>
+        <personref person="person16"/>
+        <increase>18.00</increase>
+      </bidder>
+      <bidder>
+        <date>09/17/1999</date>
+        <time>19:39:15</time>
+        <personref person="person19"/>
+        <increase>39.00</increase>
+      </bidder>
+      <bidder>
+        <date>02/20/2000</date>
+        <time>16:50:05</time>
+        <personref person="person12"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>05/19/2001</date>
+        <time>07:39:30</time>
+        <personref person="person12"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/08/2000</date>
+        <time>15:24:55</time>
+        <personref person="person32"/>
+        <increase>1.50</increase>
+      </bidder>
+      <current>106.03</current>
+      <privacy>Yes</privacy>
+      <itemref item="item27"/>
+      <seller person="person22"/>
+      <annotation>
+        <author person="person49"/>
+        <description>
+          <parlist>
+            <listitem>
+              <text>
+                basan proudly gentlemen crime much malicious died force angry
+                precedent honest holla gladly haply festival delivers atone
+                maggot charmian physic lucrece admonition fled emperor issue
+                found pestilent courtesy although neither <bold> grass
+                basilisks happy wrong recanting </bold> par hero comments sole
+                created monarchize pelican april citizens pillars authentic
+                agamemnon spare insinuating <bold> hearing </bold> 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                tongues cupid received pin heaven babe marcus purposely worthy
+                accuse bonny throw childhoods plea care lash wither exeter heir
+                die adelaide gravity tail question berowne forces legacy enjoys
+                claims pluck progeny pluck antony ruin hector lid far distemper
+                bleaching box kin tributary revenge letters advancing 
+              </text>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>1</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>01/22/1998</start>
+        <end>03/06/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction16">
+      <initial>25.15</initial>
+      <reserve>106.87</reserve>
+      <bidder>
+        <date>07/08/2001</date>
+        <time>15:30:37</time>
+        <personref person="person49"/>
+        <increase>12.00</increase>
+      </bidder>
+      <bidder>
+        <date>02/25/1999</date>
+        <time>22:08:22</time>
+        <personref person="person14"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>01/27/1999</date>
+        <time>09:52:35</time>
+        <personref person="person42"/>
+        <increase>21.00</increase>
+      </bidder>
+      <bidder>
+        <date>09/27/2001</date>
+        <time>15:06:43</time>
+        <personref person="person20"/>
+        <increase>18.00</increase>
+      </bidder>
+      <bidder>
+        <date>12/04/1999</date>
+        <time>06:05:10</time>
+        <personref person="person0"/>
+        <increase>40.50</increase>
+      </bidder>
+      <bidder>
+        <date>04/12/2001</date>
+        <time>12:56:10</time>
+        <personref person="person14"/>
+        <increase>13.50</increase>
+      </bidder>
+      <bidder>
+        <date>10/04/2000</date>
+        <time>16:51:40</time>
+        <personref person="person43"/>
+        <increase>39.00</increase>
+      </bidder>
+      <current>175.15</current>
+      <itemref item="item30"/>
+      <seller person="person19"/>
+      <annotation>
+        <author person="person50"/>
+        <description>
+          <parlist>
+            <listitem>
+              <text>
+                wrongs blackheath unmoving rather commoners physicians has
+                differ dream impartment acquaint flowers believe destin
+                recompense pleases <emph> securely bright moon lover mansion
+                dearest thence meet cats finds home art splits suffer prais
+                making </emph> win moulded warranted amended beseech town
+                hatred dote fear uncivil diana defect bourn cleave ephesian
+                lips traveller condemned temper discharge unseasonable regards
+                guess holes measure edmund hubert effect hoarse devil deities
+                hung deaf slowly sensible door wanton forgive infect sticks
+                rushing avouch rom suffice tempted contumely wreck was humbly
+                manhood antique coffin massy hungry spring though sound engine
+                bang feature harlot purpose stepping farre height divided
+                windsor vault misbhav female observe leave provost cornelius
+                root bestow virtue betwixt faculties manhood could upward
+                suffer liking laurence abilities true sentinels witness before
+                intent speeches offends saint guiding each crest beat editions
+                ripened ease pull fond nominate trib tale harmony parties safe
+                hubert because ladyship gentle affections liar appointed poor
+                runs diet numbers sinful rich noise scorn gent men laughed
+                <keyword> exercise doctor pear shining embassy gracing jot
+                states </keyword> cools noting customer creatures wildly
+                besides sort whither buck majesty brim won treasure cyprus
+                nought arithmetic sex leg lips bag swore parents arise <emph>
+                prayers along interchange saints conclusion strumpet strength
+                </emph> quick counterfeit able brat inheritance 
+              </text>
+            </listitem>
+            <listitem>
+              <text>
+                smallest excus desperate top ducats who purse mingled careless
+                howe attempt road gapes study keeps brazen thunderbolt poisoned
+                athenian <bold> dim motive inspired tufts sequel </bold> exeunt
+                <bold> pest </bold> throats <keyword> ribbon caus ample knell
+                obedient sallets cowardice dove famous grecian romeo </keyword>
+                function french hiss nevils match miss weakness govern ebbs
+                brutus matter came lover sues lamp take ant death indirect
+                policy danger commend nation castle hell tore ballad behalf
+                horrid varied violate transport repose cry higher skilful
+                branch rain practices retir potent evermore hours brings was
+                uncomfortable attended desperation outward <keyword> ring
+                understand loathsome gold soften mettle apart amorous niece
+                kinsman into cruel peril paid <bold> quietness brief defence
+                julietta </bold> peace <bold> years thou who yours along world
+                </bold> support shall necessary sails </keyword> one streets
+                opening blessing 
+              </text>
+            </listitem>
+          </parlist>
+        </description>
+        <happiness>5</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>06/11/2001</start>
+        <end>06/18/1998</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction17">
+      <initial>48.88</initial>
+      <reserve>114.23</reserve>
+      <bidder>
+        <date>12/17/1998</date>
+        <time>08:30:15</time>
+        <personref person="person10"/>
+        <increase>7.50</increase>
+      </bidder>
+      <bidder>
+        <date>08/18/2001</date>
+        <time>21:56:16</time>
+        <personref person="person37"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>04/14/1999</date>
+        <time>15:14:03</time>
+        <personref person="person31"/>
+        <increase>3.00</increase>
+      </bidder>
+      <current>60.88</current>
+      <privacy>Yes</privacy>
+      <itemref item="item33"/>
+      <seller person="person31"/>
+      <annotation>
+        <author person="person3"/>
+        <description>
+          <text>
+            robb apart unseen proved interest take banishment mischance embers
+            fortunes swallow grieving shrift featly ros priest hill rest young
+            buttock issue ancestors conceit ten whoreson murderer amities heels
+            thrive swears bars members confusion belie tyrannically blood
+            shoulders exalted prophecy seats preventions conquer coffer
+            heaviness fire amber catalogue chimneys field murdered sinew does
+            reply agree unfit bernardo plagues conclusions yellow wander cross 
+          </text>
+        </description>
+        <happiness>5</happiness>
+      </annotation>
+      <quantity>2</quantity>
+      <type>Featured, Dutch</type>
+      <interval>
+        <start>10/21/2000</start>
+        <end>12/25/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction18">
+      <initial>108.01</initial>
+      <bidder>
+        <date>10/20/2000</date>
+        <time>01:53:58</time>
+        <personref person="person12"/>
+        <increase>9.00</increase>
+      </bidder>
+      <current>117.01</current>
+      <itemref item="item35"/>
+      <seller person="person25"/>
+      <annotation>
+        <author person="person14"/>
+        <description>
+          <text>
+            ask count heard <keyword> tell moat towns brute </keyword> sow
+            disguised hoodwink give therefore when single drawn pelting
+            companion vizaments ligarius forges par judgment pours twenty
+            claudio sinking 
+          </text>
+        </description>
+        <happiness>8</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>03/08/2000</start>
+        <end>12/01/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction19">
+      <initial>131.35</initial>
+      <bidder>
+        <date>10/25/1999</date>
+        <time>23:28:01</time>
+        <personref person="person8"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>01/14/2001</date>
+        <time>23:52:27</time>
+        <personref person="person11"/>
+        <increase>7.50</increase>
+      </bidder>
+      <current>141.85</current>
+      <privacy>No</privacy>
+      <itemref item="item36"/>
+      <seller person="person32"/>
+      <annotation>
+        <author person="person23"/>
+        <description>
+          <text>
+            others mine shoulders present dane hir seek envious mistress <bold>
+            alb course nose arrive bushy form said lepidus eager assur inherit
+            wool shore <keyword> colouring preventions preserve early forester
+            utterly froth wondrous steers days heigh confine profit </keyword>
+            minion morn mortimer marriage incense clap people </bold> crutch
+            mars book motive breathing nights crest rend judges capulet lion
+            barne dolour ourselves proscription consisting albany bar withdraw
+            last custom sooner slowly destruction <emph> bacchus accompt
+            </emph> appear yield collatinus device fain lip 
+          </text>
+        </description>
+        <happiness>6</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>04/18/1998</start>
+        <end>08/28/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction20">
+      <initial>15.02</initial>
+      <reserve>30.28</reserve>
+      <bidder>
+        <date>12/11/2001</date>
+        <time>22:20:17</time>
+        <personref person="person42"/>
+        <increase>36.00</increase>
+      </bidder>
+      <bidder>
+        <date>08/04/1998</date>
+        <time>03:48:58</time>
+        <personref person="person0"/>
+        <increase>30.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/23/2000</date>
+        <time>12:34:54</time>
+        <personref person="person39"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>12/28/2000</date>
+        <time>03:03:06</time>
+        <personref person="person18"/>
+        <increase>3.00</increase>
+      </bidder>
+      <current>87.02</current>
+      <itemref item="item39"/>
+      <seller person="person29"/>
+      <annotation>
+        <author person="person30"/>
+        <description>
+          <text>
+            <emph> sure </emph> wakes session wring conjure <keyword> tribute
+            backs thorns </keyword> thyme beggarly linger hound quite base
+            tonight pen forsworn experience emilia prepar sequent justly revolt
+            giant shepherds heap tyrant same clarence cassius scornful 
+          </text>
+        </description>
+        <happiness>4</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>04/08/2000</start>
+        <end>01/11/1998</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction21">
+      <initial>214.38</initial>
+      <reserve>604.63</reserve>
+      <bidder>
+        <date>04/01/2000</date>
+        <time>23:12:29</time>
+        <personref person="person35"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>06/11/1998</date>
+        <time>18:32:16</time>
+        <personref person="person13"/>
+        <increase>18.00</increase>
+      </bidder>
+      <bidder>
+        <date>04/06/1998</date>
+        <time>11:28:49</time>
+        <personref person="person38"/>
+        <increase>13.50</increase>
+      </bidder>
+      <bidder>
+        <date>11/15/1999</date>
+        <time>02:29:15</time>
+        <personref person="person21"/>
+        <increase>9.00</increase>
+      </bidder>
+      <bidder>
+        <date>10/20/2000</date>
+        <time>05:24:55</time>
+        <personref person="person43"/>
+        <increase>10.50</increase>
+      </bidder>
+      <bidder>
+        <date>11/07/1999</date>
+        <time>17:00:16</time>
+        <personref person="person41"/>
+        <increase>37.50</increase>
+      </bidder>
+      <bidder>
+        <date>11/11/2001</date>
+        <time>12:18:44</time>
+        <personref person="person12"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>04/21/1998</date>
+        <time>16:16:38</time>
+        <personref person="person22"/>
+        <increase>18.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/06/2000</date>
+        <time>20:35:27</time>
+        <personref person="person35"/>
+        <increase>1.50</increase>
+      </bidder>
+      <bidder>
+        <date>03/18/1999</date>
+        <time>19:45:40</time>
+        <personref person="person25"/>
+        <increase>3.00</increase>
+      </bidder>
+      <current>332.88</current>
+      <privacy>No</privacy>
+      <itemref item="item40"/>
+      <seller person="person26"/>
+      <annotation>
+        <author person="person41"/>
+        <description>
+          <text>
+            stuff villainy under never she readiness cradle oftener calchas
+            conceit wond feast take shed voice pluck painting greek april ilion
+            foh lucio dare armourer became roaring barbarous next awake
+            anchises clip dies henceforth bowl chide foams edmund lady achilles
+            hide drums short captain 
+          </text>
+        </description>
+        <happiness>1</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>12/15/2001</start>
+        <end>03/17/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction22">
+      <initial>168.86</initial>
+      <reserve>790.08</reserve>
+      <bidder>
+        <date>06/20/2001</date>
+        <time>10:24:42</time>
+        <personref person="person49"/>
+        <increase>21.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/25/1998</date>
+        <time>18:13:56</time>
+        <personref person="person5"/>
+        <increase>12.00</increase>
+      </bidder>
+      <current>201.86</current>
+      <itemref item="item41"/>
+      <seller person="person31"/>
+      <annotation>
+        <author person="person0"/>
+        <description>
+          <text>
+            honour alencon precious their gasping war witchcraft wits himself
+            braz signior velvet fresh afar lost rested howling only know
+            cuckolds shortly ladies pride nine spurn stares steep compt say
+            sixteen you mayst conscience feeling jealousy fitted lining
+            laughter relent flower hero myself bereft story messengers lords
+            bounds once relish shelter beaufort outrun shown permit entrance
+            height curse brooch wash check dealings antony able bias planet
+            stopped witty war snap oregon losing uses wealth <bold> assume
+            establish mellow below blind tried boarded injury stretch took harp
+            pedro edm lame something </bold> kings suppliant preventions
+            deserve dick groan stafford out larger lash dash traveller cross
+            tod seas parchment mistrust slanderous whilst hearing unwillingly
+            pate devilish lucy lieutenant pernicious flung history wert pair
+            themselves qualified splits eagle house hide lafeu repast else
+            birth suitor quarrel southwark beaten valentine frankly <keyword>
+            sticking freedom rise bonnet dead nothings beloved </keyword> jack
+            romans speech reported sojourn stratagem happy lace stand darken
+            blow jest county region richard swore unique sickly preventions
+            deny lolling detractions mountain defy complements disgrace enrich
+            philosophy arragon steeds light smelling load hanging frogmore
+            affront startle are falcon laugh justly furnish regist starve
+            chance happily adulterate lays blame methought ber near livery
+            eternity terra purchase declares monument cassandra bows prorogue
+            elements frampold lasting unrestor said recovered mar pent sings
+            mariners holp wake hamlet martino generals smile fantasy because
+            number snatch creature <keyword> mov </keyword> spread sainted
+            balthasar feast voice unbashful protests parting dug boys condole
+            anything lucio satisfied surely revenges style sighted pretty suits
+            rough pliant fetch lightning plead revive fed certain the pretty
+            hast 
+          </text>
+        </description>
+        <happiness>9</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>07/24/1999</start>
+        <end>08/05/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction23">
+      <initial>153.07</initial>
+      <reserve>538.96</reserve>
+      <bidder>
+        <date>07/21/2000</date>
+        <time>21:40:18</time>
+        <personref person="person29"/>
+        <increase>10.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/28/2000</date>
+        <time>08:00:37</time>
+        <personref person="person26"/>
+        <increase>21.00</increase>
+      </bidder>
+      <current>184.57</current>
+      <privacy>Yes</privacy>
+      <itemref item="item42"/>
+      <seller person="person25"/>
+      <annotation>
+        <author person="person49"/>
+        <description>
+          <text>
+            parson monumental able fourth delivered tired capt organs counsel
+            weak breathing <emph> heaviness heavily fault sequent rebellion
+            case mere mines powerfully child brings old timon osw faithful
+            office </emph> pricks troops plagues wager followed <keyword> alone
+            </keyword> entreaties proof went open widow priories drink troop
+            doing rotten ends loves warnings prepare balm big lap theirs crest
+            meaner notorious expedition beasts wales offer <emph> suffers
+            succeeding valour goblins </emph> learned rest spark jocund sit
+            tent companies forgery proportion cause advice leaps shrewd goneril
+            pleas speech comes demand didst brothers treasury acquainted
+            treasons mind strike whipp shifts prick factors hadst matter
+            election <bold> fee eyes strike honour </bold> ros sleep pitied
+            speech steps forth entertainment employment darkly carpenter term
+            towards walk clink fate honest smoothing parents peck warrant
+            desert virtuous chapel disturb conduct 
+          </text>
+        </description>
+        <happiness>1</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Regular</type>
+      <interval>
+        <start>01/12/1998</start>
+        <end>12/20/2000</end>
+      </interval>
+    </open_auction>
+    <open_auction id="open_auction24">
+      <initial>222.18</initial>
+      <reserve>832.08</reserve>
+      <bidder>
+        <date>09/22/2001</date>
+        <time>05:06:50</time>
+        <personref person="person51"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>02/19/2000</date>
+        <time>19:29:43</time>
+        <personref person="person20"/>
+        <increase>4.50</increase>
+      </bidder>
+      <bidder>
+        <date>08/01/1999</date>
+        <time>07:23:21</time>
+        <personref person="person51"/>
+        <increase>6.00</increase>
+      </bidder>
+      <bidder>
+        <date>06/25/2000</date>
+        <time>09:47:02</time>
+        <personref person="person4"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>05/07/1999</date>
+        <time>00:31:25</time>
+        <personref person="person24"/>
+        <increase>16.50</increase>
+      </bidder>
+      <bidder>
+        <date>12/23/1998</date>
+        <time>16:51:10</time>
+        <personref person="person43"/>
+        <increase>3.00</increase>
+      </bidder>
+      <bidder>
+        <date>09/04/2001</date>
+        <time>21:41:31</time>
+        <personref person="person19"/>
+        <increase>1.50</increase>
+      </bidder>
+      <current>261.18</current>
+      <privacy>No</privacy>
+      <itemref item="item43"/>
+      <seller person="person32"/>
+      <annotation>
+        <author person="person49"/>
+        <description>
+          <text>
+            discomfort senses life blot pens tend god interr despis squire
+            church star quoth attends liver flaw fly walks jesting haste broils
+            december gossips rose troilus loves acknowledge wounds frame awake
+            axe admir slumber morrow 
+          </text>
+        </description>
+        <happiness>6</happiness>
+      </annotation>
+      <quantity>1</quantity>
+      <type>Featured</type>
+      <interval>
+        <start>02/14/1998</start>
+        <end>09/26/2000</end>
+      </interval>
+    </open_auction>
+  </open_auctions>
+</site>

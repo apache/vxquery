@@ -1,0 +1,6 @@
+<result>
+  <preferred>1</preferred>
+  <standard>14</standard>
+  <challenge>10</challenge>
+  <na>28</na>
+</result>

@@ -99,28 +99,35 @@ public class FnRoundHalfToEvenScalarEvaluatorFactory extends AbstractTaggedValue
                                 return;
                             }
                             break;
-
                     }
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
-
                 // Prepare input.
                 try {
                     getDecimalPointable(tp, tvp1);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
-
                 // Perform rounding on decimal value.
-                // TODO round half to the nearest even number.
-                long decimalPlace = tp.decp.getDecimalPlace();
-                if ((precision - decimalPlace) < 0) {
-                    long decimalValue = tp.decp.getDecimalValue();
-                    decimalValue = (long) (decimalValue / Math.pow(10, -(precision - decimalPlace)));
+                byte decimalPlace = tp.decp.getDecimalPlace();
+                long decimalValue = tp.decp.getDecimalValue();
+                long newValue;
+                //check if the input needs to rounded to even or normally
+                if (decimalPlace - precision == 1 && (Math.abs(decimalValue) % 10 == 5)) {
+                    newValue = decimalValue / 10;
+                    if (!(newValue % 2 == 0)) {
+                        if (newValue > 0) {
+                            newValue += 1;
+                        } else {
+                            newValue -= 1;
+                        }
+                    }
+                    tp.decp.setDecimal(newValue, (byte) precision);
+                } else if ((precision - decimalPlace) < 0) {
+                    decimalValue = (long) Math.round(decimalValue / Math.pow(10, -(precision - decimalPlace)));
                     tp.decp.setDecimal(decimalValue, (byte) precision);
                 }
-
                 // Return result.
                 try {
                     switch (tvp1.getTag()) {

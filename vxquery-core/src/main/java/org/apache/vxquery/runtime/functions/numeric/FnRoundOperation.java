@@ -33,7 +33,7 @@ public class FnRoundOperation extends AbstractNumericOperation {
     public void operateDecimal(XSDecimalPointable decp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DECIMAL_TAG);
         dOut.write(0);
-        dOut.writeLong(Math.round(decp.doubleValue()));
+        dOut.writeLong((long) (decp.getBeforeDecimalPlaceRounded()));
     }
 
     @Override

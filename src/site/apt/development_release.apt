@@ -44,12 +44,14 @@ $ svn co https://dist.apache.org/repos/dist/release/vxquery dist
 $ svn co https://svn.apache.org/repos/asf/vxquery/site
 ---
 
+  * create a code signing key with the Apache {{{http://www.apache.org/dev/openpgp.html#generate-key}instructions}} and example settings
+
   * add your key to the <<<KEYS>>> file
 
     Change into the <<<dist>>> directory and run
 
 ---
-(gpg --list-sigs <your name> && gpg2 --armor --export <your name>) >> KEYS
+(gpg2 --list-sigs <your name> && gpg2 --armor --export <your name>) >> KEYS
 ---
 
     and then check the new <<<KEYS>>> file into svn
@@ -69,21 +71,29 @@ $ svn ci -m "add [YOUR NAME]'s key to KEYS file"
     * for the upload to the nexus repository
 
 ---
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+...
   <servers>
+    ...
     <!-- To publish a snapshot of some part of Maven -->
     <server>
       <id>apache.snapshots.https</id>
       <username>[YOUR APACHE LDAP USERNAME]</username>
-      <password>[YOUR APACHE LDAP PASSWORD] (encrypted)</password>
+      <password>[YOUR APACHE LDAP PASSWORD (encrypted)]</password>
     </server>
     <!-- To stage a release of some part of Maven -->
     <server>
       <id>apache.releases.https</id>
       <username>[YOUR APACHE LDAP USERNAME]</username>
-      <password>[YOUR APACHE LDAP PASSWORD] (encrypted)</password>
+      <password>[YOUR APACHE LDAP PASSWORD (encrypted)]</password>
     </server>
    ...
   </servers>
+...
+</settings>
 ---
 
     * to sign the artifacts
@@ -101,6 +111,10 @@ $ svn ci -m "add [YOUR NAME]'s key to KEYS file"
 ---
 
   * Download Apache Rat from {{{https://creadur.apache.org/rat/download_rat.cgi}https://creadur.apache.org/rat/download_rat.cgi}}.
+  
+  * Add your ssh key to {{{https://id.apache.org}id.apache.org}} (required to create a website on {{{https://people.apache.org}people.apache.org}}).
+
+    * Login and update your profile details. 
 
 * Each time steps
 
@@ -139,11 +153,25 @@ $ mvn release:perform
 
   * close the staging repository at {{{https://repository.apache.org/}https://repository.apache.org/}}
 
+    * Log into the website and look at the "Staging Repositories". 
+
+    * Find the VXQuery repository and click the "close" button.
+
+    * Add a message: "Apache VXQuery X.Y-rc#"
+ 
   * check that the artifacts are available in the repository
 
   * send out <<<[VOTE]>>> e-mail on dev@vxquery.apache.org
 
-  * after successful vote promote staging repository {{{https://repository.apache.org/}https://repository.apache.org/}}
+    * {{{http://mail-archives.apache.org/mod_mbox/vxquery-dev/201409.mbox/%3CCAGZxfJUZDczuZR5jQResE4B7%2Bv4QQgwMpAd%2B-_Kt-U_RjCyReA%40mail.gmail.com%3E}example e-mail}} 
+
+  * after successful vote release staging repository {{{https://repository.apache.org/}https://repository.apache.org/}}
+
+    * Log into the website and look at the "Staging Repositories". 
+    
+    * Find the VXQuery repository and click the "release" button.
+    
+    * Add a message: "Apache VXQuery X.Y Release"
 
   * add new source artifacts (archive + signature + hashes) to svn {{{https://dist.apache.org/repos/dist/release/vxquery}https://dist.apache.org/repos/dist/release/vxquery}} and remove old release dirctory
 
@@ -169,6 +197,8 @@ $ cd -
   * wait a few days for the mirroring of the release artifacts
 
   * send <<<[ANNOUNCE]>>> e-mail to announce@apache.org and dev@vxquery.apache.org
+  
+    * {{{http://mail-archives.apache.org/mod_mbox/www-announce/201405.mbox/%3C537AD473.9080505@apache.org%3E}example e-mail}}
 
 * References
 
