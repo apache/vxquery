@@ -14,8 +14,10 @@
  */
 package org.apache.vxquery.xtest;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.ByteBuffer;
@@ -23,8 +25,10 @@ import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
+import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
@@ -32,8 +36,21 @@ import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
+import org.apache.vxquery.xmlquery.ast.ModuleNode;
+import org.apache.vxquery.xmlquery.query.Module;
+import org.apache.vxquery.xmlquery.query.VXQueryCompilationListener;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
+import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
+import org.apache.vxquery.xtest.XTestOptions;
+import org.json.JSONException;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.PlanPrettyPrinter;
+import edu.uci.ics.hyracks.algebricks.core.algebra.visitors.ILogicalExpressionVisitor;
 import edu.uci.ics.hyracks.api.client.HyracksConnection;
 import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
 import edu.uci.ics.hyracks.api.comm.IFrameTupleAccessor;
@@ -99,10 +116,21 @@ public class TestRunner {
         if (opts.verbose) {
             System.err.println("Starting " + testCase.getXQueryDisplayName());
         }
+
         long start = System.currentTimeMillis();
+
         try {
             try {
-                XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, opts.frameSize);
+                FileInputStream query = new FileInputStream(testCase.getXQueryFile());
+                if (opts.showQuery) {
+                    System.err.println("***Query for " + testCase.getXQueryDisplayName() + ": ");
+                    System.err.println(IOUtils.toString(query, "UTF-8"));
+                    //query.reset();
+                }
+
+                VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
+                        opts.showOET, opts.showRP);
+                XMLQueryCompiler compiler = new XMLQueryCompiler(listener, new String[] { "nc1" }, opts.frameSize);
                 Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                 CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
                         RootStaticContextImpl.INSTANCE), new ResultSetId(testCase.getXQueryDisplayName().hashCode()),
@@ -166,6 +194,14 @@ public class TestRunner {
             }
             long end = System.currentTimeMillis();
             res.time = end - start;
+        }
+        if (opts.showResult) {
+            System.err.println("***Result: ");
+            System.err.println(res.result);
+            if(res.result == null){
+                System.err.println("***Error: ");
+                System.err.println(res.error);
+            }
         }
         return res;
     }
