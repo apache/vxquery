@@ -200,9 +200,9 @@ public class TestRunner {
         if (opts.showResult) {
             System.err.println("***Result: ");
             System.err.println(res.result);
-            if(res.result == null){
+            if (res.result == null) {
                 System.err.println("***Error: ");
-                System.err.println(res.error);
+                System.err.println(res.error.getStackTrace());
             }
         }
         return res;
