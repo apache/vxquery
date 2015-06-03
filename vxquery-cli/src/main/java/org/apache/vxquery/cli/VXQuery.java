@@ -39,6 +39,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
+import org.apache.vxquery.xmlquery.query.VXQueryCompilationListener;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
 import org.json.JSONException;
@@ -183,81 +184,9 @@ public class VXQuery {
             if (opts.showQuery) {
                 System.err.println(qStr);
             }
-            XQueryCompilationListener listener = new XQueryCompilationListener() {
 
-                /**
-                 * On providing -showrp argument, output the query inputs, outputs and user constraints for each module as result of code generation.
-                 * 
-                 * @param module
-                 */
-                @Override
-                public void notifyCodegenResult(Module module) {
-                    if (opts.showRP) {
-                        JobSpecification jobSpec = module.getHyracksJobSpecification();
-                        try {
-                            System.err.println(jobSpec.toJSON().toString(2));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            System.err.println(jobSpec.toString());
-                        }
-                    }
-                }
-
-                /**
-                 * On providing -showtet argument, output the syntax translation tree for the module in the format: "-- logical operator(if exists) | execution mode |"
-                 * where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
-                 * 
-                 * @param module
-                 */
-                @Override
-                public void notifyTranslationResult(Module module) {
-                    if (opts.showTET) {
-                        System.err.println(appendPrettyPlan(new StringBuilder(), module).toString());
-                    }
-                }
-
-                @Override
-                public void notifyTypecheckResult(Module module) {
-                }
-
-                /**
-                 * On providing -showoet argument, output the optimized expression tree for the module in the format:
-                 * "-- logical operator(if exists) | execution mode |" where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
-                 * 
-                 * @param module
-                 */
-                @Override
-                public void notifyOptimizedResult(Module module) {
-                    if (opts.showOET) {
-                        System.err.println(appendPrettyPlan(new StringBuilder(), module).toString());
-                    }
-                }
-
-                /**
-                 * On providing -showast argument, output the abstract syntax tree obtained from parsing by serializing the DomDriver object to a pretty-printed XML
-                 * String.
-                 * 
-                 * @param moduleNode
-                 */
-                @Override
-                public void notifyParseResult(ModuleNode moduleNode) {
-                    if (opts.showAST) {
-                        System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
-                    }
-                }
-
-                private StringBuilder appendPrettyPlan(StringBuilder sb, Module module) {
-                    try {
-                        ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(
-                                module.getModuleContext());
-                        LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
-                        PlanPrettyPrinter.printPlan(module.getBody(), sb, v, 0);
-                    } catch (AlgebricksException e) {
-                        e.printStackTrace();
-                    }
-                    return sb;
-                }
-            };
+            VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
+                    opts.showOET, opts.showRP);
 
             start = opts.timing ? new Date() : null;
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize,
@@ -389,7 +318,7 @@ public class VXQuery {
             ncConfig.dataIPAddress = "127.0.0.1";
             ncConfig.resultIPAddress = "127.0.0.1";
             ncConfig.nodeId = "nc" + (i + 1);
-            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString(); 
+            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
         }
