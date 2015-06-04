@@ -101,7 +101,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
                 
                 File collectionDirectory = new File(collectionModifiedName);
-                //check if it in the local file system
+                //check if directory is in the local file system
                 if(collectionDirectory.exists())
                 {
 	                // Go through each tuple.
@@ -123,7 +123,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 	                            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
 	                }
                 }
-                //check in HDFS file system
+                //else check in HDFS file system
                 else
                 {
                 	HDFSFileFunctions hdfs = new HDFSFileFunctions(hdfs_conf_dir);
