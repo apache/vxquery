@@ -129,5 +129,27 @@ public class XMLParser {
             throw hde;
         }
     }
+    
+    public void parseElements(BufferedReader br, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
+            throws HyracksDataException {
+        try {
+            Reader input;
+            if (bufferSize > 0) {
+                input = br;
+            in.setCharacterStream(input);
+            handler.setupElementWriter(writer, fta, tupleIndex);
+            try {
+				parser.parse(in);
+			} catch (SAXException e) {
+				System.err.println(e);
+			}
+            input.close();
+            }
+        }  catch (IOException e) {
+            HyracksDataException hde = new HyracksDataException(e);
+            hde.setNodeId(nodeId);
+            throw hde;
+        }
+    }
 
 }

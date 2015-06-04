@@ -16,7 +16,11 @@
  */
 package org.apache.vxquery.metadata;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +29,12 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.hdfs2.HDFSFileFunctions;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -50,6 +59,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private List<Integer> childSeq;
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
 
+    private final String hdfs_conf_dir = "/home/efi/Utilities/hadoop/etc/hadoop/";
+    
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryCollectionDataSource ds,
             RecordDescriptor rDesc) {
         super(spec, 1, 1);
@@ -88,25 +99,69 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             public void nextFrame(ByteBuffer buffer) throws HyracksDataException {
                 fta.reset(buffer);
                 String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
+                
                 File collectionDirectory = new File(collectionModifiedName);
-
-                // Go through each tuple.
-                if (collectionDirectory.isDirectory()) {
-                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-                        @SuppressWarnings("unchecked")
-                        Iterator<File> it = FileUtils.iterateFiles(collectionDirectory, new VXQueryIOFileFilter(),
-                                TrueFileFilter.INSTANCE);
-                        while (it.hasNext()) {
-                            File xmlDocument = it.next();
-                            if (LOGGER.isLoggable(Level.FINE)) {
-                                LOGGER.fine("Starting to read XML document: " + xmlDocument.getAbsolutePath());
-                            }
-                            parser.parseElements(xmlDocument, writer, fta, tupleIndex);
-                        }
-                    }
-                } else {
-                    throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
-                            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
+                //check if it in the local file system
+                if(collectionDirectory.exists())
+                {
+	                // Go through each tuple.
+	                if (collectionDirectory.isDirectory()) {
+	                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
+	                        @SuppressWarnings("unchecked")
+	                        Iterator<File> it = FileUtils.iterateFiles(collectionDirectory, new VXQueryIOFileFilter(),
+	                                TrueFileFilter.INSTANCE);
+	                        while (it.hasNext()) {
+	                            File xmlDocument = it.next();
+	                            if (LOGGER.isLoggable(Level.FINE)) {
+	                                LOGGER.fine("Starting to read XML document: " + xmlDocument.getAbsolutePath());
+	                            }
+	                            parser.parseElements(xmlDocument, writer, fta, tupleIndex);
+	                        }
+	                    }
+	                } else {
+	                    throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
+	                            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
+	                }
+                }
+                //check in HDFS file system
+                else
+                {
+                	HDFSFileFunctions hdfs = new HDFSFileFunctions(hdfs_conf_dir);
+                	FileSystem fs = hdfs.getFileSystem();
+                	Path directory = new Path(collectionModifiedName);
+                	Path xmlDocument;
+                	try {
+						if (fs.exists(directory) && fs.isDirectory(directory))
+						{
+							for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
+							//read directory files from HDFS
+							RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
+						    while (it.hasNext())
+						    {
+						    	xmlDocument = it.next().getPath();
+						        if (fs.isFile(xmlDocument))
+						        {
+						        	if (LOGGER.isLoggable(Level.FINE)) {
+						                LOGGER.fine("Starting to read XML document: " + xmlDocument.getName());
+						            }
+						        	BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(xmlDocument)));
+						        	parser.parseElements(br, writer, fta, tupleIndex);
+						        }
+						    }
+							}
+						}
+						else
+						{
+							 throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
+						            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
+						}
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						System.err.println(e);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						System.err.println(e);
+					}
                 }
             }
 

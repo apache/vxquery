@@ -1,9 +1,6 @@
 package org.apache.vxquery.hdfs2;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -39,13 +36,17 @@ public class HDFSFileFunctions {
      * @param filename
      * @return 
      */
-    public boolean isLocatedInHDFS(String filename) throws IOException
+    public boolean isLocatedInHDFS(String filename)
     {
-        //search file path
-        if (fs.exists(new Path(filename)))
-        {
-            return true;
-        }
+    	 try {
+             //search file path
+             if (fs.exists(new Path(filename)))
+             {
+                 return true;
+             }
+         } catch (IOException ex) {
+             System.err.println(ex);
+         }
         //Search every file and folder in the home directory
         if (searchInDirectory(fs.getHomeDirectory(), filename) != null)
         {
@@ -82,19 +83,8 @@ public class HDFSFileFunctions {
         return null;
     }
     
-    public void readFile(String filename) throws IOException
+    public FileSystem getFileSystem()
     {
-        Path path = this.searchInDirectory(fs.getHomeDirectory(), filename);
-        if (path != null)
-        {
-            BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(path)));
-            String line;
-            line = br.readLine();
-            while (line != null) {
-                System.out.println(line);
-                line = br.readLine();
-            }
-            fs.close();
-        }
+    	return this.fs;
     }
 }
