@@ -113,7 +113,7 @@ XML Data Model Example
   These 4 bytes represent the <Size of Dictionary> in signed integer format. 
   After conversion to unsigned integer format the value is <<147>>.
   
-*** <<<0, 0, 0, 7>>> 
+*** <<<0, 0, 0, 7>>>
 
   These 4 bytes represent the <Number of items> in the dictionary: <<7>>
 
