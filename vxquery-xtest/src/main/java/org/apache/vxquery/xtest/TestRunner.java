@@ -196,11 +196,13 @@ public class TestRunner {
             res.time = end - start;
         }
         if (opts.showResult) {
-            System.err.println("***Result: ");
-            System.err.println(res.result);
             if (res.result == null) {
                 System.err.println("***Error: ");
                 System.err.println(res.error.getStackTrace());
+            } else {
+                System.err.println("***Result: ");
+                System.err.println(res.result);
+
             }
         }
         return res;
