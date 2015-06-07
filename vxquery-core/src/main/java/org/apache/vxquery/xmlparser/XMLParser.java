@@ -20,11 +20,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.Reader;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSInputStream;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
 import org.apache.vxquery.exceptions.VXQueryParseException;
@@ -130,26 +134,18 @@ public class XMLParser {
         }
     }
     
-    public void parseElements(BufferedReader br, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
-            throws HyracksDataException {
-        try {
-            Reader input;
-            if (bufferSize > 0) {
-                input = br;
-            in.setCharacterStream(input);
+    public void parseHDFSElements(URI uri, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex) throws IOException
+            {
             handler.setupElementWriter(writer, fta, tupleIndex);
-            try {
-				parser.parse(in);
+			try {
+				parser.parse(uri.toString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (SAXException e) {
-				System.err.println(e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-            input.close();
-            }
-        }  catch (IOException e) {
-            HyracksDataException hde = new HyracksDataException(e);
-            hde.setNodeId(nodeId);
-            throw hde;
-        }
     }
 
 }

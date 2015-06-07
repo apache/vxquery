@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -126,6 +128,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 //else check in HDFS file system
                 else
                 {
+                	System.out.println("search in hdfs");
                 	HDFSFileFunctions hdfs = new HDFSFileFunctions(hdfs_conf_dir);
                 	FileSystem fs = hdfs.getFileSystem();
                 	Path directory = new Path(collectionModifiedName);
@@ -144,8 +147,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 						        	if (LOGGER.isLoggable(Level.FINE)) {
 						                LOGGER.fine("Starting to read XML document: " + xmlDocument.getName());
 						            }
-						        	BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(xmlDocument)));
-						        	parser.parseElements(br, writer, fta, tupleIndex);
+						        	parser.parseHDFSElements(new URI(xmlDocument.getName()), writer, fta, tupleIndex);
 						        }
 						    }
 							}
@@ -161,6 +163,9 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						System.err.println(e);
+					} catch (URISyntaxException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
                 }
             }
