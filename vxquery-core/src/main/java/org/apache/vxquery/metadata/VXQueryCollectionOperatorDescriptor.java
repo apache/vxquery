@@ -128,7 +128,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 //else check in HDFS file system
                 else
                 {
-                	System.out.println("search in hdfs");
                 	HDFSFileFunctions hdfs = new HDFSFileFunctions(hdfs_conf_dir);
                 	FileSystem fs = hdfs.getFileSystem();
                 	Path directory = new Path(collectionModifiedName);

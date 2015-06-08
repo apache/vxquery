@@ -19,10 +19,18 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.logging.Level;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
@@ -33,6 +41,7 @@ import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.hdfs2.HDFSFileFunctions;
 import org.apache.vxquery.runtime.functions.arithmetic.AbstractArithmeticOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
@@ -1186,7 +1195,33 @@ public class FunctionHelper {
             throw new HyracksDataException(e);
         }
         File file = new File(fName);
-        parser.parseDocument(file, abvs);
+        if(file.exists())
+        {
+        	parser.parseDocument(file, abvs);
+        }
+        //else check in HDFS file system
+        else
+        {
+            String hdfs_conf_dir = "/home/efi/Utilities/hadoop/etc/hadoop/";
+        	HDFSFileFunctions hdfs = new HDFSFileFunctions(hdfs_conf_dir);
+        	FileSystem fs = hdfs.getFileSystem();
+        	Path xmlDocument = new Path(fName);
+        	try {
+				if (fs.exists(xmlDocument))
+				{
+					parser.parseHDFSDocument(new URI(xmlDocument.getName()), abvs);
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				System.err.println(e);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println(e);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,

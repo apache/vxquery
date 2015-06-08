@@ -147,5 +147,20 @@ public class XMLParser {
 				e.printStackTrace();
 			}
     }
+    
+    public void parseHDFSDocument(URI uri, ArrayBackedValueStorage abvs) throws HyracksDataException {
+        try {
+        	System.out.println("read hdfs document");
+            parser.parse(uri.toString());
+            handler.writeDocument(abvs);
+        } catch (IOException e) {
+            HyracksDataException hde = new HyracksDataException(e);
+            hde.setNodeId(nodeId);
+            throw hde;
+        } catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 
 }
