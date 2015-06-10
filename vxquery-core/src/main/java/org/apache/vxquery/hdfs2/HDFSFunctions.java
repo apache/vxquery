@@ -17,28 +17,35 @@
 package org.apache.vxquery.hdfs2;
 
 import java.io.IOException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
-public class HDFSFileFunctions {
+import sun.tools.tree.ThisExpression;
+
+public class HDFSFunctions {
 	
     private final Configuration conf;
     private FileSystem fs;
+    private String conf_path;
+    private final String conf_folder;
     
     /**
      * Create the configuration and add the paths for core-site and hdfs-site as resources.
      * Initialize an instance a hdfs FileSystem for this configuration.
      * @param hadoop_conf_filepath 
      */
-    public HDFSFileFunctions(String hadoop_conf_filepath)
+    public HDFSFunctions()
     {
+    	this.conf_folder = "/etc/hadoop/";
+    	locateConf();
+    	System.out.println(this.conf_path);
         this.conf = new Configuration();
-        conf.addResource(new Path(hadoop_conf_filepath + "core-site.xml"));
-        conf.addResource(new Path(hadoop_conf_filepath + "hdfs-site.xml"));
-        
+        conf.addResource(new Path(this.conf_path + "core-site.xml"));
+        conf.addResource(new Path(this.conf_path + "hdfs-site.xml"));
         try {
             fs =  FileSystem.get(conf);
         } catch (IOException ex) {
@@ -99,8 +106,32 @@ public class HDFSFileFunctions {
         return null;
     }
     
+    private void locateConf()
+    {
+    	String conf = System.getenv("HADOOP_HOME");
+    	if (conf == null)
+    	{
+    		conf = System.getenv("HADOOP_PREFIX");
+    		if (conf != null)
+    		{
+    			this.conf_path = conf + this.conf_folder;
+    		}
+    	}
+    	else
+    	{
+    		this.conf_path = conf + this.conf_folder;;
+    	}
+    }
+    
     public FileSystem getFileSystem()
     {
-    	return this.fs;
+    	if (this.conf_path != null)
+    	{
+    		return this.fs;
+    	}
+    	else
+    	{
+    		return null;
+    	}
     }
 }

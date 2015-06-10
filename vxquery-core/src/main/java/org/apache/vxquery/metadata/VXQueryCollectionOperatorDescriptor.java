@@ -36,7 +36,7 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.hdfs2.HDFSFileFunctions;
+import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -60,8 +60,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private String[] collectionPartitions;
     private List<Integer> childSeq;
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
-
-    private final String hdfs_conf_dir = "/home/efi/Utilities/hadoop/etc/hadoop/";
     
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryCollectionDataSource ds,
             RecordDescriptor rDesc) {
@@ -128,44 +126,47 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 //else check in HDFS file system
                 else
                 {
-                	HDFSFileFunctions hdfs = new HDFSFileFunctions(hdfs_conf_dir);
+                	HDFSFunctions hdfs = new HDFSFunctions();
                 	FileSystem fs = hdfs.getFileSystem();
-                	Path directory = new Path(collectionModifiedName);
-                	Path xmlDocument;
-                	try {
-						if (fs.exists(directory) && fs.isDirectory(directory))
-						{
-							for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-							//read directory files from HDFS
-							RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
-						    while (it.hasNext())
-						    {
-						    	xmlDocument = it.next().getPath();
-						        if (fs.isFile(xmlDocument))
-						        {
-						        	if (LOGGER.isLoggable(Level.FINE)) {
-						                LOGGER.fine("Starting to read XML document: " + xmlDocument.getName());
-						            }
-						        	parser.parseHDFSElements(new URI(xmlDocument.getName()), writer, fta, tupleIndex);
-						        }
-						    }
+                	if (fs != null)
+                	{
+	                	Path directory = new Path(collectionModifiedName);
+	                	Path xmlDocument;
+	                	try {
+							if (fs.exists(directory) && fs.isDirectory(directory))
+							{
+								for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
+								//read directory files from HDFS
+								RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
+							    while (it.hasNext())
+							    {
+							    	xmlDocument = it.next().getPath();
+							        if (fs.isFile(xmlDocument))
+							        {
+							        	if (LOGGER.isLoggable(Level.FINE)) {
+							                LOGGER.fine("Starting to read XML document: " + xmlDocument.getName());
+							            }
+							        	parser.parseHDFSElements(new URI(xmlDocument.getName()), writer, fta, tupleIndex);
+							        }
+							    }
+								}
 							}
+							else
+							{
+								 throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
+							            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
+							}
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							System.err.println(e);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							System.err.println(e);
+						} catch (URISyntaxException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-						else
-						{
-							 throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
-						            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
-						}
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						System.err.println(e);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						System.err.println(e);
-					} catch (URISyntaxException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+	                }
                 }
             }
 

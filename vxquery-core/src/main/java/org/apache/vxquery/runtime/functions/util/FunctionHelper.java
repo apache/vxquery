@@ -41,7 +41,7 @@ import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.hdfs2.HDFSFileFunctions;
+import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.runtime.functions.arithmetic.AbstractArithmeticOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
@@ -1202,25 +1202,27 @@ public class FunctionHelper {
         //else check in HDFS file system
         else
         {
-            String hdfs_conf_dir = "/home/efi/Utilities/hadoop/etc/hadoop/";
-        	HDFSFileFunctions hdfs = new HDFSFileFunctions(hdfs_conf_dir);
+        	HDFSFunctions hdfs = new HDFSFunctions();
         	FileSystem fs = hdfs.getFileSystem();
-        	Path xmlDocument = new Path(fName);
-        	try {
-				if (fs.exists(xmlDocument))
-				{
-					parser.parseHDFSDocument(new URI(xmlDocument.getName()), abvs);
+        	if (fs != null)
+        	{
+	        	Path xmlDocument = new Path(fName);
+	        	try {
+					if (fs.exists(xmlDocument))
+					{
+						parser.parseHDFSDocument(new URI(xmlDocument.getName()), abvs);
+					}
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					System.err.println(e);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.err.println(e);
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				System.err.println(e);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.err.println(e);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        	}
         }
     }
 
