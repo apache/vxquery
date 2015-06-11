@@ -52,4 +52,7 @@ public class XTestOptions {
 
     @Option(name = "-htmlreport", required = false, usage = "HTML Report output file")
     String htmlReport;
+    
+    @Option(name = "-hdfs", required = false, usage = "run HDFS tests")
+    String hdfs;
 }

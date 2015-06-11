@@ -24,14 +24,12 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
-import sun.tools.tree.ThisExpression;
-
 public class HDFSFunctions {
 	
-    private final Configuration conf;
+    private Configuration conf;
     private FileSystem fs;
     private String conf_path;
-    private final String conf_folder;
+    private final String conf_folder = "/etc/hadoop/";
     
     /**
      * Create the configuration and add the paths for core-site and hdfs-site as resources.
@@ -40,17 +38,21 @@ public class HDFSFunctions {
      */
     public HDFSFunctions()
     {
-    	this.conf_folder = "/etc/hadoop/";
-    	locateConf();
-    	System.out.println(this.conf_path);
-        this.conf = new Configuration();
-        conf.addResource(new Path(this.conf_path + "core-site.xml"));
-        conf.addResource(new Path(this.conf_path + "hdfs-site.xml"));
-        try {
-            fs =  FileSystem.get(conf);
-        } catch (IOException ex) {
-            System.err.println(ex);
-        }
+    	if(locateConf())
+    	{
+	        this.conf = new Configuration();
+	        conf.addResource(new Path(this.conf_path + "core-site.xml"));
+	        conf.addResource(new Path(this.conf_path + "hdfs-site.xml"));
+	        try {
+	            fs =  FileSystem.get(conf);
+	        } catch (IOException ex) {
+	            System.err.println(ex);
+	        }
+    	}
+    	else
+    	{
+    		//print error cannot locate configuration folder for HDFS
+    	}
     }
     
     /**
@@ -106,23 +108,54 @@ public class HDFSFunctions {
         return null;
     }
     
-    private void locateConf()
-    {
+    /**
+     * Search in the system environment variables for the Hadoop/HDFS home folder to get the path to the configuration.
+     * Variables it is checking are: HADOOP_HOME,HADOOP_PREFIX,HADOOP_CONF_DIR,HADOOP_HDFS_HOME.
+     * @return true if is successfully finds the Hadoop/HDFS home directory
+     */
+    private boolean locateConf()
+    {//HADOOP_HOME
     	String conf = System.getenv("HADOOP_HOME");
     	if (conf == null)
-    	{
+    	{//HADOOP_PREFIX
     		conf = System.getenv("HADOOP_PREFIX");
     		if (conf != null)
     		{
     			this.conf_path = conf + this.conf_folder;
+    		}
+    		else
+    		{//HADOOP_CONF_DIR
+    			conf = System.getenv("HADOOP_CONF_DIR");
+    			if (conf != null)
+    			{
+    				this.conf_path = conf + this.conf_folder;
+    			}
+    			else
+        		{//HADOOP_HDFS_HOME
+        			conf = System.getenv("HADOOP_HDFS_HOME");
+        			if (conf != null)
+        			{
+        				this.conf_path = conf + this.conf_folder;
+        			}
+        			else
+        			{
+        				return false;
+        			}
+        		}
     		}
     	}
     	else
     	{
     		this.conf_path = conf + this.conf_folder;;
     	}
+    	return true;
     }
     
+    /**
+     * Get instance of the hdfs file system if it is configured correctly.
+     * Return null if there is no instance.
+     * @return
+     */
     public FileSystem getFileSystem()
     {
     	if (this.conf_path != null)

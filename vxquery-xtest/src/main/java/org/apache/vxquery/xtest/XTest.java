@@ -61,6 +61,10 @@ public class XTest {
         if (opts.diffable != null) {
             reporters.add(new LineFileReporterImpl(new File(opts.diffable)));
         }
+        if (opts.hdfs != null)
+        {
+        	//run tests for HDFS
+        }
         reporters.add(new ResultReporter() {
             @Override
             public void close() {
