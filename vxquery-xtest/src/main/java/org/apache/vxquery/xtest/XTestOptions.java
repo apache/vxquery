@@ -54,5 +54,5 @@ public class XTestOptions {
     String htmlReport;
     
     @Option(name = "-hdfs", required = false, usage = "run HDFS tests")
-    String hdfs;
+    boolean hdfs;
 }

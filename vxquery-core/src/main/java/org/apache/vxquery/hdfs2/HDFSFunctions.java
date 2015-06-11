@@ -152,6 +152,37 @@ public class HDFSFunctions {
     }
     
     /**
+     * Upload a file/directory to HDFS.Filepath is the path in the local file system.dir is the destination path.
+     * @param filepath
+     * @param dir
+     * @return
+     */
+    public boolean put(String filepath,String dir)
+    {
+    	if (this.fs != null)
+    	{
+    		Path path = new Path(filepath);
+    		Path dest = new Path(dir);
+    		try {
+				if (fs.exists(dest))
+				{
+					fs.delete(dest, true); //recursive delete
+					try {
+						fs.copyFromLocalFile(path, dest);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	return false;
+    }
+    
+    /**
      * Get instance of the hdfs file system if it is configured correctly.
      * Return null if there is no instance.
      * @return

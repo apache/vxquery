@@ -104,6 +104,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 //check if directory is in the local file system
                 if(collectionDirectory.exists())
                 {
+                	System.out.println("searching in local for file : " + collectionDirectory.getName());
 	                // Go through each tuple.
 	                if (collectionDirectory.isDirectory()) {
 	                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
@@ -126,6 +127,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 //else check in HDFS file system
                 else
                 {
+                	System.out.println("searching in hdfs for file : " + collectionDirectory.getName());
                 	HDFSFunctions hdfs = new HDFSFunctions();
                 	FileSystem fs = hdfs.getFileSystem();
                 	if (fs != null)

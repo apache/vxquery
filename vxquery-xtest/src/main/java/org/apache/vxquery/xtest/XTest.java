@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.mortbay.jetty.Server;
 
 public class XTest {
@@ -61,9 +62,13 @@ public class XTest {
         if (opts.diffable != null) {
             reporters.add(new LineFileReporterImpl(new File(opts.diffable)));
         }
-        if (opts.hdfs != null)
+        if (opts.hdfs)
         {
         	//run tests for HDFS
+        	//upload sources to hdfs
+        	HDFSFunctions function = new HDFSFunctions();
+        	System.getProperty("user.dir");
+        	function.put("src/test/resources/TestSources/ghcnd", "vxquery-hdfs-test");
         }
         reporters.add(new ResultReporter() {
             @Override

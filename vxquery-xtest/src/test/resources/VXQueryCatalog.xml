@@ -84,6 +84,9 @@
      <source ID="ghcnd_quarter_4" FileName="TestSources/ghcnd/half_2/quarter_4" Creator="Preston Carman">
        <description last-mod="2014-04-02">Collection of files</description>
      </source>
+     <source ID="hdfs" FileName="TestSources/hdfs" Creator="Efi Kaltirimidou">
+       <description last-mod="2015-06-11">Collection of files</description>
+     </source>
    </sources>
    <test-group name="SingleQuery" featureOwner="Preston Carman">
       <GroupInfo>
