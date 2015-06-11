@@ -16,11 +16,10 @@
  */
 package org.apache.vxquery.metadata;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -127,7 +126,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 //else check in HDFS file system
                 else
                 {
-                	System.out.println("searching in hdfs for file : " + collectionDirectory.getName());
+                	System.out.println("searching in hdfs for directory : " + collectionDirectory.getName());
                 	HDFSFunctions hdfs = new HDFSFunctions();
                 	FileSystem fs = hdfs.getFileSystem();
                 	if (fs != null)
@@ -148,7 +147,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 							        	if (LOGGER.isLoggable(Level.FINE)) {
 							                LOGGER.fine("Starting to read XML document: " + xmlDocument.getName());
 							            }
-							        	parser.parseHDFSElements(new URI(xmlDocument.getName()), writer, fta, tupleIndex);
+							        	InputStream in = fs.open(xmlDocument).getWrappedStream();
+							        	parser.parseHDFSElements(in, writer, fta, tupleIndex);
 							        }
 							    }
 								}
@@ -164,9 +164,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							System.err.println(e);
-						} catch (URISyntaxException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 	                }
                 }

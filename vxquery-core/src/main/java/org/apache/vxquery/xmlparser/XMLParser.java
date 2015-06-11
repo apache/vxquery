@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.Reader;
@@ -29,9 +30,12 @@ import java.util.List;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
 import org.apache.vxquery.exceptions.VXQueryParseException;
+import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.types.SequenceType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -134,25 +138,41 @@ public class XMLParser {
         }
     }
     
-    public void parseHDFSElements(URI uri, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex) throws IOException
+    public void parseHDFSElements(InputStream inputStream, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex) throws IOException
             {
+    	try {
+            Reader input;
+            if (bufferSize > 0) {
+                input = new BufferedReader(new InputStreamReader(inputStream), bufferSize);
+            } else {
+                input = new InputStreamReader(inputStream);
+            }
+            in.setCharacterStream(input);
             handler.setupElementWriter(writer, fta, tupleIndex);
-			try {
-				parser.parse(uri.toString());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            parser.parse(in);
+            input.close();
+        } catch (IOException e) {
+            HyracksDataException hde = new HyracksDataException(e);
+            hde.setNodeId(nodeId);
+            throw hde;
+        } catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
-    public void parseHDFSDocument(URI uri, ArrayBackedValueStorage abvs) throws HyracksDataException {
+    public void parseHDFSDocument(InputStream inputStream, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
-        	System.out.println("read hdfs document");
-            parser.parse(uri.toString());
+            Reader input;
+            if (bufferSize > 0) {
+                input = new BufferedReader(new InputStreamReader(inputStream), bufferSize);
+            } else {
+                input = new InputStreamReader(inputStream);
+            }
+            in.setCharacterStream(input);
+            parser.parse(in);
             handler.writeDocument(abvs);
+            input.close();
         } catch (IOException e) {
             HyracksDataException hde = new HyracksDataException(e);
             hde.setNodeId(nodeId);

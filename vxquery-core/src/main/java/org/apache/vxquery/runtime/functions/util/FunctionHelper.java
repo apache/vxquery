@@ -21,6 +21,7 @@ import java.io.DataOutput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -1210,7 +1211,8 @@ public class FunctionHelper {
 	        	try {
 					if (fs.exists(xmlDocument))
 					{
-						parser.parseHDFSDocument(new URI(xmlDocument.getName()), abvs);
+						InputStream in =  fs.open(xmlDocument).getWrappedStream();
+						parser.parseHDFSDocument( in, abvs);
 					}
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -1218,9 +1220,6 @@ public class FunctionHelper {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					System.err.println(e);
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
         	}
         }
