@@ -67,7 +67,6 @@ public class XTest {
         	//run tests for HDFS
         	//upload sources to hdfs
         	HDFSFunctions function = new HDFSFunctions();
-        	System.getProperty("user.dir");
         	function.put("src/test/resources/TestSources/ghcnd", "vxquery-hdfs-test");
         }
         reporters.add(new ResultReporter() {

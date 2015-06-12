@@ -20,8 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -159,10 +157,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 							            + collectionDirectory.getAbsolutePath() + ") passed to collection.");
 							}
 						} catch (FileNotFoundException e) {
-							// TODO Auto-generated catch block
 							System.err.println(e);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							System.err.println(e);
 						}
 	                }

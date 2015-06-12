@@ -159,26 +159,29 @@ public class HDFSFunctions {
      */
     public boolean put(String filepath,String dir)
     {
-    	if (this.fs != null)
-    	{
-    		Path path = new Path(filepath);
-    		Path dest = new Path(dir);
-    		try {
-				if (fs.exists(dest))
-				{
-					fs.delete(dest, true); //recursive delete
-					try {
-						fs.copyFromLocalFile(path, dest);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
+        if (this.fs != null) {
+            Path path = new Path(filepath);
+            Path dest = new Path(dir);
+            try 
+            {
+                if (fs.exists(dest)) 
+                {
+                    fs.delete(dest, true); //recursive delete
+                }
+            } 
+            catch (IOException e) 
+            {
+                e.printStackTrace();
+            }
+            try 
+            {
+                fs.copyFromLocalFile(path, dest);
+            } 
+            catch (IOException e) 
+            {
+                e.printStackTrace();
+            }
+        }
     	return false;
     }
     
