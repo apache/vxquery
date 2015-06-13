@@ -33,7 +33,7 @@ public class HDFSFunctions {
     
     /**
      * Create the configuration and add the paths for core-site and hdfs-site as resources.
-     * Initialize an instance a hdfs FileSystem for this configuration.
+     * Initialize an instance of HDFS FileSystem for this configuration.
      * @param hadoop_conf_filepath 
      */
     public HDFSFunctions()
@@ -186,7 +186,7 @@ public class HDFSFunctions {
     }
     
     /**
-     * Get instance of the hdfs file system if it is configured correctly.
+     * Get instance of the HDFSfile system if it is configured correctly.
      * Return null if there is no instance.
      * @return
      */
