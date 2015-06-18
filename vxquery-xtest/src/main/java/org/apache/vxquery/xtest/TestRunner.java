@@ -110,7 +110,6 @@ public class TestRunner {
                 if (opts.showQuery) {
                     System.err.println("***Query for " + testCase.getXQueryDisplayName() + ": ");
                     System.err.println(IOUtils.toString(query, "UTF-8"));
-                    //query.reset();
                 }
 
                 VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
@@ -187,7 +186,6 @@ public class TestRunner {
             } else {
                 System.err.println("***Result: ");
                 System.err.println(res.result);
-
             }
         }
         return res;
