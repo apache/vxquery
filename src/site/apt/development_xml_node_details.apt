@@ -36,7 +36,7 @@ XML Data and Node Types
 *-----------------------------------+----------------------+---------------:
 | Comment Node(CNP)                 | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
 *-----------------------------------+----------------------+---------------:
-| Text Node (TNP)                   | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
+| Text Node(TNP)                    | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
 *-----------------------------------+----------------------+---------------:
 
 
