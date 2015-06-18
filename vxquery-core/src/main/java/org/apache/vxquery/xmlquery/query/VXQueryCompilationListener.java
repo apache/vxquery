@@ -1,11 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.xmlquery.query;
 
 import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
-import org.apache.vxquery.xmlquery.query.Module;
-import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
 import org.json.JSONException;
-import org.kohsuke.args4j.Option;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -17,7 +28,6 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.visitors.ILogicalExpressionVi
 import edu.uci.ics.hyracks.api.job.JobSpecification;
 
 public class VXQueryCompilationListener implements XQueryCompilationListener {
-    
     boolean showTET, showRP, showOET, showAST;
 
     public VXQueryCompilationListener(boolean showAST, boolean showTET, boolean showOET, boolean showRP) {
@@ -102,6 +112,4 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
         }
         return sb;
     }
-    
-
 }

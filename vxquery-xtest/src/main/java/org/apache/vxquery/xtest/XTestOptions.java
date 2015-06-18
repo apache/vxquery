@@ -17,7 +17,7 @@ package org.apache.vxquery.xtest;
 import org.kohsuke.args4j.Option;
 
 public class XTestOptions {
-    @Option(name = "-O", required = false, usage = "Optimization Level")
+    @Option(name = "-O", required = false, usage = "Optimization level")
     int optimizationLevel = Integer.MAX_VALUE;
 
     @Option(name = "-frameSize", required = false, usage = "Setting frame size")
@@ -26,7 +26,7 @@ public class XTestOptions {
     @Option(name = "-port", required = false, usage = "Port for web server to listen on")
     int port;
 
-    @Option(name = "-catalog", required = true, usage = "Test Catalog XML")
+    @Option(name = "-catalog", required = true, usage = "Test catalog XML")
     String catalog;
 
     @Option(name = "-threads", required = false, usage = "Number of threads")
@@ -47,13 +47,13 @@ public class XTestOptions {
     @Option(name = "-keepalive", required = false, usage = "Milliseconds to keep server alive after tests have completed")
     long keepalive;
 
-    @Option(name = "-textreport", required = false, usage = "Text Report output file")
+    @Option(name = "-textreport", required = false, usage = "Text report output file")
     String diffable;
 
-    @Option(name = "-xmlreport", required = false, usage = "XML Report output file")
+    @Option(name = "-xmlreport", required = false, usage = "XML report output file")
     String xmlReport;
 
-    @Option(name = "-htmlreport", required = false, usage = "HTML Report output file")
+    @Option(name = "-htmlreport", required = false, usage = "HTML report output file")
     String htmlReport;
 
     @Option(name = "-showquery", usage = "Show query string")
@@ -68,7 +68,7 @@ public class XTestOptions {
     @Option(name = "-showoet", usage = "Show optimized expression tree")
     boolean showOET;
 
-    @Option(name = "-showrp", usage = "Show Runtime plan")
+    @Option(name = "-showrp", usage = "Show runtime plan")
     boolean showRP;
 
     @Option(name = "-compileonly", usage = "Compile the query and stop")
