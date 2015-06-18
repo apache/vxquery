@@ -20,7 +20,6 @@ import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 
 import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
-import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
 import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
@@ -57,7 +56,7 @@ import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
  *  NamePtr[2][chunkSizeInBytes / (sizeof(NamePtr) * 2)] namespaces;
  * }
  */
-public class ElementNodePointable extends AbstractPointable {
+public class ElementNodePointable extends AbstractNodePointable {
     public static final byte NS_CHUNK_EXISTS_MASK = (0x1 << 0);
     public static final byte ATTRIBUTES_CHUNK_EXISTS_MASK = (0x1 << 1);
     public static final byte CHILDREN_CHUNK_EXISTS_MASK = (0x1 << 2);
@@ -170,7 +169,7 @@ public class ElementNodePointable extends AbstractPointable {
         return nodeTree.typeExists() ? CodedQNamePointable.SIZE : 0;
     }
 
-    private int getLocalNodeIdOffset(NodeTreePointable nodeTree) {
+    protected int getLocalNodeIdOffset(NodeTreePointable nodeTree) {
         return getTypeOffset() + getTypeSize(nodeTree);
     }
 
