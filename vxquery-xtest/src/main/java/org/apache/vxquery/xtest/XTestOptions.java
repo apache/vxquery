@@ -55,4 +55,25 @@ public class XTestOptions {
 
     @Option(name = "-htmlreport", required = false, usage = "HTML Report output file")
     String htmlReport;
+    
+    @Option(name = "-showquery", usage = "Show query string")
+    boolean showQuery;
+
+    @Option(name = "-showast", usage = "Show abstract syntax tree")
+    boolean showAST;
+
+    @Option(name = "-showtet", usage = "Show translated expression tree") 
+    boolean showTET;
+
+    @Option(name = "-showoet", usage = "Show optimized expression tree") 
+    boolean showOET;
+
+    @Option(name = "-showrp", usage = "Show Runtime plan") 
+    boolean showRP;
+
+    @Option(name = "-compileonly", usage = "Compile the query and stop")
+    boolean compileOnly;
+    
+    @Option(name = "-showresult", usage = "shows query result")
+    boolean showResult;
 }

@@ -263,10 +263,10 @@
 
     <!-- op:is-same-node($parameter1 as node(), $parameter2 as node()) as xs:boolean -->
     <operator name="op:is-same-node">
-        <param name="parameter1" type="node()?"/>
-        <param name="parameter2" type="node()?"/>
+        <param name="parameter1" type="node()"/>
+        <param name="parameter2" type="node()"/>
         <return type="xs:boolean"/>
-    </operator>
+     </operator>
 
     <!-- op:multiply-dayTimeDuration( $arg1 as xs:dayTimeDuration, $arg2 as xs:double)  as xs:dayTimeDuration -->
     <operator name="op:multiply-dayTimeDuration">
@@ -284,17 +284,19 @@
 
     <!-- op:node-after($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
     <operator name="op:node-after">
-        <param name="parameter1" type="node()?"/>
-        <param name="parameter2" type="node()?"/>
+        <param name="parameter1" type="node()"/>
+        <param name="parameter2" type="node()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.OpNodeAfterEvaluatorFactory"/>
         <return type="xs:boolean"/>
     </operator>
 
     <!-- op:node-before($parameter1  as node(), $parameter2 as node())  as xs:boolean -->
     <operator name="op:node-before">
-        <param name="parameter1" type="node()?"/>
-        <param name="parameter2" type="node()?"/>
+        <param name="parameter1" type="node()"/>
+        <param name="parameter2" type="node()"/>
         <return type="xs:boolean"/>
-    </operator>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.OpNodeBeforeEvaluatorFactory"/>
+     </operator>
 
     <!-- op:NOTATION-equal($arg1  as xs:NOTATION, $arg2 as xs:NOTATION)  as xs:boolean -->
     <operator name="op:NOTATION-equal">

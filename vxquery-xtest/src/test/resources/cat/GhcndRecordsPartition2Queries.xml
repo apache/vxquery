@@ -29,6 +29,11 @@
       <description>Count records returned for q03 from the weather benchmark with 2 partitions.</description>
       <query name="q03_records" date="2014-04-01"/>
       <output-file compare="Text">q03_records.txt</output-file>
+      <output-file compare="Text">q03_records-1.txt</output-file>
+      <output-file compare="Text">q03_records-2.txt</output-file>
+      <output-file compare="Text">q03_records-3.txt</output-file>
+      <output-file compare="Text">q03_records-4.txt</output-file>
+      <output-file compare="Text">q03_records-5.txt</output-file>
    </test-case>
    <test-case name="ghcnd-records-partition-2-q05" FilePath="GhcndRecords/Partition-2/" Creator="Preston Carman">
       <description>Count records returned for q05 from the weather benchmark with 2 partitions.</description>
