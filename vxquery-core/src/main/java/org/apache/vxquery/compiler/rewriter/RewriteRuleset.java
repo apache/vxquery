@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertDocExpressionToFile;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSingleItemsRule;
@@ -116,6 +117,7 @@ public class RewriteRuleset {
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
+        normalization.add(new ConvertDocExpressionToFile());
         // Adds child steps to the data source scan.
         // TODO Replace consolidate with a new child function that takes multiple paths.
         //        normalization.add(new ConsolidateUnnestsRule());

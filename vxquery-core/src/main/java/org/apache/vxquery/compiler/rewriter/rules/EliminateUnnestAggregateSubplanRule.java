@@ -78,9 +78,10 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
             return false;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
+        /*
         if (!functionCall.getFunctionIdentifier().equals(BuiltinOperators.ITERATE.getFunctionIdentifier())) {
             return false;
-        }
+        }*/
 
         AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
         if (op2.getOperatorTag() != LogicalOperatorTag.SUBPLAN) {
