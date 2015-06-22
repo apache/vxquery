@@ -64,5 +64,4 @@ public class DocumentNodePointable extends AbstractNodePointable {
     private int getContentSize(NodeTreePointable nodeTree) {
         return length - (getContentOffset(nodeTree) - start);
     }
-
 }
