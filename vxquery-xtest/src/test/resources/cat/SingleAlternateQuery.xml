@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 
-<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="AggregatePartition1Queries" featureOwner="VXQuery">
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="SingleAlternateQuery" featureOwner="VXQuery">
    <GroupInfo>
       <title>Single Test</title>
       <description/>

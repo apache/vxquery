@@ -5,7 +5,9 @@
   The ASF licenses this file to You under the Apache License, Version 2.0
   (the "License"); you may not use this file except in compliance with
   the License.  You may obtain a copy of the License at
+
       http://www.apache.org/licenses/LICENSE-2.0
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,14 +15,15 @@
   limitations under the License.
 -->
 
-<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="SingleQuery" featureOwner="VXQuery">
-   <GroupInfo>
-      <title>Single Test</title>
-      <description/>
-   </GroupInfo>
-   <test-case name="simple-add" FilePath="Simple/" Creator="Preston Carman">
-      <description>Adds two numbers.</description>
-      <query name="add" date="2014-08-18"/>
-      <output-file compare="Text">add.txt</output-file>
-   </test-case>
-</test-group>
+EXRT
+=====
+
+# Description
+
+The original EXRT queries and data generation are outlined in "Exrt: Towards 
+a simple benchmark for xml readiness testing." [1]
+
+
+1. Carey, Michael J., et al. "Exrt: Towards a simple benchmark for xml readiness 
+testing." Performance Evaluation, Measurement and Characterization of Complex 
+Systems. Springer Berlin Heidelberg, 2011. 93-109.

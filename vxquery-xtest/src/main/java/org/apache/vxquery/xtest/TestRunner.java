@@ -103,6 +103,7 @@ public class TestRunner {
         }
 
         long start = System.currentTimeMillis();
+
         try {
             try {
                 FileInputStream query = new FileInputStream(testCase.getXQueryFile());

@@ -28,7 +28,6 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.visitors.ILogicalExpressionVi
 import edu.uci.ics.hyracks.api.job.JobSpecification;
 
 public class VXQueryCompilationListener implements XQueryCompilationListener {
-
     boolean showTET, showRP, showOET, showAST;
 
     public VXQueryCompilationListener(boolean showAST, boolean showTET, boolean showOET, boolean showRP) {
@@ -113,5 +112,4 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
         }
         return sb;
     }
-
 }
