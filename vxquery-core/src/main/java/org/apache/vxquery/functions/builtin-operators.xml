@@ -296,7 +296,7 @@
         <param name="parameter2" type="node()"/>
         <return type="xs:boolean"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.OpNodeBeforeEvaluatorFactory"/>
-     </operator>
+    </operator>
 
     <!-- op:NOTATION-equal($arg1  as xs:NOTATION, $arg2 as xs:NOTATION)  as xs:boolean -->
     <operator name="op:NOTATION-equal">
