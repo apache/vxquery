@@ -53,7 +53,7 @@ import edu.uci.ics.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
     String[] nodeList;
-    public Map<String, File> sourceFileMap;
+    Map<String, File> sourceFileMap;
 
     public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap) {
         this.nodeList = nodeList;
@@ -63,6 +63,10 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     @Override
     public IDataSource<String> findDataSource(String id) throws AlgebricksException {
         return null;
+    }
+
+    public Map<String, File> getSourceFileMap() {
+        return sourceFileMap;
     }
 
     @Override

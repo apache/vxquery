@@ -92,14 +92,8 @@ public class ConvertDocExpressionToFile implements IAlgebraicRewriteRule {
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
         boolean modified = false;
-        //returns the list of expressions inside the operator.
         List<Mutable<ILogicalExpression>> expressions = OperatorToolbox.getExpressions(opRef);
-        //for each expression we go in
         for (Mutable<ILogicalExpression> expression : expressions) {
-            //checks if the expression is a function call
-            //checks if the function call is fn_doc1
-            //returns the first expression contained in it only!
-            //what is a function has multiple arguments that is multiple expressions
             Mutable<ILogicalExpression> docExpression = ExpressionToolbox.findFirstFunctionExpression(expression,
                     BuiltinFunctions.FN_DOC_1.getFunctionIdentifier());
             if (docExpression != null) {
@@ -111,9 +105,6 @@ public class ConvertDocExpressionToFile implements IAlgebraicRewriteRule {
         }
         return modified;
     }
-
-    //side note: I only see nested arguments, not multiple expressions in most cases.//
-    //Expressions == arguments ??
 
     protected boolean ifDocExpressionFound(Mutable<ILogicalOperator> opRef, Mutable<ILogicalExpression> funcExpression,
             IOptimizationContext context) {
@@ -159,10 +150,10 @@ public class ConvertDocExpressionToFile implements IAlgebraicRewriteRule {
             e.printStackTrace();
         }
         VXQueryMetadataProvider mdp = (VXQueryMetadataProvider) context.getMetadataProvider();
-        if (!mdp.sourceFileMap.containsKey(collectionName)) {
+        if (!mdp.getSourceFileMap().containsKey(collectionName)) {
             return false;
         }
-        File file = mdp.sourceFileMap.get(collectionName);
+        File file = mdp.getSourceFileMap().get(collectionName);
         StringValueBuilder svb = new StringValueBuilder();
         try {
             abvs.reset();

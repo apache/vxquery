@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 
-<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="GhcndPartition1Queries" featureOwner="VXQuery">
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="GhcndPartition2Queries" featureOwner="VXQuery">
    <GroupInfo>
       <title>GHCND Partition 1</title>
       <description/>
