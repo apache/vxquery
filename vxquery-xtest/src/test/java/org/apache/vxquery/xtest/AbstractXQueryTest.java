@@ -35,6 +35,8 @@ public abstract class AbstractXQueryTest {
         XTestOptions opts = new XTestOptions();
         opts.verbose = false;
         opts.threads = 1;
+        opts.showQuery = true;
+        opts.showResult = true;
         return opts;
     }
 
