@@ -182,7 +182,8 @@ public class TestRunner {
         if (opts.showResult) {
             if (res.result == null) {
                 System.err.println("***Error: ");
-                System.err.println(res.error.getStackTrace());
+                System.err.println("Message: " + res.error.getMessage());
+                res.error.printStackTrace();
             } else {
                 System.err.println("***Result: ");
                 System.err.println(res.result);

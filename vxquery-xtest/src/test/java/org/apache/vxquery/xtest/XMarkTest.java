@@ -25,12 +25,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class VXQueryTest extends AbstractXQueryTest{
+public class XMarkTest extends AbstractXQueryTest {
 
-    private static String VXQUERY_CATALOG = StringUtils.join(new String[] { "src", "test", "resources",
-            "VXQueryCatalog.xml" }, File.separator);
+    private static String XMARK_CATALOG = StringUtils.join(new String[] { "src", "test", "resources",
+            "VXQueryXMarkCatalog.xml" }, File.separator);
 
-    public VXQueryTest(TestCase tc) throws Exception {
+    public XMarkTest(TestCase tc) throws Exception {
         super(tc);
     }
 
@@ -43,7 +43,7 @@ public class VXQueryTest extends AbstractXQueryTest{
 
     public static XTestOptions getOptions() {
         XTestOptions options = getDefaultTestOptions();
-        setCatalogToTestOptions(options, VXQUERY_CATALOG);
+        setCatalogToTestOptions(options, XMARK_CATALOG);
         return options;
     }
 

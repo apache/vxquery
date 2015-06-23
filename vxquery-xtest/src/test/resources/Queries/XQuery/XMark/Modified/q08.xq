@@ -20,7 +20,7 @@
 let $collection1 := "people"
 for $p in collection($collection1)/site/people/person
   let $a := count(
-    let $collection2 := "vxquery-xtest/src/test/resources/TestSources/XMarkData/closed_auctions/"
+    let $collection2 := "closed_auctions"
     for $t in collection($collection2)/site/closed_auctions/closed_auction
       where $t/buyer/@person = $p/@id
       return $t
