@@ -266,7 +266,7 @@
         <param name="parameter1" type="node()"/>
         <param name="parameter2" type="node()"/>
         <return type="xs:boolean"/>
-     </operator>
+    </operator>
 
     <!-- op:multiply-dayTimeDuration( $arg1 as xs:dayTimeDuration, $arg2 as xs:double)  as xs:dayTimeDuration -->
     <operator name="op:multiply-dayTimeDuration">
