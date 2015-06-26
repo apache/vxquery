@@ -67,9 +67,6 @@ public class OperatorToolbox {
         switch (op.getOperatorTag()) {
             case AGGREGATE:
             case ASSIGN:
-                AbstractAssignOperator aap = (AbstractAssignOperator) op;
-                result.addAll(aap.getExpressions());
-                break;
             case RUNNINGAGGREGATE:
                 AbstractAssignOperator aao = (AbstractAssignOperator) op;
                 result.addAll(aao.getExpressions());

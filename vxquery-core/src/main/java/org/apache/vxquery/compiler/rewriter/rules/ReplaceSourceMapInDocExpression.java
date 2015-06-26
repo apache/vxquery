@@ -20,8 +20,6 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
@@ -81,6 +79,8 @@ public class ReplaceSourceMapInDocExpression implements IAlgebraicRewriteRule {
     final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
     final DataOutput dOut = abvs.getDataOutput();
+    StringBuilder toStr = new StringBuilder();
+    String docArg = null;
 
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
@@ -136,24 +136,18 @@ public class ReplaceSourceMapInDocExpression implements IAlgebraicRewriteRule {
             return false;
         }
         tvp.set(constantValue.getValue(), 0, constantValue.getValue().length);
-        String collectionName = null;
         tvp.getValue(stringp);
         if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
             return false;
         }
-        try {
-            bbis.setByteBuffer(
-                    ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                            stringp.getLength() + stringp.getStartOffset())), 0);
-            collectionName = di.readUTF();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        stringp.toString(toStr);
+        docArg = toStr.toString();
+
         VXQueryMetadataProvider mdp = (VXQueryMetadataProvider) context.getMetadataProvider();
-        if (!mdp.getSourceFileMap().containsKey(collectionName)) {
+        if (!mdp.getSourceFileMap().containsKey(docArg)) {
             return false;
         }
-        File file = mdp.getSourceFileMap().get(collectionName);
+        File file = mdp.getSourceFileMap().get(docArg);
         StringValueBuilder svb = new StringValueBuilder();
         try {
             abvs.reset();
