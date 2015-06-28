@@ -65,6 +65,10 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         return null;
     }
 
+    public Map<String, File> getSourceFileMap() {
+        return sourceFileMap;
+    }
+
     @Override
     public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getScannerRuntime(IDataSource<String> dataSource,
             List<LogicalVariable> scanVariables, List<LogicalVariable> projectVariables, boolean projectPushed,
