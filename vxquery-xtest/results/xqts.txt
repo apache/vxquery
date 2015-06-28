@@ -5557,7 +5557,7 @@ Expressions/Operators/NodeOp/NodeAfter//nodeexpression34, EXPECTED_ERROR_GOT_DIF
 Expressions/Operators/NodeOp/NodeAfter//nodeexpression35, EXPECTED_ERROR_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeAfter//nodeexpression36, EXPECTED_ERROR_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeAfter//nodeexpression37, EXPECTED_ERROR_GOT_DIFFERENT_ERROR
-Expressions/Operators/NodeOp/NodeAfter//nodeexpression38, EXPECTED_RESULT_GOT_ERROR
+Expressions/Operators/NodeOp/NodeAfter//nodeexpression38, EXPECTED_RESULT_GOT_SAME_RESULT
 Expressions/Operators/NodeOp/NodeAfter//nodeexpression39, EXPECTED_RESULT_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeAfter//nodeexpression40, EXPECTED_RESULT_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeAfter//nodeexpression41, EXPECTED_ERROR_GOT_FAILURE
@@ -5579,7 +5579,7 @@ Expressions/Operators/NodeOp/NodeBefore//nodeexpression18, EXPECTED_ERROR_GOT_DI
 Expressions/Operators/NodeOp/NodeBefore//nodeexpression19, EXPECTED_ERROR_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeBefore//nodeexpression20, EXPECTED_ERROR_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeBefore//nodeexpression21, EXPECTED_ERROR_GOT_DIFFERENT_ERROR
-Expressions/Operators/NodeOp/NodeBefore//nodeexpression22, EXPECTED_RESULT_GOT_ERROR
+Expressions/Operators/NodeOp/NodeBefore//nodeexpression22, EXPECTED_RESULT_GOT_SAME_RESULT
 Expressions/Operators/NodeOp/NodeBefore//nodeexpression23, EXPECTED_RESULT_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeBefore//nodeexpression24, EXPECTED_RESULT_GOT_FAILURE
 Expressions/Operators/NodeOp/NodeBefore//nodeexpression25, EXPECTED_ERROR_GOT_FAILURE
