@@ -130,7 +130,22 @@ public class ExpressionToolbox {
     }
 
     /**
-     * Find all functions for a specific expression.
+     * Finds all functions for a given expression.
+     */
+    public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe,
+            List<Mutable<ILogicalExpression>> finds) {
+        ILogicalExpression le = mutableLe.getValue();
+        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+            finds.add(mutableLe);
+            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+                findAllFunctionExpressions(argExp, finds);
+            }
+        }
+    }
+
+    /**
+     * Finds all functions for a given expression and function identifier.
      */
     public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi,
             List<Mutable<ILogicalExpression>> finds) {
