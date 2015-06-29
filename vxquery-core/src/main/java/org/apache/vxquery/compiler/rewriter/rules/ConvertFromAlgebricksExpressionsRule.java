@@ -53,13 +53,16 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  *   %OPERATOR( $v1 : algebricks_function( \@input_expression ) )
  *   plan__child
  *   
- *   Where xquery_function creates an atomic value.
+ *   where the function annotation contains a hint on which xquery expression is represented by the algebricks function.
  *   
  * After 
  * 
  *   plan__parent
- *   %OPERATOR( $v1 : boolean(xquery_function( \@input_expression ) ) )
+ *   %OPERATOR( $v1 :xquery_expression( \@input_expression ) ) )
  *   plan__child
+ *   
+ *   note the xquery_expression may include the boolean function to ensure only a true or false result.
+ * 
  * </pre>
  * 
  * @author prestonc, shivanim
@@ -67,9 +70,10 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
     final List<Mutable<ILogicalExpression>> functionList = new ArrayList<Mutable<ILogicalExpression>>();
     final static Map<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>> ALGEBRICKS_MAP = new HashMap<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>>();
-    final static String CONVERSION_TO_FR_ALGEBRICKS = "ConversionToAndFromAlgebrics";
+    final static String ALGEBRICKS_CONVERSION_ANNOTATION = "ConversionToAndFromAlgebrics";
     AbstractFunctionCallExpression searchFunction;
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public ConvertFromAlgebricksExpressionsRule() {
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.AND, new Pair(BuiltinOperators.AND, null));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.EQ, new Pair(BuiltinOperators.VALUE_EQ,
@@ -116,7 +120,7 @@ public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRu
             searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
             if (ALGEBRICKS_MAP.containsKey(searchFunction.getFunctionIdentifier())) {
                 ScalarFunctionCallExpression booleanFunctionCallExp = null;
-                IExpressionAnnotation annotate = searchFunction.getAnnotations().get(CONVERSION_TO_FR_ALGEBRICKS);
+                IExpressionAnnotation annotate = searchFunction.getAnnotations().get(ALGEBRICKS_CONVERSION_ANNOTATION);
                 FunctionIdentifier fid = searchFunction.getFunctionIdentifier();
                 if (((FunctionIdentifier) annotate.getObject()).equals(ALGEBRICKS_MAP.get(fid).first
                         .getFunctionIdentifier())) {

@@ -47,11 +47,13 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * Before
  * 
  *   plan__parent
- *   %OPERATOR( $v1 : xquery_function( \@input_expression ) )
+ *   %OPERATOR( $v1 : xquery_expression( \@input_expression ) )
  *   plan__child
  * 
- *   where xquery_function has a known equivalent in Algebricks, 
- *   such as conditional expressions and a check for null
+ *   where xquery_expression has a known equivalent in Algebricks, 
+ *     such as conditional expressions and a check for null.
+ *     The expression may include the boolean function to ensure only
+ *     a true or false result.
  *   
  * After 
  * 
@@ -65,10 +67,9 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 public class ConvertToAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
     final Map<FunctionIdentifier, FunctionIdentifier> ALGEBRICKS_MAP = new HashMap<FunctionIdentifier, FunctionIdentifier>();
     final Map<FunctionIdentifier, FunctionIdentifier> ALGEBRICKS_BOOL_MAP = new HashMap<FunctionIdentifier, FunctionIdentifier>();
-    final static String CONVERSION_TO_FR_ALGEBRICKS = "ConversionToAndFromAlgebrics";
+    final static String ALGEBRICKS_CONVERSION_ANNOTATION = "ConversionToAndFromAlgebrics";
 
     public ConvertToAlgebricksExpressionsRule() {
-
         ALGEBRICKS_BOOL_MAP.put(BuiltinOperators.AND.getFunctionIdentifier(), AlgebricksBuiltinFunctions.AND);
         ALGEBRICKS_BOOL_MAP.put(BuiltinOperators.OR.getFunctionIdentifier(), AlgebricksBuiltinFunctions.OR);
         ALGEBRICKS_BOOL_MAP.put(BuiltinOperators.VALUE_EQ.getFunctionIdentifier(), AlgebricksBuiltinFunctions.EQ);
@@ -77,7 +78,7 @@ public class ConvertToAlgebricksExpressionsRule implements IAlgebraicRewriteRule
         ALGEBRICKS_BOOL_MAP.put(BuiltinOperators.VALUE_LE.getFunctionIdentifier(), AlgebricksBuiltinFunctions.LE);
         ALGEBRICKS_BOOL_MAP.put(BuiltinOperators.VALUE_LT.getFunctionIdentifier(), AlgebricksBuiltinFunctions.LT);
         ALGEBRICKS_BOOL_MAP.put(BuiltinOperators.VALUE_NE.getFunctionIdentifier(), AlgebricksBuiltinFunctions.NEQ);
-        
+
         ALGEBRICKS_MAP.put(BuiltinFunctions.FN_EMPTY_1.getFunctionIdentifier(), AlgebricksBuiltinFunctions.IS_NULL);
         ALGEBRICKS_MAP.put(BuiltinFunctions.FN_NOT_1.getFunctionIdentifier(), AlgebricksBuiltinFunctions.NOT);
         ALGEBRICKS_MAP.put(BuiltinOperators.GENERAL_EQ.getFunctionIdentifier(), AlgebricksBuiltinFunctions.EQ);
@@ -120,7 +121,7 @@ public class ConvertToAlgebricksExpressionsRule implements IAlgebraicRewriteRule
             FunctionIdentifier algebricksFid = map.get(functionCall.getFunctionIdentifier());
             IFunctionInfo algebricksFunction = context.getMetadataProvider().lookupFunction(algebricksFid);
             functionCall.setFunctionInfo(algebricksFunction);
-            functionCall.getAnnotations().put(CONVERSION_TO_FR_ALGEBRICKS, annotate);
+            functionCall.getAnnotations().put(ALGEBRICKS_CONVERSION_ANNOTATION, annotate);
             searchM.setValue(functionCall);
             return true;
         }
