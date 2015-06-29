@@ -53,7 +53,7 @@ import edu.uci.ics.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
     String[] nodeList;
-    public Map<String, File> sourceFileMap;
+    Map<String, File> sourceFileMap;
 
     public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap) {
         this.nodeList = nodeList;

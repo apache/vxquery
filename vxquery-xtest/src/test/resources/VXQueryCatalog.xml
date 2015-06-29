@@ -84,12 +84,12 @@
        <description last-mod="2014-04-02">Collection of files</description>
      </source>
      <source ID="station_xml_file" FileName="TestSources/ghcnd/half_1/quarter_1/stations/US000000001.xml" Creator="Shivani Mall">
-       <description last-mod="2015-06-19">File</description>
+       <description last-mod="2015-06-26">File</description>
      </source>
    </sources>
-   <test-group name="BasicQueries" featureOwner="Preston Carman">
+   <test-group name="SingleQuery" featureOwner="Preston Carman">
       <GroupInfo>
-         <title>Basic Queries</title>
+         <title>Single Query</title>
          <description/>
       </GroupInfo>
       <test-group name="SingleTestAdd" featureOwner="Preston Carman">
@@ -103,7 +103,7 @@
          <GroupInfo>
             <title>Single Test List</title>
             <description/>
-          </GroupInfo>
+         </GroupInfo>
          &SingleAlternateQuery;
       </test-group>
    </test-group>
