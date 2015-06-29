@@ -67,21 +67,22 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
     final List<Mutable<ILogicalExpression>> functionList = new ArrayList<Mutable<ILogicalExpression>>();
     final static Map<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>> ALGEBRICKS_MAP = new HashMap<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>>();
-    final static String ConversionToAndFromAlgebrics = "ConversionToAndFromAlgebrics";
+    final static String CONVERSION_TO_FR_ALGEBRICKS = "ConversionToAndFromAlgebrics";
+    AbstractFunctionCallExpression searchFunction;
 
     public ConvertFromAlgebricksExpressionsRule() {
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.AND, new Pair(BuiltinOperators.AND, null));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.EQ, new Pair(BuiltinOperators.VALUE_EQ,
                 BuiltinOperators.GENERAL_EQ));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.GT, new Pair(BuiltinOperators.VALUE_GT,
-                BuiltinOperators.GENERAL_GT));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.GE, new Pair(BuiltinOperators.VALUE_GE,
                 BuiltinOperators.GENERAL_GE));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.GT, new Pair(BuiltinOperators.VALUE_GT,
+                BuiltinOperators.GENERAL_GT));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.IS_NULL, new Pair(null, BuiltinFunctions.FN_EMPTY_1));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.LT, new Pair(BuiltinOperators.VALUE_LT,
-                BuiltinOperators.GENERAL_LT));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.LE, new Pair(BuiltinOperators.VALUE_LE,
                 BuiltinOperators.GENERAL_LE));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.LT, new Pair(BuiltinOperators.VALUE_LT,
+                BuiltinOperators.GENERAL_LT));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.NOT, new Pair(null, BuiltinFunctions.FN_NOT_1));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.NEQ, new Pair(BuiltinOperators.VALUE_NE,
                 BuiltinOperators.GENERAL_NE));
@@ -112,10 +113,10 @@ public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRu
         functionList.clear();
         ExpressionToolbox.findAllFunctionExpressions(search, functionList);
         for (Mutable<ILogicalExpression> searchM : functionList) {
-            AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+            searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
             if (ALGEBRICKS_MAP.containsKey(searchFunction.getFunctionIdentifier())) {
                 ScalarFunctionCallExpression booleanFunctionCallExp = null;
-                IExpressionAnnotation annotate = searchFunction.getAnnotations().get(ConversionToAndFromAlgebrics);
+                IExpressionAnnotation annotate = searchFunction.getAnnotations().get(CONVERSION_TO_FR_ALGEBRICKS);
                 FunctionIdentifier fid = searchFunction.getFunctionIdentifier();
                 if (((FunctionIdentifier) annotate.getObject()).equals(ALGEBRICKS_MAP.get(fid).first
                         .getFunctionIdentifier())) {
@@ -131,7 +132,6 @@ public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRu
                             searchFunction.getArguments());
                     searchM.setValue(booleanFunctionCallExp);
                     modified = true;
-                } else {
                 }
             }
         }
