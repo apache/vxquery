@@ -67,7 +67,7 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 public class ConvertToAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
     final Map<FunctionIdentifier, FunctionIdentifier> ALGEBRICKS_MAP = new HashMap<FunctionIdentifier, FunctionIdentifier>();
     final Map<FunctionIdentifier, FunctionIdentifier> ALGEBRICKS_BOOL_MAP = new HashMap<FunctionIdentifier, FunctionIdentifier>();
-    final static String ALGEBRICKS_CONVERSION_ANNOTATION = "ConversionToAndFromAlgebrics";
+    final static String ALGEBRICKS_CONVERSION_ANNOTATION = "ConversionToAndFromAlgebricks";
 
     public ConvertToAlgebricksExpressionsRule() {
         ALGEBRICKS_BOOL_MAP.put(BuiltinOperators.AND.getFunctionIdentifier(), AlgebricksBuiltinFunctions.AND);
