@@ -64,7 +64,7 @@ limitations under the License.
                 href="user_installation.html" />
             <item
                 name="Cluster Installation"
-                href="cluster_installation.html" />
+                href="user_cluster_installation.html" />
             <item
                 name="Executing a Query"
                 href="user_query.html" />
@@ -77,6 +77,9 @@ limitations under the License.
             <item
                 name="Get Started"
                 href="developer_get_started.html" />
+            <item
+                name="Contributing Code"
+                href="development_contributing.html" />
             <item
                 name="Data Handling"
                 href="development_data_handling.html" />
@@ -91,6 +94,9 @@ limitations under the License.
                 href="development_eclipse_setup.html" />
             <item
                 name="Release Steps"
+                href="development_release.html" />
+            <item
+                name="Site Update Steps"
                 href="development_release.html" />
             <item
                 name="Update Local Git XQTS Results"
