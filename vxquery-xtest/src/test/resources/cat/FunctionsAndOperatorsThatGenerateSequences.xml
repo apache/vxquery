@@ -22,7 +22,7 @@
    <test-case name="functions-and-operators-that-generate-sequences-fn_doc" FilePath="Simple/" Creator="Shivani Mall">
       <description>Query for fn:doc with uri.</description>
       <query name="fn_doc" date="2015-06-19"/>
-      <output-file compare="Text">fn_doc.xml</output-file>
+      <output-file compare="Text">fn_doc.txt</output-file>
    </test-case>
 </test-group>
  
