@@ -53,13 +53,16 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  *   %OPERATOR( $v1 : algebricks_function( \@input_expression ) )
  *   plan__child
  *   
- *   Where xquery_function creates an atomic value.
+ *   where the function annotation contains a hint on which xquery expression is represented by the algebricks function.
  *   
  * After 
  * 
  *   plan__parent
- *   %OPERATOR( $v1 : boolean(xquery_function( \@input_expression ) ) )
+ *   %OPERATOR( $v1 :xquery_expression( \@input_expression ) ) )
  *   plan__child
+ *   
+ *   note the xquery_expression may include the boolean function to ensure only a true or false result.
+ * 
  * </pre>
  * 
  * @author prestonc, shivanim
@@ -67,9 +70,11 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
     final List<Mutable<ILogicalExpression>> functionList = new ArrayList<Mutable<ILogicalExpression>>();
     final static Map<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>> ALGEBRICKS_MAP = new HashMap<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>>();
-    final static String CONVERSION_TO_FR_ALGEBRICKS = "ConversionToAndFromAlgebrics";
+    final static String ALGEBRICKS_CONVERSION_ANNOTATION = "ConversionToAndFromAlgebricks";
     AbstractFunctionCallExpression searchFunction;
+    boolean isBoolean = false;
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public ConvertFromAlgebricksExpressionsRule() {
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.AND, new Pair(BuiltinOperators.AND, null));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.EQ, new Pair(BuiltinOperators.VALUE_EQ,
@@ -107,34 +112,50 @@ public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRu
         return modified;
     }
 
-    @SuppressWarnings("unchecked")
     private boolean processExpression(Mutable<ILogicalOperator> opRef, Mutable<ILogicalExpression> search) {
         boolean modified = false;
         functionList.clear();
         ExpressionToolbox.findAllFunctionExpressions(search, functionList);
         for (Mutable<ILogicalExpression> searchM : functionList) {
             searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+
             if (ALGEBRICKS_MAP.containsKey(searchFunction.getFunctionIdentifier())) {
-                ScalarFunctionCallExpression booleanFunctionCallExp = null;
-                IExpressionAnnotation annotate = searchFunction.getAnnotations().get(CONVERSION_TO_FR_ALGEBRICKS);
                 FunctionIdentifier fid = searchFunction.getFunctionIdentifier();
-                if (((FunctionIdentifier) annotate.getObject()).equals(ALGEBRICKS_MAP.get(fid).first
-                        .getFunctionIdentifier())) {
-                    searchFunction.setFunctionInfo(ALGEBRICKS_MAP.get(fid).first);
-                    booleanFunctionCallExp = new ScalarFunctionCallExpression(BuiltinFunctions.FN_BOOLEAN_1,
-                            new MutableObject<ILogicalExpression>(searchM.getValue()));
-                    searchM.setValue(booleanFunctionCallExp);
-                    modified = true;
-                } else if (((FunctionIdentifier) annotate.getObject()).equals(ALGEBRICKS_MAP.get(fid).second
-                        .getFunctionIdentifier())) {
-                    searchFunction.setFunctionInfo(ALGEBRICKS_MAP.get(fid).second);
-                    booleanFunctionCallExp = new ScalarFunctionCallExpression(ALGEBRICKS_MAP.get(fid).second,
-                            searchFunction.getArguments());
-                    searchM.setValue(booleanFunctionCallExp);
-                    modified = true;
+
+                if (ALGEBRICKS_MAP.get(fid).first == null) {
+                    modified = convertAlgebricksExpression(searchM, ALGEBRICKS_MAP.get(fid).second, false);
+                } else if (ALGEBRICKS_MAP.get(fid).second == null) {
+                    modified = convertAlgebricksExpression(searchM, ALGEBRICKS_MAP.get(fid).first, true);
+                } else {
+                    IExpressionAnnotation annotate = searchFunction.getAnnotations().get(
+                            ALGEBRICKS_CONVERSION_ANNOTATION);
+
+                    if (((FunctionIdentifier) annotate.getObject()).equals(ALGEBRICKS_MAP.get(fid).first
+                            .getFunctionIdentifier())) {
+
+                        modified = convertAlgebricksExpression(searchM, ALGEBRICKS_MAP.get(fid).first, true);
+                    } else if (((FunctionIdentifier) annotate.getObject()).equals(ALGEBRICKS_MAP.get(fid).second
+                            .getFunctionIdentifier())) {
+
+                        modified = convertAlgebricksExpression(searchM, ALGEBRICKS_MAP.get(fid).second, false);
+                    }
                 }
             }
         }
         return modified;
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean convertAlgebricksExpression(Mutable<ILogicalExpression> searchM, IFunctionInfo funcInfo,
+            boolean isBoolean) {
+        AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+        searchFunction.setFunctionInfo(funcInfo);
+
+        if (isBoolean) {
+            ScalarFunctionCallExpression functionCallExp = new ScalarFunctionCallExpression(
+                    BuiltinFunctions.FN_BOOLEAN_1, new MutableObject<ILogicalExpression>(searchM.getValue()));
+            searchM.setValue(functionCallExp);
+        }
+        return true;
     }
 }

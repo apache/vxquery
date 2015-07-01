@@ -144,6 +144,9 @@ public class ReplaceSourceMapInDocExpression implements IAlgebraicRewriteRule {
         docArg = toStr.toString();
 
         VXQueryMetadataProvider mdp = (VXQueryMetadataProvider) context.getMetadataProvider();
+        if (mdp.getSourceFileMap() == null) {
+            return false;
+        }
         if (!mdp.getSourceFileMap().containsKey(docArg)) {
             return false;
         }
