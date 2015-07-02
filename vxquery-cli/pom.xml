@@ -126,7 +126,18 @@
             <groupId>edu.uci.ics.hyracks</groupId>
             <artifactId>hyracks-dataflow-std</artifactId>
         </dependency>
+        
+            <dependency>
+					<groupId>edu.uci.ics.hyracks</groupId>
+					<artifactId>hyracks-hdfs-core</artifactId>
+		    </dependency>
+            <dependency>
+					<groupId>edu.uci.ics.hyracks</groupId>
+					<artifactId>hyracks-hdfs-2.x</artifactId>
+		    </dependency>
     </dependencies>
+    
+    
 
     <reporting>
         <plugins>
