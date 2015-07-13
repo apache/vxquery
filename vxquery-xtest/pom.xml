@@ -1,209 +1,214 @@
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	You under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-      http://www.apache.org/licenses/LICENSE-2.0
+	<parent>
+		<groupId>org.apache.vxquery</groupId>
+		<artifactId>apache-vxquery</artifactId>
+		<version>0.6-SNAPSHOT</version>
+	</parent>
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<artifactId>apache-vxquery-xtest</artifactId>
+	<packaging>jar</packaging>
+	<name>VXQuery XTest</name>
+	<description>Apache VXQuery Test Driver</description>
 
-    <parent>
-        <groupId>org.apache.vxquery</groupId>
-        <artifactId>apache-vxquery</artifactId>
-        <version>0.6-SNAPSHOT</version>
-    </parent>
+	<distributionManagement>
+		<site>
+			<id>vxquery.website</id>
+			<name>VXQuery Website</name>
+			<url>file:../site/vxquery-xtest/</url>
+		</site>
+	</distributionManagement>
 
-    <artifactId>apache-vxquery-xtest</artifactId>
-    <packaging>jar</packaging>
-    <name>VXQuery XTest</name>
-    <description>Apache VXQuery Test Driver</description>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<configuration>
+							<programs>
+								<program>
+									<mainClass>org.apache.vxquery.xtest.Main</mainClass>
+									<name>xtest</name>
+								</program>
+								<program>
+									<mainClass>org.apache.vxquery.xtest.util.DiskPerformance</mainClass>
+									<name>diskperformance</name>
+								</program>
+							</programs>
+							<repositoryLayout>flat</repositoryLayout>
+							<repositoryName>lib</repositoryName>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-xtest-scripts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/appassembler/bin</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources/scripts</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-xtest-conf</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/appassembler/conf</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources/conf</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-site</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- <argLine>-agentpath:"${yourkit.home}/bin/mac/libyjpagent.jnilib=sampling"</argLine> -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-    <distributionManagement>
-        <site>
-            <id>vxquery.website</id>
-            <name>VXQuery Website</name>
-            <url>file:../site/vxquery-xtest/</url>
-        </site>
-    </distributionManagement>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.vxquery</groupId>
+			<artifactId>apache-vxquery-core</artifactId>
+			<version>0.6-SNAPSHOT</version>
+		</dependency>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>appassembler-maven-plugin</artifactId>
-                <version>1.3</version>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <programs>
-                                <program>
-                                    <mainClass>org.apache.vxquery.xtest.Main</mainClass>
-                                    <name>xtest</name>
-                                </program>
-                                <program>
-                                    <mainClass>org.apache.vxquery.xtest.util.DiskPerformance</mainClass>
-                                    <name>diskperformance</name>
-                                </program>
-                            </programs>
-                            <repositoryLayout>flat</repositoryLayout>
-                            <repositoryName>lib</repositoryName>
-                        </configuration>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>assemble</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-xtest-scripts</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/appassembler/bin</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/resources/scripts</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-xtest-conf</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/appassembler/conf</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/resources/conf</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-site</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                     <!-- <argLine>-agentpath:"${yourkit.home}/bin/mac/libyjpagent.jnilib=sampling"</argLine> -->
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+		<dependency>
+			<groupId>edu.uci.ics.hyracks</groupId>
+			<artifactId>hyracks-api</artifactId>
+		</dependency>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.vxquery</groupId>
-            <artifactId>apache-vxquery-core</artifactId>
-            <version>0.6-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>edu.uci.ics.hyracks</groupId>
+			<artifactId>hyracks-client</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
-            <artifactId>hyracks-api</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>edu.uci.ics.hyracks</groupId>
+			<artifactId>hyracks-control-cc</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
-            <artifactId>hyracks-client</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>edu.uci.ics.hyracks</groupId>
+			<artifactId>hyracks-control-nc</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
-            <artifactId>hyracks-control-cc</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>edu.uci.ics.hyracks</groupId>
+			<artifactId>hyracks-dataflow-std</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
-            <artifactId>hyracks-control-nc</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>edu.uci.ics.hyracks</groupId>
+			<artifactId>hyracks-hdfs-2.x</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
-            <artifactId>hyracks-dataflow-std</artifactId>
-        </dependency>
-        
-        <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-hdfs</artifactId>
+		</dependency>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                            <report>dependencies</report>
-                            <report>plugins</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-                <configuration>
-                    <linkOnly>true</linkOnly>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache-rat-plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/ExpectedTestResults/**/*</exclude>
-                        <exclude>**/xqts.txt</exclude>
-                        <exclude>test-suites/**/*</exclude>
-                    </excludes>
-                    <numUnapprovedLicenses>0</numUnapprovedLicenses>
-                    <maxmemory>2g</maxmemory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <notimestamp>true</notimestamp>
-                    <maxmemory>2g</maxmemory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>dependencies</report>
+							<report>plugins</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+				<configuration>
+					<linkOnly>true</linkOnly>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.rat</groupId>
+				<artifactId>apache-rat-plugin</artifactId>
+				<version>${apache-rat-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>**/ExpectedTestResults/**/*</exclude>
+						<exclude>**/xqts.txt</exclude>
+						<exclude>test-suites/**/*</exclude>
+					</excludes>
+					<numUnapprovedLicenses>0</numUnapprovedLicenses>
+					<maxmemory>2g</maxmemory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<notimestamp>true</notimestamp>
+					<maxmemory>2g</maxmemory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
