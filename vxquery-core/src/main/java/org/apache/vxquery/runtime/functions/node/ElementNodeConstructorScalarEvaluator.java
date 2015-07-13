@@ -28,9 +28,14 @@ import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.CommentNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.ElementNodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.PINodeBuilder;
+import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -40,6 +45,7 @@ import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
 import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstructorScalarEvaluator {
     private final ElementNodeBuilder enb;
@@ -55,6 +61,8 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     private final UTF8StringPointable strp;
 
     private final SequencePointable seqp;
+
+    private final IMutableValueStorage abmvs = new ArrayBackedValueStorage();
 
     public ElementNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
@@ -164,12 +172,13 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void copyElement(ElementNodeBuilder enb, DictionaryBuilder db, NodeTreePointable ntp,
-            ElementNodePointable enp) throws IOException {
+            ElementNodePointable enp) throws IOException, SystemException {
         UTF8StringPointable strp = ppool.takeOne(UTF8StringPointable.class);
         SequencePointable seqp = ppool.takeOne(SequencePointable.class);
         AttributeNodePointable anp = ppool.takeOne(AttributeNodePointable.class);
         TaggedValuePointable tvp = ppool.takeOne(TaggedValuePointable.class);
         ElementNodePointable cenp = ppool.takeOne(ElementNodePointable.class);
+
         try {
             ElementNodeBuilder tempEnb = createENB();
             enb.startChild(tempEnb);
@@ -201,17 +210,32 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
                             break;
                         }
                         case ValueTag.COMMENT_NODE_TAG:
-                        case ValueTag.PI_NODE_TAG:
-                        case ValueTag.TEXT_NODE_TAG: {
-                            tempEnb.addChild(tvp);
+                            abmvs.reset();
+                            copyComment(tvp, ntp, abmvs);
+                            tempEnb.addChild(abmvs);
                             break;
-                        }
+                        case ValueTag.PI_NODE_TAG:
+                            abmvs.reset();
+                            copyPI(tvp, ntp, abmvs);
+                            tempEnb.addChild(abmvs);
+                            break;
+                        case ValueTag.TEXT_NODE_TAG:
+                            abmvs.reset();
+                            copyText(tvp, ntp, abmvs);
+                            tempEnb.addChild(abmvs);
+                            break;
+                        default:
+                            abmvs.reset();
+                            convertToText(tvp, abmvs);
+                            tempEnb.addChild(abmvs);
+                            break;
                     }
                 }
             }
             tempEnb.endChildrenChunk();
             enb.endChild(tempEnb);
             freeENB(tempEnb);
+
         } finally {
             ppool.giveBack(cenp);
             ppool.giveBack(tvp);
@@ -222,7 +246,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void copyDocument(ElementNodeBuilder enb, DictionaryBuilder db, NodeTreePointable ntp,
-            DocumentNodePointable dnp) throws IOException {
+            DocumentNodePointable dnp) throws IOException, SystemException {
         SequencePointable seqp = ppool.takeOne(SequencePointable.class);
         AttributeNodePointable anp = ppool.takeOne(AttributeNodePointable.class);
         TaggedValuePointable tvp = ppool.takeOne(TaggedValuePointable.class);
@@ -267,6 +291,8 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void processChild(TaggedValuePointable tvp, DictionaryBuilder db) throws IOException, SystemException {
+        IMutableValueStorage mvs = new ArrayBackedValueStorage();
+
         if (tvp.getTag() != ValueTag.NODE_TREE_TAG) {
             enb.addChild(tvp);
         } else {
@@ -292,9 +318,16 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
                             break;
                         }
                         case ValueTag.COMMENT_NODE_TAG:
+                            copyComment(innerTvp, ntp, mvs);
+                            enb.addChild(mvs);
+                            break;
                         case ValueTag.PI_NODE_TAG:
+                            copyPI(innerTvp, ntp, mvs);
+                            enb.addChild(mvs);
+                            break;
                         case ValueTag.TEXT_NODE_TAG: {
-                            enb.addChild(innerTvp);
+                            copyText(innerTvp, ntp, mvs);
+                            enb.addChild(mvs);
                             break;
                         }
                         case ValueTag.DOCUMENT_NODE_TAG: {
@@ -331,5 +364,68 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     @Override
     protected boolean createsDictionary() {
         return true;
+    }
+
+    private void copyText(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs)
+            throws IOException, SystemException {
+
+        TextNodeBuilder tnb = new TextNodeBuilder();
+        VoidPointable vp = ppool.takeOne(VoidPointable.class);
+        TextOrCommentNodePointable tcnp = ppool.takeOne(TextOrCommentNodePointable.class);
+        tvp.getValue(tcnp);
+        tcnp.getValue(ntp, vp);
+
+        tnb.reset(mvs);
+        tnb.setValue(vp);
+
+        ppool.giveBack(vp);
+        ppool.giveBack(tcnp);
+
+    }
+
+    private void copyComment(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs)
+            throws IOException, SystemException {
+        CommentNodeBuilder cnb = new CommentNodeBuilder();
+        VoidPointable vp = ppool.takeOne(VoidPointable.class);
+        TextOrCommentNodePointable tcnp = ppool.takeOne(TextOrCommentNodePointable.class);
+
+        tvp.getValue(tcnp);
+        tcnp.getValue(ntp, vp);
+
+        cnb.reset(mvs);
+        cnb.setValue(vp);
+
+        ppool.giveBack(vp);
+        ppool.giveBack(tcnp);
+    }
+
+    private void copyPI(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException,
+            SystemException {
+        PINodeBuilder pnb = new PINodeBuilder();
+        VoidPointable vp1 = ppool.takeOne(VoidPointable.class);
+        VoidPointable vp2 = ppool.takeOne(VoidPointable.class);
+        PINodePointable pnp = ppool.takeOne(PINodePointable.class);
+
+        tvp.getValue(pnp);
+        pnp.getContent(ntp, vp1);
+        pnp.getTarget(ntp, vp2);
+
+        pnb.reset(mvs);
+        pnb.setContent(vp2);
+        pnb.setTarget(vp1);
+
+        ppool.giveBack(pnp);
+        ppool.giveBack(vp1);
+        ppool.giveBack(vp2);
+    }
+
+    private void convertToText(TaggedValuePointable tvp, IMutableValueStorage mvs) throws IOException {
+        VoidPointable vp = ppool.takeOne(VoidPointable.class);
+        TextNodeBuilder tnb = new TextNodeBuilder();
+        tvp.getValue(vp);
+        tnb.reset(mvs);
+        tnb.setValue(vp);
+
+        ppool.giveBack(vp);
     }
 }
