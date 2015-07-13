@@ -30,7 +30,9 @@ public class Main {
         }
 
         XTest xts = new XTest(opts);
+        xts.setupHDFS();
         xts.init();
         xts.waitForCompletion();
+        xts.shutdownDFS();
     }
 }
