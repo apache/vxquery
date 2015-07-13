@@ -172,7 +172,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void copyElement(ElementNodeBuilder enb, DictionaryBuilder db, NodeTreePointable ntp,
-            ElementNodePointable enp) throws IOException, SystemException {
+            ElementNodePointable enp) throws IOException {
         UTF8StringPointable strp = ppool.takeOne(UTF8StringPointable.class);
         SequencePointable seqp = ppool.takeOne(SequencePointable.class);
         AttributeNodePointable anp = ppool.takeOne(AttributeNodePointable.class);
@@ -366,8 +366,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         return true;
     }
 
-    private void copyText(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs)
-            throws IOException, SystemException {
+    private void copyText(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException {
 
         TextNodeBuilder tnb = new TextNodeBuilder();
         VoidPointable vp = ppool.takeOne(VoidPointable.class);
@@ -384,7 +383,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void copyComment(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs)
-            throws IOException, SystemException {
+            throws IOException {
         CommentNodeBuilder cnb = new CommentNodeBuilder();
         VoidPointable vp = ppool.takeOne(VoidPointable.class);
         TextOrCommentNodePointable tcnp = ppool.takeOne(TextOrCommentNodePointable.class);
@@ -399,8 +398,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         ppool.giveBack(tcnp);
     }
 
-    private void copyPI(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException,
-            SystemException {
+    private void copyPI(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException {
         PINodeBuilder pnb = new PINodeBuilder();
         VoidPointable vp1 = ppool.takeOne(VoidPointable.class);
         VoidPointable vp2 = ppool.takeOne(VoidPointable.class);
