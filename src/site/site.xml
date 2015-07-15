@@ -79,7 +79,7 @@ limitations under the License.
                 href="developer_get_started.html" />
             <item
                 name="Contributing Code"
-                href="development_contributing.html" />
+                href="development_contribution.html" />
             <item
                 name="Data Handling"
                 href="development_data_handling.html" />
@@ -97,7 +97,7 @@ limitations under the License.
                 href="development_release.html" />
             <item
                 name="Site Update Steps"
-                href="development_release.html" />
+                href="development_site_update.html" />
             <item
                 name="Update Local Git XQTS Results"
                 href="development_update_xqts_results.html" />

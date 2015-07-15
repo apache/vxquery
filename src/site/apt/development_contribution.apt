@@ -16,64 +16,107 @@
 Contributing Code
 
   The following steps outline how to submit code to the VXQuery community for inclusion.
-  If you have questions about how to get started developing for VXQuery take a look at our Developer 
-  {{{http://vxquery.apache.org/developer_get_started.html}Get Started}} Guide.
-  VXQuery community supports two methods of contributing code to the project. 
-  First, a patch file can be submitted to an open VXQuery issue.
-  This method works well for small bug fixes.
-  Second, a pull request can be created in github.
-  The pull request will allow the community to give the developer feedback and support in creating a quality submission.
-  The following steps outline the github pull request process for the VXQuery community.
+  Please read the Developer {{{http://vxquery.apache.org/developer_get_started.html}Get Started}} Guide
+  to answer question about getting start as a developer.
+  VXQuery community supports two methods for contributing code to the project.
 
-  * Developer
-    
+  [[1]] <<Submit a patch file to an open VXQuery issue.>>
+
+    This method works well for small bug fixes.
+
+  [[1]] <<Create a pull request in github.>>
+
+    The pull request will allow the community to give the developer (you) feedback
+    and support in creating a quality submission.
+    The following steps outline the github pull request process for the VXQuery community.
+
+* Github Pull Request Process
+
+** Developer
+
     * Pre-contribution steps to follow.
 
       * {{{http://vxquery.apache.org/user_get_started.html}Community steps}}.
 
       * {{{http://vxquery.apache.org/developer_get_started.html}Developer steps}}.
-  
-      * Create a {{{https://github.com/}github}} account. 
+
+      * Create a {{{https://github.com/}github}} account.
+
 
     * Create a github fork of {{{https://github.com/apache/vxquery}Apache VXQuery}} project.
-    
+
       Go to {{{https://github.com/apache/vxquery}Apache VXQuery}} github mirror.
       Create a fork by clicking on the fork button.
-      The fork can be cloned to your local machine for development.
-      
+      Then clone the fork to your local machine for development.
+
+
     * Create a branch for your changes.
-    
+
       VXQuery uses the following convention when creating a branch: authors_username/topic_or_issue
-      The following branch name helps keep branches separated and its easy to determine the author and topic. 
-      
+      (examples: prestonc/vxquery_142 or tillw/group_by_clause).
+      The following branch name helps keep branches separated and keeps it easy to determine the author and topic.
+
+
+    * Make the change.
+
+      :-)
+
+
+    * Add new tests. (optional)
+
+      If the change is not covered in the XQTS, please create a new test in the VXQuery test suite
+      to cover the code changes made to VXQuery.
+
+
     * Test your changes.
-    
-      Once the work has been completed, test your branch against known passing Apache VXQuery tests.
-      Your patch must not break any of the existing test suites, either the VXQuery or currently passing XQTS.
-      
+
+      Once the change is ready, test the branch against known passing Apache VXQuery tests.
+      The patch must not break any of the existing test suites, either the VXQuery or currently passing XQTS.
+
       * {{{http://vxquery.apache.org/user_running_tests.html} Run the Test Suites}}
-      
+
       * {{{http://vxquery.apache.org/development_update_xqts_results.html}Update Passing Tests}}
-  
+
+
+    * Clean up your code.
+
+      Remove an extra debug code and verify the patch only includes code for the change.
+
+
     * Create a github Pull Request.
-    
-      Once the work has been tested, a pull request can be created for your branch.
-      Please use the Apache VXQuery master as branch to compare your changes.
+
+      Once the work has been tested, a pull request can be created for the change branch.
+      Please use the Apache VXQuery master as branch to compare the change branch.
       The branch should be up-to-date with the lastest Apache VXQuery master branch.
-      
+
+
     * Post your Pull Request.
-    
-      Post your Pull Request to the mailing list or issue to allow the VXQuery community to give you feedback.
-      At least one other member of the community should review your change.
+
+      Post the Pull Request to the mailing list or issue to allow the VXQuery community to give feedback on the change.
+      At least one other member of the community should review the change.
       If there is any feedback, address this and repeat the posting process.
-  
-  * VXQuery Reviewer / Committer
+
+** Code Reviewer
 
     * Review the Pull Request.
-    
+
+      Post inline or global comments for the developer.
+      Be polite in your suggestions.
+      Guide the developer to bring the code up to VXQuery's code standards.
+
     * Double check the VXQuery and XQTS tests.
-    
-    * Merge the change.
-   
-      When merging the change, do not rebase. 
+
+
+** VXQuery Committer (author or sponsor of the change)
+
+  The VXQuery committer will be responsible for the change made to the ASF git repository.
+  While they do not need to be the author, the committer should have some understanding of the change
+  they are pushing on to the repository.
+  Often the committer will also be the reviewer for non-committer changes.
+
+    * Double check the VXQuery and XQTS tests.
+
+    * Merge the change with ASF master.
+
+      When merging the change, do not rebase.
       Instead do a single merge commit into Apache VXQuery master.
