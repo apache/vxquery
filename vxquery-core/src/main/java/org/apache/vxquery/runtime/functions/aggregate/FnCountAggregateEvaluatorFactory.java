@@ -18,6 +18,7 @@ package org.apache.vxquery.runtime.functions.aggregate;
 
 import java.io.DataOutput;
 
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
@@ -42,6 +43,8 @@ public class FnCountAggregateEvaluatorFactory extends AbstractTaggedValueArgumen
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
+        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             long count;
 
@@ -69,7 +72,13 @@ public class FnCountAggregateEvaluatorFactory extends AbstractTaggedValueArgumen
 
             @Override
             protected void step(TaggedValuePointable[] args) throws SystemException {
-                count++;
+                TaggedValuePointable tvp = args[0];
+                if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                    tvp.getValue(seqp);
+                    count = seqp.getEntryCount();
+                } else {
+                    count++;
+                }
             }
 
         };
