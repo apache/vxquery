@@ -39,7 +39,7 @@
 <!ENTITY SingleQuery SYSTEM "cat/SingleQuery.xml">
 <!ENTITY SingleAlternateQuery SYSTEM "cat/SingleAlternateQuery.xml">
 
-<!ENTITY HDFSAggregatePartition1Queries SYSTEM "cat/HDFSAggregatePartition1Queries.xml">
+<!ENTITY HDFSAggregateQueries SYSTEM "cat/HDFSAggregateQueries.xml">
 
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
@@ -83,9 +83,6 @@
      </source>
      <source ID="ghcnd_quarter_4" FileName="TestSources/ghcnd/half_2/quarter_4" Creator="Preston Carman">
        <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="hdfs" FileName="TestSources/hdfs" Creator="Efi Kaltirimidou">
-       <description last-mod="2015-06-11">Collection of files</description>
      </source>
    </sources>
    <test-group name="SingleQuery" featureOwner="Preston Carman">
@@ -181,17 +178,17 @@
          &GhcndRecordsPartition4Queries;
       </test-group>
    </test-group>
-   <test-group name="HDFSAggregatePartitionQueries" featureOwner="Efi Kaltirimidou">
+   <test-group name="HDFSAggregateQueries" featureOwner="Efi Kaltirimidou">
       <GroupInfo>
          <title>Aggregate Partition Queries in HDFS</title>
          <description/>
       </GroupInfo>
-      <test-group name="AggregateParallelExecutionTests" featureOwner="Efi Kaltirimidou">
+      <test-group name="CollectionReadFromHDFSAggregateTests" featureOwner="Efi Kaltirimidou">
          <GroupInfo>
             <title>Aggregate HDFS Execution Tests</title>
             <description/>
          </GroupInfo>
-         &HDFSAggregatePartition1Queries;
+        &HDFSAggregateQueries;
       </test-group>
    </test-group>
 </test-suite>

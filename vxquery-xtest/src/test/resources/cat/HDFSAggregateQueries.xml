@@ -15,33 +15,33 @@
   limitations under the License.
 -->
 
-<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="AggregatePartition1Queries" featureOwner="VXQuery">
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="AggregateQueries" featureOwner="VXQuery">
    <GroupInfo>
-      <title>HDFS Aggregate Partition 1</title>
+      <title>HDFS Aggregate</title>
       <description/>
    </GroupInfo>
-   <test-case name="hdfs-aggregate-partition-1-avg" FilePath="HDFS/Partition-1/" Creator="Efi Kaltirimidou">
-      <description>Count records in HDFS returned for q02 from the weather benchmark with 1 partition.</description>
+   <test-case name="hdfs-aggregate-avg" FilePath="HDFS/Aggregate/" Creator="Efi Kaltirimidou">
+      <description>Count records in HDFS returned for q02 from the weather benchmark.</description>
       <query name="avgHDFS" date="2015-06-11"/>
       <output-file compare="Text">avgHDFS.txt</output-file>
    </test-case>
-   <test-case name="hdfs-aggregate-partition-1-count" FilePath="HDFS/Partition-1/" Creator="Efi Kaltirimidou">
-      <description>Count records in HDFS returned for q02 from the weather benchmark with 1 partition.</description>
+   <test-case name="hdfs-aggregate-count" FilePath="HDFS/Aggregate/" Creator="Efi Kaltirimidou">
+      <description>Count records in HDFS returned for q02 from the weather benchmark.</description>
       <query name="countHDFS" date="2015-06-11"/>
       <output-file compare="Text">countHDFS.txt</output-file>
    </test-case>
-   <test-case name="hdfs-aggregate-partition-1-min" FilePath="HDFS/Partition-1/" Creator="Efi Kaltirimidou">
-      <description>Count records in HDFS returned for q05 from the weather benchmark with 1 partition.</description>
+   <test-case name="hdfs-aggregate-min" FilePath="HDFS/Aggregate/" Creator="Efi Kaltirimidou">
+      <description>Count records in HDFS returned for q05 from the weather benchmark.</description>
       <query name="minHDFS" date="2015-06-11"/>
       <output-file compare="Text">minHDFS.txt</output-file>
    </test-case>
-   <test-case name="hdfs-aggregate-partition-1-max" FilePath="HDFS/Partition-1/" Creator="Efi Kaltirimidou">
-      <description>Count records in HDFS returned for q07 from the weather benchmark with 1 partition.</description>
+   <test-case name="hdfs-aggregate-max" FilePath="HDFS/Aggregate/" Creator="Efi Kaltirimidou">
+      <description>Count records in HDFS returned for q07 from the weather benchmark.</description>
       <query name="maxHDFS" date="2015-06-11"/>
       <output-file compare="Text">maxHDFS.txt</output-file>
    </test-case>
-   <test-case name="hdfs-aggregate-partition-1-sum" FilePath="HDFS/Partition-1/" Creator="Efi Kaltirimidou">
-      <description>Count records in HDFS returned for q03 from the weather benchmark with 1 partition.</description>
+   <test-case name="hdfs-aggregate-sum" FilePath="HDFS/Aggregate/" Creator="Efi Kaltirimidou">
+      <description>Count records in HDFS returned for q03 from the weather benchmark.</description>
       <query name="sumHDFS" date="2015-06-11"/>
       <output-file compare="Text">sumHDFS.txt</output-file>
    </test-case>

@@ -19,11 +19,14 @@ package org.apache.vxquery.xtest;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,6 +36,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class VXQueryTest {
     private TestCase tc;
     private TestRunner tr;
+    private static MiniDFS dfs;
 
     private static String VXQUERY_CATALOG = StringUtils.join(new String[] { "src", "test", "resources",
             "VXQueryCatalog.xml" }, File.separator);
@@ -105,6 +109,21 @@ public class VXQueryTest {
     @After
     public void afterTest() throws Exception {
         tr.close();
+    }
+
+    @BeforeClass
+    public static void setupHDFS() {
+        dfs = new MiniDFS();
+        try {
+            dfs.startHDFS();
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+    }
+
+    @AfterClass
+    public static void shutdownHDFS() {
+        dfs.shutdownHDFS();
     }
 
 }
