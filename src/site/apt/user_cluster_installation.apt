@@ -1,0 +1,149 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Cluster Installation
+
+
+* Requirements
+
+  * Apache VXQuery\x99 source archive (apache-vxquery-X.Y-source-release.zip)
+
+  * JDK >= 1.7
+
+  * Apache Maven >= 3.2
+
+
+* Steps
+
+  * <<Export JAVA_HOME>>
+  
+---
+$ export JAVA_HOME=/usr/java/latest
+---
+
+
+  * <<Unzip and build VXQuery>>
+
+--- 
+$ unzip apache-vxquery-X.Y-source-release.zip
+$ cd apache-vxquery-X.Y
+$ mvn package -DskipTests
+$ cd ..
+---
+
+
+  * <<Create configuration file>>
+    
+    Create a configuration xml file containing the information of the vxquery cluster.Here is an example of a VXQuery configuration file for a cluster with 1 master and 3 slaves.
+
+---
+    <cluster xmlns="cluster">
+      <name>local</name>
+      <username>joe</username>
+      <master_node>
+          <id>master</id>
+          <client_ip>128.195.52.177</client_ip>
+          <cluster_ip>192.168.100.0</cluster_ip>
+      </master_node>
+      <node>
+          <id>nodeA</id>
+          <cluster_ip>192.168.100.1</cluster_ip>
+      </node>
+      <node>
+          <id>nodeB</id>
+          <cluster_ip>192.168.100.2</cluster_ip>
+      </node>
+      <node>
+          <id>nodeC</id>
+          <cluster_ip>192.168.100.3</cluster_ip>
+      </node>
+  </cluster>
+---
+
+    * Fields that are required:
+
+      * name : name of the cluster
+      
+      * username : user that will execute commands in all the machines of the cluster. Preferably a user that has passwordless ssh access to the machines.
+
+      * id : hostname of the node
+
+      * cluster_ip : ip of the host in the cluster
+
+      * client_ip : ip of the master
+
+    * Some optional fields:
+
+      * CCPORT : port for the Cluster Controller
+
+      * J_OPTS : define the java options you want, for Cluster Controller and Node Controller
+
+
+  * <<Deploy cluster>>
+
+    To deploy the cluster you need to execute this command in the vxquery installation directory
+    
+---
+$python cluster_cli.py -c ../conf/cluster.xml -a deploy -d /apache-vxquery/vxquery-server
+---
+
+    * Arguments: 
+
+      * -c : path to the configuration file you created
+
+      * -a : action you want to perform
+
+      * -d : directory in the system to deploy the cluster
+
+
+  * <<Start cluster>>
+
+    The command to start the cluster is 
+
+---
+$python cluster_cli.py -c ../conf/cluster.xml -a start
+---
+  
+
+  * <<Stop cluster>>
+
+    The command to stop the cluster is 
+
+---
+$python cluster_cli.py -c ../conf/cluster.xml -a stop
+---
+
+
+  * <<Check process status for Cluster Controller>>
+
+  You can try these commands to check on the status of the processes
+
+---
+$ps -ef|grep ${USER}|grep java|grep 'Dapp.name=vxquerycc'
+---
+
+
+ * <<Check process status for Node Controller>>
+
+---
+$ps -ef|grep ${USER}|grep java|grep 'Dapp.name=vxquerync'
+---
+
+
+ * <<Check process status for hyracks process>>
+
+---
+$ps -ef|grep ${USER}|grep java|grep 'hyracks'
+---

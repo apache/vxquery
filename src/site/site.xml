@@ -63,6 +63,9 @@ limitations under the License.
                 name="Installation"
                 href="user_installation.html" />
             <item
+                name="Cluster Installation"
+                href="user_cluster_installation.html" />
+            <item
                 name="Executing a Query"
                 href="user_query.html" />
             <item
@@ -75,17 +78,26 @@ limitations under the License.
                 name="Get Started"
                 href="developer_get_started.html" />
             <item
+                name="Contributing Code"
+                href="development_contribution.html" />
+            <item
                 name="Data Handling"
                 href="development_data_handling.html" />
             <item
-                name="Data XML and Node Types"
+                name="XML Data and Node Types"
                 href="development_xml_node_details.html" />
+            <item
+                name="XML Data Model Example"
+                href="development_xml_document.html" />
             <item
                 name="Eclipse Setup"
                 href="development_eclipse_setup.html" />
             <item
                 name="Release Steps"
                 href="development_release.html" />
+            <item
+                name="Site Update Steps"
+                href="development_site_update.html" />
             <item
                 name="Update Local Git XQTS Results"
                 href="development_update_xqts_results.html" />
