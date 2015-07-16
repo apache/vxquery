@@ -41,6 +41,8 @@ $ svn co https://dist.apache.org/repos/dist/release/vxquery dist
 $ svn co https://svn.apache.org/repos/asf/vxquery/site
 ---
 
+* For each update
+
   * update the <<<site>>> branch in git
 
     * New release steps
