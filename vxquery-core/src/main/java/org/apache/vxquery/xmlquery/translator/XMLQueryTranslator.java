@@ -1971,10 +1971,7 @@ public class XMLQueryTranslator {
     }
 
     private ILogicalExpression data(ILogicalExpression expr) throws SystemException {
-        ILogicalExpression atomizedExpr = new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1,
-                Collections.singletonList(mutable(expr)));
-        return atomizedExpr;
-
+        return new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1, Collections.singletonList(mutable(expr)));
     }
 
     private ILogicalExpression promote(ILogicalExpression expr, SequenceType type) throws SystemException {
