@@ -48,9 +48,16 @@ import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstructorScalarEvaluator {
-    private final ElementNodeBuilder enb;
 
     private final AttributeNodeBuilder anb;
+
+    private final CommentNodeBuilder cnb;
+
+    private final ElementNodeBuilder enb;
+
+    private final PINodeBuilder pnb;
+
+    private final TextNodeBuilder tnb;
 
     private final List<ElementNodeBuilder> freeENBList;
 
@@ -62,12 +69,16 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
 
     private final SequencePointable seqp;
 
-    private final IMutableValueStorage abmvs = new ArrayBackedValueStorage();
+    private final IMutableValueStorage abvs;
 
     public ElementNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
-        enb = new ElementNodeBuilder();
         anb = new AttributeNodeBuilder();
+        cnb = new CommentNodeBuilder();
+        enb = new ElementNodeBuilder();
+        pnb = new PINodeBuilder();
+        tnb = new TextNodeBuilder();
+        abvs = new ArrayBackedValueStorage();
         freeENBList = new ArrayList<ElementNodeBuilder>();
         namep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
         cqp = (CodedQNamePointable) CodedQNamePointable.FACTORY.createPointable();
@@ -210,24 +221,24 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
                             break;
                         }
                         case ValueTag.COMMENT_NODE_TAG:
-                            abmvs.reset();
-                            copyComment(tvp, ntp, abmvs);
-                            tempEnb.addChild(abmvs);
+                            abvs.reset();
+                            copyComment(tvp, ntp, abvs);
+                            tempEnb.addChild(abvs);
                             break;
                         case ValueTag.PI_NODE_TAG:
-                            abmvs.reset();
-                            copyPI(tvp, ntp, abmvs);
-                            tempEnb.addChild(abmvs);
+                            abvs.reset();
+                            copyPI(tvp, ntp, abvs);
+                            tempEnb.addChild(abvs);
                             break;
                         case ValueTag.TEXT_NODE_TAG:
-                            abmvs.reset();
-                            copyText(tvp, ntp, abmvs);
-                            tempEnb.addChild(abmvs);
+                            abvs.reset();
+                            copyText(tvp, ntp, abvs);
+                            tempEnb.addChild(abvs);
                             break;
                         default:
-                            abmvs.reset();
-                            convertToText(tvp, abmvs);
-                            tempEnb.addChild(abmvs);
+                            abvs.reset();
+                            convertToText(tvp, abvs);
+                            tempEnb.addChild(abvs);
                             break;
                     }
                 }
@@ -246,7 +257,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void copyDocument(ElementNodeBuilder enb, DictionaryBuilder db, NodeTreePointable ntp,
-            DocumentNodePointable dnp) throws IOException, SystemException {
+            DocumentNodePointable dnp) throws IOException {
         SequencePointable seqp = ppool.takeOne(SequencePointable.class);
         AttributeNodePointable anp = ppool.takeOne(AttributeNodePointable.class);
         TaggedValuePointable tvp = ppool.takeOne(TaggedValuePointable.class);
@@ -291,7 +302,6 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void processChild(TaggedValuePointable tvp, DictionaryBuilder db) throws IOException, SystemException {
-        IMutableValueStorage mvs = new ArrayBackedValueStorage();
 
         if (tvp.getTag() != ValueTag.NODE_TREE_TAG) {
             enb.addChild(tvp);
@@ -318,16 +328,19 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
                             break;
                         }
                         case ValueTag.COMMENT_NODE_TAG:
-                            copyComment(innerTvp, ntp, mvs);
-                            enb.addChild(mvs);
+                            abvs.reset();
+                            copyComment(innerTvp, ntp, abvs);
+                            enb.addChild(abvs);
                             break;
                         case ValueTag.PI_NODE_TAG:
-                            copyPI(innerTvp, ntp, mvs);
-                            enb.addChild(mvs);
+                            abvs.reset();
+                            copyPI(innerTvp, ntp, abvs);
+                            enb.addChild(abvs);
                             break;
                         case ValueTag.TEXT_NODE_TAG: {
-                            copyText(innerTvp, ntp, mvs);
-                            enb.addChild(mvs);
+                            abvs.reset();
+                            copyText(innerTvp, ntp, abvs);
+                            enb.addChild(abvs);
                             break;
                         }
                         case ValueTag.DOCUMENT_NODE_TAG: {
@@ -366,25 +379,8 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         return true;
     }
 
-    private void copyText(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException {
-
-        TextNodeBuilder tnb = new TextNodeBuilder();
-        VoidPointable vp = ppool.takeOne(VoidPointable.class);
-        TextOrCommentNodePointable tcnp = ppool.takeOne(TextOrCommentNodePointable.class);
-        tvp.getValue(tcnp);
-        tcnp.getValue(ntp, vp);
-
-        tnb.reset(mvs);
-        tnb.setValue(vp);
-
-        ppool.giveBack(vp);
-        ppool.giveBack(tcnp);
-
-    }
-
     private void copyComment(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs)
             throws IOException {
-        CommentNodeBuilder cnb = new CommentNodeBuilder();
         VoidPointable vp = ppool.takeOne(VoidPointable.class);
         TextOrCommentNodePointable tcnp = ppool.takeOne(TextOrCommentNodePointable.class);
 
@@ -399,7 +395,6 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     }
 
     private void copyPI(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException {
-        PINodeBuilder pnb = new PINodeBuilder();
         VoidPointable vp1 = ppool.takeOne(VoidPointable.class);
         VoidPointable vp2 = ppool.takeOne(VoidPointable.class);
         PINodePointable pnp = ppool.takeOne(PINodePointable.class);
@@ -415,6 +410,20 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         ppool.giveBack(pnp);
         ppool.giveBack(vp1);
         ppool.giveBack(vp2);
+    }
+
+    private void copyText(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException {
+        VoidPointable vp = ppool.takeOne(VoidPointable.class);
+        TextOrCommentNodePointable tcnp = ppool.takeOne(TextOrCommentNodePointable.class);
+        tvp.getValue(tcnp);
+        tcnp.getValue(ntp, vp);
+
+        tnb.reset(mvs);
+        tnb.setValue(vp);
+
+        ppool.giveBack(vp);
+        ppool.giveBack(tcnp);
+
     }
 
     private void convertToText(TaggedValuePointable tvp, IMutableValueStorage mvs) throws IOException {
