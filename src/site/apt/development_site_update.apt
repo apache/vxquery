@@ -17,6 +17,13 @@ Updating the Apache VXQuery\x99 site
 
   * update the <<<site>>> branch in git
 
+  When pushing changes to the site without a code release, the following git
+  command will create a patch of only differences with in the site.
+
+-----
+git diff site src/site/ > ../site.patch"
+----
+
   * build a new site and deploy it to <<<../site>>>
 
 ---
