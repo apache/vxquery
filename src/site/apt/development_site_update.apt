@@ -15,13 +15,50 @@
 
 Updating the Apache VXQuery\x99 site
 
+* One time steps
+
+  * set up directory structure
+
+    There usually are 2 directories at the same level
+
+    * the source directory <<<vxquery>>>,
+
+    * the <<<site>>> directory, and
+
+    The source directory is version-controlled by <<<git>>>, the other is
+    version controlled by <<<svn>>>.
+    While the source directory can have an arbitrary name and location,
+    the <<<site>>> directory has to be called <<<site>>> and it needs to
+    be at the same level as the source directory to enable site deployment.
+
+    Assuming that the source directory is available one can create the
+    directory structure by going to the directory that contains the
+    source directory and checking out the distribution and site
+    directories:
+
+---
+$ svn co https://dist.apache.org/repos/dist/release/vxquery dist
+$ svn co https://svn.apache.org/repos/asf/vxquery/site
+---
+
   * update the <<<site>>> branch in git
 
-  When pushing changes to the site without a code release, the following git
-  command will create a patch of only differences with in the site.
+    * New release steps
+
+    Please switch to the {{{http://vxquery.apache.org/development_release.html}release steps}}
+    and follow their directions.
+
+    * Incremental site update
+
+    When pushing changes to the site without a code release, the following git
+    commands will create a patch of only differences within the src/site folder.
+    Please verify the patch before applying it the site
 
 -----
+git checkout master
 git diff site src/site/ > ../site.patch"
+git checkout site
+git apply ../site.patch
 ----
 
   * build a new site and deploy it to <<<../site>>>
