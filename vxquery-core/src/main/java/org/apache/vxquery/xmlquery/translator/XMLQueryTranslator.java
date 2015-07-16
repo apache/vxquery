@@ -161,6 +161,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractLogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCallExpression;
@@ -1165,7 +1166,7 @@ public class XMLQueryTranslator {
                 }
 
                 default:
-                    content.add(vre(translateExpression(aVal, tCtx)));
+                    content.add(data(vre(translateExpression(aVal, tCtx))));
             }
         }
         ILogicalExpression contentExpr = content.size() == 1 ? content.get(0) : sfce(BuiltinOperators.CONCATENATE,
@@ -1969,6 +1970,10 @@ public class XMLQueryTranslator {
         }
     }
 
+    private ILogicalExpression data(ILogicalExpression expr) throws SystemException {
+        return new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1, Collections.singletonList(mutable(expr)));
+    }
+
     private ILogicalExpression promote(ILogicalExpression expr, SequenceType type) throws SystemException {
         int typeCode = currCtx.lookupSequenceType(type);
         return sfce(BuiltinOperators.PROMOTE, expr,
@@ -1983,7 +1988,7 @@ public class XMLQueryTranslator {
 
     private ILogicalExpression cast(ILogicalExpression expr, SequenceType type) throws SystemException {
         int typeCode = currCtx.lookupSequenceType(type);
-        return sfce(BuiltinOperators.CAST, expr,
+        return sfce(BuiltinOperators.CAST, data(expr),
                 ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), typeCode));
     }
 
