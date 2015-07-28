@@ -37,6 +37,7 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
     private String[] collectionPartitions;
     private final List<Integer> childSeq;
     private int totalDataSources;
+    private String tag;
 
     private final Object[] types;
 
@@ -60,6 +61,7 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
             }
         };
         this.childSeq = new ArrayList<Integer>();
+        this.tag = null;
     }
 
     public int getTotalDataSources() {
@@ -84,6 +86,16 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
 
     public int getPartitionCount() {
         return collectionPartitions.length;
+    }
+    
+    public String getTag()
+    {
+        return this.tag;
+    }
+    
+    public void setTag(String tag)
+    {
+        this.tag = tag;
     }
 
     @Override

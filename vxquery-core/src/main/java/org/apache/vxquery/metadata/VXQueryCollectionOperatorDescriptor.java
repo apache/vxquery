@@ -16,13 +16,15 @@
  */
 package org.apache.vxquery.metadata;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,6 +36,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
@@ -51,6 +59,8 @@ import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
 import edu.uci.ics.hyracks.dataflow.common.comm.util.FrameUtils;
 import edu.uci.ics.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import edu.uci.ics.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
+import edu.uci.ics.hyracks.hdfs.ContextFactory;
+import edu.uci.ics.hyracks.hdfs2.dataflow.FileSplitsFactory;
 
 public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
@@ -59,6 +69,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private String[] collectionPartitions;
     private List<Integer> childSeq;
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
+    private HDFSFunctions hdfs;
+    private String tag;
 
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryCollectionDataSource ds,
             RecordDescriptor rDesc) {
@@ -68,6 +80,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         totalDataSources = (short) ds.getTotalDataSources();
         childSeq = ds.getChildSeq();
         recordDescriptors[0] = rDesc;
+        this.tag = ds.getTag();
     }
 
     @Override
@@ -92,6 +105,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             public void open() throws HyracksDataException {
                 appender.reset(frame, true);
                 writer.open();
+                hdfs = new HDFSFunctions();
             }
 
             @Override
@@ -119,51 +133,98 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
                                 + collectionDirectory.getAbsolutePath() + ") passed to collection.");
                     }
-                }
-                //else check in HDFS file system
-                else {
-                    //get instance of the HDFS filesystem
-                    HDFSFunctions hdfs = new HDFSFunctions();
+                } else {
+                    // Else check in HDFS file system
+                    // Get instance of the HDFS filesystem
                     FileSystem fs = hdfs.getFileSystem();
                     if (fs != null) {
                         Path directory = new Path(collectionModifiedName);
                         Path xmlDocument;
-                        try {
-                            //check if the path exists and is a directory
-                            if (fs.exists(directory) && fs.isDirectory(directory)) {
-                                for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-                                    //read every files in the directory
-                                    RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
-                                    while (it.hasNext()) {
-                                        xmlDocument = it.next().getPath();
-                                        if (fs.isFile(xmlDocument)) {
-                                            if (LOGGER.isLoggable(Level.FINE)) {
-                                                LOGGER.fine("Starting to read XML document: " + xmlDocument.getName());
-                                            }
+                        if (tag != null) {
+                            String tags[] = tag.split("/");
+                            String start_tag = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+                            String end_tag = "";
+                            for (int i = 0; i < tags.length - 1; i++) {
+                                start_tag = start_tag + "<" + tags[i] + ">";
+                                end_tag = end_tag + "</" + tags[i] + ">";
+                            }
+                            hdfs.setJob(directory.getName(), tags[tags.length - 1]);
+                            Job job = hdfs.getJob();
+                            InputFormat inputFormat = hdfs.getinputFormat();
+                            try {
+                                hdfs.scheduleSplits();
+                                ArrayList<Integer> schedule = hdfs.getScheduleForNode(InetAddress.getLocalHost()
+                                        .getHostName());
+                                List<InputSplit> splits = hdfs.getSplits();
+                                List<FileSplit> fileSplits = new ArrayList<FileSplit>();
+                                for (int i : schedule) {
+                                    fileSplits.add((FileSplit) splits.get(i));
+                                }
+                                FileSplitsFactory splitsFactory = new FileSplitsFactory(fileSplits);
+                                List<FileSplit> inputSplits = splitsFactory.getSplits();
+                                ContextFactory ctxFactory = new ContextFactory();
+                                int size = inputSplits.size();
+                                for (int i = 0; i < size; i++) {
+                                    //read split
+                                    TaskAttemptContext context = ctxFactory.createContext(job.getConfiguration(), i);
+                                    RecordReader reader;
+                                    try {
+                                        reader = inputFormat.createRecordReader(inputSplits.get(i), context);
+                                        reader.initialize(inputSplits.get(i), context);
+                                        while (reader.nextKeyValue() == true) {
+                                            String value = reader.getCurrentValue().toString();
+                                            String xml = start_tag;
+                                            xml = xml + value + end_tag;
+                                            System.out.println(xml);
                                             //create an input stream to the file currently reading and send it to parser
-                                            InputStream in = fs.open(xmlDocument).getWrappedStream();
-                                            parser.parseHDFSElements(in, writer, fta, tupleIndex);
+                                            InputStream stream = new ByteArrayInputStream(
+                                                    xml.getBytes(StandardCharsets.UTF_8));
+                                            parser.parseHDFSElements(stream, writer, fta, i);
                                         }
+
+                                    } catch (InterruptedException e) {
+                                        System.err.println(e);
                                     }
                                 }
-                            } else {
-                                throw new HyracksDataException("Invalid HDFS directory parameter (" + nodeId + ":"
-                                        + collectionDirectory + ") passed to collection.");
-                            }
-                        } catch (FileNotFoundException e) {
-                            System.err.println(e);
-                        } catch (IOException e) {
-                            System.err.println(e);
-                        }
 
-                        //Check for collection with tags
-                        if (true) {
+                            } catch (IOException e) {
+                                System.err.println(e);
+                            }
+                        } else {
                             try {
-                                System.out.println(InetAddress.getLocalHost().getHostName());
-                            } catch (UnknownHostException e) {
-                                e.printStackTrace();
+                                //check if the path exists and is a directory
+                                if (fs.exists(directory) && fs.isDirectory(directory)) {
+                                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
+                                        //read every file in the directory
+                                        RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
+                                        while (it.hasNext()) {
+                                            xmlDocument = it.next().getPath();
+                                            if (fs.isFile(xmlDocument)) {
+                                                if (LOGGER.isLoggable(Level.FINE)) {
+                                                    LOGGER.fine("Starting to read XML document: "
+                                                            + xmlDocument.getName());
+                                                }
+                                                //create an input stream to the file currently reading and send it to parser
+                                                InputStream in = fs.open(xmlDocument).getWrappedStream();
+                                                parser.parseHDFSElements(in, writer, fta, tupleIndex);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    throw new HyracksDataException("Invalid HDFS directory parameter (" + nodeId + ":"
+                                            + collectionDirectory + ") passed to collection.");
+                                }
+                            } catch (FileNotFoundException e) {
+                                System.err.println(e);
+                            } catch (IOException e) {
+                                System.err.println(e);
                             }
                         }
+                    }
+                    try {
+                        fs.close();
+                    } catch (IOException e) {
+                        System.err.println(e);
                     }
                 }
             }
