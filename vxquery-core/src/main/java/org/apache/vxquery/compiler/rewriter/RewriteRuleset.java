@@ -19,6 +19,7 @@ package org.apache.vxquery.compiler.rewriter;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.vxquery.compiler.rewriter.rules.ConsilidateDescandantChild;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ReplaceSourceMapInDocExpression;
@@ -248,6 +249,7 @@ public class RewriteRuleset {
         consolidation.add(new IntroduceGroupByCombinerRule());
         consolidation.add(new IntroduceAggregateCombinerRule());
         consolidation.add(new RemoveUnusedAssignAndAggregateRule());
+        consolidation.add(new ConsilidateDescandantChild());
         return consolidation;
     }
 

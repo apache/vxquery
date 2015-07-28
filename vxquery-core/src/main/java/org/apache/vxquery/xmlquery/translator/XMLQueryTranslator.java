@@ -1446,8 +1446,23 @@ public class XMLQueryTranslator {
             for (RelativePathExprNode rpen : pe.getPaths()) {
                 boolean asc = true;
                 if (PathType.SLASH_SLASH.equals(rpen.getPathType())) {
+                    tCtx = tCtx.pushContext();
+                    tCtx.pushVariableScope();
+                    iterateOver(ctxExpr, tCtx);
+                    ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
+                            .getLogicalVariable());
                     ctxExpr = sfce(BuiltinOperators.DESCENDANT_OR_SELF,
                             treat(ctxExpr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR)));
+                    List<LogicalVariable> vars = new ArrayList<LogicalVariable>();
+                    List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
+                    LogicalVariable var = newLogicalVariable();
+                    vars.add(var);
+                    exprs.add(mutable(afce(BuiltinOperators.SEQUENCE, false, ctxExpr)));
+                    AggregateOperator aop = new AggregateOperator(vars, exprs);
+                    aop.getInputs().add(mutable(tCtx.op));
+                    tCtx.op = aop;
+                    tCtx = tCtx.popContext();
+                    ctxExpr = vre(var);
                 }
                 boolean popScope = false;
                 if (ctxExpr != null) {
