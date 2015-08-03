@@ -282,14 +282,30 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
     }
 
+    /**
+     * check NodeTestFilter
+     * 
+     * @param uri
+     * @param localName
+     * @return
+     */
+
     private boolean startElementChildPathStep(String uri, String localName) {
         if (subElement != null && depth <= subElement.length) {
             // Check path step if it exists.
-            if (uri.compareTo(childUri[depth - 1]) == 0) {
-                if (localName.compareTo(childLocalName[depth - 1]) == 0) {
-                    subElement[depth - 1] = true;
+            subElement[depth - 1] = true;
+            if (uri != null) {
+                if (childUri[depth - 1] != null && uri.compareTo(childUri[depth - 1]) != 0) {
+                    subElement[depth - 1] = false;
                 }
             }
+            if (localName != null) {
+
+                if (childLocalName[depth - 1] != null && localName.compareTo(childLocalName[depth - 1]) != 0) {
+                    subElement[depth - 1] = false;
+                }
+            }
+
         }
         boolean start = foundFirstNonSkippedElement();
         if (start) {
@@ -535,6 +551,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     private String getStringFromBytes(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder();
         UTF8StringPointable.toString(sb, bytes, 0);
         return sb.toString();
