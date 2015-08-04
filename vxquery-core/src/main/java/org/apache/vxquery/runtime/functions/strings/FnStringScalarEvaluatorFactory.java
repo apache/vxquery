@@ -62,8 +62,6 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                 TaggedValuePointable tvp1 = args[0];
                 try {
                     abvs.reset();
-                    @SuppressWarnings("unused")
-                    byte bt = tvp1.getTag();
 
                     switch (tvp1.getTag()) {
                         case ValueTag.XS_ANY_URI_TAG:
@@ -199,7 +197,6 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                         default:
                             throw new SystemException(ErrorCode.XPDY0002);
                     }
-
                     result.set(abvs);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
