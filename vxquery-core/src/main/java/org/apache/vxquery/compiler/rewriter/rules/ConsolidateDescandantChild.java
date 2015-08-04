@@ -1,25 +1,20 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
-import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.functions.BuiltinOperators;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractUnnestOperator;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
@@ -34,15 +29,14 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * Before 
  * 
  *   plan__parent
- *   UNNEST( $v2 : fn:child( args[$v1] ) )
+ *   UNNEST( $v3 : fn:child( args[$filter], args[$v1]  ) )
  *   UNNEST( $v1 : fn:descandant( args[$v0] ) )
  *   plan__child
- *   
  *   
  * After
  * 
  *   plan__parent
- *   UNNEST( $v2 : fn:descandant( args[$v0] ) )
+ *   UNNEST( $v3 : fn:descandant( args[$filter], args[$v0] ) )
  *   plan__child
  * 
  * 
@@ -55,7 +49,6 @@ public class ConsolidateDescandantChild implements IAlgebraicRewriteRule {
 
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -63,59 +56,48 @@ public class ConsolidateDescandantChild implements IAlgebraicRewriteRule {
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
 
-        boolean modified = false;
         ILogicalOperator lo = opRef.getValue();
         if (!(lo.getOperatorTag().equals(LogicalOperatorTag.UNNEST))) {
-            return modified;
+            return false;
         }
         AbstractUnnestOperator auo = (AbstractUnnestOperator) lo;
         Mutable<ILogicalExpression> childExpression = ExpressionToolbox.findFirstFunctionExpression(
                 auo.getExpressionRef(), BuiltinOperators.CHILD.getFunctionIdentifier());
         if (childExpression == null) {
-            return modified;
+            return false;
         }
         AbstractFunctionCallExpression childFnCall = (AbstractFunctionCallExpression) childExpression.getValue();
         List<Mutable<ILogicalExpression>> list = (List<Mutable<ILogicalExpression>>) childFnCall.getArguments();
         Mutable<ILogicalExpression> mle = (Mutable<ILogicalExpression>) (list).get(0);
         ILogicalExpression le = mle.getValue();
         if (!(le.getExpressionTag().equals(LogicalExpressionTag.VARIABLE))) {
-            return modified;
+            return false;
         }
         VariableReferenceExpression varLogicalExpression = (VariableReferenceExpression) le;
         Mutable<ILogicalOperator> lop = OperatorToolbox.findProducerOf(opRef,
                 varLogicalExpression.getVariableReference());
         ILogicalOperator lop1 = lop.getValue();
         if (!(lop1.getOperatorTag().equals(LogicalOperatorTag.UNNEST))) {
-            return modified;
+            return false;
         }
         if (OperatorToolbox.getExpressionOf(lop, varLogicalExpression.getVariableReference()) == null) {
-            return modified;
+            return false;
         }
         ILogicalExpression variableLogicalExpression = (ILogicalExpression) OperatorToolbox.getExpressionOf(lop,
                 varLogicalExpression.getVariableReference()).getValue();
         if (!(variableLogicalExpression.getExpressionTag().equals(LogicalExpressionTag.FUNCTION_CALL))) {
-            return modified;
+            return false;
         }
         AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) variableLogicalExpression;
         if (!(afce.getFunctionIdentifier().equals(BuiltinOperators.DESCENDANT_OR_SELF.getFunctionIdentifier()))) {
-            return modified;
+            return false;
         }
-        if (changeChildToDesc(opRef, childFnCall, afce, context)) {
-            modified = true;
-        }
-        return modified;
-    }
-
-    private boolean changeChildToDesc(Mutable<ILogicalOperator> opRef, AbstractFunctionCallExpression child,
-            AbstractFunctionCallExpression desc, IOptimizationContext context) {
-
-        child.setFunctionInfo(BuiltinOperators.DESCENDANT_OR_SELF);
-        child.getArguments().get(0).setValue(desc.getArguments().get(0).getValue());
-        //can be passed in as argument
-        ILogicalOperator lo = opRef.getValue();
-        Mutable<ILogicalOperator> mlistOfLo = lo.getInputs().get(0).getValue().getInputs().get(0);
+        //All conditions have been met.
+        childFnCall.setFunctionInfo(BuiltinOperators.DESCENDANT_OR_SELF);
+        childFnCall.getArguments().get(0).setValue(afce.getArguments().get(0).getValue());
+        ILogicalOperator lo1 = opRef.getValue();
+        Mutable<ILogicalOperator> mlistOfLo = lo1.getInputs().get(0).getValue().getInputs().get(0);
         ILogicalOperator ilo = (ILogicalOperator) mlistOfLo.getValue();
-        //List<Mutable<ILogicalOperator>> listOfLo1 = listOfLo.get(0).getValue().getInputs();
         lo.getInputs().get(0).setValue((ILogicalOperator) ilo);
         return true;
     }
