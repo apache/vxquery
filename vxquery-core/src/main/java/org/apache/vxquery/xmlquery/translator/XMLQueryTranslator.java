@@ -161,7 +161,6 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractLogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCallExpression;
@@ -1503,10 +1502,8 @@ public class XMLQueryTranslator {
                     ctxExpr = sfce(asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS
                             : BuiltinOperators.SORT_DISTINCT_NODES_DESC_OR_ATOMICS, ctxExpr);
                     for (ASTNode pn : predicates) {
-                        if (!popScope) {
-                            tCtx = tCtx.pushContext();
-                            tCtx.pushVariableScope();
-                        }
+                        tCtx = tCtx.pushContext();
+                        tCtx.pushVariableScope();
                         iterateOver(ctxExpr, tCtx);
                         LogicalVariable pLVar = translateExpression(pn, tCtx);
                         ILogicalExpression tTest = instanceOf(vre(pLVar),
@@ -1521,10 +1518,8 @@ public class XMLQueryTranslator {
                         tCtx.op = select;
                         ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
                                 .getLogicalVariable());
-                        if (!popScope) {
-                            tCtx.popVariableScope();
-                            tCtx = tCtx.popContext();
-                        }
+                        tCtx.popVariableScope();
+                        tCtx = tCtx.popContext();
                     }
                 }
                 if (popScope) {
