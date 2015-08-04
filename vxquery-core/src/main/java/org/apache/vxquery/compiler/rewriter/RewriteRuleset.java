@@ -19,7 +19,7 @@ package org.apache.vxquery.compiler.rewriter;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.vxquery.compiler.rewriter.rules.ConsilidateDescandantChild;
+import org.apache.vxquery.compiler.rewriter.rules.ConsolidateDescandantChild;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ReplaceSourceMapInDocExpression;
@@ -118,6 +118,8 @@ public class RewriteRuleset {
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
+
+        normalization.add(new ConsolidateDescandantChild());
 
         normalization.add(new ReplaceSourceMapInDocExpression());
         // Adds child steps to the data source scan.
@@ -249,7 +251,6 @@ public class RewriteRuleset {
         consolidation.add(new IntroduceGroupByCombinerRule());
         consolidation.add(new IntroduceAggregateCombinerRule());
         consolidation.add(new RemoveUnusedAssignAndAggregateRule());
-        consolidation.add(new ConsilidateDescandantChild());
         return consolidation;
     }
 

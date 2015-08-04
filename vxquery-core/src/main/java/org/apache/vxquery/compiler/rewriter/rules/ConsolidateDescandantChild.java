@@ -51,7 +51,7 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * @author shivanimall
  */
 
-public class ConsilidateDescandantChild implements IAlgebraicRewriteRule {
+public class ConsolidateDescandantChild implements IAlgebraicRewriteRule {
 
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
@@ -84,6 +84,13 @@ public class ConsilidateDescandantChild implements IAlgebraicRewriteRule {
         VariableReferenceExpression varLogicalExpression = (VariableReferenceExpression) le;
         Mutable<ILogicalOperator> lop = OperatorToolbox.findProducerOf(opRef,
                 varLogicalExpression.getVariableReference());
+        ILogicalOperator lop1 = lop.getValue();
+        if (!(lop1.getOperatorTag().equals(LogicalOperatorTag.UNNEST))) {
+            return modified;
+        }
+        if (OperatorToolbox.getExpressionOf(lop, varLogicalExpression.getVariableReference()) == null) {
+            return modified;
+        }
         ILogicalExpression variableLogicalExpression = (ILogicalExpression) OperatorToolbox.getExpressionOf(lop,
                 varLogicalExpression.getVariableReference()).getValue();
         if (!(variableLogicalExpression.getExpressionTag().equals(LogicalExpressionTag.FUNCTION_CALL))) {
