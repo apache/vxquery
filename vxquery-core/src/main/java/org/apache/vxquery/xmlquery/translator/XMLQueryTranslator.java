@@ -1499,11 +1499,14 @@ public class XMLQueryTranslator {
                     throw new IllegalStateException("Unknown path node: " + pathNode.getTag());
                 }
                 if (predicates != null && !predicates.isEmpty()) {
+                    ctxExpr = vre(createAssignment(ctxExpr, tCtx));
                     ctxExpr = sfce(asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS
                             : BuiltinOperators.SORT_DISTINCT_NODES_DESC_OR_ATOMICS, ctxExpr);
                     for (ASTNode pn : predicates) {
-                        tCtx = tCtx.pushContext();
-                        tCtx.pushVariableScope();
+                        if (!popScope) {
+                            tCtx = tCtx.pushContext();
+                            tCtx.pushVariableScope();
+                        }
                         iterateOver(ctxExpr, tCtx);
                         LogicalVariable pLVar = translateExpression(pn, tCtx);
                         ILogicalExpression tTest = instanceOf(vre(pLVar),
@@ -1518,8 +1521,10 @@ public class XMLQueryTranslator {
                         tCtx.op = select;
                         ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
                                 .getLogicalVariable());
-                        tCtx.popVariableScope();
-                        tCtx = tCtx.popContext();
+                        if (!popScope) {
+                            tCtx.popVariableScope();
+                            tCtx = tCtx.popContext();
+                        }
                     }
                 }
                 if (popScope) {
