@@ -28,12 +28,14 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
+import org.apache.vxquery.runtime.functions.util.AtomizeHelper;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -50,6 +52,9 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
         final DataOutput dOut = abvs.getDataOutput();
         final CastToStringOperation castToString = new CastToStringOperation();
         final TypedPointables tp = new TypedPointables();
+        final AtomizeHelper ah = new AtomizeHelper();
+        final UTF8StringPointable stringNode = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final TaggedValuePointable tvpNode = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -57,6 +62,9 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                 TaggedValuePointable tvp1 = args[0];
                 try {
                     abvs.reset();
+                    @SuppressWarnings("unused")
+                    byte bt = tvp1.getTag();
+
                     switch (tvp1.getTag()) {
                         case ValueTag.XS_ANY_URI_TAG:
                             tvp1.getValue(tp.utf8sp);
@@ -182,7 +190,12 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                                 XDMConstants.setEmptyString(result);
                                 return;
                             }
-                            // Pass through if not empty sequence.
+                        case ValueTag.NODE_TREE_TAG:
+                            ah.atomize(tvp1, ppool, tvpNode);
+                            tvpNode.getValue(stringNode);
+                            castToString.convertUntypedAtomic(stringNode, dOut);
+                            break;
+                        // Pass through if not empty sequence.
                         default:
                             throw new SystemException(ErrorCode.XPDY0002);
                     }

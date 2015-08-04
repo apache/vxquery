@@ -300,12 +300,10 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
                 }
             }
             if (localName != null) {
-
                 if (childLocalName[depth - 1] != null && localName.compareTo(childLocalName[depth - 1]) != 0) {
                     subElement[depth - 1] = false;
                 }
             }
-
         }
         boolean start = foundFirstNonSkippedElement();
         if (start) {
