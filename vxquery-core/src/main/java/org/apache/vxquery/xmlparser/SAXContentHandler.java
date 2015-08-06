@@ -285,11 +285,11 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     /**
      * check NodeTestFilter
      * 
+     * @see org.apache.vxquery.runtime.functions.step.NodeTestFilter.java
      * @param uri
      * @param localName
-     * @return
+     * @return boolean
      */
-
     private boolean startElementChildPathStep(String uri, String localName) {
         if (subElement != null && depth <= subElement.length) {
             // Check path step if it exists.
