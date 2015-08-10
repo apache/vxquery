@@ -120,8 +120,10 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             returnSelf = false;
             tvpItem.set(rootTVP);
             try {
-                setNodeToResult(tvpItem, result);
-                return stepNodeTree(rootTVP, 0, result);
+                if (!isfilter || (isfilter && filter.accept(ntp, tvpItem))) {
+                    setNodeToResult(tvpItem, result);
+                    return true;
+                }
             } catch (IOException e) {
                 String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
                 throw new AlgebricksException(description);
@@ -152,24 +154,10 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             while (indexSequence.get(level) < seqLength) {
                 // Get the next item
                 seqItem.getEntry(indexSequence.get(level), tvpItem);
-
                 // Check current node
                 if (indexSequence.get(level) == returnSequence.get(level)) {
                     returnSequence.set(level, returnSequence.get(level) + 1);
-                    if (isfilter) {
-                        if (filter.accept(ntp, tvpItem)) {
-                            try {
-                                setNodeToResult(tvpItem, result);
-                                return true;
-                            } catch (IOException e) {
-                                String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
-                                throw new AlgebricksException(description);
-                            }
-                        } else {
-                            setNodeToResult(tvpItem, result);
-                            continue;
-                        }
-                    } else {
+                    if (!isfilter || (isfilter && filter.accept(ntp, tvpItem))) {
                         setNodeToResult(tvpItem, result);
                         return true;
                     }
