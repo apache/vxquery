@@ -161,7 +161,6 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractLogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCallExpression;
@@ -1446,8 +1445,23 @@ public class XMLQueryTranslator {
             for (RelativePathExprNode rpen : pe.getPaths()) {
                 boolean asc = true;
                 if (PathType.SLASH_SLASH.equals(rpen.getPathType())) {
+                    tCtx = tCtx.pushContext();
+                    tCtx.pushVariableScope();
+                    iterateOver(ctxExpr, tCtx);
+                    ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
+                            .getLogicalVariable());
                     ctxExpr = sfce(BuiltinOperators.DESCENDANT_OR_SELF,
                             treat(ctxExpr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR)));
+                    List<LogicalVariable> vars = new ArrayList<LogicalVariable>();
+                    List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
+                    LogicalVariable var = newLogicalVariable();
+                    vars.add(var);
+                    exprs.add(mutable(afce(BuiltinOperators.SEQUENCE, false, ctxExpr)));
+                    AggregateOperator aop = new AggregateOperator(vars, exprs);
+                    aop.getInputs().add(mutable(tCtx.op));
+                    tCtx.op = aop;
+                    tCtx = tCtx.popContext();
+                    ctxExpr = vre(var);
                 }
                 boolean popScope = false;
                 if (ctxExpr != null) {
@@ -1484,6 +1498,7 @@ public class XMLQueryTranslator {
                     throw new IllegalStateException("Unknown path node: " + pathNode.getTag());
                 }
                 if (predicates != null && !predicates.isEmpty()) {
+                    ctxExpr = vre(createAssignment(ctxExpr, tCtx));
                     ctxExpr = sfce(asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS
                             : BuiltinOperators.SORT_DISTINCT_NODES_DESC_OR_ATOMICS, ctxExpr);
                     for (ASTNode pn : predicates) {
