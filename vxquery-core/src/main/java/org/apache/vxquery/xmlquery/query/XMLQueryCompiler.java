@@ -164,7 +164,13 @@ public class XMLQueryCompiler {
         builder.setNullableTypeComputer(new INullableTypeComputer() {
             @Override
             public Object makeNullableType(Object type) throws AlgebricksException {
-                throw new NotImplementedException("NullableTypeComputer is not implented (makeNullableType)");
+                SequenceType st = (SequenceType) type;
+                if (st.getQuantifier().allowsEmptySequence()) {
+                    return type;
+                } else if (st.getQuantifier() == Quantifier.QUANT_ONE) {
+                    return SequenceType.create(st.getItemType(), Quantifier.QUANT_QUESTION);
+                }
+                return type;
             }
 
             @Override
@@ -239,6 +245,8 @@ public class XMLQueryCompiler {
                 RewriteRuleset.buildNestedDataSourceRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqOnceCtrl,
                 RewriteRuleset.buildTypeInferenceRuleCollection()));
+        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlNoDfs,
+                RewriteRuleset.buildUnnestingRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
                 RewriteRuleset.buildNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlNoDfs,

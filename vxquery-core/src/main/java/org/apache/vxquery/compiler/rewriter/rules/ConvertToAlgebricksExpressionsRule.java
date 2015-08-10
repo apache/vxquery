@@ -42,7 +42,7 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * The rule searches for where the XQuery function are used in place of Algebricks builtin function.
  * The combination of the boolean XQuery function and the XQuery equivalent function are replaced with
  * the Algebricks builtin function .
- * 
+ *
  * <pre>
  * Before
  * 
@@ -50,18 +50,18 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  *   %OPERATOR( $v1 : xquery_expression( \@input_expression ) )
  *   plan__child
  * 
- *   where xquery_expression has a known equivalent in Algebricks, 
+ *   where xquery_expression has a known equivalent in Algebricks,
  *     such as conditional expressions and a check for null.
  *     The expression may include the boolean function to ensure only
  *     a true or false result.
- *   
- * After 
+ * 
+ * After
  * 
  *   plan__parent
  *   %OPERATOR( $v1 : algebricks_function( \@input_expression ) )
  *   plan__child
  * </pre>
- * 
+ *
  * @author prestonc, shivanim
  */
 public class ConvertToAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
@@ -81,12 +81,6 @@ public class ConvertToAlgebricksExpressionsRule implements IAlgebraicRewriteRule
 
         ALGEBRICKS_MAP.put(BuiltinFunctions.FN_EMPTY_1.getFunctionIdentifier(), AlgebricksBuiltinFunctions.IS_NULL);
         ALGEBRICKS_MAP.put(BuiltinFunctions.FN_NOT_1.getFunctionIdentifier(), AlgebricksBuiltinFunctions.NOT);
-        ALGEBRICKS_MAP.put(BuiltinOperators.GENERAL_EQ.getFunctionIdentifier(), AlgebricksBuiltinFunctions.EQ);
-        ALGEBRICKS_MAP.put(BuiltinOperators.GENERAL_GE.getFunctionIdentifier(), AlgebricksBuiltinFunctions.GE);
-        ALGEBRICKS_MAP.put(BuiltinOperators.GENERAL_GT.getFunctionIdentifier(), AlgebricksBuiltinFunctions.GT);
-        ALGEBRICKS_MAP.put(BuiltinOperators.GENERAL_LE.getFunctionIdentifier(), AlgebricksBuiltinFunctions.LE);
-        ALGEBRICKS_MAP.put(BuiltinOperators.GENERAL_LT.getFunctionIdentifier(), AlgebricksBuiltinFunctions.LT);
-        ALGEBRICKS_MAP.put(BuiltinOperators.GENERAL_NE.getFunctionIdentifier(), AlgebricksBuiltinFunctions.NEQ);
     }
 
     @Override
