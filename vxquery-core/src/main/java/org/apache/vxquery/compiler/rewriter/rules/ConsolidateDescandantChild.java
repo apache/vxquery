@@ -29,14 +29,14 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * Before 
  * 
  *   plan__parent
- *   UNNEST( $v3 : fn:child( args[$filter], args[$v1]  ) )
+ *   UNNEST( $v3 : fn:child( args[$v1], args[$filter]  ) )
  *   UNNEST( $v1 : fn:descandant( args[$v0] ) )
  *   plan__child
  *   
  * After
  * 
  *   plan__parent
- *   UNNEST( $v3 : fn:descandant( args[$filter], args[$v0] ) )
+ *   UNNEST( $v3 : fn:descandant( args[$v0], args[$filter] ) )
  *   plan__child
  * 
  * 

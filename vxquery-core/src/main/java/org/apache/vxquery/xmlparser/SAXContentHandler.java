@@ -283,12 +283,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     /**
-     * check NodeTestFilter
+     * The filter settings here are similar to one in the class linked below.
      * 
      * @see org.apache.vxquery.runtime.functions.step.NodeTestFilter.java
-     * @param uri
-     * @param localName
-     * @return boolean
      */
     private boolean startElementChildPathStep(String uri, String localName) {
         if (subElement != null && depth <= subElement.length) {

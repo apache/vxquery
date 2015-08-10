@@ -45,19 +45,6 @@
    <source ID="auction_data" FileName="TestSources/XMark/SingleFile/auction.xml" Creator="Shivani Mall">
        <description last-mod="2015-03-25">Collection of files</description>
    </source>
-   <test-group name="SingleQuery" featureOwner="Preston Carman">
-      <GroupInfo>
-         <title>Single Query</title>
-         <description/>
-      </GroupInfo>
-      <test-group name="SingleTest" featureOwner="Preston Carman">
-         <GroupInfo>
-            <title>Single Test</title>
-            <description/>
-         </GroupInfo>
-         &SingleQuery;
-      </test-group>
-   </test-group>
    <test-group name="XMarkQueries" featureOwner="Shivani Mall">
       <GroupInfo>
          <title>XMark Queries</title>

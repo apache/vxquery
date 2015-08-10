@@ -120,14 +120,4 @@
       <query name="q20" date="2015-03-25"/>
       <output-file compare="Text">q20.txt</output-file>
    </test-case>
-      <test-case name="Simple-Query-1" FilePath="XMark/Original/" Creator="Shivani Mall">
-      <description>Simple Query 1</description>
-      <query name="simple_query1" date="2015-03-25"/>
-      <output-file compare="Text">simple_query1.txt</output-file>
-   </test-case>
-  <test-case name="Simple-Query-2" FilePath="XMark/Original/" Creator="Shivani Mall">
-      <description>Simple Query 2</description>
-      <query name="simple_query2" date="2015-03-25"/>
-      <output-file compare="Text">simple_query2.txt</output-file>
-   </test-case>
 </test-group>

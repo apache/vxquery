@@ -47,9 +47,9 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     private final TaggedValuePointable tvpItem = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpNtp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpStep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    INodeFilter filter;
-    int filterLookupID = -1;
-    boolean isfilter = false;
+    private INodeFilter filter;
+    private int filterLookupID = -1;
+    private boolean isfilter = false;
 
     public DescendantOrSelfPathStepUnnesting(IHyracksTaskContext ctx, PointablePool pp, boolean testSelf) {
         super(ctx, pp);
@@ -62,9 +62,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
         indexSequence.add(0);
         returnSequence.add(0);
 
-        if (args.length == 1) {
-
-        } else {
+        if (args.length > 1) {
             isfilter = true;
             if (args[1].getTag() != ValueTag.XS_INT_TAG) {
                 throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
