@@ -1,0 +1,120 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Executing a Query in HDFS
+
+
+* 1. Connecting VXQuery with HDFS
+
+    The only variable VXQuery needs in order to access HDFS is the path to the HDFS configuration directory.
+
+    We define that path in the <<cluster.properties>> file that is located in <<vxquery-root/vxquery-server/src/resources/conf/>> directory.
+
+    Inside that file we need to change the value of the variable <<HDFS_CONF>> to the full system path of the HDFS configuration.
+
+    For example, <HDFS_CONF=/usr/local/hadoop/etc/hadoop> defines that the configuration files for our HDFS installation are located in </usr/local/hadoop/etc/hadoop> path.
+
+
+* 2. Running the Query
+
+  For files stored in HDFS there are 2 ways to access them from VXQuery.
+
+  [[a]] Reading them as whole files.
+
+  [[b]] Reading them block by block.
+
+** a. Reading them as whole files.
+
+  For this option you do not need to change your query at all. VXQuery will read the path of the files you request in your query and try to locate them 
+
+  1) First in your local file system
+
+  and if the path does not exist there,
+
+  2) VXQuery will try to locate them on HDFS.
+
+
+
+  So in order to run a query that will read the input files from HDFS you need to make sure that
+
+  a) The configuration path is correctly set to the one of your HDFS system.
+
+  b) The path defined in your query does not exists on your local filesystem.
+
+  c) The path exists on HDFS and the user that runs the query has read permission to these files.
+
+
+** b. Reading them block by block
+
+  In order to use that option you need to modify your query.Instead of using the <collection> or <doc> function to define your input file(s) you need to use <collectionwithtag>.
+
+  <collectionwithtag> accepts two arguments, one is the path to the HDFS directory you have stored your input files, and the second is a specific <<tag>> that exists in the input file(s).This is the tag of the element that contains the fields that your query is looking for.
+
+*** Example
+
+  My input file <books.xml>:
+
+-----------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<bookstore>
+
+<book>
+  <title lang="en">Everyday Italian</title>
+  <author>Giada De Laurentiis</author>
+  <year>2005</year>
+  <price>30.00</price>
+</book>
+
+<book>
+  <title lang="en">Harry Potter</title>
+  <author>J K. Rowling</author>
+  <year>2005</year>
+  <price>29.99</price>
+</book>
+
+<book>
+  <title lang="en">XQuery Kick Start</title>
+  <author>James McGovern</author>
+  <author>Per Bothner</author>
+  <author>Kurt Cagle</author>
+  <author>James Linn</author>
+  <author>Vaidyanathan Nagarajan</author>
+  <year>2003</year>
+  <price>49.99</price>
+</book>
+
+<book>
+  <title lang="en">Learning XML</title>
+  <author>Erik T. Ray</author>
+  <year>2003</year>
+  <price>39.95</price>
+</book>
+
+</bookstore>
+----------------------------
+
+  I want to find all the <books> that are published after 2004.
+
+  The file is located in HDFS in this path </user/hduser/store/books.xml>
+
+  My query will look like this:
+
+----------------------------
+for $x in collectionwithtag("/user/hduser/store","book")
+where $x/year>2004
+return $x/title
+----------------------------
+
+  Take notice that I defined the path to the directory containing the file and not the file, <collectionwithtag> expects path to the directory.
