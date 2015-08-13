@@ -160,7 +160,6 @@ public class HDFSFunctions {
      */
     private boolean locateConf() {
         this.conf_path = System.getenv("HADOOP_CONF_DIR");
-        System.out.println(conf_path);
         if (this.conf_path == null) {
             
             // load properties file
@@ -182,7 +181,6 @@ public class HDFSFunctions {
 
             // get the property value for HDFS_CONF
             this.conf_path = prop.getProperty("HDFS_CONF");
-            System.out.println(conf_path);
             return this.conf_path != null;
         }
         return this.conf_path != null;
