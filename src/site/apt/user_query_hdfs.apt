@@ -58,9 +58,9 @@ Executing a Query in HDFS
 
 ** b. Reading them block by block
 
-  In order to use that option you need to modify your query.Instead of using the <collection> or <doc> function to define your input file(s) you need to use <collectionwithtag>.
+  In order to use that option you need to modify your query.Instead of using the <collection> or <doc> function to define your input file(s) you need to use <collection-with-tag>.
 
-  <collectionwithtag> accepts two arguments, one is the path to the HDFS directory you have stored your input files, and the second is a specific <<tag>> that exists in the input file(s).This is the tag of the element that contains the fields that your query is looking for.
+  <collection-with-tag> accepts two arguments, one is the path to the HDFS directory you have stored your input files, and the second is a specific <<tag>> that exists in the input file(s).This is the tag of the element that contains the fields that your query is looking for.
 
 *** Example
 
@@ -117,4 +117,4 @@ where $x/year>2004
 return $x/title
 ----------------------------
 
-  Take notice that I defined the path to the directory containing the file and not the file, <collectionwithtag> expects path to the directory.
+  Take notice that I defined the path to the directory containing the file and not the file, <collection-with-tag> expects path to the directory.
