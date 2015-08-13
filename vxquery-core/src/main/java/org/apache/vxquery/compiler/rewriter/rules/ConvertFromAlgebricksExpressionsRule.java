@@ -45,26 +45,26 @@ import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * The rule searches for where the Algebricks builtin function are temporarly in the plan in place of XQuery function.
  * The combination the Algebricks builtin function are replace with boolean XQuery function and the XQuery equivalent
  * function.
- * 
+ *
  * <pre>
  * Before
  * 
  *   plan__parent
  *   %OPERATOR( $v1 : algebricks_function( \@input_expression ) )
  *   plan__child
- *   
+ * 
  *   where the function annotation contains a hint on which xquery expression is represented by the algebricks function.
- *   
- * After 
+ * 
+ * After
  * 
  *   plan__parent
  *   %OPERATOR( $v1 :xquery_expression( \@input_expression ) ) )
  *   plan__child
- *   
+ * 
  *   note the xquery_expression may include the boolean function to ensure only a true or false result.
- * 
+ *
  * </pre>
- * 
+ *
  * @author prestonc, shivanim
  */
 public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRule {
@@ -77,20 +77,14 @@ public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRu
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ConvertFromAlgebricksExpressionsRule() {
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.AND, new Pair(BuiltinOperators.AND, null));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.EQ, new Pair(BuiltinOperators.VALUE_EQ,
-                BuiltinOperators.GENERAL_EQ));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.GE, new Pair(BuiltinOperators.VALUE_GE,
-                BuiltinOperators.GENERAL_GE));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.GT, new Pair(BuiltinOperators.VALUE_GT,
-                BuiltinOperators.GENERAL_GT));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.EQ, new Pair(BuiltinOperators.VALUE_EQ, null));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.GE, new Pair(BuiltinOperators.VALUE_GE, null));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.GT, new Pair(BuiltinOperators.VALUE_GT, null));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.IS_NULL, new Pair(null, BuiltinFunctions.FN_EMPTY_1));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.LE, new Pair(BuiltinOperators.VALUE_LE,
-                BuiltinOperators.GENERAL_LE));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.LT, new Pair(BuiltinOperators.VALUE_LT,
-                BuiltinOperators.GENERAL_LT));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.LE, new Pair(BuiltinOperators.VALUE_LE, null));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.LT, new Pair(BuiltinOperators.VALUE_LT, null));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.NOT, new Pair(null, BuiltinFunctions.FN_NOT_1));
-        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.NEQ, new Pair(BuiltinOperators.VALUE_NE,
-                BuiltinOperators.GENERAL_NE));
+        ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.NEQ, new Pair(BuiltinOperators.VALUE_NE, null));
         ALGEBRICKS_MAP.put(AlgebricksBuiltinFunctions.OR, new Pair(BuiltinOperators.OR, null));
     }
 
@@ -109,6 +103,7 @@ public class ConvertFromAlgebricksExpressionsRule implements IAlgebraicRewriteRu
                 modified = true;
             }
         }
+        context.computeAndSetTypeEnvironmentForOperator(opRef.getValue());
         return modified;
     }
 

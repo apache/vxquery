@@ -22,7 +22,7 @@ for $p in collection($collection1)/site/people/person
   let $a := count(
     let $collection2 := "closed_auctions"
     for $t in collection($collection2)/site/closed_auctions/closed_auction
-      where $t/buyer/@person = $p/@id
+      where $t/buyer/@person eq $p/@id
       return $t
     )
   return <item person="{$p/name/text()}">{$a}</item>

@@ -43,7 +43,7 @@ public class XQTSTest extends AbstractXQueryTest {
 
     public static XTestOptions getOptions() {
         XTestOptions options = getDefaultTestOptions();
-        setCatalogToTestOptions(options, XQTS_CATALOG);
+        options.catalog = XQTS_CATALOG;
         options.previousTestResults = StringUtils.join(new String[] { "results", "xqts.txt" }, File.separator);
         return options;
     }

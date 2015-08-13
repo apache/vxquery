@@ -30,7 +30,7 @@ public abstract class AbstractXQueryTest {
     private TestRunner tr;
 
     protected abstract XTestOptions getTestOptions();
-    
+
     protected static XTestOptions getDefaultTestOptions() {
         XTestOptions opts = new XTestOptions();
         opts.verbose = false;
@@ -38,10 +38,6 @@ public abstract class AbstractXQueryTest {
         opts.showQuery = true;
         opts.showResult = true;
         return opts;
-    }
-
-    protected static void setCatalogToTestOptions(XTestOptions opts, String catalog) {
-        opts.catalog = catalog;
     }
 
     public AbstractXQueryTest(TestCase tc) throws Exception {
