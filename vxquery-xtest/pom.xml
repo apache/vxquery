@@ -119,6 +119,7 @@
                      <!-- <argLine>-agentpath:"${yourkit.home}/bin/mac/libyjpagent.jnilib=sampling"</argLine> -->
                     <excludes>
                         <exclude>**/AbstractXQueryTest.java</exclude>
+                        <exclude>**/VXQueryXMarkTest.java</exclude>
                         <exclude>**/XMarkTest.java</exclude>
                         <exclude>**/XQTSTest.java</exclude>
                     </excludes>
