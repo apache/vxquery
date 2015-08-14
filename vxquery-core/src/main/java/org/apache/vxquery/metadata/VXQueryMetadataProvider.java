@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.vxquery.context.StaticContext;
+
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -52,12 +54,14 @@ import edu.uci.ics.hyracks.api.job.JobSpecification;
 import edu.uci.ics.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
-    String[] nodeList;
-    Map<String, File> sourceFileMap;
+    private final String[] nodeList;
+    private final Map<String, File> sourceFileMap;
+    private final StaticContext staticCtx;
 
-    public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap) {
+    public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap, StaticContext staticCtx) {
         this.nodeList = nodeList;
         this.sourceFileMap = sourceFileMap;
+        this.staticCtx = staticCtx;
     }
 
     @Override
@@ -67,6 +71,10 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
 
     public Map<String, File> getSourceFileMap() {
         return sourceFileMap;
+    }
+
+    public StaticContext getStaticContext() {
+        return staticCtx;
     }
 
     @Override

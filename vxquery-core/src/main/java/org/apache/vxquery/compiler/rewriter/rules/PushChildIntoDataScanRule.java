@@ -18,33 +18,27 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableObject;
+import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
-import org.apache.vxquery.context.RootStaticContextImpl;
-import org.apache.vxquery.context.StaticContextImpl;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.functions.BuiltinOperators;
-import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
 /**
  * The rule searches for an unnest operator immediately following a data scan
@@ -72,13 +66,17 @@ import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
  * @author prestonc
  */
 public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRule {
-    final StaticContextImpl dCtx = new StaticContextImpl(RootStaticContextImpl.INSTANCE);
+    StaticContext dCtx = null;
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
 
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
-        AbstractLogicalOperator op1 = (AbstractLogicalOperator) opRef.getValue();;
+        VXQueryOptimizationContext vxqOptCtx = (VXQueryOptimizationContext) context;
+        IMetadataProvider iProvider = (IMetadataProvider) vxqOptCtx.getMetadataProvider();
+        VXQueryMetadataProvider vxqProvider = (VXQueryMetadataProvider) iProvider;
+        dCtx = vxqProvider.getStaticContext();
+        AbstractLogicalOperator op1 = (AbstractLogicalOperator) opRef.getValue();
         if (op1.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
         }
@@ -120,10 +118,15 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
         for (int i = finds.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
+            SequenceType sType = null;
             if (typeId > 0) {
-                ds.addChildSeq(typeId);
-                added = true;
+                sType = dCtx.lookupSequenceType(typeId);
+                if (sType.getItemType().equals(ElementType.ANYELEMENT) && typeId > 0) {
+                    ds.addChildSeq(typeId);
+                    added = true;
+                }
             }
+
         }
         return added;
     }

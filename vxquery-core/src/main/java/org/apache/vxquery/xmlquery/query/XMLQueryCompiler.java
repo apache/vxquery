@@ -164,13 +164,7 @@ public class XMLQueryCompiler {
         builder.setNullableTypeComputer(new INullableTypeComputer() {
             @Override
             public Object makeNullableType(Object type) throws AlgebricksException {
-                SequenceType st = (SequenceType) type;
-                if (st.getQuantifier().allowsEmptySequence()) {
-                    return type;
-                } else if (st.getQuantifier() == Quantifier.QUANT_ONE) {
-                    return SequenceType.create(st.getItemType(), Quantifier.QUANT_QUESTION);
-                }
-                return type;
+                throw new NotImplementedException("NullableTypeComputer is not implented (makeNullableType)");
             }
 
             @Override
@@ -199,7 +193,8 @@ public class XMLQueryCompiler {
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
         pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(
                 module.getModuleContext()));
-        VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap());
+        VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap(),
+                module.getModuleContext());
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);
@@ -245,8 +240,6 @@ public class XMLQueryCompiler {
                 RewriteRuleset.buildNestedDataSourceRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqOnceCtrl,
                 RewriteRuleset.buildTypeInferenceRuleCollection()));
-        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlNoDfs,
-                RewriteRuleset.buildUnnestingRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
                 RewriteRuleset.buildNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlNoDfs,

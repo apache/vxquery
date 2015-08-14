@@ -101,9 +101,9 @@ limitations under the License.
             <item
                 name="XML Data Model Example"
                 href="development_xml_document.html" />
-            <!-- <item
-                name="XQuery Benchmarks"
-                href="development_benchmarks.html" /> -->
+            <item
+                name="XQuery Benchmark Documentation"
+                href="development_benchmarks.html" />
         </menu>
 
         <menu ref="reports" />
