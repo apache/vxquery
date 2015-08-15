@@ -17,19 +17,17 @@
 XMark Benchmark Documentation
     
     This page displays VXQuery's performance on XMark Benchmark. In the following 
-    table, <Query Number> represents the XMark query number. <Original Query>  
-    represents the original XMark Query from the XMark Benchmark website. Original query 
-    works if it has a <Working> status in the table. If the query does not work, then 
-    it the table displays the error. 
-    <Optimized Query> represents the optimized version of the original XMark query
-    to increase performance. Optimized query 
-    works if it has a <Working> status in the table. If the query does not work, then 
-    it the table displays the error or displays <Same Error as Original Query>. 
-    <Frame Size> represents the frame size that VXQuery needs to run the query. 
-    Usually the size of file is very large and can not fit in the default frame size.
-    The description in the table for this column is self-explanatory.
-    Issues represents the  the JIRA issues that pertain to the query or are 
-    related to the query. All queries that do not work with the default frame size
+    table, <Query Number> column represents the XMark query number. <Original Query> column 
+    represents the original XMark query from the XMark Benchmark site. Original query 
+    works if it has a <Working> status in the column. If the original query does not work, then 
+    the column displays the error. <Optimized Query> column represents the optimized version 
+    of the original XMark query. The optimized version of the query 
+    has been written to increase performance. Optimized query 
+    works if it has a <Working> status in the column. If the optimized query does not work, then 
+    the column displays the error or displays <Same Error as Original Query>. 
+    <Frame Size> column represents the frame size that VXQuery needs to run the query. 
+    The <Issues> column represents the JIRA issues for the query or are related to the query.
+    All queries that do not work with the default frame size
     are related to {{{https://issues.apache.org/jira/browse/VXQUERY-167} VXQuery Issue 167 }}.
     
 
