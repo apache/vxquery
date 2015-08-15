@@ -1,0 +1,20 @@
+{
+    "components": {
+        "slider-appmaster": {
+            "jvm.heapsize": "512M"
+        }
+    }, 
+    "global": {
+        "application.def": ".slider/package/vxquery/vxquery.zip", 
+        "java_home": "/usr", 
+        "site.global.additional_cp": "", 
+        "site.global.listen_port": "${10000}{PER_CONTAINER}", 
+        "site.global.memory_val": "500M", 
+        "site.global.query": "test.xq", 
+        "site.global.result_dir": "/tmp/result", 
+        "site.global.xms_val": "256m", 
+        "site.global.xmx_val": "1024m"
+    }, 
+    "metadata": {}, 
+    "schema": "http://example.org/specification/v2.0.0"
+}
