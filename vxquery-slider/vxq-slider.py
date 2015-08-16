@@ -34,8 +34,6 @@ def archive(filename='vxquery.tar', dirname='../vxquery-cli/target/appassembler/
     By default it creates the tar file that contains the vxquery libraries.
     """
     path = path + filename
-    print path
-    print os.getcwd()
     # Delete old file.
     try:
         os.remove(path)
@@ -59,6 +57,14 @@ def archive(filename='vxquery.tar', dirname='../vxquery-cli/target/appassembler/
             for filename in files:
                 zf.write(os.path.join(directory, filename))
         zf.close()
+
+def message(message):
+    """
+    :param message: message we want to print.
+    Prints the given message
+    """
+    print '----------------------------------------------------------------'
+    print message
 
 if __name__ == "__main__":
     # Read user aguments for query file and output file.
@@ -86,14 +92,13 @@ if __name__ == "__main__":
     archive(filename='vxquery.zip', dirname='./', filetype='zip', path='./')
 
     # Destroy old cluster
-    print '----------------------------------------------------------------'
-    print 'Destroying old package.'
+    message('Destroying old package.')
     os.system('../bin/slider destroy vxquery')
 
     # Call slider to create new cluster with the new package
-    print '----------------------------------------------------------------'
-    print 'Installing vxquery new package.'
+    message('Installing vxquery new package.')
     os.system('../bin/slider package --install --name vxquery --package vxquery.zip --replacepkg')
 
     # Create new cluster
-    #os.system('../bin/slider create vxquery --template appConfig.json --resources resources.json')
+    message('Creating and running the query.')
+    os.system('../bin/slider create vxquery --template appConfig.json --resources resources.json')
