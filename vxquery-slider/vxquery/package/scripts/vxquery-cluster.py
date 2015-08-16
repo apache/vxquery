@@ -36,8 +36,7 @@ class VXQuery(Script):
     env.set_params(params)
     self.configure(env)
 
-    process_cmd = format("{java64_home}/bin/java -Xmx{xmx_val} -Xms{xms_val} -classpath {app_root}/*:{additional_cp} org.apache.vxquery.cli.VXQuery {query}")
-    # 1>&2 {result_dir}
+    process_cmd = format("{java64_home}/bin/java -Xmx{xmx_val} -Xms{xms_val} -classpath {app_root}/*:{additional_cp} org.apache.vxquery.cli.VXQuery {query} 1>&2 {result_dir}")
     
     Execute(process_cmd,
         logoutput=True,

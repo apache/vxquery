@@ -26,7 +26,7 @@
    for Slider client to work. The following list is not an exhaustive list but the minimal config
    needed to interact with a non-secure cluster.
 -->
-
+<!--
   <property>
     <name>slider.zookeeper.quorum</name>
     <value>localhost:2181</value>
@@ -46,7 +46,7 @@
     <name>fs.defaultFS</name>
     <value>hdfs://localhost:9000</value>
   </property>
-
+  -->
   <!--
     <property>
       <name>slider.client.resource.origin</name>

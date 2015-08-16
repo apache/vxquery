@@ -22,5 +22,5 @@
 # The env variable SLIDER_JVM_OPTS can be used to override
 # the default JVM opts
 
-export JAVA_HOME=/usr
-export HADOOP_CONF_DIR=/home/efi/Utilities/hadoop/etc/hadoop
+export JAVA_HOME=
+export HADOOP_CONF_DIR=

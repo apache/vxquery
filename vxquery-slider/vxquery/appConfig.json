@@ -10,7 +10,7 @@
         "site.global.additional_cp": "", 
         "site.global.listen_port": "${10000}{PER_CONTAINER}", 
         "site.global.memory_val": "500M", 
-        "site.global.query": "", 
+        "site.global.query": "/home/efi/Projects/vxquery/test.xq", 
         "site.global.result_dir": "/tmp/result", 
         "site.global.xms_val": "256m", 
         "site.global.xmx_val": "1024m"
