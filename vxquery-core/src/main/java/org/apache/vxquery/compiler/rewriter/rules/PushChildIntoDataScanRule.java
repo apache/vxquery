@@ -66,14 +66,13 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  * @author prestonc
  */
 public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRule {
-    StaticContext dCtx = null;
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
 
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
         IMetadataProvider iProvider = ((VXQueryOptimizationContext) context).getMetadataProvider();
-        dCtx = ((VXQueryMetadataProvider) iProvider).getStaticContext();
+        StaticContext dCtx = ((VXQueryMetadataProvider) iProvider).getStaticContext();
         AbstractLogicalOperator op1 = (AbstractLogicalOperator) opRef.getValue();
         if (op1.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
@@ -89,7 +88,7 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
         if (!usedVariables.contains(datascan.getVariables())) {
             // Find all child functions.
             VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) datascan.getDataSource();
-            if (!updateDataSource(ds, unnest.getExpressionRef())) {
+            if (!updateDataSource(ds, unnest.getExpressionRef(), dCtx)) {
                 return false;
             }
 
@@ -110,7 +109,8 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
      * @param ds
      * @param expression
      */
-    private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
+    private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression,
+            StaticContext dCtx) {
         boolean added = false;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
