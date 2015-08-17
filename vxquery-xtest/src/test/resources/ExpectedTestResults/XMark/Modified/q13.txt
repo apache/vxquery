@@ -1,14 +1,15 @@
-<item name="cockatrice approves money">
-  <description>
-    <text>clothes edmund doubtful fool torments ropes contrive lecher ardea
-            happiness fertile treads constable defences<keyword>lion
-            neighbour ourself</keyword>marshal disordered moderate venus
-            afeard article rot hazards craft crowns<emph>plainness patient</emph>lying knowledge diseases meritorious medicine</text>
-  </description>
-</item>
-<item name="answer misdoubt">
-  <description>
-    <text>delay brutish rage alexandria trumpet god wet resolve pursue colour
+<item name="cockatrice approves money "><description>
+          <text>
+            clothes edmund doubtful fool torments ropes contrive lecher ardea
+            happiness fertile treads constable defences <keyword> lion
+            neighbour ourself </keyword> marshal disordered moderate venus
+            afeard article rot hazards craft crowns <emph> plainness patient
+            </emph> lying knowledge diseases meritorious medicine 
+          </text>
+        </description></item>
+<item name="answer misdoubt "><description>
+          <text>
+            delay brutish rage alexandria trumpet god wet resolve pursue colour
             body walk month writing beside profane left declining coach through
             protectorship congruent confusion favours following populous
             exercise timon shoots function fourscore mangled favorably slain
@@ -16,29 +17,30 @@
             usurers stew beard longed creep hid pursuivant beholders senators
             son mercutio woo bestow trumpet excess muffler pick ugly felt
             causes remove adding tear often rounds underbearing tree purer
-            kibes endless women benefit throw<emph>claim firmness<keyword>arrived sees wrestled multitude repent preventions infamy reproof
-            shalt hearted prais knave doubtless</keyword>deny</emph>merely
+            kibes endless women benefit throw <emph> claim firmness <keyword>
+            arrived sees wrestled multitude repent preventions infamy reproof
+            shalt hearted prais knave doubtless </keyword> deny </emph> merely
             grave voluble late loath digest horn slave hunger stronger amazed
             salt killing ross cry dry tongue kiss yields auspicious quietness
-            perpetual ways<keyword>began leg running unjust court mean
+            perpetual ways <keyword> began leg running unjust court mean
             returning brook creatures appointed paunches henry sights west
-            prunes flutes regiment seems bed</keyword>musicians slumber post
+            prunes flutes regiment seems bed </keyword> musicians slumber post
             friendship prevention abreast wouldst words vexation builds unfelt
             holly walk inform moods deck bulk begin action school nobles
             antique people unkennel stomach into petitions jack assail yongrey
-            ages betimes golden sink droop kernel hoppedance perfection weight<emph>whining safe english rod other featur</emph>
-    </text>
-  </description>
-</item>
-<item name="prosperity dine yon debate">
-  <description>
-    <text>visitation strangely mab spirit forgot bargain holds</text>
-  </description>
-</item>
-<item name="congeal pawned alack">
-  <description>
-    <text>white obey<bold>calling neighbour office afternoon drum embowell
-            touch sue lifeless leapt shun called</bold>weary congregation
+            ages betimes golden sink droop kernel hoppedance perfection weight
+            <emph> whining safe english rod other featur </emph> 
+          </text>
+        </description></item>
+<item name="prosperity dine yon debate "><description>
+          <text>
+            visitation strangely mab spirit forgot bargain holds 
+          </text>
+        </description></item>
+<item name="congeal pawned alack "><description>
+          <text>
+            white obey <bold> calling neighbour office afternoon drum embowell
+            touch sue lifeless leapt shun called </bold> weary congregation
             yield check falling wives challenge mental fatal hard ancient
             stands cor dishes therein gramercy discipline farewell dire tricks
             protest cut horatio brother speech sleeping adultress pitch cave
@@ -47,9 +49,9 @@
             vilely whet scars companions hanging foolish scene musty fruitful
             unburthen teacher garments betimes sight now for oaths vouchsafe
             particulars globe laertes afflictions rouse once news humanity buck
-            destroy military lucius lap<keyword>considered forc mourning
-            verona</keyword>waters triumphing officer hastily<emph>resign
+            destroy military lucius lap <keyword> considered forc mourning
+            verona </keyword> waters triumphing officer hastily <emph> resign
             subject figure hay thwart written signs gout bred distance period
-            glove players change folly</emph>going wat lost</text>
-  </description>
-</item>
+            glove players change folly </emph> going wat lost 
+          </text>
+        </description></item>
