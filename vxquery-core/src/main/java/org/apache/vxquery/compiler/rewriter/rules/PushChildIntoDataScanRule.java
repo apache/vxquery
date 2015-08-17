@@ -72,10 +72,8 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
 
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
-        VXQueryOptimizationContext vxqOptCtx = (VXQueryOptimizationContext) context;
-        IMetadataProvider iProvider = (IMetadataProvider) vxqOptCtx.getMetadataProvider();
-        VXQueryMetadataProvider vxqProvider = (VXQueryMetadataProvider) iProvider;
-        dCtx = vxqProvider.getStaticContext();
+        IMetadataProvider iProvider = ((VXQueryOptimizationContext) context).getMetadataProvider();
+        dCtx = ((VXQueryMetadataProvider) iProvider).getStaticContext();
         AbstractLogicalOperator op1 = (AbstractLogicalOperator) opRef.getValue();
         if (op1.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
