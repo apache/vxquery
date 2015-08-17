@@ -69,8 +69,8 @@ limitations under the License.
                 name="Executing a Query"
                 href="user_query.html" />
             <item
-                name="Executing a Query with HDFS"
-                href="user_query_hdfs.html" />
+                name="YARN integration with Slider"
+                href="slider_app.html" />
             <item
                 name="Running the Test Suite"
                 href="user_running_tests.html" />
