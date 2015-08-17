@@ -66,6 +66,7 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOpera
  * @author prestonc
  */
 public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRule {
+    StaticContext dCtx = null;
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
 
@@ -88,7 +89,7 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
         if (!usedVariables.contains(datascan.getVariables())) {
             // Find all child functions.
             VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) datascan.getDataSource();
-            if (!updateDataSource(ds, unnest.getExpressionRef(), dCtx)) {
+            if (!updateDataSource(ds, unnest.getExpressionRef())) {
                 return false;
             }
 
@@ -109,16 +110,15 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
      * @param ds
      * @param expression
      */
-    private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression,
-            StaticContext dCtx) {
+    private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
         boolean added = false;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
         for (int i = finds.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
-            SequenceType sType = null;
+
             if (typeId > 0) {
-                sType = dCtx.lookupSequenceType(typeId);
+                SequenceType sType = dCtx.lookupSequenceType(typeId);
                 if (sType.getItemType().equals(ElementType.ANYELEMENT) && typeId > 0) {
                     ds.addChildSeq(typeId);
                     added = true;
