@@ -19,10 +19,8 @@ package org.apache.vxquery.datamodel.accessors.nodes;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 
 import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
-import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
 import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 /*
@@ -39,7 +37,7 @@ import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
  *  Integer LocalCode;
  * }
  */
-public class AttributeNodePointable extends AbstractPointable {
+public class AttributeNodePointable extends AbstractNodePointable {
     private static final int LOCAL_NODE_ID_SIZE = 4;
     public static final IPointableFactory FACTORY = new IPointableFactory() {
         private static final long serialVersionUID = 1L;
@@ -67,11 +65,7 @@ public class AttributeNodePointable extends AbstractPointable {
         }
     }
 
-    public int getLocalNodeId(NodeTreePointable nodeTree) {
-        return nodeTree.nodeIdExists() ? IntegerPointable.getInteger(bytes, getLocalNodeIdOffset(nodeTree)) : -1;
-    }
-
-    public void getValue(NodeTreePointable nodeTree, IPointable value) {
+     public void getValue(NodeTreePointable nodeTree, IPointable value) {
         value.set(bytes, getValueOffset(nodeTree), getValueSize(nodeTree));
     }
 
@@ -91,7 +85,7 @@ public class AttributeNodePointable extends AbstractPointable {
         return nodeTree.typeExists() ? CodedQNamePointable.SIZE : 0;
     }
 
-    private int getLocalNodeIdOffset(NodeTreePointable nodeTree) {
+    protected int getLocalNodeIdOffset(NodeTreePointable nodeTree) {
         return getTypeOffset() + getTypeSize(nodeTree);
     }
 

@@ -39,17 +39,24 @@ import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantPromoteExpressi
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantTreatExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedUnnestIterateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ReplaceSourceMapInDocExpression;
 import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
 import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
+import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.ExtractFunctionsFromJoinConditionRule;
+import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.InlineNestedVariablesRule;
+import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.MoveFreeVariableOperatorOutOfSubplanRule;
 
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.BreakSelectIntoConjunctsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ComplexJoinInferenceRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.ComplexUnnestToProductRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ConsolidateAssignsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ConsolidateSelectsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.CopyLimitDownRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.EliminateGroupByEmptyKeyRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.EliminateSubplanRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.EliminateSubplanWithInputCardinalityOneRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.EnforceStructuralPropertiesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ExtractCommonOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ExtractGbyExpressionsRule;
@@ -57,16 +64,21 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.FactorRedundantGroupAndDeco
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InferTypesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.InsertOuterJoinRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroJoinInsideSubplanRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByForSubplanRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceProjectsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.NestedSubplanToJoinRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PullSelectOutOfEqJoin;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushMapOperatorDownThroughProductRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectIntoDataSourceScanRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectDownRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectIntoJoinRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSubplanIntoGroupByRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSubplanWithAggregateDownThroughProductRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.ReinferAllTypesRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.RemoveRedundantVariablesRule;
@@ -74,6 +86,7 @@ import edu.uci.ics.hyracks.algebricks.rewriter.rules.RemoveUnusedAssignAndAggreg
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetAlgebricksPhysicalOperatorsRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 import edu.uci.ics.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
+import edu.uci.ics.hyracks.algebricks.rewriter.rules.SubplanOutOfGroupRule;
 
 public class RewriteRuleset {
     /**
@@ -96,7 +109,7 @@ public class RewriteRuleset {
         // TODO Fix the group by operator before putting back in the rule set.
         //        normalization.add(new ConvertAssignSortDistinctNodesToOperatorsRule());
 
-        // Find unnest followed by aggregate in a subplan. 
+        // Find unnest followed by aggregate in a subplan.
         normalization.add(new EliminateUnnestAggregateSubplanRule());
         normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
@@ -118,6 +131,9 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
         normalization.add(new CollectionWithTagRule());
 
+        normalization.add(new ConsolidateDescandantChild());
+
+        normalization.add(new ReplaceSourceMapInDocExpression());
         // Adds child steps to the data source scan.
         // TODO Replace consolidate with a new child function that takes multiple paths.
         //        normalization.add(new ConsolidateUnnestsRule());
@@ -126,6 +142,7 @@ public class RewriteRuleset {
 
         // Improvement for scalar child expressions
         normalization.add(new EliminateSubplanForSingleItemsRule());
+        normalization.add(new MoveFreeVariableOperatorOutOfSubplanRule());
         return normalization;
     }
 
@@ -192,6 +209,38 @@ public class RewriteRuleset {
         List<IAlgebraicRewriteRule> typeInfer = new LinkedList<IAlgebraicRewriteRule>();
         typeInfer.add(new InferTypesRule());
         return typeInfer;
+    }
+
+    /**
+     * Unnest more complex structures.
+     */
+    public final static List<IAlgebraicRewriteRule> buildUnnestingRuleCollection() {
+        List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();
+
+        xquery.add(new PushSelectDownRule());
+        xquery.add(new SimpleUnnestToProductRule());
+        xquery.add(new ComplexUnnestToProductRule());
+        xquery.add(new ComplexJoinInferenceRule());
+        xquery.add(new PushSelectIntoJoinRule());
+        xquery.add(new IntroJoinInsideSubplanRule());
+        xquery.add(new PushMapOperatorDownThroughProductRule());
+        xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
+        xquery.add(new IntroduceGroupByForSubplanRule());
+        xquery.add(new SubplanOutOfGroupRule());
+        xquery.add(new InsertOuterJoinRule());
+        xquery.add(new ExtractFunctionsFromJoinConditionRule());
+
+        xquery.add(new RemoveRedundantVariablesRule());
+        xquery.add(new RemoveUnusedAssignAndAggregateRule());
+
+        xquery.add(new FactorRedundantGroupAndDecorVarsRule());
+        xquery.add(new EliminateSubplanRule());
+        xquery.add(new EliminateGroupByEmptyKeyRule());
+        xquery.add(new PushSubplanIntoGroupByRule());
+        xquery.add(new NestedSubplanToJoinRule());
+        xquery.add(new EliminateSubplanWithInputCardinalityOneRule());
+
+        return xquery;
     }
 
     public final static List<IAlgebraicRewriteRule> buildNormalizationRuleCollection() {

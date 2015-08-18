@@ -26,10 +26,13 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.step.NodeTestFilter.INodeFilter;
+import org.apache.vxquery.types.SequenceType;
 
 import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
 public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathStep {
     private boolean testSelf;
@@ -39,10 +42,14 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     private List<Integer> indexSequence = new ArrayList<Integer>();
     private List<Integer> returnSequence = new ArrayList<Integer>();
 
+    private final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
     private final SequencePointable seqNtp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpItem = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpNtp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpStep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private INodeFilter filter;
+    private int filterLookupID = -1;
+    private boolean isfilter = false;
 
     public DescendantOrSelfPathStepUnnesting(IHyracksTaskContext ctx, PointablePool pp, boolean testSelf) {
         super(ctx, pp);
@@ -55,6 +62,18 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
         indexSequence.add(0);
         returnSequence.add(0);
 
+        if (args.length > 1) {
+            isfilter = true;
+            if (args[1].getTag() != ValueTag.XS_INT_TAG) {
+                throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
+            }
+            args[1].getValue(ip);
+            if (ip.getInteger() != filterLookupID) {
+                filterLookupID = ip.getInteger();
+                SequenceType sType = dCtx.getStaticContext().lookupSequenceType(ip.getInteger());
+                filter = NodeTestFilter.getNodeTestFilter(sType);
+            }
+        }
         // Check the argument passed in as sequence or node tree.
         if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
             args[0].getValue(seqNtp);
@@ -99,14 +118,15 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             returnSelf = false;
             tvpItem.set(rootTVP);
             try {
-                setNodeToResult(tvpItem, result);
-                return true;
+                if (!isfilter || (isfilter && filter.accept(ntp, tvpItem))) {
+                    setNodeToResult(tvpItem, result);
+                    return true;
+                }
             } catch (IOException e) {
                 String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
                 throw new AlgebricksException(description);
             }
         }
-
         // Solve for descendants.
         return stepNodeTree(rootTVP, 0, result);
     }
@@ -132,12 +152,13 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             while (indexSequence.get(level) < seqLength) {
                 // Get the next item
                 seqItem.getEntry(indexSequence.get(level), tvpItem);
-
                 // Check current node
                 if (indexSequence.get(level) == returnSequence.get(level)) {
                     returnSequence.set(level, returnSequence.get(level) + 1);
-                    setNodeToResult(tvpItem, result);
-                    return true;
+                    if (!isfilter || (isfilter && filter.accept(ntp, tvpItem))) {
+                        setNodeToResult(tvpItem, result);
+                        return true;
+                    }
                 }
                 // Check children nodes
                 if (level + 1 <= indexSequence.size()) {

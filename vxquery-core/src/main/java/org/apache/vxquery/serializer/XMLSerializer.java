@@ -366,7 +366,7 @@ public class XMLSerializer implements IPrinter {
             enp.getAttributeSequence(ntp, seqp);
             if (seqp.getByteArray() != null && seqp.getEntryCount() > 0) {
                 ps.append(' ');
-                printSequence(ps, seqp);
+                printSequence(ps, seqp, " ");
             }
 
             enp.getChildrenSequence(ntp, seqp);
@@ -422,12 +422,19 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printSequence(PrintStream ps, SequencePointable seqp) {
+        printSequence(ps, seqp, null);
+    }
+
+    private void printSequence(PrintStream ps, SequencePointable seqp, String between) {
         VoidPointable vp = pp.takeOne(VoidPointable.class);
         try {
             int len = seqp.getEntryCount();
             for (int i = 0; i < len; ++i) {
                 seqp.getEntry(i, vp);
                 print(vp.getByteArray(), vp.getStartOffset(), vp.getLength(), ps);
+                if (i < len - 1 && between != null) {
+                    ps.append(between);
+                }
             }
         } finally {
             pp.giveBack(vp);

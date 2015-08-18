@@ -37,9 +37,8 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionC
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
@@ -131,7 +130,22 @@ public class ExpressionToolbox {
     }
 
     /**
-     * Find all functions for a specific expression.
+     * Finds all functions for a given expression.
+     */
+    public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe,
+            List<Mutable<ILogicalExpression>> finds) {
+        ILogicalExpression le = mutableLe.getValue();
+        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+            finds.add(mutableLe);
+            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+                findAllFunctionExpressions(argExp, finds);
+            }
+        }
+    }
+
+    /**
+     * Finds all functions for a given expression and function identifier.
      */
     public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi,
             List<Mutable<ILogicalExpression>> finds) {
@@ -223,19 +237,21 @@ public class ExpressionToolbox {
                 }
                 AbstractLogicalOperator variableOp = (AbstractLogicalOperator) variableProducer.getValue();
                 switch (variableOp.getOperatorTag()) {
-                    case DATASOURCESCAN:
-                        return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
-                    case UNNEST:
-                        UnnestOperator unnest = (UnnestOperator) variableOp;
-                        return getOutputSequenceType(variableProducer, unnest.getExpressionRef(), dCtx);
                     case ASSIGN:
-                        AssignOperator assign = (AssignOperator) variableOp;
+                    case AGGREGATE:
+                    case RUNNINGAGGREGATE:
+                        AbstractAssignOperator assign = (AbstractAssignOperator) variableOp;
                         for (int i = 0; i < assign.getVariables().size(); ++i) {
                             if (variableId.equals(assign.getVariables().get(i))) {
                                 return getOutputSequenceType(variableProducer, assign.getExpressions().get(i), dCtx);
                             }
                         }
                         return null;
+                    case DATASOURCESCAN:
+                        return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
+                    case UNNEST:
+                        UnnestOperator unnest = (UnnestOperator) variableOp;
+                        return getOutputSequenceType(variableProducer, unnest.getExpressionRef(), dCtx);
                     default:
                         // TODO Consider support for other operators. i.e. Assign.
                         break;

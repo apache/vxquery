@@ -1,0 +1,123 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="XMarkOriginalQueries" featureOwner="VXQuery">
+   <GroupInfo>
+      <title>XMark Queries</title>
+      <description/>
+   </GroupInfo>
+   <test-case name="XMark-Queries-01" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 1</description>
+      <query name="q01" date="2015-03-25"/>
+      <output-file compare="Text">q01.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-02" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 2</description>
+      <query name="q02" date="2015-03-25"/>
+      <output-file compare="Text">q02.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-03" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 3</description>
+      <query name="q03" date="2015-03-25"/>
+      <output-file compare="Text">q03.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-04" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 4</description>
+      <query name="q04" date="2015-03-25"/>
+      <output-file compare="Text">q04.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-05" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 5</description>
+      <query name="q05" date="2015-03-25"/>
+      <output-file compare="Text">q05.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-06" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 6</description>
+      <query name="q06" date="2015-03-25"/>
+      <output-file compare="Text">q06.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-07" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 7</description>
+      <query name="q07" date="2015-03-25"/>
+      <output-file compare="Text">q07.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-08" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 8</description>
+      <query name="q08" date="2015-03-25"/>
+      <output-file compare="Text">q08.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-09" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 9</description>
+      <query name="q09" date="2015-03-25"/>
+      <output-file compare="Text">q09.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-10" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 10</description>
+      <query name="q10" date="2015-03-25"/>
+      <output-file compare="Text">q10.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-11" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 11</description>
+      <query name="q11" date="2015-03-25"/>
+      <output-file compare="Text">q11.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-12" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 12</description>
+      <query name="q12" date="2015-03-25"/>
+      <output-file compare="Text">q12.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-13" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 13</description>
+      <query name="q13" date="2015-03-25"/>
+      <output-file compare="Text">q13.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-14" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 14</description>
+      <query name="q14" date="2015-03-25"/>
+      <output-file compare="Text">q14.txt</output-file>
+   </test-case>
+   <test-case name="XMark-Queries-15" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 15</description>
+      <query name="q15" date="2015-03-25"/>
+      <output-file compare="Text">q15.txt</output-file>
+   </test-case>
+   <test-case name="XMark-Queries-16" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 16</description>
+      <query name="q16" date="2015-03-25"/>
+      <output-file compare="Text">q16.txt</output-file>
+   </test-case>
+      <test-case name="XMark-Queries-17" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 17</description>
+      <query name="q17" date="2015-03-25"/>
+      <output-file compare="Text">q17.txt</output-file>
+   </test-case>
+   <test-case name="XMark-Queries-18" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 18</description>
+      <query name="q18" date="2015-03-25"/>
+      <output-file compare="Text">q18.txt</output-file>
+   </test-case>
+   <test-case name="XMark-Queries-19" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 19</description>
+      <query name="q19" date="2015-03-25"/>
+      <output-file compare="Text">q19.txt</output-file>
+   </test-case>
+   <test-case name="XMark-Queries-20" FilePath="XMark/Original/" Creator="Shivani Mall">
+      <description>XMark Query 20</description>
+      <query name="q20" date="2015-03-25"/>
+      <output-file compare="Text">q20.txt</output-file>
+   </test-case>
+</test-group>

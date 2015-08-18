@@ -160,7 +160,9 @@ import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCallExpression;
@@ -1165,7 +1167,7 @@ public class XMLQueryTranslator {
                 }
 
                 default:
-                    content.add(vre(translateExpression(aVal, tCtx)));
+                    content.add(data(vre(translateExpression(aVal, tCtx))));
             }
         }
         ILogicalExpression contentExpr = content.size() == 1 ? content.get(0) : sfce(BuiltinOperators.CONCATENATE,
@@ -1445,8 +1447,23 @@ public class XMLQueryTranslator {
             for (RelativePathExprNode rpen : pe.getPaths()) {
                 boolean asc = true;
                 if (PathType.SLASH_SLASH.equals(rpen.getPathType())) {
+                    tCtx = tCtx.pushContext();
+                    tCtx.pushVariableScope();
+                    iterateOver(ctxExpr, tCtx);
+                    ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
+                            .getLogicalVariable());
                     ctxExpr = sfce(BuiltinOperators.DESCENDANT_OR_SELF,
                             treat(ctxExpr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR)));
+                    List<LogicalVariable> vars = new ArrayList<LogicalVariable>();
+                    List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
+                    LogicalVariable var = newLogicalVariable();
+                    vars.add(var);
+                    exprs.add(mutable(afce(BuiltinOperators.SEQUENCE, false, ctxExpr)));
+                    AggregateOperator aop = new AggregateOperator(vars, exprs);
+                    aop.getInputs().add(mutable(tCtx.op));
+                    tCtx.op = aop;
+                    tCtx = tCtx.popContext();
+                    ctxExpr = vre(var);
                 }
                 boolean popScope = false;
                 if (ctxExpr != null) {
@@ -1483,28 +1500,43 @@ public class XMLQueryTranslator {
                     throw new IllegalStateException("Unknown path node: " + pathNode.getTag());
                 }
                 if (predicates != null && !predicates.isEmpty()) {
+                    ctxExpr = vre(createAssignment(ctxExpr, tCtx));
                     ctxExpr = sfce(asc ? BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS
                             : BuiltinOperators.SORT_DISTINCT_NODES_DESC_OR_ATOMICS, ctxExpr);
+                    iterateOver(ctxExpr, tCtx);
+                    int i = 0;
+                    ILogicalExpression selectCondition = null;
                     for (ASTNode pn : predicates) {
-                        tCtx = tCtx.pushContext();
-                        tCtx.pushVariableScope();
-                        iterateOver(ctxExpr, tCtx);
+                        // Handles integer, boolean expression, path expression exists
+                        // TODO Support inner focus between predicates.
                         LogicalVariable pLVar = translateExpression(pn, tCtx);
                         ILogicalExpression tTest = instanceOf(vre(pLVar),
                                 SequenceType.create(BuiltinTypeRegistry.XSEXT_NUMERIC, Quantifier.QUANT_ONE));
                         ILogicalExpression posTest = sfce(BuiltinOperators.VALUE_EQ, vre(pLVar), vre(tCtx.varScope
                                 .lookupVariable(XMLQueryCompilerConstants.POS_VAR_NAME).getLogicalVariable()));
-                        ILogicalExpression boolTest = sfce(BuiltinFunctions.FN_BOOLEAN_1, vre(pLVar));
-
-                        SelectOperator select = new SelectOperator(mutable(sfce(BuiltinOperators.IF_THEN_ELSE, tTest,
-                                posTest, boolTest)), false, null);
-                        select.getInputs().add(mutable(tCtx.op));
-                        tCtx.op = select;
-                        ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
-                                .getLogicalVariable());
-                        tCtx.popVariableScope();
-                        tCtx = tCtx.popContext();
+                        ILogicalExpression boolTestTmp = vre(pLVar);
+                        if (tCtx.op.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
+                            ILogicalExpression expression = ((AssignOperator) tCtx.op).getExpressions().get(0)
+                                    .getValue();
+                            if (expression.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL
+                                    && ((AbstractFunctionCallExpression) expression).getFunctionIdentifier().equals(
+                                            BuiltinOperators.CHILD.getFunctionIdentifier())) {
+                                boolTestTmp = sfce(BuiltinFunctions.FN_COUNT_1, boolTestTmp);
+                            }
+                        }
+                        ILogicalExpression boolTest = sfce(BuiltinFunctions.FN_BOOLEAN_1, boolTestTmp);
+                        ILogicalExpression condition = sfce(BuiltinOperators.IF_THEN_ELSE, tTest, posTest, boolTest);
+                        if (i++ == 0) {
+                            selectCondition = condition;
+                        } else {
+                            selectCondition = sfce(BuiltinOperators.AND, selectCondition, condition);
+                        }
                     }
+                    SelectOperator select = new SelectOperator(mutable(selectCondition), false, null);
+                    select.getInputs().add(mutable(tCtx.op));
+                    tCtx.op = select;
+                    ctxExpr = vre(tCtx.varScope.lookupVariable(XMLQueryCompilerConstants.DOT_VAR_NAME)
+                            .getLogicalVariable());
                 }
                 if (popScope) {
                     tCtx.popVariableScope();
@@ -1969,6 +2001,10 @@ public class XMLQueryTranslator {
         }
     }
 
+    private ILogicalExpression data(ILogicalExpression expr) throws SystemException {
+        return new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1, Collections.singletonList(mutable(expr)));
+    }
+
     private ILogicalExpression promote(ILogicalExpression expr, SequenceType type) throws SystemException {
         int typeCode = currCtx.lookupSequenceType(type);
         return sfce(BuiltinOperators.PROMOTE, expr,
@@ -1983,7 +2019,7 @@ public class XMLQueryTranslator {
 
     private ILogicalExpression cast(ILogicalExpression expr, SequenceType type) throws SystemException {
         int typeCode = currCtx.lookupSequenceType(type);
-        return sfce(BuiltinOperators.CAST, expr,
+        return sfce(BuiltinOperators.CAST, data(expr),
                 ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), typeCode));
     }
 

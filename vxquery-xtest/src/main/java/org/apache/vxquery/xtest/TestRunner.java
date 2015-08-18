@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
 import org.apache.vxquery.context.DynamicContext;
@@ -32,6 +33,7 @@ import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
+import org.apache.vxquery.xmlquery.query.VXQueryCompilationListener;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
 import edu.uci.ics.hyracks.api.client.HyracksConnection;
@@ -52,8 +54,6 @@ import edu.uci.ics.hyracks.control.nc.NodeControllerService;
 import edu.uci.ics.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 
 public class TestRunner {
-    private static final int FRAME_SIZE = 65536;
-
     private static final Pattern EMBEDDED_SYSERROR_PATTERN = Pattern
             .compile("org\\.apache\\.vxquery\\.exceptions\\.SystemException: (\\p{javaUpperCase}{4}\\d{4})");
 
@@ -101,10 +101,20 @@ public class TestRunner {
         if (opts.verbose) {
             System.err.println("Starting " + testCase.getXQueryDisplayName());
         }
+
         long start = System.currentTimeMillis();
+
         try {
             try {
-                XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, FRAME_SIZE);
+                FileInputStream query = new FileInputStream(testCase.getXQueryFile());
+                if (opts.showQuery) {
+                    System.err.println("***Query for " + testCase.getXQueryDisplayName() + ": ");
+                    System.err.println(IOUtils.toString(query, "UTF-8"));
+                }
+
+                VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
+                        opts.showOET, opts.showRP);
+                XMLQueryCompiler compiler = new XMLQueryCompiler(listener, new String[] { "nc1" }, opts.frameSize);
                 Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                 CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
                         RootStaticContextImpl.INSTANCE), new ResultSetId(testCase.getXQueryDisplayName().hashCode()),
@@ -168,6 +178,16 @@ public class TestRunner {
             }
             long end = System.currentTimeMillis();
             res.time = end - start;
+        }
+        if (opts.showResult) {
+            if (res.result == null) {
+                System.err.println("***Error: ");
+                System.err.println("Message: " + res.error.getMessage());
+                res.error.printStackTrace();
+            } else {
+                System.err.println("***Result: ");
+                System.err.println(res.result);
+            }
         }
         return res;
     }

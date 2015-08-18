@@ -121,8 +121,15 @@ public abstract class AbstractTestCaseFactory {
             FileReader characterStream = new FileReader(catalog);
             parser.parse(new InputSource(characterStream));
             characterStream.close();
+        } catch (SAXException e) {
+            System.err.println("Unable to parse file: " + catalog.getAbsolutePath());
+            e.printStackTrace();
         } catch (FileNotFoundException e) {
             System.err.println("Test Catalog has not been found: " + catalog.getAbsolutePath());
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("I: " + catalog.getAbsolutePath());
+            e.printStackTrace();
         }
         return count;
     }

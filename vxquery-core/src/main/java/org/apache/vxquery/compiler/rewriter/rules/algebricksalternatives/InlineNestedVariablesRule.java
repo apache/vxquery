@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.compiler.rewriter.rules;
+package org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class InlineNestedVariablesRule extends InlineVariablesRule {
             List<Mutable<ILogicalExpression>> exprs = assignOp.getExpressions();
             for (int i = 0; i < vars.size(); i++) {
                 ILogicalExpression expr = exprs.get(i).getValue();
-                // Ignore functions that are either in the doNotInline set or are non-functional               
+                // Ignore functions that are either in the doNotInline set or are non-functional
                 if (expr.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
                     AbstractFunctionCallExpression funcExpr = (AbstractFunctionCallExpression) expr;
                     if (doNotInlineFuncs.contains(funcExpr.getFunctionIdentifier()) || !funcExpr.isFunctional()) {

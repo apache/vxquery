@@ -23,6 +23,7 @@
 <!ENTITY AggregatePartition4Queries SYSTEM "cat/AggregatePartition4Queries.xml">
 
 <!ENTITY FunctionsAndOperatorsOnNumericsQueries SYSTEM "cat/FunctionsAndOperatorsOnNumericsQueries.xml">
+<!ENTITY FunctionsAndOperatorsThatGenerateSequences SYSTEM "cat/FunctionsAndOperatorsThatGenerateSequences.xml">
 
 <!ENTITY GhcndPartition1Queries SYSTEM "cat/GhcndPartition1Queries.xml">
 <!ENTITY GhcndPartition2Queries SYSTEM "cat/GhcndPartition2Queries.xml">
@@ -84,6 +85,9 @@
      <source ID="ghcnd_quarter_4" FileName="TestSources/ghcnd/half_2/quarter_4" Creator="Preston Carman">
        <description last-mod="2014-04-02">Collection of files</description>
      </source>
+     <source ID="station_xml_file" FileName="TestSources/ghcnd/half_1/quarter_1/stations/US000000001.xml" Creator="Shivani Mall">
+       <description last-mod="2015-06-26">File</description>
+     </source>
    </sources>
    <test-group name="SingleQuery" featureOwner="Preston Carman">
       <GroupInfo>
@@ -131,6 +135,19 @@
             <description/>
          </GroupInfo>
          &FunctionsAndOperatorsOnNumericsQueries;
+      </test-group>
+   </test-group>
+   <test-group name="FunctionsAndOperatorsThatGenerateSequencesQueries" featureOwner="Shivani Mall">
+      <GroupInfo>
+         <title>Functions And Operators That Generate Sequences Queries</title>
+         <description/>
+      </GroupInfo>
+      <test-group name="FunctionsAndOperatorsThatGenerateSequencesTests" featureOwner="Shivani Mall">
+         <GroupInfo>
+            <title>Functions And Operators That Generate Sequences Execution Tests</title>
+            <description/>
+         </GroupInfo>
+         &FunctionsAndOperatorsThatGenerateSequences;
       </test-group>
    </test-group>
    <test-group name="GhcndPartitionQueries" featureOwner="Preston Carman">

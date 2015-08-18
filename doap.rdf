@@ -38,8 +38,8 @@
     <release>
       <Version>
         <name>Apache VXQuery</name>
-        <created>2014-09-07</created>
-        <revision>0.4</revision>
+        <created>2015-03-05</created>
+        <revision>0.5</revision>
       </Version>
     </release>
     <repository>
