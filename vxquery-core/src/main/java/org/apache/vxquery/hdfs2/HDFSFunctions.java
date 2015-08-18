@@ -159,9 +159,7 @@ public class HDFSFunctions {
      * @return true if is successfully finds the Hadoop/HDFS home directory
      */
     private boolean locateConf() {
-        this.conf_path = System.getenv("HADOOP_CONF_DIR");
         if (this.conf_path == null) {
-            
             // load properties file
             Properties prop = new Properties();
             String propFilePath = "../vxquery-server/src/main/resources/conf/cluster.properties";
@@ -178,9 +176,13 @@ public class HDFSFunctions {
                 System.err.println(e);
                 return false;
             }
-
             // get the property value for HDFS_CONF
             this.conf_path = prop.getProperty("HDFS_CONF");
+            if (this.conf_path == null)
+            {
+                this.conf_path = System.getenv("HADOOP_CONF_DIR");
+                return this.conf_path != null;
+            }
             return this.conf_path != null;
         }
         return this.conf_path != null;
