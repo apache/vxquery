@@ -64,7 +64,7 @@ return $x/title
   If I want only one file, the <<books.xml>> to be parsed from HDFS, my query will look like this:
 
 ----------
-for $x in document("hdfs://user/hduser/store/books.xml")
+for $x in doc("hdfs://user/hduser/store/books.xml")
 where $x/year>2004
 return $x/title
 ----------
