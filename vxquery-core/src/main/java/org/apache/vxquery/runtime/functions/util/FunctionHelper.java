@@ -1190,33 +1190,32 @@ public class FunctionHelper {
         } catch (SystemException e) {
             throw new HyracksDataException(e);
         }
-        File file = new File(fName);
-        if(file.exists())
-        {
-        	parser.parseDocument(file, abvs);
+        if (!fName.contains("hdfs:/")) {
+            File file = new File(fName);
+            if (file.exists()) {
+                parser.parseDocument(file, abvs);
+            }
         }
         //else check in HDFS file system
-        else
-        {
-        	HDFSFunctions hdfs = new HDFSFunctions();
-        	FileSystem fs = hdfs.getFileSystem();
-        	if (fs != null)
-        	{
-	        	Path xmlDocument = new Path(fName);
-	        	try {
-					if (fs.exists(xmlDocument))
-					{
-						InputStream in =  fs.open(xmlDocument).getWrappedStream();
-						parser.parseHDFSDocument( in, abvs);
-					}
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					System.err.println(e);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					System.err.println(e);
-				}
-        	}
+        else {
+            fName = fName.replaceAll("hdfs:/", "");
+            HDFSFunctions hdfs = new HDFSFunctions();
+            FileSystem fs = hdfs.getFileSystem();
+            if (fs != null) {
+                Path xmlDocument = new Path(fName);
+                try {
+                    if (fs.exists(xmlDocument)) {
+                        InputStream in = fs.open(xmlDocument).getWrappedStream();
+                        parser.parseHDFSDocument(in, abvs);
+                    }
+                } catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    System.err.println(e);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    System.err.println(e);
+                }
+            }
         }
     }
 
