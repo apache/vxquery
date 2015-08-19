@@ -37,24 +37,37 @@ Executing a Query in HDFS
 
 ** a. Reading them as whole files.
 
-  For this option you do not need to change your query at all. VXQuery will read the path of the files you request in your query and try to locate them 
-
-  1) First in your local file system
-
-  and if the path does not exist there,
-
-  2) VXQuery will try to locate them on HDFS.
-
-
+  For this option you only need to change the path to files.To define that your file(s) exist and should be read from HDFS you must add <"hdfs:/"> in front of the path.VXQuery will read the path of the files you request in your query and try to locate them.
 
   So in order to run a query that will read the input files from HDFS you need to make sure that
 
   a) The configuration path is correctly set to the one of your HDFS system.
 
-  b) The path defined in your query does not exists on your local filesystem.
+  b) The path defined in your query begins with <hdfs:/> and the full path to the file(s).
 
   c) The path exists on HDFS and the user that runs the query has read permission to these files.
 
+*** Example
+
+  I want to find all the <books> that are published after 2004.
+
+  The file is located in HDFS in this path </user/hduser/store/books.xml>
+
+  My query will look like this:
+
+----------
+for $x in collection("hdfs://user/hduser/store")
+where $x/year>2004
+return $x/title
+----------
+
+  If I want only one file, the <<books.xml>> to be parsed from HDFS, my query will look like this:
+
+----------
+for $x in document("hdfs://user/hduser/store/books.xml")
+where $x/year>2004
+return $x/title
+----------
 
 ** b. Reading them block by block
 
@@ -63,6 +76,8 @@ Executing a Query in HDFS
   <collection-with-tag> accepts two arguments, one is the path to the HDFS directory you have stored your input files, and the second is a specific <<tag>> that exists in the input file(s).This is the tag of the element that contains the fields that your query is looking for.
 
 *** Example
+  
+  The same example, using <<collection-with-tag>>.
 
   My input file <books.xml>:
 
@@ -104,10 +119,6 @@ Executing a Query in HDFS
 
 </bookstore>
 ----------------------------
-
-  I want to find all the <books> that are published after 2004.
-
-  The file is located in HDFS in this path </user/hduser/store/books.xml>
 
   My query will look like this:
 
