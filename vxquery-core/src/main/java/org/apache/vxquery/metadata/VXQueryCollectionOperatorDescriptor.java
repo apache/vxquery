@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,7 @@ import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
+import org.xml.sax.SAXException;
 
 import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
 import edu.uci.ics.hyracks.api.dataflow.IOperatorNodePushable;
@@ -118,7 +121,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                     File collectionDirectory = new File(collectionModifiedName);
                     //check if directory is in the local file system
                     if (collectionDirectory.exists()) {
-                        System.out.println("local");
                         // Go through each tuple.
                         if (collectionDirectory.isDirectory()) {
                             for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
@@ -138,11 +140,11 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         }
                     }
                 } else {
-                    collectionModifiedName = collectionModifiedName.replaceAll("hdfs:/", "");
                     // Else check in HDFS file system
                     // Get instance of the HDFS filesystem
                     FileSystem fs = hdfs.getFileSystem();
                     if (fs != null) {
+                        collectionModifiedName = collectionModifiedName.replaceAll("hdfs:/", "");
                         Path directory = new Path(collectionModifiedName);
                         Path xmlDocument;
                         if (tag != null) {
@@ -201,7 +203,11 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                 }
 
                             } catch (IOException e) {
-                                System.err.println(e);
+                                e.printStackTrace();
+                            } catch (ParserConfigurationException e1) {
+                                e1.printStackTrace();
+                            } catch (SAXException e1) {
+                                e1.printStackTrace();
                             }
                         } else {
                             try {
@@ -233,11 +239,11 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                 System.err.println(e);
                             }
                         }
-                    }
-                    try {
-                        fs.close();
-                    } catch (IOException e) {
-                        System.err.println(e);
+                        try {
+                            fs.close();
+                        } catch (IOException e) {
+                            System.err.println(e);
+                        }
                     }
                 }
             }

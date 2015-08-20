@@ -80,7 +80,6 @@ public class XTest {
         trf.registerReporters(reporters);
         TestCaseFactory tcf = new TestCaseFactory(trf, eSvc, opts);
         count = tcf.process();
-
     }
 
     synchronized void waitForCompletion() throws InterruptedException {

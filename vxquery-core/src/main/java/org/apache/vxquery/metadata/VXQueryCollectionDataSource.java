@@ -79,7 +79,7 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
     public String[] getPartitions() {
         return collectionPartitions;
     }
-    
+
     public void setPartitions(String[] collectionPartitions) {
         this.collectionPartitions = collectionPartitions;
     }
@@ -87,14 +87,12 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
     public int getPartitionCount() {
         return collectionPartitions.length;
     }
-    
-    public String getTag()
-    {
+
+    public String getTag() {
         return this.tag;
     }
-    
-    public void setTag(String tag)
-    {
+
+    public void setTag(String tag) {
         this.tag = tag;
     }
 

@@ -76,4 +76,4 @@ public class XTestOptions {
 
     @Option(name = "-showresult", usage = "Show query result.")
     boolean showResult;
-    }
+}

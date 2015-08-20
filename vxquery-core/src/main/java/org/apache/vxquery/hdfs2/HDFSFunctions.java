@@ -69,6 +69,9 @@ public class HDFSFunctions {
     private ArrayList<ArrayList<String>> nodes;
     private File nodeXMLfile;
     private HashMap<Integer, String> schedule;
+    private final String TEMP = "java.io.tmpdir";
+    private final String dfs_path = "vxquery_splits_schedule.txt";
+    private final String filepath = System.getProperty(TEMP) + "splits_schedule.txt";
 
     /**
      * Create the configuration and add the paths for core-site and hdfs-site as resources.
@@ -92,8 +95,7 @@ public class HDFSFunctions {
             job = new Job(conf, "Read from HDFS");
             Path input = new Path(filepath);
             FileInputFormat.addInputPath(job, input);
-            //TODO change input format class to XMLInputFormatClassOneBufferSolution
-            job.setInputFormatClass(XmlCollectionByTagInputFormat.class);
+            job.setInputFormatClass(XmlCollectionWithTagInputFormat.class);
             inputFormat = ReflectionUtils.newInstance(job.getInputFormatClass(), job.getConfiguration());
             splits = inputFormat.getSplits(job);
         } catch (IOException e) {
@@ -178,8 +180,7 @@ public class HDFSFunctions {
             }
             // get the property value for HDFS_CONF
             this.conf_path = prop.getProperty("HDFS_CONF");
-            if (this.conf_path == null)
-            {
+            if (this.conf_path == null) {
                 this.conf_path = System.getenv("HADOOP_CONF_DIR");
                 return this.conf_path != null;
             }
@@ -265,7 +266,7 @@ public class HDFSFunctions {
         return splits_map;
     }
 
-    public void scheduleSplits() throws IOException {
+    public void scheduleSplits() throws IOException, ParserConfigurationException, SAXException {
 
         schedule = new HashMap<Integer, String>();
         ArrayList<String> empty = new ArrayList<String>();
@@ -311,67 +312,55 @@ public class HDFSFunctions {
                 }
             }
         }
-        // TODO remove from here this is for debugging only
-        for (int s : schedule.keySet()) {
-            System.out.println("split: " + s + ", host: " + schedule.get(s));
-        }
     }
 
     /**
      * Read the hostname and the ip address of every node from the xml cluster configuration file.
      * Save the information inside an ArrayList.
+     * 
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
      */
-    public void readNodesFromXML() {
+    public void readNodesFromXML() throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
-        try {
-            dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(nodeXMLfile);
-            doc.getDocumentElement().normalize();
+        dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(nodeXMLfile);
+        doc.getDocumentElement().normalize();
 
-            nodes = new ArrayList<ArrayList<String>>();
-            NodeList nList = doc.getElementsByTagName("node");
+        nodes = new ArrayList<ArrayList<String>>();
+        NodeList nList = doc.getElementsByTagName("node");
 
-            for (int temp = 0; temp < nList.getLength(); temp++) {
+        for (int temp = 0; temp < nList.getLength(); temp++) {
 
-                Node nNode = nList.item(temp);
+            Node nNode = nList.item(temp);
 
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
-                    ArrayList<String> info = new ArrayList<String>();
-                    info.add(eElement.getElementsByTagName("id").item(0).getTextContent());
-                    info.add(eElement.getElementsByTagName("cluster_ip").item(0).getTextContent());
-                    nodes.add(info);
-                }
+                Element eElement = (Element) nNode;
+                ArrayList<String> info = new ArrayList<String>();
+                info.add(eElement.getElementsByTagName("id").item(0).getTextContent());
+                info.add(eElement.getElementsByTagName("cluster_ip").item(0).getTextContent());
+                nodes.add(info);
             }
-        } catch (ParserConfigurationException e) {
-            System.err.println(e);
-        } catch (SAXException e) {
-            System.err.println(e);
-        } catch (IOException e) {
-            System.err.println(e);
         }
+
     }
 
     /**
      * Writes the schedule to a temporary file, then uploads the file to the HDFS.
+     * 
+     * @throws UnsupportedEncodingException
+     * @throws FileNotFoundException
      */
-    public void addScheduleToDistributedCache() {
-        String filepath = "/tmp/splits_schedule.txt";
-        String dfs_path = "vxquery_splits_schedule.txt";
+    public void addScheduleToDistributedCache() throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer;
-        try {
-            writer = new PrintWriter(filepath, "UTF-8");
-            for (int split : this.schedule.keySet()) {
-                writer.write(split + "," + this.schedule.get(split));
-            }
-            writer.close();
-        } catch (FileNotFoundException e) {
-            System.err.println(e);
-        } catch (UnsupportedEncodingException e) {
-            System.err.println(e);
+        writer = new PrintWriter(filepath, "UTF-8");
+        for (int split : this.schedule.keySet()) {
+            writer.write(split + "," + this.schedule.get(split));
         }
+        writer.close();
         // Add file to HDFS
         this.put(filepath, dfs_path);
     }
@@ -407,7 +396,6 @@ public class HDFSFunctions {
                 }
             }
         } catch (HyracksDataException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         return null;

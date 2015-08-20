@@ -38,7 +38,7 @@ import org.apache.hadoop.fs.FileStatus;
 /**
  * Reads records that are delimited by a specific begin/end tag.
  */
-public class XmlCollectionByTagInputFormat extends TextInputFormat {
+public class XmlCollectionWithTagInputFormat extends TextInputFormat {
 
     public static String STARTING_TAG;
     public static String ENDING_TAG;
@@ -64,7 +64,6 @@ public class XmlCollectionByTagInputFormat extends TextInputFormat {
         private final byte[] start_tag;
         private final long start;
         private final long end;
-        private int current_block = 0;
         private final FSDataInputStream fsin;
         private final DataOutputBuffer buffer = new DataOutputBuffer();
         private LongWritable currentKey;
@@ -98,8 +97,6 @@ public class XmlCollectionByTagInputFormat extends TextInputFormat {
          * @throws IOException
          */
         private boolean next(LongWritable key, Text value) throws IOException {
-            // current_block = nextBlock();
-            //if (fsin.getPos() < end && current_block < blocks.length)
             if (fsin.getPos() < end) {
                 try {
                     if (readBlock(true)) {
@@ -139,7 +136,6 @@ public class XmlCollectionByTagInputFormat extends TextInputFormat {
                     if (readUntilMatch(start_tag, false)) {
                         buffer.write(start_tag);
                         readUntilMatch(end_tag, true);
-                        //buffer.write(this.nl);
                         read = true;
                     }
                 } else {
