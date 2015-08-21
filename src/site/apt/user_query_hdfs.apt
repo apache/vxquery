@@ -18,42 +18,68 @@ Executing a Query in HDFS
 
 * 1. Connecting VXQuery with HDFS
 
-    The only variable VXQuery needs in order to access HDFS is the path to the HDFS configuration directory.
+    The only variable VXQuery needs in order to access HDFS is the path to the 
+    HDFS configuration directory.
 
-    We define that path in the <<cluster.properties>> file that is located in <<vxquery-root/vxquery-server/src/resources/conf/>> directory.
 
-    Inside that file we need to change the value of the variable <<HDFS_CONF>> to the full system path of the HDFS configuration.
+    We define that path in the <<cluster.properties>> file that is located in 
+    <<vxquery-root/vxquery-server/src/resources/conf/>> directory.
 
-    For example, <HDFS_CONF=/usr/local/hadoop/etc/hadoop> defines that the configuration files for our HDFS installation are located in </usr/local/hadoop/etc/hadoop> path.
+
+    Inside that file we need to change the value of the variable <<HDFS_CONF>> 
+    to the full system path of the HDFS configuration.
+
+
+    For example, <HDFS_CONF=/usr/local/hadoop/etc/hadoop> defines that the 
+    configuration files for our HDFS installation are located in 
+    </usr/local/hadoop/etc/hadoop> path.
 
 
 * 2. Running the Query
 
+
   For files stored in HDFS there are 2 ways to access them from VXQuery.
+
 
   [[a]] Reading them as whole files.
 
+
   [[b]] Reading them block by block.
+
 
 ** a. Reading them as whole files.
 
-  For this option you only need to change the path to files.To define that your file(s) exist and should be read from HDFS you must add <"hdfs:/"> in front of the path.VXQuery will read the path of the files you request in your query and try to locate them.
+  For this option you only need to change the path to files.To define that your 
+  file(s) exist and should be read from HDFS you must add <"hdfs:/"> in front 
+  of the path.VXQuery will read the path of the files you request in your query 
+  and try to locate them.
 
-  So in order to run a query that will read the input files from HDFS you need to make sure that
+
+  So in order to run a query that will read the input files from HDFS you need 
+  to make sure that
+
 
   a) The configuration path is correctly set to the one of your HDFS system.
 
-  b) The path defined in your query begins with <hdfs:/> and the full path to the file(s).
 
-  c) The path exists on HDFS and the user that runs the query has read permission to these files.
+  b) The path defined in your query begins with <hdfs://> and the full path to 
+  the file(s).
+
+
+  c) The path exists on HDFS and the user that runs the query has read permission 
+  to these files.
+
 
 *** Example
 
   I want to find all the <books> that are published after 2004.
 
+
   The file is located in HDFS in this path </user/hduser/store/books.xml>
 
+
   My query will look like this:
+
 
 ----------
 for $x in collection("hdfs://user/hduser/store")
@@ -61,7 +87,10 @@ where $x/year>2004
 return $x/title
 ----------
 
-  If I want only one file, the <<books.xml>> to be parsed from HDFS, my query will look like this:
+
+  If I want only one file, the <<books.xml>> to be parsed from HDFS, my query will 
+  look like this:
+
 
 ----------
 for $x in doc("hdfs://user/hduser/store/books.xml")
@@ -69,11 +98,20 @@ where $x/year>2004
 return $x/title
 ----------
 
+
 ** b. Reading them block by block
 
-  In order to use that option you need to modify your query.Instead of using the <collection> or <doc> function to define your input file(s) you need to use <collection-with-tag>.
 
-  <collection-with-tag> accepts two arguments, one is the path to the HDFS directory you have stored your input files, and the second is a specific <<tag>> that exists in the input file(s).This is the tag of the element that contains the fields that your query is looking for.
+  In order to use that option you need to modify your query.Instead of using the 
+  <collection> or <doc> function to define your input file(s) you need to use 
+  <collection-with-tag>.
+
+
+  <collection-with-tag> accepts two arguments, one is the path to the HDFS directory 
+  you have stored your input files, and the second is a specific <<tag>> that exists 
+  in the input file(s).This is the tag of the element that contains the fields that 
+  your query is looking for.
+
 
 *** Example
   
@@ -120,7 +158,9 @@ return $x/title
 </bookstore>
 ----------------------------
 
+
   My query will look like this:
+
 
 ----------------------------
 for $x in collectionwithtag("/user/hduser/store","book")
@@ -128,4 +168,6 @@ where $x/year>2004
 return $x/title
 ----------------------------
 
-  Take notice that I defined the path to the directory containing the file and not the file, <collection-with-tag> expects path to the directory.
+
+  Take notice that I defined the path to the directory containing the file 
+  and not the file, <collection-with-tag> expects path to the directory.
