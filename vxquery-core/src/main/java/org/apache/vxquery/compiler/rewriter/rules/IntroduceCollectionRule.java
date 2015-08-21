@@ -64,9 +64,10 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String collectionName = getCollectionName(opRef);
+        String args[] = getCollectionName(opRef);
 
-        if (collectionName != null) {
+        if (args != null) {
+            String collectionName = args[0];
             // Build the new operator and update the query plan.
             int collectionId = vxqueryContext.newCollectionId();
             VXQueryCollectionDataSource ds = VXQueryCollectionDataSource.create(collectionId, collectionName,

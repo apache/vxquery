@@ -37,7 +37,7 @@ public class CollectionWithTagRule extends AbstractCollectionRule {
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String args[] = getCollectionWithTagName(opRef);
+        String args[] = getCollectionName(opRef);
 
         if (args != null) {
             // Build the new operator and update the query plan.
