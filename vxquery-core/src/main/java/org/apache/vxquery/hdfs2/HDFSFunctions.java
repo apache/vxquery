@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,6 +59,7 @@ import edu.uci.ics.hyracks.hdfs2.dataflow.FileSplitsFactory;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.vxquery.metadata.VXQueryCollectionOperatorDescriptor;
 
 public class HDFSFunctions {
 
@@ -72,6 +75,7 @@ public class HDFSFunctions {
     private final String TEMP = "java.io.tmpdir";
     private final String dfs_path = "vxquery_splits_schedule.txt";
     private final String filepath = System.getProperty(TEMP) + "splits_schedule.txt";
+    protected static final Logger LOGGER = Logger.getLogger(HDFSFunctions.class.getName());
 
     /**
      * Create the configuration and add the paths for core-site and hdfs-site as resources.
@@ -99,11 +103,17 @@ public class HDFSFunctions {
             inputFormat = ReflectionUtils.newInstance(job.getInputFormatClass(), job.getConfiguration());
             splits = inputFormat.getSplits(job);
         } catch (IOException e) {
-            System.err.println(e);
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.severe(e.getMessage());
+            }
         } catch (ClassNotFoundException e) {
-            System.err.println(e);
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.severe(e.getMessage());
+            }
         } catch (InterruptedException e) {
-            System.err.println(e);
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.severe(e.getMessage());
+            }
         }
     }
 
@@ -113,15 +123,13 @@ public class HDFSFunctions {
      * 
      * @param filename
      * @return
+     * @throws IOException
+     * @throws IllegalArgumentException
      */
-    public boolean isLocatedInHDFS(String filename) {
-        try {
-            //search file path
-            if (fs.exists(new Path(filename))) {
-                return true;
-            }
-        } catch (IOException ex) {
-            System.err.println(ex);
+    public boolean isLocatedInHDFS(String filename) throws IllegalArgumentException, IOException {
+        //search file path
+        if (fs.exists(new Path(filename))) {
+            return true;
         }
         return searchInDirectory(fs.getHomeDirectory(), filename) != null;
     }
@@ -148,8 +156,10 @@ public class HDFSFunctions {
                     return path;
                 }
             }
-        } catch (IOException ex) {
-            System.err.println(ex);
+        } catch (IOException e) {
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.severe(e.getMessage());
+            }
         }
         return null;
     }
@@ -164,18 +174,17 @@ public class HDFSFunctions {
         if (this.conf_path == null) {
             // load properties file
             Properties prop = new Properties();
-            String propFilePath = "../vxquery-server/src/main/resources/conf/cluster.properties";
+            String propFilePath = "vxquery-server/src/main/resources/conf/cluster.properties";
             try {
                 prop.load(new FileInputStream(propFilePath));
             } catch (FileNotFoundException e) {
-                propFilePath = "vxquery-server/src/main/resources/conf/cluster.properties";
-                try {
-                    prop.load(new FileInputStream(propFilePath));
-                } catch (FileNotFoundException e1) {
-                } catch (IOException e1) {
+                if (LOGGER.isLoggable(Level.SEVERE)) {
+                    LOGGER.severe(e.getMessage());
                 }
             } catch (IOException e) {
-                System.err.println(e);
+                if (LOGGER.isLoggable(Level.SEVERE)) {
+                    LOGGER.severe(e.getMessage());
+                }
                 return false;
             }
             // get the property value for HDFS_CONF
@@ -205,12 +214,16 @@ public class HDFSFunctions {
                     fs.delete(dest, true); //recursive delete
                 }
             } catch (IOException e) {
-                System.err.println(e);
+                if (LOGGER.isLoggable(Level.SEVERE)) {
+                    LOGGER.severe(e.getMessage());
+                }
             }
             try {
                 fs.copyFromLocalFile(path, dest);
             } catch (IOException e) {
-                System.err.println(e);
+                if (LOGGER.isLoggable(Level.SEVERE)) {
+                    LOGGER.severe(e.getMessage());
+                }
             }
         }
         return false;
@@ -229,11 +242,15 @@ public class HDFSFunctions {
             try {
                 fs = FileSystem.get(conf);
                 return this.fs;
-            } catch (IOException ex) {
-                System.err.println(ex);
+            } catch (IOException e) {
+                if (LOGGER.isLoggable(Level.SEVERE)) {
+                    LOGGER.severe(e.getMessage());
+                }
             }
         } else {
-            System.err.println("Could not locate hdfs configuarion folder.");
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.severe("Could not locate HDFS configuration folder.");
+            }
         }
         return null;
     }
@@ -388,15 +405,23 @@ public class HDFSFunctions {
                     reader.initialize(inputSplits.get(i), context);
                     return reader;
                 } catch (HyracksDataException e) {
-                    System.err.println(e);
+                    if (LOGGER.isLoggable(Level.SEVERE)) {
+                        LOGGER.severe(e.getMessage());
+                    }
                 } catch (IOException e) {
-                    System.err.println(e);
+                    if (LOGGER.isLoggable(Level.SEVERE)) {
+                        LOGGER.severe(e.getMessage());
+                    }
                 } catch (InterruptedException e) {
-                    System.err.println(e);
+                    if (LOGGER.isLoggable(Level.SEVERE)) {
+                        LOGGER.severe(e.getMessage());
+                    }
                 }
             }
-        } catch (HyracksDataException e1) {
-            e1.printStackTrace();
+        } catch (HyracksDataException e) {
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.severe(e.getMessage());
+            }
         }
         return null;
     }
@@ -444,7 +469,9 @@ public class HDFSFunctions {
             Document doc = builder.parse(new InputSource(new StringReader(xmlStr)));
             return doc;
         } catch (Exception e) {
-            System.err.println(e);
+            if (LOGGER.isLoggable(Level.SEVERE)) {
+                LOGGER.severe(e.getMessage());
+            }
         }
         return null;
     }

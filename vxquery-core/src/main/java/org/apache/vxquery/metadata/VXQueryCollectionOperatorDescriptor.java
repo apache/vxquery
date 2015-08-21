@@ -198,16 +198,24 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                         }
 
                                     } catch (InterruptedException e) {
-                                        System.err.println(e);
+                                        if (LOGGER.isLoggable(Level.SEVERE)) {
+                                            LOGGER.severe(e.getMessage());
+                                        }
                                     }
                                 }
 
                             } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (ParserConfigurationException e1) {
-                                e1.printStackTrace();
-                            } catch (SAXException e1) {
-                                e1.printStackTrace();
+                                if (LOGGER.isLoggable(Level.SEVERE)) {
+                                    LOGGER.severe(e.getMessage());
+                                }
+                            } catch (ParserConfigurationException e) {
+                                if (LOGGER.isLoggable(Level.SEVERE)) {
+                                    LOGGER.severe(e.getMessage());
+                                }
+                            } catch (SAXException e) {
+                                if (LOGGER.isLoggable(Level.SEVERE)) {
+                                    LOGGER.severe(e.getMessage());
+                                }
                             }
                         } else {
                             try {
@@ -234,15 +242,21 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                             + directory + ") passed to collection.");
                                 }
                             } catch (FileNotFoundException e) {
-                                System.err.println(e);
+                                if (LOGGER.isLoggable(Level.SEVERE)) {
+                                    LOGGER.severe(e.getMessage());
+                                }
                             } catch (IOException e) {
-                                System.err.println(e);
+                                if (LOGGER.isLoggable(Level.SEVERE)) {
+                                    LOGGER.severe(e.getMessage());
+                                }
                             }
                         }
                         try {
                             fs.close();
                         } catch (IOException e) {
-                            System.err.println(e);
+                            if (LOGGER.isLoggable(Level.SEVERE)) {
+                                LOGGER.severe(e.getMessage());
+                            }
                         }
                     }
                 }
