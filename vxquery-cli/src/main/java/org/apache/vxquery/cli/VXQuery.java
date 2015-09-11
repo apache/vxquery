@@ -15,7 +15,9 @@
 package org.apache.vxquery.cli;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
@@ -115,8 +117,9 @@ public class VXQuery {
             timingMessage("Execution time: " + (end.getTime() - start.getTime()) + " ms");
             if (opts.repeatExec > opts.timingIgnoreQueries) {
                 long mean = sumTiming / (opts.repeatExec - opts.timingIgnoreQueries);
-                double sd = Math.sqrt(sumSquaredTiming
-                        / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue()) - mean * mean);
+                double sd = Math
+                        .sqrt(sumSquaredTiming / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue())
+                                - mean * mean);
                 timingMessage("Average execution time: " + mean + " ms");
                 timingMessage("Standard deviation: " + String.format("%.4f", sd));
                 timingMessage("Coefficient of variation: " + String.format("%.4f", (sd / mean)));
@@ -199,7 +202,12 @@ public class VXQuery {
             DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
             js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
-            PrintWriter writer = new PrintWriter(System.out, true);
+            OutputStream resultWriter = System.out;
+            if (opts.resultFile != null) {
+                resultWriter = new FileOutputStream(new File(opts.resultFile));
+            }
+
+            PrintWriter writer = new PrintWriter(resultWriter, true);
             // Repeat execution for number of times provided in -repeatexec argument
             for (int i = 0; i < opts.repeatExec; ++i) {
                 start = opts.timing ? new Date() : null;
@@ -400,6 +408,9 @@ public class VXQuery {
 
         @Option(name = "-repeatexec", usage = "Number of times to repeat execution.")
         private int repeatExec = 1;
+
+        @Option(name = "-result-file", usage = "File path to save the query result.")
+        private String resultFile = null;
 
         @Option(name = "-timing", usage = "Produce timing information.")
         private boolean timing;
