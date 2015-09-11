@@ -202,12 +202,12 @@ public class VXQuery {
             DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
             js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
-            OutputStream resultWriter = System.out;
+            OutputStream resultStream = System.out;
             if (opts.resultFile != null) {
-                resultWriter = new FileOutputStream(new File(opts.resultFile));
+                resultStream = new FileOutputStream(new File(opts.resultFile));
             }
 
-            PrintWriter writer = new PrintWriter(resultWriter, true);
+            PrintWriter writer = new PrintWriter(resultStream, true);
             // Repeat execution for number of times provided in -repeatexec argument
             for (int i = 0; i < opts.repeatExec; ++i) {
                 start = opts.timing ? new Date() : null;
