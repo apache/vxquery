@@ -23,22 +23,22 @@ DATASET=${4}
 EMAIL=${5}
 
 
-mkdir -p ~/logs/saxon/
+mkdir -p ~/logs/basex/
 
 for j in $(find ${1} -name '*q??.xq')
 do
     date
-    echo "Running Saxon query: ${j}"
-time for i in {1..${REPEAT}}; do JAVA_OPTS="-Xmx8g" java -cp saxon9he.jar net.sf.saxon.Query -t -repeat:${REPEAT} -q:${j} >> ~/logs/saxon/$(basename "${j}").log 2>&1; done; 
+    echo "Running BaseX query: ${j}"
+    time for i in {1..${REPEAT}}; do JAVA_OPTS="-Xmx8g" java -cp BaseX823.jar org.basex.BaseX -v -r${REPEAT} ${j} >> ~/logs/basex/$(basename "${j}").log 2>&1; done;
 done
 
 
 if which programname >/dev/null;
 then
     echo "Sending out e-mail notification."
-    SUBJECT="Saxon Tests Finished (${DATASET})"
+    SUBJECT="BaseX Tests Finished (${DATASET})"
     /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
-    Completed all Saxon tests on ${DATASET}.
+    Completed all BaseX tests on ${DATASET}.
     EOM
 else
     echo "No mail command to use."
