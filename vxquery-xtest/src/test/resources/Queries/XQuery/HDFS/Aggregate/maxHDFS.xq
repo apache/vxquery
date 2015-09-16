@@ -18,7 +18,7 @@
 (: XQuery Aggregate Query :)
 (: Find the highest max temperature.                                            :)
 fn:max(
-    let $collection := "vxquery-hdfs-test"
+    let $collection := "hdfs://tmp/vxquery-hdfs-test"
     for $r in collection($collection)/dataCollection/data
     where $r/dataType eq "TMAX" 
     return $r/value

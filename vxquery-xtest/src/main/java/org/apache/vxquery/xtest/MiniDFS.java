@@ -20,7 +20,9 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.hadoop.mapred.JobConf;
@@ -77,7 +79,8 @@ public class MiniDFS {
                 src = new Path(DATA_PATH);
             }
         }
-        Path dest = new Path("vxquery-hdfs-test");
+        dfs.mkdirs(new Path("/tmp"));        
+        Path dest = new Path("/tmp/vxquery-hdfs-test");
         dfs.copyFromLocalFile(src, dest);
         if (dfs.exists(dest)) {
             System.err.println("Test files copied to HDFS successfully");

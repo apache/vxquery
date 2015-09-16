@@ -18,7 +18,7 @@
 (: XQuery Aggregate Query :)
 (: Find the lowest min temperature.                                            :)
 fn:min(
-    let $collection := "vxquery-hdfs-test"
+    let $collection := "hdfs://tmp/vxquery-hdfs-test"
     for $r in collection($collection)/dataCollection/data
     where $r/dataType eq "TMIN" 
     return $r/value

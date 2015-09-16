@@ -174,12 +174,21 @@ public class HDFSFunctions {
         if (this.conf_path == null) {
             // load properties file
             Properties prop = new Properties();
-            String propFilePath = "vxquery-server/src/main/resources/conf/cluster.properties";
+            String propFilePath = "../vxquery-server/src/main/resources/conf/cluster.properties";
             try {
                 prop.load(new FileInputStream(propFilePath));
             } catch (FileNotFoundException e) {
-                if (LOGGER.isLoggable(Level.SEVERE)) {
-                    LOGGER.severe(e.getMessage());
+                propFilePath = "vxquery-server/src/main/resources/conf/cluster.properties";
+                try {
+                    prop.load(new FileInputStream(propFilePath));
+                } catch (FileNotFoundException e1) {
+                    if (LOGGER.isLoggable(Level.SEVERE)) {
+                        LOGGER.severe(e1.getMessage());
+                    }
+                } catch (IOException e1) {
+                    if (LOGGER.isLoggable(Level.SEVERE)) {
+                        LOGGER.severe(e1.getMessage());
+                    }
                 }
             } catch (IOException e) {
                 if (LOGGER.isLoggable(Level.SEVERE)) {
