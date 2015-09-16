@@ -476,6 +476,29 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
             </plugin>
+            <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
+            <version>1.5.3</version>
+            <executions>
+                <execution>
+                    <phase>prepare-package</phase>
+                    <goals>
+                        <goal>replace</goal>
+                    </goals>                    
+                </execution>
+            </executions>
+            <configuration>
+                <ignoreMissingFile>true</ignoreMissingFile>
+                <file>vxquery-server/src/main/resources/conf/cluster.properties</file>
+                <outputFile>
+                    vxquery-server/src/main/resources/conf/cluster.properties
+                </outputFile>
+                <regex>false</regex>
+                <token>$CONF_PATH$</token>
+                <value>${basedir}/vxquery-xtest/src/test/resources/hadoop/conf</value>
+            </configuration>
+           </plugin>
         </plugins>
     </build>
 
@@ -526,6 +549,7 @@
                     <maxmemory>2g</maxmemory>
                 </configuration>
             </plugin>
+            
         </plugins>
     </reporting>
 
