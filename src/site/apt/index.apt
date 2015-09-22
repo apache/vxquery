@@ -22,6 +22,7 @@ Apache VXQuery
 
   There are lots of large collections of relatively small documents like e.g. the {{{http://www.sec.gov/info/edgar/ednews/dissemin.htm}EDGAR dataset}} or the {{{http://wiki.openstreetmap.org/wiki/Download}OpenStreetMap dataset}}.
   However there are no XQuery processors available today that are capable of processing these datasets in parallel and making the contained information accessible.
-  
 
-  
+
+[images/vxquery_stack.png] VXQuery Stack Diagram
+

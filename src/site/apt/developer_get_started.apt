@@ -21,9 +21,9 @@ Get Started as a VXQuery Developer
   * Go through the community member steps.
 
     * {{{http://vxquery.apache.org/user_get_started.html}Community steps}}.
- 
+
   * Setup your eclipse development environment.
- 
+
     * {{{http://vxquery.apache.org/development_eclipse_setup.html}Setup instructions}}.
 
   * XQuery has a test suite to verify XQuery specifications.
@@ -34,8 +34,8 @@ Get Started as a VXQuery Developer
 
     * Review the test structure.
 
-      * Code is found in the "VXQuery XTest" module. 
+      * Code is found in the "VXQuery XTest" module.
 
   * Review open issues for the project.
- 
+
     * {{{http://vxquery.apache.org/issue-tracking.html}Issues list}}.

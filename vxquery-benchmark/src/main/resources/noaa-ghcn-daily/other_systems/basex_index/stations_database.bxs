@@ -1,0 +1,2 @@
+CREATE DB db_sesnors
+ADD ../weather_data/dataset-tiny-local/data_links/local_speed_up/d0_p1_i0/stations/
