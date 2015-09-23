@@ -18,11 +18,11 @@
 (: XQuery Join Query :)
 (: Find all the weather readings for King county for a specific day    :)
 (: 1976/7/4.                                                                  :)
-let $sensor_collection := "../../../../../../../weather_data/dataset-tiny-local/data_links/local_speed_up/d0_p1_i0/sensors/"
-for $r in collection($sensor_collection)/root/dataCollection/data
+let $sensor_collection := "db_sensors"
+for $r in db:open($sensor_collection)/root/dataCollection/data
 
-let $station_collection := "../../../../../../../weather_data/dataset-tiny-local/data_links/local_speed_up/d0_p1_i0/stations/"
-for $s in collection($station_collection)/root/stationCollection/station
+let $station_collection := "db_stations"
+for $s in db:open($station_collection)/root/stationCollection/station
 
 where $s/id eq $r/station
     and (some $x in $s/locationLabels satisfies ($x/type eq "ST" and fn:upper-case(fn:data($x/displayName)) eq "WASHINGTON"))

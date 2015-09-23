@@ -25,12 +25,28 @@ EMAIL=${5}
 
 mkdir -p ~/logs/basex_index/
 
-time JAVA_OPTS="-Xmx8g" java -cp BaseX823.jar org.basex.BaseX
+# Add BaseX databases
+for j in $(find ${1} -name '*add.bxs')
+do
+    date
+    echo "Setup BaseX database: ${j}"
+    time JAVA_OPTS="-Xmx8g" java -cp BaseX823.jar org.basex.BaseX -V -x -w -r${REPEAT} ${j} >> ~/logs/basex_index/$(basename "${j}").log 2>&1
+done
+
 
 for j in $(find ${1} -name '*q??.xq')
 do
     date
     echo "Running BaseX query: ${j}"
+    time JAVA_OPTS="-Xmx8g" java -cp BaseX823.jar org.basex.BaseX -V -x -w -r${REPEAT} ${j} >> ~/logs/basex_index/$(basename "${j}").log 2>&1
+done
+
+
+# Remove BaseX databases
+for j in $(find ${1} -name '*remove.bxs')
+do
+    date
+    echo "Setup BaseX database: ${j}"
     time JAVA_OPTS="-Xmx8g" java -cp BaseX823.jar org.basex.BaseX -V -x -w -r${REPEAT} ${j} >> ~/logs/basex_index/$(basename "${j}").log 2>&1
 done
 
