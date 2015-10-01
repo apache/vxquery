@@ -17,15 +17,19 @@
 package org.apache.vxquery.xtest;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class VXQueryTest extends AbstractXQueryTest {
+    private static MiniDFS dfs;
 
     private static String VXQUERY_CATALOG = StringUtils.join(new String[] { "src", "test", "resources",
             "VXQueryCatalog.xml" }, File.separator);
@@ -50,6 +54,21 @@ public class VXQueryTest extends AbstractXQueryTest {
     @Override
     protected XTestOptions getTestOptions() {
         return getOptions();
+    }
+
+    @BeforeClass
+    public static void setupHDFS() {
+        dfs = new MiniDFS();
+        try {
+            dfs.startHDFS();
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+    }
+
+    @AfterClass
+    public static void shutdownHDFS() {
+        dfs.shutdownHDFS();
     }
 
 }

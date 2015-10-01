@@ -14,7 +14,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -277,6 +278,25 @@
             </dependency>
 
             <dependency>
+                <groupId>edu.uci.ics.hyracks</groupId>
+                <artifactId>hyracks-hdfs-2.x</artifactId>
+                <version>${hyracks.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>edu.uci.ics.hyracks</groupId>
+                <artifactId>hyracks-hdfs-core</artifactId>
+                <version>${hyracks.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>2.7.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>ant</groupId>
                 <artifactId>ant-trax</artifactId>
                 <version>1.6.5</version>
@@ -322,7 +342,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>1.3.2</version>
+                <version>2.4</version>
             </dependency>
 
             <dependency>
@@ -341,9 +361,10 @@
             <dependency>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty</artifactId>
-                <version>6.1.4</version>
+                <version>6.1.22</version>
                 <scope>compile</scope>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -420,19 +441,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-        <!-- We override the configuration plugin to override the descriptor to use for building
-          the source release zip. Specifically, we would like to control the inclusions/exclusions.
-          For example, we exclude the KEYS file from the zip -->
+                <!-- We override the configuration plugin to override the descriptor 
+                    to use for building the source release zip. Specifically, we would like to 
+                    control the inclusions/exclusions. For example, we exclude the KEYS file 
+                    from the zip -->
                 <executions>
                     <execution>
-            <!-- Use this id to match the id mentioned in the assembly plugin configuration in
-              the apache parent POM under the apache-release profile -->
+                        <!-- Use this id to match the id mentioned in the assembly plugin configuration 
+                            in the apache parent POM under the apache-release profile -->
                         <id>source-release-assembly</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
-            <!-- combine.self should be override to replace the configuration in the parent POM -->
+                        <!-- combine.self should be override to replace the configuration in 
+                            the parent POM -->
                         <configuration combine.self="override">
                             <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                             <descriptors>
@@ -442,38 +465,40 @@
                     </execution>
                 </executions>
             </plugin>
-      <!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-              <version>2.7</version>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-          </reportPlugins>
-        </configuration>
-        <executions> 
-          <execution> 
-            <id>attach-site</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals> 
-          </execution> 
-        </executions> 
-      </plugin>
-      -->
+            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
+                <configuration> <reportPlugins> <plugin> <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-project-info-reports-plugin</artifactId> <version>2.7</version> 
+                </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
+                </plugin> </reportPlugins> </configuration> <executions> <execution> <id>attach-site</id> 
+                <phase>prepare-package</phase> <goals> <goal>jar</goal> </goals> </execution> 
+                </executions>< /plugin> -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
             </plugin>
+            <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
+            <version>1.5.3</version>
+            <executions>
+                <execution>
+                    <phase>prepare-package</phase>
+                    <goals>
+                        <goal>replace</goal>
+                    </goals>                    
+                </execution>
+            </executions>
+            <configuration>
+                <ignoreMissingFile>true</ignoreMissingFile>
+                <file>vxquery-server/src/main/resources/conf/cluster.properties</file>
+                <outputFile>
+                    vxquery-server/src/main/resources/conf/cluster.properties
+                </outputFile>
+                <regex>false</regex>
+                <token>$CONF_PATH$</token>
+                <value>${basedir}/vxquery-xtest/src/test/resources/hadoop/conf</value>
+            </configuration>
+           </plugin>
         </plugins>
     </build>
 
@@ -524,6 +549,7 @@
                     <maxmemory>2g</maxmemory>
                 </configuration>
             </plugin>
+            
         </plugins>
     </reporting>
 
