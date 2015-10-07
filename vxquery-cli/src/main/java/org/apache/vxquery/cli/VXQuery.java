@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +29,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.hyracks.api.client.HyracksConnection;
+import org.apache.hyracks.api.client.IHyracksClientConnection;
+import org.apache.hyracks.api.client.NodeControllerInfo;
+import org.apache.hyracks.api.comm.IFrame;
+import org.apache.hyracks.api.comm.IFrameTupleAccessor;
+import org.apache.hyracks.api.comm.VSizeFrame;
+import org.apache.hyracks.api.dataset.IHyracksDataset;
+import org.apache.hyracks.api.dataset.IHyracksDatasetReader;
+import org.apache.hyracks.api.dataset.ResultSetId;
+import org.apache.hyracks.api.job.JobFlag;
+import org.apache.hyracks.api.job.JobId;
+import org.apache.hyracks.api.job.JobSpecification;
+import org.apache.hyracks.client.dataset.HyracksDataset;
+import org.apache.hyracks.control.cc.ClusterControllerService;
+import org.apache.hyracks.control.common.controllers.CCConfig;
+import org.apache.hyracks.control.common.controllers.NCConfig;
+import org.apache.hyracks.control.nc.NodeControllerService;
+import org.apache.hyracks.control.nc.resources.memory.FrameManager;
+import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
 import org.apache.vxquery.context.DynamicContext;
@@ -44,23 +62,6 @@ import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-
-import edu.uci.ics.hyracks.api.client.HyracksConnection;
-import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
-import edu.uci.ics.hyracks.api.client.NodeControllerInfo;
-import edu.uci.ics.hyracks.api.comm.IFrameTupleAccessor;
-import edu.uci.ics.hyracks.api.dataset.IHyracksDataset;
-import edu.uci.ics.hyracks.api.dataset.IHyracksDatasetReader;
-import edu.uci.ics.hyracks.api.dataset.ResultSetId;
-import edu.uci.ics.hyracks.api.job.JobFlag;
-import edu.uci.ics.hyracks.api.job.JobId;
-import edu.uci.ics.hyracks.api.job.JobSpecification;
-import edu.uci.ics.hyracks.client.dataset.HyracksDataset;
-import edu.uci.ics.hyracks.control.cc.ClusterControllerService;
-import edu.uci.ics.hyracks.control.common.controllers.CCConfig;
-import edu.uci.ics.hyracks.control.common.controllers.NCConfig;
-import edu.uci.ics.hyracks.control.nc.NodeControllerService;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 
 public class VXQuery {
     private final CmdLineOptions opts;
@@ -266,15 +267,16 @@ public class VXQuery {
 
         JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
 
-        ByteBuffer buffer = ByteBuffer.allocate(spec.getFrameSize());
+        //        ByteBuffer buffer = ByteBuffer.allocate(spec.getFrameSize());
+        FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
+        IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
         IHyracksDatasetReader reader = hds.createReader(jobId, resultSetId);
-        IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor(spec.getFrameSize());
-        buffer.clear();
+        IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
 
-        while (reader.read(buffer) > 0) {
-            buffer.clear();
-            writer.print(ResultUtils.getStringFromBuffer(buffer, frameTupleAccessor));
+        while (reader.read(frame) > 0) {
+            writer.print(ResultUtils.getStringFromBuffer(frame.getBuffer(), frameTupleAccessor));
             writer.flush();
+            frame.getBuffer().clear();
         }
 
         hcc.waitForCompletion(jobId);

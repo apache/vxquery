@@ -23,8 +23,8 @@ import java.io.UTFDataFormatException;
 import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
+import org.apache.hyracks.data.std.api.IMutableValueStorage;
+import org.apache.hyracks.data.std.primitive.BytePointable;
 
 public class UTF8StringBuilder extends AbstractBuilder {
     private IMutableValueStorage mvs;

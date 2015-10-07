@@ -18,7 +18,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.vxquery.context.XQueryVariable;
 
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
+import org.apache.hyracks.algebricks.core.algebra.base.ILogicalPlan;
 
 public class UserDefinedXQueryFunction extends Function {
     private XQueryVariable[] params;

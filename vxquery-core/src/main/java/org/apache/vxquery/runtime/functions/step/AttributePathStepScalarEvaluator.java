@@ -24,8 +24,8 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
 
 public class AttributePathStepScalarEvaluator extends AbstractSinglePathStepScalarEvaluator {
     private final TaggedValuePointable rootTVP;

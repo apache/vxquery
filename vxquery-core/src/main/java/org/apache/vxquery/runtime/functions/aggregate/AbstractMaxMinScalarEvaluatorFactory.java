@@ -28,12 +28,12 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
 
 public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

@@ -29,10 +29,10 @@ import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class ArithmeticHelper {
     private final AbstractArithmeticOperation aOp;

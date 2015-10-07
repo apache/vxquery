@@ -51,11 +51,11 @@
                                     <name>vxqueryshutdown</name>
                                 </program>
                                 <program>
-                                    <mainClass>edu.uci.ics.hyracks.control.cc.CCDriver</mainClass>
+                                    <mainClass>org.apache.hyracks.control.cc.CCDriver</mainClass>
                                     <name>vxquerycc</name>
                                 </program>
                                 <program>
-                                    <mainClass>edu.uci.ics.hyracks.control.nc.NCDriver</mainClass>
+                                    <mainClass>org.apache.hyracks.control.nc.NCDriver</mainClass>
                                     <name>vxquerync</name>
                                 </program>
                             </programs>
@@ -146,12 +146,12 @@
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-control-cc</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-control-nc</artifactId>
         </dependency>
     </dependencies>

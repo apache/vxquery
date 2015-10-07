@@ -18,7 +18,7 @@ package org.apache.vxquery.types;
 
 import java.util.Arrays;
 
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 
 public final class ProcessingInstructionType extends AbstractNodeType {
     public static final ProcessingInstructionType ANYPI = new ProcessingInstructionType(null);

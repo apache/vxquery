@@ -23,9 +23,9 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.FloatPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
 
 public class FnRoundOperation extends AbstractNumericOperation {
 

@@ -30,9 +30,9 @@ import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class AtomizeHelper {
     AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY.createPointable();

@@ -18,9 +18,9 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.vxquery.functions.BuiltinFunctions;
 
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
-import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import org.apache.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
+import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 public abstract class AbstractVXQueryAggregateRule implements IAlgebraicRewriteRule {
 

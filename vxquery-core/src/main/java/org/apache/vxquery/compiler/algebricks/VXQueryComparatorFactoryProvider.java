@@ -18,10 +18,10 @@ package org.apache.vxquery.compiler.algebricks;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.data.IBinaryComparatorFactoryProvider;
-import edu.uci.ics.hyracks.api.dataflow.value.IBinaryComparator;
-import edu.uci.ics.hyracks.api.dataflow.value.IBinaryComparatorFactory;
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.data.IBinaryComparatorFactoryProvider;
+import org.apache.hyracks.api.dataflow.value.IBinaryComparator;
+import org.apache.hyracks.api.dataflow.value.IBinaryComparatorFactory;
 
 public class VXQueryComparatorFactoryProvider implements IBinaryComparatorFactoryProvider {
     @Override

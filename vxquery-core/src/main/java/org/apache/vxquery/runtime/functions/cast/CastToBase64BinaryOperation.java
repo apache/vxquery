@@ -24,8 +24,8 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class CastToBase64BinaryOperation extends AbstractCastToOperation {
     private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();

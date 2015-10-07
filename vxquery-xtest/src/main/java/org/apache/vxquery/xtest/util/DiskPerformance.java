@@ -52,8 +52,8 @@ import org.apache.vxquery.xtest.util.tests.Stream;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.algebricks.common.utils.Pair;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DiskPerformance {
     XMLReader parser;
@@ -77,7 +77,7 @@ public class DiskPerformance {
             List<SequenceType> childSeq = new ArrayList<SequenceType>();
             NameTest nt = new NameTest(createUTF8String(""), createUTF8String("data"));
             childSeq.add(SequenceType.create(new ElementType(nt, AnyType.INSTANCE, false), Quantifier.QUANT_ONE));
-            handler = new SAXContentHandler(false, new TreeNodeIdProvider((short) 0), null, null, childSeq);
+            handler = new SAXContentHandler(false, new TreeNodeIdProvider((short) 0), null, childSeq);
             parser.setContentHandler(handler);
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
             return new Pair<XMLReader, SAXContentHandler>(parser, handler);
