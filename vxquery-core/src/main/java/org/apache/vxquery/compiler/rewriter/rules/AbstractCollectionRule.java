@@ -100,6 +100,8 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(pos).getValue();
         if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
             return null;
+        } else if (logicalExpression2 == null) {
+            return null;
         }
         VariableReferenceExpression vre = (VariableReferenceExpression) logicalExpression2;
         Mutable<ILogicalOperator> opRef3 = OperatorToolbox.findProducerOf(opRef, vre.getVariableReference());
@@ -122,18 +124,17 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         } else {
             return null;
         }
-        String args[] = new String[2];
         // Constant value is now in a TaggedValuePointable. Convert the value into a java String.
         tvp.set(constantValue.getValue(), 0, constantValue.getValue().length);
-        String arg = null;
+        String collectionName = null;
         if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
             tvp.getValue(stringp);
             try {
                 bbis.setByteBuffer(
                         ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
                                 stringp.getLength() + stringp.getStartOffset())), 0);
-                arg = di.readUTF();
-                return arg;
+                collectionName = di.readUTF();
+                return collectionName;
             } catch (IOException e) {
                 e.printStackTrace();
             }

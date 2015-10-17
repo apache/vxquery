@@ -45,4 +45,9 @@
       <query name="sumHDFS" date="2015-06-11"/>
       <output-file compare="Text">sumHDFS.txt</output-file>
    </test-case>
+   <test-case name="hdfs-aggregate-max-value" FilePath="HDFS/Aggregate/" Creator="Efi Kaltirimidou">
+      <description>Count records in HDFS returned for q03 from the weather benchmark.</description>
+      <query name="maxvalueHDFS" date="2015-10-17"/>
+      <output-file compare="Text">maxvalueHDFS.txt</output-file>
+   </test-case>
 </test-group>

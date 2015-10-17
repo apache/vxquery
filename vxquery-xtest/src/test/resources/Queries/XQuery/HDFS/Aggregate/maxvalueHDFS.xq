@@ -16,10 +16,8 @@
    under the License. :)
 
 (: XQuery Aggregate Query :)
-(: Find the total precipitation.                                            :)
-fn:sum(
-    let $collection := "hdfs://tmp/vxquery-hdfs-test"
-    for $r in collection($collection)/dataCollection/data
-    where $r/dataType eq "PRCP" 
+(: Find the max value.                                            :)
+fn:max(
+    for $r in collectionwithtag("hdfs://tmp/vxquery-hdfs-test/half_1/quarter_1/sensors", "data")/data
     return $r/value
 )

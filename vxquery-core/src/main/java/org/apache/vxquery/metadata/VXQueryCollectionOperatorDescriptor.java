@@ -75,7 +75,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
     private HDFSFunctions hdfs;
     private String tag;
-    private final String START_TAG = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+    private final String START_TAG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
 
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryCollectionDataSource ds,
             RecordDescriptor rDesc) {
@@ -148,14 +148,14 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                         Path directory = new Path(collectionModifiedName);
                         Path xmlDocument;
                         if (tag != null) {
-                            hdfs.setJob(directory.getName(), tag);
+                            hdfs.setJob(directory.toString(), tag);
                             tag = "<" + tag + ">";
                             Job job = hdfs.getJob();
                             InputFormat inputFormat = hdfs.getinputFormat();
                             try {
                                 hdfs.scheduleSplits();
                                 ArrayList<Integer> schedule = hdfs.getScheduleForNode(InetAddress.getLocalHost()
-                                        .getHostName());
+                                        .getHostAddress());
                                 List<InputSplit> splits = hdfs.getSplits();
                                 List<FileSplit> fileSplits = new ArrayList<FileSplit>();
                                 for (int i : schedule) {

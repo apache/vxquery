@@ -19,7 +19,6 @@ package org.apache.vxquery.compiler.rewriter;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.vxquery.compiler.rewriter.rules.CollectionWithTagRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateDescandantChild;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
@@ -129,7 +128,6 @@ public class RewriteRuleset {
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
-        normalization.add(new CollectionWithTagRule());
 
         normalization.add(new ConsolidateDescandantChild());
 

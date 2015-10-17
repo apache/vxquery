@@ -130,10 +130,10 @@ public class XMLParser {
             throw hde;
         }
     }
-    
-    public void parseHDFSElements(InputStream inputStream, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex) throws IOException
-            {
-    	try {
+
+    public void parseHDFSElements(InputStream inputStream, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
+            throws IOException {
+        try {
             Reader input;
             if (bufferSize > 0) {
                 input = new BufferedReader(new InputStreamReader(inputStream), bufferSize);
@@ -149,11 +149,11 @@ public class XMLParser {
             hde.setNodeId(nodeId);
             throw hde;
         } catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
-    
+
     public void parseHDFSDocument(InputStream inputStream, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
             Reader input;
@@ -171,9 +171,9 @@ public class XMLParser {
             hde.setNodeId(nodeId);
             throw hde;
         } catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

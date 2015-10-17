@@ -175,10 +175,12 @@ public class HDFSFunctions {
             // load properties file
             Properties prop = new Properties();
             String propFilePath = "../vxquery-server/src/main/resources/conf/cluster.properties";
+            nodeXMLfile = new File("../vxquery-server/src/main/resources/conf/local.xml");
             try {
                 prop.load(new FileInputStream(propFilePath));
             } catch (FileNotFoundException e) {
                 propFilePath = "vxquery-server/src/main/resources/conf/cluster.properties";
+                nodeXMLfile = new File("vxquery-server/src/main/resources/conf/local.xml");
                 try {
                     prop.load(new FileInputStream(propFilePath));
                 } catch (FileNotFoundException e1) {
@@ -293,7 +295,6 @@ public class HDFSFunctions {
     }
 
     public void scheduleSplits() throws IOException, ParserConfigurationException, SAXException {
-
         schedule = new HashMap<Integer, String>();
         ArrayList<String> empty = new ArrayList<String>();
         HashMap<String, ArrayList<Integer>> splits_map = this.getLocationsOfSplits();
@@ -303,7 +304,7 @@ public class HDFSFunctions {
         ArrayList<Integer> splits;
         String node;
         for (ArrayList<String> info : this.nodes) {
-            node = info.get(0);
+            node = info.get(1);
             if (splits_map.containsKey(node)) {
                 splits = splits_map.get(node);
                 for (Integer split : splits) {

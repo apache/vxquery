@@ -75,6 +75,12 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
             if (ds != null) {
                 ds.setTotalDataSources(vxqueryContext.getTotalDataSources());
 
+                // Check if the call is for collection-with-tag
+                if (args.length == 2) {
+                    ds.setTotalDataSources(vxqueryContext.getTotalDataSources());
+                    ds.setTag(args[1]);
+                }
+
                 // Known to be true because of collection name.
                 AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
                 UnnestOperator unnest = (UnnestOperator) op;
