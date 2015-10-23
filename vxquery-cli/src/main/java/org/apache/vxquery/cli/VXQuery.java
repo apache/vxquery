@@ -267,7 +267,6 @@ public class VXQuery {
 
         JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
 
-        //        ByteBuffer buffer = ByteBuffer.allocate(spec.getFrameSize());
         FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
         IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
         IHyracksDatasetReader reader = hds.createReader(jobId, resultSetId);
