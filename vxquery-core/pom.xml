@@ -14,7 +14,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -63,7 +64,8 @@
                         <configuration>
                             <target>
                                 <ant antfile="build-xslt.xml" target="build">
-                                    <property name="build.gen-src.dir" value="${project.build.directory}/generated-sources/main/java" />
+                                    <property name="build.gen-src.dir"
+                                        value="${project.build.directory}/generated-sources/main/java" />
                                     <property name="src.code.dir" value="${basedir}/src/main/java" />
                                     <property name="xslt.dir" value="${basedir}/src/main/xslt" />
                                     <property name="classpath.xslt" refid="maven.compile.classpath" />
@@ -80,7 +82,8 @@
                         <configuration>
                             <target>
                                 <ant antfile="build-site.xml" target="build">
-                                    <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
+                                    <property name="build.gen-site.dir"
+                                        value="${project.build.directory}/generated-site/apt" />
                                     <property name="src.code.dir" value="${basedir}/src/main/java" />
                                     <property name="xslt.dir" value="${basedir}/src/main/xslt" />
                                     <property name="classpath.xslt" refid="maven.compile.classpath" />
@@ -121,16 +124,13 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
-      <!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-      </plugin>
-      -->
+            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
+                </plugin> -->
         </plugins>
         <pluginManagement>
             <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                    only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -209,6 +209,17 @@
         </dependency>
 
         <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-hdfs-2.x</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.uci.ics.hyracks</groupId>
+            <artifactId>hyracks-hdfs-core</artifactId>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
             <groupId>ant</groupId>
             <artifactId>ant-trax</artifactId>
             <scope>provided</scope>
@@ -259,6 +270,21 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-core</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+        </dependency>
     </dependencies>
 
     <reporting>
@@ -290,18 +316,10 @@
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
             </plugin>
-      <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.5.2</version>
-        <configuration>
-          <effort>Min</effort>
-          <threshold>Normal</threshold>
-          <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
-        </configuration>
-      </plugin>
-      -->
+            <!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>findbugs-maven-plugin</artifactId> 
+                <version>2.5.2</version> <configuration> <effort>Min</effort> <threshold>Normal</threshold> 
+                <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile> </configuration> 
+                </plugin> -->
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>

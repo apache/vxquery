@@ -54,11 +54,9 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
     final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
     /**
-     * Get the constant value for the collection. Return null for not a collection.
+     * Get the arguments for the collection and collection-with-tag. Return null for not a collection.
      */
-    protected String getCollectionName(Mutable<ILogicalOperator> opRef) throws AlgebricksException {
-        VXQueryConstantValue constantValue;
-
+    protected String[] getCollectionName(Mutable<ILogicalOperator> opRef) throws AlgebricksException {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return null;
@@ -78,12 +76,31 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
             return null;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier())) {
+        if (!functionCall.getFunctionIdentifier().equals(
+                BuiltinFunctions.FN_COLLECTIONWITHTAG_2.getFunctionIdentifier())
+                && !functionCall.getFunctionIdentifier().equals(
+                        BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier())) {
             return null;
         }
 
-        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+        // Get arguments
+        int size = functionCall.getArguments().size();
+        if (size > 0) {
+            String args[] = new String[size];
+            for (int i = 0; i < size; i++) {
+                args[i] = getArgument(functionCall, opRef, i);
+            }
+            return args;
+        }
+        return null;
+    }
+
+    private String getArgument(AbstractFunctionCallExpression functionCall, Mutable<ILogicalOperator> opRef, int pos) {
+        VXQueryConstantValue constantValue;
+        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(pos).getValue();
         if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
+            return null;
+        } else if (logicalExpression2 == null) {
             return null;
         }
         VariableReferenceExpression vre = (VariableReferenceExpression) logicalExpression2;
@@ -107,7 +124,6 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         } else {
             return null;
         }
-
         // Constant value is now in a TaggedValuePointable. Convert the value into a java String.
         tvp.set(constantValue.getValue(), 0, constantValue.getValue().length);
         String collectionName = null;
@@ -118,11 +134,12 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
                         ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
                                 stringp.getLength() + stringp.getStartOffset())), 0);
                 collectionName = di.readUTF();
+                return collectionName;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return collectionName;
+        return null;
     }
 
     @Override
