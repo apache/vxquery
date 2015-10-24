@@ -24,6 +24,20 @@ Executing a Query in HDFS
     This information should be defined in the <local.xml> or <cluster.xml> file at 
     <vxquery-server/src/main/resources/conf/> .
 
+    You can find the ip of each node located in the /etc/hosts file.There should be at
+    least two different ips defined in that file.One for localhost and one with the hostname
+    of the node.The correct one for this configuration is the one of the host.
+
+    For example:
+    An ubuntu /etc/hosts file could look like this:
+
+-----------------------------
+127.0.0.1       localhost
+127.0.1.1       node1
+----------------------------
+    
+    The ip <127.0.1.1> along with the hostname <node1> should be defined in the <local.xml> or <cluster.xml> file.
+
 
 * 2. Running the Query
 

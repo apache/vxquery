@@ -102,15 +102,7 @@ public class HDFSFunctions {
             job.setInputFormatClass(XmlCollectionWithTagInputFormat.class);
             inputFormat = ReflectionUtils.newInstance(job.getInputFormatClass(), job.getConfiguration());
             splits = inputFormat.getSplits(job);
-        } catch (IOException e) {
-            if (LOGGER.isLoggable(Level.SEVERE)) {
-                LOGGER.severe(e.getMessage());
-            }
-        } catch (ClassNotFoundException e) {
-            if (LOGGER.isLoggable(Level.SEVERE)) {
-                LOGGER.severe(e.getMessage());
-            }
-        } catch (InterruptedException e) {
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
             if (LOGGER.isLoggable(Level.SEVERE)) {
                 LOGGER.severe(e.getMessage());
             }
@@ -175,18 +167,22 @@ public class HDFSFunctions {
             // load properties file
             Properties prop = new Properties();
             String propFilePath = "../vxquery-server/src/main/resources/conf/cluster.properties";
-            nodeXMLfile = new File("../vxquery-server/src/main/resources/conf/local.xml");
+            nodeXMLfile = new File("../vxquery-server/src/main/resources/conf/cluster.xml");
+            if(!nodeXMLfile.exists()) { 
+                nodeXMLfile = new File("vxquery-server/src/main/resources/conf/cluster.xml");
+                if(!nodeXMLfile.exists()) { 
+                    nodeXMLfile = new File("vxquery-server/src/main/resources/conf/local.xml");
+                }
+                if(!nodeXMLfile.exists()) { 
+                    nodeXMLfile = new File("../vxquery-server/src/main/resources/conf/local.xml");
+                }
+            }
             try {
                 prop.load(new FileInputStream(propFilePath));
             } catch (FileNotFoundException e) {
                 propFilePath = "vxquery-server/src/main/resources/conf/cluster.properties";
-                nodeXMLfile = new File("vxquery-server/src/main/resources/conf/local.xml");
                 try {
                     prop.load(new FileInputStream(propFilePath));
-                } catch (FileNotFoundException e1) {
-                    if (LOGGER.isLoggable(Level.SEVERE)) {
-                        LOGGER.severe(e1.getMessage());
-                    }
                 } catch (IOException e1) {
                     if (LOGGER.isLoggable(Level.SEVERE)) {
                         LOGGER.severe(e1.getMessage());
@@ -414,15 +410,7 @@ public class HDFSFunctions {
                     RecordReader reader = inputFormat.createRecordReader(inputSplits.get(i), context);
                     reader.initialize(inputSplits.get(i), context);
                     return reader;
-                } catch (HyracksDataException e) {
-                    if (LOGGER.isLoggable(Level.SEVERE)) {
-                        LOGGER.severe(e.getMessage());
-                    }
-                } catch (IOException e) {
-                    if (LOGGER.isLoggable(Level.SEVERE)) {
-                        LOGGER.severe(e.getMessage());
-                    }
-                } catch (InterruptedException e) {
+                } catch (IOException | InterruptedException e) {
                     if (LOGGER.isLoggable(Level.SEVERE)) {
                         LOGGER.severe(e.getMessage());
                     }
