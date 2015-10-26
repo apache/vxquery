@@ -4,6 +4,6 @@ The options attempt to match the processing and output of VXQuery.
 
 # Local Options
 CHOP = false
-DBPATH = /home/ecarman/disk1/basex/BaseXData
-REPOPATH = /home/ecarman/disk1/basex/BaseXRepo
-WEBPATH = /home/ecarman/disk1/basex/BaseXWeb
+DBPATH = /path/to/basex/BaseXData
+REPOPATH = /path/to/basex/BaseXRepo
+WEBPATH = /path/to/basex/BaseXWeb
