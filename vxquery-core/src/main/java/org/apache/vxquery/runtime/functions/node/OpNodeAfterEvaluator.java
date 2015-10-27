@@ -17,7 +17,7 @@
 
 package org.apache.vxquery.runtime.functions.node;
 
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 
 public class OpNodeAfterEvaluator extends AbstractNodePositionalCheckEvaluator {
 

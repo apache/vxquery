@@ -24,8 +24,8 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToBase64BinaryOperation;
 
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class CastableAsBase64BinaryOperation extends AbstractCastableAsOperation {
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();

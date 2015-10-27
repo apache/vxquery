@@ -88,42 +88,42 @@
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-api</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-client</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-control-cc</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-control-nc</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>algebricks-common</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>algebricks-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-control-common</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-dataflow-std</artifactId>
         </dependency>
     </dependencies>

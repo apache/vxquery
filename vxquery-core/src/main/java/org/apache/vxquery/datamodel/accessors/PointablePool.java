@@ -19,8 +19,8 @@ package org.apache.vxquery.datamodel.accessors;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.api.IPointableFactory;
 
 public class PointablePool {
     private final Map<Class<? extends IPointable>, IPointableFactory> pfMap;

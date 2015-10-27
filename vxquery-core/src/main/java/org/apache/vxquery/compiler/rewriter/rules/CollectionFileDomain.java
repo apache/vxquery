@@ -16,7 +16,7 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import edu.uci.ics.hyracks.algebricks.core.algebra.properties.INodeDomain;
+import org.apache.hyracks.algebricks.core.algebra.properties.INodeDomain;
 
 public class CollectionFileDomain implements INodeDomain {
 

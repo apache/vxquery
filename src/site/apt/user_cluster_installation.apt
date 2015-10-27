@@ -15,6 +15,18 @@
 
 Cluster Installation
 
+* Architecture
+
+  The VXQuery cluster is made up of two parts: a single cluster controller (cc) and many node controllers (nc).
+  The VXQuery CLI is used to parse the query and compile the job for the VXQuery cluster to process.
+  The CLI passes the job to the cc which manages the job and returns the result to the CLI.
+  The following diagram depicts the cluster layout.
+
+[images/vxquery_cluster.png] VXQuery Cluster Diagram
+
+  The XML document are distributed between the ncs.
+  The query's collection function will identify XML file path for the ncs.
+
 
 * Requirements
 
@@ -28,7 +40,7 @@ Cluster Installation
 * Steps
 
   * <<Export JAVA_HOME>>
-  
+
 ---
 $ export JAVA_HOME=/usr/java/latest
 ---
@@ -36,7 +48,7 @@ $ export JAVA_HOME=/usr/java/latest
 
   * <<Unzip and build VXQuery>>
 
---- 
+---
 $ unzip apache-vxquery-X.Y-source-release.zip
 $ cd apache-vxquery-X.Y
 $ mvn package -DskipTests
@@ -45,7 +57,7 @@ $ cd ..
 
 
   * <<Create configuration file>>
-    
+
     Create a configuration xml file containing the information of the vxquery cluster.Here is an example of a VXQuery configuration file for a cluster with 1 master and 3 slaves.
 
 ---
@@ -75,7 +87,7 @@ $ cd ..
     * Fields that are required:
 
       * name : name of the cluster
-      
+
       * username : user that will execute commands in all the machines of the cluster. Preferably a user that has passwordless ssh access to the machines.
 
       * id : hostname of the node
@@ -94,12 +106,12 @@ $ cd ..
   * <<Deploy cluster>>
 
     To deploy the cluster you need to execute this command in the vxquery installation directory
-    
+
 ---
 $python cluster_cli.py -c ../conf/cluster.xml -a deploy -d /apache-vxquery/vxquery-server
 ---
 
-    * Arguments: 
+    * Arguments:
 
       * -c : path to the configuration file you created
 
@@ -110,16 +122,16 @@ $python cluster_cli.py -c ../conf/cluster.xml -a deploy -d /apache-vxquery/vxque
 
   * <<Start cluster>>
 
-    The command to start the cluster is 
+    The command to start the cluster is
 
 ---
 $python cluster_cli.py -c ../conf/cluster.xml -a start
 ---
-  
+
 
   * <<Stop cluster>>
 
-    The command to stop the cluster is 
+    The command to stop the cluster is
 
 ---
 $python cluster_cli.py -c ../conf/cluster.xml -a stop

@@ -7,9 +7,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,10 @@
 # limitations under the License.
 #
 
+NODES=${2}
 REPEAT=${3}
-DATASET="hcn"
+DATASET=${4}
+EMAIL=${5}
 
 
 mkdir -p ~/logs/saxon/
@@ -35,7 +37,6 @@ if which programname >/dev/null;
 then
     echo "Sending out e-mail notification."
     SUBJECT="Saxon Tests Finished (${DATASET})"
-    EMAIL="ecarm002@ucr.edu"
     /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
     Completed all Saxon tests on ${DATASET}.
     EOM

@@ -17,8 +17,8 @@
 
 package org.apache.vxquery.datamodel.accessors.nodes;
 
-import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.data.std.api.AbstractPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
 
 public abstract class AbstractNodePointable extends AbstractPointable {
     public int getLocalNodeId(NodeTreePointable nodeTree) {

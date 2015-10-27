@@ -1,0 +1,2 @@
+CREATE DB db_sensors
+ADD /tmp/1.0_partition_ghcnd_all_xml/

@@ -24,12 +24,12 @@ import java.util.TreeMap;
 
 import org.apache.vxquery.util.GrowableIntArray;
 
-import edu.uci.ics.hyracks.data.std.algorithms.BinarySearchAlgorithm;
-import edu.uci.ics.hyracks.data.std.collections.api.IValueReferenceVector;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
-import edu.uci.ics.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
+import org.apache.hyracks.data.std.algorithms.BinarySearchAlgorithm;
+import org.apache.hyracks.data.std.collections.api.IValueReferenceVector;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class DictionaryBuilder {
     private final GrowableIntArray stringEndOffsets;

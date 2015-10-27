@@ -179,32 +179,32 @@
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>algebricks-compiler</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>algebricks-data</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-api</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-data-std</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-dataflow-common</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>edu.uci.ics.hyracks</groupId>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-dataflow-std</artifactId>
         </dependency>
 

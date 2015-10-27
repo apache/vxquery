@@ -17,8 +17,8 @@ package org.apache.vxquery.xmlquery.query;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.context.StaticContext;
 
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalPlan;
-import edu.uci.ics.hyracks.api.job.JobSpecification;
+import org.apache.hyracks.algebricks.core.algebra.base.ILogicalPlan;
+import org.apache.hyracks.api.job.JobSpecification;
 
 public class Module {
     private ModuleType moduleType;

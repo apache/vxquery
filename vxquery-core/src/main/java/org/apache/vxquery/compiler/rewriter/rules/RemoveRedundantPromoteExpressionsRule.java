@@ -20,7 +20,7 @@ import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.SequenceType;
 
-import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 
 /**
  * The rule searches for where the xquery promote function is used. When the
