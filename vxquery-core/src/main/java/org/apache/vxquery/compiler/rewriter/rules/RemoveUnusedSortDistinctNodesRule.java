@@ -51,43 +51,43 @@ import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * The rule searches for where the xquery sort distinct function is used and
  * determines if the sort and distinct is necessary. The plan is modified if
  * any of these items is not required.
- * 
+ *
  * <pre>
  * Before
- * 
+ *
  *   plan__parent
  *   ASSIGN( $v1 : sort_distinct_nodes_asc_or_atomics( $v0 ) )
  *   plan__child
- *   
+ *
  *   Where $v0 is a variable defined in plan__child.
- *   
- * After 
- * 
- *   if ( $v0 is unique nodes && $v0 is in document order )
- *     
+ *
+ * After
+ *
+ *   if ( $v0 is unique nodes &amp;&amp; $v0 is in document order )
+ *
  *     plan__parent
  *     ASSIGN( $v1 : $v0 )
  *     plan__child
- *     
- *   if ( $v0 is NOT unique nodes && $v0 is in document order )
- *   
+ *
+ *   if ( $v0 is NOT unique nodes &amp;&amp; $v0 is in document order )
+ *
  *     plan__parent
  *     ASSIGN( $v1 : distinct_nodes_or_atomics( $v0 ) )
  *     plan__child
- *     
- *   if ( $v0 is unique nodes && $v0 is NOT in document order )
- *   
+ *
+ *   if ( $v0 is unique nodes &amp;&amp; $v0 is NOT in document order )
+ *
  *     plan__parent
  *     ASSIGN( $v1 : sort_nodes_asc( $v0 ) )
  *     plan__child
- *     
- *   if ( $v0 is NOT unique nodes && $v0 is NOT in document order )
- *   
+ *
+ *   if ( $v0 is NOT unique nodes &amp;&amp; $v0 is NOT in document order )
+ *
  *     plan__parent
  *     ASSIGN( $v1 : sort_distinct_nodes_asc_or_atomics( $v0 ) )
  *     plan__child
  * </pre>
- * 
+ *
  * @author prestonc
  */
 
@@ -123,7 +123,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
         int variableId = getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId(opRef);
         if (variableId > 0) {
             // Find the function expression.
-            // All the checks for these variable assigns and casting were done in the 
+            // All the checks for these variable assigns and casting were done in the
             // getOperatorSortDistinctNodesAscOrAtomicsArgumentVariableId function.
             AssignOperator assign = (AssignOperator) op;
             ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
@@ -194,7 +194,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
     /**
      * Get the DocumentOrder variable map of the parent operator.
-     * 
+     *
      * @param op
      * @param vxqueryContext
      * @return
@@ -217,10 +217,10 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
     /**
      * Get the UniqueNodes variable map of the parent operator.
-     * 
+     *
      * @param op
      * @param vxqueryContext
-     * @return
+     * @return Hash map of variables to unique nodes.
      */
     private HashMap<Integer, UniqueNodes> getProducerUniqueNodesVariableMap(ILogicalOperator op,
             VXQueryOptimizationContext vxqueryContext) {
@@ -297,7 +297,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
     /**
      * Sets all the variables to DocumentOrder.
-     * 
+     *
      * @param documentOrderVariables
      * @param documentOrder
      */
@@ -310,7 +310,7 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
     /**
      * Sets all the variables to UniqueNodes.
-     * 
+     *
      * @param uniqueNodesVariables
      * @param uniqueNodes
      */

@@ -47,6 +47,7 @@ public class CastToBase64BinaryOperation extends AbstractCastToOperation {
         baaos.reset();
         Base64OutputStream b64os = new Base64OutputStream(baaos, false);
         b64os.write(stringp.getByteArray(), stringp.getStartOffset() + 2, stringp.getLength() - 2);
+        b64os.close();
 
         dOut.write(ValueTag.XS_BASE64_BINARY_TAG);
         dOut.write((byte) ((baaos.size() >>> 8) & 0xFF));

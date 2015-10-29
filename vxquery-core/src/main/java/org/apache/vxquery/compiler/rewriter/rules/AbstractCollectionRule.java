@@ -55,8 +55,12 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
 
     /**
      * Get the constant value for the collection. Return null for not a collection.
+     *
+     * @param opRef
+     *            Logical operator
+     * @return collection name
      */
-    protected String getCollectionName(Mutable<ILogicalOperator> opRef) throws AlgebricksException {
+    protected String getCollectionName(Mutable<ILogicalOperator> opRef) {
         VXQueryConstantValue constantValue;
 
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
@@ -114,9 +118,8 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
             tvp.getValue(stringp);
             try {
-                bbis.setByteBuffer(
-                        ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                                stringp.getLength() + stringp.getStartOffset())), 0);
+                bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                        stringp.getLength() + stringp.getStartOffset())), 0);
                 collectionName = di.readUTF();
             } catch (IOException e) {
                 e.printStackTrace();

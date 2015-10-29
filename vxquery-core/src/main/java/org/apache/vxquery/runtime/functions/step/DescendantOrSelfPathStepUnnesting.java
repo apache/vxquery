@@ -133,9 +133,16 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
 
     /**
      * Search through all tree children and children's children.
-     * 
-     * @param nodePointable
-     * @throws SystemException
+     *
+     * @param tvpInput
+     *            pointable
+     * @param level
+     *            level
+     * @param result
+     *            result
+     * @return found result
+     * @throws AlgebricksException
+     *             Could not save result.
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
             throws AlgebricksException {

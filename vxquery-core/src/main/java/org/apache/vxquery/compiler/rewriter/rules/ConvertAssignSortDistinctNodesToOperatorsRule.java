@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.apache.vxquery.functions.BuiltinOperators;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.common.utils.Pair;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -47,6 +45,7 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.OrderOperato
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import org.apache.vxquery.functions.BuiltinOperators;
 
 public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraicRewriteRule {
 
@@ -59,6 +58,7 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
      * Find where a sort distinct nodes is being used and not required based on input parameters.
      * Search pattern: assign [function-call: sort-distinct-nodes-asc-or-atomics]
      */
+    @SuppressWarnings("unused")
     @Override
     public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         Mutable<ILogicalOperator> nextOperatorRef;
@@ -160,7 +160,7 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         Mutable<ILogicalExpression> unnestVariableRef = new MutableObject<ILogicalExpression>(
                 new VariableReferenceExpression(unnestVariable));
         aggregateSequenceArgs.add(unnestVariableRef);
-        
+
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
         ILogicalExpression aggregateExp = new AggregateFunctionCallExpression(BuiltinOperators.SEQUENCE, false,
                 aggregateSequenceArgs);
@@ -199,6 +199,7 @@ public class ConvertAssignSortDistinctNodesToOperatorsRule implements IAlgebraic
         }
     }
 
+    @SuppressWarnings("unused")
     private OrderOperator getOrderOperator(Mutable<ILogicalExpression> variableRef) {
         List<Pair<IOrder, Mutable<ILogicalExpression>>> orderArgs = new ArrayList<Pair<IOrder, Mutable<ILogicalExpression>>>();
         orderArgs.add(new Pair<IOrder, Mutable<ILogicalExpression>>(OrderOperator.ASC_ORDER, variableRef));

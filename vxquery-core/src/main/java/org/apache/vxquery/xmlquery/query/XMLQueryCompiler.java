@@ -126,7 +126,7 @@ public class XMLQueryCompiler {
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("rawtypes")
             @Override
             public ISerializerDeserializer getSerializerDeserializer(Object type) throws AlgebricksException {
                 return null;

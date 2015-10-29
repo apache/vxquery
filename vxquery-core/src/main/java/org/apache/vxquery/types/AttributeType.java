@@ -17,6 +17,8 @@
 package org.apache.vxquery.types;
 
 public final class AttributeType extends AbstractNodeType {
+    private static final long serialVersionUID = 1L;
+
     public static final AttributeType ANYATTRIBUTE = new AttributeType(NameTest.STAR_NAMETEST,
             BuiltinTypeRegistry.XS_ANY_ATOMIC);
 

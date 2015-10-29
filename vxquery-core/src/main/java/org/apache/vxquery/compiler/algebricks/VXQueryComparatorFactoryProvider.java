@@ -33,6 +33,7 @@ public class VXQueryComparatorFactoryProvider implements IBinaryComparatorFactor
     private static class BinaryComparatorFactory implements IBinaryComparatorFactory {
         private static final long serialVersionUID = 1L;
 
+        @SuppressWarnings("unused")
         private final boolean ascending;
 
         public BinaryComparatorFactory(Object type, boolean ascending) {

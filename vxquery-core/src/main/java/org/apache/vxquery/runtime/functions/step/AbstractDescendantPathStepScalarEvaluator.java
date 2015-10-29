@@ -46,9 +46,11 @@ public abstract class AbstractDescendantPathStepScalarEvaluator extends Abstract
 
     /**
      * Search through all tree children and children's children.
-     * 
+     *
      * @param nodePointable
+     *            Node pointable
      * @throws SystemException
+     *             Could not save result.
      */
     protected void searchSubtree(TaggedValuePointable nodePointable) throws SystemException {
         try {

@@ -110,9 +110,9 @@ public class FnSubsequenceScalarEvaluatorFactory extends AbstractTaggedValueArgu
 
             /**
              * XQuery Specification calls for double value. Integer and Decimal are allowed to cut down on casting.
-             * 
+             *
              * @param tvp
-             * @return
+             * @return long
              * @throws SystemException
              * @throws IOException
              */

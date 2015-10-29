@@ -40,9 +40,9 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 
 public abstract class AbstractCastToOperation {
 
-    /**
-     * Primitive Datatypes
-     */
+    //
+    // Primitive Datatypes
+    //
     public void convertAnyURI(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
@@ -135,9 +135,9 @@ public abstract class AbstractCastToOperation {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
-    /**
-     * Derived Numeric Datatypes
-     */
+    //
+    // Derived Numeric Datatypes
+    //
     public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
@@ -186,9 +186,9 @@ public abstract class AbstractCastToOperation {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
-    /**
-     * Derived String Datatypes
-     */
+    //
+    // Derived String Datatypes
+    //
 
     public void convertEntity(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
@@ -218,8 +218,8 @@ public abstract class AbstractCastToOperation {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
-    public void convertNormalizedString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException,
-            IOException {
+    public void convertNormalizedString(UTF8StringPointable stringp, DataOutput dOut)
+            throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 

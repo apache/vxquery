@@ -131,6 +131,11 @@ public class ExpressionToolbox {
 
     /**
      * Finds all functions for a given expression.
+     *
+     * @param mutableLe
+     *            Search logical expression
+     * @param finds
+     *            Logical expressions found
      */
     public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe,
             List<Mutable<ILogicalExpression>> finds) {
@@ -146,6 +151,13 @@ public class ExpressionToolbox {
 
     /**
      * Finds all functions for a given expression and function identifier.
+     *
+     * @param mutableLe
+     *            Search logical expression
+     * @param fi
+     *            Function indentifier
+     * @param finds
+     *            Logical expressions found
      */
     public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi,
             List<Mutable<ILogicalExpression>> finds) {

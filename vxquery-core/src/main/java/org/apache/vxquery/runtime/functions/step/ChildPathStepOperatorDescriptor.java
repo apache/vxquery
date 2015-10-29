@@ -66,6 +66,12 @@ public class ChildPathStepOperatorDescriptor extends AbstractForwardAxisPathStep
     /**
      * Single node tree input.
      * Requirement: "ntp" must be the node tree.
+     *
+     * @param result
+     *            Node tree pointable
+     * @return found result
+     * @throws AlgebricksException
+     *             Could not save result.
      */
     public boolean step(IPointable result) throws AlgebricksException {
         ntp.getRootNode(tvpStep);
@@ -77,6 +83,16 @@ public class ChildPathStepOperatorDescriptor extends AbstractForwardAxisPathStep
 
     /**
      * Find the next node to return.
+     *
+     * @param tvpInput
+     *            pointable
+     * @param level
+     *            level
+     * @param result
+     *            result
+     * @return found result
+     * @throws AlgebricksException
+     *             Could not save result.
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
             throws AlgebricksException {

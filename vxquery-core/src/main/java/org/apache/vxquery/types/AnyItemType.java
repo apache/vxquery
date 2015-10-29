@@ -17,6 +17,7 @@
 package org.apache.vxquery.types;
 
 public final class AnyItemType implements ItemType {
+    private static final long serialVersionUID = 1L;
     public static final AnyItemType INSTANCE = new AnyItemType();
 
     private AnyItemType() {

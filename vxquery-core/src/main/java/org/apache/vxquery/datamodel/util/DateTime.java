@@ -63,9 +63,10 @@ public class DateTime {
 
     /**
      * Check whether a given year is a leap year.
-     * 
+     *
      * @param year
-     * @return
+     *            A long for year.
+     * @return Boolean for leap year.
      */
     public static boolean isLeapYear(long year) {
         return ((year & 3) == 0) && ((year % 100) != 0 || (year % 400) == 0);
@@ -73,9 +74,24 @@ public class DateTime {
 
     /**
      * Check whether a given year is a leap year.
-     * 
+     *
      * @param year
-     * @return
+     *            year
+     * @param month
+     *            month
+     * @param day
+     *            day
+     * @param hour
+     *            hour
+     * @param minute
+     *            minute
+     * @param millisecond
+     *            millisecond
+     * @param timezoneHour
+     *            timezoneHour
+     * @param timezoneMinute
+     *            timezoneMinute
+     * @return Boolean for valid date.
      */
     public static boolean valid(long year, long month, long day, long hour, long minute, long millisecond,
             long timezoneHour, long timezoneMinute) {
@@ -115,6 +131,19 @@ public class DateTime {
 
     /**
      * Return a normalized time.
+     *
+     * @param yearMonth
+     *            Months
+     * @param dayTime
+     *            Time
+     * @param timezoneHour
+     *            timezoneHour
+     * @param timezoneMinute
+     *            timezoneMinute
+     * @param dOut
+     *            Data out
+     * @throws IOException
+     *             Could not write result.
      */
     public static void normalizeDateTime(long yearMonth, long dayTime, long timezoneHour, long timezoneMinute,
             DataOutput dOut) throws IOException {
@@ -221,7 +250,8 @@ public class DateTime {
         DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, 0, 0, dOut);
     }
 
-    public static void adjustDateTimeToTimezone(ITimezone timezonep, long timezone, DataOutput dOut) throws IOException {
+    public static void adjustDateTimeToTimezone(ITimezone timezonep, long timezone, DataOutput dOut)
+            throws IOException {
         long timezoneHour = timezone / 60;
         long timezoneMinute = timezone % 60;
         long dayTime = timezonep.getDayTime();
@@ -229,8 +259,8 @@ public class DateTime {
                 || timezonep.getTimezoneMinute() == DateTime.TIMEZONE_MINUTE_NULL) {
             // No change.
         } else {
-            dayTime -= (timezonep.getTimezoneHour() * DateTime.CHRONON_OF_HOUR + timezonep.getTimezoneMinute()
-                    * DateTime.CHRONON_OF_MINUTE);
+            dayTime -= (timezonep.getTimezoneHour() * DateTime.CHRONON_OF_HOUR
+                    + timezonep.getTimezoneMinute() * DateTime.CHRONON_OF_MINUTE);
             dayTime += (timezoneHour * DateTime.CHRONON_OF_HOUR + timezoneMinute * DateTime.CHRONON_OF_MINUTE);
         }
         DateTime.normalizeDateTime(timezonep.getYearMonth(), dayTime, timezoneHour, timezoneMinute, dOut);

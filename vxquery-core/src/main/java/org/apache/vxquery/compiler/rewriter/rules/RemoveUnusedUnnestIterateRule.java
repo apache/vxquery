@@ -17,10 +17,6 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
-import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
-import org.apache.vxquery.functions.BuiltinOperators;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
@@ -33,32 +29,32 @@ import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceE
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractScanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import org.apache.vxquery.functions.BuiltinOperators;
 
 /**
  * The rule searches for an unnest operator (1) immediately following an unnest
  * or data scan operator (2). If the variable is only used in unnest (1) then
  * unnest (1) can be removed.
- * 
+ *
  * <pre>
- * Before 
- * 
+ * Before
+ *
  *   plan__parent
  *   UNNEST( $v2 : iterate( $v1 ) )
  *   UNNEST( $v1 : $v )
  *   plan__child
- *   
+ *
  *   Where $v1 is not used in plan__parent.
- *   
+ *
  * After
- * 
+ *
  *   plan__parent
  *   ASSIGN( $v2 : $v1 )
  *   UNNEST( $v1 : $v )
  *   plan__child
  * </pre>
- * 
+ *
  * @author prestonc
  */
 public class RemoveUnusedUnnestIterateRule extends AbstractUsedVariablesProcessingRule {

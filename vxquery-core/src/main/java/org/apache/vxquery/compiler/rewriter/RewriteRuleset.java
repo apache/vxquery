@@ -90,6 +90,7 @@ import org.apache.hyracks.algebricks.rewriter.rules.SubplanOutOfGroupRule;
 public class RewriteRuleset {
     /**
      * Optimizations specific to XQuery.
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildPathStepNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
@@ -146,6 +147,7 @@ public class RewriteRuleset {
 
     /**
      * Optimizations specific to XQuery.
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
@@ -170,6 +172,7 @@ public class RewriteRuleset {
 
     /**
      * Remove expressions known to be redundant.
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildInlineRedundantExpressionNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
@@ -188,6 +191,7 @@ public class RewriteRuleset {
 
     /**
      * When a nested data sources exist, convert the plan to use the join operator.
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildNestedDataSourceRuleCollection() {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();
@@ -211,6 +215,7 @@ public class RewriteRuleset {
 
     /**
      * Unnest more complex structures.
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildUnnestingRuleCollection() {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();

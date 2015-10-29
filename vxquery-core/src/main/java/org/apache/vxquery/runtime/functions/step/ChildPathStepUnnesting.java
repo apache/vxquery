@@ -62,7 +62,7 @@ public class ChildPathStepUnnesting extends AbstractForwardAxisPathStep {
             SequenceType sType = dCtx.getStaticContext().lookupSequenceType(ip.getInteger());
             filter = NodeTestFilter.getNodeTestFilter(sType);
         }
-        
+
         if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
             args[0].getValue(seqNtp);
             seqArgsLength = seqNtp.getEntryCount();
@@ -101,6 +101,16 @@ public class ChildPathStepUnnesting extends AbstractForwardAxisPathStep {
 
     /**
      * Find the next node to return.
+     *
+     * @param tvpInput
+     *            pointable
+     * @param level
+     *            level
+     * @param result
+     *            result
+     * @return found result
+     * @throws AlgebricksException
+     *             Could not save result.
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
             throws AlgebricksException {

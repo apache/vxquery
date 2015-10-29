@@ -43,13 +43,18 @@ import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  * Factors out function expressions from each comparison function or similarity function in join condition by assigning them to a variables, and replacing the function expressions with references to those variables.
  * Examples:
  * Plan with function expressions in comparison or similarity condition of join expression. Generates one assign operator per extracted function expression.
- * Example
+ *
+ * <pre>
  * Before plan:
- * join ( eq( funcX($$1), funcX($$2) ) )
+ *
+ *   join ( eq( funcX($$1), funcX($$2) ) )
+ *
  * After plan:
- * join (eq($$3,$$4))
- * assign [$$4] <- [funcY($$2)]
- * assign [$$3] <- [funcX($$1)]
+ *
+ *   join (eq($$3,$$4))
+ *   assign [$$4] &lt;- [funcY($$2)]
+ *   assign [$$3] &lt;- [funcX($$1)]
+ * </pre>
  */
 public class ExtractFunctionsFromJoinConditionRule implements IAlgebraicRewriteRule {
 

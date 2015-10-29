@@ -17,6 +17,7 @@
 package org.apache.vxquery.types;
 
 public final class TextType extends AbstractNodeType {
+    private static final long serialVersionUID = 1L;
     public static final TextType INSTANCE = new TextType();
 
     private TextType() {
