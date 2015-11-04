@@ -15,11 +15,10 @@
 package org.apache.vxquery.cli;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,39 +28,47 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.hyracks.api.client.HyracksConnection;
-import org.apache.hyracks.api.client.IHyracksClientConnection;
-import org.apache.hyracks.api.client.NodeControllerInfo;
-import org.apache.hyracks.api.comm.IFrame;
-import org.apache.hyracks.api.comm.IFrameTupleAccessor;
-import org.apache.hyracks.api.comm.VSizeFrame;
-import org.apache.hyracks.api.dataset.IHyracksDataset;
-import org.apache.hyracks.api.dataset.IHyracksDatasetReader;
-import org.apache.hyracks.api.dataset.ResultSetId;
-import org.apache.hyracks.api.job.JobFlag;
-import org.apache.hyracks.api.job.JobId;
-import org.apache.hyracks.api.job.JobSpecification;
-import org.apache.hyracks.client.dataset.HyracksDataset;
-import org.apache.hyracks.control.cc.ClusterControllerService;
-import org.apache.hyracks.control.common.controllers.CCConfig;
-import org.apache.hyracks.control.common.controllers.NCConfig;
-import org.apache.hyracks.control.nc.NodeControllerService;
-import org.apache.hyracks.control.nc.resources.memory.FrameManager;
-import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
+import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
+import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.query.Module;
-import org.apache.vxquery.xmlquery.query.VXQueryCompilationListener;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
+import org.apache.vxquery.xmlquery.query.XQueryCompilationListener;
+import org.json.JSONException;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.PlanPrettyPrinter;
+import edu.uci.ics.hyracks.algebricks.core.algebra.visitors.ILogicalExpressionVisitor;
+import edu.uci.ics.hyracks.api.client.HyracksConnection;
+import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
+import edu.uci.ics.hyracks.api.client.NodeControllerInfo;
+import edu.uci.ics.hyracks.api.comm.IFrameTupleAccessor;
+import edu.uci.ics.hyracks.api.dataset.IHyracksDataset;
+import edu.uci.ics.hyracks.api.dataset.IHyracksDatasetReader;
+import edu.uci.ics.hyracks.api.dataset.ResultSetId;
+import edu.uci.ics.hyracks.api.job.JobFlag;
+import edu.uci.ics.hyracks.api.job.JobId;
+import edu.uci.ics.hyracks.api.job.JobSpecification;
+import edu.uci.ics.hyracks.client.dataset.HyracksDataset;
+import edu.uci.ics.hyracks.control.cc.ClusterControllerService;
+import edu.uci.ics.hyracks.control.common.controllers.CCConfig;
+import edu.uci.ics.hyracks.control.common.controllers.NCConfig;
+import edu.uci.ics.hyracks.control.nc.NodeControllerService;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 
 public class VXQuery {
     private final CmdLineOptions opts;
@@ -80,7 +87,7 @@ public class VXQuery {
 
     /**
      * Constructor to use command line options passed.
-     *
+     * 
      * @param opts
      *            Command line options object
      */
@@ -90,7 +97,7 @@ public class VXQuery {
 
     /**
      * Main method to get command line options and execute query process.
-     *
+     * 
      * @param args
      * @throws Exception
      */
@@ -118,9 +125,8 @@ public class VXQuery {
             timingMessage("Execution time: " + (end.getTime() - start.getTime()) + " ms");
             if (opts.repeatExec > opts.timingIgnoreQueries) {
                 long mean = sumTiming / (opts.repeatExec - opts.timingIgnoreQueries);
-                double sd = Math
-                        .sqrt(sumSquaredTiming / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue())
-                                - mean * mean);
+                double sd = Math.sqrt(sumSquaredTiming
+                        / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue()) - mean * mean);
                 timingMessage("Average execution time: " + mean + " ms");
                 timingMessage("Standard deviation: " + String.format("%.4f", sd));
                 timingMessage("Coefficient of variation: " + String.format("%.4f", (sd / mean)));
@@ -138,7 +144,7 @@ public class VXQuery {
     /**
      * Creates a new Hyracks connection with: the client IP address and port provided, if IP address is provided in command line. Otherwise create a new virtual
      * cluster with Hyracks nodes. Queries passed are run either way. After running queries, if a virtual cluster has been created, it is shut down.
-     *
+     * 
      * @throws Exception
      */
     private void execute() throws Exception {
@@ -164,7 +170,7 @@ public class VXQuery {
     /**
      * Reads the contents of the files passed in the list of arguments to a string. If -showquery argument is passed, output the query as string. Run the query
      * for the string.
-     *
+     * 
      * @throws IOException
      * @throws SystemException
      * @throws Exception
@@ -177,9 +183,81 @@ public class VXQuery {
             if (opts.showQuery) {
                 System.err.println(qStr);
             }
+            XQueryCompilationListener listener = new XQueryCompilationListener() {
 
-            VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
-                    opts.showOET, opts.showRP);
+                /**
+                 * On providing -showrp argument, output the query inputs, outputs and user constraints for each module as result of code generation.
+                 * 
+                 * @param module
+                 */
+                @Override
+                public void notifyCodegenResult(Module module) {
+                    if (opts.showRP) {
+                        JobSpecification jobSpec = module.getHyracksJobSpecification();
+                        try {
+                            System.err.println(jobSpec.toJSON().toString(2));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            System.err.println(jobSpec.toString());
+                        }
+                    }
+                }
+
+                /**
+                 * On providing -showtet argument, output the syntax translation tree for the module in the format: "-- logical operator(if exists) | execution mode |"
+                 * where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
+                 * 
+                 * @param module
+                 */
+                @Override
+                public void notifyTranslationResult(Module module) {
+                    if (opts.showTET) {
+                        System.err.println(appendPrettyPlan(new StringBuilder(), module).toString());
+                    }
+                }
+
+                @Override
+                public void notifyTypecheckResult(Module module) {
+                }
+
+                /**
+                 * On providing -showoet argument, output the optimized expression tree for the module in the format:
+                 * "-- logical operator(if exists) | execution mode |" where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
+                 * 
+                 * @param module
+                 */
+                @Override
+                public void notifyOptimizedResult(Module module) {
+                    if (opts.showOET) {
+                        System.err.println(appendPrettyPlan(new StringBuilder(), module).toString());
+                    }
+                }
+
+                /**
+                 * On providing -showast argument, output the abstract syntax tree obtained from parsing by serializing the DomDriver object to a pretty-printed XML
+                 * String.
+                 * 
+                 * @param moduleNode
+                 */
+                @Override
+                public void notifyParseResult(ModuleNode moduleNode) {
+                    if (opts.showAST) {
+                        System.err.println(new XStream(new DomDriver()).toXML(moduleNode));
+                    }
+                }
+
+                private StringBuilder appendPrettyPlan(StringBuilder sb, Module module) {
+                    try {
+                        ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(
+                                module.getModuleContext());
+                        LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
+                        PlanPrettyPrinter.printPlan(module.getBody(), sb, v, 0);
+                    } catch (AlgebricksException e) {
+                        e.printStackTrace();
+                    }
+                    return sb;
+                }
+            };
 
             start = opts.timing ? new Date() : null;
             XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize,
@@ -203,12 +281,7 @@ public class VXQuery {
             DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
             js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
-            OutputStream resultStream = System.out;
-            if (opts.resultFile != null) {
-                resultStream = new FileOutputStream(new File(opts.resultFile));
-            }
-
-            PrintWriter writer = new PrintWriter(resultStream, true);
+            PrintWriter writer = new PrintWriter(System.out, true);
             // Repeat execution for number of times provided in -repeatexec argument
             for (int i = 0; i < opts.repeatExec; ++i) {
                 start = opts.timing ? new Date() : null;
@@ -235,7 +308,7 @@ public class VXQuery {
 
     /**
      * Get cluster node configuration.
-     *
+     * 
      * @return Configuration of node controllers as array of Strings.
      * @throws Exception
      */
@@ -252,7 +325,7 @@ public class VXQuery {
     /**
      * Creates a Hyracks dataset, if not already existing with the job frame size, and 1 reader. Allocates a new buffer of size specified in the frame of Hyracks
      * node. Creates new dataset reader with the current job ID and result set ID. Outputs the string in buffer for each frame.
-     *
+     * 
      * @param spec
      *            JobSpecification object, containing frame size. Current specified job.
      * @param writer
@@ -267,15 +340,15 @@ public class VXQuery {
 
         JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
 
-        FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
-        IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
+        ByteBuffer buffer = ByteBuffer.allocate(spec.getFrameSize());
         IHyracksDatasetReader reader = hds.createReader(jobId, resultSetId);
-        IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
+        IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor(spec.getFrameSize());
+        buffer.clear();
 
-        while (reader.read(frame) > 0) {
-            writer.print(ResultUtils.getStringFromBuffer(frame.getBuffer(), frameTupleAccessor));
+        while (reader.read(buffer) > 0) {
+            buffer.clear();
+            writer.print(ResultUtils.getStringFromBuffer(buffer, frameTupleAccessor));
             writer.flush();
-            frame.getBuffer().clear();
         }
 
         hcc.waitForCompletion(jobId);
@@ -283,7 +356,7 @@ public class VXQuery {
 
     /**
      * Create a unique result set id to get the correct query back from the cluster.
-     *
+     * 
      * @return Result Set id generated with current system time.
      */
     protected ResultSetId createResultSetId() {
@@ -293,7 +366,7 @@ public class VXQuery {
     /**
      * Start local virtual cluster with cluster controller node and node controller nodes. IP address provided for node controller is localhost. Unassigned ports
      * 39000 and 39001 are used for client and cluster port respectively. Creates a new Hyracks connection with the IP address and client ports.
-     *
+     * 
      * @throws Exception
      */
     public void startLocalHyracks() throws Exception {
@@ -316,7 +389,7 @@ public class VXQuery {
             ncConfig.dataIPAddress = "127.0.0.1";
             ncConfig.resultIPAddress = "127.0.0.1";
             ncConfig.nodeId = "nc" + (i + 1);
-            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
+            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString(); 
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
         }
@@ -326,7 +399,7 @@ public class VXQuery {
 
     /**
      * Shuts down the virtual cluster, along with all nodes and node execution, network and queue managers.
-     *
+     * 
      * @throws Exception
      */
     public void stopLocalHyracks() throws Exception {
@@ -338,7 +411,7 @@ public class VXQuery {
 
     /**
      * Reads the contents of file given in query into a String. The file is always closed. For XML files UTF-8 encoding is used.
-     *
+     * 
      * @param query
      *            The query with filename to be processed
      * @return UTF-8 formatted query string
@@ -350,7 +423,7 @@ public class VXQuery {
 
     /**
      * Save and print out the timing message.
-     *
+     * 
      * @param message
      */
     private static void timingMessage(String message) {
@@ -362,58 +435,55 @@ public class VXQuery {
      * Helper class with fields and methods to handle all command line options
      */
     private static class CmdLineOptions {
-        @Option(name = "-available-processors", usage = "Number of available processors. (default: java's available processors)")
+        @Option(name = "-available-processors", usage = "Number of available processors. (default java's available processors)")
         private int availableProcessors = -1;
 
-        @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController.")
+        @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController")
         private String clientNetIpAddress = null;
 
-        @Option(name = "-client-net-port", usage = "Port of the ClusterController. (default: 1098)")
+        @Option(name = "-client-net-port", usage = "Port of the ClusterController (default 1098)")
         private int clientNetPort = 1098;
 
-        @Option(name = "-local-node-controllers", usage = "Number of local node controllers. (default: 1)")
+        @Option(name = "-local-node-controllers", usage = "Number of local node controllers (default 1)")
         private int localNodeControllers = 1;
 
-        @Option(name = "-frame-size", usage = "Frame size in bytes. (default: 65,536)")
+        @Option(name = "-frame-size", usage = "Frame size in bytes. (default 65,536)")
         private int frameSize = 65536;
 
-        @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default: 67,108,864)")
+        @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default 67,108,864)")
         private long joinHashSize = -1;
 
-        @Option(name = "-maximum-data-size", usage = "Maximum possible data size in bytes. (default: 150,323,855,000)")
+        @Option(name = "-maximum-data-size", usage = "Maximum possible data size in bytes. (default 150,323,855,000)")
         private long maximumDataSize = -1;
 
         @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
         private int bufferSize = -1;
 
-        @Option(name = "-O", usage = "Optimization Level. (default: Full Optimization)")
+        @Option(name = "-O", usage = "Optimization Level. Default: Full Optimization")
         private int optimizationLevel = Integer.MAX_VALUE;
 
-        @Option(name = "-showquery", usage = "Show query string.")
+        @Option(name = "-showquery", usage = "Show query string")
         private boolean showQuery;
 
-        @Option(name = "-showast", usage = "Show abstract syntax tree.")
+        @Option(name = "-showast", usage = "Show abstract syntax tree")
         private boolean showAST;
 
-        @Option(name = "-showtet", usage = "Show translated expression tree.")
+        @Option(name = "-showtet", usage = "Show translated expression tree")
         private boolean showTET;
 
-        @Option(name = "-showoet", usage = "Show optimized expression tree.")
+        @Option(name = "-showoet", usage = "Show optimized expression tree")
         private boolean showOET;
 
-        @Option(name = "-showrp", usage = "Show Runtime plan.")
+        @Option(name = "-showrp", usage = "Show Runtime plan")
         private boolean showRP;
 
-        @Option(name = "-compileonly", usage = "Compile the query and stop.")
+        @Option(name = "-compileonly", usage = "Compile the query and stop")
         private boolean compileOnly;
 
-        @Option(name = "-repeatexec", usage = "Number of times to repeat execution.")
+        @Option(name = "-repeatexec", usage = "Number of times to repeat execution")
         private int repeatExec = 1;
 
-        @Option(name = "-result-file", usage = "File path to save the query result.")
-        private String resultFile = null;
-
-        @Option(name = "-timing", usage = "Produce timing information.")
+        @Option(name = "-timing", usage = "Produce timing information")
         private boolean timing;
 
         @Option(name = "-timing-ignore-queries", usage = "Ignore the first X number of quereies.")

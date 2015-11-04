@@ -17,7 +17,6 @@
 package org.apache.vxquery.types;
 
 public final class AnyType implements ComplexType {
-    private static final long serialVersionUID = 1L;
     public static final SchemaType INSTANCE = new AnyType();
 
     private AnyType() {

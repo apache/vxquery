@@ -19,7 +19,7 @@ package org.apache.vxquery.runtime.functions.comparison.general;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
 import org.apache.vxquery.runtime.functions.comparison.ValueLeComparisonOperation;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class GeneralLeComparisonScalarEvaluatorFactory extends AbstractGeneralComparisonScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

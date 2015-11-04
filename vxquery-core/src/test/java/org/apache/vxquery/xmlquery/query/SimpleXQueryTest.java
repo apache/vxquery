@@ -29,7 +29,7 @@ import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.junit.Test;
 
-import org.apache.hyracks.api.dataset.ResultSetId;
+import edu.uci.ics.hyracks.api.dataset.ResultSetId;
 
 public class SimpleXQueryTest {
     @Test

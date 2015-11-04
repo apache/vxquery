@@ -27,12 +27,10 @@ public final class Signature {
     private SequenceType[] parameterTypes;
     private SequenceType rType;
 
-    @SuppressWarnings("unchecked")
     public Signature(SequenceType rType, Pair<QName, SequenceType>... parameters) {
         this(rType, false, parameters);
     }
 
-    @SuppressWarnings("unchecked")
     public Signature(SequenceType rType, boolean varArgs, Pair<QName, SequenceType>... parameters) {
         int len = parameters.length;
         this.varArgs = varArgs;

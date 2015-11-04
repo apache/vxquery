@@ -16,11 +16,11 @@
  */
 package org.apache.vxquery.metadata;
 
-import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSink;
-import org.apache.hyracks.algebricks.core.algebra.properties.FileSplitDomain;
-import org.apache.hyracks.algebricks.core.algebra.properties.IPartitioningProperty;
-import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
-import org.apache.hyracks.dataflow.std.file.FileSplit;
+import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IDataSink;
+import edu.uci.ics.hyracks.algebricks.core.algebra.properties.FileSplitDomain;
+import edu.uci.ics.hyracks.algebricks.core.algebra.properties.IPartitioningProperty;
+import edu.uci.ics.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
+import edu.uci.ics.hyracks.dataflow.std.file.FileSplit;
 
 public class QueryResultDataSink implements IDataSink {
     private final FileSplit[] fileSplits;

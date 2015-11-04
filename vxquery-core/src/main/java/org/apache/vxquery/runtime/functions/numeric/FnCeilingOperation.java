@@ -23,9 +23,9 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.FloatPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
+import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
 
 public class FnCeilingOperation extends AbstractNumericOperation {
 
@@ -33,11 +33,7 @@ public class FnCeilingOperation extends AbstractNumericOperation {
     public void operateDecimal(XSDecimalPointable decp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_DECIMAL_TAG);
         dOut.write(0);
-        if (decp.getDecimalValue() > 0 && decp.getDecimalPlace() > 0) {
-            dOut.writeLong((long) (decp.getBeforeDecimalPlace()) + 1);
-        } else {
-            dOut.writeLong((long) (decp.getBeforeDecimalPlace()));
-        }
+        dOut.writeLong((long) Math.ceil(decp.doubleValue()));
     }
 
     @Override

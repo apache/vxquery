@@ -30,18 +30,18 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.BytePointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.FloatPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.ShortPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
+import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
+import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
+import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnRoundHalfToEvenScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -99,35 +99,28 @@ public class FnRoundHalfToEvenScalarEvaluatorFactory extends AbstractTaggedValue
                                 return;
                             }
                             break;
+
                     }
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
+
                 // Prepare input.
                 try {
                     getDecimalPointable(tp, tvp1);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
+
                 // Perform rounding on decimal value.
-                byte decimalPlace = tp.decp.getDecimalPlace();
-                long decimalValue = tp.decp.getDecimalValue();
-                long newValue;
-                //check if the input needs to rounded to even or normally
-                if (decimalPlace - precision == 1 && (Math.abs(decimalValue) % 10 == 5)) {
-                    newValue = decimalValue / 10;
-                    if (!(newValue % 2 == 0)) {
-                        if (newValue > 0) {
-                            newValue += 1;
-                        } else {
-                            newValue -= 1;
-                        }
-                    }
-                    tp.decp.setDecimal(newValue, (byte) precision);
-                } else if ((precision - decimalPlace) < 0) {
-                    decimalValue = (long) Math.round(decimalValue / Math.pow(10, -(precision - decimalPlace)));
+                // TODO round half to the nearest even number.
+                long decimalPlace = tp.decp.getDecimalPlace();
+                if ((precision - decimalPlace) < 0) {
+                    long decimalValue = tp.decp.getDecimalValue();
+                    decimalValue = (long) (decimalValue / Math.pow(10, -(precision - decimalPlace)));
                     tp.decp.setDecimal(decimalValue, (byte) precision);
                 }
+
                 // Return result.
                 try {
                     switch (tvp1.getTag()) {

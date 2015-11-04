@@ -23,9 +23,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 
-import org.apache.hyracks.api.context.IHyracksJobletContext;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.api.context.IHyracksJobletContext;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 class DynamicContextImplFactory implements IDynamicContextFactory {
     private static final long serialVersionUID = 1L;

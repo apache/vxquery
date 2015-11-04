@@ -20,22 +20,23 @@ import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.functions.Function;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.UnnestingFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.UnnestingFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 /**
  * The rule searches for unnest(iterate) operator followed by an assign(child)
  * operator and merges the assign into the unnest operator.
- *
+ * 
  * <pre>
  * Before
  * 
@@ -43,23 +44,22 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperat
  *   UNNEST( $v2 : iterate( $v1 ) )
  *   ASSIGN( $v1 : sf1( $v0 ) )
  *   plan__child
- * 
+ *   
  *   where plan__parent does not use $v1 and $v0 is defined in plan__child.
  *   sf1 is a scalar function that has a unnesting implementation.
- * 
+ *   
  * After
  * 
  *   plan__parent
  *   UNNEST( $v2 : uf1( $v0 ) )
  *   plan__child
  * </pre>
- *
+ * 
  * @author prestonc
  */
-public class ConvertAssignToUnnestRule extends AbstractUsedVariablesProcessingRule {
+public class ConvertAssignToUnnestRule implements IAlgebraicRewriteRule {
     @Override
-    protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
-            throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
@@ -82,10 +82,6 @@ public class ConvertAssignToUnnestRule extends AbstractUsedVariablesProcessingRu
         }
         AssignOperator assign = (AssignOperator) op2;
 
-        if (usedVariables.contains(assign.getVariables())) {
-            return false;
-        }
-
         // Check to see if the expression has an unnesting implementation.
         ILogicalExpression logicalExpression2 = (ILogicalExpression) assign.getExpressions().get(0).getValue();
         if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
@@ -96,16 +92,21 @@ public class ConvertAssignToUnnestRule extends AbstractUsedVariablesProcessingRu
         if (!functionInfo2.hasUnnestingEvaluatorFactory()) {
             return false;
         }
+        
+        // TODO add checks for variables used that have now been removed.
 
         // Update the unnest parameters.
         unnest.getInputs().clear();
         unnest.getInputs().addAll(assign.getInputs());
-
-        UnnestingFunctionCallExpression child = new UnnestingFunctionCallExpression(functionInfo2,
-                functionCall2.getArguments());
+    
+        UnnestingFunctionCallExpression child = new UnnestingFunctionCallExpression(functionInfo2, functionCall2.getArguments());
         unnest.getExpressionRef().setValue(child);
-
+        
         return true;
     }
 
+    @Override
+    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
+        return false;
+    }
 }

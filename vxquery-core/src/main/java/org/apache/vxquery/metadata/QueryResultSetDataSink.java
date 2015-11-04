@@ -16,11 +16,11 @@
  */
 package org.apache.vxquery.metadata;
 
-import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSink;
-import org.apache.hyracks.algebricks.core.algebra.properties.IPartitioningProperty;
-import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
-import org.apache.hyracks.algebricks.core.algebra.properties.ResultSetDomain;
-import org.apache.hyracks.api.dataset.ResultSetId;
+import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IDataSink;
+import edu.uci.ics.hyracks.algebricks.core.algebra.properties.IPartitioningProperty;
+import edu.uci.ics.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
+import edu.uci.ics.hyracks.algebricks.core.algebra.properties.ResultSetDomain;
+import edu.uci.ics.hyracks.api.dataset.ResultSetId;
 
 public class QueryResultSetDataSink implements IDataSink {
 

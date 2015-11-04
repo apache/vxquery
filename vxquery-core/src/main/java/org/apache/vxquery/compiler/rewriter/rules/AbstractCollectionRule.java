@@ -23,29 +23,28 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
-import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
-import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
     final ByteBufferInputStream bbis = new ByteBufferInputStream();
@@ -55,12 +54,8 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
 
     /**
      * Get the constant value for the collection. Return null for not a collection.
-     *
-     * @param opRef
-     *            Logical operator
-     * @return collection name
      */
-    protected String getCollectionName(Mutable<ILogicalOperator> opRef) {
+    protected String getCollectionName(Mutable<ILogicalOperator> opRef) throws AlgebricksException {
         VXQueryConstantValue constantValue;
 
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
@@ -86,24 +81,45 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
             return null;
         }
 
-        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
-        if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
-            return null;
-        }
-        VariableReferenceExpression vre = (VariableReferenceExpression) logicalExpression2;
-        Mutable<ILogicalOperator> opRef3 = OperatorToolbox.findProducerOf(opRef, vre.getVariableReference());
-
         // Get the string assigned to the collection function.
-        AbstractLogicalOperator op3 = (AbstractLogicalOperator) opRef3.getValue();
+        AbstractLogicalOperator op3 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
         if (op3.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
             AssignOperator assign2 = (AssignOperator) op3;
 
             // Check to see if the expression is a constant expression and type string.
-            ILogicalExpression logicalExpression3 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
-            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+            ILogicalExpression logicalExpression2 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
+            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
                 return null;
             }
-            ConstantExpression constantExpression = (ConstantExpression) logicalExpression3;
+            ConstantExpression constantExpression = (ConstantExpression) logicalExpression2;
+            constantValue = (VXQueryConstantValue) constantExpression.getValue();
+            if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
+                return null;
+            }
+        } else if (op3.getOperatorTag() == LogicalOperatorTag.EMPTYTUPLESOURCE) {
+            ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(0).getValue();
+            if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return null;
+            }
+            AbstractFunctionCallExpression functionCall2 = (AbstractFunctionCallExpression) logicalExpression2;
+            if (!functionCall2.getFunctionIdentifier().equals(BuiltinOperators.PROMOTE.getFunctionIdentifier())) {
+                return null;
+            }
+
+            ILogicalExpression logicalExpression3 = (ILogicalExpression) functionCall2.getArguments().get(0).getValue();
+            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return null;
+            }
+            AbstractFunctionCallExpression functionCall3 = (AbstractFunctionCallExpression) logicalExpression3;
+            if (!functionCall3.getFunctionIdentifier().equals(BuiltinFunctions.FN_DATA_1.getFunctionIdentifier())) {
+                return null;
+            }
+
+            ILogicalExpression logicalExpression4 = (ILogicalExpression) functionCall3.getArguments().get(0).getValue();
+            if (logicalExpression4.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+                return null;
+            }
+            ConstantExpression constantExpression = (ConstantExpression) logicalExpression4;
             constantValue = (VXQueryConstantValue) constantExpression.getValue();
             if (constantValue.getType() != SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE)) {
                 return null;
@@ -118,8 +134,9 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
             tvp.getValue(stringp);
             try {
-                bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                        stringp.getLength() + stringp.getStartOffset())), 0);
+                bbis.setByteBuffer(
+                        ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                                stringp.getLength() + stringp.getStartOffset())), 0);
                 collectionName = di.readUTF();
             } catch (IOException e) {
                 e.printStackTrace();

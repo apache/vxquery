@@ -379,7 +379,10 @@ public class StaticContextImpl implements StaticContext {
             sequenceTypeList.add(type);
             return code;
         }
-        return code;
+        if (sequenceTypeMap.containsKey(type)) {
+            return sequenceTypeMap.get(type);
+        }
+        return -1;
     }
 
     List<SequenceType> getSequenceTypeList() {

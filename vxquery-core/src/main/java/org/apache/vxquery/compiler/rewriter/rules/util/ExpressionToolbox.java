@@ -29,18 +29,17 @@ import org.apache.vxquery.types.AnyNodeType;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
-import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
-import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
 
 public class ExpressionToolbox {
     public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe,
@@ -130,34 +129,7 @@ public class ExpressionToolbox {
     }
 
     /**
-     * Finds all functions for a given expression.
-     *
-     * @param mutableLe
-     *            Search logical expression
-     * @param finds
-     *            Logical expressions found
-     */
-    public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe,
-            List<Mutable<ILogicalExpression>> finds) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            finds.add(mutableLe);
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                findAllFunctionExpressions(argExp, finds);
-            }
-        }
-    }
-
-    /**
-     * Finds all functions for a given expression and function identifier.
-     *
-     * @param mutableLe
-     *            Search logical expression
-     * @param fi
-     *            Function indentifier
-     * @param finds
-     *            Logical expressions found
+     * Find all functions for a specific expression.
      */
     public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi,
             List<Mutable<ILogicalExpression>> finds) {
@@ -249,16 +221,6 @@ public class ExpressionToolbox {
                 }
                 AbstractLogicalOperator variableOp = (AbstractLogicalOperator) variableProducer.getValue();
                 switch (variableOp.getOperatorTag()) {
-                    case ASSIGN:
-                    case AGGREGATE:
-                    case RUNNINGAGGREGATE:
-                        AbstractAssignOperator assign = (AbstractAssignOperator) variableOp;
-                        for (int i = 0; i < assign.getVariables().size(); ++i) {
-                            if (variableId.equals(assign.getVariables().get(i))) {
-                                return getOutputSequenceType(variableProducer, assign.getExpressions().get(i), dCtx);
-                            }
-                        }
-                        return null;
                     case DATASOURCESCAN:
                         return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
                     case UNNEST:
@@ -271,18 +233,5 @@ public class ExpressionToolbox {
 
         }
         return null;
-    }
-
-    public static boolean isFunctionExpression(Mutable<ILogicalExpression> mutableLe,
-            AbstractFunctionCallExpression afce) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
-        }
-        AbstractFunctionCallExpression fc = (AbstractFunctionCallExpression) le;
-        if (!fc.getFunctionIdentifier().equals(afce)) {
-            return false;
-        }
-        return true;
     }
 }

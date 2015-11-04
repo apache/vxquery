@@ -91,7 +91,7 @@
             <title>Single Test</title>
             <description/>
          </GroupInfo>
-         &SingleQuery;
+         &SingleAlternateQuery;
       </test-group>
    </test-group>
 </test-suite>

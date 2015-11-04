@@ -16,9 +16,9 @@
  */
 package org.apache.vxquery.runtime.factory.hashfunction;
 
-import org.apache.hyracks.api.dataflow.value.IBinaryHashFunction;
-import org.apache.hyracks.api.dataflow.value.IBinaryHashFunctionFactory;
-import org.apache.hyracks.data.std.accessors.MurmurHash3BinaryHashFunctionFamily;
+import edu.uci.ics.hyracks.api.dataflow.value.IBinaryHashFunction;
+import edu.uci.ics.hyracks.api.dataflow.value.IBinaryHashFunctionFactory;
+import edu.uci.ics.hyracks.data.std.accessors.MurmurHash3BinaryHashFunctionFamily;
 
 public class VXQueryRawBinaryHashFunctionFactory implements IBinaryHashFunctionFactory {
     private static final long serialVersionUID = 1L;

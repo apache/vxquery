@@ -16,15 +16,10 @@ package org.apache.vxquery.xmlparser;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.hyracks.api.comm.IFrameFieldAppender;
-import org.apache.hyracks.api.comm.IFrameWriter;
-import org.apache.hyracks.api.exceptions.HyracksDataException;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.atomic.UTF8StringBuilder;
@@ -49,6 +44,14 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
+import edu.uci.ics.hyracks.api.comm.IFrameWriter;
+import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
+import edu.uci.ics.hyracks.dataflow.common.comm.util.FrameUtils;
+
 public class SAXContentHandler implements ContentHandler, LexicalHandler {
     // XML node builders
     private final AttributeNodeBuilder anb;
@@ -62,7 +65,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     private final List<ElementNodeBuilder> freeENBList;
 
     // Frame writing variables
-    private IFrameFieldAppender appender;
+    private FrameTupleAppender appender;
+    private ByteBuffer frame;
+    private FrameTupleAccessor fta;
     private int tupleIndex;
     private IFrameWriter writer;
 
@@ -112,11 +117,12 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         textABVS = new ArrayBackedValueStorage();
     }
 
-    public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, IFrameFieldAppender appender,
-            List<SequenceType> childSequenceTypes) {
+    public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, ByteBuffer frame,
+            FrameTupleAppender appender, List<SequenceType> childSequenceTypes) {
         this(attachTypes, nodeIdProvider);
 
         // Frame writing variables
+        this.frame = frame;
         this.appender = appender;
         setChildPathSteps(childSequenceTypes);
     }
@@ -139,8 +145,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
     }
 
-    public void setupElementWriter(IFrameWriter writer, int tupleIndex) {
+    public void setupElementWriter(IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex) {
         this.writer = writer;
+        this.fta = fta;
         this.tupleIndex = tupleIndex;
     }
 
@@ -167,7 +174,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             flushText();
             docb.endChildrenChunk();
             docb.finish();
-            if (appender != null) {
+            if (frame != null && appender != null) {
                 writeElement();
             }
         } catch (IOException e) {
@@ -275,23 +282,12 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
     }
 
-    /**
-     * The filter settings here are similar to one in the class linked below.
-     *
-     * @see org.apache.vxquery.runtime.functions.step.NodeTestFilter.java
-     */
     private boolean startElementChildPathStep(String uri, String localName) {
         if (subElement != null && depth <= subElement.length) {
             // Check path step if it exists.
-            subElement[depth - 1] = true;
-            if (uri != null) {
-                if (childUri[depth - 1] != null && uri.compareTo(childUri[depth - 1]) != 0) {
-                    subElement[depth - 1] = false;
-                }
-            }
-            if (localName != null) {
-                if (childLocalName[depth - 1] != null && localName.compareTo(childLocalName[depth - 1]) != 0) {
-                    subElement[depth - 1] = false;
+            if (uri.compareTo(childUri[depth - 1]) == 0) {
+                if (localName.compareTo(childLocalName[depth - 1]) == 0) {
+                    subElement[depth - 1] = true;
                 }
             }
         }
@@ -516,34 +512,29 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     private void addNodeToTuple(TaggedValuePointable result, int t) throws HyracksDataException {
-        FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(),
-                result.getLength());
-        //        // Send to the writer.
-        //        if (!addNodeToTupleAppender(result, t)) {
-        //            FrameUtils.flushFrame(frame, writer);
-        //            appender.reset(frame, true);
-        //            if (!addNodeToTupleAppender(result, t)) {
-        //                throw new HyracksDataException("Could not write frame.");
-        //            }
-        //        }
+        // Send to the writer.
+        if (!addNodeToTupleAppender(result, t)) {
+            FrameUtils.flushFrame(frame, writer);
+            appender.reset(frame, true);
+            if (!addNodeToTupleAppender(result, t)) {
+                throw new HyracksDataException("Could not write frame.");
+            }
+        }
     }
-    //
-    //    private boolean addNodeToTupleAppender(TaggedValuePointable result, int t) throws HyracksDataException {
-    //        // First copy all new fields over.
-    //        if (fta.getFieldCount() > 0) {
-    //            for (int f = 0; f < fta.getFieldCount(); ++f) {
-    //                if (!appender.appendField(fta, t, f)) {
-    //                    return false;
-    //                }
-    //            }
-    //        }
-    //        return appender.appendField(result.getByteArray(), result.getStartOffset(), result.getLength());
-    //    }
+
+    private boolean addNodeToTupleAppender(TaggedValuePointable result, int t) throws HyracksDataException {
+        // First copy all new fields over.
+        if (fta.getFieldCount() > 0) {
+            for (int f = 0; f < fta.getFieldCount(); ++f) {
+                if (!appender.appendField(fta, t, f)) {
+                    return false;
+                }
+            }
+        }
+        return appender.appendField(result.getByteArray(), result.getStartOffset(), result.getLength());
+    }
 
     private String getStringFromBytes(byte[] bytes) {
-        if (bytes == null) {
-            return null;
-        }
         StringBuilder sb = new StringBuilder();
         UTF8StringPointable.toString(sb, bytes, 0);
         return sb.toString();

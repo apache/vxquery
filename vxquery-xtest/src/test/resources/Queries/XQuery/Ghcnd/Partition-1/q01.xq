@@ -21,5 +21,5 @@
 (: meters per second). (Wind value is in tenth of a meter per second)         :)
 let $collection := "ghcnd"
 for $r in collection($collection)/dataCollection/data
-where $r/dataType eq "AWND" and xs:decimal($r/value) gt 491.744
+where $r/dataType eq "AWND" and xs:decimal(fn:data($r/value)) gt 491.744
 return $r

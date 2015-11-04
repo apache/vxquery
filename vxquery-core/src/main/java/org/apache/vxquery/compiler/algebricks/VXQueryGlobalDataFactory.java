@@ -18,8 +18,8 @@ package org.apache.vxquery.compiler.algebricks;
 
 import org.apache.vxquery.context.IDynamicContextFactory;
 
-import org.apache.hyracks.api.context.IHyracksJobletContext;
-import org.apache.hyracks.api.job.IGlobalJobDataFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksJobletContext;
+import edu.uci.ics.hyracks.api.job.IGlobalJobDataFactory;
 
 public class VXQueryGlobalDataFactory implements IGlobalJobDataFactory {
     private static final long serialVersionUID = 1L;

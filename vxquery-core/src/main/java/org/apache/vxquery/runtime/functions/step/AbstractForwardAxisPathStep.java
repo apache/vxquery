@@ -29,16 +29,15 @@ import org.apache.vxquery.datamodel.builders.nodes.NodeSubTreeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractForwardAxisPathStep {
     protected final DynamicContext dCtx;
     protected final PointablePool pp;
     protected final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
     private final ArrayBackedValueStorage nodeAbvs = new ArrayBackedValueStorage();
-    private final TaggedValuePointable tvpConvert = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
     private final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
     private final NodeSubTreeBuilder nstb = new NodeSubTreeBuilder();
@@ -62,8 +61,7 @@ public abstract class AbstractForwardAxisPathStep {
                     return;
                 }
         }
-        XDMConstants.setEmptySequence(tvpConvert);
-        tvpConvert.getValue(seqp);
+        XDMConstants.setEmptySequence(seqp);
     }
 
     protected void setNodeToResult(TaggedValuePointable tvpItem, IPointable result) throws IOException {
