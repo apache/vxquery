@@ -13,15 +13,23 @@
 ~~ See the License for the specific language governing permissions and
 ~~ limitations under the License.
 
-Apache VXQuery
+Get Started with the VXQuery Community
 
-  Apache VXQuery\x99 will be a standards compliant XML Query processor implemented in Java.
-  The focus is on the evaluation of queries on large amounts of XML data.
-  Specifically the goal is to evaluate queries on large collections of relatively small XML documents.
-  To achieve this queries will be evaluated on a cluster of shared nothing machines.
+  The following steps outline how to get involved with Apache VXQuery community.
+  These steps will connect you with the community and give you a place to start with XQuery.
 
-  There are lots of large collections of relatively small documents like e.g. the {{{http://www.sec.gov/info/edgar/ednews/dissemin.htm}EDGAR dataset}} or the {{{http://wiki.openstreetmap.org/wiki/Download}OpenStreetMap dataset}}.
-  However there are no XQuery processors available today that are capable of processing these datasets in parallel and making the contained information accessible.
-  
-
-  
+  * Sign up for the dev mailing list.
+ 
+    * {{{http://vxquery.apache.org/mail-lists.html}Mailing list}}
+ 
+  * Download the latest release and run a few queries.
+ 
+    * {{{http://vxquery.apache.org/user_installation.html}Installation instructions}}.
+   
+    * {{{http://vxquery.apache.org/user_query.html}Execute a query}}.
+   
+  * If you want more information on XQuery:
+ 
+    * Go through the {{{http://www.w3schools.com/xquery/}W3Schools XQuery tutorial}}.
+   
+    * Review the {{{http://www.w3.org/TR/xquery/}XQuery specification}}.

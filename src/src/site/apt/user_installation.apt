@@ -13,15 +13,21 @@
 ~~ See the License for the specific language governing permissions and
 ~~ limitations under the License.
 
-Apache VXQuery
+Installation
 
-  Apache VXQuery\x99 will be a standards compliant XML Query processor implemented in Java.
-  The focus is on the evaluation of queries on large amounts of XML data.
-  Specifically the goal is to evaluate queries on large collections of relatively small XML documents.
-  To achieve this queries will be evaluated on a cluster of shared nothing machines.
+* Requirements
 
-  There are lots of large collections of relatively small documents like e.g. the {{{http://www.sec.gov/info/edgar/ednews/dissemin.htm}EDGAR dataset}} or the {{{http://wiki.openstreetmap.org/wiki/Download}OpenStreetMap dataset}}.
-  However there are no XQuery processors available today that are capable of processing these datasets in parallel and making the contained information accessible.
-  
+  * Apache VXQuery\x99 source archive (apache-vxquery-X.Y-source-release.zip)
 
-  
+  * JDK >= 1.7
+
+  * Apache Maven >= 3.2
+
+* Steps
+
+--- 
+$ unzip apache-vxquery-X.Y-source-release.zip
+$ cd apache-vxquery-X.Y
+$ mvn package -DskipTests
+$ cd ..
+---
