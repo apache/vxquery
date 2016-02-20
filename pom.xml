@@ -157,27 +157,6 @@
         </site>
     </distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>hyracks-snapshots</id>
-            <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
-            <snapshots>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>hyracks-releases</id>
-            <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
-            <releases>
-            </releases>
-        </repository>
-        <repository>
-            <id>hyracks-thirdparty</id>
-            <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-thirdparty/</url>
-            <releases>
-            </releases>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
