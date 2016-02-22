@@ -17,7 +17,6 @@
 package org.apache.vxquery.types;
 
 public final class AnySimpleType implements SimpleType {
-    private static final long serialVersionUID = 1L;
     public static final SimpleType INSTANCE = new AnySimpleType();
 
     private AnySimpleType() {

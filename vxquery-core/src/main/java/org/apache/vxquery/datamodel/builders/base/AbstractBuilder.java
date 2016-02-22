@@ -18,7 +18,7 @@ package org.apache.vxquery.datamodel.builders.base;
 
 import java.io.IOException;
 
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
+import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
 
 public abstract class AbstractBuilder {
     public abstract void reset(IMutableValueStorage mvs) throws IOException;

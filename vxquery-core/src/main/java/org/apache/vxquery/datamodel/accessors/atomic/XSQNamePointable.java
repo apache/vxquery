@@ -16,11 +16,11 @@
  */
 package org.apache.vxquery.datamodel.accessors.atomic;
 
-import org.apache.hyracks.api.dataflow.value.ITypeTraits;
-import org.apache.hyracks.data.std.api.AbstractPointable;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.api.IPointableFactory;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
+import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 /**
  * The XSQNamePointable holds three strings: URI, Prefix and Local Name.

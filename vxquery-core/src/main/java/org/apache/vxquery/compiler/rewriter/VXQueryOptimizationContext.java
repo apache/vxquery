@@ -21,14 +21,14 @@ import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinalit
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrder;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.uniquenodes.UniqueNodes;
 
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
-import org.apache.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
-import org.apache.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
-import org.apache.hyracks.algebricks.core.rewriter.base.AlgebricksOptimizationContext;
-import org.apache.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.AlgebricksOptimizationContext;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
 
 public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
 

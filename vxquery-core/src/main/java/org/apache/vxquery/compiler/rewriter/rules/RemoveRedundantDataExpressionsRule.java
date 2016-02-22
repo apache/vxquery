@@ -19,7 +19,7 @@ package org.apache.vxquery.compiler.rewriter.rules;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 
 /**
  * The rule searches for where the xquery data function is used. When the

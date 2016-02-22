@@ -26,8 +26,8 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class CastToHexBinaryOperation extends AbstractCastToOperation {
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();

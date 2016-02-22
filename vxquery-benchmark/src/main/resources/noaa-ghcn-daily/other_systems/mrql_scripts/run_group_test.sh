@@ -31,23 +31,14 @@ fi
 
 DATASET=${1}
 NODES=${2}
-EMAIL=${3}
 REPEAT=1
 DATA_FILES=${NODES}
+#DATA_FILES=8
 
 # Start Hadoop
-# sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh
-sh saved/hadoop/hadoop-2.5.1/sbin/hadoop-daemon.sh start namenode
-sh saved/hadoop/hadoop-2.5.1/sbin/hadoop-daemons.sh start datanode
-sh saved/hadoop/hadoop-2.5.1/sbin/yarn-daemon.sh start resourcemanager
-sh saved/hadoop/hadoop-2.5.1/sbin/yarn-daemons.sh start nodemanager
-sh saved/hadoop/hadoop-2.5.1/sbin/mr-jobhistory-daemon.sh start historyserver
+sh saved/hadoop/hadoop-1.2.1/bin/start-all.sh
 
 sleep 10
-
-# Start Flink
-sh saved/flink/flink-yarn-0.6.1-incubating/bin/yarn-session.sh -n $((4*${NODES})) -tm 1024 &
-FLINK_PID=$!
 
 # Prepare hadoop file system
 hadoop fs -mkdir ${DATASET}
@@ -56,12 +47,19 @@ hadoop fs -mkdir ${DATASET}/sensors
 hadoop fs -mkdir ${DATASET}/stations
 hadoop fs -ls ${DATASET}
 
+# Prepare hadoop file system 2
+hadoop fs -mkdir ${DATASET}2
+hadoop fs -ls 
+hadoop fs -mkdir ${DATASET}2/sensors
+hadoop fs -mkdir ${DATASET}2/stations
+hadoop fs -ls ${DATASET}2
+
 hadoop balancer
 
 
 # Upload test data
 COUNTER=0
-while [ ${COUNTER} -lt ${DATA_FILES} ];
+while [ ${COUNTER} -lt ${NODES} ];
 do
     sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/load_node_file.sh ${DATASET} ${COUNTER}
     let COUNTER=COUNTER+1 
@@ -69,18 +67,9 @@ done
 
 
 # Start test
-sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET} ${EMAIL}
-
-# Stop Flink
-kill ${FLINK_PID}
-jobs -p
-kill $(jobs -p)
+sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh \
+        vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET}
 
 
 # Stop Hadoop
-# sh saved/hadoop/hadoop-1.2.1/bin/stop-all.sh
-sh saved/hadoop/hadoop-2.5.1/sbin/mr-jobhistory-daemon.sh stop historyserver
-sh saved/hadoop/hadoop-2.5.1/sbin/yarn-daemons.sh stop nodemanager
-sh saved/hadoop/hadoop-2.5.1/sbin/yarn-daemon.sh stop resourcemanager
-sh saved/hadoop/hadoop-2.5.1/sbin/hadoop-daemons.sh stop datanode
-sh saved/hadoop/hadoop-2.5.1/sbin/hadoop-daemon.sh stop namenode
+sh saved/hadoop/hadoop-1.2.1/bin/stop-all.sh

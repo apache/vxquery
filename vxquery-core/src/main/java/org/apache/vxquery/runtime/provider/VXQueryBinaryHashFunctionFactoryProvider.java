@@ -18,9 +18,9 @@ package org.apache.vxquery.runtime.provider;
 
 import org.apache.vxquery.runtime.factory.hashfunction.VXQueryRawBinaryHashFunctionFactory;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.data.IBinaryHashFunctionFactoryProvider;
-import org.apache.hyracks.api.dataflow.value.IBinaryHashFunctionFactory;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.data.IBinaryHashFunctionFactoryProvider;
+import edu.uci.ics.hyracks.api.dataflow.value.IBinaryHashFunctionFactory;
 
 public class VXQueryBinaryHashFunctionFactoryProvider implements IBinaryHashFunctionFactoryProvider {
 

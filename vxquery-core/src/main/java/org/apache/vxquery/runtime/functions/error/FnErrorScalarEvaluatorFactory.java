@@ -18,13 +18,6 @@ package org.apache.vxquery.runtime.functions.error;
 
 import java.io.DataInputStream;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
@@ -35,6 +28,14 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
+
 public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -42,7 +43,6 @@ public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
         super(args);
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {

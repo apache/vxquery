@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 
-<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="FunctionsAndOperatorsOnNumericQueries" featureOwner="VXQuery">
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="GhcndRecordsPartition1Queries" featureOwner="VXQuery">
    <GroupInfo>
       <title>Function and Operators on Numerics</title>
       <description/>
@@ -29,20 +29,5 @@
       <description>Query for fn:ceiling with all numeric types.</description>
       <query name="fn_ceiling" date="2015-01-05"/>
       <output-file compare="Text">fn_ceiling.txt</output-file>
-   </test-case>
-   <test-case name="functions-and-operators-on-numerics-fn_round-half-to-even" FilePath="Numerics/" Creator="Shivani Mall">
-      <description>Query for fn:round-half-to-even with all numeric types.</description>
-      <query name="fn_round-half-to-even" date="2015-02-25"/>
-      <output-file compare="Text">fn_round-half-to-even.txt</output-file>
-   </test-case>
-   <test-case name="functions-and-operators-on-numerics-fn_round" FilePath="Numerics/" Creator="Shivani Mall">
-      <description>Query for fn:round with all numeric types.</description>
-      <query name="fn_round" date="2015-02-25"/>
-      <output-file compare="Text">fn_round.txt</output-file>
-   </test-case>
-   <test-case name="functions-and-operators-on-numerics-fn_floor" FilePath="Numerics/" Creator="Shivani Mall">
-      <description>Query for fn:floor with all numeric types.</description>
-      <query name="fn_floor" date="2015-02-25"/>
-      <output-file compare="Text">fn_floor.txt</output-file>
    </test-case>
 </test-group>

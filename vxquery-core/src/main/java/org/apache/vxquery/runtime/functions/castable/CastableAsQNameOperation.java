@@ -23,7 +23,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class CastableAsQNameOperation extends AbstractCastableAsOperation {
 

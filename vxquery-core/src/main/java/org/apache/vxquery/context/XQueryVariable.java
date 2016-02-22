@@ -20,7 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
 
 public class XQueryVariable {
     private final QName name;

@@ -21,9 +21,9 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.api.IValueReference;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IValueReference;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DynamicContextImpl implements DynamicContext {
     private StaticContext sCtx;

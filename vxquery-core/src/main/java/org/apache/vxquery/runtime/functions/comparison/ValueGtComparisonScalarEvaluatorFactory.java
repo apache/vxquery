@@ -16,7 +16,7 @@
  */
 package org.apache.vxquery.runtime.functions.comparison;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class ValueGtComparisonScalarEvaluatorFactory extends AbstractValueComparisonScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

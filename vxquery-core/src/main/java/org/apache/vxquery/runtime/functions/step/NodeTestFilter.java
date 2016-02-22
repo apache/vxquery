@@ -28,9 +28,9 @@ import org.apache.vxquery.types.NameTest;
 import org.apache.vxquery.types.NodeType;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 public class NodeTestFilter {
 

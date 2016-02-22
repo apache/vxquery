@@ -17,8 +17,6 @@
 package org.apache.vxquery.types;
 
 public final class ElementType extends AbstractNodeType {
-    private static final long serialVersionUID = 1L;
-
     public static final ElementType ANYELEMENT = new ElementType(NameTest.STAR_NAMETEST, AnyType.INSTANCE, true);
 
     private NameTest nameTest;

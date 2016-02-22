@@ -1,0 +1,35 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Get Started with the VXQuery Community
+
+  The following steps outline how to get involved with Apache VXQuery community.
+  These steps will connect you with the community and give you a place to start with XQuery.
+
+  * Sign up for the dev mailing list.
+ 
+    * {{{http://vxquery.apache.org/mail-lists.html}Mailing list}}
+ 
+  * Download the latest release and run a few queries.
+ 
+    * {{{http://vxquery.apache.org/user_installation.html}Installation instructions}}.
+   
+    * {{{http://vxquery.apache.org/user_query.html}Execute a query}}.
+   
+  * If you want more information on XQuery:
+ 
+    * Go through the {{{http://www.w3schools.com/xquery/}W3Schools XQuery tutorial}}.
+   
+    * Review the {{{http://www.w3.org/TR/xquery/}XQuery specification}}.

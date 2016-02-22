@@ -19,10 +19,10 @@ package org.apache.vxquery.compiler.algebricks;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-import org.apache.hyracks.algebricks.data.IBinaryBooleanInspector;
-import org.apache.hyracks.algebricks.data.IBinaryBooleanInspectorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.algebricks.data.IBinaryBooleanInspector;
+import edu.uci.ics.hyracks.algebricks.data.IBinaryBooleanInspectorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
 
 public class VXQueryBinaryBooleanInspectorFactory implements IBinaryBooleanInspectorFactory {
     private static final long serialVersionUID = 1L;

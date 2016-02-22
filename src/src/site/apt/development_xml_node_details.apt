@@ -1,0 +1,162 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+XML Data and Node Types
+
+  XML is used as the data source for XQuery and must be parsed into Hyracks data. Each
+  node type defined in XPath and XQuery can be mapped into pointable defined in Apache 
+  VXQuery\x99.
+
+* XPath Node Types
+
+*-----------------------------------+----------------------+---------------+
+| <<Data Type>>                     | <<Pointable Name>>   | <<Data Size>> |
+*-----------------------------------+----------------------+---------------:
+| Attribute Nodes(ANP)              | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/AttributeNodePointable.java}AttributeNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Document Nodes(DNP)               | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/DocumentNodePointable.java}DocumentNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Element Nodes(ENP)                | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/ElementNodePointable.java}ElementNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Node Tree(NTP)                    | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/NodeTreePointable.java}NodeTreePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Processing Instruction Node(PINP) | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/PINodePointable.java}PINodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Comment Node(CNP)                 | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Text Node(TNP)                    | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+
+
+* XML Mapping
+
+  The XML mapping to Hyracks pointables is fairly straight forward. The following example
+  shows how each node is mapped and saved into a byte array used by Hyracks.
+
+** Example XML File
+
+  The example XML file comes from W3School XQuery tutorial.
+  
+----------------------------------------
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Edited by XMLSpyÆ -->
+<bookstore>
+
+    <book category="COOKING">
+        <title lang="en">Everyday Italian</title>
+        <author>Giada De Laurentiis</author>
+        <year>2005</year>
+        <price>30.00</price>
+    </book>
+    
+    <book category="CHILDREN">
+        <title lang="en">Harry Potter</title>
+        <author>J K. Rowling</author>
+        <year>2005</year>
+        <price>29.99</price>
+    </book>
+    
+    <book category="WEB">
+        <title lang="en">XQuery Kick Start</title>
+        <author>James McGovern</author>
+        <author>Per Bothner</author>
+        <author>Kurt Cagle</author>
+        <author>James Linn</author>
+        <author>Vaidyanathan Nagarajan</author>
+        <year>2003</year>
+        <price>49.99</price>
+    </book>
+    
+    <book category="WEB">
+        <title lang="en">Learning XML</title>
+        <author>Erik T. Ray</author>
+        <year>2003</year>
+        <price>39.95</price>
+    </book>
+
+</bookstore>
+----------------------------------------
+  
+** Example Hyracks Mapping
+
+  The mapping is explained through using some short hand for the above example XML file.
+  Realize the direct bytes will not be explained although the pointable names are used for
+  each piece of information.
+  
+----------------------------------------
+NodeTree {
+    DocumentNode {bookstore}
+        sequence (children) {
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:Everyday Italian}
+                        sequence (attributes) {
+                            AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:Harry Potter}
+                        sequence (attributes) {
+                           AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:XQuery Kick Start}
+                        sequence (attributes) {
+                            AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:Learning XML}
+                        sequence (attributes) {
+                            AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+        }
+}
+----------------------------------------
+  
+  

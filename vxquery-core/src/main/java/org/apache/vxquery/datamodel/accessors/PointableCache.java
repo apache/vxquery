@@ -19,7 +19,7 @@ package org.apache.vxquery.datamodel.accessors;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
 
 public class PointableCache<T extends IPointable> {
     private final List<T> list;

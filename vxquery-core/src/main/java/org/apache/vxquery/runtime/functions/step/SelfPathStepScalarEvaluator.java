@@ -28,10 +28,10 @@ import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class SelfPathStepScalarEvaluator extends AbstractPathStepScalarEvaluator {
     private final TaggedValuePointable rootTVP;

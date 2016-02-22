@@ -19,7 +19,7 @@ package org.apache.vxquery.runtime.functions.strings;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class UTF8StringCharacterIterator implements ICharacterIterator {
     private static final Logger LOGGER = Logger.getLogger(UTF8StringCharacterIterator.class.getName());

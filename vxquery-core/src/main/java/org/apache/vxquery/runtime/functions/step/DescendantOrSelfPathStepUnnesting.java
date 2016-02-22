@@ -26,30 +26,22 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.step.NodeTestFilter.INodeFilter;
-import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
 
 public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathStep {
     private boolean testSelf;
-    private boolean returnSelf;
     private int indexSeqArgs;
     private int seqArgsLength;
     private List<Integer> indexSequence = new ArrayList<Integer>();
-    private List<Integer> returnSequence = new ArrayList<Integer>();
+    private List<Boolean> checkSelf = new ArrayList<Boolean>();
 
-    private final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
     private final SequencePointable seqNtp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpItem = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpNtp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private final TaggedValuePointable tvpStep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    private INodeFilter filter;
-    private int filterLookupID = -1;
-    private boolean isfilter = false;
 
     public DescendantOrSelfPathStepUnnesting(IHyracksTaskContext ctx, PointablePool pp, boolean testSelf) {
         super(ctx, pp);
@@ -57,23 +49,10 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     }
 
     protected void init(TaggedValuePointable[] args) throws SystemException {
-        returnSelf = true;
+        checkSelf.add(true);
         indexSeqArgs = 0;
         indexSequence.add(0);
-        returnSequence.add(0);
 
-        if (args.length > 1) {
-            isfilter = true;
-            if (args[1].getTag() != ValueTag.XS_INT_TAG) {
-                throw new IllegalArgumentException("Expected int value tag, got: " + args[1].getTag());
-            }
-            args[1].getValue(ip);
-            if (ip.getInteger() != filterLookupID) {
-                filterLookupID = ip.getInteger();
-                SequenceType sType = dCtx.getStaticContext().lookupSequenceType(ip.getInteger());
-                filter = NodeTestFilter.getNodeTestFilter(sType);
-            }
-        }
         // Check the argument passed in as sequence or node tree.
         if (args[0].getTag() == ValueTag.SEQUENCE_TAG) {
             args[0].getValue(seqNtp);
@@ -101,7 +80,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
                 }
                 // Next node tree in sequence.
                 indexSeqArgs++;
-                returnSelf = true;
+                checkSelf.set(0, true);
             }
         } else {
             // Single node tree input.
@@ -114,42 +93,36 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
     }
 
     private boolean processNodeTree(TaggedValuePointable rootTVP, IPointable result) throws AlgebricksException {
-        if (testSelf && returnSelf) {
-            returnSelf = false;
+        if (testSelf && checkSelf.get(0)) {
+            checkSelf.set(0, false);
             tvpItem.set(rootTVP);
             try {
-                if (!isfilter || (isfilter && filter.accept(ntp, tvpItem))) {
-                    setNodeToResult(tvpItem, result);
-                    return true;
-                }
+                setNodeToResult(tvpItem, result);
+                return true;
             } catch (IOException e) {
                 String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
                 throw new AlgebricksException(description);
             }
         }
+
         // Solve for descendants.
         return stepNodeTree(rootTVP, 0, result);
     }
 
     /**
      * Search through all tree children and children's children.
-     *
-     * @param tvpInput
-     *            pointable
-     * @param level
-     *            level
-     * @param result
-     *            result
-     * @return found result
-     * @throws AlgebricksException
-     *             Could not save result.
+     * 
+     * @param nodePointable
+     * @throws SystemException
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
             throws AlgebricksException {
         // Set up next level tracking.
-        if (level + 1 > indexSequence.size()) {
+        if (level + 1 >= indexSequence.size()) {
             indexSequence.add(0);
-            returnSequence.add(0);
+        }
+        if (level + 1 >= checkSelf.size()) {
+            checkSelf.add(true);
         }
 
         SequencePointable seqItem = pp.takeOne(SequencePointable.class);
@@ -159,16 +132,18 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             while (indexSequence.get(level) < seqLength) {
                 // Get the next item
                 seqItem.getEntry(indexSequence.get(level), tvpItem);
+
                 // Check current node
-                if (indexSequence.get(level) == returnSequence.get(level)) {
-                    returnSequence.set(level, returnSequence.get(level) + 1);
-                    if (!isfilter || (isfilter && filter.accept(ntp, tvpItem))) {
-                        setNodeToResult(tvpItem, result);
-                        return true;
-                    }
+                if (checkSelf.get(level)) {
+                    checkSelf.set(level, false);
+                    setNodeToResult(tvpItem, result);
+                    return true;
                 }
                 // Check children nodes
-                if (level + 1 <= indexSequence.size()) {
+                if (level + 1 < indexSequence.size()) {
+                    if (level + 1 < checkSelf.size()) {
+                        checkSelf.set(level + 1, true);
+                    }
                     if (stepNodeTree(tvpItem, level + 1, result)) {
                         return true;
                     }
@@ -178,10 +153,8 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             // Reset for next node tree.
             if (level == 0) {
                 indexSequence.set(level, 0);
-                returnSequence.set(level, 0);
             } else {
                 indexSequence.remove(level);
-                returnSequence.remove(level);
             }
             return false;
         } catch (IOException e) {

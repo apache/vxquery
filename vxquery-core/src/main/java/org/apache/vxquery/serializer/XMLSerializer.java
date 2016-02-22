@@ -42,18 +42,18 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.data.IPrinter;
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
-import org.apache.hyracks.data.std.primitive.BytePointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.FloatPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.ShortPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.data.IPrinter;
+import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
+import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
+import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
+import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
+import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XMLSerializer implements IPrinter {
     private final PointablePool pp;
@@ -366,7 +366,7 @@ public class XMLSerializer implements IPrinter {
             enp.getAttributeSequence(ntp, seqp);
             if (seqp.getByteArray() != null && seqp.getEntryCount() > 0) {
                 ps.append(' ');
-                printSequence(ps, seqp, " ");
+                printSequence(ps, seqp);
             }
 
             enp.getChildrenSequence(ntp, seqp);
@@ -422,19 +422,12 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printSequence(PrintStream ps, SequencePointable seqp) {
-        printSequence(ps, seqp, null);
-    }
-
-    private void printSequence(PrintStream ps, SequencePointable seqp, String between) {
         VoidPointable vp = pp.takeOne(VoidPointable.class);
         try {
             int len = seqp.getEntryCount();
             for (int i = 0; i < len; ++i) {
                 seqp.getEntry(i, vp);
                 print(vp.getByteArray(), vp.getStartOffset(), vp.getLength(), ps);
-                if (i < len - 1 && between != null) {
-                    ps.append(between);
-                }
             }
         } finally {
             pp.giveBack(vp);

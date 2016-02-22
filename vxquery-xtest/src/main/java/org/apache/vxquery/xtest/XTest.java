@@ -90,9 +90,6 @@ public class XTest {
             Thread.sleep(opts.keepalive);
         }
         eSvc.shutdown();
-        while (!eSvc.awaitTermination(5L, TimeUnit.SECONDS)) {
-            System.err.println("Failed to close all threads, trying again...");
-        }
         for (ResultReporter r : reporters) {
             r.close();
         }

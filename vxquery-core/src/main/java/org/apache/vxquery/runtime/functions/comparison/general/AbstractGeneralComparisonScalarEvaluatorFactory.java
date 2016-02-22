@@ -66,14 +66,14 @@ import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOp
 import org.apache.vxquery.runtime.functions.util.AtomizeHelper;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
         AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -146,7 +146,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
 
             /**
              * Check the second argument for a sequence and loop if required.
-             *
+             * 
              * @param aOp
              * @param tvpArg1
              * @param tvpArg2
@@ -181,7 +181,7 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
 
             /**
              * Transform the values into values supported for general comparison.
-             *
+             * 
              * @param aOp
              * @param tvpArg1
              * @param tvpArg2
@@ -219,16 +219,8 @@ public abstract class AbstractGeneralComparisonScalarEvaluatorFactory extends
                     // Set up value comparison tagged value pointables.
                     if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG && tid2 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         // Only need to change tag since the storage is the same for untyped atomic and string.
-                        dOutInner1.write(tvpTransform1.getByteArray(), tvpTransform1.getStartOffset(),
-                                tvpTransform1.getLength());
-                        tvpCompare1.set(abvsInner1.getByteArray(), abvsInner1.getStartOffset(), abvsInner1.getLength());
                         tvpCompare1.getByteArray()[0] = ValueTag.XS_STRING_TAG;
-                        tagTransformed1 = true;
-                        dOutInner2.write(tvpTransform2.getByteArray(), tvpTransform2.getStartOffset(),
-                                tvpTransform2.getLength());
-                        tvpCompare2.set(abvsInner2.getByteArray(), abvsInner2.getStartOffset(), abvsInner2.getLength());
                         tvpCompare2.getByteArray()[0] = ValueTag.XS_STRING_TAG;
-                        tagTransformed2 = true;
                     } else if (tid1 == ValueTag.XS_UNTYPED_ATOMIC_TAG) {
                         tid1 = tid2;
                         getCastToOperator(tid2);

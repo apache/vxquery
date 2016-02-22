@@ -19,7 +19,7 @@ package org.apache.vxquery.types;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public final class NameTest implements Serializable {
     private static final long serialVersionUID = 1L;

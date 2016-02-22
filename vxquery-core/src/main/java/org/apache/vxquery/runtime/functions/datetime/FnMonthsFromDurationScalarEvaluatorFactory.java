@@ -16,7 +16,7 @@
  */
 package org.apache.vxquery.runtime.functions.datetime;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnMonthsFromDurationScalarEvaluatorFactory extends AbstractValueFromDurationScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

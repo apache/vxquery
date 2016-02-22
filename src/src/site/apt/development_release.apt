@@ -1,0 +1,217 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Releasing Apache VXQuery\x99
+
+* One time steps
+
+  * set up directory structure
+
+    There usually are 3 directories at the same level
+
+    * the source directory <<<vxquery>>>,
+
+    * the <<<site>>> directory, and
+
+    * the distribution directory <<<dist>>>.
+
+    The source directory is version-controlled by <<<git>>>, the other two
+    are version controlled by <<<svn>>>.
+    While the source directory and the distribution directory can have
+    arbitrary names and locations, the <<<site>>> directory has to be called
+    <<<site>>> and it needs to be at the same level as the source directory
+    to enable site deployment.
+
+    Assuming that the source directory is available one can create the
+    directory structure by going to the directory that contains the
+    source directory and checking out the distribution and site
+    directories:
+
+---
+$ svn co https://dist.apache.org/repos/dist/release/vxquery dist
+$ svn co https://svn.apache.org/repos/asf/vxquery/site
+---
+
+  * create a code signing key with the Apache {{{http://www.apache.org/dev/openpgp.html#generate-key}instructions}} and example settings
+
+  * add your key to the <<<KEYS>>> file
+
+    Change into the <<<dist>>> directory and run
+
+---
+(gpg2 --list-sigs <your name> && gpg2 --armor --export <your name>) >> KEYS
+---
+
+    and then check the new <<<KEYS>>> file into svn
+
+---
+$ svn ci -m "add [YOUR NAME]'s key to KEYS file"
+---
+
+  * create an encrypted version of your Apache LDAP password for the nexus repository at {{{https://repository.apache.org/}https://repository.apache.org/}}
+
+    Follow the steps in the {{{http://maven.apache.org/guides/mini/guide-encryption.html}Password Encryption}}
+    guide to encrypt a master password and to encrypt your Apache LDAP password.
+    (It's nicer if you have maven > 3.2.1 to do this.)
+
+  * add to <<<~/.m2/settings.xml>>>
+
+    * for the upload to the nexus repository
+
+---
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+...
+  <servers>
+    ...
+    <!-- To publish a snapshot of some part of Maven -->
+    <server>
+      <id>apache.snapshots.https</id>
+      <username>[YOUR APACHE LDAP USERNAME]</username>
+      <password>[YOUR APACHE LDAP PASSWORD (encrypted)]</password>
+    </server>
+    <!-- To stage a release of some part of Maven -->
+    <server>
+      <id>apache.releases.https</id>
+      <username>[YOUR APACHE LDAP USERNAME]</username>
+      <password>[YOUR APACHE LDAP PASSWORD (encrypted)]</password>
+    </server>
+   ...
+  </servers>
+...
+</settings>
+---
+
+    * to sign the artifacts
+
+---
+  <profiles>
+    <profile>
+      <id>apache-release</id>
+      <properties>
+        <gpg.executable>gpg2</gpg.executable>
+        <gpg.passphrase>...</gpg.passphrase>
+      </properties>
+    </profile>
+  </profiles>
+---
+
+  * Download Apache Rat from {{{https://creadur.apache.org/rat/download_rat.cgi}https://creadur.apache.org/rat/download_rat.cgi}}.
+  
+  * Add your ssh key to {{{https://id.apache.org}id.apache.org}} (required to create a website on {{{https://people.apache.org}people.apache.org}}).
+
+    * Login and update your profile details. 
+
+* Each time steps
+
+  * clean up
+
+---
+$ mvn clean
+---
+
+  * run rat (always do this on a clean source folder):
+
+---
+$ java -jar ~/Downloads/apache-rat-0.11/apache-rat-0.11.jar -d . -E .rat-excludes
+---
+
+  * test your setup
+
+---
+$ mvn install -Papache-release
+---
+
+  * dry run of the release process
+
+---
+$ mvn release:prepare -DdryRun=true
+---
+
+  * check (and fix) the content of the <<<LICENSE>>> and <<<NOTICE>>> files (especially the date) and the copyright dates in changed files
+
+  * release to the staging repository
+
+---
+$ mvn release:prepare
+$ mvn release:perform
+---
+
+  * close the staging repository at {{{https://repository.apache.org/}https://repository.apache.org/}}
+
+    * Log into the website and look at the "Staging Repositories". 
+
+    * Find the VXQuery repository and click the "close" button.
+
+    * Add a message: "Apache VXQuery X.Y-rc#"
+ 
+  * check that the artifacts are available in the repository
+
+  * send out <<<[VOTE]>>> e-mail on dev@vxquery.apache.org
+
+    * {{{http://mail-archives.apache.org/mod_mbox/vxquery-dev/201409.mbox/%3CCAGZxfJUZDczuZR5jQResE4B7%2Bv4QQgwMpAd%2B-_Kt-U_RjCyReA%40mail.gmail.com%3E}example e-mail}} 
+
+  * after successful vote release staging repository {{{https://repository.apache.org/}https://repository.apache.org/}}
+
+    * Log into the website and look at the "Staging Repositories". 
+    
+    * Find the VXQuery repository and click the "release" button.
+    
+    * Add a message: "Apache VXQuery X.Y Release"
+
+  * add new source artifacts (archive + signature + hashes) to svn {{{https://dist.apache.org/repos/dist/release/vxquery}https://dist.apache.org/repos/dist/release/vxquery}} and remove old release dirctory
+
+  * commit changes to svn
+
+  * update the <<<site>>> branch in git from the from the release-tag
+
+  * build a new site and deploy it to <<<../site>>>
+
+---
+$ mvn site site:deploy
+---
+
+  * submit the site to svn
+
+---
+$ cd ../site
+$ svn st | awk '/\?/ { print $2 }' | xargs svn add # add all new files
+$ svn ci -m"updated site"
+$ cd -
+---
+
+  * wait a few days for the mirroring of the release artifacts
+
+  * send <<<[ANNOUNCE]>>> e-mail to announce@apache.org and dev@vxquery.apache.org
+  
+    * {{{http://mail-archives.apache.org/mod_mbox/www-announce/201405.mbox/%3C537AD473.9080505@apache.org%3E}example e-mail}}
+
+* References
+
+  * {{{https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven}How To Generate PGP Signatures With Maven}}
+
+  * {{{https://www.apache.org/dev/publishing-maven-artifacts.html}Publishing Maven Artifacts}}
+
+~~ * Handling issues
+~~
+~~ ** Undo release plugin:
+~~
+~~ ---
+~~ $ svn merge -r 1526098:1524606 https://svn.apache.org/repos/asf/vxquery/branches/vxquery_0_2_staging
+~~ $ svn del -m "re-releasing build" https://svn.apache.org/repos/asf/vxquery/tags/apache-vxquery-0.2-incubating
+~~ ---
+

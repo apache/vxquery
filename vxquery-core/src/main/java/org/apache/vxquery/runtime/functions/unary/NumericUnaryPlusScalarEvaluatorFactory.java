@@ -16,7 +16,7 @@
  */
 package org.apache.vxquery.runtime.functions.unary;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class NumericUnaryPlusScalarEvaluatorFactory extends AbstractNumericUnaryScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

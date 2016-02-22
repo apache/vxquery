@@ -23,7 +23,7 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
+import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
 
 public class NodeSubTreeBuilder extends AbstractNodeBuilder {
     private DataOutput mainOut;

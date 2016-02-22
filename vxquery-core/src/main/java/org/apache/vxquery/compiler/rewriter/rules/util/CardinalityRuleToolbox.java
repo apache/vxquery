@@ -19,20 +19,18 @@ package org.apache.vxquery.compiler.rewriter.rules.util;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.cardinality.Cardinality;
 
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractOperatorWithNestedPlans;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractOperatorWithNestedPlans;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 
 public class CardinalityRuleToolbox {
     /**
      * Get the Cardinality variable of the parent operator.
-     *
+     * 
      * @param op
-     *            Logical operator
      * @param vxqueryContext
-     *            VXQuery context
-     * @return Cardinality of the producer.
+     * @return
      */
     public static Cardinality getProducerCardinality(ILogicalOperator op, VXQueryOptimizationContext vxqueryContext) {
         AbstractLogicalOperator producerOp = (AbstractLogicalOperator) op.getInputs().get(0).getValue();
@@ -57,8 +55,8 @@ public class CardinalityRuleToolbox {
             case SUBPLAN:
                 // Find the last operator to set a variable and call this function again.
                 AbstractOperatorWithNestedPlans operatorWithNestedPlan = (AbstractOperatorWithNestedPlans) op;
-                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) operatorWithNestedPlan.getNestedPlans()
-                        .get(0).getRoots().get(0).getValue();
+                AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) operatorWithNestedPlan
+                        .getNestedPlans().get(0).getRoots().get(0).getValue();
                 cardinalityVariable = vxqueryContext.getCardinalityOperatorMap(lastOperator);
                 break;
             case DATASOURCESCAN:
@@ -84,8 +82,8 @@ public class CardinalityRuleToolbox {
 
             // The following operators' analysis has not yet been implemented.
             default:
-                throw new RuntimeException(
-                        "Operator (" + op.getOperatorTag() + ") has not been implemented in rewrite rule.");
+                throw new RuntimeException("Operator (" + op.getOperatorTag()
+                        + ") has not been implemented in rewrite rule.");
         }
         return cardinalityVariable;
     }

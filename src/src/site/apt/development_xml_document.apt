@@ -1,0 +1,607 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+XML Data Model Example 
+
+
+*Byte Array Break Down
+
+  Every XML document in VXQuery is stored in memory as one continuous array of 
+  bytes. Pointables are used to refer to these bytes in the memory.
+  This document covers VXQuery's representation of all the different types of 
+  elements of an XML document. As a result, we use a lots of pointables 
+  (same and different) through out the document. To simplify explanations, 
+  each pointable is explicitly assigned a NodeID only on this web page. 
+  Refer to the following link for details on the various pointables used: 
+  {{{http://vxquery.apache.org/development_xml_node_details.html} XML Node Details }}.
+
+**XML Document
+  
+  We use the following XML document as an example to explain VXQuery's node 
+  types. The different node types are Node Tree Pointable (NTP), 
+  Document Node Pointable (DNP), Element Node Pointable (ENP), 
+  Attribute Node Pointable (ANP), Text Node Pointable (TNP),
+  Comment Node Pointable (CNP) and Processing Instruction Node Pointable (PINP). 
+   
+---
+<?xml version="1.0"?>
+<catalog xmlns:ex="http://example.org/" >
+  <ex:book isbn="0812416139">
+    <!--top secret-->
+    <title>Macbeth</title>
+    <?hide?>
+  </ex:book>
+</catalog>
+---
+
+** {Bytes}
+  
+  Following are the bytes for the XML document above. Elements in VXQuery are
+  accessed using Tagged Value Pointables. Similarly, the XML document is also 
+  accessed using a Tagged Value Pointable. The first byte is represents the 
+  value tag. It indicates the type of the bytes that follow. 
+    
+***  <<<107, 3, 0, 0, 0, 0, 0, 0, 0, -109, 0, 0, 0, 7, 0, 0, 0, 6, 0, 0, 0, 19, 0, 0, 0, 44, 0, 0, 0, 54, 0, 0, 0, 62, 0, 0, 0, 72, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 7, 99, 97, 116, 97, 108, 111, 103, 0, 0, 0, 1, 0, 19, 104, 116, 116, 112, 58, 47, 47, 101, 120, 97, 109, 112, 108, 101, 46, 111, 114, 103, 47, 0, 0, 0, 2, 0, 4, 98, 111, 111, 107, 0, 0, 0, 3, 0, 2, 101, 120, 0, 0, 0, 4, 0, 4, 105, 115, 98, 110, 0, 0, 0, 5, 0, 5, 116, 105, 116, 108, 101, 0, 0, 0, 6, 101, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 10, 0, 0, 0, -42, 0, 0, 0, -34, 104, 0, 0, 0, 2, 0, 3, 10, 32, 32, 102, 6, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 30, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 0, 0, 7, 0, 0, 0, 12, 0, 0, 0, 29, 0, 0, 0, 41, 0, 0, 0, 81, 0, 0, 0, 93, 0, 0, 0, 106, 0, 0, 0, 116, 104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32, 104, 0, 0, 0, 13, 0, 1, 10>>>
+
+
+=========================================================================
+
+** {Node Tree}
+  
+  <<<107>>> The first byte as described above is the value tag for Node Tree
+  Pointable.
+  
+  The rest of the bytes represent a Node Tree Pointable. Refer to this link
+  to view the {{Bytes}} for the Node Tree Pointable(NTP).
+
+  XML Documents in VXQuery are wrapped in Node Tree Pointables. As a side note,
+  every result produced as an output of a function is also wrapped in a NTP.
+  
+  Following are the bytes and contents of the Node Tree Pointable for this XML
+  document.
+  
+  <<< 3 >>>  Header byte (One byte) that uses the lowest three bit to denote if
+
+          ** bit <Node Id> exists: <Yes>
+          
+          ** bit <Dictionary> exists: <Yes>
+          
+          ** bit <Header Type> exists: <No>
+          
+  <<< 0, 0, 0, 0 >>>  These 4 bytes represent the
+  <Node Id> which has value <<0>>
+
+  Following are the byte contents of the {{Dictionary}}. The byte array break 
+  down is explained in details further ahead.
+ 
+*** <<<0, 0, 0, -109, 0, 0, 0, 7, 0, 0, 0, 6, 0, 0, 0, 19, 0, 0, 0, 44, 0, 0, 0, 54, 0, 0, 0, 62, 0, 0, 0, 72, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 7, 99, 97, 116, 97, 108, 111, 103, 0, 0, 0, 1, 0, 19, 104, 116, 116, 112, 58, 47, 47, 101, 120, 97, 109, 112, 108, 101, 46, 111, 114, 103, 47, 0, 0, 0, 2, 0, 4, 98, 111, 111, 107, 0, 0, 0, 3, 0, 2, 101, 120, 0, 0, 0, 4, 0, 4, 105, 115, 98, 110, 0, 0, 0, 5, 0, 5, 116, 105, 116, 108, 101, 0, 0, 0, 6>>>
+ 
+  Element Node in NTP(root node):
+  
+  In this NTP, the Element Node or the root node is a Document Node Pointable 
+  (DNP) ({{NodeID:0}}). <<101>> is the <Value Tag> for Document Node Pointable. 
+  Note that this root node can represent any pointable type. For example: 
+  ElementNodePointable, Attribute Node Pointable or Text Node Pointable.
+   
+  Following are the byte contents for the Document Node Pointable 
+  ({{NodeID:0}}). The byte array break down is explained further ahead.
+ 
+*** <<<0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 10, 0, 0, 0, -42, 0, 0, 0, -34, 104, 0, 0, 0, 2, 0, 3, 10, 32, 32, 102, 6, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 30, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 0, 0, 7, 0, 0, 0, 12, 0, 0, 0, 29, 0, 0, 0, 41, 0, 0, 0, 81, 0, 0, 0, 93, 0, 0, 0, 106, 0, 0, 0, 116, 104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32, 104, 0, 0, 0, 13, 0, 1, 10>>>
+
+=========================================================================
+
+**  {Dictionary}
+
+  Byte Array for the Dictionary
+  
+***  <<<0, 0, 0, -109, 0, 0, 0, 7, 0, 0, 0, 6, 0, 0, 0, 19, 0, 0, 0, 44, 0, 0, 0, 54, 0, 0, 0, 62, 0, 0, 0, 72, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 7, 99, 97, 116, 97, 108, 111, 103, 0, 0, 0, 1, 0, 19, 104, 116, 116, 112, 58, 47, 47, 101, 120, 97, 109, 112, 108, 101, 46, 111, 114, 103, 47, 0, 0, 0, 2, 0, 4, 98, 111, 111, 107, 0, 0, 0, 3, 0, 2, 101, 120, 0, 0, 0, 4, 0, 4, 105, 115, 98, 110, 0, 0, 0, 5, 0, 5, 116, 105, 116, 108, 101, 0, 0, 0, 6>>>
+ 
+***  <<< 0, 0, 0, -109 >>> 
+  
+  These 4 bytes represent the <Size of Dictionary> in signed integer format. 
+  After conversion to unsigned integer format the value is <<147>>.
+  
+*** <<<0, 0, 0, 7>>>
+
+  These 4 bytes represent the <Number of items> in the dictionary: <<7>>
+
+*** <<<0, 0, 0, 6, 0, 0, 0, 19, 0, 0, 0, 44, 0, 0, 0, 54, 0, 0, 0, 62, 0, 0, 0, 72, 0, 0, 0, 83>>> 
+    
+  This is a list of <Offsets> for each item in the dictionary. 
+  There are 7 offsets. Each offset is 4 bytes long. Following are 
+  the 7 offsets: <<6, 19, 44, 54, 62, 72, 83>>
+
+*** <<<0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 5, 0, 0, 0, 6>>>
+  
+  This is a sorted list of keys in alphabetical order. Each key is 4 byte long. 
+  Each key is mapped to a string in the dictionary. The keys 
+  are the numbers <<1>> through <<6>>.
+   
+  Following are the data values in the dictionary.Each data value is a 
+  StringPointable. Each StringPointable maps to XML document strings.  
+
+***  <<<0, 0, 0, 0, 0, 0>>> 
+
+  The <Size> of the string is <<0>>. The <String Value> is <<null>>. 
+  The StringPointable is followed by the key which is <<0>>.
+  
+***  <<<0, 7, 99, 97, 116, 97, 108, 111, 103, 0, 0, 0, 1>>>
+  
+  The <Size> of the string is <<7>>. The <String Value> is <<catalog>>. 
+  The StringPointable is followed by the key which is <<1>>.
+ 
+***  <<<0, 19, 104, 116, 116, 112, 58, 47, 47, 101, 120, 97, 109, 112, 108, 101, 46, 111, 114, 103, 47, 0, 0, 0, 2>>> 
+ 
+  The <Size> of the string is <<19>>. 
+  The <String Value> is <<http://example.org/>>. 
+  The StringPointable is followed by the key which is <<2>>.
+ 
+***  <<<0, 4, 98, 111, 111, 107, 0, 0, 0, 3>>>
+ 
+  The <Size> of the string is <<4>>. The <String Value> is <<book>>. 
+  The StringPointable is followed by the key which is <<3>>. 
+ 
+*** <<<0, 2, 101, 120, 0, 0, 0, 4>>>
+ 
+  The <Size> of the string is <<2>>. The <String Value> is <<ex>>. 
+  The StringPointable is followed by the key which is <<4>>.
+ 
+*** <<<0, 4, 105, 115, 98, 110, 0, 0, 0, 5>>>
+ 
+  The <Size> of the string is <<4>>. The <String Value> is <<isbn>>. 
+  The StringPointable is followed by the key which is <<5>>.
+ 
+*** <<<0, 5, 116, 105, 116, 108, 101, 0, 0, 0, 6>>>
+
+  The <Size> of the string is <<4>>. The <String Value> is <<title>>. 
+  The StringPointable is followed by the key which is <<6>>.
+
+
+================================================================ 
+
+
+** Document Node ({NodeID:0})
+  
+  This child is contained in the parent {{Node Tree}}.
+   
+  Byte Array for Document Node (NodeID:0)
+  
+***  <<<101, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 10, 0, 0, 0, -42, 0, 0, 0, -34, 104, 0, 0, 0, 2, 0, 3, 10, 32, 32, 102, 6, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 30, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 0, 0, 7, 0, 0, 0, 12, 0, 0, 0, 29, 0, 0, 0, 41, 0, 0, 0, 81, 0, 0, 0, 93, 0, 0, 0, 106, 0, 0, 0, 116, 104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32, 104, 0, 0, 0, 13, 0, 1, 10>>>
+  
+  <<<101>>> is the value tag for the Document Node Pointable.
+ 
+  Following are the bytes and contents of the Document Node Pointable.
+  
+  <<< 0, 0, 0, 0 >>>  These 4 bytes represent the <Node Id> 
+  which has value <<0>>
+ 
+  Every Document Node Pointable contains a Sequence Pointable. This is analogous 
+  to a collection of items(data). In VXQuery, the items(data) 
+  in the Sequence Pointable are preceded by the number of items in the sequence 
+  and item size.
+ 
+ Sequence Content:
+ 
+  <<<0, 0, 0, 1>>>  These 4 bytes represents the <Number of Items> 
+  in the sequence which is <<1>> 
+ 
+  <<<0, 0, 1, 0>>>  These 4 bytes represents 
+  the <Size of the item> which is <<257>>
+ 
+  <Data in the Sequence>: Here the (item)data in the sequence is an 
+  Element Node Pointable ({{NodeID:1}}). Note that the data can represent any 
+  type of pointable or element.
+  
+*** <<<102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 10, 0, 0, 0, -42, 0, 0, 0, -34, 104, 0, 0, 0, 2, 0, 3, 10, 32, 32, 102, 6, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 30, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 0, 0, 7, 0, 0, 0, 12, 0, 0, 0, 29, 0, 0, 0, 41, 0, 0, 0, 81, 0, 0, 0, 93, 0, 0, 0, 106, 0, 0, 0, 116, 104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32, 104, 0, 0, 0, 13, 0, 1, 10>>>
+ 
+ 
+================================================================ 
+
+
+**  Element Node ({NodeID:1})
+
+  This child is contained in the parent Document Node ({{NodeID:0}}).
+  
+  Byte Array for Element Node NodeID:1
+  
+***  <<<102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 10, 0, 0, 0, -42, 0, 0, 0, -34, 104, 0, 0, 0, 2, 0, 3, 10, 32, 32, 102, 6, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 30, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 0, 0, 7, 0, 0, 0, 12, 0, 0, 0, 29, 0, 0, 0, 41, 0, 0, 0, 81, 0, 0, 0, 93, 0, 0, 0, 106, 0, 0, 0, 116, 104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32, 104, 0, 0, 0, 13, 0, 1, 10>>>
+ 
+  <<<102>>> is the value tag for Element Node Pointable.
+ 
+  Following are the bytes and contents of the Element Node Pointable.
+ 
+  <<< 4 >>>  Header byte (One byte) that uses the lowest three bits to denote if
+
+          ** bit <Namespace Chunk> exists: <No>
+          
+          ** bit <Attribute Chunk> exists: <No>
+          
+          ** bit <Children Chunk> exists: <Yes>
+          
+   <<<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>> This is a <Name Pointer> which is an
+   array of integers(4 bytes) of size <<3>> 
+ 
+  <<<0, 0, 0, 1>>> This is the <Local Node Id> which uses 4 bytes.
+ 
+  Children Chunk is a Sequence Pointable. This is analogous to a collection 
+  of items(data). In VXQuery, the items(data) 
+  in the Sequence Pointable are preceded by the number of items 
+  in the sequence and item size. 
+
+  Sequence Content childrenChunk:
+
+  <<<0, 0, 0, 3>>>  <Number of Items> in the 
+  SequencePointable <children chunk> is <<3>>
+ 
+  <<<0, 0, 0, 10>>>  <Offset> of the first item is <<10>>
+ 
+  <<<0, 0, 0, -42>>>  <Offset> of the second item is <<214>>
+   
+  <<<0, 0, 0, -34>>>  <Offset> of the third item is <<222>>
+  
+  <Data in the Sequence>: Here the items(data) in the sequence are Text 
+  Node Pointables ({{NodeID:2}}), ({{NodeID:13}}) and Element Node Pointable
+  ({{NodeID:3}}). Note that the data can represent any type of pointable 
+  or element.
+  
+***  <<<104, 0, 0, 0, 2, 0, 3, 10, 32, 32, 102, 6, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 30, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 0, 0, 7, 0, 0, 0, 12, 0, 0, 0, 29, 0, 0, 0, 41, 0, 0, 0, 81, 0, 0, 0, 93, 0, 0, 0, 106, 0, 0, 0, 116, 104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32, 104, 0, 0, 0, 13, 0, 1, 10>>>
+
+
+================================================================
+
+
+** Text Node ({NodeID:2}) 
+  
+   This child is contained in the parent Element Node ({{NodeID:1}}).
+  
+  Byte Array for Text Node NodeID:2
+  
+***  <<<104, 0, 0, 0, 2, 0, 3, 10, 32, 32>>>
+
+  <<<104>>> is the value tag for the Text Node Pointable.
+ 
+  Following are the bytes and contents of the Text Node Pointable.  
+
+  <<<0, 0, 0, 2>>> This is the <Node Id> that uses 4 bytes and has value <<2>> 
+ 
+  <<<0, 3, 10, 32, 32>>> This is the <UTF8String> which has a size <<3>> 
+  and value represents a <<new line>> and 2 <<spaces>>
+
+================================================================
+
+
+** Element Node ({NodeID:3})
+  
+  This child is contained in the parent Element Node ({{NodeID:1}}).
+   
+  Byte Array for Element Node NodeID:3
+   
+***  <<<102, 6, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 30, 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 0, 0, 7, 0, 0, 0, 12, 0, 0, 0, 29, 0, 0, 0, 41, 0, 0, 0, 81, 0, 0, 0, 93, 0, 0, 0, 106, 0, 0, 0, 116, 104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32>>>
+  
+  <<<102>>> is the value tag for the Element Node Pointable.
+ 
+  Following are the bytes and contents of the Element Node Pointable.
+ 
+  <<< 6 >>>  Header byte (One byte) that uses the three lowest bit to denote if
+
+          ** bit <Namespace Chunk> exists: <No>
+          
+          ** bit <Attribute Chunk> exists: <Yes>
+          
+          ** bit <Children Chunk> exists: <Yes>
+ 
+  <<<0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3>>> This is a <Name Pointer> which is an 
+  array of integers(4 bytes) of size <<3>> 
+ 
+  <<<0, 0, 0, 3>>> This is the <Local Node Id> which uses 4 bytes.
+ 
+  Attribute Chunk is a Sequence Pointable.
+  
+  Sequence Content attributeChunk:
+  
+  <<<0, 0, 0, 1>>>  <Number of Items> in the 
+  SequencePointable <attribute chunk> is <<1>>
+ 
+  <<<0, 0, 0, 30>>>  <Size> of the first item is <<30>>
+  
+   <Data in the Sequence>: Here the item(data) in the sequence is an 
+   Attribute Node Pointable ({{NodeID:4}}). Note that the data 
+   can represent any type of pointable or element.
+  
+***  <<< 103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52,  49, 54, 49, 51, 57>>>
+
+  Children Chunk is a Sequence Pointable. This is analogous to a collection of 
+  items(data). In VXQuery, the items(data) 
+  in the Sequence Pointable are preceded by the number of 
+  items in the sequence and item size. 
+  
+  Sequence Content childrenChunk:
+
+  <<<0, 0, 0, 7>>>  <Number of Items> in the
+  SequencePointable <children chunk> is <<3>>
+ 
+  <<<0, 0, 0, 12>>>  <Offset> of the first item is <<12>>
+ 
+  <<<0, 0, 0, 29>>>  <Offset> of the second item is <<12>>
+   
+  <<<0, 0, 0, 41>>>  <Offset> of the third item is <<41>>
+  
+  <<<0, 0, 0, 81>>>  <Offset> of the fourth item is <<81>>
+
+  <<<0, 0, 0, 93>>>  <Offset> of the fifth item is <<93>>
+
+  <<<0, 0, 0, 106>>>  <Offset> of the sixth item is <<106>>
+
+  <<<0, 0, 0, 116>>>  <Offset> of the seventh item is <<116>>
+  
+  <Data in the Sequence>: Here the items(data) in the sequence are Text Node
+  ({{NodeID:5}}), ({{NodeID:7}}), ({{NodeID:10}}), ({{NodeID:12}}), 
+  Element Node ({{NodeID:8}}), Comment Node ({{NodeID:6}}) and
+  Processing Instruction Node ({{NodeID:11}}). 
+   
+***  <<<104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32, 105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116, 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32, 102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104, 104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32, 106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101, 0, 0, 104, 0, 0, 0, 12, 0, 3, 10, 32, 32, 104, 0, 0, 0, 13, 0, 1, 10>>>
+
+
+================================================================
+
+
+** Attribute Node ({NodeID:3})
+
+  This child is contained in the parent Element Node ({{NodeID:3}}).
+  
+  Byte Array for Attribute Node NodeID:3
+  
+***  <<<103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 4, 14, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57>>>
+  
+  <<<103>>> is the value tag for the Attribute Node Pointable.
+ 
+  Following are the bytes and contents of the Attribute Node Pointable.
+ 
+  <<<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,>>> This is a <Name Pointer> 
+  which is an array of integers(4 bytes) of size <<3>>. It consists of 
+  <PrefixCode>, <NamespaceCode>, <LocalCode>.
+
+  <<<0, 0, 0, 4>>> This is the <NodeId> which has a value of <<4>>.
+ 
+  <<<14, 0, 10, 48, 56, 49, 50, 52,  49, 54, 49, 51, 57 >>> This is a 
+  string of length <<10>> and the length of the string is  <<0812416139>>
+
+
+================================================================
+
+
+** Text Node Pointable ({NodeID:5})
+
+  This child is contained in the parent Element Node ({{NodeID:3}})
+  childrenChunk.
+  
+  Byte Array for Text Node NodeID:5
+  
+***  <<<104, 0, 0, 0, 5, 0, 5, 10, 32, 32, 32, 32>>>
+ 
+  <<<104>>> is the value tag for the Text Node Pointable.
+ 
+  Following are the bytes and contents of the Text Node Pointable.
+
+  <<<0, 0, 0, 5>>> This is the <Node Id> that uses 4 bytes and has value <<2>> 
+ 
+  <<< 0, 5, 10, 32, 32, 32, 32>>> This is the <UTF8String> which has 
+  a size <<5>> and value represents a <<new line>> and 4 <<spaces>>
+
+
+================================================================
+
+
+** Comment Node Pointable ({NodeID:6})
+
+  This child is contained in the parent Element Node ({{NodeID:3}}) 
+  childrenChunk.
+  
+  Byte Array for Comment Node NodeID:6
+ 
+*** <<<105, 0, 0, 0, 6, 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116>>>
+  
+  <<<105>>> is the value tag for the Comment Node Pointable.
+ 
+  Following are the bytes and contents of the Comment Node Pointable.
+ 
+  <<<0, 0, 0, 6>>> This is the <Node Id> that uses 4 bytes and has value <<6>> 
+ 
+  <<< 0, 10, 116, 111, 112, 32, 115, 101, 99, 114, 101, 116>>> 
+  This is the <UTF8String> which has a size <<10>> and value <<top secret>>
+ 
+ 
+================================================================
+ 
+ 
+** Text Node Pointable ({NodeID:7})
+ 
+  This child is contained in the parent Element Node ({{NodeID:3}}) 
+  childrenChunk.
+  
+  Byte Array for Text Node NodeID:7
+  
+***  <<< 104, 0, 0, 0, 7, 0, 5, 10, 32, 32, 32, 32>>>  
+ 
+  <<<104>>> is the value tag for the Text Node Pointable.
+ 
+  Following are the bytes and contents of the Text Node Pointable.
+
+  <<<0, 0, 0, 7>>> This is the <Node Id> that uses 4 bytes and has value <<7>> 
+ 
+  <<< 0, 5, 10, 32, 32, 32, 32>>> This is the <UTF8String> 
+  which has a size <<5>> and value represents a <<new line>> and 4 <<spaces>>
+
+
+================================================================
+
+
+** Element Node ({NodeID:8})
+
+  This child is contained in the parent Element Node ({{NodeID:3}}) 
+  childrenChunk.
+  
+  Byte Array for Element Node NodeID:8
+  
+***  <<<102, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 0, 14, 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104>>>
+ 
+  <<<102>>> is the value tag for the Element Node Pointable.
+ 
+  Following are the bytes and contents of the Element Node Pointable.
+  
+  <<< 4 >>>  Header byte (One byte) that uses the lowest three bits to denote if
+
+          ** bit <Namespace Chunk> exists: <No>
+          
+          ** bit <Attribute Chunk> exists: <No>
+          
+          ** bit <Children Chunk> exists: <Yes>
+ 
+  <<<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6>>> This is a <Name Pointer> 
+  which is an array of integers(4 bytes) of size <<3>> 
+ 
+  <<<0, 0, 0, 8>>> This is the <Node Id> that uses 4 bytes and has value <<8>> 
+  
+  Following is a SequencePointable.
+  
+  Sequence Content childrenChunk
+
+  <<<0, 0, 0, 1>>> <Number of Items> in the 
+  SequencePointable <children chunk> is <<1>>
+  
+  <<<0, 0, 0, 14>>> <Offset> of the first item is <<14>>
+  
+  <Data in the Sequence>: Here the (item)data in the sequence is a 
+  Text Node Pointable ({{NodeID:9}}).
+  
+***   <<< 104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104>>>
+ 
+ 
+================================================================
+ 
+ 
+** Text Node Pointable ({NodeID:9})
+
+  This child is contained in the parent Element Node ({{NodeID:8}}).
+  
+  Byte Array for Text NodeID:9
+  
+***  <<<104, 0, 0, 0, 9, 0, 7, 77, 97, 99, 98, 101, 116, 104>>>
+ 
+  <<<104>>> is the value tag for the Text Node Pointable.
+ 
+  Following are the bytes and contents of the Text Node Pointable.
+
+  <<<0, 0, 0, 9>>> This is the <Node Id> that uses 4 bytes and has value <<9>> 
+ 
+  <<<0, 7, 77, 97, 99, 98, 101, 116, 104>>> This is the <UTF8String> 
+  which has a size <<7>> and value <<Macbeth>>
+
+
+================================================================
+
+
+** Text Node Pointable ({NodeID:10})
+   
+  This child is contained in the parent Element Node ({{NodeID:3}}) 
+  childrenChunk.
+   
+  Byte Array for Text Node NodeID:10
+  
+***  <<<104, 0, 0, 0, 10, 0, 5, 10, 32, 32, 32, 32>>>
+    
+  <<<104>>>
+  and the rest of the bytes represent a Text Node Pointable.
+ 
+  Following are the bytes and contents of the Text Node Pointable.
+
+  <<<0, 0, 0, 10>>> This is the <Node Id> that uses 4 bytes and has value <<2>> 
+ 
+  <<<0, 5, 10, 32, 32, 32, 32>>> This is the <UTF8String> which has a size <<5>> 
+  and value represents a <<new line>> and 4 <<spaces>>
+
+
+================================================================
+
+
+** Processing Instruction Node ({NodeID:11})
+
+  This child is contained in the parent Element Node ({{NodeID:3}}) 
+  childrenChunk.
+  
+  Byte Array for Processing Instruction Node NodeID:11
+  
+***  <<<106, 0, 0, 0, 11, 0, 4, 104, 105, 100, 101>>>
+  
+  Note that this is a Tagged Value Pointable in which the value tag is <<106>>
+  and the rest of the bytes represent a Processing Instruction Node Pointable.
+ 
+  Following are the bytes and contents of the Processing 
+  Instruction Node Pointable.
+
+  <<<0, 0, 0, 11>>> This is the <Node Id> that uses 4 bytes and has value <<11>>
+ 
+  <<<0, 4, 104, 105, 100, 101>>>  This is the <UTF8String> 
+  which has a size <<4>> and value <<hide>>
+ 
+  <<<0, 0>>> This is also a string representing content. 
+  It is a <<null string>>. 
+
+
+================================================================
+
+
+** Text Node Pointable ({NodeID:12})
+
+  This child is contained in the parent Element Node ({{NodeID:3}}) 
+  childrenChunk.
+  
+   Byte Array for Text Node NodeID:12
+  
+***  <<<104, 0, 0, 0, 12, 0, 3, 10, 32, 32>>>
+  
+  Note that this is a Tagged Value Pointable in which the value tag is <<104>>
+  and the rest of the bytes represent a Text Node Pointable.
+ 
+  Following are the bytes and contents of the Text Node Pointable.
+
+  <<<0, 0, 0, 12>>> This is the <Node Id> that uses 4 bytes and has value <<12>> 
+
+  <<<0, 3, 10, 32, 32>>> This is the <UTF8String> which has a size <<3>> 
+  and value represents a <<new line>> and 2 <<spaces>>.
+
+
+================================================================
+
+
+** Text Node Pointable ({NodeID:13})
+
+  This child is contained in the parent Element Node ({{NodeID:1}}).
+  
+  Byte Array for Text Node NodeID:13
+  
+***  <<<104, 0, 0, 0, 13, 0, 1, 10>>>
+
+  <<<104>>> is the value tag for the Text Node Pointable.
+ 
+  Following are the bytes and contents of the Text Node Pointable.
+
+  <<<0, 0, 0, 13>>> This is the <Node Id> that uses 4 bytes and has value <<13>> 
+ 
+  <<<0, 1, 10>>> This is the <UTF8String> which has a size <<1>> 
+  and value represents a <<new line>>.
+
+
+================================================================

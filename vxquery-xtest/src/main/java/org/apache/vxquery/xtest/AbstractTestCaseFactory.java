@@ -117,20 +117,9 @@ public abstract class AbstractTestCaseFactory {
                         + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
             }
         });
-        try {
-            FileReader characterStream = new FileReader(catalog);
-            parser.parse(new InputSource(characterStream));
-            characterStream.close();
-        } catch (SAXException e) {
-            System.err.println("Unable to parse file: " + catalog.getAbsolutePath());
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            System.err.println("Test Catalog has not been found: " + catalog.getAbsolutePath());
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.err.println("I: " + catalog.getAbsolutePath());
-            e.printStackTrace();
-        }
+        FileReader characterStream = new FileReader(catalog);
+        parser.parse(new InputSource(characterStream));
+        characterStream.close();
         return count;
     }
 
@@ -142,7 +131,7 @@ public abstract class AbstractTestCaseFactory {
         }
         return toSubmit;
     }
-
+    
     protected abstract void submit(TestCase tc);
 
     protected class Handler implements ContentHandler {

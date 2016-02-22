@@ -1,0 +1,76 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+
+XMark Benchmark Documentation
+    
+    In the following table, XMark queries are listed to show the current status of 
+    each query in VXQuery. The <Query Number> column represents the XMark query 
+    number. <Original Query> column represents the original XMark query from the XMark Benchmark site. Original query 
+    works if it has a <Working> status in the column. If the original query does not work, then 
+    the column displays the error type. <Optimized Query> column represents 
+    the parallel optimized version for the original XMark query. The optimized version of the query 
+    has been written to increase performance. Optimized query 
+    works if it has a <Working> status in the column. If the optimized query does not work, then 
+    the column displays the error or displays <Same Error as Original Query>. 
+    <Frame Size> column represents the frame size that VXQuery needs to run the query. 
+    The <Issues> column represents the JIRA issues for the query or are related to the query.
+    All queries that do not work with the default frame size
+    are related to {{{https://issues.apache.org/jira/browse/VXQUERY-167} VXQuery Issue 167 }}.
+    
+
+*------------------+--------------------+---------------------+-----------------+-----------+
+| <<Query Number>> | <<Original Query>> | <<Optimized Query>> | <<Frame Size>>  | <<Issues>> |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 1 | Working | Working | Working with default size  | None |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 2 | Working | Working | Working with default size | None |  
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 3 | Working  | Working | Working with default size | None |  
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 4 | Working | Working| Working with default size | None |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 5  | Working | Working | Working with default size | None |
+*------------------+--------------------+---------------------+-----------------+-----------:
+|  6 | Error in the Query Plan  | Same Error as Original Query  | Cannot be determined | {{{https://issues.apache.org/jira/browse/VXQUERY-170} VXQuery Issue 170 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+|  7 | Error in the Query Plan  | Same Error as Original Query | Cannot be determined | {{{https://issues.apache.org/jira/browse/VXQUERY-170} VXQuery Issue 170 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+|  8 | Working | Working | Working with default size | {{{https://issues.apache.org/jira/browse/VXQUERY-171} VXQuery Issue 171 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 9 | Array Out Of bounds Exception | Same Error as Original Query | Cannot be determined | {{{https://issues.apache.org/jira/browse/VXQUERY-173} VXQuery Issue 173 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 10 | Times out while execution | Same Error as Original Query | Cannot be determined | {{{https://issues.apache.org/jira/browse/VXQUERY-176} VXQuery Issue 176 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 11 | Working | Working | Working with default size | {{{https://issues.apache.org/jira/browse/VXQUERY-171} VXQuery Issue 171 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 12 | Working | Working |Working with default size | {{{https://issues.apache.org/jira/browse/VXQUERY-172} VXQuery Issue 172 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 13 | Working | Working |Working with default size | None |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 14 | Working | Working |Working with max size | None |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 15 | Working | Working | Working with max size | {{{https://issues.apache.org/jira/browse/VXQUERY-174} VXQuery Issue 174 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 16 | Working | Working |Working with max size | None |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 17 | Working | Working | Working with default size | {{{https://issues.apache.org/jira/browse/VXQUERY-171} VXQuery Issue 171 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 18 | Use defined functions | Same Error as Original Query | Cannot be determined | {{{https://issues.apache.org/jira/browse/VXQUERY-154} VXQuery Issue 154 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 19 | Working | Working | Working with default size | {{{https://issues.apache.org/jira/browse/VXQUERY-172} VXQuery Issue 172 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:
+| 20 | Empty results | Same Error as Original Query | Working with frame size | {{{https://issues.apache.org/jira/browse/VXQUERY-175} VXQuery Issue 175 }} |
+*------------------+--------------------+---------------------+-----------------+-----------:

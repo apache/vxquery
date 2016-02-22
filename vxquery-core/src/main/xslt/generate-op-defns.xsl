@@ -72,17 +72,17 @@
                 </xsl:if>
                 <xsl:for-each select="runtime">
                     <xsl:if test="@type = 'scalar'">
-                    public org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory createScalarEvaluatorFactory(org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
+                    public edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory createScalarEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
                         return new <xsl:value-of select="@class"/>(args);
                     }
                     </xsl:if>
                     <xsl:if test="@type = 'aggregate'">
-                    public org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluatorFactory createAggregateEvaluatorFactory(org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
+                    public edu.uci.ics.hyracks.algebricks.runtime.base.IAggregateEvaluatorFactory createAggregateEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
                         return new <xsl:value-of select="@class"/>(args);
                     }
                     </xsl:if>
                     <xsl:if test="@type = 'unnesting'">
-                    public org.apache.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
+                    public edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
                         return new <xsl:value-of select="@class"/>(args);
                     }
                     </xsl:if>

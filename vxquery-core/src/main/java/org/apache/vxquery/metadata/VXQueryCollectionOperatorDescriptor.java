@@ -25,23 +25,22 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.hyracks.api.comm.IFrame;
-import org.apache.hyracks.api.comm.IFrameFieldAppender;
-import org.apache.hyracks.api.comm.VSizeFrame;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.api.dataflow.IOperatorNodePushable;
-import org.apache.hyracks.api.dataflow.value.IRecordDescriptorProvider;
-import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
-import org.apache.hyracks.api.exceptions.HyracksDataException;
-import org.apache.hyracks.api.job.IOperatorDescriptorRegistry;
-import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
-import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
-import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
-import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
+
+import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
+import edu.uci.ics.hyracks.api.dataflow.IOperatorNodePushable;
+import edu.uci.ics.hyracks.api.dataflow.value.IRecordDescriptorProvider;
+import edu.uci.ics.hyracks.api.dataflow.value.RecordDescriptor;
+import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
+import edu.uci.ics.hyracks.api.job.IOperatorDescriptorRegistry;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
+import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
+import edu.uci.ics.hyracks.dataflow.common.comm.util.FrameUtils;
+import edu.uci.ics.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
+import edu.uci.ics.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
 
 public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
@@ -64,18 +63,18 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     @Override
     public IOperatorNodePushable createPushRuntime(IHyracksTaskContext ctx,
             IRecordDescriptorProvider recordDescProvider, int partition, int nPartitions) throws HyracksDataException {
-        final FrameTupleAccessor fta = new FrameTupleAccessor(
+        final FrameTupleAccessor fta = new FrameTupleAccessor(ctx.getFrameSize(),
                 recordDescProvider.getInputRecordDescriptor(getActivityId(), 0));
         final int fieldOutputCount = recordDescProvider.getOutputRecordDescriptor(getActivityId(), 0).getFieldCount();
-        final IFrame frame = new VSizeFrame(ctx);
-        final IFrameFieldAppender appender = new FrameFixedFieldTupleAppender(fieldOutputCount);
+        final ByteBuffer frame = ctx.allocateFrame();
+        final FrameTupleAppender appender = new FrameTupleAppender(ctx.getFrameSize(), fieldOutputCount);
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
 
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
-        final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
+        final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, frame, appender, childSeq,
                 dCtx.getStaticContext());
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
@@ -102,7 +101,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             if (LOGGER.isLoggable(Level.FINE)) {
                                 LOGGER.fine("Starting to read XML document: " + xmlDocument.getAbsolutePath());
                             }
-                            parser.parseElements(xmlDocument, writer, tupleIndex);
+                            parser.parseElements(xmlDocument, writer, fta, tupleIndex);
                         }
                     }
                 } else {
@@ -119,8 +118,9 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             @Override
             public void close() throws HyracksDataException {
                 // Check if needed?
-                if (appender.getTupleCount() > 0) {
-                    appender.flush(writer, true);
+                fta.reset(frame);
+                if (fta.getTupleCount() > 0) {
+                    FrameUtils.flushFrame(frame, writer);
                 }
                 writer.close();
             }

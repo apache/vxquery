@@ -21,9 +21,9 @@ import java.util.Arrays;
 
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import edu.uci.ics.hyracks.data.std.api.IPointable;
+import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
+import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XDMConstants {
     private static final byte[] BOOLEAN_TRUE_CONSTANT;

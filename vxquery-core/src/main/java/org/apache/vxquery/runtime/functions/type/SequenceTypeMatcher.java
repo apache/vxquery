@@ -35,7 +35,7 @@ import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class SequenceTypeMatcher {
     private final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();

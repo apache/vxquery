@@ -18,7 +18,7 @@ package org.apache.vxquery.exceptions;
 
 import java.io.File;
 
-import org.apache.hyracks.api.exceptions.HyracksDataException;
+import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 
 public class VXQueryDataException extends HyracksDataException {
 

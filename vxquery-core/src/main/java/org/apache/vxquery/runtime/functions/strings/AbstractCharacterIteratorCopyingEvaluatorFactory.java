@@ -18,7 +18,7 @@ package org.apache.vxquery.runtime.functions.strings;
 
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public abstract class AbstractCharacterIteratorCopyingEvaluatorFactory extends
         AbstractTaggedValueArgumentScalarEvaluatorFactory {

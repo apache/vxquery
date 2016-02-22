@@ -19,7 +19,7 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
 import org.apache.vxquery.runtime.functions.comparison.ValueLtComparisonOperation;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnMinScalarEvaluatorFactory extends AbstractMaxMinScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

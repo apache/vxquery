@@ -40,37 +40,37 @@ import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.common.exceptions.NotImplementedException;
-import org.apache.hyracks.algebricks.common.utils.Pair;
-import org.apache.hyracks.algebricks.compiler.api.HeuristicCompilerFactoryBuilder;
-import org.apache.hyracks.algebricks.compiler.api.ICompiler;
-import org.apache.hyracks.algebricks.compiler.api.ICompilerFactory;
-import org.apache.hyracks.algebricks.compiler.rewriter.rulecontrollers.PrioritizedRuleController;
-import org.apache.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialFixpointRuleController;
-import org.apache.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialOnceRuleController;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
-import org.apache.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
-import org.apache.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
-import org.apache.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
-import org.apache.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
-import org.apache.hyracks.algebricks.core.rewriter.base.AbstractRuleController;
-import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
-import org.apache.hyracks.algebricks.core.rewriter.base.IOptimizationContextFactory;
-import org.apache.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
-import org.apache.hyracks.algebricks.data.ISerializerDeserializerProvider;
-import org.apache.hyracks.algebricks.data.ITypeTraitProvider;
-import org.apache.hyracks.api.dataflow.value.ISerializerDeserializer;
-import org.apache.hyracks.api.dataflow.value.ITypeTraits;
-import org.apache.hyracks.api.job.JobSpecification;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.NotImplementedException;
+import edu.uci.ics.hyracks.algebricks.common.utils.Pair;
+import edu.uci.ics.hyracks.algebricks.compiler.api.HeuristicCompilerFactoryBuilder;
+import edu.uci.ics.hyracks.algebricks.compiler.api.ICompiler;
+import edu.uci.ics.hyracks.algebricks.compiler.api.ICompilerFactory;
+import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.PrioritizedRuleController;
+import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialFixpointRuleController;
+import edu.uci.ics.hyracks.algebricks.compiler.rewriter.rulecontrollers.SequentialOnceRuleController;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
+import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
+import edu.uci.ics.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
+import edu.uci.ics.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.AbstractRuleController;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IOptimizationContextFactory;
+import edu.uci.ics.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
+import edu.uci.ics.hyracks.algebricks.data.ISerializerDeserializerProvider;
+import edu.uci.ics.hyracks.algebricks.data.ITypeTraitProvider;
+import edu.uci.ics.hyracks.api.dataflow.value.ISerializerDeserializer;
+import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
+import edu.uci.ics.hyracks.api.job.JobSpecification;
+import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
 
 public class XMLQueryCompiler {
     private final XQueryCompilationListener listener;
@@ -126,7 +126,7 @@ public class XMLQueryCompiler {
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
         builder.setSerializerDeserializerProvider(new ISerializerDeserializerProvider() {
-            @SuppressWarnings("rawtypes")
+            @SuppressWarnings("unchecked")
             @Override
             public ISerializerDeserializer getSerializerDeserializer(Object type) throws AlgebricksException {
                 return null;
@@ -164,13 +164,7 @@ public class XMLQueryCompiler {
         builder.setNullableTypeComputer(new INullableTypeComputer() {
             @Override
             public Object makeNullableType(Object type) throws AlgebricksException {
-                SequenceType st = (SequenceType) type;
-                if (st.getQuantifier().allowsEmptySequence()) {
-                    return type;
-                } else if (st.getQuantifier() == Quantifier.QUANT_ONE) {
-                    return SequenceType.create(st.getItemType(), Quantifier.QUANT_QUESTION);
-                }
-                return type;
+                throw new NotImplementedException("NullableTypeComputer is not implented (makeNullableType)");
             }
 
             @Override
@@ -199,8 +193,7 @@ public class XMLQueryCompiler {
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
         pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(
                 module.getModuleContext()));
-        VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap(),
-                module.getModuleContext());
+        VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap());
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);
@@ -241,13 +234,11 @@ public class XMLQueryCompiler {
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
                 RewriteRuleset.buildXQueryNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
-                RewriteRuleset.buildInlineRedundantExpressionNormalizationRuleCollection()));
+                RewriteRuleset.buildRedundantExpressionNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(priorityCtrl,
                 RewriteRuleset.buildNestedDataSourceRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqOnceCtrl,
                 RewriteRuleset.buildTypeInferenceRuleCollection()));
-        defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlNoDfs,
-                RewriteRuleset.buildUnnestingRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlFullDfs,
                 RewriteRuleset.buildNormalizationRuleCollection()));
         defaultLogicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqCtrlNoDfs,

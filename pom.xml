@@ -26,7 +26,7 @@
 
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.5</version>
     <packaging>pom</packaging>
     <name>VXQuery</name>
     <description>A Versatile XQuery Processor</description>
@@ -50,7 +50,7 @@
         <connection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</connection>
         <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf/vxquery.git</url>
-        <tag>HEAD</tag>
+        <tag>apache-vxquery-0.5</tag>
     </scm>
 
     <issueManagement>
@@ -166,31 +166,31 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-client</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-control-common</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-control-cc</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-control-nc</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>algebricks-compiler</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
@@ -202,55 +202,55 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>algebricks-common</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>algebricks-core</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>algebricks-data</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>algebricks-rewriter</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>algebricks-runtime</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-api</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-data-std</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-dataflow-common</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.apache.hyracks</groupId>
+                <groupId>edu.uci.ics.hyracks</groupId>
                 <artifactId>hyracks-dataflow-std</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
@@ -354,8 +354,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -367,6 +367,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>2.4.2</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.scm</groupId>
@@ -437,15 +438,15 @@
             </plugin>
           </reportPlugins>
         </configuration>
-        <executions>
-          <execution>
+        <executions> 
+          <execution> 
             <id>attach-site</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
+            </goals> 
+          </execution> 
+        </executions> 
       </plugin>
       -->
             <plugin>
@@ -508,7 +509,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <hyracks.version>0.2.16-incubating</hyracks.version>
+        <hyracks.version>0.2.15</hyracks.version>
         <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
     </properties>
 

@@ -19,22 +19,17 @@ package org.apache.vxquery.compiler.rewriter.rules;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 
 /**
  * Find the collection functions and generate the data source objects.
- *
- * <pre>
- * Search pattern:
- *   unnest &lt;- assign [function-call: collection] &lt;- assign [constant: string]
- * </pre>
+ * Search pattern: unnest <- assign [function-call: collection] <- assign [constant: string]
  */
 public class SetCollectionDataSourceRule extends AbstractCollectionRule {
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
-            throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         if (context.checkIfInDontApplySet(this, opRef.getValue())) {
             return false;
         }

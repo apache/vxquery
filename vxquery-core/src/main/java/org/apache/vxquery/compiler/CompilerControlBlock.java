@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.apache.vxquery.context.StaticContext;
 
-import org.apache.hyracks.api.dataset.ResultSetId;
+import edu.uci.ics.hyracks.api.dataset.ResultSetId;
 
 public class CompilerControlBlock {
     private final StaticContext ctx;
