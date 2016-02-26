@@ -77,7 +77,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
         if (!functionCall.getFunctionIdentifier().equals(
-                BuiltinFunctions.FN_COLLECTIONWITHTAG_2.getFunctionIdentifier())
+                BuiltinFunctions.FN_COLLECTION_WITH_TAG_2.getFunctionIdentifier())
                 && !functionCall.getFunctionIdentifier().equals(
                         BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier())) {
             return null;

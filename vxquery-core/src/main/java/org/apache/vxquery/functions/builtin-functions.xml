@@ -129,7 +129,7 @@
     </function>
     
     <!-- fn:collection-with-tag($arg1  as xs:string?, $arg2 as xs:string?) as  node()* -->
-    <function name="fn:collectionwithtag">
+    <function name="fn:collection-with-tag">
         <param name="arg1" type="xs:string?"/>
         <param name="arg2" type="xs:string?"/>
         <return type="node()*"/>

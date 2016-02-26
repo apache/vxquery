@@ -76,16 +76,17 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private HDFSFunctions hdfs;
     private String tag;
     private final String START_TAG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+    private final String hdfsConf;
 
     public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryCollectionDataSource ds,
-            RecordDescriptor rDesc) {
+            RecordDescriptor rDesc, String hdfsConf) {
         super(spec, 1, 1);
         collectionPartitions = ds.getPartitions();
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
         childSeq = ds.getChildSeq();
         recordDescriptors[0] = rDesc;
-        this.tag = ds.getTag();
+        this.hdfsConf = hdfsConf;
     }
 
     @Override

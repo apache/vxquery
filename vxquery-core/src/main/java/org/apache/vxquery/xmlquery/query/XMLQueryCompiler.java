@@ -76,6 +76,8 @@ public class XMLQueryCompiler {
     private final XQueryCompilationListener listener;
 
     private final ICompilerFactory cFactory;
+    
+    private final String hdfsConf;
 
     private LogicalOperatorPrettyPrintVisitor pprinter;
 
@@ -88,16 +90,18 @@ public class XMLQueryCompiler {
     private int frameSize;
 
     private String[] nodeList;
+    
 
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize) {
-        this(listener, nodeList, frameSize, -1, -1, -1);
+        this(listener, nodeList, frameSize, -1, -1, -1, "");
     }
 
     public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize,
-            int availableProcessors, long joinHashSize, long maximumDataSize) {
+            int availableProcessors, long joinHashSize, long maximumDataSize, String hdfsConf) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         this.frameSize = frameSize;
         this.nodeList = nodeList;
+        this.hdfsConf = hdfsConf;
         HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
                 new IOptimizationContextFactory() {
                     @Override
@@ -200,7 +204,7 @@ public class XMLQueryCompiler {
         pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(
                 module.getModuleContext()));
         VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap(),
-                module.getModuleContext());
+                module.getModuleContext(), this.hdfsConf);
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);

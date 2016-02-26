@@ -57,11 +57,14 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     private final String[] nodeList;
     private final Map<String, File> sourceFileMap;
     private final StaticContext staticCtx;
+    private final String hdfsConf;
 
-    public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap, StaticContext staticCtx) {
+    public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap, StaticContext staticCtx,
+    		String hdfsConf) {
         this.nodeList = nodeList;
         this.sourceFileMap = sourceFileMap;
         this.staticCtx = staticCtx;
+        this.hdfsConf = hdfsConf;
     }
 
     @Override
@@ -95,7 +98,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             ds.setPartitions(collectionPartitions);
         }
         RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
-        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc);
+        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf);
 
         AlgebricksPartitionConstraint constraint = getClusterLocations(nodeList, ds.getPartitionCount());
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
