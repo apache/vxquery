@@ -32,7 +32,9 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -55,6 +57,7 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             private Pattern pattern=null;
+            private Matcher matcher=null;
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 // Default result is false.
@@ -87,11 +90,11 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                         XDMConstants.setEmptyString(tvp);
                         tvp.getValue(stringp2);
                     } else {
-                        throw new SystemException(ErrorCode.FORX0002);
+                        throw new SystemException(ErrorCode.FORG0006);
                     }
                 } else {
                     if (!FunctionHelper.isDerivedFromString(tvp2.getTag())) {
-                        throw new SystemException(ErrorCode.FORX0002);
+                        throw new SystemException(ErrorCode.FORG0006);
                     }
                     tvp2.getValue(stringp2);
                 }
@@ -100,17 +103,29 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                 if (args.length > 2) {
                     TaggedValuePointable tvp3 = args[2];
                     if (!FunctionHelper.isDerivedFromString(tvp3.getTag())) {
-                        throw new SystemException(ErrorCode.FORX0001);
+                        throw new SystemException(ErrorCode.FORG0006);
                     }
                     tvp3.getValue(stringp3);
                     stringp3.toString(builder3);
-                    pattern=Pattern.compile(builder2.toString(),FlagEvaluatorUtils.toFlag(builder3.toString()));
+                    try{
+                        pattern = Pattern.compile(builder2.toString(), FlagEvaluatorUtils.toFlag(builder3.toString()));
+                    }catch (PatternSyntaxException e){
+                        throw new SystemException(ErrorCode.FORX0002);
+                    }catch (IllegalArgumentException e){
+                        throw new SystemException(ErrorCode.FORX0001);
+                    }
                 }
                 if (pattern==null){
-                    pattern = Pattern.compile(builder2.toString());
+                    try{
+                        pattern = Pattern.compile(builder2.toString());
+                    }catch (PatternSyntaxException e){
+                        throw new SystemException(ErrorCode.FORX0002);
+                    }
                 }
 
-                if(pattern.matcher(builder1.toString()).find()) {
+                matcher=pattern.matcher(builder1.toString());
+
+                if(matcher.find()) {
                     booleanResult[1] = 1;
                 }
                 result.set(booleanResult, 0, 2);
