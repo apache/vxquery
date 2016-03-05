@@ -753,6 +753,7 @@
         <param name="pattern" type="xs:string"/>
         <param name="replacement" type="xs:string"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnReplaceEvaluatorFactory"/>
     </function>
 
     <!-- fn:replace($input  as xs:string?, $pattern as xs:string, $replacement as xs:string, $flags as xs:string)  as xs:string -->
@@ -762,6 +763,7 @@
         <param name="replacement" type="xs:string"/>
         <param name="flags" type="xs:string"/>
         <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnReplaceEvaluatorFactory"/>
     </function>
 
     <!-- fn:resolve-QName($qname  as xs:string?, $element as element())  as xs:QName?  -->
