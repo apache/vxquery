@@ -123,7 +123,7 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                     }
                 }
 
-                matcher=pattern.matcher(builder1.toString());
+                matcher=pattern.matcher(builder1);
 
                 if(matcher.find()) {
                     booleanResult[1] = 1;
