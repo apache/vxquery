@@ -527,6 +527,7 @@
         <param name="input" type="xs:string?"/>
         <param name="pattern" type="xs:string"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnMatchesEvaluatorFactory"/>
     </function>
 
     <!-- fn:matches($input  as xs:string?, $pattern as xs:string, $flags as xs:string)  as xs:boolean -->
@@ -535,6 +536,7 @@
         <param name="pattern" type="xs:string"/>
         <param name="flags" type="xs:string"/>
         <return type="xs:boolean"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnMatchesEvaluatorFactory"/>
     </function>
 
     <!-- fn:max($arg as  xs:anyAtomicType*) as xs:anyAtomicType?  -->
