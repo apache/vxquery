@@ -26,7 +26,6 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -53,14 +52,15 @@ public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScala
         final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp3 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final StringBuilder builder1=new StringBuilder();
-        final StringBuilder builder2=new StringBuilder();
-        final StringBuilder builder3=new StringBuilder();
+        final StringBuilder builder1 = new StringBuilder();
+        final StringBuilder builder2 = new StringBuilder();
+        final StringBuilder builder3 = new StringBuilder();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
-            private Pattern pattern=null;
+            private Pattern pattern = null;
+
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 try {
@@ -76,35 +76,9 @@ public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScala
                     TaggedValuePointable tvp2 = args[1];
 
                     // Only accept strings as input.
-                    if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
-                        tvp1.getValue(seqp);
-                        if (seqp.getEntryCount() == 0) {
-                            XDMConstants.setEmptyString(tvp);
-                            tvp.getValue(stringp1);
-                        } else {
-                            throw new SystemException(ErrorCode.FORG0006);
-                        }
-                    } else {
-                        if (!FunctionHelper.isDerivedFromString(tvp1.getTag())) {
-                            throw new SystemException(ErrorCode.FORG0006);
-                        }
-                        tvp1.getValue(stringp1);
-                    }
+                    PatternMatchingEvaluatorUtils.checkInput(tvp, tvp1, seqp, stringp1);
                     stringp1.toString(builder1);
-                    if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
-                        tvp2.getValue(seqp);
-                        if (seqp.getEntryCount() == 0) {
-                            XDMConstants.setEmptyString(tvp);
-                            tvp.getValue(stringp2);
-                        } else {
-                            throw new SystemException(ErrorCode.FORG0006);
-                        }
-                    } else {
-                        if (!FunctionHelper.isDerivedFromString(tvp2.getTag())) {
-                            throw new SystemException(ErrorCode.FORG0006);
-                        }
-                        tvp2.getValue(stringp2);
-                    }
+                    PatternMatchingEvaluatorUtils.checkInput(tvp, tvp2, seqp, stringp2);
                     stringp2.toString(builder2);
                     // Third parameter is optional.
                     if (args.length > 2) {
@@ -115,7 +89,8 @@ public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScala
                         tvp3.getValue(stringp3);
                         stringp3.toString(builder3);
                         try {
-                            pattern = Pattern.compile(builder2.toString(), FlagEvaluatorUtils.toFlag(builder3.toString()));
+                            pattern = Pattern.compile(builder2.toString(),
+                                    PatternMatchingEvaluatorUtils.toFlag(builder3.toString()));
                         } catch (PatternSyntaxException e) {
                             throw new SystemException(ErrorCode.FORX0002);
                         } catch (IllegalArgumentException e) {
@@ -129,16 +104,16 @@ public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScala
                             throw new SystemException(ErrorCode.FORX0002);
                         }
                     }
-                    try{
-                    String[] match = pattern.split(builder1);
-                    int l=match.length;
-                    String tokenized="(";
-                    for (int i=0;i<l-1;++i) {
-                        tokenized+="\""+match[i]+"\", ";
-                    }
-                    tokenized+="\""+match[l-1]+"\")";
-                    out.write(tokenized.getBytes(StandardCharsets.UTF_8));
-                    }catch (IndexOutOfBoundsException e){
+                    try {
+                        String[] match = pattern.split(builder1);
+                        int l = match.length;
+                        String tokenized = "";
+                        for (int i = 0; i < l - 1; ++i) {
+                            tokenized += match[i] + " ";
+                        }
+                        tokenized += match[l - 1];
+                        out.write(tokenized.getBytes(StandardCharsets.UTF_8));
+                    } catch (IndexOutOfBoundsException e) {
                         throw new SystemException(ErrorCode.FORX0003);
                     }
 
@@ -146,7 +121,7 @@ public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScala
                     abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
 
                     result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
-                }catch (IOException e) {
+                } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }

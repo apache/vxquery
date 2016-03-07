@@ -25,7 +25,6 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -49,15 +48,17 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
         final UTF8StringPointable stringp1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp3 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        final StringBuilder builder1=new StringBuilder();
-        final StringBuilder builder2=new StringBuilder();
-        final StringBuilder builder3=new StringBuilder();
+        final StringBuilder builder1 = new StringBuilder();
+        final StringBuilder builder2 = new StringBuilder();
+        final StringBuilder builder3 = new StringBuilder();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
-            private Pattern pattern=null;
-            private Matcher matcher=null;
+            private Pattern pattern = null;
+            private Matcher matcher = null;
+            private String s1, s2, s3;
+
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 // Default result is false.
@@ -69,36 +70,12 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                 TaggedValuePointable tvp2 = args[1];
 
                 // Only accept strings as input.
-                if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
-                    tvp1.getValue(seqp);
-                    if (seqp.getEntryCount() == 0) {
-                        XDMConstants.setEmptyString(tvp);
-                        tvp.getValue(stringp1);
-                    } else {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                } else {
-                    if (!FunctionHelper.isDerivedFromString(tvp1.getTag())) {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                    tvp1.getValue(stringp1);
-                }
+                PatternMatchingEvaluatorUtils.checkInput(tvp, tvp1, seqp, stringp1);
                 stringp1.toString(builder1);
-                if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
-                    tvp2.getValue(seqp);
-                    if (seqp.getEntryCount() == 0) {
-                        XDMConstants.setEmptyString(tvp);
-                        tvp.getValue(stringp2);
-                    } else {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                } else {
-                    if (!FunctionHelper.isDerivedFromString(tvp2.getTag())) {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                    tvp2.getValue(stringp2);
-                }
+                s1 = builder1.toString();
+                PatternMatchingEvaluatorUtils.checkInput(tvp, tvp2, seqp, stringp2);
                 stringp2.toString(builder2);
+                s2 = builder2.toString();
                 // Third parameter is optional.
                 if (args.length > 2) {
                     TaggedValuePointable tvp3 = args[2];
@@ -107,25 +84,26 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                     }
                     tvp3.getValue(stringp3);
                     stringp3.toString(builder3);
-                    try{
-                        pattern = Pattern.compile(builder2.toString(), FlagEvaluatorUtils.toFlag(builder3.toString()));
-                    }catch (PatternSyntaxException e){
+                    s3 = builder3.toString();
+                    try {
+                        pattern = Pattern.compile(builder2.toString(), PatternMatchingEvaluatorUtils.toFlag(s3));
+                    } catch (PatternSyntaxException e) {
                         throw new SystemException(ErrorCode.FORX0002);
-                    }catch (IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         throw new SystemException(ErrorCode.FORX0001);
                     }
                 }
-                if (pattern==null){
-                    try{
-                        pattern = Pattern.compile(builder2.toString());
-                    }catch (PatternSyntaxException e){
+                if (pattern == null) {
+                    try {
+                        pattern = Pattern.compile(s2);
+                    } catch (PatternSyntaxException e) {
                         throw new SystemException(ErrorCode.FORX0002);
                     }
                 }
 
-                matcher=pattern.matcher(builder1);
+                matcher = pattern.matcher(builder1);
 
-                if(matcher.find()) {
+                if (matcher.find()) {
                     booleanResult[1] = 1;
                 }
                 result.set(booleanResult, 0, 2);
