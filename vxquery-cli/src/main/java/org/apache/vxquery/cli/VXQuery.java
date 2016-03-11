@@ -81,8 +81,7 @@ public class VXQuery {
     /**
      * Constructor to use command line options passed.
      *
-     * @param opts
-     *            Command line options object
+     * @param opts Command line options object
      */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
@@ -240,7 +239,7 @@ public class VXQuery {
      * @throws Exception
      */
     private String[] getNodeList() throws Exception {
-        if(hcc != null) {
+        if (hcc != null) {
             Map<String, NodeControllerInfo> nodeControllerInfos = hcc.getNodeControllerInfos();
             String[] nodeList = new String[nodeControllerInfos.size()];
             int index = 0;
@@ -256,10 +255,8 @@ public class VXQuery {
      * Creates a Hyracks dataset, if not already existing with the job frame size, and 1 reader. Allocates a new buffer of size specified in the frame of Hyracks
      * node. Creates new dataset reader with the current job ID and result set ID. Outputs the string in buffer for each frame.
      *
-     * @param spec
-     *            JobSpecification object, containing frame size. Current specified job.
-     * @param writer
-     *            Writer for output of job.
+     * @param spec   JobSpecification object, containing frame size. Current specified job.
+     * @param writer Writer for output of job.
      * @throws Exception
      */
     private void runJob(JobSpecification spec, PrintWriter writer) throws Exception {
@@ -342,8 +339,7 @@ public class VXQuery {
     /**
      * Reads the contents of file given in query into a String. The file is always closed. For XML files UTF-8 encoding is used.
      *
-     * @param query
-     *            The query with filename to be processed
+     * @param query The query with filename to be processed
      * @return UTF-8 formatted query string
      * @throws IOException
      */
@@ -365,7 +361,8 @@ public class VXQuery {
      * Helper class with fields and methods to handle all command line options
      */
     private static class CmdLineOptions {
-        @Option(name = "-available-processors", usage = "Number of available processors. (default: java's available processors)")
+        @Option(name = "-available-processors",
+                usage = "Number of available processors. (default: java's available processors)")
         private int availableProcessors = -1;
 
         @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController.")
