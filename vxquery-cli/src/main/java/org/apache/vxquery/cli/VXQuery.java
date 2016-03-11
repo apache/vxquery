@@ -248,7 +248,7 @@ public class VXQuery {
             }
             return nodeList;
         }
-        return new String[0];
+        return null;
     }
 
     /**
