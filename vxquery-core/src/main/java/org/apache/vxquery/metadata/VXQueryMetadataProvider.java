@@ -111,9 +111,11 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
 
     public static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
         ArrayList<String> locs = new ArrayList<String>();
-        for (String node : nodeList) {
-            for (int j = 0; j < partitions; j++) {
-                locs.add(node);
+        if (nodeList != null) {
+            for (String node : nodeList) {
+                for (int j = 0; j < partitions; j++) {
+                    locs.add(node);
+                }
             }
         }
         String[] cluster = new String[locs.size()];
