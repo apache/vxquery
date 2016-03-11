@@ -240,13 +240,16 @@ public class VXQuery {
      * @throws Exception
      */
     private String[] getNodeList() throws Exception {
-        Map<String, NodeControllerInfo> nodeControllerInfos = hcc.getNodeControllerInfos();
-        String[] nodeList = new String[nodeControllerInfos.size()];
-        int index = 0;
-        for (String node : nodeControllerInfos.keySet()) {
-            nodeList[index++] = node;
+        if(hcc != null) {
+            Map<String, NodeControllerInfo> nodeControllerInfos = hcc.getNodeControllerInfos();
+            String[] nodeList = new String[nodeControllerInfos.size()];
+            int index = 0;
+            for (String node : nodeControllerInfos.keySet()) {
+                nodeList[index++] = node;
+            }
+            return nodeList;
         }
-        return nodeList;
+        return new String[0];
     }
 
     /**
