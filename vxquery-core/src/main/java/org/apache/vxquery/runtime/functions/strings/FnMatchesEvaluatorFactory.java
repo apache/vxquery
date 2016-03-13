@@ -87,10 +87,8 @@ public class FnMatchesEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                     s3 = builder3.toString();
                     try {
                         pattern = Pattern.compile(builder2.toString(), PatternMatchingEvaluatorUtils.toFlag(s3));
-                    } catch (PatternSyntaxException e) {
-                        throw new SystemException(ErrorCode.FORX0002);
                     } catch (IllegalArgumentException e) {
-                        throw new SystemException(ErrorCode.FORX0001);
+                        throw new SystemException(ErrorCode.FORX0002);
                     }
                 }
                 if (pattern == null) {

@@ -38,7 +38,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class
+FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
     public FnTokenizeEvaluatorFactory(IScalarEvaluatorFactory[] args) {
@@ -91,10 +92,8 @@ public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScala
                         try {
                             pattern = Pattern.compile(builder2.toString(),
                                     PatternMatchingEvaluatorUtils.toFlag(builder3.toString()));
-                        } catch (PatternSyntaxException e) {
-                            throw new SystemException(ErrorCode.FORX0002);
                         } catch (IllegalArgumentException e) {
-                            throw new SystemException(ErrorCode.FORX0001);
+                            throw new SystemException(ErrorCode.FORX0002);
                         }
                     }
                     if (pattern == null) {

@@ -16,13 +16,6 @@
  */
 package org.apache.vxquery.runtime.functions.strings;
 
-import java.io.DataOutput;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -38,6 +31,13 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+
+import java.io.DataOutput;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class FnReplaceEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -98,10 +98,8 @@ public class FnReplaceEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                         try {
                             pattern = Pattern.compile(builder2.toString(),
                                     PatternMatchingEvaluatorUtils.toFlag(builder4.toString()));
-                        } catch (PatternSyntaxException e) {
-                            throw new SystemException(ErrorCode.FORX0002);
                         } catch (IllegalArgumentException e) {
-                            throw new SystemException(ErrorCode.FORX0001);
+                            throw new SystemException(ErrorCode.FORX0002);
                         }
                     }
                     if (pattern == null) {
