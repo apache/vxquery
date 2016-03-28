@@ -16,6 +16,13 @@
  */
 package org.apache.vxquery.runtime.functions.strings;
 
+import java.io.DataOutput;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -31,13 +38,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-
-import java.io.DataOutput;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 public class FnReplaceEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -84,6 +84,7 @@ public class FnReplaceEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                     stringp1.toString(builder1);
                     PatternMatchingEvaluatorUtils.checkInput(tvp, tvp2, seqp, stringp2);
                     stringp2.toString(builder2);
+                    String s2 = builder2.toString();
                     PatternMatchingEvaluatorUtils.checkInput(tvp, tvp3, seqp, stringp3);
                     stringp3.toString(builder3);
 
@@ -95,9 +96,14 @@ public class FnReplaceEvaluatorFactory extends AbstractTaggedValueArgumentScalar
                         }
                         tvp4.getValue(stringp4);
                         stringp4.toString(builder4);
+                        String s4 = builder4.toString();
                         try {
-                            pattern = Pattern.compile(builder2.toString(),
-                                    PatternMatchingEvaluatorUtils.toFlag(builder4.toString()));
+                            if (s4.contains("q")) {
+                                s2 = Pattern.quote(s2);
+                            }
+                            pattern = Pattern.compile(s2, PatternMatchingEvaluatorUtils.toFlag(s4));
+                        } catch (PatternSyntaxException e) {
+                            throw new SystemException(ErrorCode.FORX0002);
                         } catch (IllegalArgumentException e) {
                             throw new SystemException(ErrorCode.FORX0002);
                         }

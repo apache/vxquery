@@ -45,10 +45,13 @@ public class PatternMatchingEvaluatorUtils {
                 case 'x':
                     flag |= Pattern.COMMENTS;
                     break;
+                case 'q':
+                    break;
                 default:
                     throw new SystemException(ErrorCode.FORX0001);
             }
         }
+        flag |= Pattern.UNICODE_CHARACTER_CLASS;
         return flag;
     }
 

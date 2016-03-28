@@ -31,15 +31,14 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.util.GrowableIntArray;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class
-FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
     public FnTokenizeEvaluatorFactory(IScalarEvaluatorFactory[] args) {
@@ -58,20 +57,17 @@ FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFac
         final StringBuilder builder3 = new StringBuilder();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-
+        final GrowableIntArray slots = new GrowableIntArray();
+        final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             private Pattern pattern = null;
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 try {
-                    // Byte Format: Type (1 byte) + String Length (2 bytes) + String.
-                    DataOutput out = abvs.getDataOutput();
-                    out.write(ValueTag.XS_STRING_TAG);
-
-                    // Default values for the length and update later
-                    out.write(0);
-                    out.write(0);
+                    abvs.reset();
+                    slots.clear();
+                    dataArea.reset();
 
                     TaggedValuePointable tvp1 = args[0];
                     TaggedValuePointable tvp2 = args[1];
@@ -81,6 +77,7 @@ FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFac
                     stringp1.toString(builder1);
                     PatternMatchingEvaluatorUtils.checkInput(tvp, tvp2, seqp, stringp2);
                     stringp2.toString(builder2);
+                    String s2 = builder2.toString();
                     // Third parameter is optional.
                     if (args.length > 2) {
                         TaggedValuePointable tvp3 = args[2];
@@ -89,9 +86,14 @@ FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFac
                         }
                         tvp3.getValue(stringp3);
                         stringp3.toString(builder3);
+                        String s3 = builder3.toString();
                         try {
-                            pattern = Pattern.compile(builder2.toString(),
-                                    PatternMatchingEvaluatorUtils.toFlag(builder3.toString()));
+                            if (s3.contains("q")) {
+                                s2 = Pattern.quote(s2);
+                            }
+                            pattern = Pattern.compile(s2, PatternMatchingEvaluatorUtils.toFlag(s3));
+                        } catch (PatternSyntaxException e) {
+                            throw new SystemException(ErrorCode.FORX0002);
                         } catch (IllegalArgumentException e) {
                             throw new SystemException(ErrorCode.FORX0002);
                         }
@@ -106,22 +108,45 @@ FnTokenizeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFac
                     try {
                         String[] match = pattern.split(builder1);
                         int l = match.length;
-                        String tokenized = "";
-                        for (int i = 0; i < l - 1; ++i) {
-                            tokenized += match[i] + " ";
+                        DataOutput output = dataArea.getDataOutput();
+                        byte[] array;
+                        int length;
+                        for (int i = 0; i < l; ++i) {
+                            length = match[i].length();
+                            array = new byte[length + 3];
+                            array[0] = ValueTag.XS_STRING_TAG;
+                            array[1] = 0;
+                            array[2] = (byte) match[i].length();
+                            System.arraycopy(match[i].getBytes(), 0, array, 3, length);
+                            output.write(array, 0, length + 3);
+                            slots.append(dataArea.getLength());
                         }
-                        tokenized += match[l - 1];
-                        out.write(tokenized.getBytes(StandardCharsets.UTF_8));
+
                     } catch (IndexOutOfBoundsException e) {
                         throw new SystemException(ErrorCode.FORX0003);
                     }
-
-                    abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-                    abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
-
-                    result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
+                    finish();
+                    result.set(abvs);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
+                }
+            }
+
+            public void finish() throws IOException {
+                DataOutput out = abvs.getDataOutput();
+                if (slots.getSize() != 1) {
+                    out.write(ValueTag.SEQUENCE_TAG);
+                    int size = slots.getSize();
+                    out.writeInt(size);
+                    if (size > 0) {
+                        int[] slotArray = slots.getArray();
+                        for (int i = 0; i < size; ++i) {
+                            out.writeInt(slotArray[i]);
+                        }
+                        out.write(dataArea.getByteArray(), dataArea.getStartOffset(), dataArea.getLength());
+                    }
+                } else {
+                    out.write(dataArea.getByteArray(), dataArea.getStartOffset(), dataArea.getLength());
                 }
             }
         };
