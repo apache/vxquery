@@ -508,7 +508,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <hyracks.version>0.2.16-incubating</hyracks.version>
+        <hyracks.version>0.2.17-incubating</hyracks.version>
         <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
     </properties>
 
