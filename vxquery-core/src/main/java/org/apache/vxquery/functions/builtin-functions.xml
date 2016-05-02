@@ -128,6 +128,65 @@
         <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
     
+     <!-- fn:indexfromcollection($arg  as xs:string?) as  node()* -->
+    <function name="fn:indexfromcollection">
+        <param name="arg" type="xs:string?"/>
+        <return type="node()*"/> 
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.IndexConstructorScalarEvaluatorFactory"/>
+    </function>
+    
+    <!-- fn:indexfromcollection($arg  as xs:string?) as  node()* -->
+    <function name="fn:docindexfromcollection">
+        <param name="arg" type="xs:string?"/>
+        <return type="node()*"/> 
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.IndexConstructorDocScalarEvaluatorFactory"/>
+    </function>
+    
+    <!-- fn:matchindexunnesting($indexfolder  as xs:string?, $elementpath as xs:string?, $match as xs:string?) as  node()* -->
+    <function name="fn:matchindexunnesting">
+        <param name="indexfolder" type="xs:string?"/>
+        <param name="elementpath" type="xs:string?"/>
+        <param name="match" type="xs:string?"/>
+        <return type="node()*"/> 
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.node.MatchIndexUnnestingEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+    </function>
+    
+        <!-- fn:matchindexunnesting($indexfolder  as xs:string?, $elementpath as xs:string?, $match as xs:string?) as  node()* -->
+    <function name="fn:matchindexdocunnesting">
+        <param name="indexfolder" type="xs:string?"/>
+        <param name="elementpath" type="xs:string?"/>
+        <param name="match" type="xs:string?"/>
+        <return type="node()*"/> 
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.node.MatchIndexDocUnnestingEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+    </function>
+    
+    <!-- fn:searchindexunnesting($indexfolder  as xs:string?, $elementpath as xs:string?, $match as xs:string?) as  node()* -->
+    <function name="fn:searchindexunnesting">
+        <param name="indexfolder" type="xs:string?"/>
+        <param name="elementpath" type="xs:string?"/>
+        <param name="match" type="xs:string?"/>
+        <return type="node()*"/> 
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.node.SearchIndexUnnestingEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+    </function>
+    
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:integer?  -->
     <function name="fn:compare">
         <param name="comparand1" type="xs:string?"/>
