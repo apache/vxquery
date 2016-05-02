@@ -34,34 +34,42 @@ public class IndexConstructorUtil {
             ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
             boolean first, boolean isElementPath, String nodeId) throws SystemException {
-        String collectionName;
-        TaggedValuePointable tvp = args[0];
+        String collectionFolder;
+        String indexFolder;
+        TaggedValuePointable collectionTVP = args[0];
+        TaggedValuePointable indexTVP = args[1];
 
-        if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
+        if (collectionTVP.getTag() != ValueTag.XS_STRING_TAG || indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
             throw new SystemException(ErrorCode.FORG0006);
         }
-        tvp.getValue(stringp);
+
         try {
             // Get the list of files.
+            collectionTVP.getValue(stringp);
             bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
                     stringp.getLength() + stringp.getStartOffset())), 0);
-            collectionName = di.readUTF();
+            collectionFolder = di.readUTF();
+
+            // Get the index folder
+            indexTVP.getValue(stringp);
+            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                    stringp.getLength() + stringp.getStartOffset())), 0);
+            indexFolder = di.readUTF();
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
 
-        File collectionDirectory = new File(collectionName);
+        File collectionDirectory = new File(collectionFolder);
         if (!collectionDirectory.exists()) {
-            throw new RuntimeException("The collection directory (" + collectionName + ") does not exist.");
+            throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
         }
 
         try {
             abvs.reset();
             sb.reset(abvs);
-            String indexPath = "/home/steven/vxquery/indexfolder";
-            System.out.println("Indexing to directory '" + indexPath + "'...");
+            //System.out.println("Indexing to directory '" + indexFolder + "'...");
 
-            Directory dir = FSDirectory.open(new File(indexPath));
+            Directory dir = FSDirectory.open(new File(indexFolder));
             Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
             IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 

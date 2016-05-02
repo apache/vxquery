@@ -128,9 +128,10 @@
         <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
     
-     <!-- fn:indexfromcollection($arg  as xs:string?) as  node()* -->
+    <!-- fn:indexfromcollection($collectionFolder  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
     <function name="fn:indexfromcollection">
-        <param name="arg" type="xs:string?"/>
+        <param name="collectionFolder" type="xs:string?"/>
+        <param name="indexFolder" type="xs:string?"/>
         <return type="node()*"/> 
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>

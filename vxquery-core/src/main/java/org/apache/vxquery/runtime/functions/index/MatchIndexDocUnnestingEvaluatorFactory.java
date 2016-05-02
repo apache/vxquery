@@ -173,7 +173,7 @@ public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedVal
                     parser = new QueryParser(Version.LUCENE_40, "item", analyzer);
 
                     //Parser doesn't like / so paths are saved as name.name....name:elementname.element
-                    //Can NOT search with spaces
+                    //TODO: Can NOT search with spaces
                     matchin = true;
                     if (match.equals("")) {
                         matchin = false;
@@ -203,7 +203,7 @@ public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedVal
                         }
                         System.out.println(query.toString());
                         try {
-
+                            //TODO: Right now it only returns 1000000 results
                             results = searcher.search(query, 1000000);
                         } catch (IOException e) {
                             e.printStackTrace();
