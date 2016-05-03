@@ -23,6 +23,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
@@ -41,14 +48,6 @@ import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
-
-import org.apache.hyracks.api.exceptions.HyracksDataException;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class FunctionHelper {
 
@@ -1195,7 +1194,12 @@ public class FunctionHelper {
         } catch (SystemException e) {
             throw new HyracksDataException(e);
         }
-        File file = new File(fName);
+        readInDocFromString(fName, bbis, di, abvs, parser);
+    }
+
+    public static void readInDocFromString(String filename, ByteBufferInputStream bbis, DataInputStream di,
+            ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+        File file = new File(filename);
         parser.parseDocument(file, abvs);
     }
 

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.nodes.AbstractNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
@@ -37,8 +38,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
-
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class SAXIndexHandler implements ContentHandler, LexicalHandler {
     private final ArrayBackedValueStorage docABVS;

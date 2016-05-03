@@ -1,4 +1,4 @@
-package org.apache.vxquery.runtime.functions.node;
+package org.apache.vxquery.runtime.functions.index;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -8,6 +8,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -19,8 +28,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -36,17 +43,6 @@ import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import edu.uci.ics.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
-import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
-import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedValueArgumentUnnestingEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -145,20 +141,19 @@ public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedVal
                     //This whole loop is to get the string arguments, indefolder, elementpath, and match option
                     try {
                         // Get the list of files.
-                        bbis.setByteBuffer(
-                                ByteBuffer.wrap(Arrays.copyOfRange(stringindexfolder.getByteArray(),
-                                        stringindexfolder.getStartOffset(), stringindexfolder.getLength()
-                                                + stringindexfolder.getStartOffset())), 0);
+                        bbis.setByteBuffer(ByteBuffer.wrap(
+                                Arrays.copyOfRange(stringindexfolder.getByteArray(), stringindexfolder.getStartOffset(),
+                                        stringindexfolder.getLength() + stringindexfolder.getStartOffset())),
+                                0);
                         IndexName = di.readUTF();
-                        bbis.setByteBuffer(
-                                ByteBuffer.wrap(Arrays.copyOfRange(stringelementpath.getByteArray(),
-                                        stringelementpath.getStartOffset(), stringelementpath.getLength()
-                                                + stringelementpath.getStartOffset())), 0);
+                        bbis.setByteBuffer(ByteBuffer.wrap(
+                                Arrays.copyOfRange(stringelementpath.getByteArray(), stringelementpath.getStartOffset(),
+                                        stringelementpath.getLength() + stringelementpath.getStartOffset())),
+                                0);
                         elementpath = di.readUTF();
-                        bbis.setByteBuffer(
-                                ByteBuffer.wrap(Arrays.copyOfRange(stringmatch.getByteArray(),
-                                        stringmatch.getStartOffset(),
-                                        stringmatch.getLength() + stringmatch.getStartOffset())), 0);
+                        bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringmatch.getByteArray(),
+                                stringmatch.getStartOffset(), stringmatch.getLength() + stringmatch.getStartOffset())),
+                                0);
                         match = di.readUTF();
                     } catch (IOException e) {
                         throw new SystemException(ErrorCode.SYSE0001, e);
@@ -180,7 +175,7 @@ public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedVal
                     //Parser doesn't like / so paths are saved as name.name....name:elementname.element
                     //Can NOT search with spaces
                     matchin = true;
-                    if (match.equals("")){
+                    if (match.equals("")) {
                         matchin = false;
                     }
                     String parsematch = match.replaceFirst("=", "?");
@@ -193,24 +188,22 @@ public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedVal
 
                     match = parsematch.replaceFirst("\\?", ":");
 
-                    if (elementpath.startsWith(":")){
+                    if (elementpath.startsWith(":")) {
                         parseelementpath = elementpath.replaceFirst(".", "");
-                        parseelementpath = "\\:"+parseelementpath+"*";
-                    }
-                    else{
+                        parseelementpath = "\\:" + parseelementpath + "*";
+                    } else {
                         parseelementpath = elementpath.replaceFirst(":", "?");
                     }
 
-                    
                     TopDocs results = null;
                     try {
                         query = parser.parse(parseelementpath);
-                        if (matchin){
+                        if (matchin) {
                             query = parser.parse(parsematch);
                         }
                         System.out.println(query.toString());
                         try {
-                            
+
                             results = searcher.search(query, 1000000);
                         } catch (IOException e) {
                             e.printStackTrace();

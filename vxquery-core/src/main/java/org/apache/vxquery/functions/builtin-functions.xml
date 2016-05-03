@@ -132,14 +132,14 @@
     <function name="fn:indexfromcollection">
         <param name="arg" type="xs:string?"/>
         <return type="node()*"/> 
-        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.IndexConstructorScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>
     
-    <!-- fn:indexfromcollection($arg  as xs:string?) as  node()* -->
+    <!-- fn:docindexfromcollection($arg  as xs:string?) as  node()* -->
     <function name="fn:docindexfromcollection">
         <param name="arg" type="xs:string?"/>
         <return type="node()*"/> 
-        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.IndexConstructorDocScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorDocScalarEvaluatorFactory"/>
     </function>
     
     <!-- fn:matchindexunnesting($indexfolder  as xs:string?, $elementpath as xs:string?, $match as xs:string?) as  node()* -->
@@ -148,7 +148,7 @@
         <param name="elementpath" type="xs:string?"/>
         <param name="match" type="xs:string?"/>
         <return type="node()*"/> 
-         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.node.MatchIndexUnnestingEvaluatorFactory"/>
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.MatchIndexUnnestingEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
@@ -163,7 +163,7 @@
         <param name="elementpath" type="xs:string?"/>
         <param name="match" type="xs:string?"/>
         <return type="node()*"/> 
-         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.node.MatchIndexDocUnnestingEvaluatorFactory"/>
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.MatchIndexDocUnnestingEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
@@ -178,7 +178,7 @@
         <param name="elementpath" type="xs:string?"/>
         <param name="match" type="xs:string?"/>
         <return type="node()*"/> 
-         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.node.SearchIndexUnnestingEvaluatorFactory"/>
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.SearchIndexUnnestingEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>

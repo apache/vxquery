@@ -8,6 +8,17 @@ import java.util.Comparator;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import org.apache.hyracks.data.std.primitive.BytePointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.FloatPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.ShortPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -34,18 +45,6 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
 
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BooleanPointable;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.FloatPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.ShortPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public class IndexBuilderDoc {
     private IPointable treepointable;
     private PrintStream ps = System.out;
@@ -65,34 +64,37 @@ public class IndexBuilderDoc {
 
     String filepath;
     IndexWriter writer;
-    class ComplexItem{
+
+    class ComplexItem {
         public StringField sf;
         public String id;
-        public ComplexItem(StringField sfin, String idin){
+
+        public ComplexItem(StringField sfin, String idin) {
             sf = sfin;
             id = idin;
         }
     }
-    class idcomparitor implements Comparator{
+
+    class idcomparitor implements Comparator {
 
         @Override
         public int compare(Object o1, Object o2) {
-            String a = ((ComplexItem)o1).id;
-            String b = ((ComplexItem)o2).id;
+            String a = ((ComplexItem) o1).id;
+            String b = ((ComplexItem) o2).id;
             String[] apieces = a.split("\\.");
             String[] bpieces = b.split("\\.");
-            for (int i = 0; i < Math.min(apieces.length, bpieces.length); i++){
+            for (int i = 0; i < Math.min(apieces.length, bpieces.length); i++) {
                 int numa = Integer.parseInt(apieces[i]);
                 int numb = Integer.parseInt(bpieces[i]);
-                if (numa > numb){
+                if (numa > numb) {
                     return 1;
                 }
-                if (numa < numb){
+                if (numa < numb) {
                     return -1;
                 }
-                
+
             }
-            if (apieces.length > bpieces.length){
+            if (apieces.length > bpieces.length) {
                 return 1;
             }
             return -1;
@@ -112,9 +114,9 @@ public class IndexBuilderDoc {
         bstart = tvp.getByteArray();
         sstart = tvp.getStartOffset();
         lstart = tvp.getLength();
-        
+
         doc = new Document();
-        
+
         results = new Vector();
 
         pp = PointablePoolFactory.INSTANCE.createPointablePool();
@@ -124,9 +126,9 @@ public class IndexBuilderDoc {
     public void printstart() {
 
         print(bstart, sstart, lstart, ps, "0", "");
-        Collections.sort(results,new idcomparitor());
-        for (int i = 2; i < results.size()-1; i++){
-            doc.add(results.elementAt(i).sf);  
+        Collections.sort(results, new idcomparitor());
+        for (int i = 2; i < results.size() - 1; i++) {
+            doc.add(results.elementAt(i).sf);
         }
         try {
             writer.addDocument(doc);
@@ -307,12 +309,12 @@ public class IndexBuilderDoc {
                 type = "PI";
                 printPINode(ps, tvp, myid, epath);
                 break;
-                
+
             case ValueTag.ELEMENT_NODE_TAG:
                 type = "element";
                 result = printElementNode(ps, tvp, myid, epath);
                 break;
-                
+
             case ValueTag.DOCUMENT_NODE_TAG:
                 type = "doc";
                 //Create an Indexelement
@@ -323,8 +325,7 @@ public class IndexBuilderDoc {
                 String betterepath = ezpath.replaceAll("/", ".");
 
                 //Add this element to the array (they will be added in reverse order.
-                String fullitem = betterepath + "."+ test.type();
-            
+                String fullitem = betterepath + "." + test.type();
 
                 results.add(new ComplexItem(new StringField("item", fullitem, Field.Store.YES), test.id()));
                 printDocumentNode(ps, tvp, myid, epath);
@@ -333,7 +334,7 @@ public class IndexBuilderDoc {
             default:
                 throw new UnsupportedOperationException("Encountered tag: " + tvp.getTag());
         }
-        if (!type.equals("doc")){
+        if (!type.equals("doc")) {
             //Create an Indexelement
             IndexElement test = new IndexElement(result[0], myid, type, result[1]);
 
@@ -342,11 +343,9 @@ public class IndexBuilderDoc {
             ezpath = StringUtils.replace(ezpath, parentpath, "");
             String betterepath = ezpath.replaceFirst("/", ":");
             parentpath = parentpath.replaceAll("/", ".");
-          
 
             //Add this element to the array (they will be added in reverse order.
-            String fullitem = parentpath + betterepath + "."+ test.type();
-        
+            String fullitem = parentpath + betterepath + "." + test.type();
 
             results.add(new ComplexItem(new StringField("item", fullitem, Field.Store.YES), test.id()));
         }
