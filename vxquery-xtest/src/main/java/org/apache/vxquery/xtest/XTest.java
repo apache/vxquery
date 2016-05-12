@@ -88,7 +88,7 @@ public class XTest {
         }
         if (opts.keepalive > 0) {
             Thread.sleep(opts.keepalive);
-        }//
+        }
         eSvc.shutdown();
         while (!eSvc.awaitTermination(5L, TimeUnit.SECONDS)) {
             System.err.println("Failed to close all threads, trying again...");
