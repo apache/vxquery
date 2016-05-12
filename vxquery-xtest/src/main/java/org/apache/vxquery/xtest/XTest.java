@@ -16,14 +16,14 @@
  */
 package org.apache.vxquery.xtest;
 
+import org.mortbay.jetty.Server;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.mortbay.jetty.Server;
 
 public class XTest {
     private XTestOptions opts;
@@ -36,7 +36,7 @@ public class XTest {
 
     XTest(XTestOptions opts) {
         this.opts = opts;
-        reporters = new ArrayList<ResultReporter>();
+        reporters = new ArrayList<>();
     }
 
     void init() throws Exception {
@@ -88,7 +88,7 @@ public class XTest {
         }
         if (opts.keepalive > 0) {
             Thread.sleep(opts.keepalive);
-        }
+        }//
         eSvc.shutdown();
         while (!eSvc.awaitTermination(5L, TimeUnit.SECONDS)) {
             System.err.println("Failed to close all threads, trying again...");
@@ -100,6 +100,13 @@ public class XTest {
             eSvc.awaitTermination(opts.keepalive, TimeUnit.MILLISECONDS);
         } finally {
             try {
+
+                //Perform the sorting process.
+                if (opts.diffable != null) {
+                    ResultFileSorter sorter = new ResultFileSorter(opts.diffable);
+                    sorter.sortFile();
+                }
+
                 if (server != null) {
                     server.stop();
                 }
