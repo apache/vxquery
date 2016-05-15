@@ -132,6 +132,45 @@
         </developer>
     </developers>
 
+    <contributors>
+        <contributor>
+            <name>Ankit Ladhania</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+5:30</timezone>
+        </contributor>
+        <contributor>
+            <name>Christina Pavlopoulou</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-8</timezone>
+        </contributor>
+        <contributor>
+            <name>Efi Kaltirimidou</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+3</timezone>
+        </contributor>
+        <contributor>
+            <name>Shivani Mall</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-8</timezone>
+        </contributor>
+    </contributors>
+
     <mailingLists>
         <mailingList>
             <name>dev</name>
