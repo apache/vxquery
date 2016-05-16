@@ -22,9 +22,9 @@ import java.io.IOException;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
-import edu.uci.ics.hyracks.data.std.api.IMutableValueStorage;
-import edu.uci.ics.hyracks.data.std.api.IValueReference;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.api.IMutableValueStorage;
+import org.apache.hyracks.data.std.api.IValueReference;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class SequenceBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();

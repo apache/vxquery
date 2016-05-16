@@ -16,10 +16,10 @@
  */
 package org.apache.vxquery.runtime.provider;
 
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.data.IBinaryHashFunctionFamilyProvider;
-import edu.uci.ics.hyracks.api.dataflow.value.IBinaryHashFunctionFamily;
-import edu.uci.ics.hyracks.data.std.accessors.MurmurHash3BinaryHashFunctionFamily;
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.data.IBinaryHashFunctionFamilyProvider;
+import org.apache.hyracks.api.dataflow.value.IBinaryHashFunctionFamily;
+import org.apache.hyracks.data.std.accessors.MurmurHash3BinaryHashFunctionFamily;
 
 public class VXQueryBinaryHashFunctionFamilyProvider implements IBinaryHashFunctionFamilyProvider {
 

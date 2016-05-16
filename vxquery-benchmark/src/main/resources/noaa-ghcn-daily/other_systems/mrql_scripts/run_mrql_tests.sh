@@ -23,6 +23,7 @@
 NODES=${2}
 REPEAT=${3}
 DATASET=${4}
+EMAIL=${5}
 
 
 # Make log folder
@@ -40,7 +41,6 @@ if which programname >/dev/null;
 then
     echo "Sending out e-mail notification."
     SUBJECT="MRQL Tests Finished (${DATASET})"
-    EMAIL="ecarm002@ucr.edu"
     /bin/mail -s "${SUBJECT}" "${EMAIL}" <<EOM
     Completed all MRQL tests on ${DATASET}.
     EOM

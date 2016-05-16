@@ -1,0 +1,9 @@
+BaseX local configuration options for the weather benchmark.
+The options attempt to match the processing and output of VXQuery.
+
+
+# Local Options
+CHOP = false
+DBPATH = /path/to/basex/BaseXData
+REPOPATH = /path/to/basex/BaseXRepo
+WEBPATH = /path/to/basex/BaseXWeb

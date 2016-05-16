@@ -21,10 +21,10 @@ import java.io.IOException;
 
 import org.apache.vxquery.datamodel.values.XDMConstants;
 
-import edu.uci.ics.hyracks.api.dataflow.value.INullWriter;
-import edu.uci.ics.hyracks.api.dataflow.value.INullWriterFactory;
-import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
-import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.api.dataflow.value.INullWriter;
+import org.apache.hyracks.api.dataflow.value.INullWriterFactory;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
 
 public class VXQueryNullWriterFactory implements INullWriterFactory {
     private static final long serialVersionUID = 1L;

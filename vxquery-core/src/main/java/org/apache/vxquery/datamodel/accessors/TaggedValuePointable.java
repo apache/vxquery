@@ -16,12 +16,12 @@
  */
 package org.apache.vxquery.datamodel.accessors;
 
-import edu.uci.ics.hyracks.api.dataflow.value.ITypeTraits;
-import edu.uci.ics.hyracks.data.std.api.AbstractPointable;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.api.IPointableFactory;
-import edu.uci.ics.hyracks.data.std.primitive.BytePointable;
-import edu.uci.ics.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.api.dataflow.value.ITypeTraits;
+import org.apache.hyracks.data.std.api.AbstractPointable;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.api.IPointableFactory;
+import org.apache.hyracks.data.std.primitive.BytePointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
 
 public class TaggedValuePointable extends AbstractPointable {
     public static final IPointableFactory FACTORY = new IPointableFactory() {

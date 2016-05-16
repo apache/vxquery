@@ -31,6 +31,7 @@ fi
 
 DATASET=${1}
 NODES=${2}
+EMAIL=${3}
 REPEAT=1
 DATA_FILES=${NODES}
 
@@ -68,7 +69,7 @@ done
 
 
 # Start test
-sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET}
+sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql_scripts/run_mrql_tests.sh vxquery-benchmark/src/main/resources/noaa-ghcn-daily/other_systems/mrql/ ${NODES} ${REPEAT} ${DATASET} ${EMAIL}
 
 # Stop Flink
 kill ${FLINK_PID}

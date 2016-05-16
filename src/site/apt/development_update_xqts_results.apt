@@ -15,7 +15,7 @@
 
 Update the XQTS Results
 
-  VXQuery stores the latest XQTS result for the last release. 
+  VXQuery stores the latest XQTS result for the last release.
   The file can be used to verify that all the previous test still passing.
   The following instructions show how to update the XQTS results file.
 
@@ -45,7 +45,7 @@ sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-sui
   * Sort the results so they can be compared with previous results.
 
 ----------------------------------------
-sort vxquery-xtest/results/xqts_temp.txt --output=vxquery-xtest/results/xqts.txt
+sort -V vxquery-xtest/results/xqts_temp.txt --output=vxquery-xtest/results/xqts.txt
 ----------------------------------------
 
   * Clean up (remove) the temporary results files.

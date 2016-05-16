@@ -17,6 +17,7 @@
 package org.apache.vxquery.types;
 
 public final class EmptySequenceType implements ItemType {
+    private static final long serialVersionUID = 1L;
     public static final EmptySequenceType INSTANCE = new EmptySequenceType();
 
     private EmptySequenceType() {

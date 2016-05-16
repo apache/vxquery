@@ -29,10 +29,10 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.step.NodeTestFilter.INodeFilter;
 import org.apache.vxquery.types.SequenceType;
 
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
 
 public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathStep {
     private boolean testSelf;
@@ -133,9 +133,16 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
 
     /**
      * Search through all tree children and children's children.
-     * 
-     * @param nodePointable
-     * @throws SystemException
+     *
+     * @param tvpInput
+     *            pointable
+     * @param level
+     *            level
+     * @param result
+     *            result
+     * @return found result
+     * @throws AlgebricksException
+     *             Could not save result.
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
             throws AlgebricksException {

@@ -26,9 +26,9 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.data.std.api.IPointable;
 
 public abstract class AbstractDescendantPathStepScalarEvaluator extends AbstractPathStepScalarEvaluator {
     private final DocumentNodePointable dnp;
@@ -46,9 +46,11 @@ public abstract class AbstractDescendantPathStepScalarEvaluator extends Abstract
 
     /**
      * Search through all tree children and children's children.
-     * 
+     *
      * @param nodePointable
+     *            Node pointable
      * @throws SystemException
+     *             Could not save result.
      */
     protected void searchSubtree(TaggedValuePointable nodePointable) throws SystemException {
         try {
