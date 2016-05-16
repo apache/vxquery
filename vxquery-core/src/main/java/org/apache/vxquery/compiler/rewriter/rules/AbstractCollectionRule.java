@@ -22,6 +22,21 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -31,22 +46,6 @@ import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 
-import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
-import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
-
 public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
     final ByteBufferInputStream bbis = new ByteBufferInputStream();
     final DataInputStream di = new DataInputStream(bbis);
@@ -55,8 +54,13 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
 
     /**
      * Get the arguments for the collection and collection-with-tag. Return null for not a collection.
+     *
+     * @param opRef
+     *            Logical operator
+     * @return collection name
      */
     protected String[] getCollectionName(Mutable<ILogicalOperator> opRef) throws AlgebricksException {
+        VXQueryConstantValue constantValue;
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return null;
@@ -76,10 +80,10 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
             return null;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier().equals(
-                BuiltinFunctions.FN_COLLECTIONWITHTAG_2.getFunctionIdentifier())
-                && !functionCall.getFunctionIdentifier().equals(
-                        BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier())) {
+        if (!functionCall.getFunctionIdentifier()
+                .equals(BuiltinFunctions.FN_COLLECTIONWITHTAG_2.getFunctionIdentifier())
+                && !functionCall.getFunctionIdentifier()
+                        .equals(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier())) {
             return null;
         }
 
@@ -122,18 +126,16 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         } else {
             return null;
         }
-        String args[] = new String[2];
         // Constant value is now in a TaggedValuePointable. Convert the value into a java String.
         tvp.set(constantValue.getValue(), 0, constantValue.getValue().length);
-        String arg = null;
+        String collectionName = null;
         if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
             tvp.getValue(stringp);
             try {
-                bbis.setByteBuffer(
-                        ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                                stringp.getLength() + stringp.getStartOffset())), 0);
-                arg = di.readUTF();
-                return arg;
+                bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                        stringp.getLength() + stringp.getStartOffset())), 0);
+                collectionName = di.readUTF();
+                return collectionName;
             } catch (IOException e) {
                 e.printStackTrace();
             }

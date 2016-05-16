@@ -19,7 +19,7 @@ package org.apache.vxquery.runtime.functions.datetime;
 import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnSecondsFromDurationScalarEvaluatorFactory extends AbstractValueFromDurationScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

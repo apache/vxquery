@@ -17,6 +17,8 @@
 package org.apache.vxquery.types;
 
 abstract class AbstractNodeType implements NodeType {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public final boolean isAtomicType() {
         return false;

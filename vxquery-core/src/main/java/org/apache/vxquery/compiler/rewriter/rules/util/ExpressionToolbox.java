@@ -29,18 +29,18 @@ import org.apache.vxquery.types.AnyNodeType;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
-import edu.uci.ics.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
-import edu.uci.ics.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
+import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
+import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
+import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
+import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
 
 public class ExpressionToolbox {
     public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe,
@@ -131,6 +131,11 @@ public class ExpressionToolbox {
 
     /**
      * Finds all functions for a given expression.
+     *
+     * @param mutableLe
+     *            Search logical expression
+     * @param finds
+     *            Logical expressions found
      */
     public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe,
             List<Mutable<ILogicalExpression>> finds) {
@@ -146,6 +151,13 @@ public class ExpressionToolbox {
 
     /**
      * Finds all functions for a given expression and function identifier.
+     *
+     * @param mutableLe
+     *            Search logical expression
+     * @param fi
+     *            Function indentifier
+     * @param finds
+     *            Logical expressions found
      */
     public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi,
             List<Mutable<ILogicalExpression>> finds) {

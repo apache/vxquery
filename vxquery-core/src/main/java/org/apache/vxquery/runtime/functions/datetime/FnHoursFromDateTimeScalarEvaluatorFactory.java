@@ -20,7 +20,7 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnHoursFromDateTimeScalarEvaluatorFactory extends AbstractValueFromDateTimeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

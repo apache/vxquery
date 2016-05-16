@@ -18,8 +18,8 @@ package org.apache.vxquery.context;
 
 import javax.xml.namespace.QName;
 
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.api.IValueReference;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.api.IValueReference;
 
 public interface DynamicContext {
     public IDynamicContextFactory createFactory();

@@ -18,12 +18,30 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hyracks.api.client.HyracksConnection;
+import org.apache.hyracks.api.client.IHyracksClientConnection;
+import org.apache.hyracks.api.comm.IFrame;
+import org.apache.hyracks.api.comm.IFrameTupleAccessor;
+import org.apache.hyracks.api.comm.VSizeFrame;
+import org.apache.hyracks.api.dataset.IHyracksDataset;
+import org.apache.hyracks.api.dataset.IHyracksDatasetReader;
+import org.apache.hyracks.api.dataset.ResultSetId;
+import org.apache.hyracks.api.exceptions.HyracksException;
+import org.apache.hyracks.api.job.JobFlag;
+import org.apache.hyracks.api.job.JobId;
+import org.apache.hyracks.api.job.JobSpecification;
+import org.apache.hyracks.client.dataset.HyracksDataset;
+import org.apache.hyracks.control.cc.ClusterControllerService;
+import org.apache.hyracks.control.common.controllers.CCConfig;
+import org.apache.hyracks.control.common.controllers.NCConfig;
+import org.apache.hyracks.control.nc.NodeControllerService;
+import org.apache.hyracks.control.nc.resources.memory.FrameManager;
+import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
 import org.apache.vxquery.context.DynamicContext;
@@ -35,23 +53,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
 import org.apache.vxquery.xmlquery.query.VXQueryCompilationListener;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
-
-import edu.uci.ics.hyracks.api.client.HyracksConnection;
-import edu.uci.ics.hyracks.api.client.IHyracksClientConnection;
-import edu.uci.ics.hyracks.api.comm.IFrameTupleAccessor;
-import edu.uci.ics.hyracks.api.dataset.IHyracksDataset;
-import edu.uci.ics.hyracks.api.dataset.IHyracksDatasetReader;
-import edu.uci.ics.hyracks.api.dataset.ResultSetId;
-import edu.uci.ics.hyracks.api.exceptions.HyracksException;
-import edu.uci.ics.hyracks.api.job.JobFlag;
-import edu.uci.ics.hyracks.api.job.JobId;
-import edu.uci.ics.hyracks.api.job.JobSpecification;
-import edu.uci.ics.hyracks.client.dataset.HyracksDataset;
-import edu.uci.ics.hyracks.control.cc.ClusterControllerService;
-import edu.uci.ics.hyracks.control.common.controllers.CCConfig;
-import edu.uci.ics.hyracks.control.common.controllers.NCConfig;
-import edu.uci.ics.hyracks.control.nc.NodeControllerService;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 
 public class TestRunner {
     private static final Pattern EMBEDDED_SYSERROR_PATTERN = Pattern
@@ -116,9 +117,9 @@ public class TestRunner {
                         opts.showOET, opts.showRP);
                 XMLQueryCompiler compiler = new XMLQueryCompiler(listener, new String[] { "nc1" }, opts.frameSize);
                 Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
-                CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(
-                        RootStaticContextImpl.INSTANCE), new ResultSetId(testCase.getXQueryDisplayName().hashCode()),
-                        testCase.getSourceFileMap());
+                CompilerControlBlock ccb = new CompilerControlBlock(
+                        new StaticContextImpl(RootStaticContextImpl.INSTANCE),
+                        new ResultSetId(testCase.getXQueryDisplayName().hashCode()), testCase.getSourceFileMap());
                 compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
                 JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
                 in.close();
@@ -132,14 +133,14 @@ public class TestRunner {
                 if (hds == null) {
                     hds = new HyracksDataset(hcc, spec.getFrameSize(), opts.threads);
                 }
-                ByteBuffer buffer = ByteBuffer.allocate(spec.getFrameSize());
+                FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
+                IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
                 IHyracksDatasetReader reader = hds.createReader(jobId, ccb.getResultSetId());
-                IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor(spec.getFrameSize());
-                buffer.clear();
+                IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
                 res.result = "";
-                while (reader.read(buffer) > 0) {
-                    buffer.clear();
-                    res.result += ResultUtils.getStringFromBuffer(buffer, frameTupleAccessor);
+                while (reader.read(frame) > 0) {
+                    res.result += ResultUtils.getStringFromBuffer(frame.getBuffer(), frameTupleAccessor);
+                    frame.getBuffer().clear();
                 }
                 res.result.trim();
                 hcc.waitForCompletion(jobId);

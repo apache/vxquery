@@ -21,7 +21,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import edu.uci.ics.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 
 public class FnTimezoneFromTimeScalarEvaluatorFactory extends AbstractValueFromDateTimeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;

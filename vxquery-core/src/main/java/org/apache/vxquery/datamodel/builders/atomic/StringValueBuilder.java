@@ -19,7 +19,7 @@ package org.apache.vxquery.datamodel.builders.atomic;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringWriter;
+import org.apache.hyracks.data.std.primitive.UTF8StringWriter;
 
 public class StringValueBuilder {
     private final UTF8StringWriter writer;

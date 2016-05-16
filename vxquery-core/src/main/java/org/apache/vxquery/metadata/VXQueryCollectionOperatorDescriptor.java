@@ -45,26 +45,27 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hyracks.api.comm.IFrame;
+import org.apache.hyracks.api.comm.IFrameFieldAppender;
+import org.apache.hyracks.api.comm.VSizeFrame;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.dataflow.IOperatorNodePushable;
+import org.apache.hyracks.api.dataflow.value.IRecordDescriptorProvider;
+import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.api.job.IOperatorDescriptorRegistry;
+import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
+import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
+import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
+import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
+import org.apache.hyracks.hdfs.ContextFactory;
+import org.apache.hyracks.hdfs2.dataflow.FileSplitsFactory;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 import org.xml.sax.SAXException;
-
-import edu.uci.ics.hyracks.api.context.IHyracksTaskContext;
-import edu.uci.ics.hyracks.api.dataflow.IOperatorNodePushable;
-import edu.uci.ics.hyracks.api.dataflow.value.IRecordDescriptorProvider;
-import edu.uci.ics.hyracks.api.dataflow.value.RecordDescriptor;
-import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
-import edu.uci.ics.hyracks.api.job.IOperatorDescriptorRegistry;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
-import edu.uci.ics.hyracks.dataflow.common.comm.util.FrameUtils;
-import edu.uci.ics.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
-import edu.uci.ics.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
-import edu.uci.ics.hyracks.hdfs.ContextFactory;
-import edu.uci.ics.hyracks.hdfs2.dataflow.FileSplitsFactory;
 
 public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
@@ -91,18 +92,18 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     @Override
     public IOperatorNodePushable createPushRuntime(IHyracksTaskContext ctx,
             IRecordDescriptorProvider recordDescProvider, int partition, int nPartitions) throws HyracksDataException {
-        final FrameTupleAccessor fta = new FrameTupleAccessor(ctx.getFrameSize(),
+        final FrameTupleAccessor fta = new FrameTupleAccessor(
                 recordDescProvider.getInputRecordDescriptor(getActivityId(), 0));
         final int fieldOutputCount = recordDescProvider.getOutputRecordDescriptor(getActivityId(), 0).getFieldCount();
-        final ByteBuffer frame = ctx.allocateFrame();
-        final FrameTupleAppender appender = new FrameTupleAppender(ctx.getFrameSize(), fieldOutputCount);
+        final IFrame frame = new VSizeFrame(ctx);
+        final IFrameFieldAppender appender = new FrameFixedFieldTupleAppender(fieldOutputCount);
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
 
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
-        final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, frame, appender, childSeq,
+        final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
                 dCtx.getStaticContext());
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
@@ -154,8 +155,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             InputFormat inputFormat = hdfs.getinputFormat();
                             try {
                                 hdfs.scheduleSplits();
-                                ArrayList<Integer> schedule = hdfs.getScheduleForNode(InetAddress.getLocalHost()
-                                        .getHostName());
+                                ArrayList<Integer> schedule = hdfs
+                                        .getScheduleForNode(InetAddress.getLocalHost().getHostName());
                                 List<InputSplit> splits = hdfs.getSplits();
                                 List<FileSplit> fileSplits = new ArrayList<FileSplit>();
                                 for (int i : schedule) {
@@ -228,8 +229,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                             xmlDocument = it.next().getPath();
                                             if (fs.isFile(xmlDocument)) {
                                                 if (LOGGER.isLoggable(Level.FINE)) {
-                                                    LOGGER.fine("Starting to read XML document: "
-                                                            + xmlDocument.getName());
+                                                    LOGGER.fine(
+                                                            "Starting to read XML document: " + xmlDocument.getName());
                                                 }
                                                 //create an input stream to the file currently reading and send it to parser
                                                 InputStream in = fs.open(xmlDocument).getWrappedStream();
@@ -270,9 +271,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             @Override
             public void close() throws HyracksDataException {
                 // Check if needed?
-                fta.reset(frame);
-                if (fta.getTupleCount() > 0) {
-                    FrameUtils.flushFrame(frame, writer);
+                if (appender.getTupleCount() > 0) {
+                    appender.flush(writer, true);
                 }
                 writer.close();
             }

@@ -17,6 +17,7 @@
 package org.apache.vxquery.types;
 
 public final class NoneType implements ItemType {
+    private static final long serialVersionUID = 1L;
     public static final NoneType INSTANCE = new NoneType();
 
     private NoneType() {

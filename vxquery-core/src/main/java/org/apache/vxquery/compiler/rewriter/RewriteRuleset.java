@@ -46,51 +46,53 @@ import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.Extract
 import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.InlineNestedVariablesRule;
 import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.MoveFreeVariableOperatorOutOfSubplanRule;
 
-import edu.uci.ics.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
-import edu.uci.ics.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.BreakSelectIntoConjunctsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.ComplexJoinInferenceRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.ComplexUnnestToProductRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.ConsolidateAssignsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.ConsolidateSelectsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.CopyLimitDownRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.EliminateGroupByEmptyKeyRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.EliminateSubplanRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.EliminateSubplanWithInputCardinalityOneRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.EnforceStructuralPropertiesRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.ExtractCommonOperatorsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.ExtractGbyExpressionsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.FactorRedundantGroupAndDecorVarsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.InferTypesRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.InsertOuterJoinRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroJoinInsideSubplanRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceGroupByForSubplanRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.IntroduceProjectsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.NestedSubplanToJoinRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PullSelectOutOfEqJoin;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushMapOperatorDownThroughProductRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectDownRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushProjectIntoDataSourceScanRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectDownRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSelectIntoJoinRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSubplanIntoGroupByRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.PushSubplanWithAggregateDownThroughProductRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.ReinferAllTypesRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.RemoveRedundantVariablesRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.RemoveUnusedAssignAndAggregateRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetAlgebricksPhysicalOperatorsRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
-import edu.uci.ics.hyracks.algebricks.rewriter.rules.SubplanOutOfGroupRule;
+import org.apache.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
+import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import org.apache.hyracks.algebricks.rewriter.rules.BreakSelectIntoConjunctsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.ComplexJoinInferenceRule;
+import org.apache.hyracks.algebricks.rewriter.rules.ComplexUnnestToProductRule;
+import org.apache.hyracks.algebricks.rewriter.rules.ConsolidateAssignsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.ConsolidateSelectsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.CopyLimitDownRule;
+import org.apache.hyracks.algebricks.rewriter.rules.EliminateGroupByEmptyKeyRule;
+import org.apache.hyracks.algebricks.rewriter.rules.EliminateSubplanRule;
+import org.apache.hyracks.algebricks.rewriter.rules.EliminateSubplanWithInputCardinalityOneRule;
+import org.apache.hyracks.algebricks.rewriter.rules.EnforceStructuralPropertiesRule;
+import org.apache.hyracks.algebricks.rewriter.rules.ExtractCommonOperatorsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.ExtractGbyExpressionsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.FactorRedundantGroupAndDecorVarsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.InferTypesRule;
+import org.apache.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRule;
+import org.apache.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
+import org.apache.hyracks.algebricks.rewriter.rules.InsertOuterJoinRule;
+import org.apache.hyracks.algebricks.rewriter.rules.IntroJoinInsideSubplanRule;
+import org.apache.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
+import org.apache.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
+import org.apache.hyracks.algebricks.rewriter.rules.IntroduceGroupByForSubplanRule;
+import org.apache.hyracks.algebricks.rewriter.rules.IntroduceProjectsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.IsolateHyracksOperatorsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.NestedSubplanToJoinRule;
+import org.apache.hyracks.algebricks.rewriter.rules.PullSelectOutOfEqJoin;
+import org.apache.hyracks.algebricks.rewriter.rules.PushMapOperatorDownThroughProductRule;
+import org.apache.hyracks.algebricks.rewriter.rules.PushProjectDownRule;
+import org.apache.hyracks.algebricks.rewriter.rules.PushProjectIntoDataSourceScanRule;
+import org.apache.hyracks.algebricks.rewriter.rules.PushSelectDownRule;
+import org.apache.hyracks.algebricks.rewriter.rules.PushSelectIntoJoinRule;
+import org.apache.hyracks.algebricks.rewriter.rules.PushSubplanIntoGroupByRule;
+import org.apache.hyracks.algebricks.rewriter.rules.PushSubplanWithAggregateDownThroughProductRule;
+import org.apache.hyracks.algebricks.rewriter.rules.ReinferAllTypesRule;
+import org.apache.hyracks.algebricks.rewriter.rules.RemoveRedundantVariablesRule;
+import org.apache.hyracks.algebricks.rewriter.rules.RemoveUnusedAssignAndAggregateRule;
+import org.apache.hyracks.algebricks.rewriter.rules.SetAlgebricksPhysicalOperatorsRule;
+import org.apache.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
+import org.apache.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
+import org.apache.hyracks.algebricks.rewriter.rules.SubplanOutOfGroupRule;
 
 public class RewriteRuleset {
     /**
      * Optimizations specific to XQuery.
+     *
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildPathStepNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
@@ -148,6 +150,8 @@ public class RewriteRuleset {
 
     /**
      * Optimizations specific to XQuery.
+     *
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
@@ -172,6 +176,8 @@ public class RewriteRuleset {
 
     /**
      * Remove expressions known to be redundant.
+     *
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildInlineRedundantExpressionNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
@@ -190,6 +196,8 @@ public class RewriteRuleset {
 
     /**
      * When a nested data sources exist, convert the plan to use the join operator.
+     *
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildNestedDataSourceRuleCollection() {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();
@@ -213,6 +221,8 @@ public class RewriteRuleset {
 
     /**
      * Unnest more complex structures.
+     *
+     * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildUnnestingRuleCollection() {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<IAlgebraicRewriteRule>();
@@ -303,6 +313,7 @@ public class RewriteRuleset {
         physicalPlanRewrites.add(new PullSelectOutOfEqJoin());
         physicalPlanRewrites.add(new PushFunctionsOntoEqJoinBranches());
         physicalPlanRewrites.add(new SetAlgebricksPhysicalOperatorsRule());
+        physicalPlanRewrites.add(new SetExecutionModeRule());
         physicalPlanRewrites.add(new EnforceStructuralPropertiesRule());
         physicalPlanRewrites.add(new PushProjectDownRule());
         physicalPlanRewrites.add(new CopyLimitDownRule());
@@ -319,8 +330,8 @@ public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> prepareForJobGenRuleCollection() {
         List<IAlgebraicRewriteRule> prepareForJobGenRewrites = new LinkedList<IAlgebraicRewriteRule>();
         prepareForJobGenRewrites.add(new ConvertFromAlgebricksExpressionsRule());
-        prepareForJobGenRewrites.add(new IsolateHyracksOperatorsRule(
-                HeuristicOptimizer.hyraxOperatorsBelowWhichJobGenIsDisabled));
+        prepareForJobGenRewrites
+                .add(new IsolateHyracksOperatorsRule(HeuristicOptimizer.hyraxOperatorsBelowWhichJobGenIsDisabled));
         prepareForJobGenRewrites.add(new ExtractCommonOperatorsRule());
         // Re-infer all types, so that, e.g., the effect of not-is-null is
         // propagated.

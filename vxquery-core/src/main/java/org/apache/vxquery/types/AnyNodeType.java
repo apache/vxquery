@@ -17,6 +17,7 @@
 package org.apache.vxquery.types;
 
 public final class AnyNodeType extends AbstractNodeType {
+    private static final long serialVersionUID = 1L;
     public static final AnyNodeType INSTANCE = new AnyNodeType();
 
     private AnyNodeType() {

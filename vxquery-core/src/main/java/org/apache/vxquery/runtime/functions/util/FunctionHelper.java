@@ -47,13 +47,13 @@ import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
 
-import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
-import edu.uci.ics.hyracks.data.std.api.IPointable;
-import edu.uci.ics.hyracks.data.std.primitive.DoublePointable;
-import edu.uci.ics.hyracks.data.std.primitive.LongPointable;
-import edu.uci.ics.hyracks.data.std.primitive.UTF8StringPointable;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
-import edu.uci.ics.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class FunctionHelper {
 
@@ -463,7 +463,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-            throws SystemException {
+                    throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1033,6 +1033,12 @@ public class FunctionHelper {
 
     /**
      * Get the local node id from a tagged value pointable when available.
+     *
+     * @param tvp1
+     *            pointable
+     * @param tp
+     *            Typed pointable
+     * @return local node id
      */
     public static int getLocalNodeId(TaggedValuePointable tvp1, TypedPointables tp) {
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -1072,6 +1078,10 @@ public class FunctionHelper {
 
     /**
      * Returns the number of digits in a long. A few special cases that needed attention.
+     *
+     * @param value
+     *            value
+     * @return Number of digits
      */
     public static int getNumberOfDigits(long value) {
         if (value == 0) {
@@ -1100,9 +1110,8 @@ public class FunctionHelper {
     public static String getStringFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
             DataInputStream di) throws SystemException {
         try {
-            bbis.setByteBuffer(
-                    ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                            stringp.getLength() + stringp.getStartOffset())), 0);
+            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                    stringp.getLength() + stringp.getStartOffset())), 0);
             return di.readUTF();
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
@@ -1110,8 +1119,8 @@ public class FunctionHelper {
     }
 
     public static long getTimezone(ITimezone timezonep) {
-        return timezonep.getTimezoneHour() * DateTime.CHRONON_OF_HOUR + timezonep.getTimezoneMinute()
-                * DateTime.CHRONON_OF_MINUTE;
+        return timezonep.getTimezoneHour() * DateTime.CHRONON_OF_HOUR
+                + timezonep.getTimezoneMinute() * DateTime.CHRONON_OF_MINUTE;
     }
 
     public static boolean isDerivedFromDouble(int tid) {
@@ -1164,9 +1173,10 @@ public class FunctionHelper {
 
     /**
      * Returns 0 if positive, nonzero if negative.
-     * 
+     *
      * @param value
-     * @return
+     *            value
+     * @return boolean
      */
     public static boolean isNumberPostive(long value) {
         return ((value & 0x8000000000000000L) == 0 ? true : false);
@@ -1311,12 +1321,15 @@ public class FunctionHelper {
 
     /**
      * Writes a number to the DataOutput with zeros as place holders if the number is too small to fill the padding.
-     * 
+     *
      * @param value
+     *            value
      * @param padding
+     *            padding
      * @param dOut
-     * @throws IOException
+     *            data output
      */
+
     public static void writeNumberWithPadding(long value, int padding, DataOutput dOut) {
         if (value < 0) {
             writeChar('-', dOut);

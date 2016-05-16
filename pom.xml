@@ -133,6 +133,45 @@
         </developer>
     </developers>
 
+    <contributors>
+        <contributor>
+            <name>Ankit Ladhania</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+5:30</timezone>
+        </contributor>
+        <contributor>
+            <name>Christina Pavlopoulou</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-8</timezone>
+        </contributor>
+        <contributor>
+            <name>Efi Kaltirimidou</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+3</timezone>
+        </contributor>
+        <contributor>
+            <name>Shivani Mall</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-8</timezone>
+        </contributor>
+    </contributors>
+
     <mailingLists>
         <mailingList>
             <name>dev</name>
@@ -158,27 +197,6 @@
         </site>
     </distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>hyracks-snapshots</id>
-            <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-snapshots/</url>
-            <snapshots>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>hyracks-releases</id>
-            <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-releases/</url>
-            <releases>
-            </releases>
-        </repository>
-        <repository>
-            <id>hyracks-thirdparty</id>
-            <url>http://obelix.ics.uci.edu/nexus/content/repositories/hyracks-thirdparty/</url>
-            <releases>
-            </releases>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -188,31 +206,31 @@
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-client</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-control-common</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-control-cc</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-control-nc</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>algebricks-compiler</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
@@ -224,67 +242,67 @@
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>algebricks-common</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>algebricks-core</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>algebricks-data</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>algebricks-rewriter</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>algebricks-runtime</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-api</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-data-std</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-dataflow-common</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-dataflow-std</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-hdfs-2.x</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>edu.uci.ics.hyracks</groupId>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-hdfs-core</artifactId>
                 <version>${hyracks.version}</version>
                 <type>jar</type>
@@ -374,19 +392,19 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.5</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.8.1</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>2.10.3</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -396,8 +414,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -409,7 +427,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.4.2</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.scm</groupId>
@@ -465,13 +482,34 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
-                <configuration> <reportPlugins> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-                <artifactId>maven-project-info-reports-plugin</artifactId> <version>2.7</version> 
-                </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-                </plugin> </reportPlugins> </configuration> <executions> <execution> <id>attach-site</id> 
-                <phase>prepare-package</phase> <goals> <goal>jar</goal> </goals> </execution> 
-                </executions>< /plugin> -->
+      <!--
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.7</version>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+          </reportPlugins>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-site</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -556,7 +594,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <hyracks.version>0.2.15</hyracks.version>
+        <hyracks.version>0.2.17-incubating</hyracks.version>
         <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
     </properties>
 

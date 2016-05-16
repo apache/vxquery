@@ -22,10 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hyracks.api.comm.IFrameFieldAppender;
+import org.apache.hyracks.api.comm.IFrameWriter;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
 import org.apache.vxquery.exceptions.VXQueryParseException;
@@ -35,12 +38,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import edu.uci.ics.hyracks.api.comm.IFrameWriter;
-import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
-import edu.uci.ics.hyracks.data.std.util.ArrayBackedValueStorage;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
-import edu.uci.ics.hyracks.dataflow.common.comm.io.FrameTupleAppender;
-
 public class XMLParser {
     final XMLReader parser;
     final SAXContentHandler handler;
@@ -49,24 +46,23 @@ public class XMLParser {
     final int bufferSize;
 
     public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId) throws HyracksDataException {
-        this(attachTypes, idProvider, nodeId, null, null, null, null);
+        this(attachTypes, idProvider, nodeId, null, null, null);
     }
 
-    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId, ByteBuffer frame,
-            FrameTupleAppender appender, List<Integer> childSeq, StaticContext staticContext)
-            throws HyracksDataException {
+    public XMLParser(boolean attachTypes, ITreeNodeIdProvider idProvider, String nodeId, IFrameFieldAppender appender,
+            List<Integer> childSeq, StaticContext staticContext) throws HyracksDataException {
         bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1"));
         this.nodeId = nodeId;
         try {
             parser = XMLReaderFactory.createXMLReader();
-            if (frame == null || appender == null) {
+            if (appender == null) {
                 handler = new SAXContentHandler(attachTypes, idProvider);
             } else {
                 List<SequenceType> childSequenceTypes = new ArrayList<SequenceType>();
                 for (int typeCode : childSeq) {
                     childSequenceTypes.add(staticContext.lookupSequenceType(typeCode));
                 }
-                handler = new SAXContentHandler(attachTypes, idProvider, frame, appender, childSequenceTypes);
+                handler = new SAXContentHandler(attachTypes, idProvider, appender, childSequenceTypes);
             }
             parser.setContentHandler(handler);
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
@@ -103,7 +99,7 @@ public class XMLParser {
         }
     }
 
-    public void parseElements(File file, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
+    public void parseElements(File file, IFrameWriter writer, int tupleIndex)
             throws HyracksDataException {
         try {
             Reader input;
@@ -113,7 +109,7 @@ public class XMLParser {
                 input = new InputStreamReader(new FileInputStream(file));
             }
             in.setCharacterStream(input);
-            handler.setupElementWriter(writer, fta, tupleIndex);
+            handler.setupElementWriter(writer, tupleIndex);
             parser.parse(in);
             input.close();
         } catch (FileNotFoundException e) {
