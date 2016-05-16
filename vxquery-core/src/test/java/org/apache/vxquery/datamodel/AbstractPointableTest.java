@@ -34,7 +34,9 @@ public class AbstractPointableTest {
 
     protected void getTaggedValuePointable(Object value, IPointable result) throws IOException {
         int start = abvsInput.getLength();
-        if (value instanceof java.lang.Long) {
+        if (value instanceof java.lang.Integer) {
+            writeInteger((Integer) value, abvsInput.getDataOutput());
+        } else if (value instanceof java.lang.Long) {
             writeLong((Long) value, abvsInput.getDataOutput());
         } else if (value instanceof java.lang.Double) {
             writeDouble((Double) value, abvsInput.getDataOutput());
@@ -42,6 +44,11 @@ public class AbstractPointableTest {
             writeString((String) value, abvsInput.getDataOutput());
         }
         result.set(abvsInput.getByteArray(), start, abvsInput.getLength() - start);
+    }
+
+    private void writeInteger(Integer value, DataOutput dOut) throws IOException {
+        dOut.write(ValueTag.XS_LONG_TAG);
+        dOut.writeLong(value);
     }
 
     protected void writeLong(Long value, DataOutput dOut) throws IOException {

@@ -16,14 +16,14 @@
  */
 package org.apache.vxquery.datamodel.builders.jsonItem;
 
+import java.io.DataOutput;
+import java.io.IOException;
+
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
-
-import java.io.DataOutput;
-import java.io.IOException;
 
 public class ObjectBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();
@@ -37,7 +37,7 @@ public class ObjectBuilder {
     }
 
     public void addItem(IValueReference key, IValueReference value) throws IOException {
-        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset() + 1, key.getLength() - 1);
+        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset(), key.getLength());
         dataArea.getDataOutput().write(value.getByteArray(), value.getStartOffset(), value.getLength());
         slots.append(dataArea.getLength());
     }
