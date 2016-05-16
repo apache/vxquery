@@ -22,18 +22,19 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.junit.Test;
 
 import junit.framework.Assert;
 
 public class SequenceByteTest extends AbstractPointableTest {
-    ArrayBackedValueStorage abvsResult = new ArrayBackedValueStorage();
-    SequenceBuilder sb = new SequenceBuilder();
-    TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp3 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+    private final ArrayBackedValueStorage abvsResult = new ArrayBackedValueStorage();
+    private final SequenceBuilder sb = new SequenceBuilder();
+    private final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private final TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private final TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private final TaggedValuePointable tvp3 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private final SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
 
     @Test
     public void testEmptySequenceConstant() {
@@ -88,7 +89,7 @@ public class SequenceByteTest extends AbstractPointableTest {
         if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
             Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }
-        if (!comparePointable(tvp, tvp1)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
             Assert.fail("Item value is incorrect.");
         }
     }
@@ -120,16 +121,16 @@ public class SequenceByteTest extends AbstractPointableTest {
             Assert.fail("Sequence size is incorrect. Expected: 3 Got: " + sp.getEntryCount());
         }
         sp.getEntry(0, tvp);
-        if (!comparePointable(tvp, tvp1)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
             Assert.fail("Sequence item one is incorrect. Expected: " + ValueTag.XS_LONG_TAG + " Got: " + tvp.getTag());
         }
         sp.getEntry(1, tvp);
-        if (!comparePointable(tvp, tvp2)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvp2)) {
             Assert.fail(
                     "Sequence item two is incorrect. Expected: " + ValueTag.XS_DOUBLE_TAG + " Got: " + tvp.getTag());
         }
         sp.getEntry(2, tvp);
-        if (!comparePointable(tvp, tvp3)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvp3)) {
             Assert.fail(
                     "Sequence item three is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }

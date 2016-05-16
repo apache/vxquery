@@ -20,17 +20,15 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 
-import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.primitive.BytePointable;
+import org.apache.vxquery.datamodel.builders.base.IBuilder;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-public class UTF8StringBuilder extends AbstractBuilder {
+public class UTF8StringBuilder implements IBuilder {
     private IMutableValueStorage mvs;
     private DataOutput out;
 
-    @Override
     public void reset(IMutableValueStorage mvs) throws IOException {
         this.mvs = mvs;
         out = mvs.getDataOutput();
@@ -38,7 +36,6 @@ public class UTF8StringBuilder extends AbstractBuilder {
         out.write(0);
     }
 
-    @Override
     public void finish() throws IOException {
         int utflen = mvs.getLength() - 2;
         BytePointable.setByte(mvs.getByteArray(), 0, (byte) ((utflen >>> 8) & 0xFF));

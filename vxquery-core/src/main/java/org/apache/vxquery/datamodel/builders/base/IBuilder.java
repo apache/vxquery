@@ -14,33 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.datamodel.builders.nodes;
+package org.apache.vxquery.datamodel.builders.base;
 
 import java.io.IOException;
 
-import org.apache.hyracks.data.std.api.IValueReference;
-import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.hyracks.data.std.api.IMutableValueStorage;
 
-public class PINodeBuilder extends AbstractNodeBuilder {
+public interface IBuilder {
+    public abstract void reset(IMutableValueStorage mvs) throws IOException;
 
-    @Override
-    public int getValueTag() {
-        return ValueTag.PI_NODE_TAG;
-    }
-
-    @Override
-    public void finish() throws IOException {
-    }
-
-    public void setLocalNodeId(int localNodeId) throws IOException {
-        out.writeInt(localNodeId);
-    }
-
-    public void setTarget(IValueReference value) throws IOException {
-        out.write(value.getByteArray(), value.getStartOffset(), value.getLength());
-    }
-
-    public void setContent(IValueReference value) throws IOException {
-        out.write(value.getByteArray(), value.getStartOffset(), value.getLength());
-    }
+    public abstract void finish() throws IOException;
 }

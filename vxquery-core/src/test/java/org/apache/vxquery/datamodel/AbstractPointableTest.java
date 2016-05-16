@@ -21,16 +21,10 @@ import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 public class AbstractPointableTest {
     private final ArrayBackedValueStorage abvsInput = new ArrayBackedValueStorage();
     private final StringValueBuilder svb = new StringValueBuilder();
-
-    protected boolean comparePointable(IPointable p1, IPointable p2) {
-        return FunctionHelper.arraysEqual(p1.getByteArray(), p1.getStartOffset(), p1.getLength(), p2.getByteArray(),
-                p2.getStartOffset(), p2.getLength());
-    }
 
     protected void getTaggedValuePointable(Object value, IPointable result) throws IOException {
         int start = abvsInput.getLength();
