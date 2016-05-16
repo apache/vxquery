@@ -38,13 +38,13 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.SAXIndexHandler;
 import org.apache.vxquery.index.indexattributes;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluator;
-import org.apache.vxquery.runtime.functions.base.newAbstractTaggedValueArgumentUnnestingEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluatorFactory;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedValueArgumentUnnestingEvaluatorFactory {
+public class MatchIndexDocUnnestingEvaluatorFactory extends AbstractTaggedValueArgumentUnnestingEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
     public MatchIndexDocUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) {
@@ -194,6 +194,8 @@ public class MatchIndexDocUnnestingEvaluatorFactory extends newAbstractTaggedVal
                     } else {
                         parseelementpath = elementpath.replaceFirst(":", "?");
                     }
+
+                    parseelementpath = ".catalog.book";
 
                     TopDocs results = null;
                     try {

@@ -13,7 +13,6 @@ import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
@@ -32,11 +31,7 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -60,29 +55,16 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
     protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
 
-        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        final TaggedValuePointable rootTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
-        final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
-        final IntegerPointable ip = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
-        final TaggedValuePointable itemTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
 
             private boolean first;
-            private boolean go;
             private ArrayBackedValueStorage nodeAbvs;
-            //private int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
-            //private ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-            //private IHyracksTaskContext ctx;
 
             private int indexplace;
             private int indexlength;
             private String elementpath;
             private String IndexName;
             private String match;
-            private int numtotalhits;
 
             private UTF8StringPointable stringindexfolder = (UTF8StringPointable) UTF8StringPointable.FACTORY
                     .createPointable();
@@ -106,7 +88,12 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
 
             @Override
             public boolean step(IPointable result) throws AlgebricksException {
-                //System.out.println("One output");
+                /* each step will create a tuple for a single xml file
+                 * This is done using the parse function
+                 * checkoverflow is used throughout. This is because memory might not be
+                 * able to hold all of the results at once, so we return 1 million at
+                 * a time and check when we need to get more
+                 */
                 if (indexplace < indexlength) {
                     int partition = ctxview.getTaskAttemptId().getTaskId().getPartition();
                     ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
@@ -144,6 +131,7 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                     tvp1.getValue(stringindexfolder);
                     tvp2.getValue(stringelementpath);
                     tvp3.getValue(stringmatch);
+                    //This whole loop is to get the string arguments, indefolder, elementpath, and match option
                     try {
                         // Get the list of files.
                         bbis.setByteBuffer(ByteBuffer.wrap(
@@ -164,13 +152,12 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                         throw new SystemException(ErrorCode.SYSE0001, e);
                     }
                     indexplace = 0;
-                    go = true;
                     first = false;
                     reader = null;
+                    //Create the index reader.
                     try {
                         reader = DirectoryReader.open(FSDirectory.open(new File(IndexName)));
                     } catch (IOException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                     }
                     searcher = new IndexSearcher(reader);
@@ -180,31 +167,31 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                     //Parser doesn't like / so paths are saved as name.name.
                     String betterelementpath = elementpath.replaceAll("/", ".");
 
-                    //TODO: NEED TO EXCLUDE OTHER THINGS HERE> THIS WOULD FIND /bookdoodle/*
+                    //TODO: NEED TO EXCLUDE OTHER THINGS HERE> THIS WOULD FIND /bookdoodle/* when we look for /book
                     String special = "epath:" + betterelementpath + "*";
 
-                    //TODO: Paths with numbers do not currently work!!!!
                     TopDocs results = null;
                     try {
                         query = parser.parse(special);
                         try {
+                            //Get the first 1 million lines from the index
                             results = searcher.search(query, 1000000, resultsort);
                         } catch (IOException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     } catch (ParseException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
 
                     hits = results.scoreDocs;
                     indexplace = 0;
                     indexlength = hits.length;
-                    numtotalhits = results.totalHits;
                 }
             }
 
+            /*This function creates an abvsFileNode, continuing until it
+             * reaches a new filename
+             */
             public int parse(ArrayBackedValueStorage abvsFileNode, int indexplace) {
 
                 if (hits.length > 0) {
@@ -213,6 +200,7 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                             handler.startDocument();
                             String thispath = searcher.doc(hits[indexplace].doc).get("path");
                             int returner = buildelement(abvsFileNode, indexplace);
+
                             returner = checkoverflow(returner);
                             while (returner + 1 < hits.length) {
                                 if (searcher.doc(hits[returner + 1].doc).get("path").equals(thispath)) {
@@ -238,6 +226,9 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                 return hits.length;
             }
 
+            /*This is the recursive element node builder
+             * 
+             */
             private int buildelement(ArrayBackedValueStorage abvsFileNode, int indexplace) {
                 int whereifinish = indexplace;
                 Document doc = null;
@@ -271,6 +262,7 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                             qnames);
                     Attributes atts = new indexattributes(names, values, uris, localnames, types, qnames);
                     try {
+
                         handler.startElement(uri, contents, contents, atts);
                         try {
                             boolean nomorechildren = false;
@@ -285,12 +277,10 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                                 }
                             }
                         } catch (IOException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                         handler.endElement(uri, contents, contents);
                     } catch (SAXException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
 
@@ -298,6 +288,9 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                 return whereifinish;
             }
 
+            /*This function creates the attribute children for an element node
+             * 
+             */
             int findattributechildren(Document doc, int indexplace, Vector<String> n, Vector<String> v,
                     Vector<String> u, Vector<String> l, Vector<String> t, Vector<String> q) {
                 indexplace = checkoverflow(indexplace);
@@ -368,6 +361,9 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                 return false;
             }
 
+            /*This function checks for overflow. Once we have looked at a batch of 1 million
+             * hits, we start on the next batch
+             */
             int checkoverflow(int currentplace) {
                 if (currentplace + 1 >= hits.length) {
                     try {
@@ -380,7 +376,6 @@ public class SearchIndexUnnestingEvaluatorFactory extends newAbstractTaggedValue
                             return -1;
                         }
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
