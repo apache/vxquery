@@ -82,6 +82,7 @@ public class ValueTag {
     public static final int COMMENT_NODE_TAG = 105;
     public static final int PI_NODE_TAG = 106;
     public static final int NODE_TREE_TAG = 107;
+    public static final int ARRAY_TAG = 108;
 
     public static boolean isAtomic(int tag) {
         return tag < 100;
