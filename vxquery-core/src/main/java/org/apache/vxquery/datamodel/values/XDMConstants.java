@@ -19,6 +19,7 @@ package org.apache.vxquery.datamodel.values;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.vxquery.datamodel.builders.jsonItem.ArrayBuilder;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 
 import org.apache.hyracks.data.std.api.IPointable;
@@ -31,6 +32,8 @@ public class XDMConstants {
     private static final byte[] BOOLEAN_FALSE_CONSTANT;
 
     private static final byte[] EMPTY_SEQUENCE;
+    
+    private static final byte[] EMPTY_ARRAY;
 
     private static final byte[] EMPTY_STRING;
 
@@ -52,6 +55,14 @@ public class XDMConstants {
             throw new RuntimeException(e);
         }
         EMPTY_SEQUENCE = Arrays.copyOf(abvs.getByteArray(), abvs.getLength());
+        ArrayBuilder ab = new ArrayBuilder();
+        ab.reset(abvs);
+        try {
+            ab.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        EMPTY_ARRAY=Arrays.copyOf(abvs.getByteArray(), abvs.getLength());
         
         EMPTY_STRING = new byte[3];
         EMPTY_STRING[0] = ValueTag.XS_STRING_TAG;
@@ -69,6 +80,10 @@ public class XDMConstants {
 
     public static void setEmptySequence(IPointable p) {
         set(p, EMPTY_SEQUENCE);
+    }
+    
+    public static void setEmptyArray(IPointable p){
+        set(p, EMPTY_ARRAY);
     }
 
     public static void setEmptyString(IPointable p) {
