@@ -19,35 +19,40 @@ package org.apache.vxquery.xtest;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class to sort the final test results.
  */
+
+//TODO : Optimize for large files.
 public class ResultFileSorter {
 
-    private PrintWriter writer;
-    private File resultFile;
+    private final String path;
+    private final Logger logger = Logger.getLogger(ResultFileSorter.class.getName());
 
     public ResultFileSorter(String path) throws FileNotFoundException {
-        this.resultFile = new File(path);
+        this.path = path;
     }
 
     /**
      * The method to sort the test case results.
      */
     public void sortFile() {
+        File resultFile = new File(path);
         try {
-            FileReader fileReader = new FileReader(this.resultFile);
+            FileReader fileReader = new FileReader(resultFile);
             BufferedReader reader = new BufferedReader(fileReader);
             String line;
             ArrayList<String> fullText = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 fullText.add(line);
             }
-            System.out.println("Sorting.....");
+            logger.log(Level.FINE, "Sorting.....");
             Collections.sort(fullText);
             String[] sortedText = fullText.toArray(new String[fullText.size()]);
-            this.eraseFile();
+            this.eraseFile(resultFile);
             this.writeToFile(sortedText);
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,30 +60,28 @@ public class ResultFileSorter {
     }
 
     /**
-     * Method to erace the current content of the file.
+     * Method to delete existing the file.
      *
      * @throws FileNotFoundException
      */
-    private void eraseFile() throws FileNotFoundException {
-        writer = new PrintWriter(resultFile);
-        writer.write("");
-        writer.close();
-        System.out.println("File erased.");
+    private boolean eraseFile(File file) throws FileNotFoundException {
+        return file.delete();
     }
 
     /**
-     * Method to write the sorted content to the file.
+     * Method to write the sorted content to the new file.
      *
      * @param text : The sorted array of test case results.
      * @throws FileNotFoundException
      */
     private void writeToFile(String[] text) throws FileNotFoundException {
-        writer = new PrintWriter(resultFile);
-        System.out.println("Writing to file started.");
+        File newFile = new File(path);
+        PrintWriter writer = new PrintWriter(newFile);
+        logger.log(Level.FINE, "Writing to file started.");
         for (String s : text) {
             writer.write(s + "\n");
         }
         writer.close();
-        System.out.println("File writing finished.");
+        logger.log(Level.FINE, "Writing to file finished successfully.");
     }
 }
