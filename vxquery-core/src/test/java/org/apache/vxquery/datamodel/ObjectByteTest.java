@@ -22,7 +22,6 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonItem.ObjectPointable;
 import org.apache.vxquery.datamodel.builders.jsonItem.ObjectBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.junit.Test;
@@ -50,7 +49,7 @@ public class ObjectByteTest extends AbstractPointableTest {
             ob.reset(abvsResult);
             ob.finish();
         } catch (IOException e) {
-            Assert.fail("Test failed to write the sequence pointable.");
+            Assert.fail("Test failed to write the Object pointable.");
         }
         tvp.set(abvsResult);
 
@@ -60,7 +59,7 @@ public class ObjectByteTest extends AbstractPointableTest {
         }
         tvp.getValue(op);
         if (op.getEntryCount() != 0) {
-            Assert.fail("Sequence size is incorrect. Expected: 0 Got: " + op.getEntryCount());
+            Assert.fail("Object size is incorrect. Expected: 0 Got: " + op.getEntryCount());
         }
     }
 
@@ -85,6 +84,9 @@ public class ObjectByteTest extends AbstractPointableTest {
         }
 
         tvp.getValue(op);
+        if (op.getEntryCount() != 1) {
+            Assert.fail("Object size is incorrect. Expected: 1 Got: " + op.getEntryCount());
+        }
         try {
             op.getKeys(tvp);
         } catch (SystemException e) {
@@ -95,7 +97,7 @@ public class ObjectByteTest extends AbstractPointableTest {
             Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }
         if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
-            Assert.fail("Key is incorrect.");
+            Assert.fail("Key is incorrect. Expected: id");
         }
 
         op.getValue(tvp1, tvp);
@@ -142,39 +144,37 @@ public class ObjectByteTest extends AbstractPointableTest {
         }
 
         if (tvp.getTag() != ValueTag.SEQUENCE_TAG) {
-            Assert.fail("Sequence tag is incorrect. Expected: " + ValueTag.SEQUENCE_TAG + " Got: " + tvp.getTag());
+            Assert.fail("Object tag is incorrect. Expected: " + ValueTag.SEQUENCE_TAG + " Got: " + tvp.getTag());
         }
         tvp.getValue(sp);
         if (sp.getEntryCount() != 3) {
-            Assert.fail("Sequence size is incorrect. Expected: 3 Got: " + sp.getEntryCount());
+            Assert.fail("Object size is incorrect. Expected: 3 Got: " + sp.getEntryCount());
         }
         sp.getEntry(0, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
-            Assert.fail("Sequence item one is incorrect. Expected: " + ValueTag.XS_LONG_TAG + " Got: " + tvp.getTag());
+            Assert.fail("Object key one is incorrect. Expected: name");
         }
         sp.getEntry(1, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp3)) {
-            Assert.fail(
-                    "Sequence item two is incorrect. Expected: " + ValueTag.XS_DOUBLE_TAG + " Got: " + tvp.getTag());
+            Assert.fail("Object key two is incorrect. Expected: price");
         }
         sp.getEntry(2, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp5)) {
-            Assert.fail(
-                    "Sequence item three is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
+            Assert.fail("Object key three is incorrect. Expected: properties");
         }
 
         //Test values
         op.getValue(tvp1, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp2)) {
-            Assert.fail("Value is incorrect for the given key.");
+            Assert.fail("Value is incorrect for the given key. Expected: A green door");
         }
         op.getValue(tvp3, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp4)) {
-            Assert.fail("Value is incorrect for the given key.");
+            Assert.fail("Value is incorrect for the given key. Expected: 12.5");
         }
         op.getValue(tvp5, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp6)) {
-            Assert.fail("Value is incorrect for the given key.");
+            Assert.fail("Value is incorrect for the given key. Expected: 100");
         }
     }
 

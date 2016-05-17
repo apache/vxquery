@@ -30,7 +30,7 @@ public class AbstractPointableTest {
         int start = abvsInput.getLength();
         if (value instanceof java.lang.Integer) {
             writeInteger((Integer) value, abvsInput.getDataOutput());
-        }else if (value instanceof java.lang.Long) {
+        } else if (value instanceof java.lang.Long) {
             writeLong((Long) value, abvsInput.getDataOutput());
         } else if (value instanceof java.lang.Double) {
             writeDouble((Double) value, abvsInput.getDataOutput());

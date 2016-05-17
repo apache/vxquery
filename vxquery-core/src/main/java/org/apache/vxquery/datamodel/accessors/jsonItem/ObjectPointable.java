@@ -61,7 +61,7 @@ public class ObjectPointable extends AbstractPointable {
     }
 
     private static int getKeyLength(byte[] b, int s) {
-        return UTF8StringPointable.getUTFLength(b,s+1) + 3;
+        return UTF8StringPointable.getUTFLength(b, s + 1) + 3;
     }
 
     private static int getSlotArrayOffset(int start) {
@@ -95,7 +95,7 @@ public class ObjectPointable extends AbstractPointable {
         }
     }
 
-    public void getValue(TaggedValuePointable key, IPointable pointer) {
+    public void getValue(TaggedValuePointable key, TaggedValuePointable pointer) {
         int dataAreaOffset = getDataAreaOffset(bytes, start);
         int entryCount = getEntryCount();
         int s, l;
