@@ -129,7 +129,7 @@ public class ObjectByteTest extends AbstractPointableTest {
 
         // Check results.
         if (tvp.getTag() != ValueTag.OBJECT_TAG) {
-            Assert.fail("Type tag is incorrect. Expected: " + ValueTag.SEQUENCE_TAG + " Got: " + tvp.getTag());
+            Assert.fail("Type tag is incorrect. Expected: " + ValueTag.OBJECT_TAG + " Got: " + tvp.getTag());
         }
         tvp.getValue(op);
         if (op.getEntryCount() != 3) {
@@ -144,7 +144,7 @@ public class ObjectByteTest extends AbstractPointableTest {
         }
 
         if (tvp.getTag() != ValueTag.SEQUENCE_TAG) {
-            Assert.fail("Object tag is incorrect. Expected: " + ValueTag.SEQUENCE_TAG + " Got: " + tvp.getTag());
+            Assert.fail("Tag type is incorrect. Expected: " + ValueTag.SEQUENCE_TAG + " Got: " + tvp.getTag());
         }
         tvp.getValue(sp);
         if (sp.getEntryCount() != 3) {
@@ -166,15 +166,18 @@ public class ObjectByteTest extends AbstractPointableTest {
         //Test values
         op.getValue(tvp1, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp2)) {
-            Assert.fail("Value is incorrect for the given key. Expected: A green door");
+            Assert.fail("Value is incorrect for the given key. Expected: A green door with valuetag: "
+                    + ValueTag.XS_STRING_TAG + " Got valuetag: " + tvp.getTag());
         }
         op.getValue(tvp3, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp4)) {
-            Assert.fail("Value is incorrect for the given key. Expected: 12.5");
+            Assert.fail("Value is incorrect for the given key. Expected: 12.5 with valuetag: " + ValueTag.XS_DOUBLE_TAG
+                    + " Got valuetag: " + tvp.getTag());
         }
         op.getValue(tvp5, tvp);
         if (!FunctionHelper.arraysEqual(tvp, tvp6)) {
-            Assert.fail("Value is incorrect for the given key. Expected: 100");
+            Assert.fail("Value is incorrect for the given key. Expected: 100 with valuetag: " + ValueTag.XS_LONG_TAG
+                    + " Got valuetag: " + tvp.getTag());
         }
     }
 

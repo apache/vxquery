@@ -32,6 +32,14 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
+/**
+ * The datamodel of the JSON object is represented in this class:
+ * Byte 1: Value tag of object (109)
+ * Byte 2 to 5: number of key-value pairs in the object
+ * Next few bytes: Offsets for each key-value pair in the object in the order appearing in the json data
+ * Next bytes: The keys in the object each followed by the value of the key. Each key is a StringPointable and the value
+ * of the key will be the respective pointable starting with its valuetag.
+ */
 public class ObjectPointable extends AbstractPointable {
     public static final IPointableFactory FACTORY = new IPointableFactory() {
         private static final long serialVersionUID = 1L;
@@ -72,10 +80,6 @@ public class ObjectPointable extends AbstractPointable {
         return getSlotArrayOffset(start) + getEntryCount(bytes, start) * SLOT_SIZE;
     }
 
-    public int getEntryCount() {
-        return getEntryCount(bytes, start);
-    }
-
     public void getKeys(IPointable result) throws SystemException {
         try {
             abvs.reset();
@@ -95,7 +99,7 @@ public class ObjectPointable extends AbstractPointable {
         }
     }
 
-    public void getValue(TaggedValuePointable key, TaggedValuePointable pointer) {
+    public void getValue(TaggedValuePointable key, TaggedValuePointable result) {
         int dataAreaOffset = getDataAreaOffset(bytes, start);
         int entryCount = getEntryCount();
         int s, l;
@@ -104,9 +108,10 @@ public class ObjectPointable extends AbstractPointable {
             l = getKeyLength(bytes, s);
             key1.set(bytes, s, l);
             if (FunctionHelper.arraysEqual(key1, key)) {
-                pointer.set(bytes, s + l, getEntryLength(i) - l);
+                result.set(bytes, s + l, getEntryLength(i) - l);
                 break;
             }
+            //Todo: if no key found return null
         }
     }
 
@@ -116,6 +121,10 @@ public class ObjectPointable extends AbstractPointable {
 
     private int getEntryLength(int idx) {
         return getSlotValue(bytes, start, idx) - getRelativeEntryStartOffset(idx);
+    }
+
+    public int getEntryCount() {
+        return getEntryCount(bytes, start);
     }
 
 }

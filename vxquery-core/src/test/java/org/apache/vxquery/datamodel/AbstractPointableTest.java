@@ -41,8 +41,8 @@ public class AbstractPointableTest {
     }
 
     protected void writeInteger(Integer value, DataOutput dOut) throws IOException {
-        dOut.write(ValueTag.XS_LONG_TAG);
-        dOut.writeLong(value);
+        dOut.write(ValueTag.XS_INT_TAG);
+        dOut.writeInt(value);
     }
 
     protected void writeLong(Long value, DataOutput dOut) throws IOException {
