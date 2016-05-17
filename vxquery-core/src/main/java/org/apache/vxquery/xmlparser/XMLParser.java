@@ -29,6 +29,7 @@ import org.apache.hyracks.api.comm.IFrameFieldAppender;
 import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
 import org.apache.vxquery.exceptions.VXQueryParseException;
@@ -99,8 +100,7 @@ public class XMLParser {
         }
     }
 
-    public void parseElements(File file, IFrameWriter writer, int tupleIndex)
-            throws HyracksDataException {
+    public void parseElements(File file, IFrameWriter writer, int tupleIndex) throws HyracksDataException {
         try {
             Reader input;
             if (bufferSize > 0) {
@@ -127,7 +127,6 @@ public class XMLParser {
         }
     }
 
-<<<<<<< HEAD
     public void parseHDFSElements(InputStream inputStream, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
             throws IOException {
         try {
@@ -138,7 +137,7 @@ public class XMLParser {
                 input = new InputStreamReader(inputStream);
             }
             in.setCharacterStream(input);
-            handler.setupElementWriter(writer, fta, tupleIndex);
+            handler.setupElementWriter(writer, tupleIndex);
             parser.parse(in);
             input.close();
         } catch (IOException e) {
@@ -172,7 +171,4 @@ public class XMLParser {
             e.printStackTrace();
         }
     }
-
-=======
->>>>>>> master
 }

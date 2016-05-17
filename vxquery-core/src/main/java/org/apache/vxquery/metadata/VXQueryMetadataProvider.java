@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.vxquery.context.StaticContext;
-
 import org.apache.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import org.apache.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -45,6 +43,7 @@ import org.apache.hyracks.algebricks.data.IResultSerializerFactoryProvider;
 import org.apache.hyracks.algebricks.runtime.base.IPushRuntimeFactory;
 import org.apache.hyracks.algebricks.runtime.serializer.ResultSerializerFactoryProvider;
 import org.apache.hyracks.algebricks.runtime.writers.PrinterBasedWriterFactory;
+import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.dataflow.IOperatorDescriptor;
 import org.apache.hyracks.api.dataflow.value.IResultSerializerFactory;
 import org.apache.hyracks.api.dataflow.value.ISerializerDeserializer;
@@ -52,19 +51,22 @@ import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
 import org.apache.hyracks.api.dataset.ResultSetId;
 import org.apache.hyracks.api.job.JobSpecification;
 import org.apache.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
+import org.apache.vxquery.context.StaticContext;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
     private final String[] nodeList;
     private final Map<String, File> sourceFileMap;
     private final StaticContext staticCtx;
     private final String hdfsConf;
+    private final Map<String, NodeControllerInfo> nodeControllerInfos;
 
     public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap, StaticContext staticCtx,
-    		String hdfsConf) {
+            String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos) {
         this.nodeList = nodeList;
         this.sourceFileMap = sourceFileMap;
         this.staticCtx = staticCtx;
         this.hdfsConf = hdfsConf;
+        this.nodeControllerInfos = nodeControllerInfos;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             List<LogicalVariable> scanVariables, List<LogicalVariable> projectVariables, boolean projectPushed,
             List<LogicalVariable> minFilterVars, List<LogicalVariable> maxFilterVars, IOperatorSchema opSchema,
             IVariableTypeEnvironment typeEnv, JobGenContext context, JobSpecification jobSpec, Object implConfig)
-            throws AlgebricksException {
+                    throws AlgebricksException {
         VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
         if (sourceFileMap != null) {
             final int len = ds.getPartitions().length;
@@ -98,7 +100,8 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             ds.setPartitions(collectionPartitions);
         }
         RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
-        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf);
+        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf,
+                this.nodeControllerInfos);
 
         AlgebricksPartitionConstraint constraint = getClusterLocations(nodeList, ds.getPartitionCount());
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
@@ -132,7 +135,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     @Override
     public Pair<IPushRuntimeFactory, AlgebricksPartitionConstraint> getWriteFileRuntime(IDataSink sink,
             int[] printColumns, IPrinterFactory[] printerFactories, RecordDescriptor inputDesc)
-            throws AlgebricksException {
+                    throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
 
@@ -158,7 +161,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             IOperatorSchema[] inputSchemas, IVariableTypeEnvironment typeEnv, List<LogicalVariable> primaryKeys,
             List<LogicalVariable> secondaryKeys, List<LogicalVariable> additionalNonKeyFields,
             ILogicalExpression filterExpr, RecordDescriptor recordDesc, JobGenContext context, JobSpecification spec)
-            throws AlgebricksException {
+                    throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
 

@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
@@ -59,7 +58,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
      *            Logical operator
      * @return collection name
      */
-    protected String[] getCollectionName(Mutable<ILogicalOperator> opRef) throws AlgebricksException {
+    protected String[] getCollectionName(Mutable<ILogicalOperator> opRef) {
 
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {

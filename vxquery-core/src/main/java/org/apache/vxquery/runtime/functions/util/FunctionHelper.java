@@ -27,6 +27,13 @@ import java.util.Arrays;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
@@ -46,14 +53,6 @@ import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
-
-import org.apache.hyracks.api.exceptions.HyracksDataException;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class FunctionHelper {
 
@@ -1209,7 +1208,7 @@ public class FunctionHelper {
         //else check in HDFS file system
         else {
             fName = fName.replaceAll("hdfs:/", "");
-            HDFSFunctions hdfs = new HDFSFunctions();
+            HDFSFunctions hdfs = new HDFSFunctions(null, null);
             FileSystem fs = hdfs.getFileSystem();
             if (fs != null) {
                 Path xmlDocument = new Path(fName);

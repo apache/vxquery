@@ -16,8 +16,6 @@
  */
 package org.apache.vxquery.hdfs2;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,23 +41,18 @@ import org.apache.hadoop.mapred.SplitLocationInfo;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.util.ReflectionUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
-import edu.uci.ics.hyracks.hdfs.ContextFactory;
-import edu.uci.ics.hyracks.hdfs2.dataflow.FileSplitsFactory;
-
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.vxquery.metadata.VXQueryCollectionOperatorDescriptor;
+import org.apache.hadoop.util.ReflectionUtils;
+import org.apache.hyracks.api.client.NodeControllerInfo;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.hdfs.ContextFactory;
+import org.apache.hyracks.hdfs2.dataflow.FileSplitsFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class HDFSFunctions {
 
@@ -70,19 +63,24 @@ public class HDFSFunctions {
     private InputFormat inputFormat;
     private List<InputSplit> splits;
     private ArrayList<ArrayList<String>> nodes;
-    private File nodeXMLfile;
     private HashMap<Integer, String> schedule;
     private final String TEMP = "java.io.tmpdir";
     private final String dfs_path = "vxquery_splits_schedule.txt";
     private final String filepath = System.getProperty(TEMP) + "splits_schedule.txt";
     protected static final Logger LOGGER = Logger.getLogger(HDFSFunctions.class.getName());
+    private final Map<String, NodeControllerInfo> nodeControllerInfos;
 
     /**
      * Create the configuration and add the paths for core-site and hdfs-site as resources.
      * Initialize an instance of HDFS FileSystem for this configuration.
+     * 
+     * @param nodeControllerInfos
+     * @param hdfsConf
      */
-    public HDFSFunctions() {
+    public HDFSFunctions(Map<String, NodeControllerInfo> nodeControllerInfos, String hdfsConf) {
         this.conf = new Configuration();
+        this.nodeControllerInfos = nodeControllerInfos;
+        this.conf_path = hdfsConf;
     }
 
     /**
@@ -164,43 +162,9 @@ public class HDFSFunctions {
      */
     private boolean locateConf() {
         if (this.conf_path == null) {
-            // load properties file
-            Properties prop = new Properties();
-            String propFilePath = "../vxquery-server/src/main/resources/conf/cluster.properties";
-            nodeXMLfile = new File("../vxquery-server/src/main/resources/conf/cluster.xml");
-            if(!nodeXMLfile.exists()) { 
-                nodeXMLfile = new File("vxquery-server/src/main/resources/conf/cluster.xml");
-                if(!nodeXMLfile.exists()) { 
-                    nodeXMLfile = new File("vxquery-server/src/main/resources/conf/local.xml");
-                }
-                if(!nodeXMLfile.exists()) { 
-                    nodeXMLfile = new File("../vxquery-server/src/main/resources/conf/local.xml");
-                }
-            }
-            try {
-                prop.load(new FileInputStream(propFilePath));
-            } catch (FileNotFoundException e) {
-                propFilePath = "vxquery-server/src/main/resources/conf/cluster.properties";
-                try {
-                    prop.load(new FileInputStream(propFilePath));
-                } catch (IOException e1) {
-                    if (LOGGER.isLoggable(Level.SEVERE)) {
-                        LOGGER.severe(e1.getMessage());
-                    }
-                }
-            } catch (IOException e) {
-                if (LOGGER.isLoggable(Level.SEVERE)) {
-                    LOGGER.severe(e.getMessage());
-                }
-                return false;
-            }
-            // get the property value for HDFS_CONF
-            this.conf_path = prop.getProperty("HDFS_CONF");
-            if (this.conf_path == null) {
-                this.conf_path = System.getenv("HADOOP_CONF_DIR");
-                return this.conf_path != null;
-            }
-            return this.conf_path != null;
+            //As a last resort, try getting the configuration from the system environment
+            //Some systems won't have this set.
+            this.conf_path = System.getenv("HADOOP_CONF_DIR");
         }
         return this.conf_path != null;
     }
@@ -339,7 +303,7 @@ public class HDFSFunctions {
 
     /**
      * Read the hostname and the ip address of every node from the xml cluster configuration file.
-     * Save the information inside an ArrayList.
+     * Save the information inside nodes.
      * 
      * @throws ParserConfigurationException
      * @throws IOException
@@ -349,26 +313,14 @@ public class HDFSFunctions {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(nodeXMLfile);
-        doc.getDocumentElement().normalize();
-
         nodes = new ArrayList<ArrayList<String>>();
-        NodeList nList = doc.getElementsByTagName("node");
-
-        for (int temp = 0; temp < nList.getLength(); temp++) {
-
-            Node nNode = nList.item(temp);
-
-            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-                Element eElement = (Element) nNode;
-                ArrayList<String> info = new ArrayList<String>();
-                info.add(eElement.getElementsByTagName("id").item(0).getTextContent());
-                info.add(eElement.getElementsByTagName("cluster_ip").item(0).getTextContent());
-                nodes.add(info);
-            }
+        for (NodeControllerInfo ncInfo : nodeControllerInfos.values()) {
+            //Will this include the master node? Is that bad?
+            ArrayList<String> info = new ArrayList<String>();
+            info.add(ncInfo.getNodeId());
+            info.add(ncInfo.getNetworkAddress().getAddress());
+            nodes.add(info);
         }
-
     }
 
     /**

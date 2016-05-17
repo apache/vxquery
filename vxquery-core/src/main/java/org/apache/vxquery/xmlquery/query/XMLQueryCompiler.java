@@ -17,28 +17,7 @@ package org.apache.vxquery.xmlquery.query;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.vxquery.compiler.CompilerControlBlock;
-import org.apache.vxquery.compiler.algebricks.VXQueryBinaryBooleanInspectorFactory;
-import org.apache.vxquery.compiler.algebricks.VXQueryBinaryIntegerInspectorFactory;
-import org.apache.vxquery.compiler.algebricks.VXQueryComparatorFactoryProvider;
-import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
-import org.apache.vxquery.compiler.algebricks.VXQueryExpressionRuntimeProvider;
-import org.apache.vxquery.compiler.algebricks.VXQueryNullWriterFactory;
-import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
-import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
-import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
-import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.metadata.VXQueryMetadataProvider;
-import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFactoryProvider;
-import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFamilyProvider;
-import org.apache.vxquery.types.BuiltinTypeRegistry;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.xmlquery.ast.ModuleNode;
-import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
+import java.util.Map;
 
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.common.exceptions.NotImplementedException;
@@ -67,16 +46,38 @@ import org.apache.hyracks.algebricks.core.rewriter.base.IOptimizationContextFact
 import org.apache.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
 import org.apache.hyracks.algebricks.data.ISerializerDeserializerProvider;
 import org.apache.hyracks.algebricks.data.ITypeTraitProvider;
+import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.dataflow.value.ISerializerDeserializer;
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.api.job.JobSpecification;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.compiler.algebricks.VXQueryBinaryBooleanInspectorFactory;
+import org.apache.vxquery.compiler.algebricks.VXQueryBinaryIntegerInspectorFactory;
+import org.apache.vxquery.compiler.algebricks.VXQueryComparatorFactoryProvider;
+import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.compiler.algebricks.VXQueryExpressionRuntimeProvider;
+import org.apache.vxquery.compiler.algebricks.VXQueryNullWriterFactory;
+import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
+import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
+import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
+import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFactoryProvider;
+import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFamilyProvider;
+import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
+import org.apache.vxquery.xmlquery.ast.ModuleNode;
+import org.apache.vxquery.xmlquery.translator.XMLQueryTranslator;
 
 public class XMLQueryCompiler {
     private final XQueryCompilationListener listener;
 
     private final ICompilerFactory cFactory;
-    
+
     private final String hdfsConf;
 
     private LogicalOperatorPrettyPrintVisitor pprinter;
@@ -89,18 +90,26 @@ public class XMLQueryCompiler {
 
     private int frameSize;
 
-    private String[] nodeList;
-    
+    private Map<String, NodeControllerInfo> nodeControllerInfos;
 
-    public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize) {
-        this(listener, nodeList, frameSize, -1, -1, -1, "");
+    private String[] nodeList;
+
+    public XMLQueryCompiler(XQueryCompilationListener listener, Map<String, NodeControllerInfo> nodeControllerInfos,
+            int frameSize, String hdfsConf) {
+        this(listener, nodeControllerInfos, frameSize, -1, -1, -1, hdfsConf);
     }
 
-    public XMLQueryCompiler(XQueryCompilationListener listener, String[] nodeList, int frameSize,
-            int availableProcessors, long joinHashSize, long maximumDataSize, String hdfsConf) {
+    public XMLQueryCompiler(XQueryCompilationListener listener, Map<String, NodeControllerInfo> nodeControllerInfos,
+            int frameSize) {
+        this(listener, nodeControllerInfos, frameSize, -1, -1, -1, "");
+    }
+
+    public XMLQueryCompiler(XQueryCompilationListener listener, Map<String, NodeControllerInfo> nodeControllerInfos,
+            int frameSize, int availableProcessors, long joinHashSize, long maximumDataSize, String hdfsConf) {
         this.listener = listener == null ? NoopXQueryCompilationListener.INSTANCE : listener;
         this.frameSize = frameSize;
-        this.nodeList = nodeList;
+        this.nodeControllerInfos = nodeControllerInfos;
+        setNodeList();
         this.hdfsConf = hdfsConf;
         HeuristicCompilerFactoryBuilder builder = new HeuristicCompilerFactoryBuilder(
                 new IOptimizationContextFactory() {
@@ -120,12 +129,12 @@ public class XMLQueryCompiler {
             builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash((int) (joinHashSize / this.frameSize));
         }
         if (maximumDataSize > 0) {
-            builder.getPhysicalOptimizationConfig().setMaxFramesLeftInputHybridHash(
-                    (int) (maximumDataSize / this.frameSize));
+            builder.getPhysicalOptimizationConfig()
+                    .setMaxFramesLeftInputHybridHash((int) (maximumDataSize / this.frameSize));
         }
 
-        builder.getPhysicalOptimizationConfig().setMaxFramesLeftInputHybridHash(
-                (int) (60L * 1024 * 1048576 / this.frameSize));
+        builder.getPhysicalOptimizationConfig()
+                .setMaxFramesLeftInputHybridHash((int) (60L * 1024 * 1048576 / this.frameSize));
 
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
@@ -196,15 +205,26 @@ public class XMLQueryCompiler {
         cFactory = builder.create();
     }
 
+    /**
+     * Set Configuration of node controllers as array of Strings.
+     */
+    private void setNodeList() {
+        nodeList = new String[nodeControllerInfos.size()];
+        int index = 0;
+        for (String node : nodeControllerInfos.keySet()) {
+            nodeList[index++] = node;
+        }
+    }
+
     public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel)
             throws SystemException {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
-        pprinter = new LogicalOperatorPrettyPrintVisitor(new VXQueryLogicalExpressionPrettyPrintVisitor(
-                module.getModuleContext()));
+        pprinter = new LogicalOperatorPrettyPrintVisitor(
+                new VXQueryLogicalExpressionPrettyPrintVisitor(module.getModuleContext()));
         VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap(),
-                module.getModuleContext(), this.hdfsConf);
+                module.getModuleContext(), this.hdfsConf, nodeControllerInfos);
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);

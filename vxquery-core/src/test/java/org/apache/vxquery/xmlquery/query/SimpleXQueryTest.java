@@ -20,16 +20,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import junit.framework.Assert;
-
+import org.apache.hyracks.api.client.NodeControllerInfo;
+import org.apache.hyracks.api.comm.NetworkAddress;
+import org.apache.hyracks.api.dataset.ResultSetId;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
 import org.junit.Test;
 
-import org.apache.hyracks.api.dataset.ResultSetId;
+import junit.framework.Assert;
 
 public class SimpleXQueryTest {
     @Test
@@ -96,8 +99,8 @@ public class SimpleXQueryTest {
 
     private static String gunzip(String dir, String filename) {
         try {
-            GZIPInputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(new File(dir
-                    + filename + ".gz"))));
+            GZIPInputStream in = new GZIPInputStream(
+                    new BufferedInputStream(new FileInputStream(new File(dir + filename + ".gz"))));
             File temp = File.createTempFile("vxquery", filename);
             temp.deleteOnExit();
             FileOutputStream out = new FileOutputStream(temp);
@@ -133,7 +136,11 @@ public class SimpleXQueryTest {
     }
 
     private static void runTestInternal(String testName, String query) throws Exception {
-        XMLQueryCompiler compiler = new XMLQueryCompiler(null, new String[] { "nc1" }, 65536);
+
+        Map<String, NodeControllerInfo> nodeControllerInfos = new HashMap<String, NodeControllerInfo>();
+        nodeControllerInfos.put("nc1", new NodeControllerInfo("nc1", null, new NetworkAddress("127.0.0.1", 0), null));
+
+        XMLQueryCompiler compiler = new XMLQueryCompiler(null, nodeControllerInfos, 65536);
         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                 new ResultSetId(System.nanoTime()), null);
         compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE);

@@ -182,7 +182,12 @@ public class VXQuery {
                     opts.showOET, opts.showRP);
 
             start = opts.timing ? new Date() : null;
-            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, getNodeList(), opts.frameSize,
+
+            Map<String, NodeControllerInfo> nodeControllerInfos = null;
+            if (hcc != null) {
+                nodeControllerInfos = hcc.getNodeControllerInfos();
+            }
+            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, nodeControllerInfos, opts.frameSize,
                     opts.availableProcessors, opts.joinHashSize, opts.maximumDataSize, opts.hdfsConf);
             resultSetId = createResultSetId();
             CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
@@ -231,25 +236,6 @@ public class VXQuery {
                 }
             }
         }
-    }
-
-    /**
-     * Get cluster node configuration.
-     *
-     * @return Configuration of node controllers as array of Strings.
-     * @throws Exception
-     */
-    private String[] getNodeList() throws Exception {
-        if (hcc != null) {
-            Map<String, NodeControllerInfo> nodeControllerInfos = hcc.getNodeControllerInfos();
-            String[] nodeList = new String[nodeControllerInfos.size()];
-            int index = 0;
-            for (String node : nodeControllerInfos.keySet()) {
-                nodeList[index++] = node;
-            }
-            return nodeList;
-        }
-        return new String[0];
     }
 
     /**
