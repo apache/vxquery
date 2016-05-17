@@ -19,20 +19,17 @@ package org.apache.vxquery.datamodel.builders.sequence;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.util.GrowableIntArray;
-
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.builders.base.IBuilder;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.util.GrowableIntArray;
 
-public class SequenceBuilder {
+public class SequenceBuilder implements IBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();
     private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
     private IMutableValueStorage mvs;
-
-    public SequenceBuilder() {
-    }
 
     public void reset(IMutableValueStorage mvs) {
         this.mvs = mvs;
