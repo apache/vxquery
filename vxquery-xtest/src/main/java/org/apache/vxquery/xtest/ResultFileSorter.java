@@ -49,7 +49,7 @@ public class ResultFileSorter {
             while ((line = reader.readLine()) != null) {
                 fullText.add(line);
             }
-            logger.log(Level.FINE, "Sorting.....");
+            logger.log(Level.INFO, "Sorting.....");
             Collections.sort(fullText);
             String[] sortedText = fullText.toArray(new String[fullText.size()]);
             this.eraseFile(resultFile);
@@ -77,11 +77,11 @@ public class ResultFileSorter {
     private void writeToFile(String[] text) throws FileNotFoundException {
         File newFile = new File(path);
         PrintWriter writer = new PrintWriter(newFile);
-        logger.log(Level.FINE, "Writing to file started.");
+        logger.log(Level.INFO, "Writing to file started.");
         for (String s : text) {
             writer.write(s + "\n");
         }
         writer.close();
-        logger.log(Level.FINE, "Writing to file finished successfully.");
+        logger.log(Level.INFO, "Writing to file finished successfully.");
     }
 }
