@@ -23,58 +23,30 @@ import org.apache.vxquery.types.AnyItemType;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import edu.uci.ics.hyracks.algebricks.common.exceptions.AlgebricksException;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.ILogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import edu.uci.ics.hyracks.algebricks.core.algebra.base.LogicalVariable;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
+import edu.uci.ics.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 
-/**
- * Find the default query plan created for collection and updated it to use
- * parallelization. The rule searches for unnest followed by an assign for the
- * collection function expression. When this plan block exists the data source
- * scan operator added in the blocks place.
- *
- * <pre>
- * Before
- *
- *   plan__parent
- *   UNNEST( $v2 : exp($v1) )
- *   ASSIGN( $v1 : collection( $v0 ) )
- *   ASSIGN( $v0 : constant )
- *   plan__child
- *
- * After
- *
- *   plan__parent
- *   UNNEST( $v2 : exp($v1) )
- *   DATASCAN( collection( $v0 ) , $v1 )
- *   plan__child
- *
- *   Where DATASCAN operator is configured to use the collection( $v0) for
- *   data represented by the "constant" and $v1 represents the xml document
- *   nodes from the collection.
- * </pre>
- *
- * @author prestonc
- */
-public class IntroduceCollectionRule extends AbstractCollectionRule {
+public class CollectionWithTagRule extends AbstractCollectionRule {
+
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
         String args[] = getCollectionName(opRef);
 
         if (args != null) {
-            String collectionName = args[0];
             // Build the new operator and update the query plan.
             int collectionId = vxqueryContext.newCollectionId();
-            VXQueryCollectionDataSource ds = VXQueryCollectionDataSource.create(collectionId, collectionName,
+            VXQueryCollectionDataSource ds = VXQueryCollectionDataSource.create(collectionId, args[0],
                     SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
             if (ds != null) {
                 ds.setTotalDataSources(vxqueryContext.getTotalDataSources());
-
+                ds.setTag(args[1]);
                 // Known to be true because of collection name.
                 AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
                 UnnestOperator unnest = (UnnestOperator) op;
@@ -90,5 +62,4 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
         }
         return false;
     }
-
 }
