@@ -29,7 +29,7 @@ public class ArrayByteTest extends AbstractPointableTest {
         }
         tvp.getValue(ap);
         if (ap.getEntryCount() != 0) {
-            Assert.fail("Sequence size is incorrect. Expected: 0 Got: " + ap.getEntryCount());
+            Assert.fail("Array size is incorrect. Expected: 0 Got: " + ap.getEntryCount());
         }
     }
 
@@ -79,13 +79,11 @@ public class ArrayByteTest extends AbstractPointableTest {
         if (!comparePointable(tvp, tvp1)) {
             Assert.fail("Array item is incorrect. Expected: " + ValueTag.XS_LONG_TAG + " Got: " + tvp.getTag());
         }
-        if (!comparePointable(tvp, tvp1)) {
-            Assert.fail("Item value is incorrect.");
-        }
+
     }
 
     @Test
-    public void testManyArraySequence() {
+    public void testManyItemsArray() {
         // Build test array
         try {
             // Add three items
