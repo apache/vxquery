@@ -27,6 +27,14 @@ import org.junit.Test;
 
 import junit.framework.Assert;
 
+/**
+ * The sequence byte test covers empty sequences, single items and multi-item sequences.
+ *
+ * 1. Empty sequence constant
+ * 2. Empty sequence - {}
+ * 3. Single item - "one" (XQuery single item sequences are just the item.)
+ * 4. Many items - {1, 2.0, "three"}
+ */
 public class SequenceByteTest extends AbstractPointableTest {
     private final ArrayBackedValueStorage abvsResult = new ArrayBackedValueStorage();
     private final SequenceBuilder sb = new SequenceBuilder();
