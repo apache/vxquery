@@ -170,6 +170,24 @@
             </roles>
             <timezone>-8</timezone>
         </contributor>
+        <contributor>
+            <name>Menaka Madushanka</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+5:30</timezone>
+        </contributor>
+        <contributor>
+            <name>Riyafa Abdul Hameed</name>
+            <email />
+            <organization />
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+5:30</timezone>
+        </contributor>
     </contributors>
 
     <mailingLists>
