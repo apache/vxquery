@@ -22,6 +22,7 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonItem.ObjectPointable;
 import org.apache.vxquery.datamodel.builders.jsonItem.ObjectBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.junit.Test;
@@ -29,17 +30,17 @@ import org.junit.Test;
 import junit.framework.Assert;
 
 public class ObjectByteTest extends AbstractPointableTest {
-    ArrayBackedValueStorage abvsResult = new ArrayBackedValueStorage();
-    ObjectBuilder ob = new ObjectBuilder();
-    TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp3 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp4 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp5 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    TaggedValuePointable tvp6 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-    ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+    private ArrayBackedValueStorage abvsResult = new ArrayBackedValueStorage();
+    private ObjectBuilder ob = new ObjectBuilder();
+    private TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private TaggedValuePointable tvpKey1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private TaggedValuePointable tvpValue1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private TaggedValuePointable tvpKey2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private TaggedValuePointable tvpValue2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private TaggedValuePointable tvpKey3 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private TaggedValuePointable tvpValue3 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+    private ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
 
     @Test
     public void testEmptyObject() {
@@ -69,9 +70,9 @@ public class ObjectByteTest extends AbstractPointableTest {
         abvsResult.reset();
         try {
             ob.reset(abvsResult);
-            getTaggedValuePointable("id", tvp1);
-            getTaggedValuePointable(1, tvp2);
-            ob.addItem(tvp1, tvp2);
+            getTaggedValuePointable("id", tvpKey1);
+            getTaggedValuePointable(1, tvpValue1);
+            ob.addItem(tvpKey1, tvpValue1);
             ob.finish();
         } catch (IOException e) {
             Assert.fail("Test failed to write the object pointable.");
@@ -96,12 +97,15 @@ public class ObjectByteTest extends AbstractPointableTest {
         if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
             Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }
-        if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvpKey1)) {
             Assert.fail("Key is incorrect. Expected: id");
         }
-
-        op.getValue(tvp1, tvp);
-        if (!FunctionHelper.arraysEqual(tvp, tvp2)) {
+        try {
+            op.getValue(tvpKey1, tvp);
+        } catch (SystemException e) {
+            Assert.fail("Test failed to write the object pointable.");
+        }
+        if (!FunctionHelper.arraysEqual(tvp, tvpValue1)) {
             Assert.fail("Value is incorrect for the given key.");
         }
     }
@@ -112,15 +116,15 @@ public class ObjectByteTest extends AbstractPointableTest {
         try {
             // Add three items
             ob.reset(abvsResult);
-            getTaggedValuePointable("name", tvp1);
-            getTaggedValuePointable("A green door", tvp2);
-            ob.addItem(tvp1, tvp2);
-            getTaggedValuePointable("price", tvp3);
-            getTaggedValuePointable(12.5, tvp4);
-            ob.addItem(tvp3, tvp4);
-            getTaggedValuePointable("properties", tvp5);
-            getTaggedValuePointable(100l, tvp6);
-            ob.addItem(tvp5, tvp6);
+            getTaggedValuePointable("name", tvpKey1);
+            getTaggedValuePointable("A green door", tvpValue1);
+            ob.addItem(tvpKey1, tvpValue1);
+            getTaggedValuePointable("price", tvpKey2);
+            getTaggedValuePointable(12.5, tvpValue2);
+            ob.addItem(tvpKey2, tvpValue2);
+            getTaggedValuePointable("properties", tvpKey3);
+            getTaggedValuePointable(100L, tvpValue3);
+            ob.addItem(tvpKey3, tvpValue3);
             ob.finish();
         } catch (IOException e) {
             Assert.fail("Test failed to write the object pointable.");
@@ -151,34 +155,99 @@ public class ObjectByteTest extends AbstractPointableTest {
             Assert.fail("Object size is incorrect. Expected: 3 Got: " + sp.getEntryCount());
         }
         sp.getEntry(0, tvp);
-        if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvpKey1)) {
             Assert.fail("Object key one is incorrect. Expected: name");
         }
         sp.getEntry(1, tvp);
-        if (!FunctionHelper.arraysEqual(tvp, tvp3)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvpKey2)) {
             Assert.fail("Object key two is incorrect. Expected: price");
         }
         sp.getEntry(2, tvp);
-        if (!FunctionHelper.arraysEqual(tvp, tvp5)) {
+        if (!FunctionHelper.arraysEqual(tvp, tvpKey3)) {
             Assert.fail("Object key three is incorrect. Expected: properties");
         }
 
         //Test values
-        op.getValue(tvp1, tvp);
-        if (!FunctionHelper.arraysEqual(tvp, tvp2)) {
+        try {
+            op.getValue(tvpKey1, tvp);
+        } catch (SystemException e) {
+            Assert.fail("Test failed to write the object pointable.");
+        }
+        if (!FunctionHelper.arraysEqual(tvp, tvpValue1)) {
             Assert.fail("Value is incorrect for the given key. Expected: A green door with valuetag: "
                     + ValueTag.XS_STRING_TAG + " Got valuetag: " + tvp.getTag());
         }
-        op.getValue(tvp3, tvp);
-        if (!FunctionHelper.arraysEqual(tvp, tvp4)) {
+        try {
+            op.getValue(tvpKey2, tvp);
+        } catch (SystemException e) {
+            Assert.fail("Test failed to write the object pointable.");
+        }
+        if (!FunctionHelper.arraysEqual(tvp, tvpValue2)) {
             Assert.fail("Value is incorrect for the given key. Expected: 12.5 with valuetag: " + ValueTag.XS_DOUBLE_TAG
                     + " Got valuetag: " + tvp.getTag());
         }
-        op.getValue(tvp5, tvp);
-        if (!FunctionHelper.arraysEqual(tvp, tvp6)) {
+        try {
+            op.getValue(tvpKey3, tvp);
+        } catch (SystemException e) {
+            Assert.fail("Test failed to write the object pointable.");
+        }
+        if (!FunctionHelper.arraysEqual(tvp, tvpValue3)) {
             Assert.fail("Value is incorrect for the given key. Expected: 100 with valuetag: " + ValueTag.XS_LONG_TAG
                     + " Got valuetag: " + tvp.getTag());
         }
     }
 
+    @Test
+    public void testItemNotExistObject() {
+        // Build empty test Object
+        abvsResult.reset();
+        try {
+            ob.reset(abvsResult);
+            ob.finish();
+        } catch (IOException e) {
+            Assert.fail("Test failed to write the Object pointable.");
+        }
+        tvp.set(abvsResult);
+        tvp.getValue(op);
+        try {
+            getTaggedValuePointable("key", tvpKey1);
+            op.getValue(tvpKey1, tvpValue1);
+        } catch (IOException | SystemException e) {
+            Assert.fail("Test failed to write the object pointable.");
+        }
+        XDMConstants.setFalse(tvp);
+        if (!FunctionHelper.arraysEqual(tvp, tvpValue1)) {
+            Assert.fail("Value is incorrect for the given key. Expected: false with valuetag: "
+                    + ValueTag.XS_BOOLEAN_TAG + " Got valuetag: " + tvp.getTag());
+        }
+
+        // Build test object
+        try {
+            // Add two items
+            ob.reset(abvsResult);
+            getTaggedValuePointable("name", tvpKey1);
+            getTaggedValuePointable("A green door", tvpValue1);
+            ob.addItem(tvpKey1, tvpValue1);
+            getTaggedValuePointable("price", tvpKey2);
+            getTaggedValuePointable(12.5, tvpValue2);
+            ob.addItem(tvpKey2, tvpValue2);
+            ob.finish();
+        } catch (IOException e) {
+            Assert.fail("Test failed to write the object pointable.");
+        }
+
+        tvp.set(abvsResult);
+        tvp.getValue(op);
+        try {
+            getTaggedValuePointable("key", tvpKey3);
+            op.getValue(tvpKey3, tvpValue3);
+        } catch (IOException | SystemException e) {
+            Assert.fail("Test failed to write the object pointable.");
+        }
+        XDMConstants.setFalse(tvp);
+        if (!FunctionHelper.arraysEqual(tvp, tvpValue3)) {
+            Assert.fail("Value is incorrect for the given key. Expected: false with valuetag: "
+                    + ValueTag.XS_BOOLEAN_TAG + " Got valuetag: " + tvp.getTag());
+        }
+    }
 }

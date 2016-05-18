@@ -22,10 +22,12 @@ import java.io.IOException;
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
+import org.apache.vxquery.datamodel.builders.base.IBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
-public class ObjectBuilder {
+public class ObjectBuilder extends AbstractBuilder implements IBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();
     private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
     private IMutableValueStorage mvs;
@@ -36,8 +38,13 @@ public class ObjectBuilder {
         dataArea.reset();
     }
 
+    @Override
+    public int getValueTag() {
+        return ValueTag.OBJECT_TAG;
+    }
+
     public void addItem(IValueReference key, IValueReference value) throws IOException {
-        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset(), key.getLength());
+        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset() + 1, key.getLength() - 1);
         dataArea.getDataOutput().write(value.getByteArray(), value.getStartOffset(), value.getLength());
         slots.append(dataArea.getLength());
     }
