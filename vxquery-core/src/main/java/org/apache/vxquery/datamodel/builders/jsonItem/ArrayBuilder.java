@@ -9,7 +9,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
-public class ArrayBuilder {
+public class ArrayBuilder extends JsonAbstractBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();
     private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
     private IMutableValueStorage mvs;
@@ -17,6 +17,7 @@ public class ArrayBuilder {
     public ArrayBuilder() {
     }
 
+    @Override
     public void reset(IMutableValueStorage mvs) {
         this.mvs = mvs;
         slots.clear();
@@ -28,9 +29,10 @@ public class ArrayBuilder {
         slots.append(dataArea.getLength());
     }
 
+    @Override
     public void finish() throws IOException {
         DataOutput out = mvs.getDataOutput();
-        out.write(ValueTag.ARRAY_TAG);
+        out.write(getValueTag());
         int size = slots.getSize();
         out.writeInt(size);
         if (size > 0) {
@@ -40,5 +42,10 @@ public class ArrayBuilder {
             }
             out.write(dataArea.getByteArray(), dataArea.getStartOffset(), dataArea.getLength());
         }
+    }
+
+    @Override
+    public int getValueTag() {
+        return ValueTag.ARRAY_TAG;
     }
 }

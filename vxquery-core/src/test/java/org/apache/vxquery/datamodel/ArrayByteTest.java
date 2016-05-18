@@ -7,7 +7,6 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonItem.ArrayPointable;
 import org.apache.vxquery.datamodel.builders.jsonItem.ArrayBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.junit.Test;
 
 import junit.framework.Assert;
@@ -20,18 +19,6 @@ public class ArrayByteTest extends AbstractPointableTest {
     TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     TaggedValuePointable tvp3 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
-
-    @Test
-    public void testEmptyArrayConstant() {
-        XDMConstants.setEmptyArray(tvp);
-        if (tvp.getTag() != ValueTag.ARRAY_TAG) {
-            Assert.fail("Type tag is incorrect. Expected: " + ValueTag.ARRAY_TAG + " Got: " + tvp.getTag());
-        }
-        tvp.getValue(ap);
-        if (ap.getEntryCount() != 0) {
-            Assert.fail("Array size is incorrect. Expected: 0 Got: " + ap.getEntryCount());
-        }
-    }
 
     @Test
     public void testEmptyArray() {

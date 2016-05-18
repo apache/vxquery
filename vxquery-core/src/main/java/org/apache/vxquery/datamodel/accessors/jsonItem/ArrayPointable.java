@@ -1,13 +1,13 @@
 package org.apache.vxquery.datamodel.accessors.jsonItem;
 
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
+import org.apache.hyracks.data.std.api.AbstractPointable;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.api.IPointableFactory;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
 
-public class ArrayPointable extends SequencePointable {
+public class ArrayPointable extends AbstractPointable {
     private static final int ENTRY_COUNT_SIZE = 4;
     private static final int SLOT_SIZE = 4;
     public static final IPointableFactory FACTORY = new IPointableFactory() {
