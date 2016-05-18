@@ -29,7 +29,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
 import org.apache.hyracks.data.std.primitive.FloatPointable;
@@ -411,7 +411,15 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     }
 
     private boolean arraysEqual(byte[] bytes1, int offset1, int length1, byte[] bytes2, int offset2, int length2) {
-        return FunctionHelper.arraysEqual(bytes1, offset1, length1, bytes2, offset2, length2);
+        if (length1 != length2) {
+            return false;
+        }
+        for (int i = 0; i < length1; ++i) {
+            if (bytes1[offset1 + i] != bytes2[offset2 + i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

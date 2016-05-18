@@ -30,7 +30,7 @@ limitations under the License.
   <skin>
     <groupId>org.apache.maven.skins</groupId>
     <artifactId>maven-fluido-skin</artifactId>
-    <version>1.5</version>
+    <version>1.3.1</version>
   </skin>
 
   <body>
@@ -39,14 +39,14 @@ limitations under the License.
       <item name="Missing Functions" href="missing-functions.html"/>
       <item name="Missing Operators" href="missing-operators.html"/>
     </menu>
-    <footer><![CDATA[
+    <footer>
       <div class="row-fluid">Apache VXQuery, VXQuery, Apache, the Apache
         feather logo, and the Apache VXQuery project logo are either
         registered trademarks or trademarks of The Apache Software
         Foundation in the United States and other countries.
         All other marks mentioned may be trademarks or registered
         trademarks of their respective owners.</div>
-    ]]></footer>
+    </footer>
   </body>
 </project>
 

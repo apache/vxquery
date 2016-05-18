@@ -19,7 +19,6 @@ package org.apache.vxquery.datamodel.builders.sequence;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
@@ -27,7 +26,7 @@ import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
-public class SequenceBuilder extends AbstractBuilder {
+public class SequenceBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();
     private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
     private IMutableValueStorage mvs;
@@ -35,7 +34,6 @@ public class SequenceBuilder extends AbstractBuilder {
     public SequenceBuilder() {
     }
 
-    @Override
     public void reset(IMutableValueStorage mvs) {
         this.mvs = mvs;
         slots.clear();
@@ -47,7 +45,6 @@ public class SequenceBuilder extends AbstractBuilder {
         slots.append(dataArea.getLength());
     }
 
-    @Override
     public void finish() throws IOException {
         DataOutput out = mvs.getDataOutput();
         if (slots.getSize() != 1) {
