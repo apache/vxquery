@@ -48,6 +48,7 @@ vxq.bat
 -showrp                    : Show Runtime plan
 -showtet                   : Show translated expression tree
 -timing                    : Produce timing information
+-hdfs-conf VAL             : The folder containing the HDFS configuration files
 ----------------------------------------
 
 * Java Options
