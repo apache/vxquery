@@ -18,13 +18,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.InetAddress;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hyracks.api.client.HyracksConnection;
 import org.apache.hyracks.api.client.IHyracksClientConnection;
+import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
 import org.apache.hyracks.api.comm.IFrameTupleAccessor;
 import org.apache.hyracks.api.comm.VSizeFrame;
@@ -63,6 +66,7 @@ public class TestRunner {
     private NodeControllerService nc1;
     private IHyracksClientConnection hcc;
     private IHyracksDataset hds;
+    private final String publicAddress = InetAddress.getLocalHost().getHostAddress();
 
     public TestRunner(XTestOptions opts) throws Exception {
         this.opts = opts;
@@ -70,9 +74,9 @@ public class TestRunner {
 
     public void open() throws Exception {
         CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = "127.0.0.1";
+        ccConfig.clientNetIpAddress = publicAddress;
         ccConfig.clientNetPort = 39000;
-        ccConfig.clusterNetIpAddress = "127.0.0.1";
+        ccConfig.clusterNetIpAddress = publicAddress;
         ccConfig.clusterNetPort = 39001;
         ccConfig.profileDumpPeriod = 10000;
         File outDir = new File("target/ClusterController");
@@ -87,9 +91,9 @@ public class TestRunner {
         NCConfig ncConfig1 = new NCConfig();
         ncConfig1.ccHost = "localhost";
         ncConfig1.ccPort = 39001;
-        ncConfig1.clusterNetIPAddress = "127.0.0.1";
-        ncConfig1.dataIPAddress = "127.0.0.1";
-        ncConfig1.resultIPAddress = "127.0.0.1";
+        ncConfig1.clusterNetIPAddress = publicAddress;
+        ncConfig1.dataIPAddress = publicAddress;
+        ncConfig1.resultIPAddress = publicAddress;
         ncConfig1.nodeId = "nc1";
         nc1 = new NodeControllerService(ncConfig1);
         nc1.start();
@@ -115,7 +119,14 @@ public class TestRunner {
 
                 VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
                         opts.showOET, opts.showRP);
-                XMLQueryCompiler compiler = new XMLQueryCompiler(listener, new String[] { "nc1" }, opts.frameSize);
+
+                Map<String, NodeControllerInfo> nodeControllerInfos = null;
+                if (hcc != null) {
+                    nodeControllerInfos = hcc.getNodeControllerInfos();
+                }
+
+                XMLQueryCompiler compiler = new XMLQueryCompiler(listener, nodeControllerInfos, opts.frameSize,
+                        opts.hdfsConf);
                 Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
                 CompilerControlBlock ccb = new CompilerControlBlock(
                         new StaticContextImpl(RootStaticContextImpl.INSTANCE),
