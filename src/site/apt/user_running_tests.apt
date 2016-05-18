@@ -45,7 +45,7 @@ xtest.bat
  -v              : Verbose
  -xmlreport VAL  : XML Report output file
 ----------------------------------------
-
+ 
 * Java Options
 
   The command can be run with Java options to increase the amount of memory to one gigabyte.
@@ -55,30 +55,30 @@ xtest.bat
 ----------------------------------------
 JAVA_OPTS="-Xmx1024m -Djava.util.logging.config.file=/path/to/logging.properties"
 ----------------------------------------
-
+ 
 * VXQuery Testing Options
 
   * VXQuery Test Suite
 
     The VXQuery test suite focuses on parallel processing tests used in our weather benchmark.
-
+  
 ----------------------------------------
 sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/src/test/resources/VXQueryCatalog.xml -htmlreport /tmp/vxquery_report.html
 ----------------------------------------
 
     * view the results at {{{file:///tmp/vxquery_report.html}file:///tmp/vxquery_report.html}}.
-
+  
   * XQTS (XQuery Test Suite)
     To run the complete XQTS on VXQuery.
-
-    * Create a folder to hold the XQTS.
+  
+    * Create a folder to hold the XQTS. 
       If you use "vxquery-xtest/test-suites/xqts", then maven will utilize the XQTS to verify VXQuery's passing functions during the build process.
-
+    
 ----------------------------------------
 $ mkdir -p vxquery-xtest/test-suites
 $ cd vxquery-xtest/test-suites
 ----------------------------------------
-
+    
     * Get the archive {{{http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip}XQTS_1_0_3.zip}} (e.g. using wget),
 
 ----------------------------------------
@@ -88,7 +88,10 @@ $ wget http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_
     * unpack it,
 
 ----------------------------------------
-$ unzip -d xqts XQTS_1_0_3.zip
+$ mkdir xqts
+$ cd xqts
+$ unzip ../XQTS_1_0_3.zip
+$ cd ..
 ----------------------------------------
 
     * go back to the project root,
@@ -120,3 +123,4 @@ sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-sui
 
     * view the results at {{{file:///tmp/previous_report.html}file:///tmp/previous_report.html}}.
 
+  

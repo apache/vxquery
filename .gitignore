@@ -1,6 +1,5 @@
 .project
 .settings
 .classpath
-.idea
 target
 /ClusterControllerService/

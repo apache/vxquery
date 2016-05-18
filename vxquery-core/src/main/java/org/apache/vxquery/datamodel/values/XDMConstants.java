@@ -52,7 +52,7 @@ public class XDMConstants {
             throw new RuntimeException(e);
         }
         EMPTY_SEQUENCE = Arrays.copyOf(abvs.getByteArray(), abvs.getLength());
-        
+
         EMPTY_STRING = new byte[3];
         EMPTY_STRING[0] = ValueTag.XS_STRING_TAG;
         EMPTY_STRING[1] = 0;

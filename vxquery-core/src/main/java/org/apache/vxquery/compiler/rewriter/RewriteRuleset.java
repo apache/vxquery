@@ -90,7 +90,6 @@ import org.apache.hyracks.algebricks.rewriter.rules.SubplanOutOfGroupRule;
 public class RewriteRuleset {
     /**
      * Optimizations specific to XQuery.
-     *
      * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildPathStepNormalizationRuleCollection() {
@@ -148,7 +147,6 @@ public class RewriteRuleset {
 
     /**
      * Optimizations specific to XQuery.
-     *
      * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildXQueryNormalizationRuleCollection() {
@@ -174,7 +172,6 @@ public class RewriteRuleset {
 
     /**
      * Remove expressions known to be redundant.
-     *
      * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildInlineRedundantExpressionNormalizationRuleCollection() {
@@ -194,7 +191,6 @@ public class RewriteRuleset {
 
     /**
      * When a nested data sources exist, convert the plan to use the join operator.
-     *
      * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildNestedDataSourceRuleCollection() {
@@ -219,7 +215,6 @@ public class RewriteRuleset {
 
     /**
      * Unnest more complex structures.
-     *
      * @return List of algebraic rewrite rules.
      */
     public final static List<IAlgebraicRewriteRule> buildUnnestingRuleCollection() {
@@ -311,7 +306,6 @@ public class RewriteRuleset {
         physicalPlanRewrites.add(new PullSelectOutOfEqJoin());
         physicalPlanRewrites.add(new PushFunctionsOntoEqJoinBranches());
         physicalPlanRewrites.add(new SetAlgebricksPhysicalOperatorsRule());
-        physicalPlanRewrites.add(new SetExecutionModeRule());
         physicalPlanRewrites.add(new EnforceStructuralPropertiesRule());
         physicalPlanRewrites.add(new PushProjectDownRule());
         physicalPlanRewrites.add(new CopyLimitDownRule());
@@ -328,8 +322,8 @@ public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> prepareForJobGenRuleCollection() {
         List<IAlgebraicRewriteRule> prepareForJobGenRewrites = new LinkedList<IAlgebraicRewriteRule>();
         prepareForJobGenRewrites.add(new ConvertFromAlgebricksExpressionsRule());
-        prepareForJobGenRewrites
-                .add(new IsolateHyracksOperatorsRule(HeuristicOptimizer.hyraxOperatorsBelowWhichJobGenIsDisabled));
+        prepareForJobGenRewrites.add(new IsolateHyracksOperatorsRule(
+                HeuristicOptimizer.hyraxOperatorsBelowWhichJobGenIsDisabled));
         prepareForJobGenRewrites.add(new ExtractCommonOperatorsRule());
         // Re-infer all types, so that, e.g., the effect of not-is-null is
         // propagated.
