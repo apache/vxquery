@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 public class ResultFileSorter {
 
     private final String path;
-    private final Logger logger = Logger.getLogger(ResultFileSorter.class.getName());
+    private static final Logger logger = Logger.getLogger(ResultFileSorter.class.getName());
 
     public ResultFileSorter(String path) throws FileNotFoundException {
         this.path = path;

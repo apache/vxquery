@@ -101,12 +101,6 @@ public class XTest {
         } finally {
             try {
 
-                //Perform the sorting process.
-                if (opts.diffable != null) {
-                    ResultFileSorter sorter = new ResultFileSorter(opts.diffable);
-                    sorter.sortFile();
-                }
-
                 if (server != null) {
                     server.stop();
                 }
