@@ -159,7 +159,7 @@
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-dataflow-std</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-hdfs-2.x</artifactId>

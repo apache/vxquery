@@ -16,14 +16,14 @@
  */
 package org.apache.vxquery.xtest;
 
+import org.mortbay.jetty.Server;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.mortbay.jetty.Server;
 
 public class XTest {
     private XTestOptions opts;
@@ -36,7 +36,7 @@ public class XTest {
 
     XTest(XTestOptions opts) {
         this.opts = opts;
-        reporters = new ArrayList<ResultReporter>();
+        reporters = new ArrayList<>();
     }
 
     void init() throws Exception {
@@ -100,6 +100,7 @@ public class XTest {
             eSvc.awaitTermination(opts.keepalive, TimeUnit.MILLISECONDS);
         } finally {
             try {
+
                 if (server != null) {
                     server.stop();
                 }

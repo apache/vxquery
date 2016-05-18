@@ -460,9 +460,27 @@ public class FunctionHelper {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
+    public static boolean arraysEqual(IPointable p1, IPointable p2) {
+        return arraysEqual(p1.getByteArray(), p1.getStartOffset(), p1.getLength(), p2.getByteArray(),
+                p2.getStartOffset(), p2.getLength());
+    }
+
+    public static boolean arraysEqual(byte[] bytes1, int offset1, int length1, byte[] bytes2, int offset2,
+            int length2) {
+        if (length1 != length2) {
+            return false;
+        }
+        for (int i = 0; i < length1; ++i) {
+            if (bytes1[offset1 + i] != bytes2[offset2 + i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-                    throws SystemException {
+            throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 

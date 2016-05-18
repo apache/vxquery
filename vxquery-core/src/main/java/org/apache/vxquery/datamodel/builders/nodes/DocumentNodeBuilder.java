@@ -16,21 +16,16 @@
  */
 package org.apache.vxquery.datamodel.builders.nodes;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
-
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class DocumentNodeBuilder extends AbstractNodeBuilder {
     private final GrowableIntArray childrenSlots;
 
     private final ArrayBackedValueStorage childrenDataArea;
-
-    private DataOutput out;
 
     private int childrenCount;
 
@@ -40,9 +35,8 @@ public class DocumentNodeBuilder extends AbstractNodeBuilder {
     }
 
     @Override
-    public void reset(IMutableValueStorage mvs) throws IOException {
-        out = mvs.getDataOutput();
-        out.write(ValueTag.DOCUMENT_NODE_TAG);
+    public int getValueTag() {
+        return ValueTag.DOCUMENT_NODE_TAG;
     }
 
     @Override
