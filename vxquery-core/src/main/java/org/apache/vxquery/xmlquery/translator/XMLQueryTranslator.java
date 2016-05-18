@@ -1076,8 +1076,7 @@ public class XMLQueryTranslator {
                     List<org.apache.hyracks.algebricks.common.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>> oExprs = new ArrayList<org.apache.hyracks.algebricks.common.utils.Pair<OrderOperator.IOrder, Mutable<ILogicalExpression>>>();
                     List<String> collations = new ArrayList<String>();
                     for (OrderSpecNode osNode : ocNode.getOrderSpec()) {
-                        ILogicalExpression aExpr = data(vre(translateExpression(osNode.getExpression(), tCtx)));
-                        ILogicalExpression oExpr = vre(createAssignment(aExpr, tCtx));
+                        ILogicalExpression oExpr = vre(translateExpression(osNode.getExpression(), tCtx));
                         OrderOperator.IOrder o = OrderOperator.ASC_ORDER;
                         XQueryConstants.OrderDirection oDir = osNode.getDirection();
                         if (oDir != null) {
