@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -41,6 +42,7 @@ public class ObjectByteTest extends AbstractPointableTest {
     private TaggedValuePointable tvpValue3 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     private ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+    private IPointable vp = VoidPointable.FACTORY.createPointable();
 
     @Test
     public void testEmptyObject() {
@@ -254,9 +256,9 @@ public class ObjectByteTest extends AbstractPointableTest {
         }
     }
 
-    private boolean compareKeys(IPointable tvp1, IPointable tvp2) {
-
-        return FunctionHelper.arraysEqual(tvp1.getByteArray(), tvp1.getStartOffset() + 1, tvp1.getLength() - 1,
-                tvp2.getByteArray(), tvp2.getStartOffset(), tvp2.getLength());
+    private boolean compareKeys(TaggedValuePointable tvp1, IPointable tvp2) {
+        tvp1.getValue(vp);
+        return FunctionHelper.arraysEqual(vp.getByteArray(), vp.getStartOffset(), vp.getLength(), tvp2.getByteArray(),
+                tvp2.getStartOffset(), tvp2.getLength());
     }
 }
