@@ -14,14 +14,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache.vxquery</groupId>
         <artifactId>apache-vxquery</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
     </parent>
 
     <artifactId>apache-vxquery-core</artifactId>
@@ -64,8 +63,7 @@
                         <configuration>
                             <target>
                                 <ant antfile="build-xslt.xml" target="build">
-                                    <property name="build.gen-src.dir"
-                                        value="${project.build.directory}/generated-sources/main/java" />
+                                    <property name="build.gen-src.dir" value="${project.build.directory}/generated-sources/main/java" />
                                     <property name="src.code.dir" value="${basedir}/src/main/java" />
                                     <property name="xslt.dir" value="${basedir}/src/main/xslt" />
                                     <property name="classpath.xslt" refid="maven.compile.classpath" />
@@ -82,8 +80,7 @@
                         <configuration>
                             <target>
                                 <ant antfile="build-site.xml" target="build">
-                                    <property name="build.gen-site.dir"
-                                        value="${project.build.directory}/generated-site/apt" />
+                                    <property name="build.gen-site.dir" value="${project.build.directory}/generated-site/apt" />
                                     <property name="src.code.dir" value="${basedir}/src/main/java" />
                                     <property name="xslt.dir" value="${basedir}/src/main/xslt" />
                                     <property name="classpath.xslt" refid="maven.compile.classpath" />
