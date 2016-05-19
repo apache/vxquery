@@ -16,6 +16,7 @@ package org.apache.vxquery.datamodel;
 
 import java.io.IOException;
 
+import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
@@ -95,7 +96,7 @@ public class ObjectByteTest extends AbstractPointableTest {
         if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
             Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }
-        if (tvpKey1.compareTo(tvp) < 0) {
+        if (!compareKeys(tvp, tvpKey1)) {
             Assert.fail("Key is incorrect. Expected: id");
         }
 
@@ -156,21 +157,21 @@ public class ObjectByteTest extends AbstractPointableTest {
         if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
             Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }
-        if (tvpKey1.compareTo(tvp) < 0) {
+        if (!compareKeys(tvp, tvpKey1)) {
             Assert.fail("Object key one is incorrect. Expected: name");
         }
         sp.getEntry(1, tvp);
         if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
             Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }
-        if (tvpKey2.compareTo(tvp) < 0) {
+        if (!compareKeys(tvp, tvpKey2)) {
             Assert.fail("Object key two is incorrect. Expected: price");
         }
         sp.getEntry(2, tvp);
         if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
             Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
         }
-        if (tvpKey3.compareTo(tvp) < 0) {
+        if (!compareKeys(tvp, tvpKey3)) {
             Assert.fail("Object key three is incorrect. Expected: properties");
         }
 
@@ -251,5 +252,11 @@ public class ObjectByteTest extends AbstractPointableTest {
         } catch (IOException e) {
             Assert.fail("Test failed to write the object pointable.");
         }
+    }
+
+    private boolean compareKeys(IPointable tvp1, IPointable tvp2) {
+
+        return FunctionHelper.arraysEqual(tvp1.getByteArray(), tvp1.getStartOffset() + 1, tvp1.getLength() - 1,
+                tvp2.getByteArray(), tvp2.getStartOffset(), tvp2.getLength());
     }
 }
