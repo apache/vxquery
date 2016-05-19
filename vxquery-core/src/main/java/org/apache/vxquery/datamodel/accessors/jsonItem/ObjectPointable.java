@@ -16,7 +16,6 @@
  */
 package org.apache.vxquery.datamodel.accessors.jsonItem;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
@@ -27,13 +26,8 @@ import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.apache.vxquery.util.GrowableIntArray;
 
 /**
  * The datamodel of the JSON object is represented in this class:
@@ -58,10 +52,10 @@ public class ObjectPointable extends AbstractPointable {
         }
     };
     private static final int ENTRY_COUNT_SIZE = IntegerPointable.TYPE_TRAITS.getFixedLength();
-    private static final int SLOT_SIZE = 4;
+    private static final int SLOT_SIZE = IntegerPointable.TYPE_TRAITS.getFixedLength();
     private final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-    private final GrowableIntArray slots = new GrowableIntArray();
-    private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
+    private final SequenceBuilder sb = new SequenceBuilder();
+    private final UTF8StringPointable key1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
 
     private static int getSlotValue(byte[] bytes, int start, int idx) {
         return IntegerPointable.getInteger(bytes, getSlotArrayOffset(start) + idx * SLOT_SIZE);
@@ -83,61 +77,34 @@ public class ObjectPointable extends AbstractPointable {
         return getSlotArrayOffset(start) + getEntryCount(bytes, start) * SLOT_SIZE;
     }
 
-    public void getKeys(IPointable result) throws SystemException {
-        try {
-            abvs.reset();
-            slots.clear();
-            dataArea.reset();
-            int dataAreaOffset = getDataAreaOffset(bytes, start);
-            int entryCount = getEntryCount();
-            int s;
-            for (int i = 0; i < entryCount; i++) {
-                s = dataAreaOffset + getRelativeEntryStartOffset(i);
-                dataArea.getDataOutput().write(ValueTag.XS_STRING_TAG);
-                dataArea.getDataOutput().write(bytes, s, getKeyLength(bytes, s));
-                slots.append(dataArea.getLength());
-            }
-            finishSequenceBuild();
-            result.set(abvs);
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001);
+    public void getKeys(IPointable result) throws IOException {
+        abvs.reset();
+        sb.reset(abvs);
+        int dataAreaOffset = getDataAreaOffset(bytes, start);
+        int entryCount = getEntryCount();
+        int s;
+        for (int i = 0; i < entryCount; i++) {
+            s = dataAreaOffset + getRelativeEntryStartOffset(i);
+            key1.set(bytes, s, getKeyLength(bytes, s));
+            sb.addItem(key1);
         }
+        sb.finish();
+        result.set(abvs);
     }
 
-    private void finishSequenceBuild() throws IOException {
-        DataOutput out = abvs.getDataOutput();
-        if (slots.getSize() != 1) {
-            out.write(ValueTag.SEQUENCE_TAG);
-            int size = slots.getSize();
-            out.writeInt(size);
-            if (size > 0) {
-                int[] slotArray = slots.getArray();
-                for (int i = 0; i < size; ++i) {
-                    out.writeInt(slotArray[i]);
-                }
-                out.write(dataArea.getByteArray(), dataArea.getStartOffset(), dataArea.getLength());
-            }
-        } else {
-            out.write(dataArea.getByteArray(), dataArea.getStartOffset(), dataArea.getLength());
-        }
-    }
-
-    public void getValue(TaggedValuePointable key, TaggedValuePointable result) throws SystemException {
+    public boolean getValue(UTF8StringPointable key, IPointable result) {
         int dataAreaOffset = getDataAreaOffset(bytes, start);
         int entryCount = getEntryCount();
         int s, l, i;
         for (i = 0; i < entryCount; i++) {
             s = dataAreaOffset + getRelativeEntryStartOffset(i);
             l = getKeyLength(bytes, s);
-            if (FunctionHelper.arraysEqual(bytes, s, l, key.getByteArray(), key.getStartOffset() + 1,
-                    key.getLength() - 1)) {
+            if (FunctionHelper.arraysEqual(bytes, s, l, key.getByteArray(), key.getStartOffset(), key.getLength())) {
                 result.set(bytes, s + l, getEntryLength(i) - l);
-                return;
+                return true;
             }
         }
-        if (entryCount == 0 || i == entryCount) {
-            XDMConstants.setFalse(result);
-        }
+        return false;
     }
 
     private int getRelativeEntryStartOffset(int idx) {

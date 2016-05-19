@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IValueReference;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
 import org.apache.vxquery.datamodel.builders.base.IBuilder;
@@ -43,8 +44,8 @@ public class ObjectBuilder extends AbstractBuilder implements IBuilder {
         return ValueTag.OBJECT_TAG;
     }
 
-    public void addItem(IValueReference key, IValueReference value) throws IOException {
-        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset() + 1, key.getLength() - 1);
+    public void addItem(UTF8StringPointable key, IValueReference value) throws IOException {
+        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset(), key.getLength());
         dataArea.getDataOutput().write(value.getByteArray(), value.getStartOffset(), value.getLength());
         slots.append(dataArea.getLength());
     }

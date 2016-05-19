@@ -74,7 +74,7 @@ public class ValueTag {
     public static final int XS_NMTOKENS_TAG = BuiltinTypeConstants.XS_NMTOKENS_TYPE_ID;
     public static final int XS_ENTITIES_TAG = BuiltinTypeConstants.XS_ENTITIES_TYPE_ID;
 
-    public static final int JS_NULL_TAG = BuiltinTypeConstants.JS_NULL_ID;
+    public static final int JS_NULL_TAG = BuiltinTypeConstants.JS_NULL_TYPE_ID;
 
     public static final int SEQUENCE_TAG = 100;
     public static final int DOCUMENT_NODE_TAG = 101;
