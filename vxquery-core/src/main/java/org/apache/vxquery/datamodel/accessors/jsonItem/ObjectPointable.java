@@ -27,6 +27,7 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 /**
@@ -86,7 +87,7 @@ public class ObjectPointable extends AbstractPointable {
         for (int i = 0; i < entryCount; i++) {
             s = dataAreaOffset + getRelativeEntryStartOffset(i);
             key1.set(bytes, s, getKeyLength(bytes, s));
-            sb.addItem(key1);
+            sb.addItem(ValueTag.XS_STRING_TAG, key1);
         }
         sb.finish();
         result.set(abvs);
@@ -95,12 +96,13 @@ public class ObjectPointable extends AbstractPointable {
     public boolean getValue(UTF8StringPointable key, IPointable result) {
         int dataAreaOffset = getDataAreaOffset(bytes, start);
         int entryCount = getEntryCount();
-        int s, l, i;
+        int start, length, i;
         for (i = 0; i < entryCount; i++) {
-            s = dataAreaOffset + getRelativeEntryStartOffset(i);
-            l = getKeyLength(bytes, s);
-            if (FunctionHelper.arraysEqual(bytes, s, l, key.getByteArray(), key.getStartOffset(), key.getLength())) {
-                result.set(bytes, s + l, getEntryLength(i) - l);
+            start = dataAreaOffset + getRelativeEntryStartOffset(i);
+            length = getKeyLength(bytes, start);
+            if (FunctionHelper.arraysEqual(bytes, start, length, key.getByteArray(), key.getStartOffset(),
+                    key.getLength())) {
+                result.set(bytes, start + length, getEntryLength(i) - length);
                 return true;
             }
         }

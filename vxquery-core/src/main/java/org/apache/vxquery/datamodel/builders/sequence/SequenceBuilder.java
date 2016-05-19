@@ -42,6 +42,12 @@ public class SequenceBuilder implements IBuilder {
         slots.append(dataArea.getLength());
     }
 
+    public void addItem(int tagValue, IValueReference p) throws IOException {
+        dataArea.getDataOutput().write(tagValue);
+        dataArea.getDataOutput().write(p.getByteArray(), p.getStartOffset(), p.getLength());
+        slots.append(dataArea.getLength());
+    }
+
     public void finish() throws IOException {
         DataOutput out = mvs.getDataOutput();
         if (slots.getSize() != 1) {
