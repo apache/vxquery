@@ -26,7 +26,7 @@
 
     <groupId>org.apache.vxquery</groupId>
     <artifactId>apache-vxquery</artifactId>
-    <version>0.6</version>
+    <version>0.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>VXQuery</name>
     <description>A Versatile XQuery Processor</description>
@@ -50,7 +50,7 @@
         <connection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</connection>
         <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf/vxquery.git</url>
-        <tag>apache-vxquery-0.6</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
