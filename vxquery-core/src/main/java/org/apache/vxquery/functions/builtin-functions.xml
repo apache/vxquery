@@ -127,7 +127,7 @@
         <return type="node()*"/>
         <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
-    
+
     <!-- fn:indexfromcollection($collectionFolder  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
     <function name="fn:indexfromcollection">
         <param name="collectionFolder" type="xs:string?"/>
@@ -172,6 +172,13 @@
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
+
+    <!-- fn:collection-with-tag($arg1  as xs:string?, $arg2 as xs:string?) as  node()* -->
+    <function name="fn:collection-with-tag">
+        <param name="arg1" type="xs:string?"/>
+        <param name="arg2" type="xs:string?"/>
+        <return type="node()*"/>
+        <!-- CollectionWithTag operator is added during the rewrite rules phase.  -->
     </function>
     
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:integer?  -->

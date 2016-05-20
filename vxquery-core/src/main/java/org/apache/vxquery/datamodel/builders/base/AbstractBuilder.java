@@ -16,12 +16,20 @@
  */
 package org.apache.vxquery.datamodel.builders.base;
 
+import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 
-public abstract class AbstractBuilder {
-    public abstract void reset(IMutableValueStorage mvs) throws IOException;
+public abstract class AbstractBuilder implements IBuilder {
 
-    public abstract void finish() throws IOException;
+    protected DataOutput out;
+
+    public void reset(IMutableValueStorage mvs) throws IOException {
+        out = mvs.getDataOutput();
+        out.write(getValueTag());
+    }
+
+    public abstract int getValueTag();
+
 }

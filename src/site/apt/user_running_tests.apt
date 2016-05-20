@@ -79,10 +79,10 @@ $ mkdir -p vxquery-xtest/test-suites
 $ cd vxquery-xtest/test-suites
 ----------------------------------------
 
-    * Get the archive {{{http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip}XQTS_1_0_3.zip}} (e.g. using wget),
+    * Get the archive {{{http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip}XQTS_1_0_3.zip}} (e.g. using curl),
 
 ----------------------------------------
-$ wget http://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip
+$ curl -O https://dev.w3.org/2006/xquery-test-suite/PublicPagesStagingArea/XQTS_1_0_3.zip
 ----------------------------------------
 
     * unpack it,

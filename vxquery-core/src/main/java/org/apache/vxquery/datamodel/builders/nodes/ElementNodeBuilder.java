@@ -16,18 +16,16 @@
  */
 package org.apache.vxquery.datamodel.builders.nodes;
 
-import java.io.DataOutput;
 import java.io.IOException;
-
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.util.GrowableIntArray;
 
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.hyracks.data.std.primitive.BytePointable;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.util.GrowableIntArray;
 
 public class ElementNodeBuilder extends AbstractNodeBuilder {
     private final GrowableIntArray attrSlots;
@@ -39,8 +37,6 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
     private final IMutableValueStorage childrenDataArea;
 
     private IMutableValueStorage mvs;
-
-    private DataOutput out;
 
     private int headerOffset;
 
@@ -60,10 +56,15 @@ public class ElementNodeBuilder extends AbstractNodeBuilder {
     }
 
     @Override
+    public int getValueTag() {
+        return ValueTag.ELEMENT_NODE_TAG;
+    }
+
+    @Override
     public void reset(IMutableValueStorage mvs) throws IOException {
         this.mvs = mvs;
         out = mvs.getDataOutput();
-        out.write(ValueTag.ELEMENT_NODE_TAG);
+        out.write(getValueTag());
         headerOffset = mvs.getLength();
         out.write(0);
     }

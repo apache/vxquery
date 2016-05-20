@@ -15,44 +15,44 @@
 
 Eclipse Setup
 
-  Eclipse is a nice IDE for developing in Java and below are the instructions to setting up 
+  Eclipse is a nice IDE for developing in Java and below are the instructions to setting up
   Eclipse for Apache VXQuery\x99 development.
 
 * Installation
 
   * Install Java Development Kit (JDK) 1.7 or Later
-  
+
   * Install Classic Eclipse
 
-  Follow the instruction for eclipse on from {{{http://www.eclipse.org}www.eclipse.org}} for 
+  Follow the instruction for eclipse on from {{{http://www.eclipse.org}www.eclipse.org}} for
   the "Classic" eclipse version.
 
   * Install Apache Maven
 
   * Install Maven Integration (m2e)
-  
+
   VXQuery uses {{{http://maven.apache.org/}Maven}} to define external libraries and build instructions.
   The Eclipse plugin for Maven integeration can be found at {{{http://eclipse.org/m2e/}m2e}}.
 
 * Code Formatter Setup
 
-  For VXQuery, the Hyracks project Eclipse formating template has been adopted as the standard. The 
-  template file can be found at {{{http://hyracks.googlecode.com/files/HyracksCodeFormatProfile.xml}http://hyracks.googlecode.com/files/HyracksCodeFormatProfile.xml}}  
-  
+  For VXQuery, the Hyracks project Eclipse formating template has been adopted as the standard. The
+  template file can be found at {{{http://hyracks.googlecode.com/files/HyracksCodeFormatProfile.xml}http://hyracks.googlecode.com/files/HyracksCodeFormatProfile.xml}}
+
   Menu Options from Preferences:
-  
+
   * Java
-  
+
     * Code Style
-  
+
       * Formatter
-   
+
 * Code Import Setup
-  
+
   [[1]] Import Hyracks Code Base
 
     Download and install the Hyracks Full Stack Staging branch to get the latest Hyracks support
-    for development. This is required since some new features being build are affecting Hyracks 
+    for development. This is required since some new features being build are affecting Hyracks
     development.
 
 ----------------------------------------
@@ -61,6 +61,9 @@ $ cd hyracks
 $ mvn install
 $ cd ..
 ----------------------------------------
+
+    Note: VXQuery has only been lightly testing on Windows based machines. If you run into issues please file an
+    {{{https://issues.apache.org/jira/browse/VXQUERY}issue}}.
 
     The mvn "-DskipTests" option can be used to save about 20 minutes, but will skip the verification tests.
 
@@ -78,27 +81,27 @@ $ cd apache-vxquery
 $ mvn package
 $ cd ..
 ----------------------------------------
- 
-    Finally, from Eclipse's File menu "import" the Maven VXQuery project you have just downloaded through git. 
-    
+
+    Finally, from Eclipse's File menu "import" the Maven VXQuery project you have just downloaded through git.
+
   [[1]] Additional Project Configuration
-    
-    Some eclipse build errors will show up. To remove these display errors, add 
+
+    Some eclipse build errors will show up. To remove these display errors, add
     "target/generated-sources/javacc" as a source folder in VXQuery Core.
 
 
 * Debugging
 
-  Eclipse can be used to debug VXQuery. Using the following java option will allow eclipse to pause the 
+  Eclipse can be used to debug VXQuery. Using the following java option will allow eclipse to pause the
   execution and allow eclipse to step through the code.
-  
-  "-Xdebug -Xrunjdwp:transport=dt_socket,address=127.0.0.1:8000,server=y,suspend=y" 
-  
-  Realize you may need to update the address for your system. More details can be found at 
+
+  "-Xdebug -Xrunjdwp:transport=dt_socket,address=127.0.0.1:8000,server=y,suspend=y"
+
+  Realize you may need to update the address for your system. More details can be found at
   {{{http://www.ibm.com/developerworks/opensource/library/os-eclipse-javadebug/index.html}IBM}}
-  
+
   In eclipse create a debug configuration for VXQuery using Java remote application settings. The default
-  setting will most likely work out of the box. To show all the source code for debugging, add all the 
+  setting will most likely work out of the box. To show all the source code for debugging, add all the
   source code for the eclipse workspace.
 
   To begin the debug process, execute the command below. In eclipse select the new debug configuration

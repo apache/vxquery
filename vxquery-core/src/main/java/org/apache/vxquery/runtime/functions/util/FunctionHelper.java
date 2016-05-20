@@ -19,10 +19,17 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+<<<<<<< HEAD
+=======
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+>>>>>>> master
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
@@ -40,6 +47,7 @@ import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.runtime.functions.arithmetic.AbstractArithmeticOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
@@ -455,9 +463,27 @@ public class FunctionHelper {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
+    public static boolean arraysEqual(IPointable p1, IPointable p2) {
+        return arraysEqual(p1.getByteArray(), p1.getStartOffset(), p1.getLength(), p2.getByteArray(),
+                p2.getStartOffset(), p2.getLength());
+    }
+
+    public static boolean arraysEqual(byte[] bytes1, int offset1, int length1, byte[] bytes2, int offset2,
+            int length2) {
+        if (length1 != length2) {
+            return false;
+        }
+        for (int i = 0; i < length1; ++i) {
+            if (bytes1[offset1 + i] != bytes2[offset2 + i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-                    throws SystemException {
+            throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1197,10 +1223,35 @@ public class FunctionHelper {
         readInDocFromString(fName, bbis, di, abvs, parser);
     }
 
-    public static void readInDocFromString(String filename, ByteBufferInputStream bbis, DataInputStream di,
+    public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
             ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
-        File file = new File(filename);
-        parser.parseDocument(file, abvs);
+        if (!fName.contains("hdfs:/")) {
+            File file = new File(fName);
+            if (file.exists()) {
+                parser.parseDocument(file, abvs);
+            }
+        }
+        //else check in HDFS file system
+        else {
+            fName = fName.replaceAll("hdfs:/", "");
+            HDFSFunctions hdfs = new HDFSFunctions(null, null);
+            FileSystem fs = hdfs.getFileSystem();
+            if (fs != null) {
+                Path xmlDocument = new Path(fName);
+                try {
+                    if (fs.exists(xmlDocument)) {
+                        InputStream in = fs.open(xmlDocument).getWrappedStream();
+                        parser.parseHDFSDocument(in, abvs);
+                    }
+                } catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    System.err.println(e);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    System.err.println(e);
+                }
+            }
+        }
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,
