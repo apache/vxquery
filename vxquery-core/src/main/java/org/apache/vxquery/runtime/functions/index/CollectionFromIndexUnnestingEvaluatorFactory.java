@@ -58,12 +58,10 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
 
             private boolean first;
-            private boolean matchin;
             private ArrayBackedValueStorage nodeAbvs;
 
             private int indexplace;
             private int indexlength;
-            private int currentelement;
             private String elementpath;
             private String IndexName;
 
@@ -81,8 +79,6 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
             ScoreDoc[] hits;
             SAXIndexHandler handler;
             Query query;
-            int fileslookedat = 0;
-            int numindexlookups = 0;
             Document doc;
             List<IndexableField> fields;
 
@@ -109,7 +105,6 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     }
                     indexplace += 1;
                     result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
-                    fileslookedat += 1;
                     return true;
                 }
                 return false;
