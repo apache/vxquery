@@ -19,6 +19,8 @@ import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 
 public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+    //Creates one Lucene doc per file
+
     private static final long serialVersionUID = 1L;
 
     public IndexConstructorScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
@@ -29,7 +31,7 @@ public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueA
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final UTF8StringPointable collectionP = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final TaggedValuePointable nodep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
@@ -44,8 +46,8 @@ public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueA
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                IndexConstructorUtil.evaluate(args, result, collectionP, bbis, di, sb, abvs, nodeIdProvider,
-                        abvsFileNode, nodep, first, true, nodeId);
+                IndexConstructorUtil.evaluate(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider, abvsFileNode,
+                        nodep, first, false, nodeId);
             }
 
         };

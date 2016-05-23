@@ -25,11 +25,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-<<<<<<< HEAD
-=======
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
->>>>>>> master
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
@@ -483,7 +480,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-            throws SystemException {
+                    throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 

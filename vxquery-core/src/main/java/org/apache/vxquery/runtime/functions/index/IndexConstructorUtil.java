@@ -24,7 +24,6 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexBuilderDoc;
-import org.apache.vxquery.index.IndexBuilderElementPath;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -74,7 +73,6 @@ public class IndexConstructorUtil {
             IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_40, analyzer);
 
             // Create will overwrite the index everytime
-
             iwc.setOpenMode(OpenMode.CREATE);
 
             //Create an index writer
@@ -113,23 +111,12 @@ public class IndexConstructorUtil {
 
                 nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
 
-                if (isElementPath) {
-                    //Add the document to the index
-                    IndexBuilderElementPath ibuilder = new IndexBuilderElementPath(nodep, writer,
-                            file.getAbsolutePath());
-
-                    /*Output the names of the files being indexed
-                    System.out.println("Indexing: " + file.getAbsolutePath());
-                    */
-                    ibuilder.printstart();
-
-                } else {
-                    //Add the document to the index
-                    IndexBuilderDoc ibuilder = new IndexBuilderDoc(nodep, writer, file.getAbsolutePath());
-                    //Output the names of the files being indexed
-                    // System.out.println("Indexing: " + file.getAbsolutePath());
-                    ibuilder.printstart();
-                }
+                //Add the document to the index
+                //Creates one lucene doc per file
+                IndexBuilderDoc ibuilder = new IndexBuilderDoc(nodep, writer, file.getAbsolutePath());
+                //Output the names of the files being indexed
+                // System.out.println("Indexing: " + file.getAbsolutePath());
+                ibuilder.printstart();
 
                 //This returns the first file that is parsed, so there is some XML output
                 //It basically shows one sample of the files that were indexed.
