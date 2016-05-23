@@ -141,7 +141,7 @@
         <param name="indexfolder" type="xs:string?"/>
         <param name="elementpath" type="xs:string?"/>
         <return type="node()*"/> 
-         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.SearchIndexUnnestingEvaluatorFactory"/>
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.CollectionFromIndexUnnestingEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>

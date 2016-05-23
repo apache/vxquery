@@ -44,10 +44,10 @@ import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public class SearchIndexUnnestingEvaluatorFactory extends AbstractTaggedValueArgumentUnnestingEvaluatorFactory {
+public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTaggedValueArgumentUnnestingEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public SearchIndexUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public CollectionFromIndexUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
