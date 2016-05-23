@@ -29,10 +29,9 @@ import junit.framework.Assert;
 
 /**
  * The sequence byte test covers empty sequences, single items and multi-item sequences.
- *
  * 1. Empty sequence constant
  * 2. Empty sequence - {}
- * 3. Single item - "one" (XQuery single item sequences are just the item.)
+ * 3. Single item - 1l (XQuery single item sequences are just the item.)
  * 4. Many items - {1, 2.0, "three"}
  */
 public class SequenceByteTest extends AbstractPointableTest {
@@ -85,7 +84,7 @@ public class SequenceByteTest extends AbstractPointableTest {
         // Build test sequence
         try {
             sb.reset(abvsResult);
-            getTaggedValuePointable("one", tvp1);
+            getTaggedValuePointable(1l, tvp1);
             sb.addItem(tvp1);
             sb.finish();
         } catch (IOException e) {
@@ -94,8 +93,8 @@ public class SequenceByteTest extends AbstractPointableTest {
         tvp.set(abvsResult);
 
         // Check results.
-        if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
-            Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());
+        if (tvp.getTag() != ValueTag.XS_LONG_TAG) {
+            Assert.fail("Type tag is incorrect. Expected: " + ValueTag.XS_LONG_TAG + " Got: " + tvp.getTag());
         }
         if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
             Assert.fail("Item value is incorrect.");
@@ -129,15 +128,27 @@ public class SequenceByteTest extends AbstractPointableTest {
             Assert.fail("Sequence size is incorrect. Expected: 3 Got: " + sp.getEntryCount());
         }
         sp.getEntry(0, tvp);
+        if (tvp.getTag() != ValueTag.XS_INT_TAG) {
+            Assert.fail("Sequence item one type tag is incorrect. Expected: " + ValueTag.XS_INT_TAG + " Got: "
+                    + tvp.getTag());
+        }
         if (!FunctionHelper.arraysEqual(tvp, tvp1)) {
-            Assert.fail("Sequence item one is incorrect. Expected: " + ValueTag.XS_LONG_TAG + " Got: " + tvp.getTag());
+            Assert.fail("Sequence item one is incorrect. Expected: " + ValueTag.XS_INT_TAG + " Got: " + tvp.getTag());
         }
         sp.getEntry(1, tvp);
+        if (tvp.getTag() != ValueTag.XS_DOUBLE_TAG) {
+            Assert.fail("Sequence item two type tag is incorrect. Expected: " + ValueTag.XS_DOUBLE_TAG + " Got: "
+                    + tvp.getTag());
+        }
         if (!FunctionHelper.arraysEqual(tvp, tvp2)) {
             Assert.fail(
                     "Sequence item two is incorrect. Expected: " + ValueTag.XS_DOUBLE_TAG + " Got: " + tvp.getTag());
         }
         sp.getEntry(2, tvp);
+        if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
+            Assert.fail("Sequence item three type tag is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: "
+                    + tvp.getTag());
+        }
         if (!FunctionHelper.arraysEqual(tvp, tvp3)) {
             Assert.fail(
                     "Sequence item three is incorrect. Expected: " + ValueTag.XS_STRING_TAG + " Got: " + tvp.getTag());

@@ -45,13 +45,14 @@ $ svn co https://svn.apache.org/repos/asf/vxquery/site
 ---
 
   * create a code signing key with the Apache {{{http://www.apache.org/dev/openpgp.html#generate-key}instructions}} and example settings
+  *	Note: this guide may be helpful for installing {{{http://macgpg.sourceforge.net/docs/howto-build-gpg-osx.txt.asc}gpg}}
 
   * add your key to the <<<KEYS>>> file
 
     Change into the <<<dist>>> directory and run
 
 ---
-(gpg2 --list-sigs <your name> && gpg2 --armor --export <your name>) >> KEYS
+$ (gpg2 --list-sigs <your name> && gpg2 --armor --export <your name>) >> KEYS
 ---
 
     and then check the new <<<KEYS>>> file into svn
@@ -62,11 +63,11 @@ $ svn ci -m "add [YOUR NAME]'s key to KEYS file"
 
   * create an encrypted version of your Apache LDAP password for the nexus repository at {{{https://repository.apache.org/}https://repository.apache.org/}}
 
-    Follow the steps in the {{{http://maven.apache.org/guides/mini/guide-encryption.html}Password Encryption}}
+    Follow the steps in the {{{http://maven.apache.org/guides/mini/guide-encryption.html}How to create a master password}}
     guide to encrypt a master password and to encrypt your Apache LDAP password.
     (It's nicer if you have maven > 3.2.1 to do this.)
 
-  * add to <<<~/.m2/settings.xml>>>
+  * add the following xml to <<<~/.m2/settings.xml>>>
 
     * for the upload to the nexus repository
 
@@ -127,7 +128,7 @@ $ mvn clean
   * run rat (always do this on a clean source folder):
 
 ---
-$ java -jar ~/Downloads/apache-rat-0.11/apache-rat-0.11.jar -d . -E .rat-excludes
+$ java -jar ~/<DOWLOADS FOLDER>/apache-rat-0.11/apache-rat-0.11.jar -d . -E .rat-excludes
 ---
 
   * test your setup

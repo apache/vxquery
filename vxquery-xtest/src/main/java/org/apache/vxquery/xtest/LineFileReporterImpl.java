@@ -17,13 +17,16 @@
 package org.apache.vxquery.xtest;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class LineFileReporterImpl implements ResultReporter {
     private PrintWriter out;
+    private File file;
 
     public LineFileReporterImpl(File file) throws IOException {
+        this.file = file;
         out = new PrintWriter(file);
     }
 
@@ -36,6 +39,14 @@ public class LineFileReporterImpl implements ResultReporter {
 
     @Override
     public void close() {
+        //Perform the sorting process.
         out.close();
+        try {
+            ResultFileSorter sorter = new ResultFileSorter(file.getPath());
+            sorter.sortFile();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
+

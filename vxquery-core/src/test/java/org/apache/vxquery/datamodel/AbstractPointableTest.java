@@ -37,6 +37,8 @@ public class AbstractPointableTest {
             writeDouble((Double) value, abvsInput.getDataOutput());
         } else if (value instanceof java.lang.String) {
             writeString((String) value, abvsInput.getDataOutput());
+        } else {
+            throw new IOException("Unknown object type for tagged value pointable.");
         }
         result.set(abvsInput.getByteArray(), start, abvsInput.getLength() - start);
     }

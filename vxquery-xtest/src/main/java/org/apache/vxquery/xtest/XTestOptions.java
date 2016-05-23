@@ -76,4 +76,7 @@ public class XTestOptions {
 
     @Option(name = "-showresult", usage = "Show query result.")
     boolean showResult;
+
+    @Option(name = "-hdfs-conf", usage = "Directory path to Hadoop configuration files")
+    String hdfsConf;
 }

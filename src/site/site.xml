@@ -64,6 +64,9 @@ limitations under the License.
                 name="Executing a Query"
                 href="user_query.html" />
             <item
+                name="Using HDFS with VXQuery"
+                href="user_query_hdfs.html" />
+            <item
                 name="Running the Test Suite"
                 href="user_running_tests.html" />
         </menu>

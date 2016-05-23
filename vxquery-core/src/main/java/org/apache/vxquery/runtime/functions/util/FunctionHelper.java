@@ -19,10 +19,21 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
@@ -33,6 +44,7 @@ import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.runtime.functions.arithmetic.AbstractArithmeticOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
@@ -41,14 +53,6 @@ import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
-
-import org.apache.hyracks.api.exceptions.HyracksDataException;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 
 public class FunctionHelper {
 
@@ -1213,8 +1217,33 @@ public class FunctionHelper {
         } catch (SystemException e) {
             throw new HyracksDataException(e);
         }
-        File file = new File(fName);
-        parser.parseDocument(file, abvs);
+        if (!fName.contains("hdfs:/")) {
+            File file = new File(fName);
+            if (file.exists()) {
+                parser.parseDocument(file, abvs);
+            }
+        }
+        //else check in HDFS file system
+        else {
+            fName = fName.replaceAll("hdfs:/", "");
+            HDFSFunctions hdfs = new HDFSFunctions(null, null);
+            FileSystem fs = hdfs.getFileSystem();
+            if (fs != null) {
+                Path xmlDocument = new Path(fName);
+                try {
+                    if (fs.exists(xmlDocument)) {
+                        InputStream in = fs.open(xmlDocument).getWrappedStream();
+                        parser.parseHDFSDocument(in, abvs);
+                    }
+                } catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    System.err.println(e);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    System.err.println(e);
+                }
+            }
+        }
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,

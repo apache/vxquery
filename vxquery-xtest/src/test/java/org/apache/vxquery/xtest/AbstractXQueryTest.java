@@ -37,6 +37,7 @@ public abstract class AbstractXQueryTest {
         opts.threads = 1;
         opts.showQuery = true;
         opts.showResult = true;
+        opts.hdfsConf = "src/test/resources/hadoop/conf";
         return opts;
     }
 
