@@ -1937,6 +1937,26 @@ ASTNode FunctionCall()  :
     }
 }
 
+void JsonConstructor() :
+{}
+{
+	ObjectConstructor() | ArrayConstructor()
+}
+
+void ObjectConstructor() :
+{}
+{
+    <Lbrace>
+    (PairConstructor() ( "," PairConstructor())* )
+    <Rbrace>
+}
+
+void PairConstructor() :
+{}
+{
+    <StringLiteral> (<JSONObjectPairSeparateTag0> | <JSONObjectPairSeparateTag1>) Literal()
+}
+
 ASTNode Constructor()  :
 {
     ASTNode result;
@@ -4003,4 +4023,14 @@ TOKEN :
  < NotNumber : ( (
 "." <Digits>) |  (
 <Digits> ("." (["0" - "9"])*)?)) (["e", "E"] (["+", "-"])? <Digits>)? ["a" - "z", "A" - "Z"] (["0" - "9", "a" - "z", "A" - "Z"])* >
+}
+
+TOKEN :
+{
+    <JSONObjectPairSeparateTag0: ":">
+}
+
+TOKEN :
+{
+    <JSONObjectPairSeparateTag1: "?:">
 }
