@@ -35,11 +35,11 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.index.SAXIndexHandler;
 import org.apache.vxquery.index.indexattributes;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluatorFactory;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.SAXContentHandler;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -77,7 +77,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
             private Analyzer analyzer;
             private QueryParser parser;
             ScoreDoc[] hits;
-            SAXIndexHandler handler;
+            SAXContentHandler handler;
             Query query;
             Document doc;
             List<IndexableField> fields;
@@ -93,7 +93,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 if (indexplace < indexlength) {
                     int partition = ctxview.getTaskAttemptId().getTaskId().getPartition();
                     ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-                    handler = new SAXIndexHandler(false, nodeIdProvider);
+                    handler = new SAXContentHandler(false, nodeIdProvider, true);
                     nodeAbvs.reset();
                     try {
                         doc = searcher.doc(hits[indexplace].doc);
@@ -195,22 +195,22 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     }
 
                     handler.endDocument();
-                    handler.write(abvsFileNode);
+                    handler.writeDocument(abvsFileNode);
                 } catch (SAXException | IOException e) {
                     throw new IOException(e);
                 }
             }
 
             private int buildelement(ArrayBackedValueStorage abvsFileNode, int fieldnum) throws SAXException {
-                int whereifinish = fieldnum;
+                int whereIFinish = fieldnum;
                 IndexableField field = fields.get(fieldnum);
                 String contents = field.stringValue();
                 String uri = "";
 
-                int firstcolon = contents.indexOf(":");
+                int firstColon = contents.indexOf(":");
                 int lastdot = contents.lastIndexOf(".");
                 String type = contents.substring(lastdot + 1);
-                String lastbit = contents.substring(firstcolon + 1, lastdot);
+                String lastbit = contents.substring(firstColon + 1, lastdot);
 
                 if (type.equals("textnode")) {
                     char[] charcontents = lastbit.toCharArray();
@@ -224,19 +224,19 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     Vector<String> localnames = new Vector<String>();
                     Vector<String> types = new Vector<String>();
                     Vector<String> qnames = new Vector<String>();
-                    whereifinish = findattributechildren(whereifinish, names, values, uris, localnames, types, qnames);
+                    whereIFinish = findAttributeChildren(whereIFinish, names, values, uris, localnames, types, qnames);
                     Attributes atts = new indexattributes(names, values, uris, localnames, types, qnames);
                     try {
 
                         handler.startElement(uri, lastbit, lastbit, atts);
 
-                        boolean nomorechildren = false;
+                        boolean noMoreChildren = false;
 
-                        while (whereifinish + 1 < fields.size() && !nomorechildren) {
-                            if (ischild(fields.get(whereifinish + 1), field)) {
-                                whereifinish = buildelement(abvsFileNode, whereifinish + 1);
+                        while (whereIFinish + 1 < fields.size() && !noMoreChildren) {
+                            if (isChild(fields.get(whereIFinish + 1), field)) {
+                                whereIFinish = buildelement(abvsFileNode, whereIFinish + 1);
                             } else {
-                                nomorechildren = true;
+                                noMoreChildren = true;
                             }
                         }
 
@@ -246,13 +246,13 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     }
 
                 }
-                return whereifinish;
+                return whereIFinish;
             }
 
             /*This function creates the attribute children for an element node
              * 
              */
-            int findattributechildren(int fieldnum, Vector<String> n, Vector<String> v, Vector<String> u,
+            int findAttributeChildren(int fieldnum, Vector<String> n, Vector<String> v, Vector<String> u,
                     Vector<String> l, Vector<String> t, Vector<String> q) {
                 int nextindex = fieldnum + 1;
                 boolean foundattributes = false;
@@ -266,7 +266,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                         int lastdot = contents.lastIndexOf(".");
                         String lastbit = contents.substring(firstcolon + 1, lastdot);
 
-                        if (isdirectchildattribute(nextguy, fields.get(fieldnum))) {
+                        if (isDirectChildAttribute(nextguy, fields.get(fieldnum))) {
                             foundattributes = true;
                             n.add(lastbit);
                             IndexableField nextnextguy = fields.get(nextindex + 1);
@@ -293,7 +293,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 }
             }
 
-            boolean ischild(IndexableField child, IndexableField adult) {
+            boolean isChild(IndexableField child, IndexableField adult) {
                 String childid = child.stringValue();
                 String adultid = adult.stringValue();
 
@@ -310,7 +310,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 return false;
             }
 
-            boolean isdirectchildattribute(IndexableField child, IndexableField adult) {
+            boolean isDirectChildAttribute(IndexableField child, IndexableField adult) {
                 String childid = child.stringValue();
                 String adultid = adult.stringValue();
 

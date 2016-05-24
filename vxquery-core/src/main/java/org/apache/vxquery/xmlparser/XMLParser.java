@@ -57,7 +57,7 @@ public class XMLParser {
         try {
             parser = XMLReaderFactory.createXMLReader();
             if (appender == null) {
-                handler = new SAXContentHandler(attachTypes, idProvider);
+                handler = new SAXContentHandler(attachTypes, idProvider, false);
             } else {
                 List<SequenceType> childSequenceTypes = new ArrayList<SequenceType>();
                 for (int typeCode : childSeq) {

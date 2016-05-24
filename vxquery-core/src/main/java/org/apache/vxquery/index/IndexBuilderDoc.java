@@ -3,9 +3,10 @@ package org.apache.vxquery.index;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Vector;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hyracks.data.std.api.IPointable;
@@ -56,13 +57,13 @@ public class IndexBuilderDoc {
     private DataOutput dOut = abvs.getDataOutput();
     private CastToStringOperation castToString = new CastToStringOperation();
     private Document doc;
-    private Vector<ComplexItem> results;
+    private List<ComplexItem> results;
 
     private byte[] bstart;
     private int sstart;
     private int lstart;
 
-    String filepath;
+    String filePath;
     IndexWriter writer;
 
     class ComplexItem {
@@ -101,10 +102,10 @@ public class IndexBuilderDoc {
         }
     }
 
-    public IndexBuilderDoc(IPointable tree, IndexWriter inwriter, String infilepath) {
+    public IndexBuilderDoc(IPointable tree, IndexWriter inWriter, String inFilePath) {
         this.treepointable = tree;
-        writer = inwriter;
-        filepath = infilepath;
+        writer = inWriter;
+        filePath = inFilePath;
 
         //convert to tagged value pointable
         TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -117,26 +118,22 @@ public class IndexBuilderDoc {
 
         doc = new Document();
 
-        results = new Vector();
+        results = new ArrayList<ComplexItem>();
 
         pp = PointablePoolFactory.INSTANCE.createPointablePool();
     }
 
     //This is a wrapper to start indexing using the functions adapted from XMLSerializer
-    public void printstart() {
+    public void printstart() throws IOException {
 
         print(bstart, sstart, lstart, ps, "0", "");
         Collections.sort(results, new idcomparitor());
         for (int i = 2; i < results.size() - 1; i++) {
-            doc.add(results.elementAt(i).sf);
+            doc.add(results.get(i).sf);
         }
-        try {
-            writer.addDocument(doc);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        System.out.println(doc.toString());
+        writer.addDocument(doc);
+
+        //System.out.println(doc.toString());
 
     }
 
