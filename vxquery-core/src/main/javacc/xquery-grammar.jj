@@ -1954,7 +1954,7 @@ void ObjectConstructor() :
 void PairConstructor() :
 {}
 {
-    <StringLiteral> (<JSONObjectPairSeparateTag0> | <JSONObjectPairSeparateTag1>) Literal()
+    <StringLiteral> (<JSONObjectPairSeparateTag0> | <JSONObjectPairSeparateTag1>) (Literal() | <JSONnull>)
 }
 
 ASTNode Constructor()  :
@@ -4033,4 +4033,9 @@ TOKEN :
 TOKEN :
 {
     <JSONObjectPairSeparateTag1: "?:">
+}
+
+TOKEN :
+{
+    <JSONnull: "null">
 }
