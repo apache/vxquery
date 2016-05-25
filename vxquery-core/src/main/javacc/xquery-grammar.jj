@@ -1796,6 +1796,7 @@ ASTNode PrimaryExpr():
         | LOOKAHEAD(2) expr = OrderedExpr()
         | LOOKAHEAD(2) expr = UnorderedExpr()
         | expr = Constructor()
+        | expr = JsonConstructor()
     ) {
         return expr;
     }
@@ -1936,6 +1937,47 @@ ASTNode FunctionCall()  :
         return fe;
     }
 }
+
+ASTNode JsonConstructor()  :
+{
+    ASTNode result;
+}
+{
+    result = ArrayConstructor()
+    {
+		return result;
+	}
+}
+
+ASTNode ArrayConstructor()  :
+{
+	Token start, end;
+	List<ASTNode> items;
+}
+{
+	start="[" items=ArrayItemList() end="]" {
+		ArrayConstructorNode array = new ArrayConstructorNode(createSourceLocation(start));
+		array.setItems(items);
+		return array;
+	}
+}
+
+List<ASTNode> ArrayItemList()  :
+{
+	List<ASTNode> items = new ArrayList<ASTNode>();
+	ASTNode arraynode;
+}
+{[
+	arraynode = Literal() {
+        items.add(arraynode);
+    } (
+        "," arraynode = Literal() {
+            items.add(arraynode);
+        }
+    )* ]{
+        return items;
+    }
+}	
 
 ASTNode Constructor()  :
 {
