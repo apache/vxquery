@@ -14,53 +14,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.datamodel.builders.sequence;
+package org.apache.vxquery.datamodel.builders.jsonItem;
 
 import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IValueReference;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
 import org.apache.vxquery.datamodel.builders.base.IBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.util.GrowableIntArray;
 
-public class SequenceBuilder implements IBuilder {
+public class ObjectBuilder extends AbstractBuilder implements IBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();
     private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
-    private DataOutput out;
+    private IMutableValueStorage mvs;
 
     public void reset(IMutableValueStorage mvs) {
-        out = mvs.getDataOutput();
+        this.mvs = mvs;
         slots.clear();
         dataArea.reset();
     }
 
-    public void addItem(IValueReference p) throws IOException {
-        dataArea.getDataOutput().write(p.getByteArray(), p.getStartOffset(), p.getLength());
-        slots.append(dataArea.getLength());
+    @Override
+    public int getValueTag() {
+        return ValueTag.OBJECT_TAG;
     }
 
-    public void addItem(int tagValue, IValueReference p) throws IOException {
-        dataArea.getDataOutput().write(tagValue);
-        dataArea.getDataOutput().write(p.getByteArray(), p.getStartOffset(), p.getLength());
+    public void addItem(UTF8StringPointable key, IValueReference value) throws IOException {
+        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset(), key.getLength());
+        dataArea.getDataOutput().write(value.getByteArray(), value.getStartOffset(), value.getLength());
         slots.append(dataArea.getLength());
     }
 
     public void finish() throws IOException {
-        if (slots.getSize() != 1) {
-            out.write(ValueTag.SEQUENCE_TAG);
-            int size = slots.getSize();
-            out.writeInt(size);
-            if (size > 0) {
-                int[] slotArray = slots.getArray();
-                for (int i = 0; i < size; ++i) {
-                    out.writeInt(slotArray[i]);
-                }
-                out.write(dataArea.getByteArray(), dataArea.getStartOffset(), dataArea.getLength());
+        DataOutput out = mvs.getDataOutput();
+        out.write(ValueTag.OBJECT_TAG);
+        int size = slots.getSize();
+        out.writeInt(size);
+        if (size > 0) {
+            int[] slotArray = slots.getArray();
+            for (int i = 0; i < size; ++i) {
+                out.writeInt(slotArray[i]);
             }
-        } else {
             out.write(dataArea.getByteArray(), dataArea.getStartOffset(), dataArea.getLength());
         }
     }
