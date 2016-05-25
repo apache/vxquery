@@ -28,16 +28,13 @@ import org.apache.hadoop.mapred.JobConf;
 public class MiniDFS {
 
     private MiniDFSCluster dfsCluster;
-
-    public void miniDFS() {
-
-    }
+    private static final String PATH_TO_HADOOP_CONF = "src/test/resources/hadoop/conf";
+    private static final String DATA_PATH = "src/test/resources/TestSources/ghcnd";
 
     public void startHDFS() throws IOException {
 
         FileSystem lfs = FileSystem.getLocal(new Configuration());
         JobConf conf = new JobConf();
-        String PATH_TO_HADOOP_CONF = "src/test/resources/hadoop/conf";
         conf.addResource(new Path(PATH_TO_HADOOP_CONF + "/core-site.xml"));
         conf.addResource(new Path(PATH_TO_HADOOP_CONF + "/mapred-site.xml"));
         conf.addResource(new Path(PATH_TO_HADOOP_CONF + "/hdfs-site.xml"));
@@ -58,7 +55,6 @@ public class MiniDFS {
         dfsCluster = build.build();
 
         FileSystem dfs = FileSystem.get(conf);
-        String DATA_PATH = "src/test/resources/TestSources/ghcnd";
         Path src = new Path(DATA_PATH);
         dfs.mkdirs(new Path("/tmp"));
         Path dest = new Path("/tmp/vxquery-hdfs-test");
