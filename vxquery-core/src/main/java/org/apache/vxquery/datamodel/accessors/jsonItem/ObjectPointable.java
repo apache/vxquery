@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.datamodel.accessors.jsonItem;
+package org.apache.vxquery.datamodel.accessors.jsonitem;
 
 import java.io.IOException;
 
@@ -56,7 +56,7 @@ public class ObjectPointable extends AbstractPointable {
     private static final int SLOT_SIZE = IntegerPointable.TYPE_TRAITS.getFixedLength();
     private final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
     private final SequenceBuilder sb = new SequenceBuilder();
-    private final UTF8StringPointable key1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+    private final UTF8StringPointable key = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
 
     private static int getSlotValue(byte[] bytes, int start, int idx) {
         return IntegerPointable.getInteger(bytes, getSlotArrayOffset(start) + idx * SLOT_SIZE);
@@ -86,8 +86,8 @@ public class ObjectPointable extends AbstractPointable {
         int s;
         for (int i = 0; i < entryCount; i++) {
             s = dataAreaOffset + getRelativeEntryStartOffset(i);
-            key1.set(bytes, s, getKeyLength(bytes, s));
-            sb.addItem(ValueTag.XS_STRING_TAG, key1);
+            key.set(bytes, s, getKeyLength(bytes, s));
+            sb.addItem(ValueTag.XS_STRING_TAG, key);
         }
         sb.finish();
         result.set(abvs);
@@ -96,7 +96,9 @@ public class ObjectPointable extends AbstractPointable {
     public boolean getValue(UTF8StringPointable key, IPointable result) {
         int dataAreaOffset = getDataAreaOffset(bytes, start);
         int entryCount = getEntryCount();
-        int start, length, i;
+        int start;
+        int length;
+        int i;
         for (i = 0; i < entryCount; i++) {
             start = dataAreaOffset + getRelativeEntryStartOffset(i);
             length = getKeyLength(bytes, start);

@@ -1,6 +1,5 @@
 package org.apache.vxquery.datamodel.builders.jsonitem;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
@@ -9,18 +8,18 @@ import org.apache.vxquery.datamodel.builders.base.AbstractBuilder;
 import org.apache.vxquery.datamodel.builders.base.IBuilder;
 import org.apache.vxquery.util.GrowableIntArray;
 
-public abstract class JsonAbstractBuilder extends AbstractBuilder implements IBuilder {
+public abstract class AbstractJsonBuilder extends AbstractBuilder implements IBuilder {
     final GrowableIntArray slots = new GrowableIntArray();
     final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
-    protected DataOutput out;
 
+    @Override
     public void reset(IMutableValueStorage mvs) throws IOException {
-        out = mvs.getDataOutput();
-        out.write(getValueTag());
+        super.reset(mvs);
         slots.clear();
         dataArea.reset();
     }
 
+    @Override
     public void finish() throws IOException {
         int size = slots.getSize();
         out.writeInt(size);

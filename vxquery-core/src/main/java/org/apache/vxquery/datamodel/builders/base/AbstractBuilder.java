@@ -25,6 +25,7 @@ public abstract class AbstractBuilder implements IBuilder {
 
     protected DataOutput out;
 
+    @Override
     public void reset(IMutableValueStorage mvs) throws IOException {
         out = mvs.getDataOutput();
         out.write(getValueTag());

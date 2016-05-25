@@ -31,6 +31,7 @@ public class SequenceBuilder implements IBuilder {
     private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
     private DataOutput out;
 
+    @Override
     public void reset(IMutableValueStorage mvs) {
         out = mvs.getDataOutput();
         slots.clear();
@@ -48,6 +49,7 @@ public class SequenceBuilder implements IBuilder {
         slots.append(dataArea.getLength());
     }
 
+    @Override
     public void finish() throws IOException {
         if (slots.getSize() != 1) {
             out.write(ValueTag.SEQUENCE_TAG);

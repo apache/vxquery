@@ -22,7 +22,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-public class AbstractPointableTest {
+public abstract class AbstractPointableTest {
     private final ArrayBackedValueStorage abvsInput = new ArrayBackedValueStorage();
     private final StringValueBuilder svb = new StringValueBuilder();
     private boolean includeTag = true;
