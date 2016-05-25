@@ -1,9 +1,24 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package org.apache.vxquery.index;
 
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +59,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
 import org.apache.vxquery.serializer.XMLSerializer;
 
-public class IndexBuilderDoc extends XMLSerializer {
+public class IndexDocumentBuilder extends XMLSerializer {
     private IPointable treepointable;
 
     private PointablePool pp;
@@ -73,34 +88,8 @@ public class IndexBuilderDoc extends XMLSerializer {
         }
     }
 
-    class idcomparitor implements Comparator {
-
-        @Override
-        public int compare(Object o1, Object o2) {
-            String a = ((ComplexItem) o1).id;
-            String b = ((ComplexItem) o2).id;
-            String[] apieces = a.split("\\.");
-            String[] bpieces = b.split("\\.");
-            for (int i = 0; i < Math.min(apieces.length, bpieces.length); i++) {
-                int numa = Integer.parseInt(apieces[i]);
-                int numb = Integer.parseInt(bpieces[i]);
-                if (numa > numb) {
-                    return 1;
-                }
-                if (numa < numb) {
-                    return -1;
-                }
-
-            }
-            if (apieces.length > bpieces.length) {
-                return 1;
-            }
-            return -1;
-        }
-    }
-
     //TODO: Handle Processing Instructions, PrefixedNames, and Namepsace entries
-    public IndexBuilderDoc(IPointable tree, IndexWriter inWriter, String inFilePath) {
+    public IndexDocumentBuilder(IPointable tree, IndexWriter inWriter, String inFilePath) {
         this.treepointable = tree;
         writer = inWriter;
         filePath = inFilePath;
@@ -125,7 +114,6 @@ public class IndexBuilderDoc extends XMLSerializer {
     public void printstart() throws IOException {
 
         print(bstart, sstart, lstart, "0", "");
-        //Collections.sort(results, new idcomparitor());
         for (int i = 1; i < results.size() - 1; i++) {
             //Show the results for debugging
             //System.out.println(results.get(i).sf + " " + results.get(i).id);
@@ -136,7 +124,7 @@ public class IndexBuilderDoc extends XMLSerializer {
     }
 
     //adapted from XMLSerializer. The following functions are used to traverse the TaggedValuePointable
-    //and create the index elements, then add them to the lucene index.
+    //and create the index elements, then create the item for the lucene index
     public void print(byte[] b, int s, int l, String myid, String epath) {
         TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
         try {
