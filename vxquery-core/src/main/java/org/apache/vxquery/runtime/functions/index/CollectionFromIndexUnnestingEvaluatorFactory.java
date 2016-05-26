@@ -17,9 +17,9 @@
 package org.apache.vxquery.runtime.functions.index;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -34,19 +34,16 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -73,17 +70,16 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
 
         return new AbstractTaggedValueArgumentUnnestingEvaluator(args) {
 
-            private boolean first;
             private ArrayBackedValueStorage nodeAbvs;
 
-            private int indexplace;
-            private int indexlength;
-            private String elementpath;
-            private String IndexName;
+            private int indexPlace;
+            private int indexLength;
+            private String elementPath;
+            private String indexName;
 
-            private UTF8StringPointable stringindexfolder = (UTF8StringPointable) UTF8StringPointable.FACTORY
+            private UTF8StringPointable stringIndexFolder = (UTF8StringPointable) UTF8StringPointable.FACTORY
                     .createPointable();
-            private UTF8StringPointable stringelementpath = (UTF8StringPointable) UTF8StringPointable.FACTORY
+            private UTF8StringPointable stringElementPath = (UTF8StringPointable) UTF8StringPointable.FACTORY
                     .createPointable();
             private ByteBufferInputStream bbis = new ByteBufferInputStream();
             private DataInputStream di = new DataInputStream(bbis);
@@ -92,11 +88,11 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
             private IndexSearcher searcher;
             private Analyzer analyzer;
             private QueryParser parser;
-            ScoreDoc[] hits;
-            SAXContentHandler handler;
-            Query query;
-            Document doc;
-            List<IndexableField> fields;
+            private ScoreDoc[] hits;
+            private SAXContentHandler handler;
+            private Query query;
+            private Document doc;
+            private List<IndexableField> fields;
 
             @Override
             public boolean step(IPointable result) throws AlgebricksException {
@@ -106,20 +102,17 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                  * able to hold all of the results at once, so we return 1 million at
                  * a time and check when we need to get more
                  */
-                if (indexplace < indexlength) {
-                    int partition = ctxview.getTaskAttemptId().getTaskId().getPartition();
-                    ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-                    handler = new SAXContentHandler(false, nodeIdProvider, true);
+                if (indexPlace < indexLength) {
                     nodeAbvs.reset();
                     try {
-                        doc = searcher.doc(hits[indexplace].doc);
+                        doc = searcher.doc(hits[indexPlace].doc);
                         fields = doc.getFields();
                         parse(nodeAbvs);
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    indexplace += 1;
+                    indexPlace += 1;
                     result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
                     return true;
                 }
@@ -128,76 +121,75 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
 
             @Override
             protected void init(TaggedValuePointable[] args) throws SystemException {
-                first = true;
-                if (first) {
-                    nodeAbvs = new ArrayBackedValueStorage();
-                    indexplace = 0;
-                    TaggedValuePointable tvp1 = args[0];
-                    TaggedValuePointable tvp2 = args[1];
 
-                    // TODO add support empty sequence and no argument.
-                    if (tvp1.getTag() != ValueTag.XS_STRING_TAG || tvp2.getTag() != ValueTag.XS_STRING_TAG) {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                    tvp1.getValue(stringindexfolder);
-                    tvp2.getValue(stringelementpath);
-                    //This whole loop is to get the string arguments, indefolder, elementpath, and match option
-                    try {
-                        // Get the list of files.
-                        bbis.setByteBuffer(ByteBuffer.wrap(
-                                Arrays.copyOfRange(stringindexfolder.getByteArray(), stringindexfolder.getStartOffset(),
-                                        stringindexfolder.getLength() + stringindexfolder.getStartOffset())),
-                                0);
-                        IndexName = di.readUTF();
-                        bbis.setByteBuffer(ByteBuffer.wrap(
-                                Arrays.copyOfRange(stringelementpath.getByteArray(), stringelementpath.getStartOffset(),
-                                        stringelementpath.getLength() + stringelementpath.getStartOffset())),
-                                0);
-                        elementpath = di.readUTF();
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
-                    }
-                    indexplace = 0;
-                    first = false;
-                    reader = null;
-                    //Create the index reader.
-                    try {
-                        reader = DirectoryReader.open(FSDirectory.open(new File(IndexName)));
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+                int partition = ctxview.getTaskAttemptId().getTaskId().getPartition();
+                ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
+                handler = new SAXContentHandler(false, nodeIdProvider, true);
 
-                    searcher = new IndexSearcher(reader);
-                    analyzer = new StandardAnalyzer(Version.LUCENE_40);
+                nodeAbvs = new ArrayBackedValueStorage();
+                indexPlace = 0;
+                TaggedValuePointable tvp1 = args[0];
+                TaggedValuePointable tvp2 = args[1];
 
-                    parser = new QueryParser(Version.LUCENE_40, "item", analyzer);
-
-                    String queryString = elementpath.replaceAll("/", ".");
-                    queryString = "item:" + queryString + "*";
-
-                    int lastslash = elementpath.lastIndexOf("/");
-                    elementpath = elementpath.substring(0, lastslash) + ":" + elementpath.substring(lastslash + 1);
-                    elementpath = elementpath.replaceAll("/", ".") + ".element";
-
-                    TopDocs results = null;
-                    try {
-                        query = parser.parse(queryString);
-                        System.out.println(query.toString());
-                        try {
-                            //TODO: Right now it only returns 1000000 results
-                            results = searcher.search(query, 1000000);
-                        } catch (IOException e) {
-                            throw new SystemException(null);
-                        }
-                    } catch (ParseException e) {
-                        throw new SystemException(null);
-                    }
-
-                    hits = results.scoreDocs;
-                    System.out.println("found: " + results.totalHits);
-                    indexplace = 0;
-                    indexlength = hits.length;
+                // TODO add support empty sequence and no argument.
+                if (tvp1.getTag() != ValueTag.XS_STRING_TAG || tvp2.getTag() != ValueTag.XS_STRING_TAG) {
+                    throw new SystemException(ErrorCode.FORG0006);
                 }
+                tvp1.getValue(stringIndexFolder);
+                tvp2.getValue(stringElementPath);
+                //This whole loop is to get the string arguments, indefolder, elementpath, and match option
+                try {
+                    // Get the list of files.
+                    bbis.setByteBuffer(ByteBuffer.wrap(
+                            Arrays.copyOfRange(stringIndexFolder.getByteArray(), stringIndexFolder.getStartOffset(),
+                                    stringIndexFolder.getLength() + stringIndexFolder.getStartOffset())),
+                            0);
+                    indexName = di.readUTF();
+                    bbis.setByteBuffer(ByteBuffer.wrap(
+                            Arrays.copyOfRange(stringElementPath.getByteArray(), stringElementPath.getStartOffset(),
+                                    stringElementPath.getLength() + stringElementPath.getStartOffset())),
+                            0);
+                    elementPath = di.readUTF();
+                } catch (IOException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
+                indexPlace = 0;
+                reader = null;
+                //Create the index reader.
+                try {
+                    reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexName)));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                searcher = new IndexSearcher(reader);
+                analyzer = new CaseSensitiveAnalyzer();
+
+                parser = new QueryParserCaseSensitive("item", analyzer);
+
+                String queryString = elementPath.replaceAll("/", ".");
+                queryString = "item:" + queryString + "*";
+
+                int lastslash = elementPath.lastIndexOf("/");
+                elementPath = elementPath.substring(0, lastslash) + ":" + elementPath.substring(lastslash + 1);
+                elementPath = elementPath.replaceAll("/", ".") + ".element";
+
+                TopDocs results = null;
+                try {
+                    query = parser.parse(queryString);
+
+                    //TODO: Right now it only returns 1000000 results
+                    results = searcher.search(query, 1000000);
+
+                } catch (Exception e) {
+                    throw new SystemException(null);
+                }
+
+                hits = results.scoreDocs;
+                System.out.println("found: " + results.totalHits);
+                indexPlace = 0;
+                indexLength = hits.length;
+
             }
 
             public void parse(ArrayBackedValueStorage abvsFileNode) throws IOException {
@@ -205,7 +197,8 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     handler.startDocument();
 
                     for (int i = 0; i < fields.size(); i++) {
-                        if (fields.get(i).stringValue().equals(elementpath)) {
+                        String fieldValue = fields.get(i).stringValue();
+                        if (fieldValue.equals(elementPath)) {
                             buildelement(abvsFileNode, i);
                         }
                     }

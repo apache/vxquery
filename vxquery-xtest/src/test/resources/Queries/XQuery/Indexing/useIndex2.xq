@@ -14,6 +14,11 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-   
-   doc("station_xml_file")/stationCollection
-   
+
+(: Search Lucene Index :)
+(: Find all reading for hurricane force wind warning or extreme wind warning. :)
+(: The warnings occur when the wind speed (AWND) exceeds 110 mph (49.1744     :)
+(: meters per second). (Wind value is in tenth of a meter per second)         :)
+for $r in collection-from-index("src/test/resources/TestSources/tmp/indexFolder", "/dataCollection/data")/data
+where $r/dataType eq "AWND" and xs:decimal($r/value) gt 491.744
+return $r

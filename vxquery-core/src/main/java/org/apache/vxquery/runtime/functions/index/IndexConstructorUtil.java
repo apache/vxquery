@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.hyracks.data.std.api.IPointable;
@@ -27,13 +28,11 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -73,7 +72,6 @@ public class IndexConstructorUtil {
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
-
         File collectionDirectory = new File(collectionFolder);
         if (!collectionDirectory.exists()) {
             throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
@@ -84,9 +82,9 @@ public class IndexConstructorUtil {
             sb.reset(abvs);
             //System.out.println("Indexing to directory '" + indexFolder + "'...");
 
-            Directory dir = FSDirectory.open(new File(indexFolder));
-            Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-            IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+            Directory dir = FSDirectory.open(Paths.get(indexFolder));
+            Analyzer analyzer = new CaseSensitiveAnalyzer();
+            IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
             // Create will overwrite the index everytime
             iwc.setOpenMode(OpenMode.CREATE);
@@ -129,10 +127,10 @@ public class IndexConstructorUtil {
 
                 //Add the document to the index
                 //Creates one lucene doc per file
-                IndexDocumentBuilder ibuilder = new IndexDocumentBuilder(nodep, writer, file.getAbsolutePath());
+                IndexDocumentBuilder ibuilder = new IndexDocumentBuilder(nodep, writer);
                 //Output the names of the files being indexed
                 // System.out.println("Indexing: " + file.getAbsolutePath());
-                ibuilder.printstart();
+                ibuilder.printStart();
 
                 //This returns the first file that is parsed, so there is some XML output
                 //It basically shows one sample of the files that were indexed.

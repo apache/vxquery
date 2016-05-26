@@ -31,8 +31,8 @@ import org.junit.runners.Parameterized.Parameters;
 public class VXQueryTest extends AbstractXQueryTest {
     private static MiniDFS dfs;
 
-    private static String VXQUERY_CATALOG = StringUtils.join(new String[] { "src", "test", "resources",
-            "VXQueryCatalog.xml" }, File.separator);
+    private static String VXQUERY_CATALOG = StringUtils
+            .join(new String[] { "src", "test", "resources", "VXQueryCatalog.xml" }, File.separator);
 
     public VXQueryTest(TestCase tc) throws Exception {
         super(tc);
@@ -57,7 +57,12 @@ public class VXQueryTest extends AbstractXQueryTest {
     }
 
     @BeforeClass
-    public static void setupHDFS() {
+    public static void setup() {
+        File tmp = new File("src/test/resources/TestSources/tmp");
+        if (tmp.exists()) {
+            tmp.delete();
+        }
+        new File("src/test/resources/TestSources/tmp/indexFolder").mkdirs();
         dfs = new MiniDFS();
         try {
             dfs.startHDFS();
@@ -67,7 +72,11 @@ public class VXQueryTest extends AbstractXQueryTest {
     }
 
     @AfterClass
-    public static void shutdownHDFS() {
+    public static void shutdown() {
+        File tmp = new File("src/test/resources/TestSources/tmp");
+        if (tmp.exists()) {
+            tmp.delete();
+        }
         dfs.shutdownHDFS();
     }
 

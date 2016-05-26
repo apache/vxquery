@@ -14,6 +14,14 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-   
-   doc("station_xml_file")/stationCollection
-   
+
+(: Search Lucene Index :)
+(: Find the annual precipitation (PRCP) for a Seattle using the airport       :)
+(: station (US000000002) for 2002.                                            :)
+fn:sum(
+    for $r in collection-from-index("src/test/resources/TestSources/tmp/indexFolder", "/dataCollection/data")/data
+    where $r/station eq "GHCND:US000000002" 
+        and $r/dataType eq "PRCP" 
+        and fn:year-from-dateTime(xs:dateTime(fn:data($r/date))) eq 2002
+    return $r/value
+) div 10

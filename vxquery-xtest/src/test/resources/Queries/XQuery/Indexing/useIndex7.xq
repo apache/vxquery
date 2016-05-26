@@ -14,6 +14,14 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-   
-   doc("station_xml_file")/stationCollection
-   
+
+(: Search Lucene Index :)
+(: Find all the weather readings for Washington state for a specific day    :)
+(: 2002-2-2.                                                                  :)
+for $s in collection-from-index("src/test/resources/TestSources/tmp/indexFolder", "/stationCollection/station")/station
+for $r in collection-from-index("src/test/resources/TestSources/tmp/indexFolder", "/dataCollection/data")/data
+    
+where $s/id eq $r/station 
+    and (some $x in $s/locationLabels satisfies ($x/type eq "ST" and fn:upper-case(fn:data($x/displayName)) eq "STATE 1"))
+    and xs:dateTime(fn:data($r/date)) eq xs:dateTime("2002-02-02T00:00:00.000")
+return $r

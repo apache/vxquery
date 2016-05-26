@@ -1,20 +1,135 @@
-(: Licensed to the Apache Software Foundation (ASF) under one
-   or more contributor license agreements.  See the NOTICE file
-   distributed with this work for additional information
-   regarding copyright ownership.  The ASF licenses this file
-   to you under the Apache License, Version 2.0 (the
-   "License"); you may not use this file except in compliance
-   with the License.  You may obtain a copy of the License at
-   
-     http://www.apache.org/licenses/LICENSE-2.0
-   
-   Unless required by applicable law or agreed to in writing,
-   software distributed under the License is distributed on an
-   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-   KIND, either express or implied.  See the License for the
-   specific language governing permissions and limitations
-   under the License. :)
-   
-(: Build Lucene Index :)
-index-from-collection("/Users/stevenjacobs/asterix/xmlfiles", "/Users/stevenjacobs/asterix/indexFolder")
-   
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><dataCollection pageCount="1" totalCount="3"><data><date>2001-01-01T00:00:00.000</date><dataType>TMIN</dataType><station>GHCND:US000000001</station><value>11.25</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data><data><date>2001-01-01T00:00:00.000</date><dataType>TMAX</dataType><station>GHCND:US000000001</station><value>31</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data><data><date>2001-01-01T00:00:00.000</date><dataType>AWND</dataType><station>GHCND:US000000001</station><value>1000</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data></dataCollection>
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><stationCollection pageSize="100" pageCount="1" totalCount="1"><station><id>GHCND:US000000001</id><displayName>Station 1</displayName><latitude>10.000</latitude><longitude>-10.000</longitude><elevation>1000.0</elevation><locationLabels><type>ST</type><id>FIPS:1</id><displayName>State 1</displayName></locationLabels><locationLabels><type>CNTY</type><id>FIPS:-9999</id><displayName>County 1</displayName></locationLabels><locationLabels><type>CNTRY</type><id>FIPS:US</id><displayName>UNITED STATES</displayName></locationLabels></station></stationCollection>
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><dataCollection pageCount="1" totalCount="3"><data><date>2002-02-02T00:00:00.000</date><dataType>TMIN</dataType><station>GHCND:US000000002</station><value>12.5</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data><data><date>2002-02-02T00:00:00.000</date><dataType>TMAX</dataType><station>GHCND:US000000002</station><value>32</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data><data><date>2002-02-02T00:00:00.000</date><dataType>PRCP</dataType><station>GHCND:US000000002</station><value>20</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data></dataCollection>
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><stationCollection pageSize="100" pageCount="1" totalCount="1"><station><id>GHCND:US000000004</id><displayName>Station 4</displayName><latitude>40.000</latitude><longitude>-40.000</longitude><elevation>4000.0</elevation><locationLabels><type>ST</type><id>FIPS:1</id><displayName>State 4</displayName></locationLabels><locationLabels><type>CNTY</type><id>FIPS:-9999</id><displayName>County 4</displayName></locationLabels><locationLabels><type>CNTRY</type><id>FIPS:US</id><displayName>UNITED STATES</displayName></locationLabels></station></stationCollection>
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><dataCollection pageCount="1" totalCount="2"><data><date>2003-03-03T00:00:00.000</date><dataType>TMIN</dataType><station>GHCND:AS000000003</station><value>13.75</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data><data><date>2003-03-03T00:00:00.000</date><dataType>TMAX</dataType><station>GHCND:AS000000003</station><value>33</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data></dataCollection>
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><stationCollection pageSize="100" pageCount="1" totalCount="1"><station><id>GHCND:US000000002</id><displayName>Station 2</displayName><latitude>20.000</latitude><longitude>-20.000</longitude><elevation>2000.0</elevation><locationLabels><type>ST</type><id>FIPS:1</id><displayName>State 1</displayName></locationLabels><locationLabels><type>CNTY</type><id>FIPS:-9999</id><displayName>County 2</displayName></locationLabels><locationLabels><type>CNTRY</type><id>FIPS:US</id><displayName>UNITED STATES</displayName></locationLabels></station></stationCollection>
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><dataCollection pageCount="1" totalCount="2"><data><date>2004-04-04T00:00:00.000</date><dataType>PRCP</dataType><station>GHCND:US000000004</station><value>40</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data><data><date>2004-04-04T00:00:00.000</date><dataType>AWND</dataType><station>GHCND:US000000004</station><value>4</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data></dataCollection>
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the &quot;License&quot;); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--><stationCollection pageSize="100" pageCount="1" totalCount="1"><station><id>GHCND:AS000000003</id><displayName>Station 3</displayName><latitude>-30.000</latitude><longitude>30.000</longitude><locationLabels><type>CNTRY</type><id>FIPS:AS</id><displayName>AUSTRALIA</displayName></locationLabels></station></stationCollection>

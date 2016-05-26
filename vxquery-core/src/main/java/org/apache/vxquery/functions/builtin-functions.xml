@@ -128,8 +128,8 @@
         <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
     
-    <!-- fn:index-from-collection($arg  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
-    <function name="fn:index-from-collection">
+    <!-- fn:build-index-on-collection($arg  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
+    <function name="fn:build-index-on-collection">
         <param name="collectionFolder" type="xs:string?"/>
         <param name="indexFolder" type="xs:string?"/>
         <return type="node()*"/> 

@@ -16,5 +16,5 @@
    under the License. :)
    
 (: Build Lucene Index :)
-index-from-collection("/Users/stevenjacobs/asterix/xmlfiles", "/Users/stevenjacobs/asterix/indexFolder")
+build-index-on-collection( "src/test/resources/TestSources/ghcnd", "src/test/resources/TestSources/tmp/indexFolder")
    

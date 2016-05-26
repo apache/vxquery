@@ -14,6 +14,11 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-   
-   doc("station_xml_file")/stationCollection
-   
+
+(: Search Lucene Index :)
+(: Find the highest recorded temperature (TMAX) in Celsius.                   :)
+fn:max(
+    for $r in collection-from-index("src/test/resources/TestSources/tmp/indexFolder", "/dataCollection/data")/data
+    where $r/dataType eq "TMAX"
+    return $r/value
+) div 10

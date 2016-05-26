@@ -15,8 +15,11 @@
    specific language governing permissions and limitations
    under the License. :)
    
- (: Search Lucene Index :)
- 
-for $i in collection-from-index("/Users/stevenjacobs/asterix/indexFolder", "/catalog/book")/book
-return $i
-   
+(: Search Lucene Index :)
+for $r in collection-from-index("src/test/resources/TestSources/tmp/indexFolder", "/dataCollection/data")/data
+let $datetime := xs:dateTime(fn:data($r/date))
+where $r/station eq "GHCND:AS000000003" 
+    and fn:year-from-dateTime($datetime) ge 2000
+    and fn:month-from-dateTime($datetime) eq 3 
+    and fn:day-from-dateTime($datetime) eq 3
+return $r
