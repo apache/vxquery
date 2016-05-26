@@ -24,8 +24,8 @@ import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
 
 public class SequencePointable extends AbstractPointable {
-    private static final int ENTRY_COUNT_SIZE = 4;
-    private static final int SLOT_SIZE = 4;
+    private static final int ENTRY_COUNT_SIZE = IntegerPointable.TYPE_TRAITS.getFixedLength();
+    private static final int SLOT_SIZE = IntegerPointable.TYPE_TRAITS.getFixedLength();
     public static final IPointableFactory FACTORY = new IPointableFactory() {
         private static final long serialVersionUID = 1L;
 

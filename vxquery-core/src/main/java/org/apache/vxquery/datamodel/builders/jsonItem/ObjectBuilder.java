@@ -14,23 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.datamodel.builders.base;
+package org.apache.vxquery.datamodel.builders.jsonitem;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
+import org.apache.hyracks.data.std.api.IValueReference;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.vxquery.datamodel.builders.base.IBuilder;
+import org.apache.vxquery.datamodel.values.ValueTag;
 
-public abstract class AbstractBuilder implements IBuilder {
-
-    protected DataOutput out;
+public class ObjectBuilder extends AbstractJsonBuilder implements IBuilder {
 
     @Override
-    public void reset(IMutableValueStorage mvs) throws IOException {
-        out = mvs.getDataOutput();
-        out.write(getValueTag());
+    public int getValueTag() {
+        return ValueTag.OBJECT_TAG;
     }
 
-    public abstract int getValueTag();
+    public void addItem(UTF8StringPointable key, IValueReference value) throws IOException {
+        dataArea.getDataOutput().write(key.getByteArray(), key.getStartOffset(), key.getLength());
+        dataArea.getDataOutput().write(value.getByteArray(), value.getStartOffset(), value.getLength());
+        slots.append(dataArea.getLength());
+    }
 
 }

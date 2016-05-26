@@ -30,8 +30,6 @@ import java.util.logging.Logger;
 /**
  * Class to sort the final test results.
  */
-
-//TODO : Optimize for large files.
 public class ResultFileSorter {
 
     private final String path;
@@ -45,6 +43,7 @@ public class ResultFileSorter {
      * The method to sort the test case results.
      */
     public void sortFile() {
+        //TODO : Optimize for large files.
         File resultFile = new File(path);
         try {
             FileReader fileReader = new FileReader(resultFile);
@@ -54,15 +53,17 @@ public class ResultFileSorter {
             while ((line = reader.readLine()) != null) {
                 fullText.add(line);
             }
+            reader.close();
+            fileReader.close();
             if (LOGGER.isLoggable(Level.INFO)) {
                 LOGGER.log(Level.INFO, "Sorting.....");
             }
             Collections.sort(fullText, String.CASE_INSENSITIVE_ORDER);
             String[] sortedText = fullText.toArray(new String[fullText.size()]);
-            this.eraseFile(resultFile);
-            this.writeToFile(sortedText);
+            eraseFile(resultFile);
+            writeToFile(sortedText);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Trouble with sorting the file: " + resultFile.getAbsolutePath(), e);
         }
     }
 
@@ -88,7 +89,6 @@ public class ResultFileSorter {
         if (LOGGER.isLoggable(Level.INFO)) {
             LOGGER.log(Level.INFO, "Writing to file started.");
         }
-
         for (String s : text) {
             writer.write(s + "\n");
         }

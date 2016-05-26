@@ -22,9 +22,10 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-public class AbstractPointableTest {
+public abstract class AbstractPointableTest {
     private final ArrayBackedValueStorage abvsInput = new ArrayBackedValueStorage();
     private final StringValueBuilder svb = new StringValueBuilder();
+    private boolean includeTag = true;
 
     protected void getTaggedValuePointable(Object value, IPointable result) throws IOException {
         int start = abvsInput.getLength();
@@ -42,23 +43,36 @@ public class AbstractPointableTest {
         result.set(abvsInput.getByteArray(), start, abvsInput.getLength() - start);
     }
 
+    protected void getTaggedValuePointable(Object value, boolean includeTag, IPointable result) throws IOException {
+        this.includeTag = includeTag;
+        getTaggedValuePointable(value, result);
+    }
+
     protected void writeInteger(Integer value, DataOutput dOut) throws IOException {
-        dOut.write(ValueTag.XS_INT_TAG);
+        if (includeTag) {
+            dOut.write(ValueTag.XS_INT_TAG);
+        }
         dOut.writeInt(value);
     }
 
     protected void writeLong(Long value, DataOutput dOut) throws IOException {
-        dOut.write(ValueTag.XS_LONG_TAG);
+        if (includeTag) {
+            dOut.write(ValueTag.XS_LONG_TAG);
+        }
         dOut.writeLong(value);
     }
 
     protected void writeDouble(Double value, DataOutput dOut) throws IOException {
-        dOut.write(ValueTag.XS_DOUBLE_TAG);
+        if (includeTag) {
+            dOut.write(ValueTag.XS_DOUBLE_TAG);
+        }
         dOut.writeDouble(value);
     }
 
     protected void writeString(String value, DataOutput dOut) throws IOException {
-        dOut.write(ValueTag.XS_STRING_TAG);
+        if (includeTag) {
+            dOut.write(ValueTag.XS_STRING_TAG);
+        }
         svb.write(value, dOut);
     }
 

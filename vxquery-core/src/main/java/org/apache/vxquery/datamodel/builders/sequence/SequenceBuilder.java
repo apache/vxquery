@@ -29,10 +29,11 @@ import org.apache.vxquery.util.GrowableIntArray;
 public class SequenceBuilder implements IBuilder {
     private final GrowableIntArray slots = new GrowableIntArray();
     private final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
-    private IMutableValueStorage mvs;
+    private DataOutput out;
 
+    @Override
     public void reset(IMutableValueStorage mvs) {
-        this.mvs = mvs;
+        out = mvs.getDataOutput();
         slots.clear();
         dataArea.reset();
     }
@@ -42,8 +43,14 @@ public class SequenceBuilder implements IBuilder {
         slots.append(dataArea.getLength());
     }
 
+    public void addItem(int tagValue, IValueReference p) throws IOException {
+        dataArea.getDataOutput().write(tagValue);
+        dataArea.getDataOutput().write(p.getByteArray(), p.getStartOffset(), p.getLength());
+        slots.append(dataArea.getLength());
+    }
+
+    @Override
     public void finish() throws IOException {
-        DataOutput out = mvs.getDataOutput();
         if (slots.getSize() != 1) {
             out.write(ValueTag.SEQUENCE_TAG);
             int size = slots.getSize();
