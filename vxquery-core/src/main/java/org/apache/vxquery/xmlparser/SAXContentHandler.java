@@ -51,40 +51,41 @@ import org.xml.sax.ext.LexicalHandler;
 
 public class SAXContentHandler implements ContentHandler, LexicalHandler {
     // XML node builders
-    private final AttributeNodeBuilder anb;
-    private final CommentNodeBuilder cnb;
-    private final DictionaryBuilder db;
-    private final DocumentNodeBuilder docb;
-    private final PINodeBuilder pinb;
-    private final TextNodeBuilder tnb;
-    private final UTF8StringBuilder utf8b;
-    private final List<ElementNodeBuilder> enbStack;
-    private final List<ElementNodeBuilder> freeENBList;
+    protected final AttributeNodeBuilder anb;
+    protected final CommentNodeBuilder cnb;
+    protected final DictionaryBuilder db;
+    protected final DocumentNodeBuilder docb;
+    protected final PINodeBuilder pinb;
+    protected final TextNodeBuilder tnb;
+    protected final UTF8StringBuilder utf8b;
+    protected final List<ElementNodeBuilder> enbStack;
+    protected final List<ElementNodeBuilder> freeENBList;
+    protected boolean isIndexHandler;
 
     // Frame writing variables
-    private IFrameFieldAppender appender;
+    protected IFrameFieldAppender appender;
     private int tupleIndex;
     private IFrameWriter writer;
 
     // Element writing and path step variables
-    private boolean skipping;
+    protected boolean skipping;
     private String[] childLocalName = null;
     private String[] childUri = null;
     private boolean[] subElement = null;
     private final TaggedValuePointable tvp;
 
     // Basic tracking and setting variables
-    private final boolean attachTypes;
-    private final boolean createNodeIds;
+    protected final boolean attachTypes;
+    protected final boolean createNodeIds;
     private int depth;
-    private final ArrayBackedValueStorage resultABVS;
-    private boolean pendingText;
-    private int nodeIdCounter;
-    private final ITreeNodeIdProvider nodeIdProvider;
-    private final ArrayBackedValueStorage tempABVS;
+    protected final ArrayBackedValueStorage resultABVS;
+    protected boolean pendingText;
+    protected int nodeIdCounter;
+    protected final ITreeNodeIdProvider nodeIdProvider;
+    protected final ArrayBackedValueStorage tempABVS;
     private final ArrayBackedValueStorage textABVS;
 
-    public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider) {
+    public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, boolean isIndexHandler) {
         // XML node builders
         anb = new AttributeNodeBuilder();
         cnb = new CommentNodeBuilder();
@@ -110,11 +111,16 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         this.nodeIdProvider = nodeIdProvider;
         tempABVS = new ArrayBackedValueStorage();
         textABVS = new ArrayBackedValueStorage();
+        this.isIndexHandler = isIndexHandler;
+        if (isIndexHandler) {
+            this.appender = null;
+            this.skipping = false;
+        }
     }
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, IFrameFieldAppender appender,
             List<SequenceType> childSequenceTypes) {
-        this(attachTypes, nodeIdProvider);
+        this(attachTypes, nodeIdProvider, false);
 
         // Frame writing variables
         this.appender = appender;
@@ -189,16 +195,21 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             return;
         }
         try {
-            boolean nonSkipped = foundFirstNonSkippedElement();
+            boolean nonSkipped = false;
+            if (!isIndexHandler) {
+                nonSkipped = foundFirstNonSkippedElement();
+            }
             flushText();
             ElementNodeBuilder enb = enbStack.remove(enbStack.size() - 1);
             enb.endChildrenChunk();
             endChildInParent(enb, nonSkipped);
             freeENB(enb);
-            if (nonSkipped) {
-                writeElement();
+            if (!isIndexHandler) {
+                if (nonSkipped) {
+                    writeElement();
+                }
+                endElementChildPathStep();
             }
-            endElementChildPathStep();
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
@@ -248,7 +259,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     @Override
     public void startDocument() throws SAXException {
-        if (subElement == null) {
+        if (isIndexHandler || subElement == null) {
             skipping = false;
         }
         db.reset();
@@ -305,7 +316,10 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     @Override
     public void startElement(String uri, String localName, String name, Attributes atts) throws SAXException {
         ++depth;
-        boolean start = startElementChildPathStep(uri, localName);
+        boolean start = false;
+        if (!isIndexHandler) {
+            start = startElementChildPathStep(uri, localName);
+        }
 
         if (skipping) {
             return;
@@ -392,7 +406,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
     }
 
-    private void flushText() throws IOException {
+    protected void flushText() throws IOException {
         if (pendingText) {
             peekENBStackTop().startChild(tnb);
             if (createNodeIds) {
@@ -471,7 +485,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         out.write(resultABVS.getByteArray(), resultABVS.getStartOffset(), resultABVS.getLength());
     }
 
-    private ElementNodeBuilder createENB() {
+    protected ElementNodeBuilder createENB() {
         if (freeENBList.isEmpty()) {
             return new ElementNodeBuilder();
         }
@@ -482,7 +496,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         freeENBList.add(enb);
     }
 
-    private ElementNodeBuilder peekENBStackTop() {
+    protected ElementNodeBuilder peekENBStackTop() {
         return enbStack.get(enbStack.size() - 1);
     }
 

@@ -480,7 +480,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-            throws SystemException {
+                    throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1217,6 +1217,11 @@ public class FunctionHelper {
         } catch (SystemException e) {
             throw new HyracksDataException(e);
         }
+        readInDocFromString(fName, bbis, di, abvs, parser);
+    }
+
+    public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
+            ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
         if (!fName.contains("hdfs:/")) {
             File file = new File(fName);
             if (file.exists()) {
