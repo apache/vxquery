@@ -111,7 +111,9 @@ public class IndexDocumentBuilder extends XMLSerializer {
 
         print(bstart, sstart, lstart, "0", "");
         for (int i = 1; i < results.size() - 1; i++) {
-            //Show the results for debugging
+            //TODO: Since each doc is a file,
+            //we can only handle files 
+            //small enough to fit in memory
             doc.add(results.get(i).sf);
         }
         writer.addDocument(doc);

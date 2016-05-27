@@ -105,6 +105,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 if (indexPlace < indexLength) {
                     nodeAbvs.reset();
                     try {
+                        //TODO: now we get back the entire document
                         doc = searcher.doc(hits[indexPlace].doc);
                         fields = doc.getFields();
                         parse(nodeAbvs);
@@ -130,7 +131,6 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 TaggedValuePointable tvp1 = args[0];
                 TaggedValuePointable tvp2 = args[1];
 
-                // TODO add support empty sequence and no argument.
                 if (tvp1.getTag() != ValueTag.XS_STRING_TAG || tvp2.getTag() != ValueTag.XS_STRING_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
@@ -213,8 +213,8 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 String contents = field.stringValue();
                 String uri = "";
 
-                int firstColon = contents.indexOf(":");
-                int lastdot = contents.lastIndexOf(".");
+                int firstColon = contents.indexOf(':');
+                int lastdot = contents.lastIndexOf('.');
                 String type = contents.substring(lastdot + 1);
                 String lastbit = contents.substring(firstColon + 1, lastdot);
 
@@ -232,24 +232,20 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     List<String> qnames = new ArrayList<String>();
                     whereIFinish = findAttributeChildren(whereIFinish, names, values, uris, localnames, types, qnames);
                     Attributes atts = new IndexAttributes(names, values, uris, localnames, types, qnames);
-                    try {
 
-                        handler.startElement(uri, lastbit, lastbit, atts);
+                    handler.startElement(uri, lastbit, lastbit, atts);
 
-                        boolean noMoreChildren = false;
+                    boolean noMoreChildren = false;
 
-                        while (whereIFinish + 1 < fields.size() && !noMoreChildren) {
-                            if (isChild(fields.get(whereIFinish + 1), field)) {
-                                whereIFinish = buildelement(abvsFileNode, whereIFinish + 1);
-                            } else {
-                                noMoreChildren = true;
-                            }
+                    while (whereIFinish + 1 < fields.size() && !noMoreChildren) {
+                        if (isChild(fields.get(whereIFinish + 1), field)) {
+                            whereIFinish = buildelement(abvsFileNode, whereIFinish + 1);
+                        } else {
+                            noMoreChildren = true;
                         }
-
-                        handler.endElement(uri, lastbit, lastbit);
-                    } catch (SAXException e) {
-                        throw e;
                     }
+
+                    handler.endElement(uri, lastbit, lastbit);
 
                 }
                 return whereIFinish;
@@ -268,8 +264,8 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     while (nextindex < fields.size()) {
                         nextguy = fields.get(nextindex);
                         String contents = nextguy.stringValue();
-                        int firstcolon = contents.indexOf(":");
-                        int lastdot = contents.lastIndexOf(".");
+                        int firstcolon = contents.indexOf(':');
+                        int lastdot = contents.lastIndexOf('.');
                         String lastbit = contents.substring(firstcolon + 1, lastdot);
 
                         if (isDirectChildAttribute(nextguy, fields.get(fieldnum))) {
@@ -277,8 +273,8 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                             n.add(lastbit);
                             IndexableField nextnextguy = fields.get(nextindex + 1);
                             contents = nextnextguy.stringValue();
-                            firstcolon = contents.indexOf(":");
-                            lastdot = contents.lastIndexOf(".");
+                            firstcolon = contents.indexOf(':');
+                            lastdot = contents.lastIndexOf('.');
                             String nextlastbit = contents.substring(firstcolon + 1, lastdot);
                             v.add(nextlastbit);
                             u.add(lastbit);
