@@ -18,8 +18,6 @@ package org.apache.vxquery.metadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
@@ -30,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -67,7 +63,6 @@ import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
-import org.xml.sax.SAXException;
 
 public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
@@ -179,50 +174,34 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                 for (int i = 0; i < size; i++) {
                                     //read split
                                     context = ctxFactory.createContext(job.getConfiguration(), i);
-                                    try {
-                                        reader = inputFormat.createRecordReader(inputSplits.get(i), context);
-                                        reader.initialize(inputSplits.get(i), context);
-                                        while (reader.nextKeyValue()) {
-                                            value = reader.getCurrentValue().toString();
-                                            //Split value if it contains more than one item with the tag
-                                            if (StringUtils.countMatches(value, tag) > 1) {
-                                                String items[] = value.split(tag);
-                                                for (String item : items) {
-                                                    if (item.length() > 0) {
-                                                        item = START_TAG + tag + item;
-                                                        stream = new ByteArrayInputStream(
-                                                                item.getBytes(StandardCharsets.UTF_8));
-                                                        parser.parseHDFSElements(stream, writer, fta, i);
-                                                    }
-                                                }
-                                            } else {
-                                                value = START_TAG + value;
-                                                //create an input stream to the file currently reading and send it to parser
-                                                stream = new ByteArrayInputStream(
-                                                        value.getBytes(StandardCharsets.UTF_8));
-                                                parser.parseHDFSElements(stream, writer, fta, i);
-                                            }
-                                        }
 
-                                    } catch (InterruptedException e) {
-                                        if (LOGGER.isLoggable(Level.SEVERE)) {
-                                            LOGGER.severe(e.getMessage());
+                                    reader = inputFormat.createRecordReader(inputSplits.get(i), context);
+                                    reader.initialize(inputSplits.get(i), context);
+                                    while (reader.nextKeyValue()) {
+                                        value = reader.getCurrentValue().toString();
+                                        //Split value if it contains more than one item with the tag
+                                        if (StringUtils.countMatches(value, tag) > 1) {
+                                            String items[] = value.split(tag);
+                                            for (String item : items) {
+                                                if (item.length() > 0) {
+                                                    item = START_TAG + tag + item;
+                                                    stream = new ByteArrayInputStream(
+                                                            item.getBytes(StandardCharsets.UTF_8));
+                                                    parser.parseHDFSElements(stream, writer, fta, i);
+                                                }
+                                            }
+                                        } else {
+                                            value = START_TAG + value;
+                                            //create an input stream to the file currently reading and send it to parser
+                                            stream = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
+                                            parser.parseHDFSElements(stream, writer, fta, i);
                                         }
                                     }
+
                                 }
 
-                            } catch (IOException e) {
-                                if (LOGGER.isLoggable(Level.SEVERE)) {
-                                    LOGGER.severe(e.getMessage());
-                                }
-                            } catch (ParserConfigurationException e) {
-                                if (LOGGER.isLoggable(Level.SEVERE)) {
-                                    LOGGER.severe(e.getMessage());
-                                }
-                            } catch (SAXException e) {
-                                if (LOGGER.isLoggable(Level.SEVERE)) {
-                                    LOGGER.severe(e.getMessage());
-                                }
+                            } catch (Exception e) {
+                                throw new HyracksDataException(e);
                             }
                         } else {
                             try {
@@ -248,22 +227,14 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                     throw new HyracksDataException("Invalid HDFS directory parameter (" + nodeId + ":"
                                             + directory + ") passed to collection.");
                                 }
-                            } catch (FileNotFoundException e) {
-                                if (LOGGER.isLoggable(Level.SEVERE)) {
-                                    LOGGER.severe(e.getMessage());
-                                }
-                            } catch (IOException e) {
-                                if (LOGGER.isLoggable(Level.SEVERE)) {
-                                    LOGGER.severe(e.getMessage());
-                                }
+                            } catch (Exception e) {
+                                throw new HyracksDataException(e);
                             }
                         }
                         try {
                             fs.close();
-                        } catch (IOException e) {
-                            if (LOGGER.isLoggable(Level.SEVERE)) {
-                                LOGGER.severe(e.getMessage());
-                            }
+                        } catch (Exception e) {
+                            throw new HyracksDataException(e);
                         }
                     }
                 }

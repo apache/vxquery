@@ -128,6 +128,28 @@
         <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
     
+    <!-- fn:build-index-on-collection($arg  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
+    <function name="fn:build-index-on-collection">
+        <param name="collectionFolder" type="xs:string?"/>
+        <param name="indexFolder" type="xs:string?"/>
+        <return type="node()*"/> 
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
+    </function>
+    
+    <!-- fn:collection-from-index($indexfolder  as xs:string?, $elementpath as xs:string?) as  node()* -->
+    <function name="fn:collection-from-index">
+        <param name="indexfolder" type="xs:string?"/>
+        <param name="elementpath" type="xs:string?"/>
+        <return type="node()*"/> 
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.CollectionFromIndexUnnestingEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+            <argument value="0"/>
+        </property>
+    </function>
+    
     <!-- fn:collection-with-tag($arg1  as xs:string?, $arg2 as xs:string?) as  node()* -->
     <function name="fn:collection-with-tag">
         <param name="arg1" type="xs:string?"/>

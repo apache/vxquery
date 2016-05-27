@@ -266,7 +266,36 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <artifactId>lucene-core</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-queryparser</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-demo</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-backward-codecs</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-core</artifactId>
