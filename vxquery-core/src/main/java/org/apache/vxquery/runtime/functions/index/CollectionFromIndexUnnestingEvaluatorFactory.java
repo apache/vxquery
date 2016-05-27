@@ -20,9 +20,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -109,8 +109,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                         fields = doc.getFields();
                         parse(nodeAbvs);
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        throw new AlgebricksException(e);
                     }
                     indexPlace += 1;
                     result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
@@ -150,22 +149,20 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                                     stringElementPath.getLength() + stringElementPath.getStartOffset())),
                             0);
                     elementPath = di.readUTF();
+
+                    indexPlace = 0;
+                    reader = null;
+                    //Create the index reader.
+
+                    reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexName)));
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
-                }
-                indexPlace = 0;
-                reader = null;
-                //Create the index reader.
-                try {
-                    reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexName)));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
                 }
 
                 searcher = new IndexSearcher(reader);
                 analyzer = new CaseSensitiveAnalyzer();
 
-                parser = new QueryParserCaseSensitive("item", analyzer);
+                parser = new CaseSensitiveQueryParser("item", analyzer);
 
                 String queryString = elementPath.replaceAll("/", ".");
                 queryString = "item:" + queryString + "*";
@@ -205,7 +202,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
 
                     handler.endDocument();
                     handler.writeDocument(abvsFileNode);
-                } catch (SAXException | IOException e) {
+                } catch (Exception e) {
                     throw new IOException(e);
                 }
             }
@@ -227,12 +224,12 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
 
                 }
                 if (type.equals("element")) {
-                    Vector<String> names = new Vector<String>();
-                    Vector<String> values = new Vector<String>();
-                    Vector<String> uris = new Vector<String>();
-                    Vector<String> localnames = new Vector<String>();
-                    Vector<String> types = new Vector<String>();
-                    Vector<String> qnames = new Vector<String>();
+                    List<String> names = new ArrayList<String>();
+                    List<String> values = new ArrayList<String>();
+                    List<String> uris = new ArrayList<String>();
+                    List<String> localnames = new ArrayList<String>();
+                    List<String> types = new ArrayList<String>();
+                    List<String> qnames = new ArrayList<String>();
                     whereIFinish = findAttributeChildren(whereIFinish, names, values, uris, localnames, types, qnames);
                     Attributes atts = new IndexAttributes(names, values, uris, localnames, types, qnames);
                     try {
@@ -251,7 +248,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
 
                         handler.endElement(uri, lastbit, lastbit);
                     } catch (SAXException e) {
-                        e.printStackTrace();
+                        throw e;
                     }
 
                 }
@@ -261,8 +258,8 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
             /*This function creates the attribute children for an element node
              * 
              */
-            int findAttributeChildren(int fieldnum, Vector<String> n, Vector<String> v, Vector<String> u,
-                    Vector<String> l, Vector<String> t, Vector<String> q) {
+            int findAttributeChildren(int fieldnum, List<String> n, List<String> v, List<String> u, List<String> l,
+                    List<String> t, List<String> q) {
                 int nextindex = fieldnum + 1;
                 boolean foundattributes = false;
                 if (nextindex < fields.size()) {
@@ -306,34 +303,28 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 String childid = child.stringValue();
                 String adultid = adult.stringValue();
 
-                int lastdotchild = childid.lastIndexOf(".");
-                int lastdotadult = adultid.lastIndexOf(".");
+                int lastdotchild = childid.lastIndexOf('.');
+                int lastdotadult = adultid.lastIndexOf('.');
 
                 String childpath = childid.substring(0, lastdotchild);
                 String adultpath = adultid.substring(0, lastdotadult);
                 adultpath = adultpath.replaceFirst(":", ".");
 
-                if (childpath.startsWith(adultpath + ":") || childpath.startsWith(adultpath + ".")) {
-                    return true;
-                }
-                return false;
+                return (childpath.startsWith(adultpath + ":") || childpath.startsWith(adultpath + "."));
             }
 
             boolean isDirectChildAttribute(IndexableField child, IndexableField adult) {
                 String childid = child.stringValue();
                 String adultid = adult.stringValue();
 
-                String childpath = childid.substring(0, childid.lastIndexOf("."));
-                String adultpath = adultid.substring(0, adultid.lastIndexOf("."));
+                String childpath = childid.substring(0, childid.lastIndexOf('.'));
+                String adultpath = adultid.substring(0, adultid.lastIndexOf('.'));
                 adultpath = adultpath.replaceFirst(":", ".");
                 String[] childpieces = child.stringValue().split("\\.");
 
                 String childtype = childpieces[childpieces.length - 1];
 
-                if (childpath.startsWith(adultpath + ":") && childtype.equals("attribute")) {
-                    return true;
-                }
-                return false;
+                return (childpath.startsWith(adultpath + ":") && childtype.equals("attribute"));
             }
 
         };

@@ -16,22 +16,22 @@
 */
 package org.apache.vxquery.index;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.xml.sax.Attributes;
 
 public class IndexAttributes implements Attributes {
     int length;
 
-    Vector<String> names;
-    Vector<String> values;
-    Vector<String> uris;
-    Vector<String> localnames;
-    Vector<String> types;
-    Vector<String> qnames;
+    List<String> names;
+    List<String> values;
+    List<String> uris;
+    List<String> localnames;
+    List<String> types;
+    List<String> qnames;
 
-    public IndexAttributes(Vector<String> n, Vector<String> v, Vector<String> u, Vector<String> l, Vector<String> t,
-            Vector<String> q) {
+    public IndexAttributes(List<String> n, List<String> v, List<String> u, List<String> l, List<String> t,
+            List<String> q) {
         length = n.size();
         names = n;
         values = v;
@@ -69,7 +69,7 @@ public class IndexAttributes implements Attributes {
      * @see #getLength
      */
     public String getURI(int index) {
-        return uris.elementAt(index).toString();
+        return uris.get(index);
     }
 
     /**
@@ -83,7 +83,7 @@ public class IndexAttributes implements Attributes {
      * @see #getLength
      */
     public String getLocalName(int index) {
-        return localnames.elementAt(index).toString();
+        return localnames.get(index);
     }
 
     /**
@@ -97,7 +97,7 @@ public class IndexAttributes implements Attributes {
      * @see #getLength
      */
     public String getQName(int index) {
-        return qnames.elementAt(index).toString();
+        return qnames.get(index);
     }
 
     /**
@@ -119,7 +119,7 @@ public class IndexAttributes implements Attributes {
      * @see #getLength
      */
     public String getType(int index) {
-        return types.elementAt(index).toString();
+        return types.get(index);
     }
 
     /**
@@ -135,7 +135,7 @@ public class IndexAttributes implements Attributes {
      * @see #getLength
      */
     public String getValue(int index) {
-        return values.elementAt(index).toString();
+        return values.get(index);
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ public class IndexAttributes implements Attributes {
      */
     public int getIndex(String uri, String localName) {
         for (int i = 0; i < length; i++) {
-            if (localnames.elementAt(i).toString() == localName && uris.elementAt(i).toString() == uri) {
+            if (localnames.get(i).equals(localName) && uris.get(i).equals(uri)) {
                 return i;
             }
         }
@@ -172,7 +172,7 @@ public class IndexAttributes implements Attributes {
      */
     public int getIndex(String qName) {
         for (int i = 0; i < length; i++) {
-            if (qnames.elementAt(i).toString() == qName) {
+            if (qnames.get(i).equals(qName)) {
                 return i;
             }
         }
@@ -196,8 +196,8 @@ public class IndexAttributes implements Attributes {
      */
     public String getType(String uri, String localName) {
         for (int i = 0; i < length; i++) {
-            if (localnames.elementAt(i).toString() == localName && uris.elementAt(i).toString() == uri) {
-                return types.elementAt(i).toString();
+            if (localnames.get(i).equals(localName) && uris.get(i).equals(uri)) {
+                return types.get(i);
             }
         }
         return null;
@@ -217,8 +217,8 @@ public class IndexAttributes implements Attributes {
      */
     public String getType(String qName) {
         for (int i = 0; i < length; i++) {
-            if (qnames.elementAt(i).toString() == qName) {
-                return types.elementAt(i).toString();
+            if (qnames.get(i).equals(qName)) {
+                return types.get(i);
             }
         }
         return null;
@@ -240,8 +240,8 @@ public class IndexAttributes implements Attributes {
      */
     public String getValue(String uri, String localName) {
         for (int i = 0; i < length; i++) {
-            if (localnames.elementAt(i).toString() == localName && uris.elementAt(i).toString() == uri) {
-                return values.elementAt(i).toString();
+            if (localnames.get(i).equals(localName) && uris.get(i).equals(uri)) {
+                return values.get(i);
             }
         }
         return null;
@@ -261,8 +261,8 @@ public class IndexAttributes implements Attributes {
      */
     public String getValue(String qName) {
         for (int i = 0; i < length; i++) {
-            if (qnames.elementAt(i).toString() == qName) {
-                return values.elementAt(i).toString();
+            if (qnames.get(i).equals(qName)) {
+                return values.get(i);
             }
         }
         return null;

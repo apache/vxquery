@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -57,10 +58,10 @@ public class VXQueryTest extends AbstractXQueryTest {
     }
 
     @BeforeClass
-    public static void setup() {
+    public static void setup() throws IOException {
         File tmp = new File("src/test/resources/TestSources/tmp");
         if (tmp.exists()) {
-            tmp.delete();
+            FileUtils.deleteDirectory(tmp);
         }
         new File("src/test/resources/TestSources/tmp/indexFolder").mkdirs();
         dfs = new MiniDFS();
@@ -72,10 +73,10 @@ public class VXQueryTest extends AbstractXQueryTest {
     }
 
     @AfterClass
-    public static void shutdown() {
+    public static void shutdown() throws IOException {
         File tmp = new File("src/test/resources/TestSources/tmp");
         if (tmp.exists()) {
-            tmp.delete();
+            FileUtils.deleteDirectory(tmp);
         }
         dfs.shutdownHDFS();
     }

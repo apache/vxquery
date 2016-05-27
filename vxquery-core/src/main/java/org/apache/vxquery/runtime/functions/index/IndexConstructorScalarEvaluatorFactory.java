@@ -58,12 +58,11 @@ public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueA
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
-            private boolean first = true;
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 IndexConstructorUtil.evaluate(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider, abvsFileNode,
-                        nodep, first, false, nodeId);
+                        nodep, false, nodeId);
             }
 
         };
