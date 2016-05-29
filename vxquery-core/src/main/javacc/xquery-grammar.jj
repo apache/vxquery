@@ -1960,6 +1960,48 @@ ASTNode ArrayConstructor() :
 	}
 }
 
+ASTNode ObjectConstructor() :
+{
+    Map<String, ASTNode> content=new LinkedHashMap<String, ASTNode>();
+    Token t;
+}
+{
+    t=<Lbrace>
+    (PairConstructor(content) ( "," PairConstructor(content))* )
+    <Rbrace>
+    {
+        ObjectConstructor obj=new ObjectConstructor(createSourceLocation(t));
+        return obj;
+    }
+
+}
+
+void PairConstructor(Map<String, ASTNode> content) :
+{
+    String key;
+    ASTNode value;
+    Token t;
+}
+{
+    t= <StringLiteral> {key=t.image;}
+    (<JSONObjectPairSeparateTag0> | <JSONObjectPairSeparateTag1>)
+    (value=Literal() |
+    t=<JSONnull>
+    {
+    LiteralNode l = new LiteralNode(createSourceLocation(t));
+    l.setImage(t.image);
+    l.setType(LiteralNode.LiteralType.NULL);
+    value=l;
+    })
+    {
+        if(!content.containsKey(key)){
+            content.put(key, value);
+        }else{
+            //Todo: Throw the required exception
+        }
+    }
+}
+
 ASTNode Constructor()  :
 {
     ASTNode result;
@@ -4026,4 +4068,19 @@ TOKEN :
  < NotNumber : ( (
 "." <Digits>) |  (
 <Digits> ("." (["0" - "9"])*)?)) (["e", "E"] (["+", "-"])? <Digits>)? ["a" - "z", "A" - "Z"] (["0" - "9", "a" - "z", "A" - "Z"])* >
+}
+
+TOKEN :
+{
+    <JSONObjectPairSeparateTag0: ":">
+}
+
+TOKEN :
+{
+    <JSONObjectPairSeparateTag1: "?:">
+}
+
+TOKEN :
+{
+    <JSONnull: "null">
 }
