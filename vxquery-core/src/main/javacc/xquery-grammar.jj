@@ -1795,8 +1795,8 @@ ASTNode PrimaryExpr():
         | LOOKAHEAD(2) expr = FunctionCall()
         | LOOKAHEAD(2) expr = OrderedExpr()
         | LOOKAHEAD(2) expr = UnorderedExpr()
-        | expr = Constructor()
         | expr = JsonConstructor()
+        | expr = Constructor()
     ) {
         return expr;
     }
@@ -1938,7 +1938,6 @@ ASTNode FunctionCall()  :
     }
 }
 
-<<<<<<< HEAD
 ASTNode JsonConstructor() :
 {
 	ASTNode result;
@@ -1947,28 +1946,7 @@ ASTNode JsonConstructor() :
 	
 	result = ObjectConstructor() | result = ArrayConstructor()
 	{
-=======
-ASTNode JsonConstructor()  :
-{
-    ASTNode result;
-}
-{
-    result = ArrayConstructor()
-    {
->>>>>>> 6c7dd2924d26e091d261a4e8729b1c46dfc83599
 		return result;
-	}
-}
-
-<<<<<<< HEAD
-ASTNode ArrayConstructor() :
-{
-	Token start, end;
-	ASTNode expr;
-}
-{
-	start="[" ([expr=Literal()])* end="]" {
-		return expr;
 	}
 }
 
@@ -1978,7 +1956,7 @@ ASTNode ObjectConstructor() :
     Token t;
 }
 {
-    t=<Lbrace>
+    t=<LbraceExprEnclosure>
     (PairConstructor(content) ( "," PairConstructor(content))* )
     <Rbrace>
     {
@@ -2013,7 +1991,7 @@ void PairConstructor(Map<String, ASTNode> content) :
         }
     }
 }
-=======
+
 ASTNode ArrayConstructor()  :
 {
 	Token start, end;
@@ -2042,8 +2020,7 @@ List<ASTNode> ArrayItemList()  :
     )* ]{
         return items;
     }
-}	
->>>>>>> 6c7dd2924d26e091d261a4e8729b1c46dfc83599
+}
 
 ASTNode Constructor()  :
 {
