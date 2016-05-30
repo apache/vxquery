@@ -1944,7 +1944,7 @@ ASTNode JsonConstructor() :
 }
 {
 	
-	result = ObjectConstructor() | result = ArrayConstructor()
+	(result = ObjectConstructor() | result = ArrayConstructor())
 	{
 		return result;
 	}
@@ -1974,7 +1974,7 @@ void PairConstructor(Map<String, ASTNode> content) :
 }
 {
     t= <StringLiteral> {key=t.image;}
-    (<JSONObjectPairSeparateTag0> | <JSONObjectPairSeparateTag1>)
+    (":" | ":?")
     (value=Literal() |
     t=<JSONnull>
     {
@@ -4092,15 +4092,5 @@ TOKEN :
 
 TOKEN :
 {
-    <JSONObjectPairSeparateTag0: ":">
-}
-
-TOKEN :
-{
-    <JSONObjectPairSeparateTag1: "?:">
-}
-
-TOKEN :
-{
-    <JSONnull: "null">
+    < JSONnull: "null">
 }
