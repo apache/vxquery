@@ -1795,7 +1795,6 @@ ASTNode PrimaryExpr():
         | LOOKAHEAD(2) expr = FunctionCall()
         | LOOKAHEAD(2) expr = OrderedExpr()
         | LOOKAHEAD(2) expr = UnorderedExpr()
-        | expr = JsonConstructor()
         | expr = Constructor()
     ) {
         return expr;
@@ -1944,12 +1943,25 @@ ASTNode FunctionCall()  :
     }
 }
 
+ASTNode Constructor()  :
+{
+    ASTNode result;
+}
+{
+    (
+        result = DirectConstructor()
+        | result = ComputedConstructor()
+        | result = JsonConstructor()
+    ) {
+        return result;
+    }
+}
 ASTNode JsonConstructor() :
 {
 	ASTNode result;
 }
 {
-	
+
 	(result = ObjectConstructor() | result = ArrayConstructor())
 	{
 		return result;
@@ -1981,7 +1993,7 @@ void PairConstructor(Map<String, ASTNode> content) :
 {
     t= <StringLiteral> {key=t.image;}
     (":" | ":?")
-    (value=Literal())
+    (value=Literal() | value=ArrayConstructor())
     {
         if(!content.containsKey(key)){
             content.put(key, value);
@@ -2018,19 +2030,6 @@ List<ASTNode> ArrayItemList()  :
         }
     )* ]{
         return items;
-    }
-}
-
-ASTNode Constructor()  :
-{
-    ASTNode result;
-}
-{
-    (
-        result = DirectConstructor()
-        | result = ComputedConstructor()
-    ) {
-        return result;
     }
 }
 
