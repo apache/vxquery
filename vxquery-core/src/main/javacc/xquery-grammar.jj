@@ -1796,6 +1796,7 @@ ASTNode PrimaryExpr():
         | LOOKAHEAD(2) expr = OrderedExpr()
         | LOOKAHEAD(2) expr = UnorderedExpr()
         | expr = Constructor()
+        | expr = JsonConstructor()
     ) {
         return expr;
     }
@@ -1937,6 +1938,7 @@ ASTNode FunctionCall()  :
     }
 }
 
+<<<<<<< HEAD
 ASTNode JsonConstructor() :
 {
 	ASTNode result;
@@ -1945,10 +1947,20 @@ ASTNode JsonConstructor() :
 	
 	result = ObjectConstructor() | result = ArrayConstructor()
 	{
+=======
+ASTNode JsonConstructor()  :
+{
+    ASTNode result;
+}
+{
+    result = ArrayConstructor()
+    {
+>>>>>>> 6c7dd2924d26e091d261a4e8729b1c46dfc83599
 		return result;
 	}
 }
 
+<<<<<<< HEAD
 ASTNode ArrayConstructor() :
 {
 	Token start, end;
@@ -2001,6 +2013,37 @@ void PairConstructor(Map<String, ASTNode> content) :
         }
     }
 }
+=======
+ASTNode ArrayConstructor()  :
+{
+	Token start, end;
+	List<ASTNode> items;
+}
+{
+	start="[" items=ArrayItemList() end="]" {
+		ArrayConstructorNode array = new ArrayConstructorNode(createSourceLocation(start));
+		array.setItems(items);
+		return array;
+	}
+}
+
+List<ASTNode> ArrayItemList()  :
+{
+	List<ASTNode> items = new ArrayList<ASTNode>();
+	ASTNode arraynode;
+}
+{[
+	arraynode = Literal() {
+        items.add(arraynode);
+    } (
+        "," arraynode = Literal() {
+            items.add(arraynode);
+        }
+    )* ]{
+        return items;
+    }
+}	
+>>>>>>> 6c7dd2924d26e091d261a4e8729b1c46dfc83599
 
 ASTNode Constructor()  :
 {
