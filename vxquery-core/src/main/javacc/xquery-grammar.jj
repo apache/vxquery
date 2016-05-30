@@ -1817,6 +1817,12 @@ ASTNode Literal()   :
         l.setType(LiteralNode.LiteralType.STRING);
         return l;
     }
+    | t="null" {
+          LiteralNode l1 = new LiteralNode(createSourceLocation(t));
+          l1.setImage(t.image);
+          l1.setType(LiteralNode.LiteralType.NULL);
+          return l1;
+     }
 }
 
 ASTNode NumericLiteral()   :
@@ -1975,14 +1981,7 @@ void PairConstructor(Map<String, ASTNode> content) :
 {
     t= <StringLiteral> {key=t.image;}
     (":" | ":?")
-    (value=Literal() |
-    t=<JSONnull>
-    {
-    LiteralNode l = new LiteralNode(createSourceLocation(t));
-    l.setImage(t.image);
-    l.setType(LiteralNode.LiteralType.NULL);
-    value=l;
-    })
+    (value=Literal())
     {
         if(!content.containsKey(key)){
             content.put(key, value);
@@ -4088,9 +4087,4 @@ TOKEN :
  < NotNumber : ( (
 "." <Digits>) |  (
 <Digits> ("." (["0" - "9"])*)?)) (["e", "E"] (["+", "-"])? <Digits>)? ["a" - "z", "A" - "Z"] (["0" - "9", "a" - "z", "A" - "Z"])* >
-}
-
-TOKEN :
-{
-    < JSONnull: "null">
 }
