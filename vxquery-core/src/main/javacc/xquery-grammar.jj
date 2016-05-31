@@ -1796,7 +1796,6 @@ ASTNode PrimaryExpr():
         | LOOKAHEAD(2) expr = OrderedExpr()
         | LOOKAHEAD(2) expr = UnorderedExpr()
         | expr = Constructor()
-        | expr = JsonConstructor()
     ) {
         return expr;
     }
@@ -1951,33 +1950,13 @@ ASTNode JsonConstructor()  :
 
 ASTNode ArrayConstructor()  :
 {
-	Token start, end;
-	List<ASTNode> items;
+	ASTNode expr;
 }
 {
-	start="[" items=ArrayItemList() end="]" {
-		ArrayConstructorNode array = new ArrayConstructorNode(createSourceLocation(start));
-		array.setItems(items);
-		return array;
+	"[" expr=Expr() "]" {
+		return expr;
 	}
 }
-
-List<ASTNode> ArrayItemList()  :
-{
-	List<ASTNode> items = new ArrayList<ASTNode>();
-	ASTNode arraynode;
-}
-{[
-	arraynode = Literal() {
-        items.add(arraynode);
-    } (
-        "," arraynode = Literal() {
-            items.add(arraynode);
-        }
-    )* ]{
-        return items;
-    }
-}	
 
 ASTNode Constructor()  :
 {
@@ -1987,6 +1966,7 @@ ASTNode Constructor()  :
     (
         result = DirectConstructor()
         | result = ComputedConstructor()
+        | result = JsonConstructor()
     ) {
         return result;
     }
