@@ -1970,21 +1970,23 @@ ASTNode JsonConstructor() :
 
 ASTNode ObjectConstructor() :
 {
-    Map<String, ASTNode> content=new LinkedHashMap<String, ASTNode>();
+    List<ASTNode> content=new ArrayList<ASTNode>();
     Token t;
+    ASTNode pc;
 }
 {
     t=<LbraceExprEnclosure>
-    (PairConstructor(content) ( "," PairConstructor(content))* )
+    (pc=PairConstructor() {content.add(pc);} ( "," pc=PairConstructor() {content.add(pc);})* )
     <Rbrace>
     {
         ObjectConstructor obj=new ObjectConstructor(createSourceLocation(t));
+        obj.setContent(content);
         return obj;
     }
 
 }
 
-void PairConstructor(Map<String, ASTNode> content) :
+ASTNode PairConstructor() :
 {
     String key;
     ASTNode value;
@@ -1995,11 +1997,10 @@ void PairConstructor(Map<String, ASTNode> content) :
     (":" | ":?")
     (value=Literal() | value=ArrayConstructor())
     {
-        if(!content.containsKey(key)){
-            content.put(key, value);
-        }else{
-            //Todo: Throw the required exception
-        }
+        PairConstructor pc=new PairConstructor(createSourceLocation(t));
+        pc.setKey(key);
+        pc.setValue(value);
+        return pc;
     }
 }
 

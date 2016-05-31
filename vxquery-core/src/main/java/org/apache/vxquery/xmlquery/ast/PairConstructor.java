@@ -16,27 +16,33 @@
 */
 package org.apache.vxquery.xmlquery.ast;
 
-import java.util.List;
-
 import org.apache.vxquery.util.SourceLocation;
 
-public class ObjectConstructor extends ASTNode {
-    private List<ASTNode> content;
-
-    public ObjectConstructor(SourceLocation loc) {
+public class PairConstructor extends ASTNode{
+    private String key;
+    private ASTNode value;
+    public PairConstructor(SourceLocation loc) {
         super(loc);
     }
 
     @Override
     public ASTTag getTag() {
-        return ASTTag.OBJECT_CONSTRUCTOR;
+        return ASTTag.PAIR_CONSTRUCTOR;
     }
 
-    public List<ASTNode> getContent() {
-        return content;
+    public String getKey() {
+        return key;
     }
 
-    public void setContent(List<ASTNode> content) {
-        this.content = content;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public ASTNode getValue() {
+        return value;
+    }
+
+    public void setValue(ASTNode value) {
+        this.value = value;
     }
 }
