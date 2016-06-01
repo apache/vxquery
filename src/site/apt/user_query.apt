@@ -25,8 +25,9 @@ sh ./apache-vxquery-X.Y/vxquery-cli/target/appassembler/bin/vxq
 * Commands On Windows Based Systems
 
 ----------------------------------------
-cd apache-vxquery-X.Y/vxquery-cli/target/appassembler/bin
-vxq.bat
+set JAVA_OPTS=-Xmx1024m
+set PATH=%PATH%;"path-to"\apache-vxquery-X.Y\vxquery-cli\target\appassembler\bin\
+vxq "path-to"\test.xq
 ----------------------------------------
 
 * Command Line Options
@@ -48,6 +49,7 @@ vxq.bat
 -showrp                    : Show Runtime plan
 -showtet                   : Show translated expression tree
 -timing                    : Produce timing information
+-hdfs-conf VAL             : The folder containing the HDFS configuration files
 ----------------------------------------
 
 * Java Options
@@ -56,14 +58,14 @@ vxq.bat
 JAVA_OPTS="-Xmx1024m"
 ----------------------------------------
 
- 
+
 * Example
 
-  The following example query is from {{{http://www.w3schools.com/xquery/default.asp}W3Schools XQuery Tutorial}}. 
+  The following example query is from {{{http://www.w3schools.com/xquery/default.asp}W3Schools XQuery Tutorial}}.
   If you are new to XQuery, the W3Schools tutorial is a great place to start.
-  
+
   [[i]] Query file (test.xq)
-  
+
 ----------------------------------------
 for $x in doc("books.xml")/bookstore/book
 where $x/price>30
@@ -72,7 +74,7 @@ return $x/title
 ----------------------------------------
 
   [[i]] Command line
-  
+
 ----------------------------------------
 JAVA_OPTS="-Xmx1024m" sh ./apache-vxquery-X.Y/vxquery-cli/target/appassembler/bin/vxq test.xq
 ----------------------------------------

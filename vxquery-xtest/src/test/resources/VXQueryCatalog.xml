@@ -40,6 +40,10 @@
 <!ENTITY SingleQuery SYSTEM "cat/SingleQuery.xml">
 <!ENTITY SingleAlternateQuery SYSTEM "cat/SingleAlternateQuery.xml">
 
+<!ENTITY HDFSAggregateQueries SYSTEM "cat/HDFSAggregateQueries.xml">
+
+<!ENTITY IndexingQueries SYSTEM "cat/IndexingQueries.xml">
+
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -191,6 +195,32 @@
          &GhcndRecordsPartition1Queries;
          &GhcndRecordsPartition2Queries;
          &GhcndRecordsPartition4Queries;
+      </test-group>
+   </test-group>
+   <test-group name="HDFSAggregateQueries" featureOwner="Efi Kaltirimidou">
+      <GroupInfo>
+         <title>Aggregate Partition Queries in HDFS</title>
+         <description/>
+      </GroupInfo>
+      <test-group name="CollectionReadFromHDFSAggregateTests" featureOwner="Efi Kaltirimidou">
+         <GroupInfo>
+            <title>Aggregate HDFS Execution Tests</title>
+            <description/>
+         </GroupInfo>
+        &HDFSAggregateQueries;
+      </test-group>
+   </test-group>
+   <test-group name="IndexingQueries" featureOwner="Steven Jacobs">
+      <GroupInfo>
+         <title>Indexing Queries</title>
+         <description/>
+      </GroupInfo>
+      <test-group name="IndexingTests" featureOwner="Steven Jacobs">
+         <GroupInfo>
+            <title>Indexing Execution Tests</title>
+            <description/>
+         </GroupInfo>
+        &IndexingQueries;
       </test-group>
    </test-group>
 </test-suite>

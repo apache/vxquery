@@ -74,6 +74,8 @@ public class ValueTag {
     public static final int XS_NMTOKENS_TAG = BuiltinTypeConstants.XS_NMTOKENS_TYPE_ID;
     public static final int XS_ENTITIES_TAG = BuiltinTypeConstants.XS_ENTITIES_TYPE_ID;
 
+    public static final int JS_NULL_TAG = BuiltinTypeConstants.JS_NULL_TYPE_ID;
+
     public static final int SEQUENCE_TAG = 100;
     public static final int DOCUMENT_NODE_TAG = 101;
     public static final int ELEMENT_NODE_TAG = 102;
@@ -82,6 +84,8 @@ public class ValueTag {
     public static final int COMMENT_NODE_TAG = 105;
     public static final int PI_NODE_TAG = 106;
     public static final int NODE_TREE_TAG = 107;
+    public static final int ARRAY_TAG = 108;
+    public static final int OBJECT_TAG = 109;
 
     public static boolean isAtomic(int tag) {
         return tag < 100;

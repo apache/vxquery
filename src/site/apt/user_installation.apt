@@ -19,7 +19,7 @@ Installation
 
   * Apache VXQuery\x99 source archive (apache-vxquery-X.Y-source-release.zip)
 
-  * JDK >= 1.7
+  * JDK >= 1.8
 
   * Apache Maven >= 3.2
 

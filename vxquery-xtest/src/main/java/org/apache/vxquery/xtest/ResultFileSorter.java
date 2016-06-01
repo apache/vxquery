@@ -16,7 +16,12 @@
  */
 package org.apache.vxquery.xtest;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -25,12 +30,10 @@ import java.util.logging.Logger;
 /**
  * Class to sort the final test results.
  */
-
-//TODO : Optimize for large files.
 public class ResultFileSorter {
 
     private final String path;
-    private static final Logger logger = Logger.getLogger(ResultFileSorter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ResultFileSorter.class.getName());
 
     public ResultFileSorter(String path) throws FileNotFoundException {
         this.path = path;
@@ -40,6 +43,7 @@ public class ResultFileSorter {
      * The method to sort the test case results.
      */
     public void sortFile() {
+        //TODO : Optimize for large files.
         File resultFile = new File(path);
         try {
             FileReader fileReader = new FileReader(resultFile);
@@ -49,13 +53,17 @@ public class ResultFileSorter {
             while ((line = reader.readLine()) != null) {
                 fullText.add(line);
             }
-            logger.log(Level.INFO, "Sorting.....");
-            Collections.sort(fullText);
+            reader.close();
+            fileReader.close();
+            if (LOGGER.isLoggable(Level.INFO)) {
+                LOGGER.log(Level.INFO, "Sorting.....");
+            }
+            Collections.sort(fullText, String.CASE_INSENSITIVE_ORDER);
             String[] sortedText = fullText.toArray(new String[fullText.size()]);
-            this.eraseFile(resultFile);
-            this.writeToFile(sortedText);
+            eraseFile(resultFile);
+            writeToFile(sortedText);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Trouble with sorting the file: " + resultFile.getAbsolutePath(), e);
         }
     }
 
@@ -71,17 +79,23 @@ public class ResultFileSorter {
     /**
      * Method to write the sorted content to the new file.
      *
-     * @param text : The sorted array of test case results.
+     * @param text
+     *            : The sorted array of test case results.
      * @throws FileNotFoundException
      */
     private void writeToFile(String[] text) throws FileNotFoundException {
         File newFile = new File(path);
         PrintWriter writer = new PrintWriter(newFile);
-        logger.log(Level.INFO, "Writing to file started.");
+        if (LOGGER.isLoggable(Level.INFO)) {
+            LOGGER.log(Level.INFO, "Writing to file started.");
+        }
         for (String s : text) {
             writer.write(s + "\n");
         }
         writer.close();
-        logger.log(Level.INFO, "Writing to file finished successfully.");
+        if (LOGGER.isLoggable(Level.INFO)) {
+            LOGGER.log(Level.INFO, "Writing to file finished successfully.");
+        }
+
     }
 }

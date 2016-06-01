@@ -16,22 +16,17 @@
  */
 package org.apache.vxquery.datamodel.builders.nodes;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
-
 public class NodeSubTreeBuilder extends AbstractNodeBuilder {
-    private DataOutput mainOut;
 
     @Override
-    public void reset(IMutableValueStorage mvs) throws IOException {
-        mainOut = mvs.getDataOutput();
-        mainOut.write(ValueTag.NODE_TREE_TAG);
+    public int getValueTag() {
+        return ValueTag.NODE_TREE_TAG;
     }
 
     @Override
@@ -46,14 +41,14 @@ public class NodeSubTreeBuilder extends AbstractNodeBuilder {
         if (hasNodeIds) {
             header |= NodeTreePointable.HEADER_NODEID_EXISTS_MASK;
         }
-        mainOut.write(header);
+        out.write(header);
         if (hasNodeIds) {
-            mainOut.writeInt(ntp.getRootNodeId());
+            out.writeInt(ntp.getRootNodeId());
         }
         if (hasDictionary) {
-            mainOut.write(ntp.getByteArray(), ntp.getDictionaryOffset(), ntp.getDictionarySize());
+            out.write(ntp.getByteArray(), ntp.getDictionaryOffset(), ntp.getDictionarySize());
         }
-        mainOut.write(itemTvp.getByteArray(), itemTvp.getStartOffset(), itemTvp.getLength());
+        out.write(itemTvp.getByteArray(), itemTvp.getStartOffset(), itemTvp.getLength());
     }
 
     private boolean hasDictionary(byte tag) {

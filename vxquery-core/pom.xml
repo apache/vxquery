@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.vxquery</groupId>
         <artifactId>apache-vxquery</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>apache-vxquery-core</artifactId>
@@ -121,16 +121,13 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
-      <!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-      </plugin>
-      -->
+            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
+                </plugin> -->
         </plugins>
         <pluginManagement>
             <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                    only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -209,6 +206,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-hdfs-2.x</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-hdfs-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>ant</groupId>
             <artifactId>ant-trax</artifactId>
             <scope>provided</scope>
@@ -259,6 +266,50 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <artifactId>lucene-core</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-queryparser</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-demo</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-backward-codecs</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <type>jar</type>
+            <version>5.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-core</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+        </dependency>
     </dependencies>
 
     <reporting>
@@ -290,18 +341,10 @@
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
             </plugin>
-      <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.5.2</version>
-        <configuration>
-          <effort>Min</effort>
-          <threshold>Normal</threshold>
-          <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
-        </configuration>
-      </plugin>
-      -->
+            <!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>findbugs-maven-plugin</artifactId> 
+                <version>2.5.2</version> <configuration> <effort>Min</effort> <threshold>Normal</threshold> 
+                <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile> </configuration> 
+                </plugin> -->
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>

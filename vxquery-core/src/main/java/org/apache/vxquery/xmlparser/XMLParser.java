@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import org.apache.hyracks.api.comm.IFrameFieldAppender;
 import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.exceptions.VXQueryFileNotFoundException;
 import org.apache.vxquery.exceptions.VXQueryParseException;
@@ -55,7 +57,7 @@ public class XMLParser {
         try {
             parser = XMLReaderFactory.createXMLReader();
             if (appender == null) {
-                handler = new SAXContentHandler(attachTypes, idProvider);
+                handler = new SAXContentHandler(attachTypes, idProvider, false);
             } else {
                 List<SequenceType> childSequenceTypes = new ArrayList<SequenceType>();
                 for (int typeCode : childSeq) {
@@ -98,8 +100,7 @@ public class XMLParser {
         }
     }
 
-    public void parseElements(File file, IFrameWriter writer, int tupleIndex)
-            throws HyracksDataException {
+    public void parseElements(File file, IFrameWriter writer, int tupleIndex) throws HyracksDataException {
         try {
             Reader input;
             if (bufferSize > 0) {
@@ -126,4 +127,48 @@ public class XMLParser {
         }
     }
 
+    public void parseHDFSElements(InputStream inputStream, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
+            throws IOException {
+        try {
+            Reader input;
+            if (bufferSize > 0) {
+                input = new BufferedReader(new InputStreamReader(inputStream), bufferSize);
+            } else {
+                input = new InputStreamReader(inputStream);
+            }
+            in.setCharacterStream(input);
+            handler.setupElementWriter(writer, tupleIndex);
+            parser.parse(in);
+            input.close();
+        } catch (IOException e) {
+            HyracksDataException hde = new HyracksDataException(e);
+            hde.setNodeId(nodeId);
+            throw hde;
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void parseHDFSDocument(InputStream inputStream, ArrayBackedValueStorage abvs) throws HyracksDataException {
+        try {
+            Reader input;
+            if (bufferSize > 0) {
+                input = new BufferedReader(new InputStreamReader(inputStream), bufferSize);
+            } else {
+                input = new InputStreamReader(inputStream);
+            }
+            in.setCharacterStream(input);
+            parser.parse(in);
+            handler.writeDocument(abvs);
+            input.close();
+        } catch (IOException e) {
+            HyracksDataException hde = new HyracksDataException(e);
+            hde.setNodeId(nodeId);
+            throw hde;
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

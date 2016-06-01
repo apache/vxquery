@@ -39,17 +39,5 @@ rm vxquery-xtest/results/xqts.txt
   * Generate the new XQTS result file and save it in the text format.
 
 ----------------------------------------
-sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -textreport vxquery-xtest/results/xqts_temp.txt
-----------------------------------------
-
-  * Sort the results so they can be compared with previous results.
-
-----------------------------------------
-sort -V vxquery-xtest/results/xqts_temp.txt --output=vxquery-xtest/results/xqts.txt
-----------------------------------------
-
-  * Clean up (remove) the temporary results files.
-
-----------------------------------------
-rm vxquery-xtest/results/xqts_temp.txt
+sh ./vxquery-xtest/target/appassembler/bin/xtest -catalog vxquery-xtest/test-suites/xqts/XQTSCatalog.xml -textreport vxquery-xtest/results/xqts.txt
 ----------------------------------------

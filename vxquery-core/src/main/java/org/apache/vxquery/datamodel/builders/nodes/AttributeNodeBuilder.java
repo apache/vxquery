@@ -16,21 +16,16 @@
  */
 package org.apache.vxquery.datamodel.builders.nodes;
 
-import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
-import org.apache.hyracks.data.std.api.IValueReference;
-
 public class AttributeNodeBuilder extends AbstractNodeBuilder {
-    private DataOutput out;
 
     @Override
-    public void reset(IMutableValueStorage mvs) throws IOException {
-        out = mvs.getDataOutput();
-        out.write(ValueTag.ATTRIBUTE_NODE_TAG);
+    public int getValueTag() {
+        return ValueTag.ATTRIBUTE_NODE_TAG;
     }
 
     @Override
@@ -56,4 +51,5 @@ public class AttributeNodeBuilder extends AbstractNodeBuilder {
     public void setValue(IValueReference value) throws IOException {
         out.write(value.getByteArray(), value.getStartOffset(), value.getLength());
     }
+
 }

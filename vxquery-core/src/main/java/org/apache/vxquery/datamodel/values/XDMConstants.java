@@ -19,11 +19,10 @@ package org.apache.vxquery.datamodel.values;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
-
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 
 public class XDMConstants {
     private static final byte[] BOOLEAN_TRUE_CONSTANT;
@@ -33,6 +32,8 @@ public class XDMConstants {
     private static final byte[] EMPTY_SEQUENCE;
 
     private static final byte[] EMPTY_STRING;
+
+    private static final byte[] JS_NULL_CONSTANT;
 
     static {
         BOOLEAN_TRUE_CONSTANT = new byte[2];
@@ -52,11 +53,17 @@ public class XDMConstants {
             throw new RuntimeException(e);
         }
         EMPTY_SEQUENCE = Arrays.copyOf(abvs.getByteArray(), abvs.getLength());
-        
+
         EMPTY_STRING = new byte[3];
         EMPTY_STRING[0] = ValueTag.XS_STRING_TAG;
         EMPTY_STRING[1] = 0;
         EMPTY_STRING[2] = 0;
+
+        JS_NULL_CONSTANT = new byte[1];
+        JS_NULL_CONSTANT[0] = ValueTag.JS_NULL_TAG;
+    }
+
+    private XDMConstants() {
     }
 
     public static void setTrue(IPointable p) {
@@ -75,10 +82,11 @@ public class XDMConstants {
         set(p, EMPTY_STRING);
     }
 
-    private static void set(IPointable p, byte[] array) {
-        p.set(array, 0, array.length);
+    public static void setJsNull(IPointable p) {
+        set(p, JS_NULL_CONSTANT);
     }
 
-    private XDMConstants() {
+    private static void set(IPointable p, byte[] array) {
+        p.set(array, 0, array.length);
     }
 }
