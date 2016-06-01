@@ -1816,7 +1816,7 @@ ASTNode Literal()   :
         l.setType(LiteralNode.LiteralType.STRING);
         return l;
     }
-    | t="null" {
+    | t = "null" {
           LiteralNode l1 = new LiteralNode(createSourceLocation(t));
           l1.setImage(t.image);
           l1.setType(LiteralNode.LiteralType.NULL);
@@ -1958,12 +1958,10 @@ ASTNode Constructor()  :
 }
 ASTNode JsonConstructor() :
 {
-	ASTNode result;
+    ASTNode result;
 }
 {
-
-	(result = ObjectConstructor() | result = ArrayConstructor())
-	{
+	(result = ObjectConstructor() | result = ArrayConstructor()){
 		return result;
 	}
 }
@@ -1995,8 +1993,7 @@ ASTNode PairConstructor() :
 {
     t= <StringLiteral> {key=t.image;}
     (":" | ":?")
-    (value=Literal() | value=ArrayConstructor())
-    {
+    (value=Literal() | value=ArrayConstructor()){
         PairConstructor pc=new PairConstructor(createSourceLocation(t));
         pc.setKey(key);
         pc.setValue(value);
