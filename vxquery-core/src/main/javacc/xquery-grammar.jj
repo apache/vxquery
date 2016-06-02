@@ -1937,27 +1937,6 @@ ASTNode FunctionCall()  :
     }
 }
 
-ASTNode JsonConstructor()  :
-{
-    ASTNode result;
-}
-{
-    result = ArrayConstructor()
-    {
-		return result;
-	}
-}
-
-ASTNode ArrayConstructor()  :
-{
-	ASTNode expr;
-}
-{
-	"[" expr=Expr() "]" {
-		return expr;
-	}
-}
-
 ASTNode Constructor()  :
 {
     ASTNode result;
@@ -2461,6 +2440,30 @@ ASTNode CompPIConstructor()  :
         pi.setTarget(target);
         pi.setContent(content);
         return pi;
+    }
+}
+
+ASTNode JsonConstructor()  :
+{
+    ASTNode result;
+}
+{
+    result = ArrayConstructor()
+    {
+	    return result;
+	}
+}
+
+ASTNode ArrayConstructor()  :
+{
+    ASTNode expr;
+    Token start;
+}
+{
+    (start="[") expr=Expr() "]" {
+        ArrayConstructorNode an = new ArrayConstructorNode(createSourceLocation(start));
+        an.setExpression(expr);
+	    return an;
     }
 }
 
