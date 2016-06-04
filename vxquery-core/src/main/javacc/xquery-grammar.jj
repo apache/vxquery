@@ -2460,7 +2460,7 @@ ASTNode ArrayConstructor()  :
     Token start;
 }
 {
-    (start="[") expr = Expr() "]" {
+    (start = "[") expr = Expr() "]" {
         ArrayConstructorNode an = new ArrayConstructorNode(createSourceLocation(start));
         an.setExpression(expr);
         return an;
