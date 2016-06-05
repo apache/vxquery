@@ -236,6 +236,9 @@ public class XMLSerializer implements IPrinter {
                 printPINode(ps, tvp);
                 break;
 
+            case ValueTag.OBJECT_TAG:
+                printObject(ps,tvp);
+
             default:
                 throw new UnsupportedOperationException("Encountered tag: " + tvp.getTag());
         }
@@ -803,7 +806,12 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
+    private void printObject(PrintStream ps, TaggedValuePointable tvp) {
+
+    }
+
     @Override
     public void init() throws AlgebricksException {
+
     }
 }

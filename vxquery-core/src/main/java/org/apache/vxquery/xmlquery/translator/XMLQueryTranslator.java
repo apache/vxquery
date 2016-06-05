@@ -19,12 +19,7 @@ package org.apache.vxquery.xmlquery.translator;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,27 +28,9 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.base.ILogicalPlan;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
-import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.ScalarFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.UnnestingFunctionCallExpression;
-import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.DistributeResultOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.EmptyTupleSourceOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.OrderOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import org.apache.hyracks.algebricks.core.algebra.base.*;
+import org.apache.hyracks.algebricks.core.algebra.expressions.*;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.*;
 import org.apache.hyracks.algebricks.core.algebra.plan.ALogicalPlanImpl;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -68,112 +45,13 @@ import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.functions.BuiltinFunctions;
-import org.apache.vxquery.functions.BuiltinOperators;
-import org.apache.vxquery.functions.ExternalFunction;
-import org.apache.vxquery.functions.Function;
-import org.apache.vxquery.functions.Signature;
-import org.apache.vxquery.functions.UserDefinedXQueryFunction;
+import org.apache.vxquery.functions.*;
 import org.apache.vxquery.metadata.QueryResultSetDataSink;
 import org.apache.vxquery.runtime.functions.cast.CastToDecimalOperation;
-import org.apache.vxquery.types.AnyItemType;
-import org.apache.vxquery.types.AnyNodeType;
-import org.apache.vxquery.types.AnyType;
-import org.apache.vxquery.types.AtomicType;
-import org.apache.vxquery.types.AttributeType;
-import org.apache.vxquery.types.BuiltinTypeConstants;
-import org.apache.vxquery.types.BuiltinTypeRegistry;
-import org.apache.vxquery.types.CommentType;
-import org.apache.vxquery.types.DocumentType;
-import org.apache.vxquery.types.ElementType;
-import org.apache.vxquery.types.EmptySequenceType;
-import org.apache.vxquery.types.ItemType;
-import org.apache.vxquery.types.NameTest;
-import org.apache.vxquery.types.NodeType;
-import org.apache.vxquery.types.ProcessingInstructionType;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SchemaType;
-import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.types.TextType;
-import org.apache.vxquery.types.TypeUtils;
-import org.apache.vxquery.xmlquery.ast.ASTNode;
-import org.apache.vxquery.xmlquery.ast.ASTTag;
-import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
-import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
-import org.apache.vxquery.xmlquery.ast.AxisStepNode;
-import org.apache.vxquery.xmlquery.ast.BaseUriDeclNode;
-import org.apache.vxquery.xmlquery.ast.BoundarySpaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.CDataSectionNode;
-import org.apache.vxquery.xmlquery.ast.ComputedAttributeConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedCommentConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedDocumentConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedElementConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedPIConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedTextConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ConstructionDeclNode;
-import org.apache.vxquery.xmlquery.ast.ContentCharsNode;
-import org.apache.vxquery.xmlquery.ast.CopyNamespacesDeclNode;
-import org.apache.vxquery.xmlquery.ast.DefaultCollationDeclNode;
-import org.apache.vxquery.xmlquery.ast.DefaultElementNamespaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.DefaultFunctionNamespaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.DirectAttributeConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DirectCommentConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DirectElementConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DirectPIConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DocumentTestNode;
-import org.apache.vxquery.xmlquery.ast.ElementTestNode;
-import org.apache.vxquery.xmlquery.ast.EmptyOrderDeclNode;
-import org.apache.vxquery.xmlquery.ast.EnclosedExprNode;
-import org.apache.vxquery.xmlquery.ast.ExprNode;
-import org.apache.vxquery.xmlquery.ast.ExtensionExprNode;
-import org.apache.vxquery.xmlquery.ast.FLWORClauseNode;
-import org.apache.vxquery.xmlquery.ast.FLWORExprNode;
-import org.apache.vxquery.xmlquery.ast.FilterExprNode;
-import org.apache.vxquery.xmlquery.ast.ForClauseNode;
-import org.apache.vxquery.xmlquery.ast.ForVarDeclNode;
-import org.apache.vxquery.xmlquery.ast.FunctionDeclNode;
-import org.apache.vxquery.xmlquery.ast.FunctionExprNode;
-import org.apache.vxquery.xmlquery.ast.IfExprNode;
-import org.apache.vxquery.xmlquery.ast.InfixExprNode;
+import org.apache.vxquery.types.*;
+import org.apache.vxquery.xmlquery.ast.*;
 import org.apache.vxquery.xmlquery.ast.InfixExprNode.InfixOperator;
-import org.apache.vxquery.xmlquery.ast.LetClauseNode;
-import org.apache.vxquery.xmlquery.ast.LetVarDeclNode;
-import org.apache.vxquery.xmlquery.ast.LibraryModuleNode;
-import org.apache.vxquery.xmlquery.ast.LiteralNode;
-import org.apache.vxquery.xmlquery.ast.MainModuleNode;
-import org.apache.vxquery.xmlquery.ast.ModuleImportNode;
-import org.apache.vxquery.xmlquery.ast.ModuleNode;
-import org.apache.vxquery.xmlquery.ast.NCNameNode;
-import org.apache.vxquery.xmlquery.ast.NameTestNode;
-import org.apache.vxquery.xmlquery.ast.NamespaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.OptionDeclNode;
-import org.apache.vxquery.xmlquery.ast.OrderSpecNode;
-import org.apache.vxquery.xmlquery.ast.OrderbyClauseNode;
-import org.apache.vxquery.xmlquery.ast.OrderedExprNode;
-import org.apache.vxquery.xmlquery.ast.OrderingModeDeclNode;
-import org.apache.vxquery.xmlquery.ast.PITestNode;
-import org.apache.vxquery.xmlquery.ast.ParamNode;
-import org.apache.vxquery.xmlquery.ast.ParenthesizedExprNode;
-import org.apache.vxquery.xmlquery.ast.PathExprNode;
-import org.apache.vxquery.xmlquery.ast.PrologNode;
-import org.apache.vxquery.xmlquery.ast.QNameNode;
-import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode;
 import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode.QuantifierType;
-import org.apache.vxquery.xmlquery.ast.QuantifiedVarDeclNode;
-import org.apache.vxquery.xmlquery.ast.QueryBodyNode;
-import org.apache.vxquery.xmlquery.ast.RelativePathExprNode;
-import org.apache.vxquery.xmlquery.ast.SchemaImportNode;
-import org.apache.vxquery.xmlquery.ast.SequenceTypeNode;
-import org.apache.vxquery.xmlquery.ast.SingleTypeNode;
-import org.apache.vxquery.xmlquery.ast.TypeDeclNode;
-import org.apache.vxquery.xmlquery.ast.TypeExprNode;
-import org.apache.vxquery.xmlquery.ast.UnaryExprNode;
-import org.apache.vxquery.xmlquery.ast.UnorderedExprNode;
-import org.apache.vxquery.xmlquery.ast.ValidateExprNode;
-import org.apache.vxquery.xmlquery.ast.VarDeclNode;
-import org.apache.vxquery.xmlquery.ast.VarRefNode;
-import org.apache.vxquery.xmlquery.ast.VersionDeclNode;
-import org.apache.vxquery.xmlquery.ast.WhereClauseNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.ModuleType;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompilerConstants;
@@ -823,6 +701,11 @@ public class XMLQueryTranslator {
                 return translateComputedAttributeConstructorNode(tCtx, cNode);
             }
 
+            case OBJECT_CONSTRUCTOR: {
+                ObjectConstructor obj = (ObjectConstructor) value;
+                return translateObjectConstructor(tCtx, obj);
+            }
+
             case QNAME: {
                 QNameNode qnNode = (QNameNode) value;
                 return translateQNameNode(tCtx, qnNode);
@@ -1178,6 +1061,22 @@ public class XMLQueryTranslator {
                 : sfce(BuiltinOperators.CONCATENATE, content.toArray(new ILogicalExpression[content.size()]));
         LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ATTRIBUTE_CONSTRUCTOR, name, contentExpr), tCtx);
         return lVar;
+    }
+
+    private LogicalVariable translateObjectConstructor(TranslationContext tCtx, ObjectConstructor obj)
+            throws SystemException {
+        List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
+        for (ASTNode aVal : obj.getContent()) {
+            String key = ((PairConstructor) aVal).getKey();
+            ILogicalExpression ke = ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
+                    unquote(key));
+            content.add(ke);
+            ILogicalExpression ve = vre(translateExpression(((PairConstructor) aVal).getValue(), tCtx));
+            content.add(ve);
+        }
+        ILogicalExpression contentExpr = sfce(BuiltinOperators.CONCATENATE,
+                content.toArray(new ILogicalExpression[content.size()]));
+        return createAssignment(sfce(BuiltinOperators.OBJECT_CONSTRUCTOR, contentExpr), tCtx);
     }
 
     private LogicalVariable translateDirectElementConstructorNode(TranslationContext tCtx,
