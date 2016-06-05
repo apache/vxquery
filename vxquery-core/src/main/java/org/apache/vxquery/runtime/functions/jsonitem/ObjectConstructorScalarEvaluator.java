@@ -70,6 +70,8 @@ public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorSca
                     ob.addItem(sp, tempValue);
                 }
             }
+            ppool.giveBack(tempKey);
+            ppool.giveBack(tempValue);
         }
         ob.finish();
     }

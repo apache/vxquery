@@ -20,40 +20,20 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.data.IPrinter;
+import org.apache.hyracks.data.std.primitive.*;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.*;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
+import org.apache.vxquery.datamodel.accessors.nodes.*;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.data.IPrinter;
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
-import org.apache.hyracks.data.std.primitive.BytePointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.FloatPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.ShortPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XMLSerializer implements IPrinter {
     private final PointablePool pp;
@@ -238,6 +218,7 @@ public class XMLSerializer implements IPrinter {
 
             case ValueTag.OBJECT_TAG:
                 printObject(ps,tvp);
+                break;
 
             default:
                 throw new UnsupportedOperationException("Encountered tag: " + tvp.getTag());
@@ -341,6 +322,54 @@ public class XMLSerializer implements IPrinter {
             pp.giveBack(utf8sp);
             pp.giveBack(anp);
             pp.giveBack(cqp);
+        }
+    }
+
+    private void printObject(PrintStream ps, TaggedValuePointable tvp) {
+        ObjectPointable op = pp.takeOne(ObjectPointable.class);
+        SequencePointable seqp = pp.takeOne(SequencePointable.class);
+        VoidPointable vp = pp.takeOne(VoidPointable.class);
+        UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
+        try {
+            tvp.getValue(op);
+            op.getKeys(tvp);
+            if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                int len = seqp.getEntryCount();
+                for (int i = 0; i < len; i++) {
+                    ps.append("{");
+                    seqp.getEntry(i, tvp);
+                    print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
+                    tvp.getValue(vp);
+                    utf8sp.set(vp);
+                    ps.append(":");
+                    op.getValue(utf8sp, tvp);
+                    printTaggedValuePointable(ps, tvp);
+                }
+            } else {
+                ps.append("{\"");
+                print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
+                ps.append('\"');
+                tvp.getValue(vp);
+                utf8sp.set(vp);
+                ps.append(":");
+                op.getValue(utf8sp, tvp);
+                if(tvp.getTag()==ValueTag.XS_STRING_TAG) {
+                    ps.append('\"');
+                }
+                printTaggedValuePointable(ps, tvp);
+                if(tvp.getTag()==ValueTag.XS_STRING_TAG) {
+                    ps.append('\"');
+                }
+                ps.append('}');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(op);
+            pp.giveBack(seqp);
+            pp.giveBack(tvp);
+            pp.giveBack(vp);
+            pp.giveBack(utf8sp);
         }
     }
 
@@ -804,10 +833,6 @@ public class XMLSerializer implements IPrinter {
         } finally {
             pp.giveBack(ip);
         }
-    }
-
-    private void printObject(PrintStream ps, TaggedValuePointable tvp) {
-
     }
 
     @Override
