@@ -217,7 +217,7 @@ public class XMLSerializer implements IPrinter {
                 break;
 
             case ValueTag.OBJECT_TAG:
-                printObject(ps,tvp);
+                printObject(ps, tvp);
                 break;
 
             default:
@@ -334,17 +334,30 @@ public class XMLSerializer implements IPrinter {
             tvp.getValue(op);
             op.getKeys(tvp);
             if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                tvp.getValue(seqp);
                 int len = seqp.getEntryCount();
+                ps.append('{');
                 for (int i = 0; i < len; i++) {
-                    ps.append("{");
+                    ps.append('\"');
                     seqp.getEntry(i, tvp);
                     print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
+                    ps.append('\"');
                     tvp.getValue(vp);
                     utf8sp.set(vp);
                     ps.append(":");
                     op.getValue(utf8sp, tvp);
+                    if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                        ps.append('\"');
+                    }
                     printTaggedValuePointable(ps, tvp);
+                    if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                        ps.append('\"');
+                    }
+                    if (i != len - 1) {
+                        ps.append(',');
+                    }
                 }
+                ps.append('}');
             } else {
                 ps.append("{\"");
                 print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
@@ -353,11 +366,11 @@ public class XMLSerializer implements IPrinter {
                 utf8sp.set(vp);
                 ps.append(":");
                 op.getValue(utf8sp, tvp);
-                if(tvp.getTag()==ValueTag.XS_STRING_TAG) {
+                if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
                     ps.append('\"');
                 }
                 printTaggedValuePointable(ps, tvp);
-                if(tvp.getTag()==ValueTag.XS_STRING_TAG) {
+                if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
                     ps.append('\"');
                 }
                 ps.append('}');

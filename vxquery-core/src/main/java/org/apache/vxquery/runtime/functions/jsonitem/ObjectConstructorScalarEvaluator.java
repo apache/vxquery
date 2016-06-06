@@ -17,8 +17,6 @@
 package org.apache.vxquery.runtime.functions.jsonitem;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
@@ -33,10 +31,11 @@ import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.node.AbstractNodeConstructorScalarEvaluator;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorScalarEvaluator {
     private ObjectBuilder ob;
-    private Set<TaggedValuePointable> keys;
+    private TaggedValuePointable[] pointables;
     private IPointable vp;
     private UTF8StringPointable sp;
     private SequencePointable seqp;
@@ -44,7 +43,6 @@ public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorSca
     public ObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
         ob = new ObjectBuilder();
-        keys = new HashSet<>();
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
@@ -61,19 +59,38 @@ public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorSca
         tvp = args[0];
         if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
             tvp.getValue(seqp);
-            for (int i = 0; i < seqp.getEntryCount(); i += 2) {
+            int len = seqp.getEntryCount();
+            pointables = new TaggedValuePointable[len / 2];
+            for (int i = 0; i < len; i += 2) {
                 seqp.getEntry(i, tempKey);
                 seqp.getEntry(i + 1, tempValue);
-                if (keys.add(tempKey)) {
+                if (!isDuplicate(tempKey)) {
+                    pointables[i / 2] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                    tempKey.getValue(pointables[i / 2]);
                     tempKey.getValue(vp);
                     sp.set(vp);
                     ob.addItem(sp, tempValue);
+                } else {
+                    //Todo: throw the required exception
                 }
             }
             ppool.giveBack(tempKey);
             ppool.giveBack(tempValue);
         }
         ob.finish();
+    }
+
+    private boolean isDuplicate(TaggedValuePointable tempKey) {
+        for (TaggedValuePointable tvp : pointables) {
+            if (tvp == null) {
+                return false;
+            }
+            tempKey.getValue(vp);
+            if (FunctionHelper.arraysEqual(tvp, vp)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
