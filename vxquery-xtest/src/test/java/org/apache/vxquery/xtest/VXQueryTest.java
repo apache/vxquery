@@ -65,9 +65,11 @@ public class VXQueryTest extends AbstractXQueryTest {
             FileUtils.deleteDirectory(tmp);
         }
         new File(TMP.concat("/indexFolder")).mkdirs();
+        String HDFSFolder = TMP.concat("/hdfsFolder");
+        new File(HDFSFolder).mkdirs();
         dfs = new MiniDFS();
         try {
-            dfs.startHDFS();
+            dfs.startHDFS(HDFSFolder);
         } catch (IOException e) {
             System.err.println(e);
         }
