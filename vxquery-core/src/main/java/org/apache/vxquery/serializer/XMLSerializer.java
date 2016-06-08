@@ -16,10 +16,6 @@
  */
 package org.apache.vxquery.serializer;
 
-import java.io.DataOutput;
-import java.io.IOException;
-import java.io.PrintStream;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.data.IPrinter;
 import org.apache.hyracks.data.std.primitive.*;
@@ -34,6 +30,10 @@ import org.apache.vxquery.datamodel.accessors.nodes.*;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
+
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.PrintStream;
 
 public class XMLSerializer implements IPrinter {
     private final PointablePool pp;
@@ -327,14 +327,23 @@ public class XMLSerializer implements IPrinter {
 
     private void printObject(PrintStream ps, TaggedValuePointable tvp) {
         ObjectPointable op = pp.takeOne(ObjectPointable.class);
+        tvp.getValue(op);
+        try {
+            op.getKeys(tvp);
+            printPair(ps,tvp,op);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void printPair(PrintStream ps, TaggedValuePointable keys,ObjectPointable op) {
         SequencePointable seqp = pp.takeOne(SequencePointable.class);
         VoidPointable vp = pp.takeOne(VoidPointable.class);
         UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
+        TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
         try {
-            tvp.getValue(op);
-            op.getKeys(tvp);
-            if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                tvp.getValue(seqp);
+            if (keys.getTag() == ValueTag.SEQUENCE_TAG) {
+                keys.getValue(seqp);
                 int len = seqp.getEntryCount();
                 ps.append('{');
                 for (int i = 0; i < len; i++) {
@@ -375,8 +384,6 @@ public class XMLSerializer implements IPrinter {
                 }
                 ps.append('}');
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             pp.giveBack(op);
             pp.giveBack(seqp);

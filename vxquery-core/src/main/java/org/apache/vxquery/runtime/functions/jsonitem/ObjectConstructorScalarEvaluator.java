@@ -67,7 +67,6 @@ public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorSca
                 if (!isDuplicate(tempKey)) {
                     pointables[i / 2] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
                     tempKey.getValue(pointables[i / 2]);
-                    tempKey.getValue(vp);
                     sp.set(vp);
                     ob.addItem(sp, tempValue);
                 } else {
@@ -82,11 +81,8 @@ public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorSca
 
     private boolean isDuplicate(TaggedValuePointable tempKey) {
         for (TaggedValuePointable tvp : pointables) {
-            if (tvp == null) {
-                return false;
-            }
             tempKey.getValue(vp);
-            if (FunctionHelper.arraysEqual(tvp, vp)) {
+            if (tvp != null && FunctionHelper.arraysEqual(tvp, vp)) {
                 return true;
             }
         }
