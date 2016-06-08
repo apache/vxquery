@@ -32,6 +32,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
@@ -218,6 +219,10 @@ public class XMLSerializer implements IPrinter {
 
             case ValueTag.ELEMENT_NODE_TAG:
                 printElementNode(ps, tvp);
+                break;
+
+            case ValueTag.ARRAY_TAG:
+                printArrayNode(ps, tvp);
                 break;
 
             case ValueTag.ATTRIBUTE_NODE_TAG:
@@ -438,6 +443,34 @@ public class XMLSerializer implements IPrinter {
             }
         } finally {
             pp.giveBack(vp);
+        }
+    }
+
+    private void printArrayNode(PrintStream ps, TaggedValuePointable tvp) {
+        ArrayPointable ap = pp.takeOne(ArrayPointable.class);
+        SequencePointable seqp = pp.takeOne(SequencePointable.class);
+
+        try {
+            tvp.getValue(ap);
+            if (tvp.getTag() == ValueTag.ARRAY_TAG) {
+                tvp.getValue(ap);
+                int len = ap.getEntryCount();
+                ps.append('[');
+
+                for (int i = 0; i < len; i++) {
+                    ap.getEntry(i, tvp);
+                    print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
+                    if (i != len - 1) {
+                        ps.append(',');
+                    }
+                }
+                ps.append(']');
+            }
+
+        } finally {
+            pp.giveBack(ap);
+            pp.giveBack(seqp);
+            pp.giveBack(tvp);
         }
     }
 
