@@ -704,7 +704,10 @@ ASTNode ExprSingle():
         | LOOKAHEAD(2) expr = QuantifiedExpr()
         | LOOKAHEAD(2) expr = TypeswitchExpr()
         | LOOKAHEAD(2) expr = IfExpr()
-        | expr = OrExpr()
+        | LOOKAHEAD(2) expr = OrExpr()
+        | LOOKAHEAD(2) expr = ArrayConstructor()
+        | LOOKAHEAD(2) expr = ObjectConstructor()
+        | expr = Literal()
     ) {
         return expr;
     }
@@ -1816,6 +1819,12 @@ ASTNode Literal()   :
         l.setType(LiteralNode.LiteralType.STRING);
         return l;
     }
+    | t = "null" {
+          LiteralNode l1 = new LiteralNode(createSourceLocation(t));
+          l1.setImage(t.image);
+          l1.setType(LiteralNode.LiteralType.NULL);
+          return l1;
+     }
 }
 
 ASTNode NumericLiteral()   :
@@ -1945,8 +1954,100 @@ ASTNode Constructor()  :
     (
         result = DirectConstructor()
         | result = ComputedConstructor()
+        | result = JsonConstructor()
     ) {
         return result;
+    }
+}
+ASTNode JsonConstructor() :
+{
+    ASTNode result;
+}
+{
+	(
+	result = ObjectConstructor()
+	| result = ArrayConstructor()){
+		return result;
+	}
+}
+
+ASTNode ObjectConstructor() :
+{
+    List<ASTNode> content = new ArrayList<ASTNode>();
+    Token t;
+    ASTNode pc;
+}
+{
+    t = <LbraceExprEnclosure>
+    (
+      pc = PairConstructor() {
+          content.add(pc);
+      } (
+          "," pc = PairConstructor() {
+              content.add(pc);
+          }
+        )*
+    )
+    <Rbrace>
+    {
+        ObjectConstructor obj = new ObjectConstructor(createSourceLocation(t));
+        obj.setContent(content);
+        return obj;
+    }
+
+}
+
+ASTNode PairConstructor() :
+{
+    String key;
+    ASTNode value;
+    Token t;
+}
+{
+    t = <StringLiteral> {
+        key = t.image;
+    }
+    (
+      ":"
+      | ":?"
+    )
+    (
+      value = ExprSingle()
+    ) {
+          PairConstructor pc = new PairConstructor(createSourceLocation(t));
+          pc.setKey(key);
+          pc.setValue(value);
+          return pc;
+    }
+}
+
+ASTNode ArrayConstructor()  :
+{
+	Token start, end;
+	List<ASTNode> items;
+}
+{
+	start="[" items=ArrayItemList() end="]" {
+		ArrayConstructorNode array = new ArrayConstructorNode(createSourceLocation(start));
+		array.setItems(items);
+		return array;
+	}
+}
+
+List<ASTNode> ArrayItemList()  :
+{
+	List<ASTNode> items = new ArrayList<ASTNode>();
+	ASTNode arraynode;
+}
+{[
+	arraynode = Literal() {
+        items.add(arraynode);
+    } (
+        "," arraynode = Literal() {
+            items.add(arraynode);
+        }
+    )* ]{
+        return items;
     }
 }
 

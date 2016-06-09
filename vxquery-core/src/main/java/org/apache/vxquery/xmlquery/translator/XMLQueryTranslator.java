@@ -96,84 +96,9 @@ import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.types.TypeUtils;
-import org.apache.vxquery.xmlquery.ast.ASTNode;
-import org.apache.vxquery.xmlquery.ast.ASTTag;
-import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
-import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
-import org.apache.vxquery.xmlquery.ast.AxisStepNode;
-import org.apache.vxquery.xmlquery.ast.BaseUriDeclNode;
-import org.apache.vxquery.xmlquery.ast.BoundarySpaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.CDataSectionNode;
-import org.apache.vxquery.xmlquery.ast.ComputedAttributeConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedCommentConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedDocumentConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedElementConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedPIConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ComputedTextConstructorNode;
-import org.apache.vxquery.xmlquery.ast.ConstructionDeclNode;
-import org.apache.vxquery.xmlquery.ast.ContentCharsNode;
-import org.apache.vxquery.xmlquery.ast.CopyNamespacesDeclNode;
-import org.apache.vxquery.xmlquery.ast.DefaultCollationDeclNode;
-import org.apache.vxquery.xmlquery.ast.DefaultElementNamespaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.DefaultFunctionNamespaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.DirectAttributeConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DirectCommentConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DirectElementConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DirectPIConstructorNode;
-import org.apache.vxquery.xmlquery.ast.DocumentTestNode;
-import org.apache.vxquery.xmlquery.ast.ElementTestNode;
-import org.apache.vxquery.xmlquery.ast.EmptyOrderDeclNode;
-import org.apache.vxquery.xmlquery.ast.EnclosedExprNode;
-import org.apache.vxquery.xmlquery.ast.ExprNode;
-import org.apache.vxquery.xmlquery.ast.ExtensionExprNode;
-import org.apache.vxquery.xmlquery.ast.FLWORClauseNode;
-import org.apache.vxquery.xmlquery.ast.FLWORExprNode;
-import org.apache.vxquery.xmlquery.ast.FilterExprNode;
-import org.apache.vxquery.xmlquery.ast.ForClauseNode;
-import org.apache.vxquery.xmlquery.ast.ForVarDeclNode;
-import org.apache.vxquery.xmlquery.ast.FunctionDeclNode;
-import org.apache.vxquery.xmlquery.ast.FunctionExprNode;
-import org.apache.vxquery.xmlquery.ast.IfExprNode;
-import org.apache.vxquery.xmlquery.ast.InfixExprNode;
+import org.apache.vxquery.xmlquery.ast.*;
 import org.apache.vxquery.xmlquery.ast.InfixExprNode.InfixOperator;
-import org.apache.vxquery.xmlquery.ast.LetClauseNode;
-import org.apache.vxquery.xmlquery.ast.LetVarDeclNode;
-import org.apache.vxquery.xmlquery.ast.LibraryModuleNode;
-import org.apache.vxquery.xmlquery.ast.LiteralNode;
-import org.apache.vxquery.xmlquery.ast.MainModuleNode;
-import org.apache.vxquery.xmlquery.ast.ModuleImportNode;
-import org.apache.vxquery.xmlquery.ast.ModuleNode;
-import org.apache.vxquery.xmlquery.ast.NCNameNode;
-import org.apache.vxquery.xmlquery.ast.NameTestNode;
-import org.apache.vxquery.xmlquery.ast.NamespaceDeclNode;
-import org.apache.vxquery.xmlquery.ast.OptionDeclNode;
-import org.apache.vxquery.xmlquery.ast.OrderSpecNode;
-import org.apache.vxquery.xmlquery.ast.OrderbyClauseNode;
-import org.apache.vxquery.xmlquery.ast.OrderedExprNode;
-import org.apache.vxquery.xmlquery.ast.OrderingModeDeclNode;
-import org.apache.vxquery.xmlquery.ast.PITestNode;
-import org.apache.vxquery.xmlquery.ast.ParamNode;
-import org.apache.vxquery.xmlquery.ast.ParenthesizedExprNode;
-import org.apache.vxquery.xmlquery.ast.PathExprNode;
-import org.apache.vxquery.xmlquery.ast.PrologNode;
-import org.apache.vxquery.xmlquery.ast.QNameNode;
-import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode;
 import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode.QuantifierType;
-import org.apache.vxquery.xmlquery.ast.QuantifiedVarDeclNode;
-import org.apache.vxquery.xmlquery.ast.QueryBodyNode;
-import org.apache.vxquery.xmlquery.ast.RelativePathExprNode;
-import org.apache.vxquery.xmlquery.ast.SchemaImportNode;
-import org.apache.vxquery.xmlquery.ast.SequenceTypeNode;
-import org.apache.vxquery.xmlquery.ast.SingleTypeNode;
-import org.apache.vxquery.xmlquery.ast.TypeDeclNode;
-import org.apache.vxquery.xmlquery.ast.TypeExprNode;
-import org.apache.vxquery.xmlquery.ast.UnaryExprNode;
-import org.apache.vxquery.xmlquery.ast.UnorderedExprNode;
-import org.apache.vxquery.xmlquery.ast.ValidateExprNode;
-import org.apache.vxquery.xmlquery.ast.VarDeclNode;
-import org.apache.vxquery.xmlquery.ast.VarRefNode;
-import org.apache.vxquery.xmlquery.ast.VersionDeclNode;
-import org.apache.vxquery.xmlquery.ast.WhereClauseNode;
 import org.apache.vxquery.xmlquery.query.Module;
 import org.apache.vxquery.xmlquery.query.ModuleType;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompilerConstants;
@@ -823,6 +748,11 @@ public class XMLQueryTranslator {
                 return translateComputedAttributeConstructorNode(tCtx, cNode);
             }
 
+            case OBJECT_CONSTRUCTOR: {
+                ObjectConstructor obj = (ObjectConstructor) value;
+                return translateObjectConstructor(tCtx, obj);
+            }
+
             case QNAME: {
                 QNameNode qnNode = (QNameNode) value;
                 return translateQNameNode(tCtx, qnNode);
@@ -1178,6 +1108,22 @@ public class XMLQueryTranslator {
                 : sfce(BuiltinOperators.CONCATENATE, content.toArray(new ILogicalExpression[content.size()]));
         LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ATTRIBUTE_CONSTRUCTOR, name, contentExpr), tCtx);
         return lVar;
+    }
+
+    private LogicalVariable translateObjectConstructor(TranslationContext tCtx, ObjectConstructor obj)
+            throws SystemException {
+        List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
+        for (ASTNode aVal : obj.getContent()) {
+            String key = ((PairConstructor) aVal).getKey();
+            ILogicalExpression ke = ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
+                    unquote(key));
+            content.add(ke);
+            ILogicalExpression ve = vre(translateExpression(((PairConstructor) aVal).getValue(), tCtx));
+            content.add(ve);
+        }
+        ILogicalExpression contentExpr = sfce(BuiltinOperators.CONCATENATE,
+                content.toArray(new ILogicalExpression[content.size()]));
+        return createAssignment(sfce(BuiltinOperators.OBJECT_CONSTRUCTOR, contentExpr), tCtx);
     }
 
     private LogicalVariable translateDirectElementConstructorNode(TranslationContext tCtx,

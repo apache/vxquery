@@ -149,6 +149,8 @@ public enum ErrorCode {
     FORX0004(new QName(XQueryConstants.ERR_NSURI, "FORX0004"), ErrorMessages.ERR_FORX0004_DESCRIPTION),
     FOTY0012(new QName(XQueryConstants.ERR_NSURI, "FOTY0012"), ErrorMessages.ERR_FOTY0012_DESCRIPTION),
 
+    JNDY0003(new QName(XQueryConstants.ERR_NSURI, "JNDY0003"), ErrorMessages.ERR_JNDY0003_DESCRIPTION),
+
     SYSE0001(new QName(XQueryConstants.ERR_NSURI, "SYSE0001"), ErrorMessages.ERR_SYSE0001_DESCRIPTION),
     TODO(new QName(XQueryConstants.ERR_NSURI, "TODO"), ErrorMessages.ERR_TODO_DESCRIPTION),
     ;

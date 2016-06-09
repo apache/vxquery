@@ -809,6 +809,14 @@
         </property>
     </operator>
 
+    <!-- opext:object-constructor($content as item()*) as node() -->
+    <operator name="opext:object-constructor">
+        <param name="content" type="item()*"/>
+        <return type="item()"/>
+        <runtime type="scalar"
+                 class="org.apache.vxquery.runtime.functions.jsonitem.ObjectConstructorScalarEvaluatorFactory"/>
+    </operator>
+
     <!-- opext:pi-constructor($target as xs:sring, $content as xs:string) as node() -->
     <operator name="opext:pi-constructor">
         <param name="target" type="xs:string"/>
