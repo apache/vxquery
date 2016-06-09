@@ -181,6 +181,8 @@ public class ErrorMessages {
     public static String ERR_FORX0004_DESCRIPTION;
     public static String ERR_FOTY0012_DESCRIPTION;
 
+    public static String ERR_JNDY0003_DESCRIPTION;
+
     public static String ERR_SYSE0001_DESCRIPTION;
     public static String ERR_TODO_DESCRIPTION;
 }

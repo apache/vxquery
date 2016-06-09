@@ -29,6 +29,7 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.node.AbstractNodeConstructorScalarEvaluator;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
@@ -70,7 +71,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorSca
                     sp.set(vp);
                     ob.addItem(sp, tempValue);
                 } else {
-                    //Todo: throw the required exception
+                    throw new SystemException(ErrorCode.JNDY0003);
                 }
             }
             ppool.giveBack(tempKey);
