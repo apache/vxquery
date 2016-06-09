@@ -44,16 +44,20 @@ public class ArrayNodeConstructorScalarEvaluator extends AbstractNodeConstructor
             throws IOException, SystemException {
         ab.reset(mvs);
         TaggedValuePointable arg = args[0];
-        TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
-            arg.getValue(sp);
-            for (int i = 0; i < sp.getEntryCount(); ++i) {
-                sp.getEntry(i, tempTvp);
-                ab.addItem(tempTvp);
+            TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+            try {
+                arg.getValue(sp);
+                for (int i = 0; i < sp.getEntryCount(); ++i) {
+                    sp.getEntry(i, tempTvp);
+                    ab.addItem(tempTvp);
+                }
+            } finally {
+                ppool.giveBack(tempTvp);
             }
-            ppool.giveBack(tempTvp);
+        } else {
+            ab.addItem(arg);
         }
-
         ab.finish();
     }
 
