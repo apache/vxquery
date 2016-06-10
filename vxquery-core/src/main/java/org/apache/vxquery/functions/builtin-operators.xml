@@ -852,6 +852,13 @@
         <param name="content" type="node()"/>
         <return type="node()"/>
     </operator>
+    
+    <!-- opext:array-constructor($expression as node()) as node() -->
+    <operator name="opext:array-constructor">
+        <param name="expession" type="node()"/>
+        <return type="item()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.ArrayConstructorScalarEvaluatorFactory"/>
+    </operator>
 
     <!-- opext:if-then-else($condition as xs:boolean, $then as item()*, $else as item()*) as item()* -->
     <operator name="opext:if-then-else">

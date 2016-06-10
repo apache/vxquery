@@ -97,7 +97,7 @@ public class XMLQuery {
 
 PARSER_END(XMLQuery)
 
-	
+    
 
 TOKEN_MGR_DECLS : {
   public Stack<Integer> stateStack = new Stack<Integer>();
@@ -105,7 +105,7 @@ TOKEN_MGR_DECLS : {
   public int offset = 0;
   
   
-  void CommonTokenAction(Token t) {}	
+  void CommonTokenAction(Token t) {}    
 
   
   /**
@@ -148,13 +148,13 @@ TOKEN_MGR_DECLS : {
    */
   private boolean isState(int state)
   {
-	for (int i = 0; i < stateStack.size(); i++) {
+    for (int i = 0; i < stateStack.size(); i++) {
         if(stateStack.elementAt(i) == state)
         {
-        	return true;
+            return true;
         }
-	}
-	return false;
+    }
+    return false;
   }
 
   /**
@@ -1945,6 +1945,7 @@ ASTNode Constructor()  :
     (
         result = DirectConstructor()
         | result = ComputedConstructor()
+        | result = JsonConstructor()
     ) {
         return result;
     }
@@ -2442,6 +2443,30 @@ ASTNode CompPIConstructor()  :
     }
 }
 
+ASTNode JsonConstructor()  :
+{
+    ASTNode result;
+}
+{
+    result = ArrayConstructor()
+    {
+        return result;
+    }
+}
+
+ASTNode ArrayConstructor()  :
+{
+    ASTNode expr=null;
+    Token start;
+}
+{
+    (start = "[") [expr = Expr()] "]" {
+        ArrayConstructor an = new ArrayConstructor(createSourceLocation(start));
+        an.setExpression(expr);
+        return an;
+    }
+}
+
 SingleTypeNode SingleType()  :
 {
     AtomicTypeNode type;
@@ -2800,7 +2825,7 @@ void FTSelection()  :
 void FTOrExpr()  : 
 {}
 {
-	FTOr()
+    FTOr()
 }
 
 void FTOr()  : 
