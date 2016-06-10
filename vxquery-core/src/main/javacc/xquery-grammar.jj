@@ -97,7 +97,7 @@ public class XMLQuery {
 
 PARSER_END(XMLQuery)
 
-	
+    
 
 TOKEN_MGR_DECLS : {
   public Stack<Integer> stateStack = new Stack<Integer>();
@@ -105,7 +105,7 @@ TOKEN_MGR_DECLS : {
   public int offset = 0;
   
   
-  void CommonTokenAction(Token t) {}	
+  void CommonTokenAction(Token t) {}    
 
   
   /**
@@ -148,13 +148,13 @@ TOKEN_MGR_DECLS : {
    */
   private boolean isState(int state)
   {
-	for (int i = 0; i < stateStack.size(); i++) {
+    for (int i = 0; i < stateStack.size(); i++) {
         if(stateStack.elementAt(i) == state)
         {
-        	return true;
+            return true;
         }
-	}
-	return false;
+    }
+    return false;
   }
 
   /**
@@ -2023,31 +2023,14 @@ ASTNode PairConstructor() :
 
 ASTNode ArrayConstructor()  :
 {
-	Token start, end;
-	List<ASTNode> items;
+    ASTNode expr=null;
+    Token start;
 }
 {
-	start="[" items=ArrayItemList() end="]" {
-		ArrayConstructorNode array = new ArrayConstructorNode(createSourceLocation(start));
-		array.setItems(items);
-		return array;
-	}
-}
-
-List<ASTNode> ArrayItemList()  :
-{
-	List<ASTNode> items = new ArrayList<ASTNode>();
-	ASTNode arraynode;
-}
-{[
-	arraynode = Literal() {
-        items.add(arraynode);
-    } (
-        "," arraynode = Literal() {
-            items.add(arraynode);
-        }
-    )* ]{
-        return items;
+    (start = "[") [expr = Expr()] "]" {
+        ArrayConstructor an = new ArrayConstructor(createSourceLocation(start));
+        an.setExpression(expr);
+        return an;
     }
 }
 
@@ -2901,7 +2884,7 @@ void FTSelection()  :
 void FTOrExpr()  : 
 {}
 {
-	FTOr()
+    FTOr()
 }
 
 void FTOr()  : 

@@ -96,7 +96,50 @@ import org.apache.vxquery.types.SchemaType;
 import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.types.TypeUtils;
+<<<<<<< HEAD
 import org.apache.vxquery.xmlquery.ast.*;
+=======
+import org.apache.vxquery.xmlquery.ast.ASTNode;
+import org.apache.vxquery.xmlquery.ast.ASTTag;
+import org.apache.vxquery.xmlquery.ast.ArrayConstructor;
+import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
+import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
+import org.apache.vxquery.xmlquery.ast.AxisStepNode;
+import org.apache.vxquery.xmlquery.ast.BaseUriDeclNode;
+import org.apache.vxquery.xmlquery.ast.BoundarySpaceDeclNode;
+import org.apache.vxquery.xmlquery.ast.CDataSectionNode;
+import org.apache.vxquery.xmlquery.ast.ComputedAttributeConstructorNode;
+import org.apache.vxquery.xmlquery.ast.ComputedCommentConstructorNode;
+import org.apache.vxquery.xmlquery.ast.ComputedDocumentConstructorNode;
+import org.apache.vxquery.xmlquery.ast.ComputedElementConstructorNode;
+import org.apache.vxquery.xmlquery.ast.ComputedPIConstructorNode;
+import org.apache.vxquery.xmlquery.ast.ComputedTextConstructorNode;
+import org.apache.vxquery.xmlquery.ast.ConstructionDeclNode;
+import org.apache.vxquery.xmlquery.ast.ContentCharsNode;
+import org.apache.vxquery.xmlquery.ast.CopyNamespacesDeclNode;
+import org.apache.vxquery.xmlquery.ast.DefaultCollationDeclNode;
+import org.apache.vxquery.xmlquery.ast.DefaultElementNamespaceDeclNode;
+import org.apache.vxquery.xmlquery.ast.DefaultFunctionNamespaceDeclNode;
+import org.apache.vxquery.xmlquery.ast.DirectAttributeConstructorNode;
+import org.apache.vxquery.xmlquery.ast.DirectCommentConstructorNode;
+import org.apache.vxquery.xmlquery.ast.DirectElementConstructorNode;
+import org.apache.vxquery.xmlquery.ast.DirectPIConstructorNode;
+import org.apache.vxquery.xmlquery.ast.DocumentTestNode;
+import org.apache.vxquery.xmlquery.ast.ElementTestNode;
+import org.apache.vxquery.xmlquery.ast.EmptyOrderDeclNode;
+import org.apache.vxquery.xmlquery.ast.EnclosedExprNode;
+import org.apache.vxquery.xmlquery.ast.ExprNode;
+import org.apache.vxquery.xmlquery.ast.ExtensionExprNode;
+import org.apache.vxquery.xmlquery.ast.FLWORClauseNode;
+import org.apache.vxquery.xmlquery.ast.FLWORExprNode;
+import org.apache.vxquery.xmlquery.ast.FilterExprNode;
+import org.apache.vxquery.xmlquery.ast.ForClauseNode;
+import org.apache.vxquery.xmlquery.ast.ForVarDeclNode;
+import org.apache.vxquery.xmlquery.ast.FunctionDeclNode;
+import org.apache.vxquery.xmlquery.ast.FunctionExprNode;
+import org.apache.vxquery.xmlquery.ast.IfExprNode;
+import org.apache.vxquery.xmlquery.ast.InfixExprNode;
+>>>>>>> 80efee30c7bf002420a1036ff7f3fee891e32f44
 import org.apache.vxquery.xmlquery.ast.InfixExprNode.InfixOperator;
 import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode.QuantifierType;
 import org.apache.vxquery.xmlquery.query.Module;
@@ -743,6 +786,11 @@ public class XMLQueryTranslator {
                 return translateComputedElementConstructorNode(tCtx, cNode);
             }
 
+            case ARRAY_CONSTRUCTOR: {
+                ArrayConstructor aNode = (ArrayConstructor) value;
+                return translateArrayConstructor(tCtx, aNode);
+            }
+
             case COMPUTED_ATTRIBUTE_CONSTRUCTOR: {
                 ComputedAttributeConstructorNode cNode = (ComputedAttributeConstructorNode) value;
                 return translateComputedAttributeConstructorNode(tCtx, cNode);
@@ -898,6 +946,15 @@ public class XMLQueryTranslator {
         ILogicalExpression cExpr = content == null ? sfce(BuiltinOperators.CONCATENATE)
                 : vre(translateExpression(content, tCtx));
         LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ELEMENT_CONSTRUCTOR, name, cExpr), tCtx);
+        return lVar;
+    }
+
+    private LogicalVariable translateArrayConstructor(TranslationContext tCtx, ArrayConstructor aNode)
+            throws SystemException {
+        ASTNode expression = aNode.getExpression();
+        ILogicalExpression aExpr = expression == null ? sfce(BuiltinOperators.CONCATENATE)
+                : vre(translateExpression(expression, tCtx));
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ARRAY_CONSTRUCTOR, aExpr), tCtx);
         return lVar;
     }
 

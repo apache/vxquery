@@ -24,7 +24,11 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+<<<<<<< HEAD
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
+=======
+import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
+>>>>>>> 80efee30c7bf002420a1036ff7f3fee891e32f44
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
@@ -74,6 +78,7 @@ public class PointablePoolFactory {
         pp.register(NodeTreePointable.class, NodeTreePointable.FACTORY);
         pp.register(DocumentNodePointable.class, DocumentNodePointable.FACTORY);
         pp.register(ElementNodePointable.class, ElementNodePointable.FACTORY);
+        pp.register(ArrayPointable.class, ArrayPointable.FACTORY);
         pp.register(AttributeNodePointable.class, AttributeNodePointable.FACTORY);
         pp.register(TextOrCommentNodePointable.class, TextOrCommentNodePointable.FACTORY);
         pp.register(PINodePointable.class, PINodePointable.FACTORY);

@@ -18,7 +18,6 @@ package org.apache.vxquery.xtest;
 
 import java.io.IOException;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
@@ -31,9 +30,8 @@ public class MiniDFS {
     private static final String PATH_TO_HADOOP_CONF = "src/test/resources/hadoop/conf";
     private static final String DATA_PATH = "src/test/resources/TestSources/ghcnd";
 
-    public void startHDFS() throws IOException {
+    public void startHDFS(String folder) throws IOException {
 
-        FileSystem lfs = FileSystem.getLocal(new Configuration());
         JobConf conf = new JobConf();
         conf.addResource(new Path(PATH_TO_HADOOP_CONF + "/core-site.xml"));
         conf.addResource(new Path(PATH_TO_HADOOP_CONF + "/mapred-site.xml"));
@@ -41,9 +39,8 @@ public class MiniDFS {
         int numDataNodes = 1;
         int nameNodePort = 40000;
 
-        // cleanup artifacts created on the local file system
-        lfs.delete(new Path("build"), true);
         System.setProperty("hadoop.log.dir", "logs");
+        System.setProperty("test.build.data", folder.concat("/"));
         MiniDFSCluster.Builder build = new MiniDFSCluster.Builder(conf);
         build.nameNodePort(nameNodePort);
         build.nameNodeHttpPort(nameNodePort + 34);
