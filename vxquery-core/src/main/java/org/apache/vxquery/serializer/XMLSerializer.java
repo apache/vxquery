@@ -24,11 +24,7 @@ import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-<<<<<<< HEAD
-import org.apache.vxquery.datamodel.accessors.atomic.*;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
-import org.apache.vxquery.datamodel.accessors.nodes.*;
-=======
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
@@ -44,7 +40,6 @@ import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
->>>>>>> 80efee30c7bf002420a1036ff7f3fee891e32f44
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;

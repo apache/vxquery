@@ -24,11 +24,8 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
-<<<<<<< HEAD
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
-=======
 import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
->>>>>>> 80efee30c7bf002420a1036ff7f3fee891e32f44
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
