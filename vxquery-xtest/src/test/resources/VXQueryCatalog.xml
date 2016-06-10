@@ -42,6 +42,8 @@
 
 <!ENTITY HDFSAggregateQueries SYSTEM "cat/HDFSAggregateQueries.xml">
 
+<!ENTITY IndexingQueries SYSTEM "cat/IndexingQueries.xml">
+
 <!ENTITY JsonArrayQueries SYSTEM "cat/JsonArrayQueries.xml">
 <!ENTITY JsonObjectQueries SYSTEM "cat/JsonObjectQueries.xml">
 
@@ -208,7 +210,20 @@
             <title>Aggregate HDFS Execution Tests</title>
             <description/>
          </GroupInfo>
-        &HDFSAggregateQueries;
+         &HDFSAggregateQueries;
+      </test-group>
+   </test-group>
+   <test-group name="IndexingQueries" featureOwner="Steven Jacobs">
+      <GroupInfo>
+         <title>Indexing Queries</title>
+         <description/>
+      </GroupInfo>
+      <test-group name="IndexingTests" featureOwner="Steven Jacobs">
+         <GroupInfo>
+            <title>Indexing Execution Tests</title>
+            <description/>
+         </GroupInfo>
+         &IndexingQueries;
       </test-group>
    </test-group>
    <test-group name="JsoniqQueries" featureOwner="Christina Pavlopoulou">

@@ -14,7 +14,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -475,20 +478,20 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <!-- We override the configuration plugin to override the descriptor 
-                    to use for building the source release zip. Specifically, we would like to 
-                    control the inclusions/exclusions. For example, we exclude the KEYS file 
+                <!-- We override the configuration plugin to override the descriptor
+                    to use for building the source release zip. Specifically, we would like to
+                    control the inclusions/exclusions. For example, we exclude the KEYS file
                     from the zip -->
                 <executions>
                     <execution>
-                        <!-- Use this id to match the id mentioned in the assembly plugin configuration 
+                        <!-- Use this id to match the id mentioned in the assembly plugin configuration
                             in the apache parent POM under the apache-release profile -->
                         <id>source-release-assembly</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
-                        <!-- combine.self should be override to replace the configuration in 
+                        <!-- combine.self should be override to replace the configuration in
                             the parent POM -->
                         <configuration combine.self="override">
                             <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
@@ -548,6 +551,30 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <version>0.11</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>.gitignore</exclude>
+                        <exclude>.rat-excludes</exclude>
+                        <exclude>.project</exclude>
+                        <exclude>.classpath</exclude>
+                        <exclude>.basex</exclude>
+                        <exclude>**/ExpectedTestResults/**</exclude>
+                        <exclude>**/xqts.txt</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -626,7 +653,7 @@
                     <maxmemory>2g</maxmemory>
                 </configuration>
             </plugin>
-            
+
         </plugins>
     </reporting>
 

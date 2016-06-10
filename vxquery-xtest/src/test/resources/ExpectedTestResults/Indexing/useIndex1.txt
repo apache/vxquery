@@ -1,0 +1,2 @@
+<data><date>2003-03-03T00:00:00.000</date><dataType>TMIN</dataType><station>GHCND:AS000000003</station><value>13.75</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data>
+<data><date>2003-03-03T00:00:00.000</date><dataType>TMAX</dataType><station>GHCND:AS000000003</station><value>33</value><attributes><attribute/><attribute/><attribute>a</attribute></attributes></data>
