@@ -24,22 +24,10 @@ import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.*;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
-import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
-import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
+import org.apache.vxquery.datamodel.accessors.nodes.*;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
@@ -344,12 +332,15 @@ public class XMLSerializer implements IPrinter {
 
     private void printObject(PrintStream ps, TaggedValuePointable tvp) {
         ObjectPointable op = pp.takeOne(ObjectPointable.class);
+        TaggedValuePointable keys = pp.takeOne(TaggedValuePointable.class);
         tvp.getValue(op);
         try {
-            op.getKeys(tvp);
-            printPair(ps, tvp, op);
+            op.getKeys(keys);
+            printPair(ps, keys, op);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            pp.giveBack(keys);
         }
     }
 
@@ -409,6 +400,28 @@ public class XMLSerializer implements IPrinter {
             pp.giveBack(tvp);
             pp.giveBack(vp);
             pp.giveBack(utf8sp);
+        }
+    }
+
+    private void printArray(PrintStream ps, TaggedValuePointable tvp) {
+        ArrayPointable ap = pp.takeOne(ArrayPointable.class);
+        try {
+            tvp.getValue(ap);
+            int len = ap.getEntryCount();
+            ps.append('[');
+            ps.append(' ');
+            for (int i = 0; i < len; i++) {
+                ap.getEntry(i, tvp);
+                print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
+                if (i != len - 1) {
+                    ps.append(',');
+                }
+                ps.append(' ');
+            }
+            ps.append(']');
+        } finally {
+            pp.giveBack(ap);
+            pp.giveBack(tvp);
         }
     }
 
@@ -512,29 +525,7 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
-    private void printArray(PrintStream ps, TaggedValuePointable tvp) {
-        ArrayPointable ap = pp.takeOne(ArrayPointable.class);
-        try {
-            tvp.getValue(ap);
-            int len = ap.getEntryCount();
-            ps.append('[');
-            ps.append(' ');
-            for (int i = 0; i < len; i++) {
-                ap.getEntry(i, tvp);
-                print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
-                if (i != len - 1) {
-                    ps.append(',');
-                }
-                ps.append(' ');
-            }
-            ps.append(']');
-        } finally {
-            pp.giveBack(ap);
-            pp.giveBack(tvp);
-        }
-    }
-
-    private void printBase64Binary(PrintStream ps, TaggedValuePointable tvp) {
+     private void printBase64Binary(PrintStream ps, TaggedValuePointable tvp) {
         XSBinaryPointable bp = pp.takeOne(XSBinaryPointable.class);
         try {
             tvp.getValue(bp);
