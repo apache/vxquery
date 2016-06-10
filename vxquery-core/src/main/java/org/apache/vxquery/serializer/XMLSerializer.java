@@ -330,13 +330,13 @@ public class XMLSerializer implements IPrinter {
         tvp.getValue(op);
         try {
             op.getKeys(tvp);
-            printPair(ps,tvp,op);
+            printPair(ps, tvp, op);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void printPair(PrintStream ps, TaggedValuePointable keys,ObjectPointable op) {
+    private void printPair(PrintStream ps, TaggedValuePointable keys, ObjectPointable op) {
         SequencePointable seqp = pp.takeOne(SequencePointable.class);
         VoidPointable vp = pp.takeOne(VoidPointable.class);
         UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
@@ -355,11 +355,12 @@ public class XMLSerializer implements IPrinter {
                     utf8sp.set(vp);
                     ps.append(":");
                     op.getValue(utf8sp, tvp);
-                    if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                    boolean isString = tvp.getTag() == ValueTag.XS_STRING_TAG;
+                    if (isString) {
                         ps.append('\"');
                     }
                     printTaggedValuePointable(ps, tvp);
-                    if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                    if (isString) {
                         ps.append('\"');
                     }
                     if (i != len - 1) {
@@ -369,17 +370,18 @@ public class XMLSerializer implements IPrinter {
                 ps.append('}');
             } else {
                 ps.append("{\"");
-                print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
+                print(keys.getByteArray(), keys.getStartOffset(), keys.getLength(), ps);
                 ps.append('\"');
-                tvp.getValue(vp);
+                keys.getValue(vp);
                 utf8sp.set(vp);
                 ps.append(":");
                 op.getValue(utf8sp, tvp);
-                if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                boolean isString = tvp.getTag() == ValueTag.XS_STRING_TAG;
+                if (isString) {
                     ps.append('\"');
                 }
                 printTaggedValuePointable(ps, tvp);
-                if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                if (isString) {
                     ps.append('\"');
                 }
                 ps.append('}');

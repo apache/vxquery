@@ -16,68 +16,40 @@
  */
 package org.apache.vxquery.runtime.functions.jsonitem;
 
-import java.io.IOException;
-
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
-import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.node.AbstractNodeConstructorScalarEvaluator;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorScalarEvaluator {
+import java.io.IOException;
+
+public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     private ObjectBuilder ob;
     private TaggedValuePointable[] pointables;
     private IPointable vp;
     private UTF8StringPointable sp;
     private SequencePointable seqp;
+    protected final IHyracksTaskContext ctx;
+    private final ArrayBackedValueStorage abvs;
 
     public ObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(ctx, args);
+        super(args);
+        this.ctx = ctx;
+        abvs = new ArrayBackedValueStorage();
         ob = new ObjectBuilder();
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-    }
-
-    @Override
-    protected void constructNode(DictionaryBuilder db, TaggedValuePointable[] args, IMutableValueStorage mvs)
-            throws IOException, SystemException {
-        ob.reset(mvs);
-        TaggedValuePointable tvp;
-        TaggedValuePointable tempKey = ppool.takeOne(TaggedValuePointable.class);
-        TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
-
-        tvp = args[0];
-        if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-            tvp.getValue(seqp);
-            int len = seqp.getEntryCount();
-            pointables = new TaggedValuePointable[len / 2];
-            for (int i = 0; i < len; i += 2) {
-                seqp.getEntry(i, tempKey);
-                seqp.getEntry(i + 1, tempValue);
-                if (!isDuplicate(tempKey)) {
-                    pointables[i / 2] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                    tempKey.getValue(pointables[i / 2]);
-                    sp.set(vp);
-                    ob.addItem(sp, tempValue);
-                } else {
-                    throw new SystemException(ErrorCode.JNDY0003);
-                }
-            }
-            ppool.giveBack(tempKey);
-            ppool.giveBack(tempValue);
-        }
-        ob.finish();
     }
 
     private boolean isDuplicate(TaggedValuePointable tempKey) {
@@ -91,7 +63,37 @@ public class ObjectConstructorScalarEvaluator extends AbstractNodeConstructorSca
     }
 
     @Override
-    protected boolean createsDictionary() {
-        return false;
+    protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+        try {
+            ob.reset(abvs);
+            TaggedValuePointable tvp;
+            TaggedValuePointable tempKey = ppool.takeOne(TaggedValuePointable.class);
+            TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
+
+            tvp = args[0];
+            if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                tvp.getValue(seqp);
+                int len = seqp.getEntryCount();
+                pointables = new TaggedValuePointable[len / 2];
+                for (int i = 0; i < len; i += 2) {
+                    seqp.getEntry(i, tempKey);
+                    seqp.getEntry(i + 1, tempValue);
+                    if (!isDuplicate(tempKey)) {
+                        pointables[i / 2] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                        tempKey.getValue(pointables[i / 2]);
+                        sp.set(vp);
+                        ob.addItem(sp, tempValue);
+                    } else {
+                        throw new SystemException(ErrorCode.JNDY0003);
+                    }
+                }
+                ppool.giveBack(tempKey);
+                ppool.giveBack(tempValue);
+            }
+            ob.finish();
+            result.set(abvs);
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        }
     }
 }

@@ -706,8 +706,7 @@ ASTNode ExprSingle():
         | LOOKAHEAD(2) expr = IfExpr()
         | LOOKAHEAD(2) expr = OrExpr()
         | LOOKAHEAD(2) expr = ArrayConstructor()
-        | LOOKAHEAD(2) expr = ObjectConstructor()
-        | expr = Literal()
+        | expr = ObjectConstructor()
     ) {
         return expr;
     }
@@ -1965,9 +1964,10 @@ ASTNode JsonConstructor() :
 }
 {
 	(
-	result = ObjectConstructor()
-	| result = ArrayConstructor()){
-		return result;
+	  result = ObjectConstructor()
+	  | result = ArrayConstructor()
+	){
+	    return result;
 	}
 }
 
