@@ -2456,12 +2456,12 @@ ASTNode JsonConstructor()  :
 
 ASTNode ArrayConstructor()  :
 {
-    ASTNode expr;
+    ASTNode expr=null;
     Token start;
 }
 {
-    (start = "[") expr = Expr() "]" {
-        ArrayConstructorNode an = new ArrayConstructorNode(createSourceLocation(start));
+    (start = "[") [expr = Expr()] "]" {
+        ArrayConstructor an = new ArrayConstructor(createSourceLocation(start));
         an.setExpression(expr);
         return an;
     }

@@ -20,50 +20,57 @@ import java.io.IOException;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IMutableValueStorage;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
-import org.apache.vxquery.datamodel.builders.nodes.DictionaryBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 
-public class ArrayNodeConstructorScalarEvaluator extends AbstractNodeConstructorScalarEvaluator {
+public class ArrayConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+    protected final IHyracksTaskContext ctx;
+
+    private final ArrayBackedValueStorage mvs;
+
     private final ArrayBuilder ab;
 
     private final SequencePointable sp;
 
-    public ArrayNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(ctx, args);
+    public ArrayConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
+        super(args);
+        this.ctx = ctx;
         ab = new ArrayBuilder();
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        mvs = new ArrayBackedValueStorage();
     }
 
     @Override
-    protected void constructNode(DictionaryBuilder db, TaggedValuePointable[] args, IMutableValueStorage mvs)
-            throws IOException, SystemException {
-        ab.reset(mvs);
-        TaggedValuePointable arg = args[0];
-        if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
-            TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
-            try {
-                arg.getValue(sp);
-                for (int i = 0; i < sp.getEntryCount(); ++i) {
-                    sp.getEntry(i, tempTvp);
-                    ab.addItem(tempTvp);
+    protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+        mvs.reset();
+        try {
+            ab.reset(mvs);
+            TaggedValuePointable arg = args[0];
+            if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
+                TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+                try {
+                    arg.getValue(sp);
+                    for (int i = 0; i < sp.getEntryCount(); ++i) {
+                        sp.getEntry(i, tempTvp);
+                        ab.addItem(tempTvp);
+                    }
+                } finally {
+                    ppool.giveBack(tempTvp);
                 }
-            } finally {
-                ppool.giveBack(tempTvp);
+            } else {
+                ab.addItem(arg);
             }
-        } else {
-            ab.addItem(arg);
+            ab.finish();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        ab.finish();
-    }
-
-    @Override
-    protected boolean createsDictionary() {
-        return false;
+        result.set(mvs);
     }
 
 }

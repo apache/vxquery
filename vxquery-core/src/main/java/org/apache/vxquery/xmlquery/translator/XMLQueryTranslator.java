@@ -98,7 +98,7 @@ import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.types.TypeUtils;
 import org.apache.vxquery.xmlquery.ast.ASTNode;
 import org.apache.vxquery.xmlquery.ast.ASTTag;
-import org.apache.vxquery.xmlquery.ast.ArrayConstructorNode;
+import org.apache.vxquery.xmlquery.ast.ArrayConstructor;
 import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
 import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
 import org.apache.vxquery.xmlquery.ast.AxisStepNode;
@@ -820,8 +820,8 @@ public class XMLQueryTranslator {
             }
 
             case ARRAY_CONSTRUCTOR: {
-                ArrayConstructorNode aNode = (ArrayConstructorNode) value;
-                return translateArrayConstructorNode(tCtx, aNode);
+                ArrayConstructor aNode = (ArrayConstructor) value;
+                return translateArrayConstructor(tCtx, aNode);
             }
 
             case COMPUTED_ATTRIBUTE_CONSTRUCTOR: {
@@ -977,13 +977,12 @@ public class XMLQueryTranslator {
         return lVar;
     }
 
-    private LogicalVariable translateArrayConstructorNode(TranslationContext tCtx, ArrayConstructorNode aNode)
+    private LogicalVariable translateArrayConstructor(TranslationContext tCtx, ArrayConstructor aNode)
             throws SystemException {
-        ILogicalExpression name = vre(translateExpression(aNode.getExpression(), tCtx));
         ASTNode expression = aNode.getExpression();
         ILogicalExpression aExpr = expression == null ? sfce(BuiltinOperators.CONCATENATE)
                 : vre(translateExpression(expression, tCtx));
-        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ARRAY_CONSTRUCTOR, name, aExpr), tCtx);
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.ARRAY_CONSTRUCTOR, aExpr), tCtx);
         return lVar;
     }
 

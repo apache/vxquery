@@ -18,10 +18,10 @@ package org.apache.vxquery.xmlquery.ast;
 
 import org.apache.vxquery.util.SourceLocation;
 
-public class ArrayConstructorNode extends ASTNode {
+public class ArrayConstructor extends ASTNode {
     private ASTNode expression;
 
-    public ArrayConstructorNode(SourceLocation loc) {
+    public ArrayConstructor(SourceLocation loc) {
         super(loc);
     }
 
