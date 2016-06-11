@@ -16,13 +16,13 @@
 -->
 
 <test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="JsonObjectQueries" featureOwner="VXQuery">
-   <GroupInfo>
-      <title>Json Object</title>
-      <description/>
-   </GroupInfo>
-   <test-case name="json-object-q01" FilePath="Json/Object/" Creator="Christina Pavlopoulou">
-      <description>Object.</description>
-      <query name="q01_object" date="2016-06-09"/>
-      <output-file compare="Text">q01_object.txt</output-file>
-   </test-case>
+    <GroupInfo>
+        <title>Json Object</title>
+        <description/>
+    </GroupInfo>
+    <test-case name="json-object-q01" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q01_object" date="2016-06-11"/>
+        <output-file compare="Text">q01_object.txt</output-file>
+    </test-case>
 </test-group>

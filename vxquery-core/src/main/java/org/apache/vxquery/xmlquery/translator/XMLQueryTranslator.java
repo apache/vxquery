@@ -1236,6 +1236,10 @@ public class XMLQueryTranslator {
                 t = SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE);
                 value = unquote(image);
                 break;
+            case NULL:
+                t = SequenceType.create(BuiltinTypeRegistry.JS_NULL, Quantifier.QUANT_ONE);
+                value=null;
+                break;
             default:
                 throw new IllegalStateException("Unknown type: " + lType);
         }
@@ -1897,6 +1901,11 @@ public class XMLQueryTranslator {
                         baaos.reset();
                         dOut.write((byte) ValueTag.XS_UNTYPED_ATOMIC_TAG);
                         stringVB.write((CharSequence) value, dOut);
+                        break;
+                    }
+                    case BuiltinTypeConstants.JS_NULL_TYPE_ID:{
+                        baaos.reset();
+                        dOut.write((byte) ValueTag.JS_NULL_TAG);
                         break;
                     }
                     default:

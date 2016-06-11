@@ -64,11 +64,11 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+        TaggedValuePointable tvp;
+        TaggedValuePointable tempKey = ppool.takeOne(TaggedValuePointable.class);
+        TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
         try {
             ob.reset(abvs);
-            TaggedValuePointable tvp;
-            TaggedValuePointable tempKey = ppool.takeOne(TaggedValuePointable.class);
-            TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
 
             tvp = args[0];
             if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
@@ -87,13 +87,14 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
                         throw new SystemException(ErrorCode.JNDY0003);
                     }
                 }
-                ppool.giveBack(tempKey);
-                ppool.giveBack(tempValue);
             }
             ob.finish();
             result.set(abvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
+        }finally {
+            ppool.giveBack(tempKey);
+            ppool.giveBack(tempValue);
         }
     }
 }

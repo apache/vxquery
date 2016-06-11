@@ -16,25 +16,46 @@
  */
 package org.apache.vxquery.serializer;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.data.IPrinter;
-import org.apache.hyracks.data.std.primitive.*;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.PrintStream;
+
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.accessors.atomic.*;
+import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
+import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
-import org.apache.vxquery.datamodel.accessors.nodes.*;
+import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
+import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
 
-import java.io.DataOutput;
-import java.io.IOException;
-import java.io.PrintStream;
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.data.IPrinter;
+import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import org.apache.hyracks.data.std.primitive.BytePointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.FloatPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.ShortPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XMLSerializer implements IPrinter {
     private final PointablePool pp;
@@ -225,9 +246,16 @@ public class XMLSerializer implements IPrinter {
                 printObject(ps, tvp);
                 break;
 
+            case ValueTag.JS_NULL_TAG:
+                printNull(ps,tvp);
+                break;
             default:
                 throw new UnsupportedOperationException("Encountered tag: " + tvp.getTag());
         }
+    }
+
+    private void printNull(PrintStream ps, TaggedValuePointable tvp) {
+        ps.append("null");
     }
 
     private void printDecimal(PrintStream ps, TaggedValuePointable tvp) {
@@ -384,13 +412,12 @@ public class XMLSerializer implements IPrinter {
                 utf8sp.set(vp);
                 ps.append(":");
                 op.getValue(utf8sp, tvp);
-                boolean isString = tvp.getTag() == ValueTag.XS_STRING_TAG;
-                if (isString) {
+                if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
                     ps.append('\"');
-                }
-                printTaggedValuePointable(ps, tvp);
-                if (isString) {
+                    printTaggedValuePointable(ps, tvp);
                     ps.append('\"');
+                }else {
+                    printTaggedValuePointable(ps, tvp);
                 }
                 ps.append('}');
             }

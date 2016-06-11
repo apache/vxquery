@@ -704,9 +704,7 @@ ASTNode ExprSingle():
         | LOOKAHEAD(2) expr = QuantifiedExpr()
         | LOOKAHEAD(2) expr = TypeswitchExpr()
         | LOOKAHEAD(2) expr = IfExpr()
-        | LOOKAHEAD(2) expr = OrExpr()
-        | LOOKAHEAD(2) expr = ArrayConstructor()
-        | expr = ObjectConstructor()
+        | expr = OrExpr()
     ) {
         return expr;
     }

@@ -16,5 +16,5 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Just an object example :)
-    1
+(: Pasrse object with a single item :)
+{"name":"Riyafa"}
