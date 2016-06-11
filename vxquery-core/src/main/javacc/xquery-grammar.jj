@@ -1985,7 +1985,7 @@ ASTNode ObjectConstructor() :
               content.add(pc);
           }
         )*
-    )
+    )*
     <Rbrace>
     {
         ObjectConstructor obj = new ObjectConstructor(createSourceLocation(t));
