@@ -16,5 +16,5 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Pasrse object with multiple items :)
+(: Pasrse empty object :)
 { }

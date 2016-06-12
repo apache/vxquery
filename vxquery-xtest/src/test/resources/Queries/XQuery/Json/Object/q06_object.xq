@@ -16,15 +16,12 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Pasrse object with nested objects :)
+(: Pasrse object with arrays :)
 {
-    "object1": {
-        "more": "object",
-        "number": 123
-    },
-    "object2": {
-        "object3": {
-            "number": 23
-        }
-    }
+    "a": [
+        1,
+        2,
+        3
+    ],
+    "b": 2
 }

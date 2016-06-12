@@ -16,15 +16,8 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Pasrse object with nested objects :)
+(: Pasrse object with functions :)
 {
-    "object1": {
-        "more": "object",
-        "number": 123
-    },
-    "object2": {
-        "object3": {
-            "number": 23
-        }
-    }
+    "a": xs:date("2016-06-07"),
+    "b": 2
 }

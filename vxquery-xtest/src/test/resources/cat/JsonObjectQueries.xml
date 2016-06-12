@@ -40,4 +40,14 @@
         <query name="q04_object" date="2016-06-11"/>
         <output-file compare="Text">q04_object.txt</output-file>
     </test-case>
+    <test-case name="json-object-q05" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q05_object" date="2016-06-11"/>
+        <output-file compare="Text">q05_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q06" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q06_object" date="2016-06-11"/>
+        <output-file compare="Text">q06_object.txt</output-file>
+    </test-case>
 </test-group>
