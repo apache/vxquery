@@ -50,4 +50,9 @@
         <query name="q06_object" date="2016-06-11"/>
         <output-file compare="Text">q06_object.txt</output-file>
     </test-case>
+    <test-case name="json-object-q07" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q07_object" date="2016-06-14"/>
+        <expected-error>JNDY0003</expected-error>
+    </test-case>
 </test-group>
