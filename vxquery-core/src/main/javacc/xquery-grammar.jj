@@ -1937,6 +1937,29 @@ ASTNode FunctionCall()  :
     }
 }
 
+ASTNode JsonConstructor() :
+{
+	ASTNode result;
+}
+{
+	
+	result = ObjectConstructor() | result = ArrayConstructor()
+	{
+		return result;
+	}
+}
+
+ASTNode ArrayConstructor() :
+{
+	Token start, end;
+	ASTNode expr;
+}
+{
+	start="[" ([expr=Literal()])* end="]" {
+		return expr;
+	}
+}
+
 ASTNode Constructor()  :
 {
     ASTNode result;
