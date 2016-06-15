@@ -16,9 +16,9 @@
  */
 package org.apache.vxquery.exceptions;
 
-import javax.xml.namespace.QName;
-
 import org.apache.vxquery.xmlquery.query.XQueryConstants;
+
+import javax.xml.namespace.QName;
 
 public enum ErrorCode {
     XPST0001(new QName(XQueryConstants.ERR_NSURI, "XPST0001"), ErrorMessages.ERR_XPST0001_DESCRIPTION),
@@ -148,6 +148,27 @@ public enum ErrorCode {
     FORX0003(new QName(XQueryConstants.ERR_NSURI, "FORX0003"), ErrorMessages.ERR_FORX0003_DESCRIPTION),
     FORX0004(new QName(XQueryConstants.ERR_NSURI, "FORX0004"), ErrorMessages.ERR_FORX0004_DESCRIPTION),
     FOTY0012(new QName(XQueryConstants.ERR_NSURI, "FOTY0012"), ErrorMessages.ERR_FOTY0012_DESCRIPTION),
+
+    JNDY0003(new QName(XQueryConstants.ERR_NSURI, "JNDY0003"), ErrorMessages.ERR_JNDY0003_DESCRIPTION),
+    JNTY0004(new QName(XQueryConstants.ERR_NSURI, "JNTY0004"), ErrorMessages.ERR_JNTY0004_DESCRIPTION),
+    JNUP0005(new QName(XQueryConstants.ERR_NSURI, "JNUP0005"), ErrorMessages.ERR_JNUP0005_DESCRIPTION),
+    JNUP0006(new QName(XQueryConstants.ERR_NSURI, "JNUP0006"), ErrorMessages.ERR_JNUP0006_DESCRIPTION),
+    JNUP0007(new QName(XQueryConstants.ERR_NSURI, "JNUP0007"), ErrorMessages.ERR_JNUP0007_DESCRIPTION),
+    JNUP0008(new QName(XQueryConstants.ERR_NSURI, "JNUP0008"), ErrorMessages.ERR_JNUP0008_DESCRIPTION),
+    JNUP0009(new QName(XQueryConstants.ERR_NSURI, "JNUP0009"), ErrorMessages.ERR_JNUP0009_DESCRIPTION),
+    JNUP0010(new QName(XQueryConstants.ERR_NSURI, "JNUP0010"), ErrorMessages.ERR_JNUP0010_DESCRIPTION),
+    JNTY0011(new QName(XQueryConstants.ERR_NSURI, "JNTY0011"), ErrorMessages.ERR_JNTY0011_DESCRIPTION),
+    JNSE0012(new QName(XQueryConstants.ERR_NSURI, "JNSE0012"), ErrorMessages.ERR_JNSE0012_DESCRIPTION),
+    JNSE0014(new QName(XQueryConstants.ERR_NSURI, "JNSE0014"), ErrorMessages.ERR_JNSE0014_DESCRIPTION),
+    JNSE0015(new QName(XQueryConstants.ERR_NSURI, "JNSE0015"), ErrorMessages.ERR_JNSE0015_DESCRIPTION),
+    JNUP0016(new QName(XQueryConstants.ERR_NSURI, "JNUP0016"), ErrorMessages.ERR_JNUP0016_DESCRIPTION),
+    JNTY0018(new QName(XQueryConstants.ERR_NSURI, "JNTY0018"), ErrorMessages.ERR_JNTY0018_DESCRIPTION),
+    JNUP0019(new QName(XQueryConstants.ERR_NSURI, "JNUP0019"), ErrorMessages.ERR_JNUP0019_DESCRIPTION),
+    JNTY0020(new QName(XQueryConstants.ERR_NSURI, "JNTY0020"), ErrorMessages.ERR_JNTY0020_DESCRIPTION),
+    JNDY0021(new QName(XQueryConstants.ERR_NSURI, "JNDY0021"), ErrorMessages.ERR_JNDY0021_DESCRIPTION),
+    JNSE0022(new QName(XQueryConstants.ERR_NSURI, "JNSE0022"), ErrorMessages.ERR_JNSE0022_DESCRIPTION),
+    JNTY0023(new QName(XQueryConstants.ERR_NSURI, "JNTY0023"), ErrorMessages.ERR_JNTY0023_DESCRIPTION),
+    JNTY0024(new QName(XQueryConstants.ERR_NSURI, "JNDY0003"), ErrorMessages.ERR_JNTY0024_DESCRIPTION),
 
     SYSE0001(new QName(XQueryConstants.ERR_NSURI, "SYSE0001"), ErrorMessages.ERR_SYSE0001_DESCRIPTION),
     TODO(new QName(XQueryConstants.ERR_NSURI, "TODO"), ErrorMessages.ERR_TODO_DESCRIPTION),

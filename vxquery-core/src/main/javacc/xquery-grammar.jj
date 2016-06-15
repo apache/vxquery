@@ -1816,6 +1816,12 @@ ASTNode Literal()   :
         l.setType(LiteralNode.LiteralType.STRING);
         return l;
     }
+    | t = "null" {
+        LiteralNode l1 = new LiteralNode(createSourceLocation(t));
+        l1.setImage(t.image);
+        l1.setType(LiteralNode.LiteralType.NULL);
+        return l1;
+     }
 }
 
 ASTNode NumericLiteral()   :
@@ -1948,6 +1954,81 @@ ASTNode Constructor()  :
         | result = JsonConstructor()
     ) {
         return result;
+    }
+}
+ASTNode JsonConstructor() :
+{
+    ASTNode result;
+}
+{
+	(
+	    result = ObjectConstructor()
+	    | result = ArrayConstructor()
+	) {
+	    return result;
+	}
+}
+
+ASTNode ObjectConstructor() :
+{
+    List<ASTNode> content = new ArrayList<ASTNode>();
+    Token t;
+    ASTNode pc;
+}
+{
+    t = <LbraceExprEnclosure>
+    (
+        pc = PairConstructor() {
+            content.add(pc);
+      } (
+            "," pc = PairConstructor() {
+                content.add(pc);
+            }
+        )*
+    )*
+    <Rbrace>
+    {
+        ObjectConstructor obj = new ObjectConstructor(createSourceLocation(t));
+        obj.setContent(content);
+        return obj;
+    }
+
+}
+
+ASTNode PairConstructor() :
+{
+    String key;
+    ASTNode value;
+    Token t;
+}
+{
+    t = <StringLiteral> {
+        key = t.image;
+    }
+    (
+        ":"
+        | ":?"
+    )
+    (
+        value = ExprSingle()
+    ) {
+          PairConstructor pc = new PairConstructor(createSourceLocation(t));
+          pc.setKey(key);
+          pc.setValue(value);
+          return pc;
+    }
+}
+
+ASTNode ArrayConstructor()  :
+{
+    ASTNode expr=null;
+    Token start;
+}
+{
+    (start = "[") [expr = Expr()] "]" {
+        ArrayConstructor an = new ArrayConstructor(createSourceLocation(start));
+        an.setExpression(expr);
+        return an;
     }
 }
 
@@ -2440,30 +2521,6 @@ ASTNode CompPIConstructor()  :
         pi.setTarget(target);
         pi.setContent(content);
         return pi;
-    }
-}
-
-ASTNode JsonConstructor()  :
-{
-    ASTNode result;
-}
-{
-    result = ArrayConstructor()
-    {
-        return result;
-    }
-}
-
-ASTNode ArrayConstructor()  :
-{
-    ASTNode expr=null;
-    Token start;
-}
-{
-    (start = "[") [expr = Expr()] "]" {
-        ArrayConstructor an = new ArrayConstructor(createSourceLocation(start));
-        an.setExpression(expr);
-        return an;
     }
 }
 

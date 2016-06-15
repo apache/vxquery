@@ -93,6 +93,7 @@ public class ObjectPointable extends AbstractPointable {
         result.set(abvs);
     }
 
+    //here the UTF8StringPointable of key is without the tag
     public boolean getValue(UTF8StringPointable key, IPointable result) {
         int dataAreaOffset = getDataAreaOffset(bytes, start);
         int entryCount = getEntryCount();

@@ -161,6 +161,9 @@ public final class BuiltinTypeRegistry {
     public static final BuiltinAtomicType XS_NOTATION = new BuiltinAtomicType(BuiltinTypeConstants.XS_NOTATION_TYPE_ID,
             XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
 
+    public static final BuiltinAtomicType JS_NULL = new BuiltinAtomicType(BuiltinTypeConstants.JS_NULL_TYPE_ID,
+            XS_ANY_ATOMIC, DerivationProcess.RESTRICTION);
+
     public static final BuiltinTypeRegistry INSTANCE = new BuiltinTypeRegistry();
 
     private final SchemaType[] types;

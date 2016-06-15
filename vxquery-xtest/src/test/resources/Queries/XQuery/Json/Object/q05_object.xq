@@ -16,5 +16,8 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Pasrse object with a single item :)
-{"name":"Riyafa"}
+(: Pasrse object with functions :)
+{
+    "a": xs:date("2016-06-07"),
+    "b": 2
+}

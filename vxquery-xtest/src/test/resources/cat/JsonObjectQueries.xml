@@ -16,13 +16,43 @@
 -->
 
 <test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="JsonObjectQueries" featureOwner="VXQuery">
-   <GroupInfo>
-      <title>Json Object</title>
-      <description/>
-   </GroupInfo>
-   <test-case name="json-object-q01" FilePath="Json/Object/" Creator="Christina Pavlopoulou">
-      <description>Object.</description>
-      <query name="q01_object" date="2016-06-09"/>
-      <output-file compare="Text">q01_object.txt</output-file>
-   </test-case>
+    <GroupInfo>
+        <title>Json Object</title>
+        <description/>
+    </GroupInfo>
+    <test-case name="json-object-q01" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q01_object" date="2016-06-11"/>
+        <output-file compare="Text">q01_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q02" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q02_object" date="2016-06-11"/>
+        <output-file compare="Text">q02_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q03" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q03_object" date="2016-06-11"/>
+        <output-file compare="Text">q03_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q04" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q04_object" date="2016-06-11"/>
+        <output-file compare="Text">q04_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q05" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q05_object" date="2016-06-11"/>
+        <output-file compare="Text">q05_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q06" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q06_object" date="2016-06-11"/>
+        <output-file compare="Text">q06_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q07" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q07_object" date="2016-06-14"/>
+        <expected-error>JNDY0003</expected-error>
+    </test-case>
 </test-group>
