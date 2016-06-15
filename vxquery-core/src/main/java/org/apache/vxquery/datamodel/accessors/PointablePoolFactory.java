@@ -80,7 +80,7 @@ public class PointablePoolFactory {
         pp.register(TextOrCommentNodePointable.class, TextOrCommentNodePointable.FACTORY);
         pp.register(PINodePointable.class, PINodePointable.FACTORY);
 
-        pp.register(ObjectPointable.class,ObjectPointable.FACTORY);
+        pp.register(ObjectPointable.class, ObjectPointable.FACTORY);
 
         return pp;
     }

@@ -1817,10 +1817,10 @@ ASTNode Literal()   :
         return l;
     }
     | t = "null" {
-          LiteralNode l1 = new LiteralNode(createSourceLocation(t));
-          l1.setImage(t.image);
-          l1.setType(LiteralNode.LiteralType.NULL);
-          return l1;
+        LiteralNode l1 = new LiteralNode(createSourceLocation(t));
+        l1.setImage(t.image);
+        l1.setType(LiteralNode.LiteralType.NULL);
+        return l1;
      }
 }
 
@@ -1962,9 +1962,9 @@ ASTNode JsonConstructor() :
 }
 {
 	(
-	  result = ObjectConstructor()
-	  | result = ArrayConstructor()
-	){
+	    result = ObjectConstructor()
+	    | result = ArrayConstructor()
+	) {
 	    return result;
 	}
 }
@@ -1978,12 +1978,12 @@ ASTNode ObjectConstructor() :
 {
     t = <LbraceExprEnclosure>
     (
-      pc = PairConstructor() {
-          content.add(pc);
+        pc = PairConstructor() {
+            content.add(pc);
       } (
-          "," pc = PairConstructor() {
-              content.add(pc);
-          }
+            "," pc = PairConstructor() {
+                content.add(pc);
+            }
         )*
     )*
     <Rbrace>
@@ -2006,11 +2006,11 @@ ASTNode PairConstructor() :
         key = t.image;
     }
     (
-      ":"
-      | ":?"
+        ":"
+        | ":?"
     )
     (
-      value = ExprSingle()
+        value = ExprSingle()
     ) {
           PairConstructor pc = new PairConstructor(createSourceLocation(t));
           pc.setKey(key);

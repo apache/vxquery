@@ -92,7 +92,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
             result.set(abvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
-        }finally {
+        } finally {
             ppool.giveBack(tempKey);
             ppool.giveBack(tempValue);
         }

@@ -247,7 +247,7 @@ public class XMLSerializer implements IPrinter {
                 break;
 
             case ValueTag.JS_NULL_TAG:
-                printNull(ps,tvp);
+                printNull(ps, tvp);
                 break;
             default:
                 throw new UnsupportedOperationException("Encountered tag: " + tvp.getTag());
@@ -364,7 +364,13 @@ public class XMLSerializer implements IPrinter {
         tvp.getValue(op);
         try {
             op.getKeys(keys);
-            printPair(ps, keys, op);
+            ps.append('{');
+            if (keys.getTag() == ValueTag.SEQUENCE_TAG) {
+                printObjectPairs(ps, keys, op);
+            } else {
+                printObjectPair(ps, keys, op);
+            }
+            ps.append('}');
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -372,62 +378,60 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
-    private void printPair(PrintStream ps, TaggedValuePointable keys, ObjectPointable op) {
-        SequencePointable seqp = pp.takeOne(SequencePointable.class);
-        VoidPointable vp = pp.takeOne(VoidPointable.class);
+    private void printObjectPair(PrintStream ps, TaggedValuePointable keys, ObjectPointable op) {
         UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
         TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
         try {
-            if (keys.getTag() == ValueTag.SEQUENCE_TAG) {
-                keys.getValue(seqp);
-                int len = seqp.getEntryCount();
-                ps.append('{');
-                for (int i = 0; i < len; i++) {
-                    ps.append('\"');
-                    seqp.getEntry(i, tvp);
-                    print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
-                    ps.append('\"');
-                    tvp.getValue(vp);
-                    utf8sp.set(vp);
-                    ps.append(":");
-                    op.getValue(utf8sp, tvp);
-                    boolean isString = tvp.getTag() == ValueTag.XS_STRING_TAG;
-                    if (isString) {
-                        ps.append('\"');
-                    }
-                    printTaggedValuePointable(ps, tvp);
-                    if (isString) {
-                        ps.append('\"');
-                    }
-                    if (i != len - 1) {
-                        ps.append(',');
-                    }
-                }
-                ps.append('}');
+            printQuotedString(ps, keys);
+            keys.getValue(utf8sp);
+            ps.append(":");
+            op.getValue(utf8sp, tvp);
+            if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                printQuotedString(ps, tvp);
             } else {
-                ps.append("{\"");
-                print(keys.getByteArray(), keys.getStartOffset(), keys.getLength(), ps);
-                ps.append('\"');
-                keys.getValue(vp);
-                utf8sp.set(vp);
+                printTaggedValuePointable(ps, tvp);
+            }
+        } finally {
+            pp.giveBack(op);
+            pp.giveBack(tvp);
+            pp.giveBack(utf8sp);
+        }
+    }
+
+    private void printObjectPairs(PrintStream ps, TaggedValuePointable keys, ObjectPointable op) {
+        SequencePointable seqp = pp.takeOne(SequencePointable.class);
+        UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
+        TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
+        try {
+            keys.getValue(seqp);
+            int len = seqp.getEntryCount();
+            for (int i = 0; i < len; i++) {
+                seqp.getEntry(i, tvp);
+                printQuotedString(ps, tvp);
+                tvp.getValue(utf8sp);
                 ps.append(":");
                 op.getValue(utf8sp, tvp);
                 if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
-                    ps.append('\"');
-                    printTaggedValuePointable(ps, tvp);
-                    ps.append('\"');
-                }else {
+                    printQuotedString(ps, tvp);
+                } else {
                     printTaggedValuePointable(ps, tvp);
                 }
-                ps.append('}');
+                if (i != len - 1) {
+                    ps.append(',');
+                }
             }
         } finally {
             pp.giveBack(op);
             pp.giveBack(seqp);
             pp.giveBack(tvp);
-            pp.giveBack(vp);
             pp.giveBack(utf8sp);
         }
+    }
+
+    private void printQuotedString(PrintStream ps, TaggedValuePointable tvp) {
+        ps.append('\"');
+        printString(ps, tvp);
+        ps.append('\"');
     }
 
     private void printArray(PrintStream ps, TaggedValuePointable tvp) {
@@ -552,7 +556,7 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
-     private void printBase64Binary(PrintStream ps, TaggedValuePointable tvp) {
+    private void printBase64Binary(PrintStream ps, TaggedValuePointable tvp) {
         XSBinaryPointable bp = pp.takeOne(XSBinaryPointable.class);
         try {
             tvp.getValue(bp);
