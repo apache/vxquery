@@ -61,7 +61,7 @@ public abstract class AbstractXQueryTest {
             case EXPECTED_RESULT_GOT_DIFFERENT_RESULT:
             case EXPECTED_RESULT_GOT_ERROR:
             case EXPECTED_RESULT_GOT_FAILURE:
-                fail(result.state + " (" + result.time + " ms): " + result.testCase.getXQueryDisplayName());
+                fail(result.state + " (" + result.time + " ms): " + result.testCase.getXQueryDisplayName() + " " + result.error);
                 break;
             case EXPECTED_ERROR_GOT_SAME_ERROR:
             case EXPECTED_RESULT_GOT_SAME_RESULT:

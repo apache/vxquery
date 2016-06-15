@@ -147,12 +147,14 @@ import org.apache.vxquery.xmlquery.ast.ModuleNode;
 import org.apache.vxquery.xmlquery.ast.NCNameNode;
 import org.apache.vxquery.xmlquery.ast.NameTestNode;
 import org.apache.vxquery.xmlquery.ast.NamespaceDeclNode;
+import org.apache.vxquery.xmlquery.ast.ObjectConstructor;
 import org.apache.vxquery.xmlquery.ast.OptionDeclNode;
 import org.apache.vxquery.xmlquery.ast.OrderSpecNode;
 import org.apache.vxquery.xmlquery.ast.OrderbyClauseNode;
 import org.apache.vxquery.xmlquery.ast.OrderedExprNode;
 import org.apache.vxquery.xmlquery.ast.OrderingModeDeclNode;
 import org.apache.vxquery.xmlquery.ast.PITestNode;
+import org.apache.vxquery.xmlquery.ast.PairConstructor;
 import org.apache.vxquery.xmlquery.ast.ParamNode;
 import org.apache.vxquery.xmlquery.ast.ParenthesizedExprNode;
 import org.apache.vxquery.xmlquery.ast.PathExprNode;
@@ -829,6 +831,11 @@ public class XMLQueryTranslator {
                 return translateComputedAttributeConstructorNode(tCtx, cNode);
             }
 
+            case OBJECT_CONSTRUCTOR: {
+                ObjectConstructor obj = (ObjectConstructor) value;
+                return translateObjectConstructor(tCtx, obj);
+            }
+
             case QNAME: {
                 QNameNode qnNode = (QNameNode) value;
                 return translateQNameNode(tCtx, qnNode);
@@ -1195,6 +1202,22 @@ public class XMLQueryTranslator {
         return lVar;
     }
 
+    private LogicalVariable translateObjectConstructor(TranslationContext tCtx, ObjectConstructor obj)
+            throws SystemException {
+        List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
+        for (ASTNode aVal : obj.getContent()) {
+            String key = ((PairConstructor) aVal).getKey();
+            ILogicalExpression ke = ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
+                    unquote(key));
+            content.add(ke);
+            ILogicalExpression ve = vre(translateExpression(((PairConstructor) aVal).getValue(), tCtx));
+            content.add(ve);
+        }
+        ILogicalExpression contentExpr = sfce(BuiltinOperators.CONCATENATE,
+                content.toArray(new ILogicalExpression[content.size()]));
+        return createAssignment(sfce(BuiltinOperators.OBJECT_CONSTRUCTOR, contentExpr), tCtx);
+    }
+
     private LogicalVariable translateDirectElementConstructorNode(TranslationContext tCtx,
             DirectElementConstructorNode decNode) throws SystemException {
         QNameNode startName = decNode.getStartTagName();
@@ -1290,6 +1313,10 @@ public class XMLQueryTranslator {
             case STRING:
                 t = SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE);
                 value = unquote(image);
+                break;
+            case NULL:
+                t = SequenceType.create(BuiltinTypeRegistry.JS_NULL, Quantifier.QUANT_ONE);
+                value = null;
                 break;
             default:
                 throw new IllegalStateException("Unknown type: " + lType);
@@ -1952,6 +1979,11 @@ public class XMLQueryTranslator {
                         baaos.reset();
                         dOut.write((byte) ValueTag.XS_UNTYPED_ATOMIC_TAG);
                         stringVB.write((CharSequence) value, dOut);
+                        break;
+                    }
+                    case BuiltinTypeConstants.JS_NULL_TYPE_ID: {
+                        baaos.reset();
+                        dOut.write((byte) ValueTag.JS_NULL_TAG);
                         break;
                     }
                     default:

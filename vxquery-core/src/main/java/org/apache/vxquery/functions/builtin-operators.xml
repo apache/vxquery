@@ -731,7 +731,7 @@
             <argument value="0"/>
         </property>
     </operator>
-    
+
     <!-- opext:sort-distinct-nodes-asc-or-atomics($arg as item()*) as item()* -->
     <operator name="opext:sort-distinct-nodes-asc-or-atomics">
         <param name="arg" type="item()*"/>
@@ -852,12 +852,19 @@
         <param name="content" type="node()"/>
         <return type="node()"/>
     </operator>
-    
-    <!-- opext:array-constructor($expression as node()) as node() -->
+
+    <!-- opext:array-constructor($expression as item()*) as array() -->
     <operator name="opext:array-constructor">
-        <param name="expession" type="node()"/>
+        <param name="expression" type="item()*"/>
         <return type="item()"/>
-        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.ArrayConstructorScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.jsonitem.ArrayConstructorScalarEvaluatorFactory"/>
+    </operator>
+
+    <!-- opext:object-constructor($expression as item()*) as object() -->
+    <operator name="opext:object-constructor">
+        <param name="expression" type="item()*"/>
+        <return type="item()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.jsonitem.ObjectConstructorScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:if-then-else($condition as xs:boolean, $then as item()*, $else as item()*) as item()* -->

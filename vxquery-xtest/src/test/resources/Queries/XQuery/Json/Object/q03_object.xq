@@ -16,5 +16,15 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Pasrse object with a single item :)
-{"name":"Riyafa"}
+(: Pasrse object with nested objects :)
+{
+    "object1": {
+        "more": "object",
+        "number": 123
+    },
+    "object2": {
+        "object3": {
+            "number": 23
+        }
+    }
+}

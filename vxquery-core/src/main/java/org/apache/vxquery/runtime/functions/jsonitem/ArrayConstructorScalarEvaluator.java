@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.runtime.functions.node;
+package org.apache.vxquery.runtime.functions.jsonitem;
 
 import java.io.IOException;
 

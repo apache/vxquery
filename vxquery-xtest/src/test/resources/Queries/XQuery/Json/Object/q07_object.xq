@@ -16,5 +16,9 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Pasrse object with a single item :)
-{"name":"Riyafa"}
+(: Pasrse object with arrays :)
+{
+    "a":123,
+    "a":234,
+    "b":456
+}
