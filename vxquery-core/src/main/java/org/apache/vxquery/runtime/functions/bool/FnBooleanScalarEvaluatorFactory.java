@@ -158,6 +158,15 @@ public class FnBooleanScalarEvaluatorFactory extends AbstractTaggedValueArgument
                     }
                     break;
                 }
+                case ValueTag.JS_NULL_TAG: {
+                    booleanResult = false;
+                    break;
+                }
+                case ValueTag.ARRAY_TAG:
+                case ValueTag.OBJECT_TAG: {
+                    booleanResult = true;
+                    break;
+                }
                 default:
                     throw new SystemException(ErrorCode.FORG0006);
             }

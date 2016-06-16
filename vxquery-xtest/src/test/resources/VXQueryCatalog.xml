@@ -46,6 +46,7 @@
 
 <!ENTITY JsonArrayQueries SYSTEM "cat/JsonArrayQueries.xml">
 <!ENTITY JsonObjectQueries SYSTEM "cat/JsonObjectQueries.xml">
+<!ENTITY FunctionsInJSONiq SYSTEM "cat/FunctionsInJSONiq.xml">
 
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
@@ -238,6 +239,18 @@
          </GroupInfo>
          &JsonArrayQueries;
          &JsonObjectQueries;
+      </test-group>
+   </test-group>
+   <test-group name="FunctionsInJSONiq" featureOwner="Riyafa Abdul Hameed">
+      <GroupInfo>
+         <title>Functions in JSONiq</title>
+         <description>The functions extended and newly created for JSONiq</description>
+      </GroupInfo>
+      <test-group name="FunctionsInJSONiqTesting" featureOwner="Riyafa Abdul Hameed">
+         <GroupInfo>
+            <title>Tests for functions in JSONiq</title>
+         </GroupInfo>
+         &FunctionsInJSONiq;
       </test-group>
    </test-group>
 </test-suite>
