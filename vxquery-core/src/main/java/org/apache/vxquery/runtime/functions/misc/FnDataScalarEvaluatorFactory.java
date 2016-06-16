@@ -71,10 +71,12 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
                     int seqLen = seq.getEntryCount();
                     for (int j = 0; j < seqLen; ++j) {
                         seq.getEntry(j, p);
+                        check(p);
                         ah.atomize(p, ppool, tempTVP);
                         sb.addItem(tempTVP);
                     }
                 } else {
+                    check(tvp);
                     ah.atomize(tvp, ppool, tempTVP);
                     sb.addItem(tempTVP);
                 }
@@ -85,6 +87,10 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
             }
         }
 
+        private void check(TaggedValuePointable p) throws SystemException {
+            if (p.getTag() == ValueTag.ARRAY_TAG || p.getTag() == ValueTag.OBJECT_TAG) {
+                throw new SystemException(ErrorCode.JNTY0004);
+            }
+        }
     }
-
 }
