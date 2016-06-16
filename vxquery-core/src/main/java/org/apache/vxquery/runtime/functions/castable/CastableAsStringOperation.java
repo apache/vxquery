@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.castable;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -171,6 +172,12 @@ public class CastableAsStringOperation extends AbstractCastableAsOperation {
 
     @Override
     public void convertYMDuration(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
+        dOut.write(ValueTag.XS_BOOLEAN_TAG);
+        dOut.write((byte) 1);
+    }
+
+    @Override
+    public void convertNull(TaggedValuePointable nullp, DataOutput dOut) throws SystemException, IOException {
         dOut.write(ValueTag.XS_BOOLEAN_TAG);
         dOut.write((byte) 1);
     }
