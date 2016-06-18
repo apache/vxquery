@@ -17,6 +17,7 @@
 package org.apache.vxquery.xmlquery.ast;
 
 public enum ASTTag {
+    ARGUMENT_EXPRESSION,
     VERSION_DECL,
     PROLOG,
     LIBRARY_MODULE,
@@ -80,6 +81,7 @@ public enum ASTTag {
     AXIS_STEP,
     NAME_TEST,
     FILTER_EXPRESSION,
+    POSTFIX_EXPRESSION,
     LITERAL,
     VARIABLE_REFERENCE,
     PARENTHESIZED_EXPRESSION,
