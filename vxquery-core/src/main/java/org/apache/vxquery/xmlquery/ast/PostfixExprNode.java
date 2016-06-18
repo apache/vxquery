@@ -20,17 +20,17 @@ import java.util.List;
 
 import org.apache.vxquery.util.SourceLocation;
 
-public class FilterExprNode extends ASTNode {
+public class PostfixExprNode extends ASTNode {
     private ASTNode expr;
-    private List<ASTNode> predicates;
+    private List<ASTNode> args;
 
-    public FilterExprNode(SourceLocation loc) {
+    public PostfixExprNode(SourceLocation loc) {
         super(loc);
     }
 
     @Override
     public ASTTag getTag() {
-        return ASTTag.FILTER_EXPRESSION;
+        return ASTTag.POSTFIX_EXPRESSION;
     }
 
     public ASTNode getExpr() {
@@ -41,11 +41,11 @@ public class FilterExprNode extends ASTNode {
         this.expr = expr;
     }
 
-    public List<ASTNode> getPredicates() {
-        return predicates;
+    public List<ASTNode> getArgs() {
+        return args;
     }
 
-    public void setPredicates(List<ASTNode> predicates) {
-        this.predicates = predicates;
+    public void setArgs(List<ASTNode> args) {
+        this.args = args;
     }
 }
