@@ -27,7 +27,9 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 
@@ -36,7 +38,7 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
     private final ArrayBackedValueStorage mvs;
     private final ArrayPointable ap;
     private final LongPointable lp;
-    private final ArrayBuilder ab;
+    private final SequenceBuilder ab;
     protected DataOutput out;
 
     public ValueScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
@@ -45,7 +47,7 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
         ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
         lp = (LongPointable) LongPointable.FACTORY.createPointable();
         mvs = new ArrayBackedValueStorage();
-        ab = new ArrayBuilder();
+        ab = new SequenceBuilder();
     }
 
     @Override
@@ -59,9 +61,14 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
                 TaggedValuePointable tvp2 = args[1];
                 TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
                 tvp2.getValue(lp);
+                if ((int) lp.getLong() > ap.getEntryCount())
+                    throw new RuntimeException("The argument is out of bounds");
                 ap.getEntry((int) lp.getLong() - 1, tempTvp);
                 try {
-                    ab.addItem(tempTvp);
+                    if (ap.getEntryCount() != 0)
+                        ab.addItem(tempTvp);
+                    else
+                        ab.addItem(tvp1);
                 } finally {
                     ppool.giveBack(tempTvp);
                 }

@@ -98,7 +98,7 @@ import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.types.TypeUtils;
 import org.apache.vxquery.xmlquery.ast.ASTNode;
 import org.apache.vxquery.xmlquery.ast.ASTTag;
-import org.apache.vxquery.xmlquery.ast.ArgumentNode;
+import org.apache.vxquery.xmlquery.ast.ArgumentListNode;
 import org.apache.vxquery.xmlquery.ast.ArrayConstructor;
 import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
 import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
@@ -1549,8 +1549,8 @@ public class XMLQueryTranslator {
                     List<ILogicalExpression> arguments = new ArrayList<ILogicalExpression>();
                     if (args != null && !args.isEmpty()) {
                         for (ASTNode an : args) {
-                            if (an.getTag() == ASTTag.ARGUMENT_EXPRESSION) {
-                                ArgumentNode argNode = (ArgumentNode) an;
+                            if (an.getTag() == ASTTag.ARGUMENT_LIST) {
+                                ArgumentListNode argNode = (ArgumentListNode) an;
                                 for (ASTNode en : argNode.getExpression()) {
                                     ILogicalExpression argument = vre(translateExpression(en, tCtx));
                                     arguments.add(argument);
@@ -1564,6 +1564,8 @@ public class XMLQueryTranslator {
                                         }
                                     }
                                 }
+                                if (arguments.size() == 0)
+                                    ctxExpr = expr;
                             } else {
                                 predicates = postfixNode.getArgs();
                                 ctxExpr = expr;

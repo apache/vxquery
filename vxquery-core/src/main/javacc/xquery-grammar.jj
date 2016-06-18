@@ -1753,9 +1753,9 @@ ASTNode PostfixExpr()   :
 {
     expr = PrimaryExpr() (arguments = Predicate() {
         argList.add(arguments);
-        } | arguments = Arguments() {
-            argList.add(arguments);
-        })*{
+    } | arguments = Arguments() {
+        argList.add(arguments);
+    } )* {
         PostfixExprNode pe = new PostfixExprNode(expr.getSourceLocation());
         pe.setExpr(expr);
         pe.setArgs(argList);  
@@ -1769,8 +1769,8 @@ ASTNode Arguments()    :
     Token start;
 }
 {
-   start= "(" expr=ArgumentList(){
-        ArgumentNode an =new ArgumentNode(createSourceLocation(start));
+   start= "(" expr = ArgumentList() {
+        ArgumentListNode an = new ArgumentListNode(createSourceLocation(start));
         an.setExpression(expr);
         return an;
     }
