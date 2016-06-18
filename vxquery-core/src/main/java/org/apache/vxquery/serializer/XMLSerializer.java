@@ -452,14 +452,12 @@ public class XMLSerializer implements IPrinter {
             tvp.getValue(ap);
             int len = ap.getEntryCount();
             ps.append('[');
-            ps.append(' ');
             for (int i = 0; i < len; i++) {
                 ap.getEntry(i, tvp);
                 print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
                 if (i != len - 1) {
                     ps.append(',');
                 }
-                ps.append(' ');
             }
             ps.append(']');
         } finally {

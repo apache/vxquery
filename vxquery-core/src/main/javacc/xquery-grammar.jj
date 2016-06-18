@@ -1541,7 +1541,8 @@ ASTNode StepExpr():
     ASTNode expr;
 }
 {
-    LOOKAHEAD(3) expr = FilterExpr() {
+    
+    LOOKAHEAD(3)expr = PostfixExpr() {
         return expr;
     }
     | expr = AxisStep() {
@@ -1743,17 +1744,54 @@ NameTestNode Wildcard():
     }
 }
 
-ASTNode FilterExpr()   :
+ASTNode PostfixExpr()   :
 {
     ASTNode expr;
-    List<ASTNode> pList;
+    ASTNode arguments;
+    List<ASTNode> argList=new ArrayList<ASTNode>();
 }
 {
-    expr = PrimaryExpr() pList = PredicateList() {
-        FilterExprNode fe = new FilterExprNode(expr.getSourceLocation());
-        fe.setExpr(expr);
-        fe.setPredicates(pList);
-        return fe;
+    expr = PrimaryExpr() (arguments = Predicate() {
+        argList.add(arguments);
+        } | arguments = Arguments() {
+            argList.add(arguments);
+        })*{
+        PostfixExprNode pe = new PostfixExprNode(expr.getSourceLocation());
+        pe.setExpr(expr);
+        pe.setArgs(argList);  
+        return pe;
+    }
+}
+
+ASTNode Arguments()    :
+{
+    List<ASTNode> expr = new ArrayList<ASTNode>();
+    Token start;
+}
+{
+   start= "(" expr=ArgumentList(){
+        ArgumentNode an =new ArgumentNode(createSourceLocation(start));
+        an.setExpression(expr);
+        return an;
+    }
+}
+
+List<ASTNode> ArgumentList()    :
+{
+    ASTNode expr;
+    List<ASTNode> args = new ArrayList<ASTNode>();
+}
+{
+     [
+        expr = ExprSingle() {
+            args.add(expr);
+        } (
+            "," expr = ExprSingle() {
+                args.add(expr);
+            }
+        )*
+    ] ")" {
+        return args;
     }
 }
 

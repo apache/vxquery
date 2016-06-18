@@ -98,6 +98,7 @@ import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.types.TypeUtils;
 import org.apache.vxquery.xmlquery.ast.ASTNode;
 import org.apache.vxquery.xmlquery.ast.ASTTag;
+import org.apache.vxquery.xmlquery.ast.ArgumentNode;
 import org.apache.vxquery.xmlquery.ast.ArrayConstructor;
 import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
 import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
@@ -156,6 +157,7 @@ import org.apache.vxquery.xmlquery.ast.PITestNode;
 import org.apache.vxquery.xmlquery.ast.ParamNode;
 import org.apache.vxquery.xmlquery.ast.ParenthesizedExprNode;
 import org.apache.vxquery.xmlquery.ast.PathExprNode;
+import org.apache.vxquery.xmlquery.ast.PostfixExprNode;
 import org.apache.vxquery.xmlquery.ast.PrologNode;
 import org.apache.vxquery.xmlquery.ast.QNameNode;
 import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode;
@@ -1513,6 +1515,36 @@ public class XMLQueryTranslator {
                     FilterExprNode filterNode = (FilterExprNode) pathNode;
                     predicates = filterNode.getPredicates();
                     ctxExpr = vre(translateExpression(filterNode.getExpr(), tCtx));
+                } else if (ASTTag.POSTFIX_EXPRESSION.equals(pathNode.getTag())) {
+                    PostfixExprNode postfixNode = (PostfixExprNode) pathNode;
+                    List<ASTNode> args = postfixNode.getArgs();
+                    ILogicalExpression expr = vre(translateExpression(postfixNode.getExpr(), tCtx));
+                    List<ILogicalExpression> arguments = new ArrayList<ILogicalExpression>();
+                    if (args != null && !args.isEmpty()) {
+                        for (ASTNode an : args) {
+                            if (an.getTag() == ASTTag.ARGUMENT_EXPRESSION) {
+                                ArgumentNode argNode = (ArgumentNode) an;
+                                for (ASTNode en : argNode.getExpression()) {
+                                    ILogicalExpression argument = vre(translateExpression(en, tCtx));
+                                    arguments.add(argument);
+                                    if (args.size() == 1) {
+                                        ctxExpr = sfce(BuiltinOperators.VALUE, expr, argument);
+                                    } else {
+                                        if (an == args.get(0))
+                                            ctxExpr = sfce(BuiltinOperators.VALUE, expr, argument);
+                                        if (an == args.get(1)) {
+                                            ctxExpr = sfce(BuiltinOperators.VALUE, data(ctxExpr), argument);
+                                        }
+                                    }
+                                }
+                            } else {
+                                predicates = postfixNode.getArgs();
+                                ctxExpr = expr;
+                            }
+                        }
+                    } else {
+                        ctxExpr = expr;
+                    }
                 } else {
                     throw new IllegalStateException("Unknown path node: " + pathNode.getTag());
                 }
@@ -2020,6 +2052,10 @@ public class XMLQueryTranslator {
 
     private ILogicalExpression data(ILogicalExpression expr) throws SystemException {
         return new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1, Collections.singletonList(mutable(expr)));
+    }
+
+    private ILogicalExpression size(ILogicalExpression expr) throws SystemException {
+        return sfce(BuiltinFunctions.FN_SIZE_1, expr);
     }
 
     private ILogicalExpression promote(ILogicalExpression expr, SequenceType type) throws SystemException {

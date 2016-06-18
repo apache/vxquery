@@ -646,6 +646,14 @@
         <return type="xs:anyAtomicType?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.arithmetic.AddScalarEvaluatorFactory"/>
     </operator>
+    
+    <!-- opext:value($expr as xs:item(), $arg as xs:anyAtomicType?) as xs:anyAtomicType? -->
+    <operator name="opext:value">
+        <param name="expr" type="item()"/>
+        <param name="argExpr" type="xs:anyAtomicType"/>
+        <return type="xs:anyAtomicType"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.ValueScalarEvaluatorFactory"/>
+    </operator>
 
     <!-- opext:subtract($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
     <operator name="opext:subtract">
