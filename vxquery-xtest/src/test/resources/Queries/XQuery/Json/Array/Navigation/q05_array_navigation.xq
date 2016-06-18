@@ -15,8 +15,8 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Array Size Query :)
-(: Size of an array :)
-    let $x:=[2,[2,1,3]]
-    return size($x)
+(: Json Array Navigation Query :)
+(: Ask for an index out of the array size:)
+    let $x:=[1]
+    return $x(2)
     

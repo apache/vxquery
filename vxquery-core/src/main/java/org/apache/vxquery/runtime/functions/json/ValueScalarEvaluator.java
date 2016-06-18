@@ -27,7 +27,10 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 
@@ -36,7 +39,7 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
     private final ArrayBackedValueStorage mvs;
     private final ArrayPointable ap;
     private final LongPointable lp;
-    private final ArrayBuilder ab;
+    private final SequenceBuilder ab;
     protected DataOutput out;
 
     public ValueScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
@@ -45,32 +48,40 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
         ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
         lp = (LongPointable) LongPointable.FACTORY.createPointable();
         mvs = new ArrayBackedValueStorage();
-        ab = new ArrayBuilder();
+        ab = new SequenceBuilder();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        mvs.reset();
-        try {
-            ab.reset(mvs);
-            TaggedValuePointable tvp1 = args[0];
-            if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
-                tvp1.getValue(ap);
-                TaggedValuePointable tvp2 = args[1];
-                TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
-                tvp2.getValue(lp);
-                ap.getEntry((int) lp.getLong() - 1, tempTvp);
-                try {
-                    ab.addItem(tempTvp);
-                } finally {
-                    ppool.giveBack(tempTvp);
-                }
-                ab.finish();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        TaggedValuePointable tvp1 = args[0];
+        TaggedValuePointable tvp2 = args[1];
+        if (!(tvp1.getTag() == ValueTag.ARRAY_TAG || tvp1.getTag() == ValueTag.OBJECT_TAG)) {
+            throw new SystemException(ErrorCode.FORG0006);
         }
-        result.set(mvs);
+        if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
+            if (tvp2.getTag() != ValueTag.XS_INTEGER_TAG) {
+                throw new SystemException(ErrorCode.FORG0006);
+            }
+            TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+            mvs.reset();
+            try {
+                ab.reset(mvs);
+                tvp1.getValue(ap);
+                tvp2.getValue(lp);
+                if ((int) lp.getLong() > ap.getEntryCount()) {
+                    ab.finish();
+                    result.set(mvs);
+                    return;
+                }
+                ap.getEntry((int) lp.getLong() - 1, tempTvp);
+                ab.addItem(ap.getEntryCount() != 0 ? tempTvp : tvp1);
+                ab.finish();
+                result.set(mvs);
+            } catch (IOException e) {
+                throw new SystemException(ErrorCode.SYSE0001, e);
+            } finally {
+                ppool.giveBack(tempTvp);
+            }
+        }
     }
-
 }

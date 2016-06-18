@@ -546,29 +546,6 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
-<<<<<<< HEAD
-=======
-    private void printArray(PrintStream ps, TaggedValuePointable tvp) {
-        ArrayPointable ap = pp.takeOne(ArrayPointable.class);
-        try {
-            tvp.getValue(ap);
-            int len = ap.getEntryCount();
-            ps.append('[');
-            for (int i = 0; i < len; i++) {
-                ap.getEntry(i, tvp);
-                print(tvp.getByteArray(), tvp.getStartOffset(), tvp.getLength(), ps);
-                if (i != len - 1) {
-                    ps.append(',');
-                }
-            }
-            ps.append(']');
-        } finally {
-            pp.giveBack(ap);
-            pp.giveBack(tvp);
-        }
-    }
-
->>>>>>> pavlopoulou/navigation
     private void printBase64Binary(PrintStream ps, TaggedValuePointable tvp) {
         XSBinaryPointable bp = pp.takeOne(XSBinaryPointable.class);
         try {

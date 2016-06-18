@@ -26,7 +26,7 @@
       <output-file compare="Text">q01_array_navigation.txt</output-file>
    </test-case>
    <test-case name="json-array-navigation-q02" FilePath="Json/Array/Navigation" Creator="Christina Pavlopoulou">
-      <description>Navigate through an array.</description>
+      <description>Navigate through nested arrays.</description>
       <query name="q02_array_navigation" date="2016-06-16"/>
       <output-file compare="Text">q02_array_navigation.txt</output-file>
    </test-case>
@@ -34,5 +34,15 @@
       <description>Size of an array.</description>
       <query name="q03_array_navigation" date="2016-06-16"/>
       <output-file compare="Text">q03_array_navigation.txt</output-file>
+   </test-case>
+   <test-case name="json-array-navigation-q04" FilePath="Json/Array/Navigation" Creator="Christina Pavlopoulou">
+      <description>Navigate through an empty array.</description>
+      <query name="q04_array_navigation" date="2016-06-18"/>
+      <output-file compare="Text">q04_array_navigation.txt</output-file>
+   </test-case>
+   <test-case name="json-array-navigation-q05" FilePath="Json/Array/Navigation" Creator="Christina Pavlopoulou">
+      <description>Ask for an index out of the array size.</description>
+      <query name="q05_array_navigation" date="2016-06-18"/>
+      <output-file compare="Text">q05_array_navigation.txt</output-file>
    </test-case>
 </test-group>

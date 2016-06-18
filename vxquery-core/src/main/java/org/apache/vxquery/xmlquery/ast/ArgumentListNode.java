@@ -20,23 +20,23 @@ import java.util.List;
 
 import org.apache.vxquery.util.SourceLocation;
 
-public class ArgumentNode extends ASTNode {
-    private List<ASTNode> expression;
+public class ArgumentListNode extends ASTNode {
+    private List<ASTNode> arg;
 
-    public ArgumentNode(SourceLocation loc) {
+    public ArgumentListNode(SourceLocation loc) {
         super(loc);
     }
 
     @Override
     public ASTTag getTag() {
-        return ASTTag.ARGUMENT_EXPRESSION;
+        return ASTTag.ARGUMENT_LIST;
     }
 
-    public List<ASTNode> getExpression() {
-        return expression;
+    public List<ASTNode> getArg() {
+        return arg;
     }
 
-    public void setExpression(List<ASTNode> expression) {
-        this.expression = expression;
+    public void setArg(List<ASTNode> arg) {
+        this.arg = arg;
     }
 }

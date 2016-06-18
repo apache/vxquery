@@ -1542,7 +1542,7 @@ ASTNode StepExpr():
 }
 {
     
-    LOOKAHEAD(3)expr = PostfixExpr() {
+    LOOKAHEAD(3) expr = PostfixExpr() {
         return expr;
     }
     | expr = AxisStep() {
@@ -1753,9 +1753,9 @@ ASTNode PostfixExpr()   :
 {
     expr = PrimaryExpr() (arguments = Predicate() {
         argList.add(arguments);
-        } | arguments = Arguments() {
-            argList.add(arguments);
-        })*{
+    } | arguments = Arguments() {
+        argList.add(arguments);
+    } )* {
         PostfixExprNode pe = new PostfixExprNode(expr.getSourceLocation());
         pe.setExpr(expr);
         pe.setArgs(argList);  
@@ -1765,13 +1765,13 @@ ASTNode PostfixExpr()   :
 
 ASTNode Arguments()    :
 {
-    List<ASTNode> expr = new ArrayList<ASTNode>();
+    List<ASTNode> arg;
     Token start;
 }
 {
-   start= "(" expr=ArgumentList(){
-        ArgumentNode an =new ArgumentNode(createSourceLocation(start));
-        an.setExpression(expr);
+   start= "(" arg = ArgumentList() {
+        ArgumentListNode an = new ArgumentListNode(createSourceLocation(start));
+        an.setArg(arg);
         return an;
     }
 }

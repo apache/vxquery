@@ -28,6 +28,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
@@ -56,18 +57,19 @@ public class FnSizeScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
 
         @Override
         protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-            abvs.reset();
             TaggedValuePointable tvp = args[0];
-            if (tvp.getTag() == ValueTag.ARRAY_TAG) {
-                tvp.getValue(ap);
-                DataOutput out = abvs.getDataOutput();
-                ap.getEntryCount();
-                try {
-                    out.write(ValueTag.XS_INT_TAG);
-                    out.writeInt(ap.getEntryCount());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if (!(tvp.getTag() != ValueTag.ARRAY_TAG || tvp.getTag() != ValueTag.OBJECT_TAG)) {
+                throw new SystemException(ErrorCode.FORG0006);
+            }
+            abvs.reset();
+            tvp.getValue(ap);
+            DataOutput out = abvs.getDataOutput();
+            ap.getEntryCount();
+            try {
+                out.write(ValueTag.XS_INTEGER_TAG);
+                out.writeLong(ap.getEntryCount());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             result.set(abvs);
         }

@@ -98,7 +98,7 @@ import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.types.TypeUtils;
 import org.apache.vxquery.xmlquery.ast.ASTNode;
 import org.apache.vxquery.xmlquery.ast.ASTTag;
-import org.apache.vxquery.xmlquery.ast.ArgumentNode;
+import org.apache.vxquery.xmlquery.ast.ArgumentListNode;
 import org.apache.vxquery.xmlquery.ast.ArrayConstructor;
 import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
 import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
@@ -130,7 +130,6 @@ import org.apache.vxquery.xmlquery.ast.ExprNode;
 import org.apache.vxquery.xmlquery.ast.ExtensionExprNode;
 import org.apache.vxquery.xmlquery.ast.FLWORClauseNode;
 import org.apache.vxquery.xmlquery.ast.FLWORExprNode;
-import org.apache.vxquery.xmlquery.ast.FilterExprNode;
 import org.apache.vxquery.xmlquery.ast.ForClauseNode;
 import org.apache.vxquery.xmlquery.ast.ForVarDeclNode;
 import org.apache.vxquery.xmlquery.ast.FunctionDeclNode;
@@ -1538,10 +1537,6 @@ public class XMLQueryTranslator {
                             treat(ctxExpr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR)),
                             ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), ntCode));
                     asc = isForwardAxis(axis);
-                } else if (ASTTag.FILTER_EXPRESSION.equals(pathNode.getTag())) {
-                    FilterExprNode filterNode = (FilterExprNode) pathNode;
-                    predicates = filterNode.getPredicates();
-                    ctxExpr = vre(translateExpression(filterNode.getExpr(), tCtx));
                 } else if (ASTTag.POSTFIX_EXPRESSION.equals(pathNode.getTag())) {
                     PostfixExprNode postfixNode = (PostfixExprNode) pathNode;
                     List<ASTNode> args = postfixNode.getArgs();
@@ -1549,21 +1544,22 @@ public class XMLQueryTranslator {
                     List<ILogicalExpression> arguments = new ArrayList<ILogicalExpression>();
                     if (args != null && !args.isEmpty()) {
                         for (ASTNode an : args) {
-                            if (an.getTag() == ASTTag.ARGUMENT_EXPRESSION) {
-                                ArgumentNode argNode = (ArgumentNode) an;
-                                for (ASTNode en : argNode.getExpression()) {
+                            if (an.getTag() == ASTTag.ARGUMENT_LIST) {
+                                ArgumentListNode argNode = (ArgumentListNode) an;
+                                for (ASTNode en : argNode.getArg()) {
                                     ILogicalExpression argument = vre(translateExpression(en, tCtx));
                                     arguments.add(argument);
-                                    if (args.size() == 1) {
+                                    //if this is the first argument, then the first parameter in the value 
+                                    //is the whole expression,
+                                    //otherwise it is the result of the value function
+                                    if (an == args.get(0)) {
                                         ctxExpr = sfce(BuiltinOperators.VALUE, expr, argument);
                                     } else {
-                                        if (an == args.get(0))
-                                            ctxExpr = sfce(BuiltinOperators.VALUE, expr, argument);
-                                        if (an == args.get(1)) {
-                                            ctxExpr = sfce(BuiltinOperators.VALUE, data(ctxExpr), argument);
-                                        }
+                                        ctxExpr = sfce(BuiltinOperators.VALUE, data(ctxExpr), argument);
                                     }
                                 }
+                                if (arguments.size() == 0)
+                                    ctxExpr = expr;
                             } else {
                                 predicates = postfixNode.getArgs();
                                 ctxExpr = expr;
@@ -2084,10 +2080,6 @@ public class XMLQueryTranslator {
 
     private ILogicalExpression data(ILogicalExpression expr) throws SystemException {
         return new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1, Collections.singletonList(mutable(expr)));
-    }
-
-    private ILogicalExpression size(ILogicalExpression expr) throws SystemException {
-        return sfce(BuiltinFunctions.FN_SIZE_1, expr);
     }
 
     private ILogicalExpression promote(ILogicalExpression expr, SequenceType type) throws SystemException {
