@@ -413,25 +413,6 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
-    private void printArray(PrintStream ps, TaggedValuePointable tvp) {
-        ArrayPointable ap = pp.takeOne(ArrayPointable.class);
-        try {
-            tvp.getValue(ap);
-            int len = ap.getEntryCount();
-            ps.append('[');
-            for (int i = 0; i < len; i++) {
-                ap.getEntry(i, tvp);
-                printJsonValue(ps, tvp);
-                if (i != len - 1) {
-                    ps.append(',');
-                }
-            }
-            ps.append(']');
-        } finally {
-            pp.giveBack(ap);
-        }
-    }
-
     private void printJsonValue(PrintStream ps, TaggedValuePointable tvp) {
         if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
             printQuotedString(ps, tvp);
@@ -546,8 +527,6 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
-<<<<<<< HEAD
-=======
     private void printArray(PrintStream ps, TaggedValuePointable tvp) {
         ArrayPointable ap = pp.takeOne(ArrayPointable.class);
         try {
@@ -568,7 +547,6 @@ public class XMLSerializer implements IPrinter {
         }
     }
 
->>>>>>> pavlopoulou/navigation
     private void printBase64Binary(PrintStream ps, TaggedValuePointable tvp) {
         XSBinaryPointable bp = pp.takeOne(XSBinaryPointable.class);
         try {
