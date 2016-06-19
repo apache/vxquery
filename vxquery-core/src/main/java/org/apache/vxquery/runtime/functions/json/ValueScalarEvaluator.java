@@ -29,6 +29,7 @@ import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -52,32 +53,30 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+        TaggedValuePointable tvp1;
+        TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         mvs.reset();
         try {
             ab.reset(mvs);
-            TaggedValuePointable tvp1 = args[0];
+            tvp1 = args[0];
             if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
                 tvp1.getValue(ap);
                 TaggedValuePointable tvp2 = args[1];
-                TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
                 tvp2.getValue(lp);
-                if ((int) lp.getLong() > ap.getEntryCount())
-                    throw new RuntimeException("The argument is out of bounds");
-                ap.getEntry((int) lp.getLong() - 1, tempTvp);
-                try {
-                    if (ap.getEntryCount() != 0)
-                        ab.addItem(tempTvp);
-                    else
-                        ab.addItem(tvp1);
-                } finally {
-                    ppool.giveBack(tempTvp);
+                if ((int) lp.getLong() > ap.getEntryCount()) {
+                    ab.finish();
+                    result.set(mvs);
+                    return;
                 }
-                ab.finish();
+                ap.getEntry((int) lp.getLong() - 1, tempTvp);
+                ab.addItem(ap.getEntryCount() != 0 ? tempTvp : tvp1);
             }
+            ab.finish();
+            result.set(mvs);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        } finally {
+            ppool.giveBack(tempTvp);
         }
-        result.set(mvs);
     }
-
 }

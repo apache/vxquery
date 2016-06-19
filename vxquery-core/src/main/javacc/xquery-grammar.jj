@@ -1542,7 +1542,7 @@ ASTNode StepExpr():
 }
 {
     
-    LOOKAHEAD(3)expr = PostfixExpr() {
+    LOOKAHEAD(3) expr = PostfixExpr() {
         return expr;
     }
     | expr = AxisStep() {
@@ -1765,13 +1765,13 @@ ASTNode PostfixExpr()   :
 
 ASTNode Arguments()    :
 {
-    List<ASTNode> expr = new ArrayList<ASTNode>();
+    List<ASTNode> arg;
     Token start;
 }
 {
-   start= "(" expr = ArgumentList() {
+   start= "(" arg = ArgumentList() {
         ArgumentListNode an = new ArgumentListNode(createSourceLocation(start));
-        an.setExpression(expr);
+        an.setArg(arg);
         return an;
     }
 }

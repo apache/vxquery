@@ -42,7 +42,7 @@
    </test-case>
    <test-case name="json-array-navigation-q05" FilePath="Json/Array/Navigation" Creator="Christina Pavlopoulou">
       <description>Ask for an index out of the array size.</description>
-      <query name="q04_array_navigation" date="2016-06-18"/>
+      <query name="q05_array_navigation" date="2016-06-18"/>
       <output-file compare="Text">q05_array_navigation.txt</output-file>
    </test-case>
 </test-group>

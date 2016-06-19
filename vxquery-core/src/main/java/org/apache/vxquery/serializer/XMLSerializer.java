@@ -543,7 +543,6 @@ public class XMLSerializer implements IPrinter {
             ps.append(']');
         } finally {
             pp.giveBack(ap);
-            pp.giveBack(tvp);
         }
     }
 

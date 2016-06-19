@@ -63,8 +63,8 @@ public class FnSizeScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
                 DataOutput out = abvs.getDataOutput();
                 ap.getEntryCount();
                 try {
-                    out.write(ValueTag.XS_INT_TAG);
-                    out.writeInt(ap.getEntryCount());
+                    out.write(ValueTag.XS_INTEGER_TAG);
+                    out.writeLong(ap.getEntryCount());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
