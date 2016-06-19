@@ -125,4 +125,6 @@ public class BuiltinTypeQNames {
             XQueryConstants.XS_PREFIX);
     public static final QName XSEXT_TYPE_TYPE_QNAME = new QName(XQueryConstants.XSEXT_NSURI, "type",
             XQueryConstants.XSEXT_PREFIX);
+    public static final QName JS_NULL_TYPE_QNAME = new QName(XQueryConstants.JS_NSURI, "null",
+            XQueryConstants.JS_PREFIX);
 }

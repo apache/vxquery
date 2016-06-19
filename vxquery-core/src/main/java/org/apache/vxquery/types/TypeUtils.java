@@ -27,39 +27,41 @@ public class TypeUtils {
     }
 
     public static SequenceType createSequenceType(StaticContext sCtx, String str) {
-        str = str.trim();
+        String s = str.trim();
         Quantifier q = Quantifier.QUANT_ONE;
-        if (str.endsWith("?")) {
+        if (s.endsWith("?")) {
             q = Quantifier.QUANT_QUESTION;
-            str = str.substring(0, str.length() - 1);
-        } else if (str.endsWith("*")) {
+            s = s.substring(0, s.length() - 1);
+        } else if (s.endsWith("*")) {
             q = Quantifier.QUANT_STAR;
-            str = str.substring(0, str.length() - 1);
-        } else if (str.endsWith("+")) {
+            s = s.substring(0, s.length() - 1);
+        } else if (s.endsWith("+")) {
             q = Quantifier.QUANT_PLUS;
-            str = str.substring(0, str.length() - 1);
+            s = s.substring(0, s.length() - 1);
         }
 
         ItemType it;
-        if (str.equals("item()")) {
+        if (s.equals("item()")) {
             it = AnyItemType.INSTANCE;
-        } else if (str.equals("node()")) {
+        } else if (s.equals("json-item()")) {
+            it = AnyJsonItemType.INSTANCE;
+        } else if (s.equals("node()")) {
             it = AnyNodeType.INSTANCE;
-        } else if (str.equals("document-node()")) {
+        } else if (s.equals("document-node()")) {
             it = DocumentType.ANYDOCUMENT;
-        } else if (str.equals("none")) {
+        } else if (s.equals("none")) {
             it = NoneType.INSTANCE;
-        } else if (str.equals("element()")) {
+        } else if (s.equals("element()")) {
             it = ElementType.ANYELEMENT;
-        } else if (str.equals("empty-sequence()")) {
+        } else if (s.equals("empty-sequence()")) {
             it = EmptySequenceType.INSTANCE;
         } else {
-            int idx = str.indexOf(':');
+            int idx = s.indexOf(':');
             if (idx < 0) {
-                throw new IllegalStateException("QName has no prefix: " + str);
+                throw new IllegalStateException("QName has no prefix: " + s);
             }
-            String prefix = str.substring(0, idx);
-            String local = str.substring(idx + 1);
+            String prefix = s.substring(0, idx);
+            String local = s.substring(idx + 1);
             String uri = sCtx.lookupNamespaceUri(prefix);
             if (uri == null) {
                 throw new IllegalStateException("Prefix has no URI mapping: " + prefix);

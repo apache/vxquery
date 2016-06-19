@@ -855,15 +855,15 @@
 
     <!-- opext:array-constructor($expression as item()*) as array() -->
     <operator name="opext:array-constructor">
-        <param name="expression" type="item()*"/>
-        <return type="item()"/>
+        <param name="expression" type="json-item()*"/>
+        <return type="json-item()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.jsonitem.ArrayConstructorScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:object-constructor($expression as item()*) as object() -->
     <operator name="opext:object-constructor">
-        <param name="expression" type="item()*"/>
-        <return type="item()"/>
+        <param name="expression" type="json-item()*"/>
+        <return type="json-item()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.jsonitem.ObjectConstructorScalarEvaluatorFactory"/>
     </operator>
 
