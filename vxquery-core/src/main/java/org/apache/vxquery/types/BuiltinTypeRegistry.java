@@ -219,6 +219,7 @@ public final class BuiltinTypeRegistry {
         types[BuiltinTypeConstants.XS_ANY_URI_TYPE_ID] = XS_ANY_URI;
         types[BuiltinTypeConstants.XS_QNAME_TYPE_ID] = XS_QNAME;
         types[BuiltinTypeConstants.XS_NOTATION_TYPE_ID] = XS_NOTATION;
+        types[BuiltinTypeConstants.JS_NULL_TYPE_ID] = JS_NULL;
 
         typeNames = new QName[BuiltinTypeConstants.BUILTIN_TYPE_COUNT];
         typeNames[BuiltinTypeConstants.XS_ANY_TYPE_ID] = BuiltinTypeQNames.XS_ANY_TYPE_QNAME;
@@ -270,6 +271,7 @@ public final class BuiltinTypeRegistry {
         typeNames[BuiltinTypeConstants.XS_ANY_URI_TYPE_ID] = BuiltinTypeQNames.XS_ANY_URI_TYPE_QNAME;
         typeNames[BuiltinTypeConstants.XS_QNAME_TYPE_ID] = BuiltinTypeQNames.XS_QNAME_TYPE_QNAME;
         typeNames[BuiltinTypeConstants.XS_NOTATION_TYPE_ID] = BuiltinTypeQNames.XS_NOTATION_TYPE_QNAME;
+        typeNames[BuiltinTypeConstants.JS_NULL_TYPE_ID] = BuiltinTypeQNames.JS_NULL_TYPE_QNAME;
     }
 
     public SchemaType getSchemaTypeById(int id) {

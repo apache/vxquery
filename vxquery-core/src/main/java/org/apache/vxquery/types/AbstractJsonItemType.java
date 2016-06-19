@@ -16,6 +16,11 @@
 */
 package org.apache.vxquery.types;
 
-public interface NodeType extends StructuredItemType {
-    public NodeKind getNodeKind();
+abstract class AbstractJsonItemType implements JsonItemType {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public final boolean isAtomicType() {
+        return false;
+    }
 }
