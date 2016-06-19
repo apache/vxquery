@@ -30,7 +30,7 @@ public final class SequenceType implements Serializable {
     private Quantifier quantifier;
 
     static {
-        Map<ItemType, SequenceType[]> types = new LinkedHashMap<ItemType, SequenceType[]>();
+        Map<ItemType, SequenceType[]> types = new LinkedHashMap<>();
 
         createBuiltinEntry(types, BuiltinTypeRegistry.XS_ANY_ATOMIC);
         createBuiltinEntry(types, BuiltinTypeRegistry.XS_STRING);
@@ -79,6 +79,7 @@ public final class SequenceType implements Serializable {
         createBuiltinEntry(types, BuiltinTypeRegistry.XS_ANY_URI);
         createBuiltinEntry(types, BuiltinTypeRegistry.XS_QNAME);
         createBuiltinEntry(types, BuiltinTypeRegistry.XS_NOTATION);
+        createBuiltinEntry(types, BuiltinTypeRegistry.JS_NULL);
 
         createBuiltinEntry(types, AnyItemType.INSTANCE);
         createBuiltinEntry(types, AnyNodeType.INSTANCE);
@@ -88,14 +89,24 @@ public final class SequenceType implements Serializable {
         createBuiltinEntry(types, CommentType.INSTANCE);
         createBuiltinEntry(types, ProcessingInstructionType.ANYPI);
 
+        createBuiltinEntry(types, ArrayType.INSTANCE);
+        createBuiltinEntry(types, ObjectType.INSTANCE);
+
         BUILTIN_SEQ_TYPES = Collections.unmodifiableMap(types);
     }
 
+    private SequenceType(ItemType itemType, Quantifier quantifier) {
+        this.itemType = itemType;
+        this.quantifier = quantifier;
+    }
+
     private static void createBuiltinEntry(Map<ItemType, SequenceType[]> types, ItemType itemType) {
-        types.put(itemType, new SequenceType[] { new SequenceType(itemType, Quantifier.QUANT_ZERO),
-                new SequenceType(itemType, Quantifier.QUANT_ONE),
-                new SequenceType(itemType, Quantifier.QUANT_QUESTION),
-                new SequenceType(itemType, Quantifier.QUANT_STAR), new SequenceType(itemType, Quantifier.QUANT_PLUS), });
+        types.put(itemType,
+                new SequenceType[] { new SequenceType(itemType, Quantifier.QUANT_ZERO),
+                        new SequenceType(itemType, Quantifier.QUANT_ONE),
+                        new SequenceType(itemType, Quantifier.QUANT_QUESTION),
+                        new SequenceType(itemType, Quantifier.QUANT_STAR),
+                        new SequenceType(itemType, Quantifier.QUANT_PLUS), });
     }
 
     public static SequenceType create(ItemType itemType, Quantifier quantifier) {
@@ -104,11 +115,6 @@ public final class SequenceType implements Serializable {
             return new SequenceType(itemType, quantifier);
         }
         return types[quantifier.ordinal()];
-    }
-
-    private SequenceType(ItemType itemType, Quantifier quantifier) {
-        this.itemType = itemType;
-        this.quantifier = quantifier;
     }
 
     public ItemType getItemType() {

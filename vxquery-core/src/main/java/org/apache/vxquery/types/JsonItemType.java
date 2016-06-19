@@ -16,6 +16,6 @@
 */
 package org.apache.vxquery.types;
 
-public interface NodeType extends StructuredItemType {
-    public NodeKind getNodeKind();
+public interface JsonItemType extends StructuredItemType {
+    public JsonItemKind getJsonItemKind();
 }
