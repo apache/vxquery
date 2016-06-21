@@ -25,6 +25,7 @@
       <query name="createIndex" date="2016-05-26"/>
       <output-file compare="Text">createIndex.txt</output-file>
    </test-case>
+   <!--  
    <test-case name="use-index-1" FilePath="Indexing/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex1" date="2016-05-26"/>
@@ -59,5 +60,5 @@
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex7" date="2016-05-26"/>
       <output-file compare="Text">useIndex7.txt</output-file>
-   </test-case>
+   </test-case>-->
 </test-group>

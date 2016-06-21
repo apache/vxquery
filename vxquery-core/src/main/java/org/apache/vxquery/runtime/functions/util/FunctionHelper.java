@@ -1,12 +1,12 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -1240,12 +1239,8 @@ public class FunctionHelper {
                         InputStream in = fs.open(xmlDocument).getWrappedStream();
                         parser.parseHDFSDocument(in, abvs);
                     }
-                } catch (FileNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    System.err.println(e);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    System.err.println(e);
+                } catch (Exception e) {
+                    throw new HyracksDataException(e);
                 }
             }
         }
