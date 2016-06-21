@@ -15,6 +15,7 @@
   limitations under the License.
 -->
 
+<!--  
 <test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="IndexingQueries" featureOwner="VXQuery">
    <GroupInfo>
       <title>Indexing</title>
@@ -54,10 +55,11 @@
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex6" date="2016-05-26"/>
       <output-file compare="Text">useIndex6.txt</output-file>
-   </test-case>
+   </test-case> 
    <test-case name="use-index-7" FilePath="Indexing/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex7" date="2016-05-26"/>
       <output-file compare="Text">useIndex7.txt</output-file>
    </test-case>
 </test-group>
+-->
