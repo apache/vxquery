@@ -181,6 +181,27 @@ public class ErrorMessages {
     public static String ERR_FORX0004_DESCRIPTION;
     public static String ERR_FOTY0012_DESCRIPTION;
 
+    public static String ERR_JNDY0003_DESCRIPTION;
+    public static String ERR_JNTY0004_DESCRIPTION;
+    public static String ERR_JNUP0005_DESCRIPTION;
+    public static String ERR_JNUP0006_DESCRIPTION;
+    public static String ERR_JNUP0007_DESCRIPTION;
+    public static String ERR_JNUP0008_DESCRIPTION;
+    public static String ERR_JNUP0009_DESCRIPTION;
+    public static String ERR_JNUP0010_DESCRIPTION;
+    public static String ERR_JNTY0011_DESCRIPTION;
+    public static String ERR_JNSE0012_DESCRIPTION;
+    public static String ERR_JNSE0014_DESCRIPTION;
+    public static String ERR_JNSE0015_DESCRIPTION;
+    public static String ERR_JNUP0016_DESCRIPTION;
+    public static String ERR_JNTY0018_DESCRIPTION;
+    public static String ERR_JNUP0019_DESCRIPTION;
+    public static String ERR_JNTY0020_DESCRIPTION;
+    public static String ERR_JNDY0021_DESCRIPTION;
+    public static String ERR_JNSE0022_DESCRIPTION;
+    public static String ERR_JNTY0023_DESCRIPTION;
+    public static String ERR_JNTY0024_DESCRIPTION;
+
     public static String ERR_SYSE0001_DESCRIPTION;
     public static String ERR_TODO_DESCRIPTION;
 }

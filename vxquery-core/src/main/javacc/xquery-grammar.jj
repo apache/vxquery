@@ -97,17 +97,17 @@ public class XMLQuery {
 
 PARSER_END(XMLQuery)
 
-	
+
 
 TOKEN_MGR_DECLS : {
   public Stack<Integer> stateStack = new Stack<Integer>();
   static final int PARENMARKER = 2000;
   public int offset = 0;
-  
-  
-  void CommonTokenAction(Token t) {}	
 
-  
+
+  void CommonTokenAction(Token t) {}
+
+
   /**
    * Push the current state onto the state stack.
    */
@@ -115,7 +115,7 @@ TOKEN_MGR_DECLS : {
   {
       stateStack.addElement(curLexState);
   }
-  
+
   /**
    * Push the given state onto the state stack.
    * @param state Must be a valid state.
@@ -124,7 +124,7 @@ TOKEN_MGR_DECLS : {
   {
       stateStack.push(state);
   }
-  
+
   /**
    * Pop the state on the state stack, and switch to that state.
    */
@@ -136,30 +136,30 @@ TOKEN_MGR_DECLS : {
     }
 
     int nextState = stateStack.pop();
-    
+
     if(nextState == PARENMARKER)
       printLinePos();
     SwitchTo(nextState);
   }
-  
+
   /**
    * Push the given state onto the state stack.
    * @param state Must be a valid state.
    */
   private boolean isState(int state)
   {
-	for (int i = 0; i < stateStack.size(); i++) {
+    for (int i = 0; i < stateStack.size(); i++) {
         if(stateStack.elementAt(i) == state)
         {
-        	return true;
+            return true;
         }
-	}
-	return false;
+    }
+    return false;
   }
 
   /**
-   * Push a parenthesis state.  This pushes, in addition to the 
-   * lexical state value, a special marker that lets 
+   * Push a parenthesis state.  This pushes, in addition to the
+   * lexical state value, a special marker that lets
    * resetParenStateOrSwitch(int state)
    * know if it should pop and switch.  Used for the comma operator.
    */
@@ -1003,7 +1003,7 @@ ASTNode IfExpr()  :
     }
 }
 
-ASTNode OrExpr() : 
+ASTNode OrExpr() :
 {
     ASTNode result;
     ASTNode temp;
@@ -1021,7 +1021,7 @@ ASTNode OrExpr() :
     }
 }
 
-ASTNode AndExpr(): 
+ASTNode AndExpr():
 {
     ASTNode result;
     ASTNode temp;
@@ -1039,7 +1039,7 @@ ASTNode AndExpr():
     }
 }
 
-ASTNode ComparisonExpr(): 
+ASTNode ComparisonExpr():
 {
     ASTNode result;
     ASTNode temp;
@@ -1060,7 +1060,7 @@ ASTNode ComparisonExpr():
 }
 
 // TODO - Not yet implemented.
-ASTNode FTContainsExpr(): 
+ASTNode FTContainsExpr():
 {
     ASTNode result;
 }
@@ -1072,7 +1072,7 @@ ASTNode FTContainsExpr():
     }
 }
 
-ASTNode RangeExpr() : 
+ASTNode RangeExpr() :
 {
     ASTNode result;
     ASTNode temp;
@@ -1090,7 +1090,7 @@ ASTNode RangeExpr() :
     }
 }
 
-ASTNode AdditiveExpr(): 
+ASTNode AdditiveExpr():
 {
     ASTNode result;
     ASTNode temp;
@@ -1116,7 +1116,7 @@ ASTNode AdditiveExpr():
     }
 }
 
-ASTNode MultiplicativeExpr(): 
+ASTNode MultiplicativeExpr():
 {
     ASTNode result = null;
     ASTNode temp;
@@ -1150,7 +1150,7 @@ ASTNode MultiplicativeExpr():
     }
 }
 
-ASTNode UnionExpr(): 
+ASTNode UnionExpr():
 {
     ASTNode result = null;
     ASTNode temp;
@@ -1173,7 +1173,7 @@ ASTNode UnionExpr():
     }
 }
 
-ASTNode IntersectExceptExpr(): 
+ASTNode IntersectExceptExpr():
 {
     ASTNode result = null;
     ASTNode temp;
@@ -1199,7 +1199,7 @@ ASTNode IntersectExceptExpr():
     }
 }
 
-ASTNode InstanceofExpr(): 
+ASTNode InstanceofExpr():
 {
     ASTNode result;
     SequenceTypeNode type;
@@ -1215,7 +1215,7 @@ ASTNode InstanceofExpr():
     }
 }
 
-ASTNode TreatExpr(): 
+ASTNode TreatExpr():
 {
     ASTNode result;
     SequenceTypeNode type;
@@ -1231,7 +1231,7 @@ ASTNode TreatExpr():
     }
 }
 
-ASTNode CastableExpr(): 
+ASTNode CastableExpr():
 {
     ASTNode result;
     SingleTypeNode type;
@@ -1247,7 +1247,7 @@ ASTNode CastableExpr():
     }
 }
 
-ASTNode CastExpr(): 
+ASTNode CastExpr():
 {
     ASTNode result;
     SingleTypeNode type;
@@ -1263,7 +1263,7 @@ ASTNode CastExpr():
     }
 }
 
-ASTNode UnaryExpr(): 
+ASTNode UnaryExpr():
 {
     ASTNode expr;
     List<UnaryExprNode.Sign> signs = new ArrayList<UnaryExprNode.Sign>();
@@ -1288,7 +1288,7 @@ ASTNode UnaryExpr():
     }
 }
 
-ASTNode ValueExpr(): 
+ASTNode ValueExpr():
 {
     ASTNode expr;
 }
@@ -1694,7 +1694,7 @@ ASTNode NodeTest():
 {
     (
         LOOKAHEAD(2) test = KindTest()
-        | test = NameTest() 
+        | test = NameTest()
     ) {
         return test;
     }
@@ -1816,6 +1816,12 @@ ASTNode Literal()   :
         l.setType(LiteralNode.LiteralType.STRING);
         return l;
     }
+    | t = "null" {
+        LiteralNode l1 = new LiteralNode(createSourceLocation(t));
+        l1.setImage(t.image);
+        l1.setType(LiteralNode.LiteralType.NULL);
+        return l1;
+     }
 }
 
 ASTNode NumericLiteral()   :
@@ -1945,8 +1951,83 @@ ASTNode Constructor()  :
     (
         result = DirectConstructor()
         | result = ComputedConstructor()
+        | result = JsonConstructor()
     ) {
         return result;
+    }
+}
+ASTNode JsonConstructor() :
+{
+    ASTNode result;
+}
+{
+    (
+        result = ObjectConstructor()
+        | result = ArrayConstructor()
+    ) {
+        return result;
+    }
+}
+
+ASTNode ObjectConstructor() :
+{
+    List<ASTNode> content = new ArrayList<ASTNode>();
+    Token t;
+    ASTNode pc;
+}
+{
+    t = <LbraceExprEnclosure>
+    (
+        pc = PairConstructor() {
+            content.add(pc);
+        } (
+            "," pc = PairConstructor() {
+                content.add(pc);
+            }
+        )*
+    )*
+    <Rbrace>
+    {
+        ObjectConstructor obj = new ObjectConstructor(createSourceLocation(t));
+        obj.setContent(content);
+        return obj;
+    }
+}
+
+ASTNode PairConstructor() :
+{
+    String key;
+    ASTNode value;
+    Token t;
+}
+{
+    t = <StringLiteral> {
+        key = t.image;
+    }
+    (
+        ":"
+        | ":?"
+    )
+    (
+        value = ExprSingle()
+    ) {
+        PairConstructor pc = new PairConstructor(createSourceLocation(t));
+        pc.setKey(key);
+        pc.setValue(value);
+        return pc;
+    }
+}
+
+ASTNode ArrayConstructor()  :
+{
+    ASTNode expr=null;
+    Token start;
+}
+{
+    (start = "[") [expr = Expr()] "]" {
+        ArrayConstructor an = new ArrayConstructor(createSourceLocation(start));
+        an.setExpression(expr);
+        return an;
     }
 }
 
@@ -2215,7 +2296,7 @@ List<ASTNode> DirAttributeValue():
                     }
                     buffer.append("}");
                 }
-            )* <CloseApos> 
+            )* <CloseApos>
         )
     ) {
         if (bufferStart != null) {
@@ -2432,7 +2513,7 @@ ASTNode CompPIConstructor()  :
     start = "processing-instruction" (
         target = NCName()
         | (
-            <LbraceExprEnclosure>  target = Expr() <Rbrace> 
+            <LbraceExprEnclosure>  target = Expr() <Rbrace>
         )
     ) <LbraceExprEnclosure>  [content = Expr()] <Rbrace> {
         ComputedPIConstructorNode pi = new ComputedPIConstructorNode(createSourceLocation(start));
@@ -2797,38 +2878,38 @@ void FTSelection()  :
     FTOr() (FTPosFilter())* ["weight" RangeExpr()]
 }
 
-void FTOrExpr()  : 
+void FTOrExpr()  :
 {}
 {
-	FTOr()
+    FTOr()
 }
 
-void FTOr()  : 
+void FTOr()  :
 {}
 {
     FTAnd() ("ftor"{ binaryTokenStack.push(token); } FTAnd())*
 }
 
-void FTAnd()  : 
+void FTAnd()  :
 {}
 {
     FTMildNot() ("ftand"{ binaryTokenStack.push(token); } FTMildNot())*
 }
 
-void FTMildNot()  : 
+void FTMildNot()  :
 {}
 {
     FTUnaryNot() ( ( "not"{ binaryTokenStack.push(token); } "in"{ binaryTokenStack.push(token); }) FTUnaryNot())*
 }
 
-void FTUnaryNot()  : 
+void FTUnaryNot()  :
 {boolean keepUnary=false;}
 {
    (
 "ftnot"{keepUnary=true;})? FTPrimaryWithOptions()
 }
 
-void FTPrimaryWithOptions(): 
+void FTPrimaryWithOptions():
 {}
 {
    (
@@ -2856,7 +2937,7 @@ void FTWordsValue()  :
 void FTExtensionSelection()  :
 {}
 {
-    (Pragma())+  <LbraceExprEnclosure>  [FTSelection()] <Rbrace> 
+    (Pragma())+  <LbraceExprEnclosure>  [FTSelection()] <Rbrace>
 }
 
 void FTAnyallOption()  :
@@ -2934,19 +3015,19 @@ void FTContent()  :
 void FTMatchOptions()  :
 {}
 {
-    (LOOKAHEAD(2) FTMatchOption())+ 
+    (LOOKAHEAD(2) FTMatchOption())+
 }
 
 void FTMatchOption()  :
 {}
 {
-    LOOKAHEAD(2) FTLanguageOption() 
-    | LOOKAHEAD(2) FTWildCardOption() 
-    | LOOKAHEAD(2) FTThesaurusOption() 
-    | LOOKAHEAD(2) FTStemOption() 
-    | LOOKAHEAD(2) FTCaseOption() 
-    | LOOKAHEAD(2) FTDiacriticsOption() 
-    | LOOKAHEAD(2) FTStopwordOption() 
+    LOOKAHEAD(2) FTLanguageOption()
+    | LOOKAHEAD(2) FTWildCardOption()
+    | LOOKAHEAD(2) FTThesaurusOption()
+    | LOOKAHEAD(2) FTStemOption()
+    | LOOKAHEAD(2) FTCaseOption()
+    | LOOKAHEAD(2) FTDiacriticsOption()
+    | LOOKAHEAD(2) FTStopwordOption()
     | LOOKAHEAD(2) FTExtensionOption()
 }
 
@@ -3001,7 +3082,7 @@ void FTInclExclStringLiteral()  :
 void FTLanguageOption()  :
 {}
 {
-    "language" <StringLiteral> 
+    "language" <StringLiteral>
 }
 
 void FTWildCardOption()  :
@@ -3013,7 +3094,7 @@ void FTWildCardOption()  :
 void FTExtensionOption()  :
 {}
 {
-    "option" QName() <StringLiteral> 
+    "option" QName() <StringLiteral>
 }
 
 void FTIgnoreOption()  :

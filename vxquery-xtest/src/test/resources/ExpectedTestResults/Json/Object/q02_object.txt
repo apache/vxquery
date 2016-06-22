@@ -1,0 +1,1 @@
+{"string":"name","number1":123.5,"number2":-123.5,"number3":123,"number4":123,"number5":1.23E11,"null":null}

@@ -18,40 +18,23 @@ package org.apache.vxquery.xmlquery.ast;
 
 import org.apache.vxquery.util.SourceLocation;
 
-public class LiteralNode extends ASTNode {
-    private String image;
-    private LiteralType type;
-    
-    public LiteralNode(SourceLocation loc) {
+public class ArrayConstructor extends ASTNode {
+    private ASTNode expression;
+
+    public ArrayConstructor(SourceLocation loc) {
         super(loc);
     }
 
     @Override
     public ASTTag getTag() {
-        return ASTTag.LITERAL;
-    }
-    
-    public enum LiteralType {
-        INTEGER,
-        DECIMAL,
-        DOUBLE,
-        STRING,
-        NULL
+        return ASTTag.ARRAY_CONSTRUCTOR;
     }
 
-    public String getImage() {
-        return image;
+    public ASTNode getExpression() {
+        return expression;
     }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public LiteralType getType() {
-        return type;
-    }
-
-    public void setType(LiteralType type) {
-        this.type = type;
+    public void setExpression(ASTNode expression) {
+        this.expression = expression;
     }
 }

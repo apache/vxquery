@@ -32,6 +32,8 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
@@ -220,6 +222,10 @@ public class XMLSerializer implements IPrinter {
                 printElementNode(ps, tvp);
                 break;
 
+            case ValueTag.ARRAY_TAG:
+                printArray(ps, tvp);
+                break;
+
             case ValueTag.ATTRIBUTE_NODE_TAG:
                 printAttributeNode(ps, tvp);
                 break;
@@ -236,9 +242,20 @@ public class XMLSerializer implements IPrinter {
                 printPINode(ps, tvp);
                 break;
 
+            case ValueTag.OBJECT_TAG:
+                printObject(ps, tvp);
+                break;
+
+            case ValueTag.JS_NULL_TAG:
+                printNull(ps, tvp);
+                break;
             default:
                 throw new UnsupportedOperationException("Encountered tag: " + tvp.getTag());
         }
+    }
+
+    private void printNull(PrintStream ps, TaggedValuePointable tvp) {
+        ps.append("null");
     }
 
     private void printDecimal(PrintStream ps, TaggedValuePointable tvp) {
@@ -339,6 +356,94 @@ public class XMLSerializer implements IPrinter {
             pp.giveBack(anp);
             pp.giveBack(cqp);
         }
+    }
+
+    private void printObject(PrintStream ps, TaggedValuePointable tvp) {
+        ObjectPointable op = pp.takeOne(ObjectPointable.class);
+        TaggedValuePointable keys = pp.takeOne(TaggedValuePointable.class);
+        tvp.getValue(op);
+        try {
+            op.getKeys(keys);
+            ps.append('{');
+            if (keys.getTag() == ValueTag.SEQUENCE_TAG) {
+                printObjectPairs(ps, keys, op);
+            } else {
+                printObjectPair(ps, keys, op);
+            }
+            ps.append('}');
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pp.giveBack(keys);
+            pp.giveBack(op);
+        }
+    }
+
+    private void printObjectPairs(PrintStream ps, TaggedValuePointable keys, ObjectPointable op) {
+        SequencePointable seqp = pp.takeOne(SequencePointable.class);
+        TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
+        try {
+            keys.getValue(seqp);
+            int len = seqp.getEntryCount();
+            for (int i = 0; i < len; i++) {
+                seqp.getEntry(i, tvp);
+                printObjectPair(ps, tvp, op);
+                if (i != len - 1) {
+                    ps.append(',');
+                }
+            }
+        } finally {
+            pp.giveBack(seqp);
+            pp.giveBack(tvp);
+        }
+    }
+
+    private void printObjectPair(PrintStream ps, TaggedValuePointable key, ObjectPointable op) {
+        UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
+        TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
+        try {
+            printQuotedString(ps, key);
+            key.getValue(utf8sp);
+            ps.append(":");
+            op.getValue(utf8sp, tvp);
+            printJsonValue(ps, tvp);
+        } finally {
+            pp.giveBack(tvp);
+            pp.giveBack(utf8sp);
+        }
+    }
+
+    private void printArray(PrintStream ps, TaggedValuePointable tvp) {
+        ArrayPointable ap = pp.takeOne(ArrayPointable.class);
+        try {
+            tvp.getValue(ap);
+            int len = ap.getEntryCount();
+            ps.append('[');
+            for (int i = 0; i < len; i++) {
+                ap.getEntry(i, tvp);
+                printJsonValue(ps, tvp);
+                if (i != len - 1) {
+                    ps.append(',');
+                }
+            }
+            ps.append(']');
+        } finally {
+            pp.giveBack(ap);
+        }
+    }
+
+    private void printJsonValue(PrintStream ps, TaggedValuePointable tvp) {
+        if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+            printQuotedString(ps, tvp);
+        } else {
+            printTaggedValuePointable(ps, tvp);
+        }
+    }
+
+    private void printQuotedString(PrintStream ps, TaggedValuePointable tvp) {
+        ps.append('\"');
+        printString(ps, tvp);
+        ps.append('\"');
     }
 
     private void printElementNode(PrintStream ps, TaggedValuePointable tvp) {
@@ -805,5 +910,6 @@ public class XMLSerializer implements IPrinter {
 
     @Override
     public void init() throws AlgebricksException {
+
     }
 }
