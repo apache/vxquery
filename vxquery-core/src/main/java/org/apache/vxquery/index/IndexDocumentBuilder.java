@@ -56,7 +56,7 @@ import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
-import org.apache.vxquery.runtime.functions.index.indexupdaterUtils.Constants;
+import org.apache.vxquery.runtime.functions.index.updateIndex.Constants;
 import org.apache.vxquery.serializer.XMLSerializer;
 
 public class IndexDocumentBuilder extends XMLSerializer {

@@ -29,7 +29,7 @@ import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.index.indexupdaterUtils.IndexUpdater;
+import org.apache.vxquery.runtime.functions.index.updateIndex.IndexUpdater;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 
@@ -63,14 +63,12 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 IndexUpdater updater = new IndexUpdater(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider,
-                        abvsFileNode, nodep, false, nodeId);
+                        abvsFileNode, nodep, nodeId);
                 try {
                     updater.evaluate();
                 } catch (IOException | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
-//                IndexConstructorUtil.evaluate(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider, abvsFileNode,
-//                        nodep, false, nodeId);
             }
 
         };
