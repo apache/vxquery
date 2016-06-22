@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,7 +73,7 @@ public class VXQuery {
     private IHyracksDataset hds;
 
     private ResultSetId resultSetId;
-    private static List<String> timingMessages = new ArrayList<String>();
+    private static List<String> timingMessages = new ArrayList<>();
     private static long sumTiming;
     private static long sumSquaredTiming;
     private static long minTiming = Long.MAX_VALUE;
@@ -117,13 +118,11 @@ public class VXQuery {
             Date end = new Date();
             timingMessage("Execution time: " + (end.getTime() - start.getTime()) + " ms");
             if (opts.repeatExec > opts.timingIgnoreQueries) {
-                long mean = sumTiming / (opts.repeatExec - opts.timingIgnoreQueries);
-                double sd = Math
-                        .sqrt(sumSquaredTiming / (opts.repeatExec - new Integer(opts.timingIgnoreQueries).doubleValue())
-                                - mean * mean);
+                Double mean = (double) (sumTiming) / (opts.repeatExec - opts.timingIgnoreQueries);
+                double sd = Math.sqrt(sumSquaredTiming / (opts.repeatExec - opts.timingIgnoreQueries) - mean * mean);
                 timingMessage("Average execution time: " + mean + " ms");
                 timingMessage("Standard deviation: " + String.format("%.4f", sd));
-                timingMessage("Coefficient of variation: " + String.format("%.4f", (sd / mean)));
+                timingMessage("Coefficient of variation: " + String.format("%.4f", sd / mean));
                 timingMessage("Minimum execution time: " + minTiming + " ms");
                 timingMessage("Maximum execution time: " + maxTiming + " ms");
             }
@@ -169,9 +168,9 @@ public class VXQuery {
      * @throws SystemException
      * @throws Exception
      */
-    private void runQueries() throws IOException, SystemException, Exception {
-        Date start = null;
-        Date end = null;
+    private void runQueries() throws Exception {
+        Date start;
+        Date end;
         for (String query : opts.arguments) {
             String qStr = slurp(query);
             if (opts.showQuery) {
@@ -286,10 +285,11 @@ public class VXQuery {
      * @throws Exception
      */
     public void startLocalHyracks() throws Exception {
+        String localAddress = InetAddress.getLocalHost().getHostAddress();
         CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = "127.0.0.1";
+        ccConfig.clientNetIpAddress = localAddress;
         ccConfig.clientNetPort = 39000;
-        ccConfig.clusterNetIpAddress = "127.0.0.1";
+        ccConfig.clusterNetIpAddress = localAddress;
         ccConfig.clusterNetPort = 39001;
         ccConfig.httpPort = 39002;
         ccConfig.profileDumpPeriod = 10000;
@@ -301,9 +301,9 @@ public class VXQuery {
             NCConfig ncConfig = new NCConfig();
             ncConfig.ccHost = "localhost";
             ncConfig.ccPort = 39001;
-            ncConfig.clusterNetIPAddress = "127.0.0.1";
-            ncConfig.dataIPAddress = "127.0.0.1";
-            ncConfig.resultIPAddress = "127.0.0.1";
+            ncConfig.clusterNetIPAddress = localAddress;
+            ncConfig.dataIPAddress = localAddress;
+            ncConfig.resultIPAddress = localAddress;
             ncConfig.nodeId = "nc" + (i + 1);
             ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
             ncs[i] = new NodeControllerService(ncConfig);
@@ -409,13 +409,13 @@ public class VXQuery {
         private int timingIgnoreQueries = 2;
 
         @Option(name = "-x", usage = "Bind an external variable")
-        private Map<String, String> bindings = new HashMap<String, String>();
+        private Map<String, String> bindings = new HashMap<>();
 
         @Option(name = "-hdfs-conf", usage = "Directory path to Hadoop configuration files")
         private String hdfsConf = null;
 
         @Argument
-        private List<String> arguments = new ArrayList<String>();
+        private List<String> arguments = new ArrayList<>();
     }
 
 }

@@ -17,7 +17,6 @@
 package org.apache.vxquery.xtest;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,8 +35,8 @@ public class TestCase {
 
     public TestCase(TestConfiguration config) {
         this.tConfig = config;
-        extVars = new HashMap<QName, File>();
-        expectedResults = new ArrayList<ExpectedResult>();
+        extVars = new HashMap<>();
+        expectedResults = new ArrayList<>();
     }
 
     public TestConfiguration getConfig() {
@@ -92,6 +91,7 @@ public class TestCase {
         this.expectedResults.add(expectedResult);
     }
 
+    @Override
     public String toString() {
         return getXQueryDisplayName();
     }

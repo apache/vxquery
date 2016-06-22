@@ -38,23 +38,23 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 public abstract class AbstractTestCaseFactory {
-    public TestConfiguration tConfig;
-    public File catalog;
-    public String baseDirectory;
-    public TestCase tc;
-    public Pattern include;
-    public Pattern exclude;
-    public Set<String> previousTestResults;
-    public XTestOptions opts;
-    public String nextVariable;
-    public boolean expectedError;
-    public boolean outputFile;
-    public int currPathLen;
-    public int count;
+    protected TestConfiguration tConfig;
+    protected File catalog;
+    protected String baseDirectory;
+    protected TestCase tc;
+    protected Pattern include;
+    protected Pattern exclude;
+    protected Set<String> previousTestResults;
+    protected XTestOptions opts;
+    protected String nextVariable;
+    protected boolean expectedError;
+    protected boolean outputFile;
+    protected int currPathLen;
+    protected int count;
 
-    static int TEST_NAME_INDEX = 0;
-    static int TEST_RESULT_INDEX = 1;
-    static List<String> PASSING_TESTS = Arrays.asList("EXPECTED_RESULT_GOT_SAME_RESULT",
+    protected static final int TEST_NAME_INDEX = 0;
+    protected static final int TEST_RESULT_INDEX = 1;
+    protected static final List<String> PASSING_TESTS = Arrays.asList("EXPECTED_RESULT_GOT_SAME_RESULT",
             "EXPECTED_ERROR_GOT_SAME_ERROR");
 
     public AbstractTestCaseFactory(XTestOptions opts) {
@@ -113,8 +113,8 @@ public abstract class AbstractTestCaseFactory {
             @Override
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
                 URL url = new URL(systemId);
-                return new InputSource(baseDirectory
-                        + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
+                return new InputSource(
+                        baseDirectory + new File(url.getFile()).getCanonicalPath().substring(currPathLen));
             }
         });
         try {
@@ -252,10 +252,10 @@ public abstract class AbstractTestCaseFactory {
                     File srcFile = new File(tConfig.testRoot, atts.getValue("", "FileName"));
                     tConfig.sourceFileMap.put(id, srcFile);
                 } else if ("test-suite".equals(localName)) {
-                    tConfig.testRoot = new File(new File(baseDirectory).getCanonicalFile(), atts.getValue("",
-                            "SourceOffsetPath"));
-                    tConfig.xqueryQueryOffsetPath = new File(tConfig.testRoot, atts.getValue("",
-                            "XQueryQueryOffsetPath"));
+                    tConfig.testRoot = new File(new File(baseDirectory).getCanonicalFile(),
+                            atts.getValue("", "SourceOffsetPath"));
+                    tConfig.xqueryQueryOffsetPath = new File(tConfig.testRoot,
+                            atts.getValue("", "XQueryQueryOffsetPath"));
                     tConfig.resultOffsetPath = new File(tConfig.testRoot, atts.getValue("", "ResultOffsetPath"));
                     tConfig.xqueryFileExtension = atts.getValue("", "XQueryFileExtension");
                     tConfig.xqueryxFileExtension = atts.getValue("", "XQueryXFileExtension");

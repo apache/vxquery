@@ -121,12 +121,12 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
-            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
+            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId>
                 </plugin> -->
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                <!--This plugin's configuration is used to store Eclipse m2e settings
                     only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -341,23 +341,10 @@
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
             </plugin>
-            <!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>findbugs-maven-plugin</artifactId> 
-                <version>2.5.2</version> <configuration> <effort>Min</effort> <threshold>Normal</threshold> 
-                <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile> </configuration> 
+            <!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.5.2</version> <configuration> <effort>Min</effort> <threshold>Normal</threshold>
+                <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile> </configuration>
                 </plugin> -->
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache-rat-plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>testsuites/**/*</exclude>
-                        <exclude>reports/**/*</exclude>
-                    </excludes>
-                    <numUnapprovedLicenses>0</numUnapprovedLicenses>
-                    <maxmemory>2g</maxmemory>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>

@@ -50,17 +50,17 @@ public class HTMLFileReporterImpl implements ResultReporter {
     private long endTime;
 
     private PrintWriter out;
-    
+
     private File reportFile;
 
     public HTMLFileReporterImpl(File file) {
-        results = new ArrayList<TestCaseResult>();
+        results = new ArrayList<>();
         count = 0;
         userErrors = 0;
         internalErrors = 0;
         startTime = -1;
-        exDistribution = new HashMap<Class<?>, Integer>();
-        stDistribution = new HashMap<TestCaseResult.State, Integer>();
+        exDistribution = new HashMap<>();
+        stDistribution = new HashMap<>();
         reportFile = file;
     }
 
@@ -105,20 +105,19 @@ public class HTMLFileReporterImpl implements ResultReporter {
             }
         }
     }
-    
+
     private static File createResultDir(File file) {
         String fileName = file.getName();
         int dot = file.getName().lastIndexOf('.');
         String resultDirName = (dot < 0 ? fileName : fileName.substring(0, dot)) + "_results";
-        return file.getParent() != null 
-            ? new File(file.getParent() + File.separator + resultDirName)
-            : new File(resultDirName);
+        return file.getParent() != null ? new File(file.getParent() + File.separator + resultDirName)
+                : new File(resultDirName);
     }
-    
+
     public void writeHTML(PrintWriter out) {
         writeHTML(out, null);
     }
-        
+
     public void writeHTML(PrintWriter out, File resultDir) {
         long start = System.currentTimeMillis();
         out.println("<html><body>");
@@ -133,8 +132,8 @@ public class HTMLFileReporterImpl implements ResultReporter {
         System.err.println("HTML generation time: " + (System.currentTimeMillis() - start));
     }
 
-    private static void writeSummary(PrintWriter out, int count, int userErrors, 
-            int internalErrors, long startTime, long endTime) {
+    private static void writeSummary(PrintWriter out, int count, int userErrors, int internalErrors, long startTime,
+            long endTime) {
         out.println("<table>");
         out.println("<tr><td>Test Count</td><td>");
         out.println(count);
@@ -149,11 +148,11 @@ public class HTMLFileReporterImpl implements ResultReporter {
         out.println(endTime - startTime);
         out.println("</td></tr>");
         out.println("</table>");
-    } 
+    }
 
     private static void writeExceptionDistribution(PrintWriter out, Map<Class<?>, Integer> exDistribution) {
         out.println("<table>");
-        List<Entry<Class<?>, Integer>> entryList = new ArrayList<Entry<Class<?>, Integer>>(exDistribution.entrySet());
+        List<Entry<Class<?>, Integer>> entryList = new ArrayList<>(exDistribution.entrySet());
         Comparator<Entry<Class<?>, Integer>> comp = new Comparator<Entry<Class<?>, Integer>>() {
             public int compare(Entry<Class<?>, Integer> o1, Entry<Class<?>, Integer> o2) {
                 return o1.getKey().getName().compareTo(o2.getKey().getName());
@@ -172,14 +171,13 @@ public class HTMLFileReporterImpl implements ResultReporter {
 
     private static void writeStateDistribution(PrintWriter out, Map<TestCaseResult.State, Integer> stDistribution) {
         out.println("<table>");
-        List<Map.Entry<TestCaseResult.State, Integer>> entryList 
-            = new ArrayList<Map.Entry<TestCaseResult.State, Integer>>(stDistribution.entrySet());
-        Comparator<Map.Entry<TestCaseResult.State, Integer>> comp 
-            = new Comparator<Map.Entry<TestCaseResult.State, Integer>>() {
-                public int compare(Map.Entry<TestCaseResult.State, Integer> o1, Map.Entry<TestCaseResult.State, Integer> o2) {
-                    return o1.getKey().compareTo(o2.getKey());
-                }
-            };
+        List<Map.Entry<TestCaseResult.State, Integer>> entryList = new ArrayList<>(stDistribution.entrySet());
+        Comparator<Map.Entry<TestCaseResult.State, Integer>> comp = new Comparator<Map.Entry<TestCaseResult.State, Integer>>() {
+            public int compare(Map.Entry<TestCaseResult.State, Integer> o1,
+                    Map.Entry<TestCaseResult.State, Integer> o2) {
+                return o1.getKey().compareTo(o2.getKey());
+            }
+        };
         Collections.sort(entryList, comp);
         for (Map.Entry<TestCaseResult.State, Integer> e : entryList) {
             State key = e.getKey();
@@ -227,22 +225,22 @@ public class HTMLFileReporterImpl implements ResultReporter {
         out.println("</table>");
         rfw.close();
     }
-    
+
 }
 
-/** 
- * writes results into several HTML files of manageable size 
+/**
+ * writes results into several HTML files of manageable size
  */
 class ResultManager {
-    
-    /** 
+
+    /**
      * if the length of a file passes this length, a new file will be used
-     * for the next result 
+     * for the next result
      */
     private static final long MAX_LEN = 1000000;
-    
+
     private final File dir;
-    
+
     private File curFile;
     private URI curURI;
     private FileWriter curFileWriter;
@@ -251,13 +249,16 @@ class ResultManager {
     ResultManager(File dir) {
         this.dir = dir;
     }
-    
+
     /**
      * writes an HTML serialization of a test result into a temp HTML file
-     * inside the given directory 
-     * @param res the result data for 1 test case
-     * @param linkName the name of the (internal) HTML link that points to 
-     *        the test result inside the HTML file
+     * inside the given directory
+     *
+     * @param res
+     *            the result data for 1 test case
+     * @param linkName
+     *            the name of the (internal) HTML link that points to
+     *            the test result inside the HTML file
      * @return the full URI that references the test result in the HTML file
      */
     String writeResult(TestCaseResult res, String linkName) {
@@ -284,9 +285,7 @@ class ResultManager {
             return null;
         }
 
-        curPrintWriter.println(
-                "<a style=\"background: " + res.state.getColor() 
-                + "\" name=\"" + linkName 
+        curPrintWriter.println("<a style=\"background: " + res.state.getColor() + "\" name=\"" + linkName
                 + "\">&nbsp;&nbsp;&nbsp;</a>");
         curPrintWriter.println(linkName);
         curPrintWriter.println("<pre>");
@@ -305,12 +304,12 @@ class ResultManager {
                 writeDocFooter(curPrintWriter);
                 curPrintWriter.flush();
                 curFileWriter.close();
-            }        
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
+
     private static void ensureDir(File dir) throws IOException {
         if (!dir.isDirectory() && !dir.mkdirs()) {
             throw new IOException("could not create dir " + dir);
@@ -328,7 +327,7 @@ class ResultManager {
         resOut.println("</body></html>");
     }
 
-    /* this should not be necessary anymore, when the XQuery serialization 
+    /* this should not be necessary anymore, when the XQuery serialization
      * works right
      */
     private static String escape(String s) {
@@ -347,15 +346,15 @@ class ResultManager {
                     sb.append(ca, start, i - start);
                     sb.append("&gt;");
                     start = i + 1;
-                    break;                    
+                    break;
                 case '&':
                     sb.append(ca, start, i - start);
                     sb.append("&amp;");
                     start = i + 1;
-                    break;                
+                    break;
             }
         }
-        return start > 0 ? sb.toString() : s;   
+        return start > 0 ? sb.toString() : s;
     }
 
 }

@@ -19,7 +19,6 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -55,6 +54,9 @@ import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.xmlparser.XMLParser;
 
 public class FunctionHelper {
+
+    private FunctionHelper() {
+    }
 
     public static void arithmeticOperation(AbstractArithmeticOperation aOp, DynamicContext dCtx,
             TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result, TypedPointables tp1,
@@ -480,7 +482,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-                    throws SystemException {
+            throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -852,7 +854,8 @@ public class FunctionHelper {
         }
     }
 
-    public static int getBaseTypeForComparisons(int tid) throws SystemException {
+    public static int getBaseTypeForComparisons(int tidArg) throws SystemException {
+        int tid = tidArg;
         while (true) {
             switch (tid) {
                 case ValueTag.XS_ANY_URI_TAG:
@@ -903,7 +906,8 @@ public class FunctionHelper {
         }
     }
 
-    public static int getBaseTypeForGeneralComparisons(int tid) throws SystemException {
+    public static int getBaseTypeForGeneralComparisons(int tidArg) throws SystemException {
+        int tid = tidArg;
         while (true) {
             switch (tid) {
                 case ValueTag.NODE_TREE_TAG:
@@ -1115,8 +1119,8 @@ public class FunctionHelper {
         }
     }
 
-    public static long getPowerOf10(double value, long max, long min) {
-        value = Math.abs(value);
+    public static long getPowerOf10(double valueArg, long max, long min) {
+        double value = Math.abs(valueArg);
         for (long i = min; i < max; i++) {
             if (Math.pow(10, i) > value)
                 return i;
@@ -1146,8 +1150,9 @@ public class FunctionHelper {
             case ValueTag.XS_DOUBLE_TAG:
             case ValueTag.XS_FLOAT_TAG:
                 return true;
+            default:
+                return isDerivedFromInteger(tid);
         }
-        return isDerivedFromInteger(tid);
     }
 
     public static boolean isDerivedFromInteger(int tid) {
@@ -1166,8 +1171,9 @@ public class FunctionHelper {
             case ValueTag.XS_BYTE_TAG:
             case ValueTag.XS_UNSIGNED_BYTE_TAG:
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     public static boolean isDerivedFromString(int tid) {
@@ -1184,8 +1190,9 @@ public class FunctionHelper {
             case ValueTag.XS_IDREF_TAG:
             case ValueTag.XS_ENTITY_TAG:
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     /**
@@ -1196,7 +1203,7 @@ public class FunctionHelper {
      * @return boolean
      */
     public static boolean isNumberPostive(long value) {
-        return ((value & 0x8000000000000000L) == 0 ? true : false);
+        return (value & 0x8000000000000000L) == 0 ? true : false;
     }
 
     public static void printUTF8String(UTF8StringPointable stringp) {
@@ -1230,22 +1237,20 @@ public class FunctionHelper {
         }
         //else check in HDFS file system
         else {
-            fName = fName.replaceAll("hdfs:/", "");
             HDFSFunctions hdfs = new HDFSFunctions(null, null);
             FileSystem fs = hdfs.getFileSystem();
             if (fs != null) {
-                Path xmlDocument = new Path(fName);
                 try {
+                    String fHdfsName = fName.replaceAll("hdfs:/", "");
+                    Path xmlDocument = new Path(fHdfsName);
                     if (fs.exists(xmlDocument)) {
                         InputStream in = fs.open(xmlDocument).getWrappedStream();
                         parser.parseHDFSDocument(in, abvs);
+                        in.close();
                     }
-                } catch (FileNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    System.err.println(e);
+                    fs.close();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    System.err.println(e);
+                    throw new HyracksDataException(e);
                 }
             }
         }
@@ -1352,7 +1357,9 @@ public class FunctionHelper {
      *            data output
      */
 
-    public static void writeNumberWithPadding(long value, int padding, DataOutput dOut) {
+    public static void writeNumberWithPadding(long valueArg, int paddingArg, DataOutput dOut) {
+        long value = valueArg;
+        int padding = paddingArg;
         if (value < 0) {
             writeChar('-', dOut);
             value = Math.abs(value);
@@ -1366,7 +1373,7 @@ public class FunctionHelper {
         }
 
         // Write the actual number.
-        long pow10 = (long) Math.pow(10, nDigits - 1);
+        long pow10 = (long) Math.pow(10, nDigits - 1.0);
         for (int i = nDigits - 1; i >= 0; --i) {
             writeChar((char) ('0' + (value / pow10)), dOut);
             value %= pow10;

@@ -18,15 +18,16 @@ import java.util.concurrent.ExecutorService;
 
 public class TestCaseFactory extends AbstractTestCaseFactory {
 
-    public TestRunnerFactory trf;
-    public ExecutorService eSvc;
+    private TestRunnerFactory trf;
+    private ExecutorService eSvc;
 
     public TestCaseFactory(TestRunnerFactory trf, ExecutorService eSvc, XTestOptions opts) {
         super(opts);
         this.trf = trf;
         this.eSvc = eSvc;
     }
-    
+
+    @Override
     protected void submit(TestCase tc) {
         if (submitTestCase(tc)) {
             if (opts.verbose) {

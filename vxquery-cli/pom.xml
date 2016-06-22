@@ -126,19 +126,19 @@
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-dataflow-std</artifactId>
         </dependency>
-        
+
         <dependency>
                 <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-hdfs-core</artifactId>
         </dependency>
-        
+
         <dependency>
                 <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-hdfs-2.x</artifactId>
         </dependency>
     </dependencies>
-    
-    
+
+
 
     <reporting>
         <plugins>
@@ -158,11 +158,6 @@
                     <linkOnly>true</linkOnly>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache-rat-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

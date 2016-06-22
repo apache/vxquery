@@ -17,7 +17,6 @@ package org.apache.vxquery.xtest;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +25,11 @@ import org.apache.vxquery.exceptions.SystemException;
 
 public class TestCaseResult {
     private static final int DISPLAY_LEN = 1000;
-    private static Pattern XML_RES_PREFIX = Pattern.compile("<\\?[xX][mM][lL][^\\?]*\\?>");
+    private static final Pattern XML_RES_PREFIX = Pattern.compile("<\\?[xX][mM][lL][^\\?]*\\?>");
+
+    private static final String RED = "#FF9900";
+    private static final String ORANGE = "#FFCC00";
+    private static final String GREEN = "#99CC00";
 
     TestCase testCase;
 
@@ -122,12 +125,13 @@ public class TestCaseResult {
         if (cmp) {
             return Pair.<Boolean, String> of(Boolean.TRUE, "Got expected result");
         } else {
-            return Pair.<Boolean, String> of(Boolean.FALSE, "Expected: " + truncate(expRes) + " Got: "
-                    + truncate(actRes));
+            return Pair.<Boolean, String> of(Boolean.FALSE,
+                    "Expected: " + truncate(expRes) + " Got: " + truncate(actRes));
         }
     }
 
-    private String truncate(String str) {
+    private String truncate(String strArg) {
+        String str = strArg;
         if (str == null) {
             return "&lt;NULL&gt;";
         }
@@ -172,25 +176,22 @@ public class TestCaseResult {
     }
 
     private String slurpFile(File f) {
-        StringWriter out = new StringWriter();
+        StringBuilder content = new StringBuilder();
         try {
             FileReader in = new FileReader(f);
             try {
                 char[] buffer = new char[8192];
                 int c;
                 while ((c = in.read(buffer)) >= 0) {
-                    out.write(buffer, 0, c);
+                    content.append(buffer, 0, c);
                 }
             } finally {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
+                in.close();
             }
         } catch (IOException e) {
             return null;
         }
-        return out.toString();
+        return content.toString();
     }
 
     public enum State {
@@ -215,7 +216,4 @@ public class TestCaseResult {
         }
     }
 
-    private static final String RED = "#FF9900";
-    private static final String ORANGE = "#FFCC00";
-    private static final String GREEN = "#99CC00";
 }

@@ -159,7 +159,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                 ArrayList<Integer> schedule = hdfs
                                         .getScheduleForNode(InetAddress.getLocalHost().getHostAddress());
                                 List<InputSplit> splits = hdfs.getSplits();
-                                List<FileSplit> fileSplits = new ArrayList<FileSplit>();
+                                List<FileSplit> fileSplits = new ArrayList<>();
                                 for (int i : schedule) {
                                     fileSplits.add((FileSplit) splits.get(i));
                                 }
@@ -181,13 +181,14 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                         value = reader.getCurrentValue().toString();
                                         //Split value if it contains more than one item with the tag
                                         if (StringUtils.countMatches(value, tag) > 1) {
-                                            String items[] = value.split(tag);
+                                            String[] items = value.split(tag);
                                             for (String item : items) {
                                                 if (item.length() > 0) {
                                                     item = START_TAG + tag + item;
                                                     stream = new ByteArrayInputStream(
                                                             item.getBytes(StandardCharsets.UTF_8));
                                                     parser.parseHDFSElements(stream, writer, fta, i);
+                                                    stream.close();
                                                 }
                                             }
                                         } else {
@@ -195,9 +196,10 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                             //create an input stream to the file currently reading and send it to parser
                                             stream = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
                                             parser.parseHDFSElements(stream, writer, fta, i);
+                                            stream.close();
                                         }
                                     }
-
+                                    reader.close();
                                 }
 
                             } catch (Exception e) {
@@ -220,6 +222,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                                 //create an input stream to the file currently reading and send it to parser
                                                 InputStream in = fs.open(xmlDocument).getWrappedStream();
                                                 parser.parseHDFSElements(in, writer, fta, tupleIndex);
+                                                in.close();
                                             }
                                         }
                                     }

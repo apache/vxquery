@@ -50,10 +50,6 @@
                                     <mainClass>org.apache.vxquery.xtest.Main</mainClass>
                                     <name>xtest</name>
                                 </program>
-                                <program>
-                                    <mainClass>org.apache.vxquery.xtest.util.DiskPerformance</mainClass>
-                                    <name>diskperformance</name>
-                                </program>
                             </programs>
                             <repositoryLayout>flat</repositoryLayout>
                             <repositoryName>lib</repositoryName>
@@ -156,7 +152,7 @@
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-dataflow-std</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-hdfs-2.x</artifactId>
@@ -196,20 +192,6 @@
                 <configuration>
                     <linkOnly>true</linkOnly>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache-rat-plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/ExpectedTestResults/**/*</exclude>
-                        <exclude>**/xqts.txt</exclude>
-                        <exclude>test-suite*/**/*</exclude>
-                    </excludes>
-                    <numUnapprovedLicenses>0</numUnapprovedLicenses>
-                    <maxmemory>2g</maxmemory>
                 </configuration>
             </plugin>
             <plugin>

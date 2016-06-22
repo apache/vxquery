@@ -569,6 +569,7 @@
                         <exclude>.gitignore</exclude>
                         <exclude>.rat-excludes</exclude>
                         <exclude>.project</exclude>
+                        <exclude>.pydevproject</exclude>
                         <exclude>.classpath</exclude>
                         <exclude>.basex</exclude>
                         <exclude>**/ExpectedTestResults/**</exclude>

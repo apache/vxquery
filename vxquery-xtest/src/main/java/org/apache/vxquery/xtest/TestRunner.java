@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -66,10 +67,11 @@ public class TestRunner {
     private NodeControllerService nc1;
     private IHyracksClientConnection hcc;
     private IHyracksDataset hds;
-    private final String publicAddress = InetAddress.getLocalHost().getHostAddress();
+    private final String publicAddress;
 
-    public TestRunner(XTestOptions opts) throws Exception {
+    public TestRunner(XTestOptions opts) throws UnknownHostException {
         this.opts = opts;
+        this.publicAddress = InetAddress.getLocalHost().getHostAddress();
     }
 
     public void open() throws Exception {
@@ -111,10 +113,11 @@ public class TestRunner {
 
         try {
             try {
-                FileInputStream query = new FileInputStream(testCase.getXQueryFile());
                 if (opts.showQuery) {
+                    FileInputStream query = new FileInputStream(testCase.getXQueryFile());
                     System.err.println("***Query for " + testCase.getXQueryDisplayName() + ": ");
                     System.err.println(IOUtils.toString(query, "UTF-8"));
+                    query.close();
                 }
 
                 VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
