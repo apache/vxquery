@@ -31,4 +31,13 @@ public final class ArrayType extends AbstractJsonItemType {
         return other instanceof ArrayType;
     }
 
+    @Override
+    public String toString() {
+        return "array";
+    }
+
+    @Override
+    public JsonItemKind getJsonItemKind() {
+        return JsonItemKind.ARRAY;
+    }
 }

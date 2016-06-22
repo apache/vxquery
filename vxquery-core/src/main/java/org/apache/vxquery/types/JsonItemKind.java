@@ -16,5 +16,8 @@
 */
 package org.apache.vxquery.types;
 
-public interface StructuredItemType extends ItemType {
+public enum JsonItemKind {
+    ANY,
+    OBJECT,
+    ARRAY
 }

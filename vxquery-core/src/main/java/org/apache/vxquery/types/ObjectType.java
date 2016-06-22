@@ -31,4 +31,13 @@ public final class ObjectType extends AbstractJsonItemType {
         return other instanceof ObjectType;
     }
 
+    @Override
+    public JsonItemKind getJsonItemKind() {
+        return JsonItemKind.OBJECT;
+    }
+
+    @Override
+    public String toString() {
+        return "object";
+    }
 }

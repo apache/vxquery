@@ -37,4 +37,9 @@ public final class AnyJsonItemType extends AbstractJsonItemType {
     public boolean equals(Object other) {
         return other instanceof AnyJsonItemType;
     }
+
+    @Override
+    public JsonItemKind getJsonItemKind() {
+        return JsonItemKind.ANY;
+    }
 }

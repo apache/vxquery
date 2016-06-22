@@ -45,6 +45,10 @@ public class TypeUtils {
             it = AnyItemType.INSTANCE;
         } else if (s.equals("json-item()")) {
             it = AnyJsonItemType.INSTANCE;
+        } else if (s.equals("object()")) {
+            it = ObjectType.INSTANCE;
+        } else if (s.equals("array()")) {
+            it = ArrayType.INSTANCE;
         } else if (s.equals("node()")) {
             it = AnyNodeType.INSTANCE;
         } else if (s.equals("document-node()")) {
