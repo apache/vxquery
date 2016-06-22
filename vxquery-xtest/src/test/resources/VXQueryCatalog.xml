@@ -210,7 +210,7 @@
             <title>Aggregate HDFS Execution Tests</title>
             <description/>
          </GroupInfo>
-         &HDFSAggregateQueries;
+         <!-- &HDFSAggregateQueries; -->
       </test-group>
    </test-group>
    <test-group name="IndexingQueries" featureOwner="Steven Jacobs">
@@ -223,7 +223,7 @@
             <title>Indexing Execution Tests</title>
             <description/>
          </GroupInfo>
-         &IndexingQueries;
+        <!--   &IndexingQueries;-->
       </test-group>
    </test-group>
    <test-group name="JsoniqQueries" featureOwner="Christina Pavlopoulou">
