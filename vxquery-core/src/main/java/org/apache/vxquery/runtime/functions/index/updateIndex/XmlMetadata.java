@@ -23,7 +23,7 @@ import java.io.Serializable;
  * This contains
  *      - Path to the xml file
  *      - MD5 Checksum String
- *      - Index Document information
+ *      - File name
  */
 public class XmlMetadata implements Serializable{
 
