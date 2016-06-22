@@ -40,7 +40,7 @@ public class VXQueryTest extends AbstractXQueryTest {
         super(tc);
     }
 
-    @Parameters
+    @Parameters(name = "VXQueryTest {index}: {0}")
     public static Collection<Object[]> tests() throws Exception {
         JUnitTestCaseFactory jtcf_vxquery = new JUnitTestCaseFactory(getOptions());
         Collection<Object[]> tests = jtcf_vxquery.getList();
