@@ -93,19 +93,6 @@ public class TestCase {
     }
 
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("TestCase {\n");
-        buffer.append("   name = ").append(name).append('\n');
-        buffer.append("   vars = {\n");
-        for (Map.Entry<QName, File> e : extVars.entrySet()) {
-            try {
-                buffer.append("      ").append(e.getKey()).append(" = ").append(e.getValue().getCanonicalPath())
-                        .append('\n');
-            } catch (IOException ex) {
-            }
-        }
-        buffer.append("   }\n");
-        buffer.append("}");
-        return buffer.toString();
+        return getXQueryDisplayName();
     }
 }
