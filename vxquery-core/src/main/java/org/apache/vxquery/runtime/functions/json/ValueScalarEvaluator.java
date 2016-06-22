@@ -53,15 +53,20 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        TaggedValuePointable tvp1;
-        TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
-        mvs.reset();
-        try {
-            ab.reset(mvs);
-            tvp1 = args[0];
-            if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
+        TaggedValuePointable tvp1 = args[0];
+        TaggedValuePointable tvp2 = args[1];
+        if (!(tvp1.getTag() == ValueTag.ARRAY_TAG || tvp1.getTag() == ValueTag.OBJECT_TAG)) {
+            throw new SystemException(ErrorCode.FORG0006);
+        }
+        if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
+            if (tvp2.getTag() != ValueTag.XS_INTEGER_TAG) {
+                throw new SystemException(ErrorCode.FORG0006);
+            }
+            TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+            mvs.reset();
+            try {
+                ab.reset(mvs);
                 tvp1.getValue(ap);
-                TaggedValuePointable tvp2 = args[1];
                 tvp2.getValue(lp);
                 if ((int) lp.getLong() > ap.getEntryCount()) {
                     ab.finish();
@@ -70,13 +75,13 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
                 }
                 ap.getEntry((int) lp.getLong() - 1, tempTvp);
                 ab.addItem(ap.getEntryCount() != 0 ? tempTvp : tvp1);
+                ab.finish();
+                result.set(mvs);
+            } catch (IOException e) {
+                throw new SystemException(ErrorCode.SYSE0001, e);
+            } finally {
+                ppool.giveBack(tempTvp);
             }
-            ab.finish();
-            result.set(mvs);
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        } finally {
-            ppool.giveBack(tempTvp);
         }
     }
 }
