@@ -226,4 +226,8 @@ public abstract class AbstractCastToOperation {
     public void convertToken(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
+
+    public void convertNull(DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
 }

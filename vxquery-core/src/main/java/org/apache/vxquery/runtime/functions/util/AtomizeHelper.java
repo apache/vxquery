@@ -33,6 +33,8 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
 
 public class AtomizeHelper {
     AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY.createPointable();
@@ -46,13 +48,16 @@ public class AtomizeHelper {
     TaggedValuePointable tempTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     VoidPointable vp = (VoidPointable) VoidPointable.FACTORY.createPointable();
 
-    public void atomize(TaggedValuePointable tvp, PointablePool pp, IPointable result) throws IOException {
+    public void atomize(TaggedValuePointable tvp, PointablePool pp, IPointable result)
+            throws SystemException, IOException {
         switch (tvp.getTag()) {
             case ValueTag.NODE_TREE_TAG:
                 tvp.getValue(ntp);
                 atomizeNode(ntp, pp, result);
                 break;
-
+            case ValueTag.ARRAY_TAG:
+            case ValueTag.OBJECT_TAG:
+                throw new SystemException(ErrorCode.JNTY0004);
             default:
                 result.set(tvp);
         }

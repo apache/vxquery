@@ -271,6 +271,10 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
                             result.set(abvs);
                             return;
 
+                        case ValueTag.JS_NULL_TAG:
+                            aOp.convertNull(tvp, dOut);
+                            result.set(abvs);
+                            return;
                     }
                 } catch (SystemException se) {
                     throw se;
