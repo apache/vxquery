@@ -113,10 +113,9 @@ public class IndexUpdater {
             metaFileUtil = MetaFileUtil.create(indexFolder);
             metadataMap = metaFileUtil.readMetaFile();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new SystemException(ErrorCode.SYSE0001, e);
         }
 
-        assert collectionFolder != null;
         File collectionDirectory = new File(collectionFolder);
         if (!collectionDirectory.exists()) {
             throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
@@ -125,7 +124,6 @@ public class IndexUpdater {
         abvs.reset();
         sb.reset(abvs);
 
-        assert indexFolder != null;
         Directory fsdir = FSDirectory.open(Paths.get(indexFolder));
         indexWriter = new IndexWriter(fsdir, new IndexWriterConfig(new CaseSensitiveAnalyzer()).
                 setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));

@@ -151,7 +151,7 @@ public class IndexConstructorUtil {
                     try {
                         xmlMetadata.setMd5(metaFileUtil.generateMD5(file));
                     } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
+                        throw new SystemException(ErrorCode.SYSE0001, e);
                     }
                     metadataMap.put(file.getCanonicalPath(), xmlMetadata);
                 }
