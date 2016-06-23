@@ -856,7 +856,7 @@
     <!-- opext:array-constructor($expression as item()*) as array() -->
     <operator name="opext:array-constructor">
         <param name="expression" type="item()*"/>
-        <return type="object()"/>
+        <return type="array()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.jsonitem.ArrayConstructorScalarEvaluatorFactory"/>
     </operator>
 

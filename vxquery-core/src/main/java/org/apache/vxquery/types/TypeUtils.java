@@ -26,46 +26,46 @@ public class TypeUtils {
         return createSequenceType(RootStaticContextImpl.INSTANCE, str);
     }
 
-    public static SequenceType createSequenceType(StaticContext sCtx, String str) {
-        String s = str.trim();
+    public static SequenceType createSequenceType(StaticContext sCtx, String s) {
+        String str = s.trim();
         Quantifier q = Quantifier.QUANT_ONE;
-        if (s.endsWith("?")) {
+        if (str.endsWith("?")) {
             q = Quantifier.QUANT_QUESTION;
-            s = s.substring(0, s.length() - 1);
-        } else if (s.endsWith("*")) {
+            str = str.substring(0, str.length() - 1);
+        } else if (str.endsWith("*")) {
             q = Quantifier.QUANT_STAR;
-            s = s.substring(0, s.length() - 1);
-        } else if (s.endsWith("+")) {
+            str = str.substring(0, str.length() - 1);
+        } else if (str.endsWith("+")) {
             q = Quantifier.QUANT_PLUS;
-            s = s.substring(0, s.length() - 1);
+            str = str.substring(0, str.length() - 1);
         }
 
         ItemType it;
-        if (s.equals("item()")) {
+        if (str.equals("item()")) {
             it = AnyItemType.INSTANCE;
-        } else if (s.equals("json-item()")) {
+        } else if (str.equals("json-item()")) {
             it = AnyJsonItemType.INSTANCE;
-        } else if (s.equals("object()")) {
+        } else if (str.equals("object()")) {
             it = ObjectType.INSTANCE;
-        } else if (s.equals("array()")) {
+        } else if (str.equals("array()")) {
             it = ArrayType.INSTANCE;
-        } else if (s.equals("node()")) {
+        } else if (str.equals("node()")) {
             it = AnyNodeType.INSTANCE;
-        } else if (s.equals("document-node()")) {
+        } else if (str.equals("document-node()")) {
             it = DocumentType.ANYDOCUMENT;
-        } else if (s.equals("none")) {
+        } else if (str.equals("none")) {
             it = NoneType.INSTANCE;
-        } else if (s.equals("element()")) {
+        } else if (str.equals("element()")) {
             it = ElementType.ANYELEMENT;
-        } else if (s.equals("empty-sequence()")) {
+        } else if (str.equals("empty-sequence()")) {
             it = EmptySequenceType.INSTANCE;
         } else {
-            int idx = s.indexOf(':');
+            int idx = str.indexOf(':');
             if (idx < 0) {
-                throw new IllegalStateException("QName has no prefix: " + s);
+                throw new IllegalStateException("QName has no prefix: " + str);
             }
-            String prefix = s.substring(0, idx);
-            String local = s.substring(idx + 1);
+            String prefix = str.substring(0, idx);
+            String local = str.substring(idx + 1);
             String uri = sCtx.lookupNamespaceUri(prefix);
             if (uri == null) {
                 throw new IllegalStateException("Prefix has no URI mapping: " + prefix);
