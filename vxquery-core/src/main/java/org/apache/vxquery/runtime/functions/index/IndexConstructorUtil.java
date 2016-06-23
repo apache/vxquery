@@ -53,8 +53,9 @@ public class IndexConstructorUtil {
     static ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
 
     public static void evaluate(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
-                                ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
-                                ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
+                                ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb,
+                                ArrayBackedValueStorage abvs, ITreeNodeIdProvider nodeIdProvider,
+                                ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
                                 boolean isElementPath, String nodeId) throws SystemException {
         String collectionFolder;
         String indexFolder;
@@ -127,8 +128,9 @@ public class IndexConstructorUtil {
      * it indexes that document node.
      */
     public static void indexXmlFiles(File collectionDirectory, IndexWriter writer, boolean isElementPath,
-                                     TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider,
-                                     SequenceBuilder sb, ByteBufferInputStream bbis, DataInputStream di, String nodeId)
+                                     TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode,
+                                     ITreeNodeIdProvider nodeIdProvider, SequenceBuilder sb,
+                                     ByteBufferInputStream bbis, DataInputStream di, String nodeId)
             throws SystemException, IOException {
 
 
@@ -136,15 +138,7 @@ public class IndexConstructorUtil {
 
             if (readableXmlFile(file.getPath())) {
                 abvsFileNode.reset();
-                // Get the document node
-//                XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
-//                FunctionHelper.readInDocFromString(file.getPath(), bbis, di, abvsFileNode, parser);
-//
-//                nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
-//
-//                //Add the document to the index
-//                //Creates one lucene doc per file
-//                IndexDocumentBuilder ibuilder = new IndexDocumentBuilder(nodep, writer, file.getCanonicalPath());
+
                 IndexDocumentBuilder ibuilder = getIndexBuilder(file, writer, nodep, abvsFileNode, nodeIdProvider,
                         bbis, di, nodeId);
 
@@ -180,7 +174,8 @@ public class IndexConstructorUtil {
     public static IndexDocumentBuilder getIndexBuilder(File file, IndexWriter writer,
                                                        TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode,
                                                        ITreeNodeIdProvider nodeIdProvider,
-                                                       ByteBufferInputStream bbis, DataInputStream di, String nodeId) throws IOException {
+                                                       ByteBufferInputStream bbis, DataInputStream di, String nodeId)
+            throws IOException {
 
         //Get the document node
         XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
