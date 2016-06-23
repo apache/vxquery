@@ -116,6 +116,12 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                     result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
                     return true;
                 }
+                try {
+                    reader.close();
+                    analyzer.close();
+                } catch (IOException e) {
+                    throw new AlgebricksException(e);
+                }
                 return false;
             }
 
