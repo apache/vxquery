@@ -552,31 +552,31 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>0.11</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>.gitignore</exclude>
-                        <exclude>.rat-excludes</exclude>
-                        <exclude>.project</exclude>
-                        <exclude>.classpath</exclude>
-                        <exclude>.basex</exclude>
-                        <exclude>**/ExpectedTestResults/**</exclude>
-                        <exclude>**/xqts.txt</exclude>
-                        <exclude>test-suite*/**/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.rat</groupId>-->
+                <!--<artifactId>apache-rat-plugin</artifactId>-->
+                <!--<version>0.11</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>verify</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>check</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<excludes>-->
+                        <!--<exclude>.gitignore</exclude>-->
+                        <!--<exclude>.rat-excludes</exclude>-->
+                        <!--<exclude>.project</exclude>-->
+                        <!--<exclude>.classpath</exclude>-->
+                        <!--<exclude>.basex</exclude>-->
+                        <!--<exclude>**/ExpectedTestResults/**</exclude>-->
+                        <!--<exclude>**/xqts.txt</exclude>-->
+                        <!--<exclude>test-suite*/**/*</exclude>-->
+                    <!--</excludes>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -632,19 +632,19 @@
                     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache-rat-plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>.gitignore</exclude>
-                        <exclude>.git/**/*</exclude>
-                    </excludes>
-                    <numUnapprovedLicenses>0</numUnapprovedLicenses>
-                    <maxmemory>2g</maxmemory>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.rat</groupId>-->
+                <!--<artifactId>apache-rat-plugin</artifactId>-->
+                <!--<version>${apache-rat-plugin.version}</version>-->
+                <!--<configuration>-->
+                    <!--<excludes>-->
+                        <!--<exclude>.gitignore</exclude>-->
+                        <!--<exclude>.git/**/*</exclude>-->
+                    <!--</excludes>-->
+                    <!--<numUnapprovedLicenses>0</numUnapprovedLicenses>-->
+                    <!--<maxmemory>2g</maxmemory>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>

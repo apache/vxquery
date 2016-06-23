@@ -16,6 +16,9 @@
 */
 package org.apache.vxquery.runtime.functions.index.updateIndex;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.file.Files;
@@ -31,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MetaFileUtil {
 
     private File metaFile;
+    private Logger LOGGER = Logger.getLogger("MetadataFileUtil");
 
     private MetaFileUtil(String indexFolder) {
         this.metaFile = new File(indexFolder + "/" + Constants.META_FILE_NAME);
@@ -62,7 +66,9 @@ public class MetaFileUtil {
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
         objectOutputStream.writeObject(metadataMap);
         objectOutputStream.close();
-        System.out.println("Done");
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
 
     }
 

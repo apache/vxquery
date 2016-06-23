@@ -89,29 +89,31 @@ public class IndexUpdater {
     }
 
     public void evaluate() throws SystemException, IOException, NoSuchAlgorithmException {
-        String collectionFolder = null;
-        String indexFolder = null;
-        TaggedValuePointable collectionTVP = args[0]; //To be removed
-        TaggedValuePointable indexTVP = args[1];
+        String collectionFolder;
+        String indexFolder;
+        TaggedValuePointable indexTVP = args[0];
 
-        if (collectionTVP.getTag() != ValueTag.XS_STRING_TAG || indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
+        if (indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
             throw new SystemException(ErrorCode.FORG0006);
         }
 
+        XmlMetadata collectionMetadata;
         try {
-            // Get the list of files.
-            collectionTVP.getValue(stringp);
-            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                    stringp.getLength() + stringp.getStartOffset())), 0);
-            collectionFolder = di.readUTF();
-
             // Get the index folder
             indexTVP.getValue(stringp);
             bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
                     stringp.getLength() + stringp.getStartOffset())), 0);
             indexFolder = di.readUTF();
+
+            // Read the metadata file and load the metadata map into memory.
             metaFileUtil = MetaFileUtil.create(indexFolder);
             metadataMap = metaFileUtil.readMetaFile();
+
+            // Retrieve the collection folder path.
+            // Remove the entry for ease of the next steps.
+            collectionMetadata = metadataMap.remove(Constants.COLLECTION_ENTRY);
+            collectionFolder = collectionMetadata.getPath();
+
         } catch (IOException | ClassNotFoundException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
@@ -133,6 +135,9 @@ public class IndexUpdater {
 
         //Detect deleted files and execute the delete index process.
         deleteIndexOfDeletedFiles(metadataMap.keySet(), pathsFromFileList);
+
+        // Add collection path entry back
+        metadataMap.put(Constants.COLLECTION_ENTRY, collectionMetadata);
 
         //Write the updated metadata to the file.
         metaFileUtil.writeMetaFile(metadataMap);
@@ -182,7 +187,7 @@ public class IndexUpdater {
                         if (LOGGER.isDebugEnabled())
                             LOGGER.log(Level.DEBUG, "New Index is created for updated file " + file.getCanonicalPath());
 
-                        //Update metafile
+                        //Update the metadata map.
                         XmlMetadata metadata = updateEntry(file, data);
                         metadataMap.replace(file.getCanonicalPath(), metadata);
 
@@ -251,7 +256,7 @@ public class IndexUpdater {
                 metadataMap.remove(s);
                 indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, s));
                 if (LOGGER.isDebugEnabled())
-                    LOGGER.log(Level.DEBUG, "Index of the deleted file " + s + " deleted from the index!");
+                    LOGGER.log(Level.DEBUG, "Index of the deleted file " + s + " was deleted from the index!");
             }
         }
     }

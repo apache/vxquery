@@ -136,9 +136,8 @@
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>
 
-    <!-- fn:update-index($arg  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
+    <!-- fn:update-index($indexFolder  as xs:string?) as  node()* -->
     <function name="fn:update-index">
-        <param name="collection-folder" type="xs:string?"/>
         <param name="index-folder" type="xs:string?"/>
         <return type="node()*"/>
         <runtime type="scalar"

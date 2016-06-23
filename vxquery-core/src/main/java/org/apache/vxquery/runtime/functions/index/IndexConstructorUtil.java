@@ -32,6 +32,7 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexDocumentBuilder;
+import org.apache.vxquery.runtime.functions.index.updateIndex.Constants;
 import org.apache.vxquery.runtime.functions.index.updateIndex.MetaFileUtil;
 import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
@@ -109,6 +110,12 @@ public class IndexConstructorUtil {
                     nodeId);
 
             if (!isMetaFilePresent) {
+                // Add collection information to the map.
+                XmlMetadata data = new XmlMetadata();
+                data.setPath(collectionFolder);
+                metadataMap.put(Constants.COLLECTION_ENTRY, data);
+
+                // Write metadata map to a file.
                 metaFileUtil.writeMetaFile(metadataMap);
             }
 
