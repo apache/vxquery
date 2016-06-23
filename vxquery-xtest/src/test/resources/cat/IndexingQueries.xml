@@ -50,11 +50,11 @@
       <query name="useIndex5" date="2016-05-26"/>
       <output-file compare="Text">useIndex5.txt</output-file>
    </test-case>
-   <test-case name="use-index-6" FilePath="Indexing/" Creator="Steven Jacobs">
+   <!--<test-case name="use-index-6" FilePath="Indexing/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex6" date="2016-05-26"/>
       <output-file compare="Text">useIndex6.txt</output-file>
-   </test-case>
+   </test-case>-->
    <test-case name="use-index-7" FilePath="Indexing/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex7" date="2016-05-26"/>
