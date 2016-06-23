@@ -1,0 +1,63 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="JsonArrayQueries" featureOwner="VXQuery">
+    <GroupInfo>
+        <title>Functions in JSONiq</title>
+        <description>The functions extended and newly created for JSONiq</description>
+    </GroupInfo>
+    <test-case name="functions-in-jsoniq-fn_boolean" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:boolean for JSON objects, arrays and null</description>
+        <query name="fn_boolean" date="2016-06-17"/>
+        <output-file compare="Text">fn_boolean.txt</output-file>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:data for JSON objects, arrays and null</description>
+        <query name="fn_data1" date="2016-06-17"/>
+        <output-file compare="Text">fn_data1.txt</output-file>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:data for JSON objects, arrays and null</description>
+        <query name="fn_data2" date="2016-06-17"/>
+        <expected-error>JNTY0004</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:data for JSON objects, arrays and null</description>
+        <query name="fn_data3" date="2016-06-17"/>
+        <expected-error>JNTY0004</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_string" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:string for JSON null</description>
+        <query name="fn_string1" date="2016-06-17"/>
+        <output-file compare="Text">fn_string1.txt</output-file>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:string for JSON objects</description>
+        <query name="fn_string2" date="2016-06-17"/>
+        <expected-error>JNTY0024</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:string for JSON arrays</description>
+        <query name="fn_string3" date="2016-06-17"/>
+        <expected-error>JNTY0024</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for cast for JSON null</description>
+        <query name="cast" date="2016-06-17"/>
+        <output-file compare="Text">cast.txt</output-file>
+    </test-case>
+</test-group>

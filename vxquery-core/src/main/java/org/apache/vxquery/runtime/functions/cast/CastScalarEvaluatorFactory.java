@@ -56,9 +56,9 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                 int tid = tvp.getTag();
                 try {
                     switch (tid) {
-                    /**
-                     * Primitive Datatypes (Alphabetical)
-                     */
+                        /**
+                         * Primitive Datatypes (Alphabetical)
+                         */
                         case ValueTag.XS_ANY_URI_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertAnyURI(tp.utf8sp, dOut);
@@ -197,9 +197,9 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             result.set(abvs);
                             return;
 
-                            /**
-                             * Derived Numeric Datatypes (Alphabetical)
-                             */
+                        /**
+                         * Derived Numeric Datatypes (Alphabetical)
+                         */
                         case ValueTag.XS_BYTE_TAG:
                             tvp.getValue(tp.bytep);
                             aOp.convertByte(tp.bytep, dOut);
@@ -272,9 +272,9 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                             result.set(abvs);
                             return;
 
-                            /**
-                             * Derived String Datatypes (Alphabetical)
-                             */
+                        /**
+                         * Derived String Datatypes (Alphabetical)
+                         */
                         case ValueTag.XS_ENTITY_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertEntity(tp.utf8sp, dOut);
@@ -326,6 +326,14 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                         case ValueTag.XS_TOKEN_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertToken(tp.utf8sp, dOut);
+                            result.set(abvs);
+                            return;
+                        
+                        /**
+                         * JSON null
+                         */
+                        case ValueTag.JS_NULL_TAG:
+                            aOp.convertNull(dOut);
                             result.set(abvs);
                             return;
                     }
