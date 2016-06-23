@@ -41,18 +41,24 @@
         <expected-error>JNTY0004</expected-error>
     </test-case>
     <test-case name="functions-in-jsoniq-fn_string" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
-        <description>Query for fn:data for JSON objects, arrays and null</description>
+        <description>Query for fn:string for JSON null</description>
         <query name="fn_string1" date="2016-06-17"/>
         <output-file compare="Text">fn_string1.txt</output-file>
     </test-case>
     <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
-        <description>Query for fn:data for JSON objects, arrays and null</description>
+
+        <description>Query for fn:string for JSON objects</description>
         <query name="fn_string2" date="2016-06-17"/>
         <expected-error>JNTY0024</expected-error>
     </test-case>
     <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
-        <description>Query for fn:data for JSON objects, arrays and null</description>
+        <description>Query for fn:string for JSON arrays</description>
         <query name="fn_string3" date="2016-06-17"/>
         <expected-error>JNTY0024</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for cast for JSON null</description>
+        <query name="cast" date="2016-06-17"/>
+        <output-file compare="Text">cast.txt</output-file>
     </test-case>
 </test-group>
