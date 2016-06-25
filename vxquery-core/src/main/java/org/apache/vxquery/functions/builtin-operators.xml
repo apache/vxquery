@@ -655,6 +655,12 @@
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.ValueScalarEvaluatorFactory"/>
     </operator>
 
+    <operator name="opext:keys">
+        <param name="expr" type="json-item()"/>
+        <return type="item()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.KeysScalarEvaluatorFactory"/>
+    </operator>
+
     <!-- opext:subtract($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
     <operator name="opext:subtract">
         <param name="arg1" type="xs:anyAtomicType?"/>

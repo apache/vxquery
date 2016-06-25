@@ -767,35 +767,35 @@ public class XMLQueryTranslator {
                 return translateQuantifiedExprNode(tCtx, qeNode);
             }
 
-                /*
-                        case TYPESWITCH_EXPRESSION: {
-                            TypeswitchExprNode teNode = (TypeswitchExprNode) value;
-                            Expression sExpr = translateExpression(teNode.getSwitchExpr());
-                            ForLetVariable tVar = new ForLetVariable(VarTag.LET, createVarName(), sExpr);
-                            tVar.setDeclaredStaticType(SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
+            /*
+                    case TYPESWITCH_EXPRESSION: {
+                        TypeswitchExprNode teNode = (TypeswitchExprNode) value;
+                        Expression sExpr = translateExpression(teNode.getSwitchExpr());
+                        ForLetVariable tVar = new ForLetVariable(VarTag.LET, createVarName(), sExpr);
+                        tVar.setDeclaredStaticType(SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
+                        pushVariableScope();
+                        varScope.registerVariable(tVar);
+                        List<TypeswitchExpression.Case> cases = new ArrayList<TypeswitchExpression.Case>();
+                        for (CaseClauseNode ccNode : teNode.getCaseClauses()) {
+                            SequenceType type = createSequenceType(ccNode.getType());
+                            ForLetVariable caseVar = null;
                             pushVariableScope();
-                            varScope.registerVariable(tVar);
-                            List<TypeswitchExpression.Case> cases = new ArrayList<TypeswitchExpression.Case>();
-                            for (CaseClauseNode ccNode : teNode.getCaseClauses()) {
-                                SequenceType type = createSequenceType(ccNode.getType());
-                                ForLetVariable caseVar = null;
-                                pushVariableScope();
-                                if (ccNode.getCaseVar() != null) {
-                                    caseVar = new ForLetVariable(VarTag.LET, createQName(ccNode.getCaseVar()), new TreatExpression(
-                                            currCtx, new VariableReferenceExpression(currCtx, tVar), type));
-                                    caseVar.setDeclaredStaticType(type);
-                                    varScope.registerVariable(caseVar);
-                                }
-                                Expression cExpr = translateExpression(ccNode.getValueExpr());
-                                TypeswitchExpression.Case c = new TypeswitchExpression.Case(caseVar, type, cExpr);
-                                cases.add(c);
-                                popVariableScope();
+                            if (ccNode.getCaseVar() != null) {
+                                caseVar = new ForLetVariable(VarTag.LET, createQName(ccNode.getCaseVar()), new TreatExpression(
+                                        currCtx, new VariableReferenceExpression(currCtx, tVar), type));
+                                caseVar.setDeclaredStaticType(type);
+                                varScope.registerVariable(caseVar);
                             }
-                            Expression dExpr = translateExpression(teNode.getDefaultClause());
+                            Expression cExpr = translateExpression(ccNode.getValueExpr());
+                            TypeswitchExpression.Case c = new TypeswitchExpression.Case(caseVar, type, cExpr);
+                            cases.add(c);
                             popVariableScope();
-                            return new TypeswitchExpression(currCtx, tVar, cases, dExpr);
                         }
-                        */
+                        Expression dExpr = translateExpression(teNode.getDefaultClause());
+                        popVariableScope();
+                        return new TypeswitchExpression(currCtx, tVar, cases, dExpr);
+                    }
+                    */
 
             case COMPUTED_TEXT_CONSTRUCTOR: {
                 ComputedTextConstructorNode cNode = (ComputedTextConstructorNode) value;
@@ -1559,7 +1559,7 @@ public class XMLQueryTranslator {
                                     }
                                 }
                                 if (arguments.size() == 0)
-                                    ctxExpr = expr;
+                                    ctxExpr = sfce(BuiltinOperators.KEYS, expr);
                             } else {
                                 predicates = postfixNode.getArgs();
                                 ctxExpr = expr;
