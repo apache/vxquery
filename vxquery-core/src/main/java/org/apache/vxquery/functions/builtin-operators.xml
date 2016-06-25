@@ -649,8 +649,8 @@
     
     <!-- opext:value($expr as xs:item(), $arg as xs:anyAtomicType?) as item() -->
     <operator name="opext:value">
-        <param name="expr" type="item()"/>
-        <param name="argExpr" type="xs:anyAtomicType"/>
+        <param name="expr" type="json-item()"/>
+        <param name="argExpr" type="item()"/>
         <return type="item()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.ValueScalarEvaluatorFactory"/>
     </operator>
