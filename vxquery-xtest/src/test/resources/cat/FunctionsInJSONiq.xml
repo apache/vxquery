@@ -61,4 +61,14 @@
         <query name="cast" date="2016-06-23"/>
         <output-file compare="Text">cast.txt</output-file>
     </test-case>
+    <test-case name="functions-in-jsoniq-jn_keys" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for cast for JSON null</description>
+        <query name="jn_keys1" date="2016-06-26"/>
+        <output-file compare="Text">jn_keys1.txt</output-file>
+    </test-case>
+    <test-case name="functions-in-jsoniq-jn_keys" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for cast for JSON null</description>
+        <query name="jn_keys2" date="2016-06-26"/>
+        <output-file compare="Text">jn_keys2.txt</output-file>
+    </test-case>
 </test-group>
