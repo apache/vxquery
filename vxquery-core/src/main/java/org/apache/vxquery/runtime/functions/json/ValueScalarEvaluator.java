@@ -92,6 +92,7 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
             }
             TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
             try {
+                mvs.reset();
                 sb.reset(mvs);
                 tvp1.getValue(op);
                 tvp2.getValue(sp);
