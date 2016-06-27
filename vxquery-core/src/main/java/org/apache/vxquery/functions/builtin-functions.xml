@@ -323,6 +323,13 @@
         <return type="document-node()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnDocScalarEvaluatorFactory"/>
     </function>
+    
+    <!-- jn:json-doc($uri as  xs:string?) as json-item()?  -->
+    <function name="jn:json-doc">
+        <param name="uri" type="xs:string?"/>
+        <return type="json-item()?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnDocScalarEvaluatorFactory"/>
+    </function>
 
     <!-- fn:doc-available($uri  as xs:string?) as  xs:boolean -->
     <function name="fn:doc-available">
@@ -1154,6 +1161,13 @@
         <param name="arg" type="item()*"/>
         <return type="xs:string*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnKeysScalarEvaluatorFactory"/>
+    </function>
+    
+    <!-- jn:members($arg as item()*) as item()* -->
+    <function name="jn:members">
+        <param name="arg" type="item()*"/>
+        <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnMembersScalarEvaluatorFactory"/>
     </function>
 
     <!-- jn:null() as js:null -->

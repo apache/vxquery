@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.htrace.fasterxml.jackson.core.JsonParseException;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
@@ -51,7 +52,7 @@ import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
-import org.apache.vxquery.xmlparser.XMLParser;
+import org.apache.vxquery.xmlparser.IParser;
 
 public class FunctionHelper {
 
@@ -482,7 +483,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-            throws SystemException {
+                    throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1217,7 +1218,8 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+            DataInputStream di, ArrayBackedValueStorage abvs, IParser parser)
+                    throws NumberFormatException, JsonParseException, IOException {
         String fName;
         try {
             fName = getStringFromPointable(stringp, bbis, di);
@@ -1228,7 +1230,8 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
-            ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+            ArrayBackedValueStorage abvs, IParser parser)
+                    throws NumberFormatException, JsonParseException, IOException {
         if (!fName.contains("hdfs:/")) {
             File file = new File(fName);
             if (file.exists()) {

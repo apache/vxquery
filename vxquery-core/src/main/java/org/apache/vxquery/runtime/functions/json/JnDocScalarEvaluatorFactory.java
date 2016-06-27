@@ -14,23 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.runtime.functions.node;
+package org.apache.vxquery.runtime.functions.json;
 
 import java.io.DataInputStream;
-
-import org.apache.vxquery.datamodel.accessors.SequencePointable;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.apache.vxquery.xmlparser.IParser;
-import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
-import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
-import org.apache.vxquery.xmlparser.XMLParser;
+import java.io.IOException;
 
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -40,51 +27,51 @@ import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.jsonparser.JSONParser;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.IParser;
 
-public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class JnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+
     private static final long serialVersionUID = 1L;
 
-    public FnDocAvailableScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public JnDocScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
-        final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
-        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-        final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
+
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp = args[0];
-                if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                    tvp.getValue(seqp);
-                    if (seqp.getEntryCount() == 0) {
-                        XDMConstants.setFalse(result);
-                        return;
-                    } else {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                }
                 if (tvp.getTag() != ValueTag.XS_STRING_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
                 tvp.getValue(stringp);
                 try {
-                    IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
+                    IParser parser = new JSONParser();
                     FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
-                    XDMConstants.setTrue(result);
-                } catch (Exception e) {
-                    XDMConstants.setFalse(result);
+                } catch (IOException e) {
+                    throw new SystemException(ErrorCode.FODC0002, e);
                 }
+                result.set(abvs);
             }
+
         };
     }
+
 }
