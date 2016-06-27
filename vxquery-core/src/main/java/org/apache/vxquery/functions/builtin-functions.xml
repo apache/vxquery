@@ -1147,4 +1147,10 @@
         <return type="xs:string*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnKeysScalarEvaluatorFactory"/>
     </function>
+
+    <!-- jn:null() as js:null -->
+    <function name="jn:null">
+        <return type="xs:string*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnNullScalarEvaluatorFactory"/>
+    </function>
 </functions>
