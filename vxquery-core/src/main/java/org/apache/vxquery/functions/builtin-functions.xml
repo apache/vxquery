@@ -27,8 +27,7 @@
     <function name="fn:adjust-date-to-timezone">
         <param name="arg" type="xs:date?"/>
         <return type="xs:date?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateToTimezoneScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-date-to-timezone( $arg as xs:date?, $timezone as xs:dayTimeDuration?)  as xs:date? -->
@@ -36,16 +35,14 @@
         <param name="arg" type="xs:date?"/>
         <param name="timezone" type="xs:dayTimeDuration?"/>
         <return type="xs:date?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateToTimezoneScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-dateTime-to-timezone( $arg as xs:dateTime?)  as xs:dateTime? -->
     <function name="fn:adjust-dateTime-to-timezone">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:dateTime?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateTimeToTimezoneScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-dateTime-to-timezone( $arg as xs:dateTime?, $timezone as xs:dayTimeDuration?)  as xs:dateTime? -->
@@ -53,16 +50,14 @@
         <param name="arg" type="xs:dateTime?"/>
         <param name="timezone" type="xs:dayTimeDuration?"/>
         <return type="xs:dateTime?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateTimeToTimezoneScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustDateTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-time-to-timezone( $arg as xs:time?) as  xs:time? -->
     <function name="fn:adjust-time-to-timezone">
         <param name="arg" type="xs:time?"/>
         <return type="xs:time?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnAdjustTimeToTimezoneScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:adjust-time-to-timezone( $arg as xs:time?, $timezone as xs:dayTimeDuration?)  as xs:time? -->
@@ -70,8 +65,7 @@
         <param name="arg" type="xs:time?"/>
         <param name="timezone" type="xs:dayTimeDuration?"/>
         <return type="xs:time?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnAdjustTimeToTimezoneScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnAdjustTimeToTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:avg($arg as  xs:anyAtomicType*) as xs:anyAtomicType? -->
@@ -79,8 +73,7 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnAvgScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnAvgAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnAvgAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:base-uri() as  xs:anyURI? -->
@@ -120,8 +113,7 @@
     <function name="fn:codepoints-to-string">
         <param name="arg" type="xs:integer*"/>
         <return type="xs:string"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.strings.FnCodepointsToStringEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCodepointsToStringEvaluatorFactory"/>
     </function>
 
     <!-- fn:collection() as  node()* -->
@@ -141,8 +133,7 @@
         <param name="collection-folder" type="xs:string?"/>
         <param name="index-folder" type="xs:string?"/>
         <return type="node()*"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:collection-from-index($indexfolder  as xs:string?, $elementpath as xs:string?) as  node()* -->
@@ -150,14 +141,11 @@
         <param name="index-folder" type="xs:string?"/>
         <param name="element-path" type="xs:string?"/>
         <return type="node()*"/>
-        <runtime type="unnesting"
-                 class="org.apache.vxquery.runtime.functions.index.CollectionFromIndexUnnestingEvaluatorFactory"/>
-        <property type="DocumentOrder"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.CollectionFromIndexUnnestingEvaluatorFactory"/>
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
@@ -216,29 +204,25 @@
         <param name="arg" type="item()*"/>
         <return type="xs:integer"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnCountScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnCountAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnCountAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:current-date() as  xs:date -->
     <function name="fn:current-date">
         <return type="xs:date"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnCurrentDateScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnCurrentDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:current-dateTime()  as xs:dateTime -->
     <function name="fn:current-dateTime">
         <return type="xs:dateTime"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnCurrentDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnCurrentDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:current-time() as  xs:time -->
     <function name="fn:current-time">
         <return type="xs:time"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnCurrentTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnCurrentTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:data($arg as  item()*) as xs:anyAtomicType* -->
@@ -246,12 +230,10 @@
         <param name="arg" type="item()*"/>
         <return type="xs:anyAtomicType*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.misc.FnDataScalarEvaluatorFactory"/>
-        <property type="DocumentOrder"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
@@ -275,24 +257,21 @@
     <function name="fn:day-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnDayFromDateScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnDayFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:day-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
     <function name="fn:day-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnDayFromDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnDayFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:days-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:days-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnDaysFromDurationScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnDaysFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:deep-equal($parameter1  as item()*, $parameter2 as item()*)  as xs:boolean -->
@@ -319,8 +298,7 @@
     <function name="fn:distinct-values">
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType*"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.sequence.FnDistinctValuesScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnDistinctValuesScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:distinct-values($arg  as xs:anyAtomicType*, $collation as xs:string)  as xs:anyAtomicType* -->
@@ -328,8 +306,7 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType*"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.sequence.FnDistinctValuesScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnDistinctValuesScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:doc($uri as  xs:string?) as document-node()?  -->
@@ -422,10 +399,8 @@
     <function name="fn:exactly-one">
         <param name="arg" type="item()*"/>
         <return type="item()"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.sequence.FnExactlyOneScalarEvaluatorFactory"/>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnExactlyOneScalarEvaluatorFactory"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
@@ -454,24 +429,21 @@
     <function name="fn:hours-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:hours-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:hours-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromDurationScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:hours-from-time($arg  as xs:time?) as  xs:integer?  -->
     <function name="fn:hours-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnHoursFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:id($arg as  xs:string*) as element()* -->
@@ -503,8 +475,7 @@
     <!-- fn:implicit-timezone()  as xs:dayTimeDuration -->
     <function name="fn:implicit-timezone">
         <return type="xs:dayTimeDuration"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnImplicitTimezoneScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnImplicitTimezoneScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:in-scope-prefixes( $element as element())  as xs:string* -->
@@ -536,8 +507,7 @@
         <param name="position" type="xs:integer"/>
         <param name="inserts" type="item()*"/>
         <return type="item()*"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.sequence.FnInsertBeforeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnInsertBeforeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:iri-to-uri($iri  as xs:string?) as  xs:string -->
@@ -579,8 +549,7 @@
     <function name="fn:local-name-from-QName">
         <param name="arg" type="xs:QName?"/>
         <return type="xs:NCName?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.qname.FnLocalNameFromQNameScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.qname.FnLocalNameFromQNameScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:lower-case($arg  as xs:string?) as  xs:string -->
@@ -610,8 +579,7 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnMaxAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:max($arg as  xs:anyAtomicType*, $collation as string)  as xs:anyAtomicType?  -->
@@ -620,8 +588,7 @@
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnMaxAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMaxAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:min($arg as  xs:anyAtomicType*) as xs:anyAtomicType?  -->
@@ -629,8 +596,7 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMinScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnMinAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMinAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:min($arg as  xs:anyAtomicType*, $collation as string)  as xs:anyAtomicType?  -->
@@ -639,56 +605,49 @@
         <param name="collation" type="xs:string"/>
         <return type="xs:anyAtomicType"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnMinScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnMinAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnMinAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:minutes-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
     <function name="fn:minutes-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:minutes-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:minutes-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromDurationScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:minutes-from-time( $arg as xs:time?) as  xs:integer?  -->
     <function name="fn:minutes-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMinutesFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:month-from-date($arg  as xs:date?) as  xs:integer?  -->
     <function name="fn:month-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnMonthFromDateScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMonthFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:month-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
     <function name="fn:month-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnMonthFromDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMonthFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:months-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:months-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnMonthsFromDurationScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnMonthsFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:name() as  xs:string -->
@@ -724,8 +683,7 @@
     <function name="fn:namespace-uri-from-QName">
         <param name="arg" type="xs:QName?"/>
         <return type="xs:anyURI?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.qname.FnNamespaceUriFromQNameScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.qname.FnNamespaceUriFromQNameScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:nilled($arg as  node()?) as xs:boolean?  -->
@@ -788,12 +746,10 @@
         <param name="arg" type="item()*"/>
         <return type="item()+"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnOneOrMoreScalarEvaluatorFactory"/>
-        <property type="DocumentOrder"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
@@ -807,8 +763,7 @@
     <function name="fn:prefix-from-QName">
         <param name="arg" type="xs:QName?"/>
         <return type="xs:NCName?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.qname.FnPrefixFromQNameScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.qname.FnPrefixFromQNameScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:QName($paramURI  as xs:string?, $paramQName as xs:string)  as xs:QName -->
@@ -880,8 +835,7 @@
     <function name="fn:root">
         <param name="arg" type="node()?"/>
         <return type="node()"/>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
@@ -897,8 +851,7 @@
     <function name="fn:round-half-to-even">
         <param name="arg" type="xsext:numeric?"/>
         <return type="xsext:numeric?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.numeric.FnRoundHalfToEvenScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnRoundHalfToEvenScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:round-half-to-even( $arg as numeric?, $precision as xs:integer)  as numeric?  -->
@@ -906,32 +859,28 @@
         <param name="arg" type="xsext:numeric?"/>
         <param name="precision" type="xs:integer"/>
         <return type="xsext:numeric?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.numeric.FnRoundHalfToEvenScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnRoundHalfToEvenScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:seconds-from-dateTime( $arg as xs:dateTime?)  as xs:decimal?  -->
     <function name="fn:seconds-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:decimal?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:seconds-from-duration( $arg as xs:duration?)  as xs:decimal?  -->
     <function name="fn:seconds-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:decimal?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromDurationScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:seconds-from-time( $arg as xs:time?) as  xs:decimal?  -->
     <function name="fn:seconds-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:decimal?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnSecondsFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:starts-with($arg1  as xs:string?, $arg2 as xs:string?)  as xs:boolean -->
@@ -992,8 +941,7 @@
     <function name="fn:string-to-codepoints">
         <param name="arg" type="xs:string?"/>
         <return type="xs:integer*"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.strings.FnStringToCodepointsEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnStringToCodepointsEvaluatorFactory"/>
     </function>
 
     <!-- fn:subsequence($sourceSeq  as item()*, $startingLoc as xs:double)  as item()* -->
@@ -1001,8 +949,7 @@
         <param name="sourceSeq" type="item()*"/>
         <param name="startingLoc" type="xs:double"/>
         <return type="item()*"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.sequence.FnSubsequenceScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnSubsequenceScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:subsequence($sourceSeq  as item()*, $startingLoc as xs:double, $length as xs:double)  as item()* -->
@@ -1011,8 +958,7 @@
         <param name="startingLoc" type="xs:double"/>
         <param name="length" type="xs:double"/>
         <return type="item()*"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.sequence.FnSubsequenceScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnSubsequenceScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:substring($sourceString  as xs:string?, $startingLoc as xs:double)  as xs:string -->
@@ -1071,8 +1017,7 @@
         <param name="arg" type="xs:anyAtomicType*"/>
         <return type="xs:anyAtomicType"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnSumScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnSumAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnSumAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:sum($arg as  xs:anyAtomicType*, $zero as xs:anyAtomicType?)  as xs:anyAtomicType?  -->
@@ -1081,32 +1026,28 @@
         <param name="zero" type="xs:anyAtomicType?"/>
         <return type="xs:anyAtomicType?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.aggregate.FnSumScalarEvaluatorFactory"/>
-        <runtime type="aggregate"
-                 class="org.apache.vxquery.runtime.functions.aggregate.FnSumAggregateEvaluatorFactory"/>
+        <runtime type="aggregate" class="org.apache.vxquery.runtime.functions.aggregate.FnSumAggregateEvaluatorFactory"/>
     </function>
 
     <!-- fn:timezone-from-date( $arg as xs:date?) as  xs:dayTimeDuration?  -->
     <function name="fn:timezone-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:dayTimeDuration?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromDateScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:timezone-from-dateTime( $arg as xs:dateTime?)  as xs:dayTimeDuration?  -->
     <function name="fn:timezone-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:dayTimeDuration?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:timezone-from-time( $arg as xs:time?) as  xs:dayTimeDuration?  -->
     <function name="fn:timezone-from-time">
         <param name="arg" type="xs:time?"/>
         <return type="xs:dayTimeDuration?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnTimezoneFromTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:tokenize($input  as xs:string?, $pattern as xs:string)  as xs:string* -->
@@ -1129,12 +1070,10 @@
         <param name="value" type="item()*"/>
         <param name="label" type="xs:string"/>
         <return type="item()*"/>
-        <property type="DocumentOrder"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
@@ -1158,10 +1097,8 @@
         <param name="sourceSeq" type="item()*"/>
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnUnorderedScalarEvaluatorFactory"/>
-        <property type="DocumentOrder"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrderNOPropagationPolicy"/>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.documentorder.DocumentOrderNOPropagationPolicy"/>
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
@@ -1177,24 +1114,21 @@
     <function name="fn:year-from-date">
         <param name="arg" type="xs:date?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnYearFromDateScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnYearFromDateScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:year-from-dateTime( $arg as xs:dateTime?)  as xs:integer?  -->
     <function name="fn:year-from-dateTime">
         <param name="arg" type="xs:dateTime?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnYearFromDateTimeScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnYearFromDateTimeScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:years-from-duration( $arg as xs:duration?)  as xs:integer?  -->
     <function name="fn:years-from-duration">
         <param name="arg" type="xs:duration?"/>
         <return type="xs:integer?"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.datetime.FnYearsFromDurationScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.datetime.FnYearsFromDurationScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:zero-or-one($arg  as item()*) as  item()?  -->
@@ -1202,13 +1136,12 @@
         <param name="arg" type="item()*"/>
         <return type="item()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.FnZeroOrOneScalarEvaluatorFactory"/>
-        <property type="UniqueNodes"
-                  class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
+        <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
     </function>
 
-    <!-- fn:zero-or-one($arg  as item()*) as  item()?  -->
+    <!-- jn:keys($arg as item()*) as xs:string* -->
     <function name="jn:keys">
         <param name="arg" type="item()*"/>
         <return type="xs:string*"/>
