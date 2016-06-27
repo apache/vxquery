@@ -44,6 +44,7 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
+import org.apache.vxquery.jsonparser.JSONParser;
 import org.apache.vxquery.runtime.functions.arithmetic.AbstractArithmeticOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
@@ -482,7 +483,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-            throws SystemException {
+                    throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1251,6 +1252,31 @@ public class FunctionHelper {
                     fs.close();
                 } catch (IOException e) {
                     throw new HyracksDataException(e);
+                }
+            }
+        }
+    }
+
+    public static void readInJnDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
+            DataInputStream di, ArrayBackedValueStorage abvs, JSONParser parser) throws HyracksDataException {
+        String fName;
+        try {
+            fName = getStringFromPointable(stringp, bbis, di);
+        } catch (SystemException e) {
+            throw new HyracksDataException(e);
+        }
+        readInJnDocFromString(fName, bbis, di, abvs, parser);
+    }
+
+    public static void readInJnDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
+            ArrayBackedValueStorage abvs, JSONParser parser) throws HyracksDataException {
+        if (!fName.contains("hdfs:/")) {
+            File file = new File(fName);
+            if (file.exists()) {
+                try {
+                    parser.parseDocument(file, abvs);
+                } catch (NumberFormatException | IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

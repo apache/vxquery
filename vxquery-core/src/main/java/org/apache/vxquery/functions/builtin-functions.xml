@@ -315,6 +315,13 @@
         <return type="document-node()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnDocScalarEvaluatorFactory"/>
     </function>
+    
+    <!-- jn:doc($uri as  xs:string?) as document-node()?  
+    <function name="jn:doc">
+        <param name="uri" type="xs:string?"/>
+        <return type="json-item()?"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.JnDocScalarEvaluatorFactory"/>
+    </function>-->
 
     <!-- fn:doc-available($uri  as xs:string?) as  xs:boolean -->
     <function name="fn:doc-available">
