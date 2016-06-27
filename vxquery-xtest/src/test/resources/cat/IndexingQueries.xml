@@ -60,4 +60,9 @@
       <query name="useIndex7" date="2016-05-26"/>
       <output-file compare="Text">useIndex7.txt</output-file>
    </test-case>
+   <test-case name="update-index" FilePath="Indexing/" Creator="Menaka Jayawardena">
+      <description>Update the existing index</description>
+      <query name="updateIndex" date="2016-06-24"/>
+      <output-file compare="Text">updateIndex.txt</output-file>
+   </test-case>
 </test-group>
