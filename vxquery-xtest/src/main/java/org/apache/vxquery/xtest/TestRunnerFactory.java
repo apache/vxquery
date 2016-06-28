@@ -26,7 +26,7 @@ public class TestRunnerFactory {
     public TestRunnerFactory(XTestOptions opts) throws Exception {
         tr = new TestRunner(opts);
         tr.open();
-        reporters = new ArrayList<ResultReporter>();
+        reporters = new ArrayList<>();
     }
 
     public void registerReporter(ResultReporter reporter) {

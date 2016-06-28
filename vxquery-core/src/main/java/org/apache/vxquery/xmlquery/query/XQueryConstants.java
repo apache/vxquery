@@ -36,12 +36,30 @@ public final class XQueryConstants {
     public static final String LOCAL_NSURI = "http://www.w3.org/2005/xquery-local-functions";
 
     public static final String ERR_NSURI = "http://www.w3.org/2005/xqt-errors";
-    
+
     public static final String OP_PREFIX = "op";
     public static final String OP_NSURI = "urn:org.apache.vxquery.operators";
 
     public static final String OPEXT_PREFIX = "opext";
     public static final String OPEXT_NSURI = "urn:org.apache.vxquery.operators-ext";
+
+    public static final String JS_PREFIX = "js";
+    public static final String JS_NSURI = "http://jsoniq.org/types";
+
+    public static final String JN_PREFIX = "jn";
+    public static final String JN_NSURI = "http://jsoniq.org/functions";
+
+    public static final String LIBJN_PREFIX = "libjn";
+    public static final String LIBJN_NSURI = "http://jsoniq.org/function-library";
+
+    public static final String JERR_PREFIX = "jerr";
+    public static final String JERR_NSURI = "http://jsoniq.org/errors";
+
+    public static final String JUPD_PREFIX = "jupd";
+    public static final String JUPD_NSURI = "http://jsoniq.org/updates";
+
+    public static final String JDM_PREFIX = "jdm";
+    public static final String JDM_NSURI = "urn:org.apache.vxquery.jsoniq-data-model";
 
     private XQueryConstants() {
     }
@@ -57,7 +75,7 @@ public final class XQueryConstants {
     public enum TypeQuantifier {
         QUANT_QUESTION, QUANT_STAR, QUANT_PLUS
     }
-    
+
     public enum PathType {
         SLASH,
         SLASH_SLASH,

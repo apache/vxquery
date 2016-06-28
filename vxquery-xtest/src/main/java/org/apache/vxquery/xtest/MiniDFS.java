@@ -59,6 +59,7 @@ public class MiniDFS {
         if (dfs.exists(dest)) {
             System.err.println("Test files copied to HDFS successfully");
         }
+        dfs.close();
     }
 
     public void shutdownHDFS() {

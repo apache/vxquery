@@ -14,11 +14,10 @@
  */
 package org.apache.vxquery.xtest;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -39,10 +38,7 @@ import org.apache.hyracks.api.job.JobFlag;
 import org.apache.hyracks.api.job.JobId;
 import org.apache.hyracks.api.job.JobSpecification;
 import org.apache.hyracks.client.dataset.HyracksDataset;
-import org.apache.hyracks.control.cc.ClusterControllerService;
 import org.apache.hyracks.control.common.controllers.CCConfig;
-import org.apache.hyracks.control.common.controllers.NCConfig;
-import org.apache.hyracks.control.nc.NodeControllerService;
 import org.apache.hyracks.control.nc.resources.memory.FrameManager;
 import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 import org.apache.vxquery.compiler.CompilerControlBlock;
@@ -62,42 +58,15 @@ public class TestRunner {
             .compile("org\\.apache\\.vxquery\\.exceptions\\.SystemException: (\\p{javaUpperCase}{4}\\d{4})");
 
     private XTestOptions opts;
-    private ClusterControllerService cc;
-    private NodeControllerService nc1;
     private IHyracksClientConnection hcc;
     private IHyracksDataset hds;
-    private final String publicAddress = InetAddress.getLocalHost().getHostAddress();
 
-    public TestRunner(XTestOptions opts) throws Exception {
+    public TestRunner(XTestOptions opts) throws UnknownHostException {
         this.opts = opts;
     }
 
     public void open() throws Exception {
-        CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = publicAddress;
-        ccConfig.clientNetPort = 39000;
-        ccConfig.clusterNetIpAddress = publicAddress;
-        ccConfig.clusterNetPort = 39001;
-        ccConfig.profileDumpPeriod = 10000;
-        File outDir = new File("target/ClusterController");
-        outDir.mkdirs();
-        File ccRoot = File.createTempFile(TestRunner.class.getName(), ".data", outDir);
-        ccRoot.delete();
-        ccRoot.mkdir();
-        ccConfig.ccRoot = ccRoot.getAbsolutePath();
-        cc = new ClusterControllerService(ccConfig);
-        cc.start();
-
-        NCConfig ncConfig1 = new NCConfig();
-        ncConfig1.ccHost = "localhost";
-        ncConfig1.ccPort = 39001;
-        ncConfig1.clusterNetIPAddress = publicAddress;
-        ncConfig1.dataIPAddress = publicAddress;
-        ncConfig1.resultIPAddress = publicAddress;
-        ncConfig1.nodeId = "nc1";
-        nc1 = new NodeControllerService(ncConfig1);
-        nc1.start();
-
+        CCConfig ccConfig = TestClusterUtil.createCCConfig();
         hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
     }
 
@@ -111,10 +80,11 @@ public class TestRunner {
 
         try {
             try {
-                FileInputStream query = new FileInputStream(testCase.getXQueryFile());
                 if (opts.showQuery) {
+                    FileInputStream query = new FileInputStream(testCase.getXQueryFile());
                     System.err.println("***Query for " + testCase.getXQueryDisplayName() + ": ");
                     System.err.println(IOUtils.toString(query, "UTF-8"));
+                    query.close();
                 }
 
                 VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
@@ -205,7 +175,5 @@ public class TestRunner {
     }
 
     public void close() throws Exception {
-        nc1.stop();
-        cc.stop();
     }
 }

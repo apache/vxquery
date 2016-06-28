@@ -73,7 +73,7 @@ public class HDFSFunctions {
     /**
      * Create the configuration and add the paths for core-site and hdfs-site as resources.
      * Initialize an instance of HDFS FileSystem for this configuration.
-     * 
+     *
      * @param nodeControllerInfos
      * @param hdfsConf
      */
@@ -86,7 +86,7 @@ public class HDFSFunctions {
     /**
      * Create the needed objects for reading the splits of the filepath given as argument.
      * This method should run before the scheduleSplits method.
-     * 
+     *
      * @param filepath
      */
     @SuppressWarnings({ "deprecation", "unchecked" })
@@ -110,7 +110,7 @@ public class HDFSFunctions {
     /**
      * Returns true if the file path exists or it is located somewhere in the home directory of the user that called the function.
      * Searches in subdirectories of the home directory too.
-     * 
+     *
      * @param filename
      * @return
      * @throws IOException
@@ -126,7 +126,7 @@ public class HDFSFunctions {
 
     /**
      * Searches the given directory for the file.
-     * 
+     *
      * @param directory
      *            to search
      * @param filename
@@ -157,7 +157,7 @@ public class HDFSFunctions {
     /**
      * Read the cluster properties file and locate the HDFS_CONF variable that is the directory path for the
      * hdfs configuration if the system environment variable HDFS_CONF is not set.
-     * 
+     *
      * @return true if is successfully finds the Hadoop/HDFS home directory
      */
     private boolean locateConf() {
@@ -171,7 +171,7 @@ public class HDFSFunctions {
 
     /**
      * Upload a file/directory to HDFS.Filepath is the path in the local file system.dir is the destination path.
-     * 
+     *
      * @param filepath
      * @param dir
      * @return
@@ -203,7 +203,7 @@ public class HDFSFunctions {
     /**
      * Get instance of the HDFSfile system if it is configured correctly.
      * Return null if there is no instance.
-     * 
+     *
      * @return
      */
     public FileSystem getFileSystem() {
@@ -228,50 +228,48 @@ public class HDFSFunctions {
 
     /**
      * Create a HashMap that has as key the hostname and values the splits that belong to this hostname;
-     * 
+     *
      * @return
      * @throws IOException
      */
     public HashMap<String, ArrayList<Integer>> getLocationsOfSplits() throws IOException {
-        HashMap<String, ArrayList<Integer>> splits_map = new HashMap<String, ArrayList<Integer>>();
+        HashMap<String, ArrayList<Integer>> splitsMap = new HashMap<>();
         ArrayList<Integer> temp;
         int i = 0;
         String hostname;
         for (InputSplit s : this.splits) {
             SplitLocationInfo info[] = s.getLocationInfo();
             hostname = info[0].getLocation();
-            if (splits_map.containsKey(hostname)) {
-                temp = splits_map.get(hostname);
+            if (splitsMap.containsKey(hostname)) {
+                temp = splitsMap.get(hostname);
                 temp.add(i);
             } else {
-                temp = new ArrayList<Integer>();
+                temp = new ArrayList<>();
                 temp.add(i);
-                splits_map.put(hostname, temp);
+                splitsMap.put(hostname, temp);
             }
             i++;
         }
 
-        return splits_map;
+        return splitsMap;
     }
 
     public void scheduleSplits() throws IOException, ParserConfigurationException, SAXException {
-        schedule = new HashMap<Integer, String>();
-        ArrayList<String> empty = new ArrayList<String>();
-        HashMap<String, ArrayList<Integer>> splits_map = this.getLocationsOfSplits();
+        schedule = new HashMap<>();
+        ArrayList<String> empty = new ArrayList<>();
+        HashMap<String, ArrayList<Integer>> splitsMap = this.getLocationsOfSplits();
         readNodesFromXML();
         int count = this.splits.size();
 
-        ArrayList<Integer> splits;
         String node;
         for (ArrayList<String> info : this.nodes) {
             node = info.get(1);
-            if (splits_map.containsKey(node)) {
-                splits = splits_map.get(node);
-                for (Integer split : splits) {
+            if (splitsMap.containsKey(node)) {
+                for (Integer split : splitsMap.get(node)) {
                     schedule.put(split, node);
                     count--;
                 }
-                splits_map.remove(node);
+                splitsMap.remove(node);
             } else {
                 empty.add(node);
             }
@@ -279,7 +277,7 @@ public class HDFSFunctions {
 
         //Check if every split got assigned to a node
         if (count != 0) {
-            ArrayList<Integer> remaining = new ArrayList<Integer>();
+            ArrayList<Integer> remaining = new ArrayList<>();
             // Find remaining splits
             for (InputSplit s : this.splits) {
                 int i = 0;
@@ -288,14 +286,14 @@ public class HDFSFunctions {
                 }
             }
 
-            if (empty.size() != 0) {
-                int node_number = 0;
+            if (!empty.isEmpty()) {
+                int nodeNumber = 0;
                 for (int split : remaining) {
-                    if (node_number == empty.size()) {
-                        node_number = 0;
+                    if (nodeNumber == empty.size()) {
+                        nodeNumber = 0;
                     }
-                    schedule.put(split, empty.get(node_number));
-                    node_number++;
+                    schedule.put(split, empty.get(nodeNumber));
+                    nodeNumber++;
                 }
             }
         }
@@ -304,19 +302,12 @@ public class HDFSFunctions {
     /**
      * Read the hostname and the ip address of every node from the xml cluster configuration file.
      * Save the information inside nodes.
-     * 
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
      */
-    public void readNodesFromXML() throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder;
-        dBuilder = dbFactory.newDocumentBuilder();
-        nodes = new ArrayList<ArrayList<String>>();
+    public void readNodesFromXML() {
+        nodes = new ArrayList<>();
         for (NodeControllerInfo ncInfo : nodeControllerInfos.values()) {
             //Will this include the master node? Is that bad?
-            ArrayList<String> info = new ArrayList<String>();
+            ArrayList<String> info = new ArrayList<>();
             info.add(ncInfo.getNodeId());
             info.add(ncInfo.getNetworkAddress().getAddress());
             nodes.add(info);
@@ -325,13 +316,12 @@ public class HDFSFunctions {
 
     /**
      * Writes the schedule to a temporary file, then uploads the file to the HDFS.
-     * 
+     *
      * @throws UnsupportedEncodingException
      * @throws FileNotFoundException
      */
     public void addScheduleToDistributedCache() throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer;
-        writer = new PrintWriter(filepath, "UTF-8");
+        PrintWriter writer = new PrintWriter(filepath, "UTF-8");
         for (int split : this.schedule.keySet()) {
             writer.write(split + "," + this.schedule.get(split));
         }
@@ -342,7 +332,7 @@ public class HDFSFunctions {
 
     public RecordReader getReader() {
 
-        List<FileSplit> fileSplits = new ArrayList<FileSplit>();
+        List<FileSplit> fileSplits = new ArrayList<>();
         for (int i = 0; i < splits.size(); i++) {
             fileSplits.add((FileSplit) splits.get(i));
         }
@@ -385,18 +375,18 @@ public class HDFSFunctions {
 
     /**
      * Return the splits belonging to this node for the existing schedule.
-     * 
+     *
      * @param node
      * @return
      */
     public ArrayList<Integer> getScheduleForNode(String node) {
-        ArrayList<Integer> node_schedule = new ArrayList<Integer>();
+        ArrayList<Integer> nodeSchedule = new ArrayList<>();
         for (int split : this.schedule.keySet()) {
             if (node.equals(this.schedule.get(split))) {
-                node_schedule.add(split);
+                nodeSchedule.add(split);
             }
         }
-        return node_schedule;
+        return nodeSchedule;
     }
 
     public List<InputSplit> getSplits() {

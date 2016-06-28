@@ -245,6 +245,13 @@
             <argument value="0"/>
         </property>
     </function>
+    
+    <!-- fn:size($expr as  item()*) as xs:anyAtomicType* -->
+    <function name="fn:size">
+        <param name="expr" type="item()*"/>
+        <return type="xs:integer"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.misc.FnSizeScalarEvaluatorFactory"/>
+    </function>
 
     <!-- fn:dateTime($arg1  as xs:date?, $arg2 as xs:time?)  as xs:dateTime?  -->
     <function name="fn:dateTime">

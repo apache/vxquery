@@ -14,38 +14,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.vxquery.xmlquery.ast;
+package org.apache.vxquery.types;
 
-import java.util.List;
-
-import org.apache.vxquery.util.SourceLocation;
-
-public class FilterExprNode extends ASTNode {
-    private ASTNode expr;
-    private List<ASTNode> predicates;
-
-    public FilterExprNode(SourceLocation loc) {
-        super(loc);
-    }
-
-    @Override
-    public ASTTag getTag() {
-        return ASTTag.FILTER_EXPRESSION;
-    }
-
-    public ASTNode getExpr() {
-        return expr;
-    }
-
-    public void setExpr(ASTNode expr) {
-        this.expr = expr;
-    }
-
-    public List<ASTNode> getPredicates() {
-        return predicates;
-    }
-
-    public void setPredicates(List<ASTNode> predicates) {
-        this.predicates = predicates;
-    }
+public enum JsonItemKind {
+    ANY,
+    OBJECT,
+    ARRAY
 }

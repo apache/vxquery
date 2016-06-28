@@ -26,8 +26,8 @@ public class TypeUtils {
         return createSequenceType(RootStaticContextImpl.INSTANCE, str);
     }
 
-    public static SequenceType createSequenceType(StaticContext sCtx, String str) {
-        str = str.trim();
+    public static SequenceType createSequenceType(StaticContext sCtx, String s) {
+        String str = s.trim();
         Quantifier q = Quantifier.QUANT_ONE;
         if (str.endsWith("?")) {
             q = Quantifier.QUANT_QUESTION;
@@ -43,6 +43,12 @@ public class TypeUtils {
         ItemType it;
         if (str.equals("item()")) {
             it = AnyItemType.INSTANCE;
+        } else if (str.equals("json-item()")) {
+            it = AnyJsonItemType.INSTANCE;
+        } else if (str.equals("object()")) {
+            it = ObjectType.INSTANCE;
+        } else if (str.equals("array()")) {
+            it = ArrayType.INSTANCE;
         } else if (str.equals("node()")) {
             it = AnyNodeType.INSTANCE;
         } else if (str.equals("document-node()")) {

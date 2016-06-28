@@ -84,7 +84,5 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
                 throw new SystemException(ErrorCode.SYSE0001);
             }
         }
-
     }
-
 }

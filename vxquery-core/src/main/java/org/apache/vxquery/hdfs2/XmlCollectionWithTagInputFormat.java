@@ -60,8 +60,8 @@ public class XmlCollectionWithTagInputFormat extends TextInputFormat {
      */
     public static class XmlRecordReader extends RecordReader<LongWritable, Text> {
 
-        private final byte[] end_tag;
-        private final byte[] start_tag;
+        private final byte[] endTag;
+        private final byte[] startTag;
         private final long start;
         private final long end;
         private final FSDataInputStream fsin;
@@ -69,11 +69,11 @@ public class XmlCollectionWithTagInputFormat extends TextInputFormat {
         private LongWritable currentKey;
         private Text currentValue;
         BlockLocation[] blocks;
-        public static byte[] nl = "\n".getBytes();
+        protected static byte[] nl = "\n".getBytes();
 
         public XmlRecordReader(FileSplit split, Configuration conf) throws IOException {
-            end_tag = ENDING_TAG.getBytes(Charsets.UTF_8);
-            start_tag = STARTING_TAG.getBytes(Charsets.UTF_8);
+            endTag = ENDING_TAG.getBytes(Charsets.UTF_8);
+            startTag = STARTING_TAG.getBytes(Charsets.UTF_8);
 
             // open the file and seek to the start of the split
             start = split.getStart();
@@ -90,7 +90,7 @@ public class XmlCollectionWithTagInputFormat extends TextInputFormat {
 
         /**
          * Get next block item
-         * 
+         *
          * @param key
          * @param value
          * @return
@@ -123,7 +123,7 @@ public class XmlCollectionWithTagInputFormat extends TextInputFormat {
 
         /**
          * Read the block from start till end and after that until you find a closing tag
-         * 
+         *
          * @param withinBlock
          * @return
          * @throws IOException
@@ -133,9 +133,9 @@ public class XmlCollectionWithTagInputFormat extends TextInputFormat {
 
             while (true) {
                 if (fsin.getPos() < end) {
-                    if (readUntilMatch(start_tag, false)) {
-                        buffer.write(start_tag);
-                        readUntilMatch(end_tag, true);
+                    if (readUntilMatch(startTag, false)) {
+                        buffer.write(startTag);
+                        readUntilMatch(endTag, true);
                         read = true;
                     }
                 } else {
@@ -146,7 +146,7 @@ public class XmlCollectionWithTagInputFormat extends TextInputFormat {
 
         /**
          * Read from block(s) until you reach the end of file or find a matching bytes with match[]
-         * 
+         *
          * @param match
          * @param withinBlock
          * @return
@@ -183,10 +183,10 @@ public class XmlCollectionWithTagInputFormat extends TextInputFormat {
 
         private int nextBlock() throws IOException {
             long pos = fsin.getPos();
-            long block_length;
+            long blockLength;
             for (int i = 0; i < blocks.length; i++) {
-                block_length = blocks[i].getOffset() + blocks[i].getLength();
-                if (pos == block_length) {
+                blockLength = blocks[i].getOffset() + blocks[i].getLength();
+                if (pos == blockLength) {
                     return i + 1;
                 }
             }

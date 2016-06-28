@@ -33,5 +33,5 @@ public class TestConfiguration {
 
     String xqueryxFileExtension;
 
-    Map<String, File> sourceFileMap = new HashMap<String, File>();
+    Map<String, File> sourceFileMap = new HashMap<>();
 }

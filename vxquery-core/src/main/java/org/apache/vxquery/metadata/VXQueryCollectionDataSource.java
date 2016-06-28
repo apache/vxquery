@@ -43,25 +43,26 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
 
     private IDataSourcePropertiesProvider propProvider;
 
-    public static VXQueryCollectionDataSource create(int id, String file, Object type) {
-        return new VXQueryCollectionDataSource(id, file, new Object[] { type });
-    }
-
     private VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
         this.collectionName = file;
         collectionPartitions = collectionName.split(DELIMITER);
         this.types = types;
-        final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(new RandomPartitioningProperty(
-                new CollectionFileDomain(collectionName)), new ArrayList<ILocalStructuralProperty>());
+        final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
+                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
+                new ArrayList<ILocalStructuralProperty>());
         propProvider = new IDataSourcePropertiesProvider() {
             @Override
             public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
                 return vec;
             }
         };
-        this.childSeq = new ArrayList<Integer>();
+        this.childSeq = new ArrayList<>();
         this.tag = null;
+    }
+
+    public static VXQueryCollectionDataSource create(int id, String file, Object type) {
+        return new VXQueryCollectionDataSource(id, file, new Object[] { type });
     }
 
     public int getTotalDataSources() {

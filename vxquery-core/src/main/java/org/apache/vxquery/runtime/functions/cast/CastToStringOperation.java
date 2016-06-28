@@ -27,6 +27,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
@@ -692,4 +693,10 @@ public class CastToStringOperation extends AbstractCastToOperation {
         sendStringDataOutput(dOut);
     }
 
+    @Override
+    public void convertNull(DataOutput dOut) throws SystemException, IOException {
+        StringValueBuilder svb = new StringValueBuilder();
+        dOut.write(returnTag);
+        svb.write("null",dOut);
+    }
 }

@@ -98,6 +98,7 @@ import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.types.TypeUtils;
 import org.apache.vxquery.xmlquery.ast.ASTNode;
 import org.apache.vxquery.xmlquery.ast.ASTTag;
+import org.apache.vxquery.xmlquery.ast.ArgumentListNode;
 import org.apache.vxquery.xmlquery.ast.ArrayConstructor;
 import org.apache.vxquery.xmlquery.ast.AtomicTypeNode;
 import org.apache.vxquery.xmlquery.ast.AttributeTestNode;
@@ -129,7 +130,6 @@ import org.apache.vxquery.xmlquery.ast.ExprNode;
 import org.apache.vxquery.xmlquery.ast.ExtensionExprNode;
 import org.apache.vxquery.xmlquery.ast.FLWORClauseNode;
 import org.apache.vxquery.xmlquery.ast.FLWORExprNode;
-import org.apache.vxquery.xmlquery.ast.FilterExprNode;
 import org.apache.vxquery.xmlquery.ast.ForClauseNode;
 import org.apache.vxquery.xmlquery.ast.ForVarDeclNode;
 import org.apache.vxquery.xmlquery.ast.FunctionDeclNode;
@@ -158,6 +158,7 @@ import org.apache.vxquery.xmlquery.ast.PairConstructor;
 import org.apache.vxquery.xmlquery.ast.ParamNode;
 import org.apache.vxquery.xmlquery.ast.ParenthesizedExprNode;
 import org.apache.vxquery.xmlquery.ast.PathExprNode;
+import org.apache.vxquery.xmlquery.ast.PostfixExprNode;
 import org.apache.vxquery.xmlquery.ast.PrologNode;
 import org.apache.vxquery.xmlquery.ast.QNameNode;
 import org.apache.vxquery.xmlquery.ast.QuantifiedExprNode;
@@ -1536,10 +1537,37 @@ public class XMLQueryTranslator {
                             treat(ctxExpr, SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_STAR)),
                             ce(SequenceType.create(BuiltinTypeRegistry.XS_INT, Quantifier.QUANT_ONE), ntCode));
                     asc = isForwardAxis(axis);
-                } else if (ASTTag.FILTER_EXPRESSION.equals(pathNode.getTag())) {
-                    FilterExprNode filterNode = (FilterExprNode) pathNode;
-                    predicates = filterNode.getPredicates();
-                    ctxExpr = vre(translateExpression(filterNode.getExpr(), tCtx));
+                } else if (ASTTag.POSTFIX_EXPRESSION.equals(pathNode.getTag())) {
+                    PostfixExprNode postfixNode = (PostfixExprNode) pathNode;
+                    List<ASTNode> args = postfixNode.getArgs();
+                    ILogicalExpression expr = vre(translateExpression(postfixNode.getExpr(), tCtx));
+                    List<ILogicalExpression> arguments = new ArrayList<ILogicalExpression>();
+                    if (args != null && !args.isEmpty()) {
+                        for (ASTNode an : args) {
+                            if (an.getTag() == ASTTag.ARGUMENT_LIST) {
+                                ArgumentListNode argNode = (ArgumentListNode) an;
+                                for (ASTNode en : argNode.getArg()) {
+                                    ILogicalExpression argument = vre(translateExpression(en, tCtx));
+                                    arguments.add(argument);
+                                    //if this is the first argument, then the first parameter in the value
+                                    //is the whole expression,
+                                    //otherwise it is the result of the value function
+                                    if (an == args.get(0)) {
+                                        ctxExpr = sfce(BuiltinOperators.VALUE, expr, argument);
+                                    } else {
+                                        ctxExpr = sfce(BuiltinOperators.VALUE, ctxExpr, argument);
+                                    }
+                                }
+                                if (arguments.size() == 0)
+                                    ctxExpr = expr;
+                            } else {
+                                predicates = postfixNode.getArgs();
+                                ctxExpr = expr;
+                            }
+                        }
+                    } else {
+                        ctxExpr = expr;
+                    }
                 } else {
                     throw new IllegalStateException("Unknown path node: " + pathNode.getTag());
                 }

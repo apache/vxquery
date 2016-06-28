@@ -193,7 +193,13 @@ public class FnStringScalarEvaluatorFactory extends AbstractTaggedValueArgumentS
                             tvpNode.getValue(stringNode);
                             castToString.convertUntypedAtomic(stringNode, dOut);
                             break;
-                        // Pass through if not empty sequence.
+                        case ValueTag.JS_NULL_TAG:
+                            castToString.convertNull(dOut);
+                            break;
+                        case ValueTag.ARRAY_TAG:
+                        case ValueTag.OBJECT_TAG:
+                            throw new SystemException(ErrorCode.JNTY0024);
+                            // Pass through if not empty sequence.
                         default:
                             throw new SystemException(ErrorCode.XPDY0002);
                     }
