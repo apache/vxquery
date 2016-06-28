@@ -136,7 +136,7 @@ public class CollectionFromIndexUnnestingEvaluatorFactory extends AbstractTagged
                 }
                 tvp1.getValue(stringIndexFolder);
                 tvp2.getValue(stringElementPath);
-                //This whole loop is to get the string arguments, indefolder, elementpath, and match option
+                //This whole loop is to get the string arguments, indexFolder, elementPath, and match option
                 try {
                     // Get the list of files.
                     bbis.setByteBuffer(ByteBuffer.wrap(

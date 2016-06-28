@@ -56,6 +56,7 @@ import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
+import org.apache.vxquery.runtime.functions.index.updateIndex.Constants;
 import org.apache.vxquery.serializer.XMLSerializer;
 
 public class IndexDocumentBuilder extends XMLSerializer {
@@ -74,6 +75,7 @@ public class IndexDocumentBuilder extends XMLSerializer {
     private final int sstart;
     private final int lstart;
     private final IndexWriter writer;
+    private final String filePath;
 
     class ComplexItem {
         public final StringField sf;
@@ -86,9 +88,11 @@ public class IndexDocumentBuilder extends XMLSerializer {
     }
 
     //TODO: Handle Processing Instructions, PrefixedNames, and Namepsace entries
-    public IndexDocumentBuilder(IPointable tree, IndexWriter inWriter) {
+    public IndexDocumentBuilder(IPointable tree, IndexWriter inWriter, String file) {
         this.treePointable = tree;
         writer = inWriter;
+
+        this.filePath = file;
 
         //convert to tagged value pointable
         TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -109,6 +113,7 @@ public class IndexDocumentBuilder extends XMLSerializer {
     //This is a wrapper to start indexing using the functions adapted from XMLSerializer
     public void printStart() throws IOException {
 
+        doc.add(new StringField(Constants.FIELD_PATH, filePath, Field.Store.YES));
         print(bstart, sstart, lstart, "0", "");
         for (int i = 1; i < results.size() - 1; i++) {
             //TODO: Since each doc is a file,

@@ -16,13 +16,6 @@
 */
 package org.apache.vxquery.runtime.functions.index;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.file.Paths;
-import java.util.Arrays;
-
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -39,15 +32,32 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexDocumentBuilder;
+import org.apache.vxquery.runtime.functions.index.updateIndex.Constants;
+import org.apache.vxquery.runtime.functions.index.updateIndex.MetaFileUtil;
+import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class IndexConstructorUtil {
+    static boolean isMetaFilePresent = false;
+    static MetaFileUtil metaFileUtil;
+    static ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
+
     public static void evaluate(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
-            ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
-            ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
-            boolean isElementPath, String nodeId) throws SystemException {
+                                ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb,
+                                ArrayBackedValueStorage abvs, ITreeNodeIdProvider nodeIdProvider,
+                                ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
+                                boolean isElementPath, String nodeId) throws SystemException {
         String collectionFolder;
         String indexFolder;
         TaggedValuePointable collectionTVP = args[0];
@@ -69,6 +79,10 @@ public class IndexConstructorUtil {
             bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
                     stringp.getLength() + stringp.getStartOffset())), 0);
             indexFolder = di.readUTF();
+
+            metaFileUtil = MetaFileUtil.create(indexFolder);
+            isMetaFilePresent = metaFileUtil.isMetaFilePresent();
+
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
@@ -95,6 +109,16 @@ public class IndexConstructorUtil {
             indexXmlFiles(collectionDirectory, writer, isElementPath, nodep, abvsFileNode, nodeIdProvider, sb, bbis, di,
                     nodeId);
 
+            if (!isMetaFilePresent) {
+                // Add collection information to the map.
+                XmlMetadata data = new XmlMetadata();
+                data.setPath(collectionFolder);
+                metadataMap.put(Constants.COLLECTION_ENTRY, data);
+
+                // Write metadata map to a file.
+                metaFileUtil.writeMetaFile(metadataMap);
+            }
+
             //This makes write slower but search faster.
             writer.forceMerge(1);
 
@@ -111,24 +135,33 @@ public class IndexConstructorUtil {
      * it indexes that document node.
      */
     public static void indexXmlFiles(File collectionDirectory, IndexWriter writer, boolean isElementPath,
-            TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider,
-            SequenceBuilder sb, ByteBufferInputStream bbis, DataInputStream di, String nodeId)
-                    throws SystemException, IOException {
+                                     TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode,
+                                     ITreeNodeIdProvider nodeIdProvider, SequenceBuilder sb,
+                                     ByteBufferInputStream bbis, DataInputStream di, String nodeId)
+            throws SystemException, IOException {
+
+
         for (File file : collectionDirectory.listFiles()) {
 
             if (readableXmlFile(file.getPath())) {
                 abvsFileNode.reset();
-                // Get the document node
-                XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
-                FunctionHelper.readInDocFromString(file.getPath(), bbis, di, abvsFileNode, parser);
 
-                nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
-
-                //Add the document to the index
-                //Creates one lucene doc per file
-                IndexDocumentBuilder ibuilder = new IndexDocumentBuilder(nodep, writer);
+                IndexDocumentBuilder ibuilder = getIndexBuilder(file, writer, nodep, abvsFileNode, nodeIdProvider,
+                        bbis, di, nodeId);
 
                 ibuilder.printStart();
+
+                if (!isMetaFilePresent) {
+                    XmlMetadata xmlMetadata = new XmlMetadata();
+                    xmlMetadata.setPath(file.getCanonicalPath());
+                    xmlMetadata.setFileName(file.getName());
+                    try {
+                        xmlMetadata.setMd5(metaFileUtil.generateMD5(file));
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new SystemException(ErrorCode.SYSE0001, e);
+                    }
+                    metadataMap.put(file.getCanonicalPath(), xmlMetadata);
+                }
 
             } else if (file.isDirectory()) {
                 // Consider all XML file in sub directories.
@@ -139,6 +172,27 @@ public class IndexConstructorUtil {
 
     public static boolean readableXmlFile(String path) {
         return (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".xml.gz"));
+    }
+
+
+    /**
+     * Separated from create index method so that it could be used as a helper function in IndexUpdater
+     */
+    public static IndexDocumentBuilder getIndexBuilder(File file, IndexWriter writer,
+                                                       TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode,
+                                                       ITreeNodeIdProvider nodeIdProvider,
+                                                       ByteBufferInputStream bbis, DataInputStream di, String nodeId)
+            throws IOException {
+
+        //Get the document node
+        XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
+        FunctionHelper.readInDocFromString(file.getPath(), bbis, di, abvsFileNode, parser);
+
+        nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
+
+        //Add the document to the index
+        //Creates one lucene doc per file
+        return new IndexDocumentBuilder(nodep, writer, file.getCanonicalPath());
     }
 
 }
