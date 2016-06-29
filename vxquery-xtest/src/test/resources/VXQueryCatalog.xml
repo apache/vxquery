@@ -46,7 +46,9 @@
 
 <!ENTITY JsonArrayQueries SYSTEM "cat/JsonArrayQueries.xml">
 <!ENTITY JsonObjectQueries SYSTEM "cat/JsonObjectQueries.xml">
+<!ENTITY JsonArrayNavigationQueries SYSTEM "cat/JsonArrayNavigationQueries.xml">
 <!ENTITY FunctionsInJSONiq SYSTEM "cat/FunctionsInJSONiq.xml">
+<!ENTITY JsonParserQueries SYSTEM "cat/JsonParserQueries.xml">
 
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
@@ -93,6 +95,21 @@
      </source>
      <source ID="station_xml_file" FileName="TestSources/ghcnd/half_1/quarter_1/stations/US000000001.xml" Creator="Shivani Mall">
        <description last-mod="2015-06-26">File</description>
+     </source>
+     <source ID="array_json_file" FileName="TestSources/json/array/array.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-28">File</description>
+     </source>
+     <source ID="int_json_file" FileName="TestSources/json/atomic_int.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-28">File</description>
+     </source>
+     <source ID="double_json_file" FileName="TestSources/json/atomic_double.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-28">File</description>
+     </source>
+     <source ID="string_json_file" FileName="TestSources/json/atomic_string.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-28">File</description>
+     </source>
+     <source ID="nested_arrays_json_file" FileName="TestSources/json/array/nested_array.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-29">File</description>
      </source>
    </sources>
    <test-group name="SingleQuery" featureOwner="Preston Carman">
@@ -239,6 +256,8 @@
          </GroupInfo>
          &JsonArrayQueries;
          &JsonObjectQueries;
+         &JsonArrayNavigationQueries;
+         &JsonParserQueries;
       </test-group>
    </test-group>
    <test-group name="FunctionsInJSONiq" featureOwner="Riyafa Abdul Hameed">

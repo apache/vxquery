@@ -23,4 +23,9 @@
       <query name="add" date="2014-08-18"/>
       <output-file compare="Text">add.txt</output-file>
    </test-case>
+   <test-case name="simple-fn-doc" FilePath="Simple/" Creator="Preston Carman">
+      <description>Adds two numbers.</description>
+      <query name="fn_doc" date="2014-08-18"/>
+      <output-file compare="Text">fn_doc.txt</output-file>
+   </test-case>
 </test-group>

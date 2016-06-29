@@ -14,68 +14,98 @@
  */
 package org.apache.vxquery.jsonparser;
 
-import java.io.BufferedReader;
 import java.io.DataOutput;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.htrace.fasterxml.jackson.core.JsonFactory;
+import org.apache.htrace.fasterxml.jackson.core.JsonParseException;
+import org.apache.htrace.fasterxml.jackson.core.JsonParser;
+import org.apache.htrace.fasterxml.jackson.core.JsonToken;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.vxquery.datamodel.accessors.PointablePool;
-import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-
-import com.google.gson.stream.JsonToken;
 
 public class JSONParser {
-    protected JsonParser parser;
-    protected final PointablePool ppool = PointablePoolFactory.INSTANCE.createPointablePool();
-    protected final ArrayBuilder ab;
+
     final JsonFactory factory;
-    protected JsonGenerator generator;
-    protected final ArrayBackedValueStorage result;
+    protected final ArrayBackedValueStorage atomic;
+    protected final List<ArrayBuilder> abStack;
+    protected final List<ArrayBackedValueStorage> abvsStack;
 
     public JSONParser() throws JsonParseException, IOException {
         factory = new JsonFactory();
-        parser = null;
-        ab = new ArrayBuilder();
-        generator = null;
-        result = new ArrayBackedValueStorage();
+        atomic = new ArrayBackedValueStorage();
+        abStack = new ArrayList<ArrayBuilder>();
+        abvsStack = new ArrayList<ArrayBackedValueStorage>();
     }
 
-    public void parseDocument(File file, ArrayBackedValueStorage mvs)
+    public void parseDocument(File file, ArrayBackedValueStorage result)
             throws NumberFormatException, JsonParseException, IOException {
-        Reader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)),
-                Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1")));
-        parser = factory.createJsonParser(input);
-        if (parser.getCurrentToken().equals(JsonToken.BEGIN_ARRAY)) {
-            writeArrayDocument(mvs);
+        DataOutput outResult = result.getDataOutput();
+        ArrayBackedValueStorage array = null;
+        boolean inarray = false;
+        boolean nestedarray = false;
+        int counter = -1;
+        JsonParser parser = factory.createParser(file);
+        while (!parser.isClosed()) {
+            JsonToken token = parser.nextToken();
+            if (token == JsonToken.START_ARRAY) {
+                if (!nestedarray) {
+                    array = new ArrayBackedValueStorage();
+                }
+                ArrayBuilder ab = new ArrayBuilder();
+                counter++;
+                inarray = true;
+                abvsStack.add(array);
+                abStack.add(ab);
+                abvsStack.get(counter).reset();
+                abStack.get(counter).reset(abvsStack.get(counter));
+            }
+            if (token == JsonToken.VALUE_NUMBER_INT) {
+                atomic.reset();
+                DataOutput out = atomic.getDataOutput();
+                out.write(ValueTag.XS_INTEGER_TAG);
+                out.writeLong(parser.getLongValue());
+                if (inarray) {
+                    abStack.get(counter).addItem(atomic);
+                }
+            }
+            if (token == JsonToken.VALUE_STRING) {
+                atomic.reset();
+                StringValueBuilder svb = new StringValueBuilder();
+                DataOutput out = atomic.getDataOutput();
+                out.write(ValueTag.XS_STRING_TAG);
+                svb.write(parser.getText(), out);
+                if (inarray) {
+                    abStack.get(counter).addItem(atomic);
+                }
+            }
+            if (token == JsonToken.VALUE_NUMBER_FLOAT) {
+                atomic.reset();
+                DataOutput out = atomic.getDataOutput();
+                out.write(ValueTag.XS_DOUBLE_TAG);
+                out.writeDouble(parser.getDoubleValue());
+                if (inarray) {
+                    abStack.get(counter).addItem(atomic);
+                }
+            }
+            if (token == JsonToken.END_ARRAY) {
+                abStack.get(counter).finish();
+                if (counter > 0) {
+                    abStack.get(counter - 1).addItem(abvsStack.get(counter));
+                    nestedarray = true;
+                }
+                counter--;
+            }
         }
-        input.close();
-        //        while (!parser.isClosed()) {
-        //            if (parser.getCurrentToken().equals(JsonToken.BEGIN_ARRAY)
-        //                    || parser.getCurrentToken().equals(JsonToken.BEGIN_OBJECT)) {
-        //                mvs.reset();
-        //                ab.reset(mvs);
-        //                TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
-        //                ab.addItem(tempTvp);
-        //            }
-        //        }
-        //        ab.finish();
-    }
-
-    public void writeArrayDocument(ArrayBackedValueStorage mvs) throws IOException {
-        DataOutput out = mvs.getDataOutput();
-        out.write(ValueTag.ARRAY_TAG);
-        out.write(result.getByteArray(), result.getStartOffset(), result.getLength());
+        if (inarray) {
+            outResult.write(abvsStack.get(0).getByteArray());
+        } else {
+            outResult.write(atomic.getByteArray());
+        }
     }
 }
