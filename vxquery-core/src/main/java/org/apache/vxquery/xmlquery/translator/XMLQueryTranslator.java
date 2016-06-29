@@ -1207,9 +1207,7 @@ public class XMLQueryTranslator {
             throws SystemException {
         List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
         for (ASTNode aVal : obj.getContent()) {
-            String key = ((PairConstructor) aVal).getKey();
-            ILogicalExpression ke = ce(SequenceType.create(BuiltinTypeRegistry.XS_STRING, Quantifier.QUANT_ONE),
-                    unquote(key));
+            ILogicalExpression ke = vre(translateExpression(((PairConstructor) aVal).getKey(), tCtx));
             content.add(ke);
             ILogicalExpression ve = vre(translateExpression(((PairConstructor) aVal).getValue(), tCtx));
             content.add(ve);

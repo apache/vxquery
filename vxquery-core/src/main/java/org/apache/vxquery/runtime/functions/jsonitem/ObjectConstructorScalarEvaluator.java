@@ -29,6 +29,7 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+import org.apache.vxquery.runtime.functions.util.AtomizeHelper;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
     private SequencePointable seqp;
     protected final IHyracksTaskContext ctx;
     private final ArrayBackedValueStorage abvs;
+    private final AtomizeHelper ah;
 
     public ObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -50,6 +52,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        ah = new AtomizeHelper();
     }
 
     private boolean isDuplicate(TaggedValuePointable tempKey) {
@@ -65,6 +68,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable tvp;
+        TaggedValuePointable tvpKey = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         TaggedValuePointable tempKey = ppool.takeOne(TaggedValuePointable.class);
         TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
         try {
@@ -76,7 +80,8 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
                 int len = seqp.getEntryCount();
                 pointables = new TaggedValuePointable[len / 2];
                 for (int i = 0; i < len; i += 2) {
-                    seqp.getEntry(i, tempKey);
+                    seqp.getEntry(i, tvpKey);
+                    ah.atomize(tvpKey, ppool, tempKey);
                     seqp.getEntry(i + 1, tempValue);
                     if (!isDuplicate(tempKey)) {
                         pointables[i / 2] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
