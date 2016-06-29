@@ -575,6 +575,8 @@
                         <exclude>**/ExpectedTestResults/**</exclude>
                         <exclude>**/xqts.txt</exclude>
                         <exclude>test-suite*/**/*</exclude>
+                        <exclude>**/TestSources/**/*.json</exclude>
+                        <exclude>ClusterControllerService/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
