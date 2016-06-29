@@ -17,21 +17,15 @@
 package org.apache.vxquery.xtest;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class VXQueryTest extends AbstractXQueryTest {
-    private static MiniDFS dfs;
-    private final static String TMP = "target/tmp";
 
     private static String VXQUERY_CATALOG = StringUtils
             .join(new String[] { "src", "test", "resources", "VXQueryCatalog.xml" }, File.separator);
@@ -56,32 +50,6 @@ public class VXQueryTest extends AbstractXQueryTest {
     @Override
     protected XTestOptions getTestOptions() {
         return getOptions();
-    }
-
-    @BeforeClass
-    public static void setup() throws IOException {
-        File tmp = new File(TMP);
-        if (tmp.exists()) {
-            FileUtils.deleteDirectory(tmp);
-        }
-        new File(TMP.concat("/indexFolder")).mkdirs();
-        String HDFSFolder = TMP.concat("/hdfsFolder");
-        new File(HDFSFolder).mkdirs();
-        dfs = new MiniDFS();
-        try {
-            dfs.startHDFS(HDFSFolder);
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-    }
-
-    @AfterClass
-    public static void shutdown() throws IOException {
-        File tmp = new File(TMP);
-        if (tmp.exists()) {
-            FileUtils.deleteDirectory(tmp);
-        }
-        dfs.shutdownHDFS();
     }
 
 }
