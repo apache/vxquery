@@ -104,7 +104,7 @@ public class ValueScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalu
             } catch (IOException e) {
                 throw new SystemException(ErrorCode.SYSE0001, e);
 
-            }finally {
+            } finally {
                 ppool.giveBack(tempTvp);
             }
         }

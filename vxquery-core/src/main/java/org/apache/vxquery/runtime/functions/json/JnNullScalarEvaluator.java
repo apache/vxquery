@@ -21,12 +21,9 @@ import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
-
-import java.io.IOException;
 
 public class JnNullScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
@@ -40,12 +37,6 @@ public class JnNullScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        try {
-            abvs.reset();
-            abvs.getDataOutput().write(ValueTag.JS_NULL_TAG);
-            result.set(abvs);
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        }
+        XDMConstants.setJsNull(result);
     }
 }

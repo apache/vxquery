@@ -25,6 +25,7 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -37,7 +38,6 @@ import java.util.List;
 public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
     private final SequencePointable sp1, sp2;
-    private final List<TaggedValuePointable> pointables;
     private final SequenceBuilder sb;
     private final ArrayBackedValueStorage abvs;
 
@@ -46,7 +46,6 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
         this.ctx = ctx;
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        pointables = new ArrayList<>();
         sb = new SequenceBuilder();
         abvs = new ArrayBackedValueStorage();
     }
@@ -56,6 +55,7 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
         TaggedValuePointable tvp1 = args[0];
         ObjectPointable op;
         if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+            List<TaggedValuePointable> pointables = new ArrayList<>();
             TaggedValuePointable temptvp = ppool.takeOne(TaggedValuePointable.class);
             try {
                 tvp1.getValue(sp1);
@@ -99,15 +99,7 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
                 throw new SystemException(ErrorCode.SYSE0001, e);
             }
         } else {
-            try {
-                abvs.reset();
-                sb.reset(abvs);
-                sb.finish();
-                result.set(abvs);
-            } catch (IOException e) {
-                throw new SystemException(ErrorCode.SYSE0001, e);
-
-            }
+            XDMConstants.setEmptySequence(result);
         }
     }
 
@@ -115,8 +107,9 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
         int size = pointables.size();
         for (int i = 0; i < size - 1; i++) {
             for (int j = i + 1; j < size; j++) {
-                if (!FunctionHelper.arraysEqual(pointables.get(j), pointables.get(i)))
+                if (!FunctionHelper.arraysEqual(pointables.get(j), pointables.get(i))) {
                     continue;
+                }
                 pointables.remove(j);
                 j--;
                 size--;
