@@ -46,6 +46,9 @@ public final class RootStaticContextImpl extends StaticContextImpl {
         INSTANCE.registerNamespaceUri(XQueryConstants.XSI_PREFIX, XQueryConstants.XSI_NSURI);
         INSTANCE.registerNamespaceUri(XQueryConstants.FN_PREFIX, XQueryConstants.FN_NSURI);
         INSTANCE.registerNamespaceUri(XQueryConstants.LOCAL_PREFIX, XQueryConstants.LOCAL_NSURI);
+        INSTANCE.registerNamespaceUri(XQueryConstants.JS_PREFIX, XQueryConstants.JS_NSURI);
+        INSTANCE.registerNamespaceUri(XQueryConstants.JN_PREFIX, XQueryConstants.JN_NSURI);
+        INSTANCE.registerNamespaceUri(XQueryConstants.JDM_PREFIX, XQueryConstants.JDM_NSURI);
 
         INSTANCE.setBaseUri(".");
 
