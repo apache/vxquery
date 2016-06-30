@@ -1,0 +1,59 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<test-group xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" name="JsonObjectNavigationQueries"
+            featureOwner="VXQuery">
+    <GroupInfo>
+        <title>Json Object Navigation</title>
+        <description/>
+    </GroupInfo>
+    <test-case name="json-object-navigation-q01" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Navigate through an object.</description>
+        <query name="q01_object_navigation" date="2016-06-25"/>
+        <output-file compare="Text">q01_object_navigation.txt</output-file>
+    </test-case>
+    <test-case name="json-object-navigation-q02" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Navigate through an object.</description>
+        <query name="q02_object_navigation" date="2016-06-25"/>
+        <output-file compare="Text">q02_object_navigation.txt</output-file>
+    </test-case>
+    <test-case name="json-object-navigation-q03" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Size of an object.</description>
+        <query name="q03_object_navigation" date="2016-06-25"/>
+        <output-file compare="Text">q03_object_navigation.txt</output-file>
+    </test-case>
+    <test-case name="json-object-navigation-q04" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Navigate through an empty object.</description>
+        <query name="q04_object_navigation" date="2016-06-25"/>
+        <output-file compare="Text">q04_object_navigation.txt</output-file>
+    </test-case>
+    <test-case name="json-object-navigation-q05" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Ask for an index out of the object size.</description>
+        <query name="q05_object_navigation" date="2016-06-25"/>
+        <output-file compare="Text">q05_object_navigation.txt</output-file>
+    </test-case>
+    <test-case name="json-object-navigation-q06" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Ask for an index out of the object size.</description>
+        <query name="q06_object_navigation" date="2016-06-25"/>
+        <output-file compare="Text">q06_object_navigation.txt</output-file>
+    </test-case>
+    <test-case name="json-object-navigation-q07" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Ask for an index out of the object size.</description>
+        <query name="q07_object_navigation" date="2016-06-25"/>
+        <output-file compare="Text">q07_object_navigation.txt</output-file>
+    </test-case>
+</test-group>
