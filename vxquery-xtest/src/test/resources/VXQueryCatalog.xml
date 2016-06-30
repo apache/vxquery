@@ -47,6 +47,8 @@
 <!ENTITY JsonArrayQueries SYSTEM "cat/JsonArrayQueries.xml">
 <!ENTITY JsonObjectQueries SYSTEM "cat/JsonObjectQueries.xml">
 <!ENTITY FunctionsInJSONiq SYSTEM "cat/FunctionsInJSONiq.xml">
+<!ENTITY JsonObjectNavigationQueries SYSTEM "cat/JsonObjectNavigationQueries.xml">
+<!ENTITY JsonArrayNavigationQueries SYSTEM "cat/JsonArrayNavigationQueries.xml">
 
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
@@ -67,33 +69,34 @@
       </description>
    </test-suite-info>
    <sources>
-     <source ID="VXQueryCatalog" FileName="VXQueryCatalog.xml" Creator="VXQuery team">
-       <description last-mod="2014-04-02">VXQuery Test Suite Catalog</description>
-     </source>
-     <source ID="ghcnd" FileName="TestSources/ghcnd" Creator="Preston Carman">
-       <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="ghcnd_half_1" FileName="TestSources/ghcnd/half_1" Creator="Preston Carman">
-       <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="ghcnd_half_2" FileName="TestSources/ghcnd/half_2" Creator="Preston Carman">
-       <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="ghcnd_quarter_1" FileName="TestSources/ghcnd/half_1/quarter_1" Creator="Preston Carman">
-       <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="ghcnd_quarter_2" FileName="TestSources/ghcnd/half_1/quarter_2" Creator="Preston Carman">
-       <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="ghcnd_quarter_3" FileName="TestSources/ghcnd/half_2/quarter_3" Creator="Preston Carman">
-       <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="ghcnd_quarter_4" FileName="TestSources/ghcnd/half_2/quarter_4" Creator="Preston Carman">
-       <description last-mod="2014-04-02">Collection of files</description>
-     </source>
-     <source ID="station_xml_file" FileName="TestSources/ghcnd/half_1/quarter_1/stations/US000000001.xml" Creator="Shivani Mall">
-       <description last-mod="2015-06-26">File</description>
-     </source>
+      <source ID="VXQueryCatalog" FileName="VXQueryCatalog.xml" Creator="VXQuery team">
+         <description last-mod="2014-04-02">VXQuery Test Suite Catalog</description>
+      </source>
+      <source ID="ghcnd" FileName="TestSources/ghcnd" Creator="Preston Carman">
+         <description last-mod="2014-04-02">Collection of files</description>
+      </source>
+      <source ID="ghcnd_half_1" FileName="TestSources/ghcnd/half_1" Creator="Preston Carman">
+         <description last-mod="2014-04-02">Collection of files</description>
+      </source>
+      <source ID="ghcnd_half_2" FileName="TestSources/ghcnd/half_2" Creator="Preston Carman">
+         <description last-mod="2014-04-02">Collection of files</description>
+      </source>
+      <source ID="ghcnd_quarter_1" FileName="TestSources/ghcnd/half_1/quarter_1" Creator="Preston Carman">
+         <description last-mod="2014-04-02">Collection of files</description>
+      </source>
+      <source ID="ghcnd_quarter_2" FileName="TestSources/ghcnd/half_1/quarter_2" Creator="Preston Carman">
+         <description last-mod="2014-04-02">Collection of files</description>
+      </source>
+      <source ID="ghcnd_quarter_3" FileName="TestSources/ghcnd/half_2/quarter_3" Creator="Preston Carman">
+         <description last-mod="2014-04-02">Collection of files</description>
+      </source>
+      <source ID="ghcnd_quarter_4" FileName="TestSources/ghcnd/half_2/quarter_4" Creator="Preston Carman">
+         <description last-mod="2014-04-02">Collection of files</description>
+      </source>
+      <source ID="station_xml_file" FileName="TestSources/ghcnd/half_1/quarter_1/stations/US000000001.xml"
+              Creator="Shivani Mall">
+         <description last-mod="2015-06-26">File</description>
+      </source>
    </sources>
    <test-group name="SingleQuery" featureOwner="Preston Carman">
       <GroupInfo>
@@ -251,6 +254,19 @@
             <title>Tests for functions in JSONiq</title>
          </GroupInfo>
          &FunctionsInJSONiq;
+      </test-group>
+   </test-group>
+   <test-group name="JsonNavigation" featureOwner="Riyafa Abdul Hameed">
+      <GroupInfo>
+         <title>Json navigation queries</title>
+         <description>Json navigation tests</description>
+      </GroupInfo>
+      <test-group name="JsonNavigationTesting" featureOwner="Riyafa Abdul Hameed">
+         <GroupInfo>
+            <title>Json navigation tests</title>
+         </GroupInfo>
+         &JsonObjectNavigationQueries;
+         &JsonArrayNavigationQueries;
       </test-group>
    </test-group>
 </test-suite>
