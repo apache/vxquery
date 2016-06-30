@@ -55,4 +55,19 @@
         <query name="q07_object" date="2016-06-14"/>
         <expected-error>JNDY0003</expected-error>
     </test-case>
+    <test-case name="json-object-q08" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q08_object" date="2016-06-30"/>
+        <expected-error>JNTY0004</expected-error>
+    </test-case>
+    <test-case name="json-object-q09" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q09_object" date="2016-06-30"/>
+        <output-file compare="Text">q09_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q10" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q10_object" date="2016-06-30"/>
+        <output-file compare="Text">q10_object.txt</output-file>
+    </test-case>
 </test-group>

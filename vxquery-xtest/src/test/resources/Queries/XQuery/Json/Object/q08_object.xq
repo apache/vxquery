@@ -16,9 +16,7 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Object having two pairs with the same name :)
+(: Issue VXQUERY-215 :)
 {
-    "a":123,
-    "a":234,
-    "b":456
+    [1,2,3] : "Numbers"
 }
