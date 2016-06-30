@@ -1556,8 +1556,9 @@ public class XMLQueryTranslator {
                                         ctxExpr = sfce(BuiltinOperators.VALUE, ctxExpr, argument);
                                     }
                                 }
-                                if (arguments.size() == 0)
-                                    ctxExpr = expr;
+                                if (arguments.size() == 0) {
+                                    ctxExpr = sfce(BuiltinOperators.KEYS, expr);
+                                }
                             } else {
                                 predicates = postfixNode.getArgs();
                                 ctxExpr = expr;
