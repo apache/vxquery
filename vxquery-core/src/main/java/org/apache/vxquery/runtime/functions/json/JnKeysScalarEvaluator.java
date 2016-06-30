@@ -40,6 +40,7 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
     private final SequencePointable sp1, sp2;
     private final SequenceBuilder sb;
     private final ArrayBackedValueStorage abvs;
+    private List<TaggedValuePointable> pointables;
 
     public JnKeysScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -55,7 +56,7 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
         TaggedValuePointable tvp1 = args[0];
         ObjectPointable op;
         if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
-            List<TaggedValuePointable> pointables = new ArrayList<>();
+            pointables = new ArrayList<>();
             TaggedValuePointable temptvp = ppool.takeOne(TaggedValuePointable.class);
             try {
                 tvp1.getValue(sp1);
