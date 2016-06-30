@@ -648,11 +648,17 @@
     </operator>
     
     <!-- opext:value($expr as xs:item(), $arg as xs:anyAtomicType?) as item() -->
-    <operator name="opext:value">
-        <param name="expr" type="item()"/>
+    <operator name="jdm:value">
+        <param name="expr" type="json-item()"/>
         <param name="argExpr" type="xs:anyAtomicType"/>
         <return type="item()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.ValueScalarEvaluatorFactory"/>
+    </operator>
+
+    <operator name="jdm:keys">
+        <param name="expr" type="json-item()"/>
+        <return type="item()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.KeysScalarEvaluatorFactory"/>
     </operator>
 
     <!-- opext:subtract($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->
