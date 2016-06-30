@@ -70,4 +70,9 @@
         <query name="q10_object" date="2016-06-30"/>
         <output-file compare="Text">q10_object.txt</output-file>
     </test-case>
+    <test-case name="json-object-q11" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q11_object" date="2016-06-30"/>
+        <output-file compare="Text">q11_object.txt</output-file>
+    </test-case>
 </test-group>
