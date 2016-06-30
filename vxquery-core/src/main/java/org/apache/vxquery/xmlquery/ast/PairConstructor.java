@@ -19,7 +19,7 @@ package org.apache.vxquery.xmlquery.ast;
 import org.apache.vxquery.util.SourceLocation;
 
 public class PairConstructor extends ASTNode{
-    private String key;
+    private ASTNode key;
     private ASTNode value;
     public PairConstructor(SourceLocation loc) {
         super(loc);
@@ -30,11 +30,11 @@ public class PairConstructor extends ASTNode{
         return ASTTag.PAIR_CONSTRUCTOR;
     }
 
-    public String getKey() {
+    public ASTNode getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+    public void setKey(ASTNode key) {
         this.key = key;
     }
 
