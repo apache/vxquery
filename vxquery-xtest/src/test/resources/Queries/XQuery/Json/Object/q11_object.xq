@@ -18,5 +18,6 @@
 (: Json Object Query :)
 (: Issue VXQUERY-215 :)
 {
-    <Name>Joe</Name> : "Joe"
+    <Name>Joe</Name> : "Joe",
+    "Joe" : "Name"
 }
