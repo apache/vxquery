@@ -22,9 +22,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -67,6 +65,8 @@ public class IndexUpdater {
     private String nodeId;
     private IndexWriter indexWriter;
     private Set<String> pathsFromFileList;
+    private String collectionFolder;
+    private XmlMetadata collectionMetadata;
     private Logger LOGGER = Logger.getLogger("Index Updater");
 
     //TODO : Implement for paralleizing
@@ -88,16 +88,21 @@ public class IndexUpdater {
         this.pathsFromFileList = new HashSet<>();
     }
 
-    public void evaluate() throws SystemException, IOException, NoSuchAlgorithmException {
-        String collectionFolder;
-        String indexFolder;
+    /**
+     * Perform the initial configuration for index update/ delete processes.
+     * @throws SystemException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+    public void setup() throws SystemException, IOException, NoSuchAlgorithmException {
+
         TaggedValuePointable indexTVP = args[0];
 
         if (indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
             throw new SystemException(ErrorCode.FORG0006);
         }
 
-        XmlMetadata collectionMetadata;
+        String indexFolder;
         try {
             // Get the index folder
             indexTVP.getValue(stringp);
@@ -118,11 +123,6 @@ public class IndexUpdater {
             throw new SystemException(ErrorCode.SYSE0001, e);
         }
 
-        File collectionDirectory = new File(collectionFolder);
-        if (!collectionDirectory.exists()) {
-            throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
-        }
-
         abvs.reset();
         sb.reset(abvs);
 
@@ -130,24 +130,50 @@ public class IndexUpdater {
         indexWriter = new IndexWriter(fsdir, new IndexWriterConfig(new CaseSensitiveAnalyzer()).
                 setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
 
+        status(indexFolder);
+    }
+
+    /**
+     * Wrapper for update index function.
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+    public void updateIndex() throws IOException, NoSuchAlgorithmException {
+        File collectionDirectory = new File(collectionFolder);
+        if (!collectionDirectory.exists()) {
+            throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
+        }
+
         //Execute update index process
         updateIndex(collectionDirectory);
 
         //Detect deleted files and execute the delete index process.
         deleteIndexOfDeletedFiles(metadataMap.keySet(), pathsFromFileList);
+    }
 
-        // Add collection path entry back
-        metadataMap.put(Constants.COLLECTION_ENTRY, collectionMetadata);
-
-        //Write the updated metadata to the file.
-        metaFileUtil.writeMetaFile(metadataMap);
-
+    /**
+     * Close opened IndexWriter and terminate the index update/ delete process.
+     * @throws IOException
+     */
+    public void exit() throws IOException {
         indexWriter.forceMerge(1);
 
         indexWriter.close();
 
         sb.finish();
         result.set(abvs);
+    }
+
+    /**
+     * Functional wrapper to update Metadata file.
+     * @throws IOException
+     */
+    public synchronized void updateMetadataFile() throws IOException {
+        // Add collection path entry back
+        metadataMap.put(Constants.COLLECTION_ENTRY, collectionMetadata);
+
+        //Write the updated metadata to the file.
+        metaFileUtil.writeMetaFile(metadataMap);
     }
 
     /**
@@ -222,7 +248,7 @@ public class IndexUpdater {
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
-    public XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException, NoSuchAlgorithmException {
+    private XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException, NoSuchAlgorithmException {
 
         if (metadata == null)
             metadata = new XmlMetadata();
@@ -240,7 +266,7 @@ public class IndexUpdater {
      * @param pathsFromFileList : Set of paths taken from list of existing files.
      * @throws IOException
      */
-    public void deleteIndexOfDeletedFiles(Set<String> pathsFromMap, Set<String> pathsFromFileList) throws IOException {
+    private void deleteIndexOfDeletedFiles(Set<String> pathsFromMap, Set<String> pathsFromFileList) throws IOException {
         Set<String> sfm = new HashSet<>(pathsFromMap);
 
         // If any file has been deleted from the collection, the number of files stored in metadata is higher  than
@@ -259,6 +285,48 @@ public class IndexUpdater {
                     LOGGER.log(Level.DEBUG, "Index of the deleted file " + s + " was deleted from the index!");
             }
         }
+    }
+
+    /**
+     * Delete all indexes in the given directory.
+     * This will also remove the existing metadata file.
+     * It will be created when recreating the index.
+     *
+     * When deleting indexes, if any error occurred, the process will be rolled back and all the indexes will be
+     * restored.
+     * Otherwise the changes will be committed.
+     *
+     */
+    public void deleteAllIndexes() {
+        try {
+            indexWriter.deleteAll();
+            indexWriter.commit();
+            indexWriter.close();
+            metaFileUtil.deleteMetaDataFile();
+
+            sb.finish();
+            result.set(abvs);
+        } catch (IOException e) {
+            try {
+                indexWriter.rollback();
+                indexWriter.close();
+
+                sb.finish();
+                result.set(abvs);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+    }
+
+    public static void status(String index) throws IOException {
+        Directory directory = FSDirectory.open(Paths.get(index));
+        IndexReader indexReader = DirectoryReader.open(directory);
+        System.out.print("Has deletions:" + indexReader.hasDeletions());
+        System.out.print(", maxDoc:" + indexReader.maxDoc());
+        System.out.println(", numDocs:" + indexReader.numDocs());
+        indexReader.close();
     }
 
 }

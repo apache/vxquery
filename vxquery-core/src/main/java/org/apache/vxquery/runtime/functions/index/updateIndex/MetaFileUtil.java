@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -104,6 +105,21 @@ public class MetaFileUtil {
         md.update(Files.readAllBytes(file.toPath()));
         byte[] md5 = md.digest();
         return DatatypeConverter.printHexBinary(md5);
+    }
+
+    /**
+     * Delete the existing Metadata file.
+     * @return True if deleted, false otherwise.
+     */
+    public boolean deleteMetaDataFile() {
+        try {
+            Files.delete(Paths.get(metaFile.getCanonicalPath()));
+            LOGGER.log(Level.DEBUG, "Metadata file deleted!");
+            return true;
+        } catch (IOException e) {
+            LOGGER.log(Level.ERROR, "Metadata file could not be deleted!");
+            return false;
+        }
     }
 
 }
