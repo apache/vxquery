@@ -49,14 +49,15 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
         sp2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sb = new SequenceBuilder();
         abvs = new ArrayBackedValueStorage();
+        pointables = new ArrayList<>();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable tvp1 = args[0];
         ObjectPointable op;
+        pointables.clear();
         if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
-            pointables = new ArrayList<>();
             TaggedValuePointable temptvp = ppool.takeOne(TaggedValuePointable.class);
             try {
                 tvp1.getValue(sp1);
