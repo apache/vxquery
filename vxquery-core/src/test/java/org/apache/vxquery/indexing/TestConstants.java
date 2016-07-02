@@ -18,7 +18,6 @@ public class TestConstants {
 
     public static String COLLECTION = "src/test/resources/collection/";
     public static String XML_FILE = "/tmp/index/catalog.xml";
-    public static String META_FILE_NAME = "metaFile.file";
 
     public static String INDEX_DIR = "/tmp/index";
 
@@ -98,8 +97,9 @@ public class TestConstants {
     }
 
     /**
-     * @param metadata
-     * @return
+     * Get the XmlMetadata contents as an String.
+     * @param metadata : XmlMetadata Object
+     * @return String containing metadata
      */
     public static String getXMLMetadataString(XmlMetadata metadata) {
         return String.format("%s %s %s", metadata.getFileName(), metadata.getPath(), metadata.getMd5());
