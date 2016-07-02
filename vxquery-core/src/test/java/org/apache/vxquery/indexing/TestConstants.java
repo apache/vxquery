@@ -5,8 +5,6 @@ import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,6 +25,7 @@ public class TestConstants {
 
     /**
      * Creates a HashMap with initial sample data and returns it.
+     *
      * @return HashMap with sample data.
      */
     public static ConcurrentHashMap<String, XmlMetadata> getInitialMap() {
@@ -46,6 +45,7 @@ public class TestConstants {
 
     /**
      * Creates a HashMap with modified data and returns it.
+     *
      * @return HashMap with sample data.
      */
     public static ConcurrentHashMap<String, XmlMetadata> getModifiedMap() {
@@ -65,6 +65,7 @@ public class TestConstants {
 
     /**
      * Generate XML file from given template.
+     *
      * @param fileName : Template file name
      * @throws IOException
      */
@@ -86,7 +87,7 @@ public class TestConstants {
 
         String line;
 
-        while ((line = reader.readLine())!=null) {
+        while ((line = reader.readLine()) != null) {
             bufferedWriter.write(line);
             bufferedWriter.newLine();
         }
@@ -98,6 +99,7 @@ public class TestConstants {
 
     /**
      * Get the XmlMetadata contents as an String.
+     *
      * @param metadata : XmlMetadata Object
      * @return String containing metadata
      */
