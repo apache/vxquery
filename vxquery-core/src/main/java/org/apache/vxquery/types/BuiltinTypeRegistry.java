@@ -348,6 +348,7 @@ public final class BuiltinTypeRegistry {
         typeMap.put(BuiltinTypeQNames.XS_ANY_URI_TYPE_QNAME, XS_ANY_URI);
         typeMap.put(BuiltinTypeQNames.XS_QNAME_TYPE_QNAME, XS_QNAME);
         typeMap.put(BuiltinTypeQNames.XS_NOTATION_TYPE_QNAME, XS_NOTATION);
+        typeMap.put(BuiltinTypeQNames.JS_NULL_TYPE_QNAME, JS_NULL);
         TYPE_MAP = Collections.unmodifiableMap(typeMap);
     }
 }

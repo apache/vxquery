@@ -655,9 +655,10 @@
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.ValueScalarEvaluatorFactory"/>
     </operator>
 
+    <!-- jdm:keys($o as object()) as xs:string* -->
     <operator name="jdm:keys">
         <param name="expr" type="json-item()"/>
-        <return type="item()"/>
+        <return type="xs:string*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.KeysScalarEvaluatorFactory"/>
     </operator>
 
