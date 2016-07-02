@@ -15,10 +15,7 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Object Query :)
-(: Object having two pairs with the same name :)
-{
-    "a":123,
-    "a":234,
-    "b":456
-}
+(: Json Object Navigation :)
+let $x := { "eyes" : "blue", "hair" : "fuchsia" }
+let $y := { "eyes" : "brown", "hair" : "brown" }
+return { "eyes" : $x("eyes"), "hair" : $y("hair") }

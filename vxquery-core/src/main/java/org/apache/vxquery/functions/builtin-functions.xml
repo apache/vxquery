@@ -151,7 +151,7 @@
         <runtime type="scalar"
                  class="org.apache.vxquery.runtime.functions.index.IndexDeleteEvaluatorFactory"/>
     </function>
-    
+
     <!-- fn:collection-from-index($indexfolder  as xs:string?, $elementpath as xs:string?) as  node()* -->
     <function name="fn:collection-from-index">
         <param name="index-folder" type="xs:string?"/>
@@ -253,7 +253,7 @@
             <argument value="0"/>
         </property>
     </function>
-    
+
     <!-- fn:size($expr as  item()*) as xs:anyAtomicType* -->
     <function name="fn:size">
         <param name="expr" type="item()*"/>
@@ -1155,5 +1155,18 @@
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
+    </function>
+
+    <!-- jn:keys($arg as item()*) as xs:string* -->
+    <function name="jn:keys">
+        <param name="arg" type="item()*"/>
+        <return type="xs:string*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnKeysScalarEvaluatorFactory"/>
+    </function>
+
+    <!-- jn:null() as js:null -->
+    <function name="jn:null">
+        <return type="xs:string*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnNullScalarEvaluatorFactory"/>
     </function>
 </functions>

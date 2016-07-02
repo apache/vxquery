@@ -2033,14 +2033,11 @@ ASTNode ObjectConstructor() :
 
 ASTNode PairConstructor() :
 {
-    String key;
+    ASTNode key;
     ASTNode value;
-    Token t;
 }
 {
-    t = <StringLiteral> {
-        key = t.image;
-    }
+    key = ExprSingle()
     (
         ":"
         | ":?"
@@ -2048,7 +2045,7 @@ ASTNode PairConstructor() :
     (
         value = ExprSingle()
     ) {
-        PairConstructor pc = new PairConstructor(createSourceLocation(t));
+        PairConstructor pc = new PairConstructor(key.getSourceLocation());
         pc.setKey(key);
         pc.setValue(value);
         return pc;
