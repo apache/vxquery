@@ -39,6 +39,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -67,6 +68,7 @@ public class IndexUpdater {
     private Set<String> pathsFromFileList;
     private String collectionFolder;
     private XmlMetadata collectionMetadata;
+    private String indexFolder;
     private Logger LOGGER = Logger.getLogger("Index Updater");
 
     //TODO : Implement for paralleizing
@@ -102,7 +104,6 @@ public class IndexUpdater {
             throw new SystemException(ErrorCode.FORG0006);
         }
 
-        String indexFolder;
         try {
             // Get the index folder
             indexTVP.getValue(stringp);
@@ -129,8 +130,6 @@ public class IndexUpdater {
         Directory fsdir = FSDirectory.open(Paths.get(indexFolder));
         indexWriter = new IndexWriter(fsdir, new IndexWriterConfig(new CaseSensitiveAnalyzer()).
                 setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
-
-        status(indexFolder);
     }
 
     /**
@@ -297,12 +296,15 @@ public class IndexUpdater {
      * Otherwise the changes will be committed.
      *
      */
-    public void deleteAllIndexes() {
+    public void deleteAllIndexes() throws SystemException {
         try {
             indexWriter.deleteAll();
             indexWriter.commit();
             indexWriter.close();
             metaFileUtil.deleteMetaDataFile();
+
+            for (File f : (new File(indexFolder)).listFiles())
+                Files.delete(f.toPath());
 
             sb.finish();
             result.set(abvs);
@@ -314,19 +316,10 @@ public class IndexUpdater {
                 sb.finish();
                 result.set(abvs);
             } catch (IOException e1) {
-                e1.printStackTrace();
+                throw new SystemException(ErrorCode.FOAR0001);
             }
         }
 
-    }
-
-    public static void status(String index) throws IOException {
-        Directory directory = FSDirectory.open(Paths.get(index));
-        IndexReader indexReader = DirectoryReader.open(directory);
-        System.out.print("Has deletions:" + indexReader.hasDeletions());
-        System.out.print(", maxDoc:" + indexReader.maxDoc());
-        System.out.println(", numDocs:" + indexReader.numDocs());
-        indexReader.close();
     }
 
 }
