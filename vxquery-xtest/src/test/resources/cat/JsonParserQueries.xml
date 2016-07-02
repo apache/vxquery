@@ -45,4 +45,19 @@
       <query name="q05_parser" date="2016-06-29"/>
       <output-file compare="Text">q05_parser.txt</output-file>
    </test-case>
+   <test-case name="json-parser-q06" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing an object from a json file.</description>
+      <query name="q06_parser" date="2016-06-29"/>
+      <output-file compare="Text">q06_parser.txt</output-file>
+   </test-case>
+   <test-case name="json-parser-q07" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing nested objects from a json file.</description>
+      <query name="q07_parser" date="2016-06-30"/>
+      <output-file compare="Text">q07_parser.txt</output-file>
+   </test-case>
+    <test-case name="json-parser-q08" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing nested objects and arrays from a json file.</description>
+      <query name="q08_parser" date="2016-06-30"/>
+      <output-file compare="Text">q08_parser.txt</output-file>
+   </test-case>
 </test-group>

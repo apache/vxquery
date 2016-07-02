@@ -111,6 +111,15 @@
      <source ID="nested_arrays_json_file" FileName="TestSources/json/array/nested_array.json" Creator="Christina Pavlopoulou">
        <description last-mod="2016-06-29">File</description>
      </source>
+     <source ID="object_json_file" FileName="TestSources/json/object/object.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-29">File</description>
+     </source>
+     <source ID="nested_object_json_file" FileName="TestSources/json/object/nested_object.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-30">File</description>
+     </source>
+     <source ID="nested_object_array_json_file" FileName="TestSources/json/object/nested_object_array.json" Creator="Christina Pavlopoulou">
+       <description last-mod="2016-06-30">File</description>
+     </source>
    </sources>
    <test-group name="SingleQuery" featureOwner="Preston Carman">
       <GroupInfo>
