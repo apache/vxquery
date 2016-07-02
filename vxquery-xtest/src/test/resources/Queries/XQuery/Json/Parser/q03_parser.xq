@@ -17,4 +17,4 @@
 
 (: Json Parser Query :)
 (: parse a file containing a double :)
-    doc-json("double_json_file")
+    json-doc("double_json_file")

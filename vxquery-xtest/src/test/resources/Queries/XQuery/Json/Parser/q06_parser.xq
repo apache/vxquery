@@ -17,4 +17,4 @@
 
 (: Json Parser Query :)
 (: parse a file containing an object :)
-    doc-json("object_json_file")
+    json-doc("object_json_file")

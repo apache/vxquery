@@ -17,4 +17,4 @@
 
 (: Json Parser Query :)
 (: parse a file containing an atomic int :)
-    doc-json("int_json_file")
+    json-doc("int_json_file")

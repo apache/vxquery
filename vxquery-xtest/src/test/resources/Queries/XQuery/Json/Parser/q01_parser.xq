@@ -17,4 +17,4 @@
 
 (: Json Parser Query :)
 (: parse a file containing an array :)
-    doc-json("array_json_file")
+    json-doc("array_json_file")
