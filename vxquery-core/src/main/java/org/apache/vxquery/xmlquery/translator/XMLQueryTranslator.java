@@ -1211,6 +1211,9 @@ public class XMLQueryTranslator {
             content.add(ke);
             ILogicalExpression ve = vre(translateExpression(((PairConstructor) aVal).getValue(), tCtx));
             content.add(ve);
+            ILogicalExpression qmce = ce(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE),
+                    ((PairConstructor) aVal).isQuestionMarkColon());
+            content.add(qmce);
         }
         ILogicalExpression contentExpr = sfce(BuiltinOperators.CONCATENATE,
                 content.toArray(new ILogicalExpression[content.size()]));
