@@ -16,13 +16,14 @@
    under the License. :)
 
 (: Json Object Query :)
-(: Pasrse object with multiple items :)
+(: Issue VXQUERY-211 :)
 {
-    "string":"name",
-    "number1":+123.5,
-    "number2":-123.5,
-    "number3":123,
-    "number4":00123,
-    "number5":1.23E+11,
-    "null":null
+    "Sunday" : 1,
+    "Monday" ?: 1 + 1,
+    "Tuesday" : 3 * 1,
+    "Wednesday" : 8 div 2,
+    "Thursday" : (),
+    "Friday" : count(for $i in 1 to 6 return $i),
+    "Saturday" : (1,2,3),
+    "NotADay" ?: ()
 }

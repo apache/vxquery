@@ -2035,12 +2035,13 @@ ASTNode PairConstructor() :
 {
     ASTNode key;
     ASTNode value;
+    Token qmc = null;
 }
 {
     key = ExprSingle()
     (
         ":"
-        | ":?"
+        | qmc = "?:"
     )
     (
         value = ExprSingle()
@@ -2048,6 +2049,11 @@ ASTNode PairConstructor() :
         PairConstructor pc = new PairConstructor(key.getSourceLocation());
         pc.setKey(key);
         pc.setValue(value);
+        if(qmc != null) {
+            pc.setQuestionMarkColon(true);
+        } else {
+            pc.setQuestionMarkColon(false);
+        }
         return pc;
     }
 }
