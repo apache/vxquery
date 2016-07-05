@@ -35,7 +35,6 @@ import org.apache.vxquery.jsonparser.JSONParser;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-import org.apache.vxquery.xmlparser.XMLParser;
 
 public class JnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
 
@@ -66,7 +65,7 @@ public class JnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                     JSONParser parser = new JSONParser();
                     FunctionHelper.readInJnDocFromPointable(stringp, bbis, di, abvs, parser);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new SystemException(ErrorCode.FODC0002, e);
                 }
                 result.set(abvs);
             }

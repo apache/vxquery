@@ -17,4 +17,4 @@
 
 (: Json Parser Query :)
 (: parse a file containing an array :)
-    json-doc("array_json_file")
+    jn:json-doc("array_json_file")

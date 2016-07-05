@@ -17,4 +17,4 @@
 
 (: Json Parser Query :)
 (: parse a file containing a string :)
-    json-doc("string_json_file")
+    jn:json-doc("string_json_file")

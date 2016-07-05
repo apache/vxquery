@@ -103,7 +103,7 @@ public class ReplaceSourceMapInDocExpression implements IAlgebraicRewriteRule {
                 }
             }
             docExpression = ExpressionToolbox.findFirstFunctionExpression(expression,
-                    BuiltinFunctions.FN_JSON_DOC_1.getFunctionIdentifier());
+                    BuiltinFunctions.JN_JSON_DOC_1.getFunctionIdentifier());
             if (docExpression != null) {
                 AbstractFunctionCallExpression absFnCall = (AbstractFunctionCallExpression) docExpression.getValue();
                 if (updateDocExpression(opRef, absFnCall.getArguments().get(0), context)) {

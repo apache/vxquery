@@ -38,17 +38,25 @@ public class JSONParser {
     protected final List<ArrayBuilder> abStack;
     protected final List<ObjectBuilder> obStack;
     protected final List<ArrayBackedValueStorage> abvsStack;
+    protected final List<ArrayBackedValueStorage> keyStack;
     protected final List<UTF8StringPointable> spStack;
-    protected final List<String> itemStack;
 
-    public JSONParser() throws JsonParseException, IOException {
+    enum itemType {
+        ARRAY,
+        OBJECT
+    }
+
+    protected final List<itemType> itemStack;
+
+    public JSONParser() throws JsonParseException {
         factory = new JsonFactory();
         atomic = new ArrayBackedValueStorage();
         abStack = new ArrayList<ArrayBuilder>();
         obStack = new ArrayList<ObjectBuilder>();
         abvsStack = new ArrayList<ArrayBackedValueStorage>();
+        keyStack = new ArrayList<ArrayBackedValueStorage>();
         spStack = new ArrayList<UTF8StringPointable>();
-        itemStack = new ArrayList<String>();
+        itemStack = new ArrayList<itemType>();
     }
 
     public void parseDocument(File file, ArrayBackedValueStorage result)
@@ -56,133 +64,116 @@ public class JSONParser {
         DataOutput outResult = result.getDataOutput();
         DataOutput out = atomic.getDataOutput();
         StringValueBuilder svb = new StringValueBuilder();
-        String lastItem = null;
         String startItem = null;
         boolean nested = false;
         JsonParser parser = factory.createParser(file);
-        while (!parser.isClosed()) {
-            JsonToken token = parser.nextToken();
-            if (token == JsonToken.START_ARRAY) {
-                if (!nested) {
-                    abvsStack.add(new ArrayBackedValueStorage());
-                    abStack.add(new ArrayBuilder());
-                }
-                itemStack.add("array");
-                lastItem = "array";
-                abvsStack.get(abvsStack.size() - 1).reset();
-                abStack.get(abStack.size() - 1).reset(abvsStack.get(abvsStack.size() - 1));
+        JsonToken token = parser.nextToken();
+        itemType checkItem = null;
+        while (token != null) {
+            if (itemStack.size() > 1) {
+                checkItem = itemStack.get(itemStack.size() - 2);
             }
-            if (token == JsonToken.START_OBJECT) {
-                if (!nested) {
-                    abvsStack.add(new ArrayBackedValueStorage());
-                    obStack.add(new ObjectBuilder());
-                }
-                itemStack.add("object");
-                lastItem = "object";
-                abvsStack.get(abvsStack.size() - 1).reset();
-                obStack.get(obStack.size() - 1).reset(abvsStack.get(abvsStack.size() - 1));
-            }
-            if (token == JsonToken.FIELD_NAME) {
-                UTF8StringPointable sp = new UTF8StringPointable();
-                ArrayBackedValueStorage key = new ArrayBackedValueStorage();
-                key.reset();
-                spStack.add(sp);
-                DataOutput outk = key.getDataOutput();
-                svb.write(parser.getText(), outk);
-                spStack.get(spStack.size() - 1).set(key);
-            }
-            if (token == JsonToken.VALUE_NUMBER_INT) {
-                atomic.reset();
-                out.write(ValueTag.XS_INTEGER_TAG);
-                out.writeLong(parser.getLongValue());
-                if (lastItem == "array") {
-                    abStack.get(abStack.size() - 1).addItem(atomic);
-                } else if (lastItem == "object") {
-                    obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1), atomic);
-                }
-            }
-            if (token == JsonToken.VALUE_STRING) {
-                atomic.reset();
-                out.write(ValueTag.XS_STRING_TAG);
-                svb.write(parser.getText(), out);
-                if (lastItem == "array") {
-                    abStack.get(abStack.size() - 1).addItem(atomic);
-                } else if (lastItem == "object") {
-                    obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1), atomic);
-                }
-            }
-            if (token == JsonToken.VALUE_NUMBER_FLOAT) {
-                atomic.reset();
-                out.write(ValueTag.XS_DOUBLE_TAG);
-                out.writeDouble(parser.getDoubleValue());
-                if (lastItem == "array") {
-                    abStack.get(abStack.size() - 1).addItem(atomic);
-                } else if (lastItem == "object") {
-                    obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1), atomic);
-                }
-            }
-            if (token == JsonToken.END_ARRAY) {
-                if (itemStack.size() == 1) {
+            switch (token) {
+                case START_ARRAY:
+                    if (!nested) {
+                        abvsStack.add(new ArrayBackedValueStorage());
+                        abStack.add(new ArrayBuilder());
+                    }
+                    itemStack.add(itemType.ARRAY);
+                    abvsStack.get(abvsStack.size() - 1).reset();
+                    abStack.get(abStack.size() - 1).reset(abvsStack.get(abvsStack.size() - 1));
+                    break;
+                case START_OBJECT:
+                    if (!nested) {
+                        abvsStack.add(new ArrayBackedValueStorage());
+                        obStack.add(new ObjectBuilder());
+                    }
+                    itemStack.add(itemType.OBJECT);
+                    abvsStack.get(abvsStack.size() - 1).reset();
+                    obStack.get(obStack.size() - 1).reset(abvsStack.get(abvsStack.size() - 1));
+                    break;
+                case FIELD_NAME:
+                    if (!nested) {
+                        keyStack.add(new ArrayBackedValueStorage());
+                        spStack.add(new UTF8StringPointable());
+                    }
+                    keyStack.get(keyStack.size() - 1).reset();
+                    DataOutput outk = keyStack.get(keyStack.size() - 1).getDataOutput();
+                    svb.write(parser.getText(), outk);
+                    spStack.get(spStack.size() - 1).set(keyStack.get(keyStack.size() - 1));
+                    break;
+                case VALUE_NUMBER_INT:
+                    atomicValues(ValueTag.XS_INTEGER_TAG, parser, out, svb);
+                    break;
+                case VALUE_STRING:
+                    atomicValues(ValueTag.XS_STRING_TAG, parser, out, svb);
+                    break;
+                case VALUE_NUMBER_FLOAT:
+                    atomicValues(ValueTag.XS_DOUBLE_TAG, parser, out, svb);
+                    break;
+                case END_ARRAY:
                     abStack.get(abStack.size() - 1).finish();
                     abStack.remove(abStack.size() - 1);
+                    if (itemStack.size() == 1) {
+                        nested = true;
+                    } else if (checkItem == itemType.ARRAY) {
+                        abStack.get(abStack.size() - 1).addItem(abvsStack.get(abvsStack.size() - 1));
+                        abvsStack.remove(abvsStack.size() - 1);
+                    } else if (checkItem == itemType.OBJECT) {
+                        obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1),
+                                abvsStack.get(abvsStack.size() - 1));
+                        abvsStack.remove(abvsStack.size() - 1);
+                        nested = true;
+                    }
                     itemStack.remove(itemStack.size() - 1);
-                    nested = true;
-                    lastItem = "array";
-                } else if (itemStack.get(itemStack.size() - 2) == "array") {
-                    abStack.get(abStack.size() - 1).finish();
-                    abStack.remove(abStack.size() - 1);
-                    abStack.get(abStack.size() - 1).addItem(abvsStack.get(abvsStack.size() - 1));
-                    abvsStack.remove(abvsStack.size() - 1);
-                    itemStack.remove(itemStack.size() - 1);
-                    lastItem = "array";
-                } else if (itemStack.get(itemStack.size() - 2) == "object") {
-                    abStack.get(abStack.size() - 1).finish();
-                    abStack.remove(abStack.size() - 1);
-                    obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1),
-                            abvsStack.get(abvsStack.size() - 1));
-                    abvsStack.remove(abvsStack.size() - 1);
-                    itemStack.remove(itemStack.size() - 1);
-                    nested = true;
-                    lastItem = "object";
-                }
-
-                startItem = "array";
-
-            }
-            if (token == JsonToken.END_OBJECT) {
-                if (itemStack.size() == 1) {
+                    startItem = "array";
+                    break;
+                case END_OBJECT:
                     obStack.get(obStack.size() - 1).finish();
                     obStack.remove(obStack.size() - 1);
                     spStack.remove(spStack.size() - 1);
+                    if (itemStack.size() == 1) {
+                        nested = true;
+                    } else if (checkItem == itemType.OBJECT) {
+                        obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1),
+                                abvsStack.get(abvsStack.size() - 1));
+                        abvsStack.remove(abvsStack.size() - 1);
+                    } else if (checkItem == itemType.ARRAY) {
+                        abStack.get(abStack.size() - 1).addItem(abvsStack.get(abvsStack.size() - 1));
+                        abvsStack.remove(abvsStack.size() - 1);
+                        nested = true;
+                    }
                     itemStack.remove(itemStack.size() - 1);
-                    nested = true;
-                    lastItem = "object";
-                } else if (itemStack.get(itemStack.size() - 2) == "object") {
-                    obStack.get(obStack.size() - 1).finish();
-                    obStack.remove(obStack.size() - 1);
-                    spStack.remove(spStack.size() - 1);
-                    obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1),
-                            abvsStack.get(abvsStack.size() - 1));
-                    abvsStack.remove(abvsStack.size() - 1);
-                    itemStack.remove(itemStack.size() - 1);
-                    lastItem = "object";
-                } else if (itemStack.get(itemStack.size() - 2) == "array") {
-                    obStack.get(obStack.size() - 1).finish();
-                    obStack.remove(obStack.size() - 1);
-                    spStack.remove(spStack.size() - 1);
-                    abStack.get(abStack.size() - 1).addItem(abvsStack.get(abvsStack.size() - 1));
-                    abvsStack.remove(abvsStack.size() - 1);
-                    itemStack.remove(itemStack.size() - 1);
-                    nested = true;
-                    lastItem = "array";
-                }
-                startItem = "object";
+                    startItem = "object";
+                    break;
+                default:
+                    break;
             }
+            token = parser.nextToken();
         }
         if (startItem == "array" || startItem == "object") {
             outResult.write(abvsStack.get(0).getByteArray());
         } else {
             outResult.write(atomic.getByteArray());
+        }
+    }
+
+    public void atomicValues(int tag, JsonParser parser, DataOutput out, StringValueBuilder svb) throws IOException {
+        atomic.reset();
+        out.write(tag);
+        if (tag == ValueTag.XS_DOUBLE_TAG) {
+            out.writeDouble(parser.getDoubleValue());
+        } else if (tag == ValueTag.XS_STRING_TAG) {
+            svb.write(parser.getText(), out);
+        } else if (tag == ValueTag.XS_INTEGER_TAG) {
+            out.writeLong(parser.getLongValue());
+        }
+        if (itemStack.size() != 0) {
+            if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
+                abStack.get(abStack.size() - 1).addItem(atomic);
+            } else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
+                obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1), atomic);
+            }
         }
     }
 }

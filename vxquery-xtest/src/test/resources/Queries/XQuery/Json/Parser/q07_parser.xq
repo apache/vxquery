@@ -17,4 +17,4 @@
 
 (: Json Parser Query :)
 (: parse a file containing nested object :)
-    json-doc("nested_object_json_file")
+    jn:json-doc("nested_object_json_file")

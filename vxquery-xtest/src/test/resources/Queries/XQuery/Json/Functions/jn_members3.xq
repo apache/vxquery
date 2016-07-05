@@ -15,6 +15,8 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Parser Query :)
-(: parse a file containing a double :)
-    jn:json-doc("double_json_file")
+(: JSONiq jn:members :)
+(
+     let $planets := ("foo",{"foo":"bar"})
+          return jn:members($planets)
+)
