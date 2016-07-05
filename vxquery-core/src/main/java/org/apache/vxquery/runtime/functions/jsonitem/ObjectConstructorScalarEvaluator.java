@@ -41,7 +41,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
     private TaggedValuePointable[] pointables;
     private IPointable vp;
     private UTF8StringPointable sp;
-    private SequencePointable seqp, seqp2;
+    private SequencePointable seqp;
     protected final IHyracksTaskContext ctx;
     private final ArrayBackedValueStorage abvs;
     private final ArrayBackedValueStorage abvs1;
@@ -57,7 +57,6 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        seqp2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
         ab = new ArrayBuilder();
     }
@@ -74,64 +73,54 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        TaggedValuePointable tvp;
-        TaggedValuePointable tempKey = ppool.takeOne(TaggedValuePointable.class);
-        TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
-        TaggedValuePointable tempQmc = ppool.takeOne(TaggedValuePointable.class);
+        TaggedValuePointable key, value, qmc;
         try {
             abvs.reset();
             ob.reset(abvs);
 
-            tvp = args[0];
-            if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                tvp.getValue(seqp);
-                int len = seqp.getEntryCount();
-                pointables = new TaggedValuePointable[len / 3];
-                for (int i = 0; i < len; i += 3) {
-                    seqp.getEntry(i, tempKey);
-                    seqp.getEntry(i + 1, tempValue);
-                    seqp.getEntry(i + 2, tempQmc);
-                    if (!isDuplicate(tempKey)) {
-                        pointables[i / 3] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                        tempKey.getValue(pointables[i / 3]);
-                        sp.set(vp);
-                        if (tempValue.getTag() == ValueTag.SEQUENCE_TAG) {
-                            tempQmc.getValue(bp);
-                            tempValue.getValue(seqp2);
-                            if (bp.getBoolean()) {
-                                continue;
-                            }
-                            if (seqp2.getEntryCount() == 0) {
-                                XDMConstants.setJsNull(tempValue);
-                                ob.addItem(sp, tempValue);
-                            } else {
-                                abvs1.reset();
-                                ab.reset(abvs1);
-                                int l = seqp2.getEntryCount();
-                                for (int j = 0; j < l; j++) {
-                                    seqp2.getEntry(j, tempValue);
-                                    ab.addItem(tempValue);
-                                }
-                                ab.finish();
-                                vp.set(abvs1);
-                                ob.addItem(sp, vp);
-                            }
+            int len = args.length;
+            pointables = new TaggedValuePointable[len / 3];
+            for (int i = 0; i < len; i += 3) {
+                key = args[i];
+                value = args[i + 1];
+                qmc = args[i + 2];
+                if (!isDuplicate(key)) {
+                    pointables[i / 3] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                    key.getValue(pointables[i / 3]);
+                    sp.set(vp);
+                    if (value.getTag() == ValueTag.SEQUENCE_TAG) {
+                        qmc.getValue(bp);
+                        value.getValue(seqp);
+                        if (bp.getBoolean()) {
+                            continue;
+                        }
+                        if (seqp.getEntryCount() == 0) {
+                            XDMConstants.setJsNull(value);
+                            ob.addItem(sp, value);
                         } else {
-                            ob.addItem(sp, tempValue);
+                            abvs1.reset();
+                            ab.reset(abvs1);
+                            int l = seqp.getEntryCount();
+                            for (int j = 0; j < l; j++) {
+                                seqp.getEntry(j, value);
+                                ab.addItem(value);
+                            }
+                            ab.finish();
+                            vp.set(abvs1);
+                            ob.addItem(sp, vp);
                         }
                     } else {
-                        throw new SystemException(ErrorCode.JNDY0003);
+                        ob.addItem(sp, value);
                     }
+                } else {
+                    throw new SystemException(ErrorCode.JNDY0003);
                 }
             }
+
             ob.finish();
             result.set(abvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
-        } finally {
-            ppool.giveBack(tempKey);
-            ppool.giveBack(tempValue);
-            ppool.giveBack(tempQmc);
         }
     }
 }

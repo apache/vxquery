@@ -1215,9 +1215,10 @@ public class XMLQueryTranslator {
                     ((PairConstructor) aVal).isQuestionMarkColon());
             content.add(qmce);
         }
-        ILogicalExpression contentExpr = sfce(BuiltinOperators.CONCATENATE,
-                content.toArray(new ILogicalExpression[content.size()]));
-        return createAssignment(sfce(BuiltinOperators.OBJECT_CONSTRUCTOR, contentExpr), tCtx);
+
+        return createAssignment(
+                sfce(BuiltinOperators.OBJECT_CONSTRUCTOR, content.toArray(new ILogicalExpression[content.size()])),
+                tCtx);
     }
 
     private LogicalVariable translateDirectElementConstructorNode(TranslationContext tCtx,
