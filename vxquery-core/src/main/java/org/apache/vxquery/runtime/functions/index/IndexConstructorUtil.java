@@ -36,6 +36,7 @@ import org.apache.vxquery.runtime.functions.index.updateIndex.Constants;
 import org.apache.vxquery.runtime.functions.index.updateIndex.MetaFileUtil;
 import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.IParser;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 
@@ -185,7 +186,7 @@ public class IndexConstructorUtil {
             throws IOException {
 
         //Get the document node
-        XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
+        IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
         FunctionHelper.readInDocFromString(file.getPath(), bbis, di, abvsFileNode, parser);
 
         nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());

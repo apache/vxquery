@@ -27,6 +27,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.IParser;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -77,7 +78,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
                 }
                 tvp.getValue(stringp);
                 try {
-                    XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
+                    IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
                     FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
                     XDMConstants.setTrue(result);
                 } catch (Exception e) {

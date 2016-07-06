@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.htrace.fasterxml.jackson.core.JsonParseException;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
@@ -44,7 +45,6 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
-import org.apache.vxquery.jsonparser.JSONParser;
 import org.apache.vxquery.runtime.functions.arithmetic.AbstractArithmeticOperation;
 import org.apache.vxquery.runtime.functions.cast.CastToDoubleOperation;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
@@ -52,7 +52,7 @@ import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 import org.apache.vxquery.types.BuiltinTypeConstants;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
-import org.apache.vxquery.xmlparser.XMLParser;
+import org.apache.vxquery.xmlparser.IParser;
 
 public class FunctionHelper {
 
@@ -1218,7 +1218,8 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+            DataInputStream di, ArrayBackedValueStorage abvs, IParser parser)
+                    throws NumberFormatException, JsonParseException, IOException {
         String fName;
         try {
             fName = getStringFromPointable(stringp, bbis, di);
@@ -1229,7 +1230,8 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
-            ArrayBackedValueStorage abvs, XMLParser parser) throws HyracksDataException {
+            ArrayBackedValueStorage abvs, IParser parser)
+                    throws NumberFormatException, JsonParseException, IOException {
         if (!fName.contains("hdfs:/")) {
             File file = new File(fName);
             if (file.exists()) {
@@ -1252,31 +1254,6 @@ public class FunctionHelper {
                     fs.close();
                 } catch (IOException e) {
                     throw new HyracksDataException(e);
-                }
-            }
-        }
-    }
-
-    public static void readInJnDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, JSONParser parser) throws HyracksDataException {
-        String fName;
-        try {
-            fName = getStringFromPointable(stringp, bbis, di);
-        } catch (SystemException e) {
-            throw new HyracksDataException(e);
-        }
-        readInJnDocFromString(fName, bbis, di, abvs, parser);
-    }
-
-    public static void readInJnDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
-            ArrayBackedValueStorage abvs, JSONParser parser) throws HyracksDataException {
-        if (!fName.contains("hdfs:/")) {
-            File file = new File(fName);
-            if (file.exists()) {
-                try {
-                    parser.parseDocument(file, abvs);
-                } catch (NumberFormatException | IOException e) {
-                    e.printStackTrace();
                 }
             }
         }

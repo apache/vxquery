@@ -128,7 +128,7 @@ public class XMLParser implements IParser {
     }
 
     public void parseHDFSElements(InputStream inputStream, IFrameWriter writer, FrameTupleAccessor fta, int tupleIndex)
-            throws IOException {
+            throws HyracksDataException {
         try {
             Reader input;
             if (bufferSize > 0) {
@@ -140,13 +140,10 @@ public class XMLParser implements IParser {
             handler.setupElementWriter(writer, tupleIndex);
             parser.parse(in);
             input.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             HyracksDataException hde = new HyracksDataException(e);
             hde.setNodeId(nodeId);
             throw hde;
-        } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 
@@ -162,13 +159,10 @@ public class XMLParser implements IParser {
             parser.parse(in);
             handler.writeDocument(abvs);
             input.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             HyracksDataException hde = new HyracksDataException(e);
             hde.setNodeId(nodeId);
             throw hde;
-        } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 }

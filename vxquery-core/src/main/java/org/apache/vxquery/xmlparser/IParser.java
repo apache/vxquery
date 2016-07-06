@@ -17,13 +17,13 @@
 package org.apache.vxquery.xmlparser;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 
-import org.apache.htrace.fasterxml.jackson.core.JsonParseException;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public interface IParser {
-    public void parseDocument(File file, ArrayBackedValueStorage abvs)
-            throws HyracksDataException, NumberFormatException, JsonParseException, IOException;
+    public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException;
+
+    public void parseHDFSDocument(InputStream in, ArrayBackedValueStorage abvs) throws HyracksDataException;
 }
