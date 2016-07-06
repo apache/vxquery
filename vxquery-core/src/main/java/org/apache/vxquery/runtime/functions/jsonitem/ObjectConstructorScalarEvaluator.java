@@ -19,13 +19,16 @@ package org.apache.vxquery.runtime.functions.jsonitem;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -41,15 +44,21 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
     private SequencePointable seqp;
     protected final IHyracksTaskContext ctx;
     private final ArrayBackedValueStorage abvs;
+    private final ArrayBackedValueStorage abvs1;
+    private final BooleanPointable bp;
+    private final ArrayBuilder ab;
 
     public ObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
         this.ctx = ctx;
         abvs = new ArrayBackedValueStorage();
+        abvs1 = new ArrayBackedValueStorage();
         ob = new ObjectBuilder();
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
+        ab = new ArrayBuilder();
     }
 
     private boolean isDuplicate(TaggedValuePointable tempKey) {
@@ -64,37 +73,54 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        TaggedValuePointable tvp;
-        TaggedValuePointable tempKey = ppool.takeOne(TaggedValuePointable.class);
-        TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
+        TaggedValuePointable key, value, qmc;
         try {
+            abvs.reset();
             ob.reset(abvs);
 
-            tvp = args[0];
-            if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                tvp.getValue(seqp);
-                int len = seqp.getEntryCount();
-                pointables = new TaggedValuePointable[len / 2];
-                for (int i = 0; i < len; i += 2) {
-                    seqp.getEntry(i, tempKey);
-                    seqp.getEntry(i + 1, tempValue);
-                    if (!isDuplicate(tempKey)) {
-                        pointables[i / 2] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                        tempKey.getValue(pointables[i / 2]);
-                        sp.set(vp);
-                        ob.addItem(sp, tempValue);
+            int len = args.length;
+            pointables = new TaggedValuePointable[len / 3];
+            for (int i = 0; i < len; i += 3) {
+                key = args[i];
+                value = args[i + 1];
+                qmc = args[i + 2];
+                if (!isDuplicate(key)) {
+                    pointables[i / 3] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                    key.getValue(pointables[i / 3]);
+                    sp.set(vp);
+                    if (value.getTag() == ValueTag.SEQUENCE_TAG) {
+                        qmc.getValue(bp);
+                        value.getValue(seqp);
+                        if (seqp.getEntryCount() == 0) {
+                            if (bp.getBoolean()) {
+                                continue;
+                            }
+                            XDMConstants.setJsNull(value);
+                            ob.addItem(sp, value);
+                        } else {
+                            abvs1.reset();
+                            ab.reset(abvs1);
+                            int l = seqp.getEntryCount();
+                            for (int j = 0; j < l; j++) {
+                                seqp.getEntry(j, value);
+                                ab.addItem(value);
+                            }
+                            ab.finish();
+                            vp.set(abvs1);
+                            ob.addItem(sp, vp);
+                        }
                     } else {
-                        throw new SystemException(ErrorCode.JNDY0003);
+                        ob.addItem(sp, value);
                     }
+                } else {
+                    throw new SystemException(ErrorCode.JNDY0003);
                 }
             }
+
             ob.finish();
             result.set(abvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
-        } finally {
-            ppool.giveBack(tempKey);
-            ppool.giveBack(tempValue);
         }
     }
 }
