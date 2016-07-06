@@ -324,10 +324,10 @@
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnDocScalarEvaluatorFactory"/>
     </function>
     
-    <!-- jn:json-doc($uri as  xs:string?) as document-node()?  -->
+    <!-- jn:json-doc($uri as  xs:string?) as json-item()?  -->
     <function name="jn:json-doc">
         <param name="uri" type="xs:string?"/>
-        <return type="json-item()"/>
+        <return type="json-item()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnDocScalarEvaluatorFactory"/>
     </function>
 

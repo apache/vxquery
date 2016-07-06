@@ -32,7 +32,7 @@ import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.xmlparser.IParser;
 
-public class JSONParser implements IParser{
+public class JSONParser implements IParser {
 
     final JsonFactory factory;
     protected final ArrayBackedValueStorage atomic;
@@ -42,6 +42,9 @@ public class JSONParser implements IParser{
     protected final List<ArrayBackedValueStorage> keyStack;
     protected final List<UTF8StringPointable> spStack;
     protected final StringValueBuilder svb;
+    protected final DataOutput out;
+    protected itemType checkItem, startItem;
+    protected int levelArray, levelObject;
 
     enum itemType {
         ARRAY,
@@ -60,24 +63,23 @@ public class JSONParser implements IParser{
         spStack = new ArrayList<UTF8StringPointable>();
         itemStack = new ArrayList<itemType>();
         svb = new StringValueBuilder();
+        abvsStack.add(atomic);
+        out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
+        checkItem = null;
+        startItem = null;
+        levelArray = 0;
+        levelObject = 0;
     }
 
     public void parseDocument(File file, ArrayBackedValueStorage result)
             throws NumberFormatException, JsonParseException, IOException {
         DataOutput outResult = result.getDataOutput();
-        abvsStack.add(atomic);
-        DataOutput out = abvsStack.get(0).getDataOutput();
-        String startItem = null;
         JsonParser parser = factory.createParser(file);
         JsonToken token = parser.nextToken();
-        itemType checkItem = null;
-        int levelArray = 0;
-        int levelObject = 0;
         while (token != null) {
             if (itemStack.size() > 1) {
                 checkItem = itemStack.get(itemStack.size() - 2);
             }
-
             switch (token) {
                 case START_ARRAY:
                     levelArray++;
@@ -133,7 +135,7 @@ public class JSONParser implements IParser{
                         }
                     }
                     itemStack.remove(itemStack.size() - 1);
-                    startItem = "array";
+                    startItem = itemType.ARRAY;
                     levelArray--;
                     break;
                 case END_OBJECT:
@@ -147,7 +149,7 @@ public class JSONParser implements IParser{
                         }
                     }
                     itemStack.remove(itemStack.size() - 1);
-                    startItem = "object";
+                    startItem = itemType.OBJECT;
                     levelObject--;
                     break;
                 default:
@@ -155,7 +157,7 @@ public class JSONParser implements IParser{
             }
             token = parser.nextToken();
         }
-        if (startItem == "array" || startItem == "object") {
+        if (startItem == itemType.ARRAY || startItem == itemType.OBJECT) {
             outResult.write(abvsStack.get(1).getByteArray());
         } else {
             outResult.write(abvsStack.get(0).getByteArray());
