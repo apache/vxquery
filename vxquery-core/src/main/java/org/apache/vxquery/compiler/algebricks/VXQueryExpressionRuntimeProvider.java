@@ -53,7 +53,8 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
             IOperatorSchema[] inputSchemas, JobGenContext context) throws AlgebricksException {
         switch (expr.getExpressionTag()) {
             case CONSTANT:
-                IAlgebricksConstantValue constantValue = (IAlgebricksConstantValue) ((ConstantExpression) expr).getValue();
+                IAlgebricksConstantValue constantValue = (IAlgebricksConstantValue) ((ConstantExpression) expr)
+                        .getValue();
                 if (constantValue.isFalse()) {
                     IPointable p = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
                     XDMConstants.setFalse(p);
@@ -81,12 +82,7 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
 
                 IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
                         fcExpr.getArguments());
-
-                try {
-                    return fn.createScalarEvaluatorFactory(argFactories);
-                } catch (SystemException e) {
-                    throw new AlgebricksException(e);
-                }
+                return fn.createScalarEvaluatorFactory(argFactories);
         }
         throw new UnsupportedOperationException("Cannot create runtime for " + expr.getExpressionTag());
     }
@@ -110,11 +106,7 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
 
         IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
                 expr.getArguments());
-        try {
-            return fn.createAggregateEvaluatorFactory(argFactories);
-        } catch (SystemException e) {
-            throw new AlgebricksException(e);
-        }
+        return fn.createAggregateEvaluatorFactory(argFactories);
     }
 
     @Override
@@ -139,10 +131,6 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
 
         IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
                 expr.getArguments());
-        try {
-            return fn.createUnnestingEvaluatorFactory(argFactories);
-        } catch (SystemException e) {
-            throw new AlgebricksException(e);
-        }
+        return fn.createUnnestingEvaluatorFactory(argFactories);
     }
 }
