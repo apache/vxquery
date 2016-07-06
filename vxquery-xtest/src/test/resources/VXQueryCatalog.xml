@@ -130,6 +130,10 @@
               Creator="Christina Pavlopoulou">
          <description last-mod="2016-07-02">File</description>
       </source>
+      <source ID="nested_array_object_json_file" FileName="TestSources/json/array/nested_array_object.json"
+              Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-05">File</description>
+      </source>
    </sources>
    <test-group name="SingleQuery" featureOwner="Preston Carman">
       <GroupInfo>

@@ -30,8 +30,9 @@ import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.xmlparser.IParser;
 
-public class JSONParser {
+public class JSONParser implements IParser{
 
     final JsonFactory factory;
     protected final ArrayBackedValueStorage atomic;
@@ -40,6 +41,7 @@ public class JSONParser {
     protected final List<ArrayBackedValueStorage> abvsStack;
     protected final List<ArrayBackedValueStorage> keyStack;
     protected final List<UTF8StringPointable> spStack;
+    protected final StringValueBuilder svb;
 
     enum itemType {
         ARRAY,
@@ -57,94 +59,96 @@ public class JSONParser {
         keyStack = new ArrayList<ArrayBackedValueStorage>();
         spStack = new ArrayList<UTF8StringPointable>();
         itemStack = new ArrayList<itemType>();
+        svb = new StringValueBuilder();
     }
 
     public void parseDocument(File file, ArrayBackedValueStorage result)
             throws NumberFormatException, JsonParseException, IOException {
         DataOutput outResult = result.getDataOutput();
-        DataOutput out = atomic.getDataOutput();
-        StringValueBuilder svb = new StringValueBuilder();
+        abvsStack.add(atomic);
+        DataOutput out = abvsStack.get(0).getDataOutput();
         String startItem = null;
-        boolean nested = false;
         JsonParser parser = factory.createParser(file);
         JsonToken token = parser.nextToken();
         itemType checkItem = null;
+        int levelArray = 0;
+        int levelObject = 0;
         while (token != null) {
             if (itemStack.size() > 1) {
                 checkItem = itemStack.get(itemStack.size() - 2);
             }
+
             switch (token) {
                 case START_ARRAY:
-                    if (!nested) {
-                        abvsStack.add(new ArrayBackedValueStorage());
+                    levelArray++;
+                    if (levelArray > abStack.size()) {
                         abStack.add(new ArrayBuilder());
                     }
+                    if (levelArray + levelObject > abvsStack.size() - 1) {
+                        abvsStack.add(new ArrayBackedValueStorage());
+                    }
                     itemStack.add(itemType.ARRAY);
-                    abvsStack.get(abvsStack.size() - 1).reset();
-                    abStack.get(abStack.size() - 1).reset(abvsStack.get(abvsStack.size() - 1));
+                    abvsStack.get(levelArray + levelObject).reset();
+                    abStack.get(levelArray - 1).reset(abvsStack.get(levelArray + levelObject));
                     break;
                 case START_OBJECT:
-                    if (!nested) {
-                        abvsStack.add(new ArrayBackedValueStorage());
+                    levelObject++;
+                    if (levelObject > obStack.size()) {
                         obStack.add(new ObjectBuilder());
                     }
+                    if (levelArray + levelObject > abvsStack.size() - 1) {
+                        abvsStack.add(new ArrayBackedValueStorage());
+                    }
                     itemStack.add(itemType.OBJECT);
-                    abvsStack.get(abvsStack.size() - 1).reset();
-                    obStack.get(obStack.size() - 1).reset(abvsStack.get(abvsStack.size() - 1));
+                    abvsStack.get(levelArray + levelObject).reset();
+                    obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
                     break;
                 case FIELD_NAME:
-                    if (!nested) {
+                    if (levelObject > spStack.size()) {
                         keyStack.add(new ArrayBackedValueStorage());
                         spStack.add(new UTF8StringPointable());
                     }
-                    keyStack.get(keyStack.size() - 1).reset();
-                    DataOutput outk = keyStack.get(keyStack.size() - 1).getDataOutput();
+                    keyStack.get(levelObject - 1).reset();
+                    DataOutput outk = keyStack.get(levelObject - 1).getDataOutput();
                     svb.write(parser.getText(), outk);
-                    spStack.get(spStack.size() - 1).set(keyStack.get(keyStack.size() - 1));
+                    spStack.get(levelObject - 1).set(keyStack.get(levelObject - 1));
                     break;
                 case VALUE_NUMBER_INT:
-                    atomicValues(ValueTag.XS_INTEGER_TAG, parser, out, svb);
+                    atomicValues(ValueTag.XS_INTEGER_TAG, parser, out, svb, levelArray, levelObject);
                     break;
                 case VALUE_STRING:
-                    atomicValues(ValueTag.XS_STRING_TAG, parser, out, svb);
+                    atomicValues(ValueTag.XS_STRING_TAG, parser, out, svb, levelArray, levelObject);
                     break;
                 case VALUE_NUMBER_FLOAT:
-                    atomicValues(ValueTag.XS_DOUBLE_TAG, parser, out, svb);
+                    atomicValues(ValueTag.XS_DOUBLE_TAG, parser, out, svb, levelArray, levelObject);
                     break;
                 case END_ARRAY:
-                    abStack.get(abStack.size() - 1).finish();
-                    abStack.remove(abStack.size() - 1);
-                    if (itemStack.size() == 1) {
-                        nested = true;
-                    } else if (checkItem == itemType.ARRAY) {
-                        abStack.get(abStack.size() - 1).addItem(abvsStack.get(abvsStack.size() - 1));
-                        abvsStack.remove(abvsStack.size() - 1);
-                    } else if (checkItem == itemType.OBJECT) {
-                        obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1),
-                                abvsStack.get(abvsStack.size() - 1));
-                        abvsStack.remove(abvsStack.size() - 1);
-                        nested = true;
+                    abStack.get(levelArray - 1).finish();
+                    if (itemStack.size() > 1) {
+                        if (checkItem == itemType.ARRAY) {
+                            abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
+                        } else if (checkItem == itemType.OBJECT) {
+                            obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
+                                    abvsStack.get(levelArray + levelObject));
+                        }
                     }
                     itemStack.remove(itemStack.size() - 1);
                     startItem = "array";
+                    levelArray--;
                     break;
                 case END_OBJECT:
-                    obStack.get(obStack.size() - 1).finish();
-                    obStack.remove(obStack.size() - 1);
-                    spStack.remove(spStack.size() - 1);
-                    if (itemStack.size() == 1) {
-                        nested = true;
-                    } else if (checkItem == itemType.OBJECT) {
-                        obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1),
-                                abvsStack.get(abvsStack.size() - 1));
-                        abvsStack.remove(abvsStack.size() - 1);
-                    } else if (checkItem == itemType.ARRAY) {
-                        abStack.get(abStack.size() - 1).addItem(abvsStack.get(abvsStack.size() - 1));
-                        abvsStack.remove(abvsStack.size() - 1);
-                        nested = true;
+                    obStack.get(levelObject - 1).finish();
+                    if (itemStack.size() > 1) {
+                        if (checkItem == itemType.OBJECT) {
+                            obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
+                                    abvsStack.get(levelArray + levelObject));
+                        } else if (checkItem == itemType.ARRAY) {
+                            abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+                        }
                     }
                     itemStack.remove(itemStack.size() - 1);
                     startItem = "object";
+                    levelObject--;
                     break;
                 default:
                     break;
@@ -152,14 +156,15 @@ public class JSONParser {
             token = parser.nextToken();
         }
         if (startItem == "array" || startItem == "object") {
-            outResult.write(abvsStack.get(0).getByteArray());
+            outResult.write(abvsStack.get(1).getByteArray());
         } else {
-            outResult.write(atomic.getByteArray());
+            outResult.write(abvsStack.get(0).getByteArray());
         }
     }
 
-    public void atomicValues(int tag, JsonParser parser, DataOutput out, StringValueBuilder svb) throws IOException {
-        atomic.reset();
+    public void atomicValues(int tag, JsonParser parser, DataOutput out, StringValueBuilder svb, int levelArray,
+            int levelObject) throws IOException {
+        abvsStack.get(0).reset();
         out.write(tag);
         if (tag == ValueTag.XS_DOUBLE_TAG) {
             out.writeDouble(parser.getDoubleValue());
@@ -170,9 +175,9 @@ public class JSONParser {
         }
         if (itemStack.size() != 0) {
             if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
-                abStack.get(abStack.size() - 1).addItem(atomic);
+                abStack.get(levelArray - 1).addItem(abvsStack.get(0));
             } else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
-                obStack.get(obStack.size() - 1).addItem(spStack.get(spStack.size() - 1), atomic);
+                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
             }
         }
     }

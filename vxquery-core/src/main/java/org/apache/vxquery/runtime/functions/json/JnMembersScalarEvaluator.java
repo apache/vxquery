@@ -17,8 +17,6 @@
 package org.apache.vxquery.runtime.functions.json;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
@@ -39,7 +37,7 @@ public class JnMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarE
     private final SequencePointable sp1, sp2;
     private final ArrayBackedValueStorage abvs;
     private final SequenceBuilder sb;
-    private List<TaggedValuePointable> pointables;
+    private ArrayPointable ap;
 
     public JnMembersScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -48,14 +46,15 @@ public class JnMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarE
         sp2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         abvs = new ArrayBackedValueStorage();
         sb = new SequenceBuilder();
-        pointables = new ArrayList<>();
+        ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-
         TaggedValuePointable tvp = args[0];
-
+        TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        abvs.reset();
+        sb.reset(abvs);
         if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
             TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
             try {
@@ -64,7 +63,7 @@ public class JnMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarE
                 for (int i = 0; i < size1; i++) {
                     sp1.getEntry(i, tempTvp);
                     if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
-                        membersSequence(tempTvp, result);
+                        membersSequence(tempTvp, result, tvp1);
                     } else {
                         XDMConstants.setEmptySequence(result);
                     }
@@ -73,36 +72,30 @@ public class JnMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarE
                 ppool.giveBack(tempTvp);
             }
         } else if (tvp.getTag() == ValueTag.ARRAY_TAG) {
-            membersSequence(tvp, result);
+            membersSequence(tvp, result, tvp1);
         } else {
             XDMConstants.setEmptySequence(result);
-        }
-    }
-
-    public void membersSequence(TaggedValuePointable tvp, IPointable result) throws SystemException {
-        ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
-        tvp.getValue(ap);
-        tvp.getValue(sp2);
-        int size = sp2.getEntryCount();
-        for (int j = 0; j < size; j++) {
-            TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-            sp2.getEntry(j, tvp1);
-            pointables.add(tvp1);
-        }
-        abvs.reset();
-        sb.reset(abvs);
-        for (TaggedValuePointable tvp2 : pointables) {
-            try {
-                sb.addItem(tvp2);
-            } catch (IOException e) {
-                throw new SystemException(ErrorCode.SYSE0001, e);
-            }
         }
         try {
             sb.finish();
             result.set(abvs);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void membersSequence(TaggedValuePointable tvp, IPointable result, TaggedValuePointable tvp1)
+            throws SystemException {
+        tvp.getValue(ap);
+        tvp.getValue(sp2);
+        int size = sp2.getEntryCount();
+        for (int j = 0; j < size; j++) {
+            sp2.getEntry(j, tvp1);
+            try {
+                sb.addItem(tvp1);
+            } catch (IOException e) {
+                throw new SystemException(ErrorCode.SYSE0001, e);
+            }
         }
     }
 }

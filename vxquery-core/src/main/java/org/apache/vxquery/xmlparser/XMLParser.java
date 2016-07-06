@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class XMLParser {
+public class XMLParser implements IParser {
     final XMLReader parser;
     final SAXContentHandler handler;
     final InputSource in;

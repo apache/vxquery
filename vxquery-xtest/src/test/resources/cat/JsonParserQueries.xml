@@ -60,4 +60,9 @@
       <query name="q08_parser" date="2016-06-30"/>
       <output-file compare="Text">q08_parser.txt</output-file>
    </test-case>
+   <test-case name="json-parser-q09" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing nested objects and arrays from a json file.</description>
+      <query name="q09_parser" date="2016-07-05"/>
+      <output-file compare="Text">q09_parser.txt</output-file>
+   </test-case>
 </test-group>

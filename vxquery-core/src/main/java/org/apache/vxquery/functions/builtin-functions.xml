@@ -327,7 +327,7 @@
     <!-- jn:json-doc($uri as  xs:string?) as document-node()?  -->
     <function name="jn:json-doc">
         <param name="uri" type="xs:string?"/>
-        <return type="item()"/>
+        <return type="json-item()"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnDocScalarEvaluatorFactory"/>
     </function>
 
