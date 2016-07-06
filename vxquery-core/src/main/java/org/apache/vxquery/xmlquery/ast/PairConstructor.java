@@ -18,9 +18,11 @@ package org.apache.vxquery.xmlquery.ast;
 
 import org.apache.vxquery.util.SourceLocation;
 
-public class PairConstructor extends ASTNode{
+public class PairConstructor extends ASTNode {
     private ASTNode key;
     private ASTNode value;
+    private boolean qmc;
+
     public PairConstructor(SourceLocation loc) {
         super(loc);
     }
@@ -44,5 +46,13 @@ public class PairConstructor extends ASTNode{
 
     public void setValue(ASTNode value) {
         this.value = value;
+    }
+
+    public void setQuestionMarkColon(boolean qmc) {
+        this.qmc = qmc;
+    }
+
+    public boolean isQuestionMarkColon() {
+        return qmc;
     }
 }
