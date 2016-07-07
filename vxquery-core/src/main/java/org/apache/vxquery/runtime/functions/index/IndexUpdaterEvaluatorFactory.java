@@ -45,8 +45,8 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
         super(args);
     }
 
-    @Override
-    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws AlgebricksException {
+    @Override protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final TaggedValuePointable nodep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -60,8 +60,7 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
 
-            @Override
-            protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+            @Override protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 IndexUpdater updater = new IndexUpdater(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider,
                         abvsFileNode, nodep, nodeId);
                 try {

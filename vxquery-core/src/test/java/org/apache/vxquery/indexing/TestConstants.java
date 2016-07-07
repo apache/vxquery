@@ -33,7 +33,6 @@ public class TestConstants {
 
     public static String INDEX_DIR = "/tmp/index";
 
-
     private static ConcurrentHashMap<String, XmlMetadata> initialMetadataMap = new ConcurrentHashMap<>();
     private static ConcurrentHashMap<String, XmlMetadata> modifiedMetadataMap = new ConcurrentHashMap<>();
 
@@ -120,6 +119,5 @@ public class TestConstants {
     public static String getXMLMetadataString(XmlMetadata metadata) {
         return String.format("%s %s %s", metadata.getFileName(), metadata.getPath(), metadata.getMd5());
     }
-
 
 }

@@ -19,13 +19,13 @@ package org.apache.vxquery.runtime.functions.index.updateIndex;
 import java.io.Serializable;
 
 /**
- *Class to store metadata related to an XML file.
+ * Class to store metadata related to an XML file.
  * This contains
- *      - Path to the xml file
- *      - MD5 Checksum String
- *      - File name
+ * - Path to the xml file
+ * - MD5 Checksum String
+ * - File name
  */
-public class XmlMetadata implements Serializable{
+public class XmlMetadata implements Serializable {
 
     private String path;
     private String md5;

@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -47,6 +46,7 @@ public class MetaFileUtil {
 
     /**
      * Checks for existing metadata file.
+     *
      * @return true if the metadata file is present
      */
     public boolean isMetaFilePresent() {
@@ -61,7 +61,8 @@ public class MetaFileUtil {
      * @throws IOException
      */
     public void writeMetaFile(ConcurrentHashMap<String, XmlMetadata> metadataMap) throws IOException {
-        if (this.isMetaFilePresent()) Files.delete(Paths.get(metaFile.getCanonicalPath()));
+        if (this.isMetaFilePresent())
+            Files.delete(Paths.get(metaFile.getCanonicalPath()));
 
         FileOutputStream fileOutputStream = new FileOutputStream(this.metaFile);
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -70,9 +71,7 @@ public class MetaFileUtil {
 
         if (LOGGER.isDebugEnabled())
             LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
-
     }
-
 
     /**
      * Read metadata file
@@ -84,12 +83,11 @@ public class MetaFileUtil {
     public ConcurrentHashMap<String, XmlMetadata> readMetaFile() throws IOException, ClassNotFoundException {
         FileInputStream fin = new FileInputStream(this.metaFile);
         ObjectInputStream ois = new ObjectInputStream(fin);
-        ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>((Map<String, XmlMetadata>)ois
-                .readObject()) ;
+        ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>(
+                (Map<String, XmlMetadata>) ois.readObject());
         ois.close();
 
         return metadataMap;
-
     }
 
     /**
@@ -109,6 +107,7 @@ public class MetaFileUtil {
 
     /**
      * Delete the existing Metadata file.
+     *
      * @return True if deleted, false otherwise.
      */
     public boolean deleteMetaDataFile() {
@@ -121,5 +120,4 @@ public class MetaFileUtil {
             return false;
         }
     }
-
 }

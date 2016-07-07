@@ -90,8 +90,8 @@ public class MetaFileUtilTest {
         Assert.assertTrue(from.containsAll(initial));
 
         for (String key : initial) {
-            Assert.assertEquals(TestConstants.getXMLMetadataString(initialMap.get(key)), TestConstants
-                    .getXMLMetadataString(fromFile.get(key)));
+            Assert.assertEquals(TestConstants.getXMLMetadataString(initialMap.get(key)),
+                    TestConstants.getXMLMetadataString(fromFile.get(key)));
         }
 
     }
@@ -139,8 +139,8 @@ public class MetaFileUtilTest {
         Assert.assertTrue(from.containsAll(modified));
 
         for (String key : modified) {
-            Assert.assertEquals(TestConstants.getXMLMetadataString(modifiedMap.get(key)), TestConstants
-                    .getXMLMetadataString(fromFile.get(key)));
+            Assert.assertEquals(TestConstants.getXMLMetadataString(modifiedMap.get(key)),
+                    TestConstants.getXMLMetadataString(fromFile.get(key)));
         }
     }
 
@@ -157,6 +157,4 @@ public class MetaFileUtilTest {
     public static void tearDown() throws IOException {
         FileUtils.forceDelete(new File(TestConstants.INDEX_DIR));
     }
-
-
 }

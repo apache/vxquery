@@ -22,7 +22,9 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.lucene.index.*;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -73,9 +75,9 @@ public class IndexUpdater {
 
     //TODO : Implement for paralleizing
     public IndexUpdater(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
-                        ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
-                        ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode,
-                        TaggedValuePointable nodep,  String nodeId) {
+            ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
+            ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
+            String nodeId) {
         this.args = args;
         this.result = result;
         this.stringp = stringp;
@@ -92,6 +94,7 @@ public class IndexUpdater {
 
     /**
      * Perform the initial configuration for index update/ delete processes.
+     *
      * @throws SystemException
      * @throws IOException
      * @throws NoSuchAlgorithmException
@@ -134,6 +137,7 @@ public class IndexUpdater {
 
     /**
      * Wrapper for update index function.
+     *
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
@@ -152,6 +156,7 @@ public class IndexUpdater {
 
     /**
      * Close opened IndexWriter and terminate the index update/ delete process.
+     *
      * @throws IOException
      */
     public void exit() throws IOException {
@@ -165,6 +170,7 @@ public class IndexUpdater {
 
     /**
      * Functional wrapper to update Metadata file.
+     *
      * @throws IOException
      */
     public synchronized void updateMetadataFile() throws IOException {
@@ -205,8 +211,9 @@ public class IndexUpdater {
 
                         //Update index corresponding to the xml file.
                         indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, file.getCanonicalPath()));
-                        indexDocumentBuilder = IndexConstructorUtil.getIndexBuilder(file, indexWriter,
-                                nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
+                        indexDocumentBuilder = IndexConstructorUtil
+                                .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di,
+                                        nodeId);
                         indexDocumentBuilder.printStart();
 
                         if (LOGGER.isDebugEnabled())
@@ -221,8 +228,8 @@ public class IndexUpdater {
 
                     // In this case, the xml file has not added to the index. (It is a newly added file)
                     // Therefore generate a new index for this file and add it to the existing index.
-                    indexDocumentBuilder = IndexConstructorUtil.getIndexBuilder(file, indexWriter,
-                            nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
+                    indexDocumentBuilder = IndexConstructorUtil
+                            .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
                     indexDocumentBuilder.printStart();
 
                     if (LOGGER.isDebugEnabled())
@@ -237,11 +244,10 @@ public class IndexUpdater {
         }
     }
 
-
     /**
      * Update the current XmlMetadata object related to the currently reading XML file.
      *
-     * @param file : XML file
+     * @param file     : XML file
      * @param metadata : Existing metadata object
      * @return : XML metadata object with updated fields.
      * @throws IOException
@@ -290,11 +296,9 @@ public class IndexUpdater {
      * Delete all indexes in the given directory.
      * This will also remove the existing metadata file.
      * It will be created when recreating the index.
-     *
      * When deleting indexes, if any error occurred, the process will be rolled back and all the indexes will be
      * restored.
      * Otherwise the changes will be committed.
-     *
      */
     public void deleteAllIndexes() throws SystemException {
         try {
