@@ -42,6 +42,13 @@
         <revision>0.5</revision>
       </Version>
     </release>
+    <release>
+      <Version>
+        <name>Apache VXQuery</name>
+        <created>2015-05-26</created>
+        <revision>0.6</revision>
+      </Version>
+    </release>
     <repository>
       <GitRepository>
         <location rdf:resource="https://git-wip-us.apache.org/repos/asf/vxquery.git"/>
