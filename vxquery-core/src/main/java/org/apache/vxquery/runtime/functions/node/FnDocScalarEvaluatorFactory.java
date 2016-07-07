@@ -27,6 +27,7 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.xmlparser.IParser;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -78,7 +79,7 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 tvp.getValue(stringp);
                 try {
                     // Only one document should be parsed so its ok to have a unique parser.
-                    XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId);
+                    IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
                     FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);

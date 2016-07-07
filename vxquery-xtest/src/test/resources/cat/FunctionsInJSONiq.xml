@@ -71,4 +71,19 @@
         <query name="jn_keys2" date="2016-06-26"/>
         <output-file compare="Text">jn_keys2.txt</output-file>
     </test-case>
+    <test-case name="functions-in-jsoniq-jn_members" FilePath="Json/Functions/" Creator="Christina Pavlopoulou">
+        <description>Query for json array members</description>
+        <query name="jn_members1" date="2016-07-05"/>
+        <output-file compare="Text">jn_members1.txt</output-file>
+    </test-case>
+    <test-case name="functions-in-jsoniq-jn_members" FilePath="Json/Functions/" Creator="Christina Pavlopoulou">
+        <description>Query for json array members</description>
+        <query name="jn_members2" date="2016-07-05"/>
+        <output-file compare="Text">jn_members2.txt</output-file>
+    </test-case>
+    <test-case name="functions-in-jsoniq-jn_members" FilePath="Json/Functions/" Creator="Christina Pavlopoulou">
+        <description>Query for json array members</description>
+        <query name="jn_members3" date="2016-07-05"/>
+        <output-file compare="Text">jn_members3.txt</output-file>
+    </test-case>
 </test-group>

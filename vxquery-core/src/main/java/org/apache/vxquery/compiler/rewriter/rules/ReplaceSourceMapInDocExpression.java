@@ -102,6 +102,14 @@ public class ReplaceSourceMapInDocExpression implements IAlgebraicRewriteRule {
                     modified = true;
                 }
             }
+            docExpression = ExpressionToolbox.findFirstFunctionExpression(expression,
+                    BuiltinFunctions.JN_JSON_DOC_1.getFunctionIdentifier());
+            if (docExpression != null) {
+                AbstractFunctionCallExpression absFnCall = (AbstractFunctionCallExpression) docExpression.getValue();
+                if (updateDocExpression(opRef, absFnCall.getArguments().get(0), context)) {
+                    modified = true;
+                }
+            }
         }
         return modified;
     }
