@@ -20,7 +20,7 @@
 {
     "Sunday" : 1,
     "Monday" ?: 1 + 1,
-    "Tuesday" : 3 * 1,
+    "Tuesday" ?: (1,2,3),
     "Wednesday" : 8 div 2,
     "Thursday" : (),
     "Friday" : count(for $i in 1 to 6 return $i),

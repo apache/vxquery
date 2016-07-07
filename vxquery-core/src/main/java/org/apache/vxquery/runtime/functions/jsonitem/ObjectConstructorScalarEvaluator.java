@@ -91,10 +91,10 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
                     if (value.getTag() == ValueTag.SEQUENCE_TAG) {
                         qmc.getValue(bp);
                         value.getValue(seqp);
-                        if (bp.getBoolean()) {
-                            continue;
-                        }
                         if (seqp.getEntryCount() == 0) {
+                            if (bp.getBoolean()) {
+                                continue;
+                            }
                             XDMConstants.setJsNull(value);
                             ob.addItem(sp, value);
                         } else {
