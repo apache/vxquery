@@ -62,8 +62,6 @@ import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
 import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
 import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFactoryProvider;
 import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFamilyProvider;
@@ -217,7 +215,7 @@ public class XMLQueryCompiler {
     }
 
     public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel)
-            throws SystemException {
+            throws AlgebricksException {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
@@ -229,19 +227,11 @@ public class XMLQueryCompiler {
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);
         listener.notifyTypecheckResult(module);
-        try {
-            compiler.optimize();
-        } catch (AlgebricksException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        }
+        compiler.optimize();
         listener.notifyOptimizedResult(module);
         JobSpecification jobSpec;
-        try {
-            jobSpec = compiler.createJob(null, null);
-            jobSpec.setFrameSize(frameSize);
-        } catch (AlgebricksException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        }
+        jobSpec = compiler.createJob(null, null);
+        jobSpec.setFrameSize(frameSize);
         module.setHyracksJobSpecification(jobSpec);
         listener.notifyCodegenResult(module);
     }
@@ -255,7 +245,7 @@ public class XMLQueryCompiler {
     }
 
     private static List<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>> buildDefaultLogicalRewrites() {
-        List<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>> defaultLogicalRewrites = new ArrayList<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>>();
+        List<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>> defaultLogicalRewrites = new ArrayList<>();
         SequentialFixpointRuleController seqCtrlNoDfs = new SequentialFixpointRuleController(false);
         SequentialFixpointRuleController seqCtrlFullDfs = new SequentialFixpointRuleController(true);
         SequentialOnceRuleController seqOnceCtrl = new SequentialOnceRuleController(true);

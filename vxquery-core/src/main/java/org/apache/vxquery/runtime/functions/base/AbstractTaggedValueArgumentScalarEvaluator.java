@@ -30,7 +30,7 @@ public abstract class AbstractTaggedValueArgumentScalarEvaluator implements ISca
     private final IScalarEvaluator[] args;
 
     private final TaggedValuePointable[] tvps;
-    
+
     protected final PointablePool ppool = PointablePoolFactory.INSTANCE.createPointablePool();
 
     public AbstractTaggedValueArgumentScalarEvaluator(IScalarEvaluator[] args) {
@@ -46,11 +46,7 @@ public abstract class AbstractTaggedValueArgumentScalarEvaluator implements ISca
         for (int i = 0; i < args.length; ++i) {
             args[i].evaluate(tuple, tvps[i]);
         }
-        try {
-            evaluate(tvps, result);
-        } catch (SystemException e) {
-            throw new AlgebricksException(e);
-        }
+        evaluate(tvps, result);
     }
 
     protected abstract void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException;

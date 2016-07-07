@@ -46,11 +46,7 @@ public abstract class AbstractTaggedValueArgumentUnnestingEvaluator implements I
         for (int i = 0; i < args.length; ++i) {
             args[i].evaluate(tuple, tvps[i]);
         }
-        try {
-            init(tvps);
-        } catch (SystemException e) {
-            throw new AlgebricksException(e);
-        }
+        init(tvps);
     }
 
     protected abstract void init(TaggedValuePointable[] args) throws SystemException;

@@ -46,11 +46,7 @@ public abstract class AbstractTaggedValueArgumentAggregateEvaluator implements I
         for (int i = 0; i < args.length; ++i) {
             args[i].evaluate(tuple, tvps[i]);
         }
-        try {
-            step(tvps);
-        } catch (SystemException e) {
-            throw new AlgebricksException(e);
-        }
+        step(tvps);
     }
 
     protected abstract void step(TaggedValuePointable[] args) throws SystemException;
