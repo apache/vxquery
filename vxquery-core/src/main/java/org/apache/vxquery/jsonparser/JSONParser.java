@@ -31,6 +31,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.xmlparser.IParser;
 
@@ -44,8 +45,9 @@ public class JSONParser implements IParser {
     protected final List<ArrayBackedValueStorage> keyStack;
     protected final List<UTF8StringPointable> spStack;
     protected final StringValueBuilder svb;
+    protected final SequenceBuilder sb;
     protected final DataOutput out;
-    protected itemType checkItem, startItem;
+    protected itemType checkItem;
     protected int levelArray, levelObject;
 
     enum itemType {
@@ -65,20 +67,30 @@ public class JSONParser implements IParser {
         spStack = new ArrayList<UTF8StringPointable>();
         itemStack = new ArrayList<itemType>();
         svb = new StringValueBuilder();
+        sb = new SequenceBuilder();
         abvsStack.add(atomic);
         out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
 
     }
 
-    public void parseDocument(File file, ArrayBackedValueStorage result) throws HyracksDataException {
+    public void parseString(String input, ArrayBackedValueStorage result) throws HyracksDataException {
         try {
+            JsonParser parser = factory.createParser(input);
+            parse(parser, result);
+        } catch (Exception e) {
+            throw new HyracksDataException(e.toString());
+        }
+    }
+
+    public void parse(JsonParser parser, ArrayBackedValueStorage result) throws HyracksDataException {
+        try {
+
             DataOutput outResult = result.getDataOutput();
-            JsonParser parser = factory.createParser(file);
             JsonToken token = parser.nextToken();
             checkItem = null;
-            startItem = null;
             levelArray = 0;
             levelObject = 0;
+            sb.reset(result);
             while (token != null) {
                 if (itemStack.size() > 1) {
                     checkItem = itemStack.get(itemStack.size() - 2);
@@ -138,8 +150,10 @@ public class JSONParser implements IParser {
                             }
                         }
                         itemStack.remove(itemStack.size() - 1);
-                        startItem = itemType.ARRAY;
                         levelArray--;
+                        if (levelArray + levelObject == 0) {
+                            sb.addItem(abvsStack.get(1));
+                        }
                         break;
                     case END_OBJECT:
                         obStack.get(levelObject - 1).finish();
@@ -152,20 +166,27 @@ public class JSONParser implements IParser {
                             }
                         }
                         itemStack.remove(itemStack.size() - 1);
-                        startItem = itemType.OBJECT;
                         levelObject--;
+                        if (levelObject + levelArray == 0) {
+                            sb.addItem(abvsStack.get(1));
+                        }
                         break;
                     default:
                         break;
                 }
                 token = parser.nextToken();
             }
-            if (startItem == itemType.ARRAY || startItem == itemType.OBJECT) {
-                outResult.write(abvsStack.get(1).getByteArray());
-            } else {
-                //the atomic value is always set to be at the bottom of the arraybackedvaluestorage stack.
-                outResult.write(abvsStack.get(0).getByteArray());
-            }
+            sb.finish();
+            outResult.write(result.getByteArray());
+        } catch (Exception e) {
+            throw new HyracksDataException(e.toString());
+        }
+    }
+
+    public void parseDocument(File file, ArrayBackedValueStorage result) throws HyracksDataException {
+        try {
+            JsonParser parser = factory.createParser(file);
+            parse(parser, result);
         } catch (Exception e) {
             throw new HyracksDataException(e.toString());
         }

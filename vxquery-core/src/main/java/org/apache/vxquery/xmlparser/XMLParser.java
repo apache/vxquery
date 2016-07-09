@@ -165,4 +165,11 @@ public class XMLParser implements IParser {
             throw hde;
         }
     }
+
+    @Override
+    public void parseString(String input, ArrayBackedValueStorage abvs) throws HyracksDataException {
+        // TODO Auto-generated method stub
+
+    }
+
 }

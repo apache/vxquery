@@ -16,5 +16,6 @@
    under the License. :)
 
 (: Json Parser Query :)
-(: parse a file containing a string :)
-    jn:json-doc("string_json_file")
+(: parse a string with arrays :)
+let $x:="{&quot;foo&quot;:&quot;bar&quot;} {&quot;bar&quot;:&quot;foo&quot;} [1,2,3]"
+return jn:parse-json($x)

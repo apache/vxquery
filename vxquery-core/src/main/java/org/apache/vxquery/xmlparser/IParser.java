@@ -25,5 +25,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 public interface IParser {
     public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException;
 
+    public void parseString(String input, ArrayBackedValueStorage abvs) throws HyracksDataException;
+
     public void parseHDFSDocument(InputStream in, ArrayBackedValueStorage abvs) throws HyracksDataException;
 }

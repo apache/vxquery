@@ -331,10 +331,17 @@
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnDocScalarEvaluatorFactory"/>
     </function>
     
+    <!-- jn:parse-json($arg as  xs:string?) as json-item()*  -->
+    <function name="jn:parse-json">
+        <param name="arg" type="xs:string?"/>
+        <return type="json-item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnParseJsonScalarEvaluatorFactory"/>
+    </function>
+    
     <!-- jn:parse-json($arg as  xs:string?, $options as object()) as json-item()*  -->
     <function name="jn:parse-json">
         <param name="arg" type="xs:string?"/>
-        <param name="options" type="object()"/>
+        <param name="options" type="item()"/>
         <return type="json-item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnParseJsonScalarEvaluatorFactory"/>
     </function>
