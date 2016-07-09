@@ -25,21 +25,6 @@
       <query name="q01_parser" date="2016-06-28"/>
       <output-file compare="Text">q01_parser.txt</output-file>
    </test-case>
-   <test-case name="json-parser-q02" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
-      <description>Parsing atomic int from json file.</description>
-      <query name="q02_parser" date="2016-06-28"/>
-      <output-file compare="Text">q02_parser.txt</output-file>
-   </test-case>
-   <test-case name="json-parser-q03" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
-      <description>Parsing atomic double from a json file.</description>
-      <query name="q03_parser" date="2016-06-28"/>
-      <output-file compare="Text">q03_parser.txt</output-file>
-   </test-case>
-   <test-case name="json-parser-q04" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
-      <description>Parsing atomic string from a json file.</description>
-      <query name="q04_parser" date="2016-06-28"/>
-      <output-file compare="Text">q04_parser.txt</output-file>
-   </test-case>
    <test-case name="json-parser-q05" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
       <description>Parsing nested arrays from a json file.</description>
       <query name="q05_parser" date="2016-06-29"/>
@@ -64,5 +49,25 @@
       <description>Parsing nested objects and arrays from a json file.</description>
       <query name="q09_parser" date="2016-07-05"/>
       <output-file compare="Text">q09_parser.txt</output-file>
+   </test-case>
+   <test-case name="json-parser-q10" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing arrays and objects from a json string.</description>
+      <query name="q10_parser" date="2016-07-07"/>
+      <output-file compare="Text">q10_parser.txt</output-file>
+   </test-case>
+   <test-case name="json-parser-q11" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing arrays and objects from a json string.</description>
+      <query name="q11_parser" date="2016-07-09"/>
+      <output-file compare="Text">q11_parser.txt</output-file>
+   </test-case>
+   <test-case name="json-parser-q12" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing arrays and objects from a json string.</description>
+      <query name="q12_parser" date="2016-07-10"/>
+      <output-file compare="Text">q12_parser.txt</output-file>
+   </test-case>
+    <test-case name="json-parser-q13" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing arrays and objects from a json string.</description>
+      <query name="q13_parser" date="2016-07-12"/>
+      <expected-error>JNDY0021</expected-error>
    </test-case>
 </test-group>

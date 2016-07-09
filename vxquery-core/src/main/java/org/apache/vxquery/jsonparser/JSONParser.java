@@ -15,9 +15,8 @@
 package org.apache.vxquery.jsonparser;
 
 import java.io.DataOutput;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +30,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.xmlparser.IParser;
 
@@ -44,8 +44,9 @@ public class JSONParser implements IParser {
     protected final List<ArrayBackedValueStorage> keyStack;
     protected final List<UTF8StringPointable> spStack;
     protected final StringValueBuilder svb;
+    protected final SequenceBuilder sb;
     protected final DataOutput out;
-    protected itemType checkItem, startItem;
+    protected itemType checkItem;
     protected int levelArray, levelObject;
 
     enum itemType {
@@ -65,20 +66,23 @@ public class JSONParser implements IParser {
         spStack = new ArrayList<UTF8StringPointable>();
         itemStack = new ArrayList<itemType>();
         svb = new StringValueBuilder();
+        sb = new SequenceBuilder();
         abvsStack.add(atomic);
         out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
 
     }
 
-    public void parseDocument(File file, ArrayBackedValueStorage result) throws HyracksDataException {
+    public int parse(Reader input, ArrayBackedValueStorage result) throws HyracksDataException {
+        int items = 0;
         try {
             DataOutput outResult = result.getDataOutput();
-            JsonParser parser = factory.createParser(file);
+            JsonParser parser = factory.createParser(input);
             JsonToken token = parser.nextToken();
             checkItem = null;
-            startItem = null;
+
             levelArray = 0;
             levelObject = 0;
+            sb.reset(result);
             while (token != null) {
                 if (itemStack.size() > 1) {
                     checkItem = itemStack.get(itemStack.size() - 2);
@@ -138,8 +142,11 @@ public class JSONParser implements IParser {
                             }
                         }
                         itemStack.remove(itemStack.size() - 1);
-                        startItem = itemType.ARRAY;
                         levelArray--;
+                        if (levelArray + levelObject == 0) {
+                            sb.addItem(abvsStack.get(1));
+                            items++;
+                        }
                         break;
                     case END_OBJECT:
                         obStack.get(levelObject - 1).finish();
@@ -152,23 +159,23 @@ public class JSONParser implements IParser {
                             }
                         }
                         itemStack.remove(itemStack.size() - 1);
-                        startItem = itemType.OBJECT;
                         levelObject--;
+                        if (levelObject + levelArray == 0) {
+                            sb.addItem(abvsStack.get(1));
+                            items++;
+                        }
                         break;
                     default:
                         break;
                 }
                 token = parser.nextToken();
             }
-            if (startItem == itemType.ARRAY || startItem == itemType.OBJECT) {
-                outResult.write(abvsStack.get(1).getByteArray());
-            } else {
-                //the atomic value is always set to be at the bottom of the arraybackedvaluestorage stack.
-                outResult.write(abvsStack.get(0).getByteArray());
-            }
+            sb.finish();
+            outResult.write(result.getByteArray());
         } catch (Exception e) {
             throw new HyracksDataException(e.toString());
         }
+        return items;
     }
 
     public void atomicValues(int tag, JsonParser parser, DataOutput out, StringValueBuilder svb, int levelArray,
@@ -189,10 +196,5 @@ public class JSONParser implements IParser {
                 obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
             }
         }
-    }
-
-    @Override
-    public void parseHDFSDocument(InputStream in, ArrayBackedValueStorage abvs) throws HyracksDataException {
-
     }
 }

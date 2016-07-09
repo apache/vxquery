@@ -16,5 +16,7 @@
    under the License. :)
 
 (: Json Parser Query :)
-(: parse a file containing a double :)
-    jn:json-doc("double_json_file")
+(: parse a string with arrays :)
+let $x:="{&quot;foo&quot;:&quot;bar&quot;}"
+let $y:={"jsoniq-multiple-top-level-items":xs:boolean("false")}
+return jn:parse-json($x,$y)
