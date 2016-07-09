@@ -2013,17 +2013,27 @@ ASTNode ObjectConstructor() :
     ASTNode pc;
 }
 {
-    t = <LbraceExprEnclosure>
     (
-        pc = PairConstructor() {
-            content.add(pc);
-        } (
-            "," pc = PairConstructor() {
-                content.add(pc);
-            }
-        )*
-    )*
-    <Rbrace>
+        (
+            t = <LbraceExprEnclosure>
+            (
+                pc = PairConstructor() {
+                    content.add(pc);
+                } (
+                    "," pc = PairConstructor() {
+                        content.add(pc);
+                    }
+                )*
+            )*
+            <Rbrace>
+        )
+        | (
+                t = "{|" pc = Expr() "|}"
+                {
+                    content.add(pc);
+                }
+        )
+    )
     {
         ObjectConstructor obj = new ObjectConstructor(createSourceLocation(t));
         obj.setContent(content);

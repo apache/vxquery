@@ -882,6 +882,13 @@
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.jsonitem.ObjectConstructorScalarEvaluatorFactory"/>
     </operator>
 
+    <!-- opext:simple-object-union($expression as object()*) as object() -->
+    <operator name="opext:simple-object-union">
+        <param name="expression" type="object()*"/>
+        <return type="object()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.jsonitem.SimpleObjectUnionScalarEvaluatorFactory"/>
+    </operator>
+
     <!-- opext:if-then-else($condition as xs:boolean, $then as item()*, $else as item()*) as item()* -->
     <operator name="opext:if-then-else">
         <param name="condition" type="xs:boolean"/>
