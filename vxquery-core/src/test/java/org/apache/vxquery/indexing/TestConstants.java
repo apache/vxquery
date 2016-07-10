@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * TestConstants and methods which will be used in indexing test cases.
  */
 public class TestConstants {
-    public static String INITIAL_MD5 = "16E867C6F082E04D04FB2EF7831647AD";
-    public static String CHANGED_MD5 = "49329F554B2F8A81D8F79D2EC4BC3A98";
+    public static String INITIAL_MD5 = "F62EE4BBBBE37183E5F50BB1A0B4FFB4";
+    public static String CHANGED_MD5 = "98B31970B863E86AB2D7852B346FF234";
 
     public static String COLLECTION = "src/test/resources/collection/";
     public static String XML_FILE = "/tmp/index/catalog.xml";

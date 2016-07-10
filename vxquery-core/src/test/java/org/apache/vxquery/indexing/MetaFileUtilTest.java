@@ -59,7 +59,7 @@ public class MetaFileUtilTest {
      */
     @Test
     public void step1_testGenerateMD5ForXML() throws IOException, NoSuchAlgorithmException {
-        TestConstants.createXML("catalog.txt");
+        TestConstants.createXML("catalog.xml");
         File xml = new File(TestConstants.XML_FILE);
         String md5 = metaFileUtil.generateMD5(xml);
 
@@ -100,7 +100,7 @@ public class MetaFileUtilTest {
      */
     @Test
     public void step4_testDetectFileChanges() throws IOException, NoSuchAlgorithmException {
-        TestConstants.createXML("catalog_edited.txt");
+        TestConstants.createXML("catalog_edited.xml");
         File xml = new File(TestConstants.XML_FILE);
         Assert.assertTrue(metaFileUtil.generateMD5(xml).equals(TestConstants.CHANGED_MD5));
     }

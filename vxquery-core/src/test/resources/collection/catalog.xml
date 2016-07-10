@@ -15,29 +15,29 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<CATALOG>
-    <CD>
-        <TITLE>Empire Burlesque</TITLE>
-        <ARTIST>Bob Dylan</ARTIST>
-        <COUNTRY>USA</COUNTRY>
-        <COMPANY>Columbia</COMPANY>
-        <PRICE>10.90</PRICE>
-        <YEAR>1985</YEAR>
-    </CD>
-    <CD>
-        <TITLE>Hide your heart</TITLE>
-        <ARTIST>Bonnie Tyler</ARTIST>
-        <COUNTRY>UK</COUNTRY>
-        <COMPANY>CBS Records</COMPANY>
-        <PRICE>10.90</PRICE>
-        <YEAR>1988</YEAR>
-    </CD>
-    <CD>
-        <TITLE>Greatest Hits</TITLE>
-        <ARTIST>Dolly Parton</ARTIST>
-        <COUNTRY>USA</COUNTRY>
-        <COMPANY>RCA</COMPANY>
-        <PRICE>10.90</PRICE>
-        <YEAR>1982</YEAR>
-    </CD>
-</CATALOG>
+<catalog>
+    <book id="bk001">
+        <author>Hightower, Kim</author>
+        <title>The First Book</title>
+        <genre>Fiction</genre>
+        <price>44.95</price>
+        <pub_date>2000-10-01</pub_date>
+        <review>An amazing story of nothing.</review>
+    </book>
+
+    <book id="bk002">
+        <author>Oberg, Bruce</author>
+        <title>The Poet's First Poem</title>
+        <genre>Poem</genre>
+        <price>24.95</price>
+        <review>The least poetic poems of the decade.</review>
+    </book>
+
+    <book id="bk003">
+        <author>Nagata, Suanne</author>
+        <title>Becoming Somebody</title>
+        <genre>Biography</genre>
+        <review>A masterpiece of the fine art of gossiping.</review>
+    </book>
+
+</catalog>
