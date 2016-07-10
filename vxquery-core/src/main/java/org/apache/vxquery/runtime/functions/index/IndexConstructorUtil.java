@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -139,6 +140,8 @@ public class IndexConstructorUtil {
             SequenceBuilder sb, ByteBufferInputStream bbis, DataInputStream di, String nodeId)
             throws SystemException, IOException {
 
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy, HH:mm:ss");
+
         for (File file : collectionDirectory.listFiles()) {
 
             if (readableXmlFile(file.getPath())) {
@@ -148,11 +151,11 @@ public class IndexConstructorUtil {
                         di, nodeId);
 
                 ibuilder.printStart();
-
                 if (!isMetaFilePresent) {
                     XmlMetadata xmlMetadata = new XmlMetadata();
                     xmlMetadata.setPath(file.getCanonicalPath());
                     xmlMetadata.setFileName(file.getName());
+                    xmlMetadata.setLastModified(sdf.format(file.lastModified()));
                     try {
                         xmlMetadata.setMd5(metaFileUtil.generateMD5(file));
                     } catch (NoSuchAlgorithmException e) {

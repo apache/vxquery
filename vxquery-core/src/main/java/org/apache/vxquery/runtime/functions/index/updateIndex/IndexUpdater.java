@@ -45,6 +45,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -73,6 +74,7 @@ public class IndexUpdater {
     private XmlMetadata collectionMetadata;
     private String indexFolder;
     private Logger LOGGER = Logger.getLogger("Index Updater");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     //TODO : Implement for paralleizing
     public IndexUpdater(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
@@ -121,7 +123,7 @@ public class IndexUpdater {
 
             // Retrieve the collection folder path.
             // Remove the entry for ease of the next steps.
-            collectionMetadata = metadataMap.remove(Constants.COLLECTION_ENTRY);
+            collectionMetadata = metadataMap.get(Constants.COLLECTION_ENTRY);
             collectionFolder = collectionMetadata.getPath();
 
         } catch (IOException | ClassNotFoundException e) {
@@ -264,6 +266,7 @@ public class IndexUpdater {
         metadata.setPath(file.getCanonicalPath());
         metadata.setFileName(file.getName());
         metadata.setMd5(metaFileUtil.generateMD5(file));
+        metadata.setLastModified(sdf.format(file.lastModified()));
         return metadata;
     }
 

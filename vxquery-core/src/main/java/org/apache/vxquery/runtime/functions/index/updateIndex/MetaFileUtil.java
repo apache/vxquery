@@ -101,7 +101,12 @@ public class MetaFileUtil {
         ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
 
         for (XmlMetadata xmlMetadata : metadata) {
-            metadataMap.put(xmlMetadata.getPath(), xmlMetadata);
+            if (xmlMetadata.getFileName() == null) {
+                metadataMap.put(Constants.COLLECTION_ENTRY, xmlMetadata);
+            }
+            else {
+                metadataMap.put(xmlMetadata.getPath(), xmlMetadata);
+            }
         }
         return metadataMap;
     }

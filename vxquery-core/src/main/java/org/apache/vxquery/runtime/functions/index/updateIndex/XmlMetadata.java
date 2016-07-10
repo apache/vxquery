@@ -27,6 +27,7 @@ import java.io.Serializable;
  * - Path to the xml file
  * - MD5 Checksum String
  * - File name
+ * - LastModified date
  */
 @XmlRootElement(name = "index")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -35,6 +36,7 @@ public class XmlMetadata implements Serializable {
     private String path;
     private String md5;
     private String fileName;
+    private String lastModified;
 
     public String getPath() {
         return path;
@@ -58,5 +60,13 @@ public class XmlMetadata implements Serializable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
     }
 }
