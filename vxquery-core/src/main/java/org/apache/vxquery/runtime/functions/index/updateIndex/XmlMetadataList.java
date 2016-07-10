@@ -6,6 +6,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
+/**
+ * Class for holding the list of XML metadata objects.
+ * This class will be written to an xml file.
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "indexes")
 public class XmlMetadataList {
