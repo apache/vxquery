@@ -39,6 +39,7 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 
+import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class IndexConstructorUtil {
     public static void evaluate(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
             ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
-            boolean isElementPath, String nodeId) throws SystemException {
+            boolean isElementPath, String nodeId) throws SystemException, JAXBException {
         String collectionFolder;
         String indexFolder;
         TaggedValuePointable collectionTVP = args[0];

@@ -24,6 +24,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -70,7 +71,7 @@ public class MetaFileUtilTest {
      * Test the creation of metadata file.
      */
     @Test
-    public void step2_testCreateMetaDataFile() throws IOException {
+    public void step2_testCreateMetaDataFile() throws IOException, JAXBException {
         ConcurrentHashMap<String, XmlMetadata> initialMap = TestConstants.getInitialMap();
         metaFileUtil.writeMetaFile(initialMap);
         Assert.assertEquals(true, metaFileUtil.isMetaFilePresent());
@@ -80,7 +81,7 @@ public class MetaFileUtilTest {
      * Validate the content of the file.
      */
     @Test
-    public void step3_testValidateMetadataFile() throws IOException, ClassNotFoundException {
+    public void step3_testValidateMetadataFile() throws IOException, ClassNotFoundException, JAXBException {
         ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.readMetaFile();
         Set<String> from = fromFile.keySet();
         Set<String> initial = initialMap.keySet();
@@ -110,7 +111,8 @@ public class MetaFileUtilTest {
      * Test the update metadata file process.
      */
     @Test
-    public void step5_testUpdateMetadata() throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    public void step5_testUpdateMetadata()
+            throws IOException, ClassNotFoundException, NoSuchAlgorithmException, JAXBException {
         ConcurrentHashMap<String, XmlMetadata> fromFileMap = metaFileUtil.readMetaFile();
         XmlMetadata modified = fromFileMap.get(TestConstants.XML_FILE);
 
@@ -129,7 +131,7 @@ public class MetaFileUtilTest {
      * Validate the updated metadata.
      */
     @Test
-    public void step6_testVerifyMetadataChange() throws IOException, ClassNotFoundException {
+    public void step6_testVerifyMetadataChange() throws IOException, ClassNotFoundException, JAXBException {
         ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.readMetaFile();
         Set<String> from = fromFile.keySet();
         Set<String> modified = modifiedMap.keySet();

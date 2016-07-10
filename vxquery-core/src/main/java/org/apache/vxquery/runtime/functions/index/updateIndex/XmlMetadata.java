@@ -16,6 +16,9 @@
 */
 package org.apache.vxquery.runtime.functions.index.updateIndex;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
@@ -25,6 +28,8 @@ import java.io.Serializable;
  * - MD5 Checksum String
  * - File name
  */
+@XmlRootElement(name = "index")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class XmlMetadata implements Serializable {
 
     private String path;

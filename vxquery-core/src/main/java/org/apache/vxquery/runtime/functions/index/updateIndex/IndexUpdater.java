@@ -37,6 +37,7 @@ import org.apache.vxquery.runtime.functions.index.CaseSensitiveAnalyzer;
 import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 
+import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -99,7 +100,7 @@ public class IndexUpdater {
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
-    public void setup() throws SystemException, IOException, NoSuchAlgorithmException {
+    public void setup() throws SystemException, IOException, NoSuchAlgorithmException, JAXBException {
 
         TaggedValuePointable indexTVP = args[0];
 
@@ -173,7 +174,7 @@ public class IndexUpdater {
      *
      * @throws IOException
      */
-    public synchronized void updateMetadataFile() throws IOException {
+    public synchronized void updateMetadataFile() throws IOException, JAXBException {
         // Add collection path entry back
         metadataMap.put(Constants.COLLECTION_ENTRY, collectionMetadata);
 

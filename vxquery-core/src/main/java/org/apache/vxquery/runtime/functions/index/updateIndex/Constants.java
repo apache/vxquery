@@ -21,6 +21,6 @@ package org.apache.vxquery.runtime.functions.index.updateIndex;
  */
 public class Constants {
     public static String FIELD_PATH = "path";
-    public static String META_FILE_NAME = "metaFile.file";
+    public static String META_FILE_NAME = "vxquery_index.xml";
     public static String COLLECTION_ENTRY = "collection";
 }

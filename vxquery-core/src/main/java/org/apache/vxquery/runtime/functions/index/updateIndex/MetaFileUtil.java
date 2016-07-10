@@ -19,12 +19,14 @@ package org.apache.vxquery.runtime.functions.index.updateIndex;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,14 +62,22 @@ public class MetaFileUtil {
      * @param metadataMap : Set of XmlMetaData objects
      * @throws IOException
      */
-    public void writeMetaFile(ConcurrentHashMap<String, XmlMetadata> metadataMap) throws IOException {
+    public void writeMetaFile(ConcurrentHashMap<String, XmlMetadata> metadataMap) throws IOException, JAXBException {
         if (this.isMetaFilePresent())
             Files.delete(Paths.get(metaFile.getCanonicalPath()));
 
+        List<XmlMetadata> metaDataList = new ArrayList<>();
+        metaDataList.addAll(metadataMap.values());
+
+        XmlMetadataList list = new XmlMetadataList();
+        list.setMetadataList(metaDataList);
+
         FileOutputStream fileOutputStream = new FileOutputStream(this.metaFile);
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(metadataMap);
-        objectOutputStream.close();
+        JAXBContext jaxbContext = JAXBContext.newInstance(XmlMetadataList.class);
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        jaxbMarshaller.marshal(list, fileOutputStream);
+        jaxbMarshaller.marshal(list, System.out);
 
         if (LOGGER.isDebugEnabled())
             LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
@@ -80,13 +90,19 @@ public class MetaFileUtil {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public ConcurrentHashMap<String, XmlMetadata> readMetaFile() throws IOException, ClassNotFoundException {
-        FileInputStream fin = new FileInputStream(this.metaFile);
-        ObjectInputStream ois = new ObjectInputStream(fin);
-        ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>(
-                (Map<String, XmlMetadata>) ois.readObject());
-        ois.close();
+    public ConcurrentHashMap<String, XmlMetadata> readMetaFile()
+            throws IOException, ClassNotFoundException, JAXBException {
 
+        JAXBContext jaxbContext = JAXBContext.newInstance(XmlMetadataList.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        XmlMetadataList metadataList = (XmlMetadataList) jaxbUnmarshaller.unmarshal(metaFile);
+
+        List<XmlMetadata> metadata = metadataList.getMetadataList();
+        ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
+
+        for (XmlMetadata xmlMetadata : metadata) {
+            metadataMap.put(xmlMetadata.getPath(), xmlMetadata);
+        }
         return metadataMap;
     }
 
