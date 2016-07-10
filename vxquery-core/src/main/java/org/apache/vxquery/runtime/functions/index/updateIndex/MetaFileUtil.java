@@ -78,7 +78,6 @@ public class MetaFileUtil {
         Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
         jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         jaxbMarshaller.marshal(list, fileOutputStream);
-        jaxbMarshaller.marshal(list, System.out);
 
         if (LOGGER.isDebugEnabled())
             LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
@@ -130,10 +129,14 @@ public class MetaFileUtil {
     public boolean deleteMetaDataFile() {
         try {
             Files.delete(Paths.get(metaFile.getCanonicalPath()));
-            LOGGER.log(Level.DEBUG, "Metadata file deleted!");
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.log(Level.DEBUG, "Metadata file deleted!");
+            }
             return true;
         } catch (IOException e) {
-            LOGGER.log(Level.ERROR, "Metadata file could not be deleted!");
+            if (LOGGER.isTraceEnabled()){
+                LOGGER.log(Level.ERROR, "Metadata file could not be deleted!");
+            }
             return false;
         }
     }

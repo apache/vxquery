@@ -86,8 +86,6 @@ public class MetaFileUtilTest {
         Set<String> from = fromFile.keySet();
         Set<String> initial = initialMap.keySet();
 
-        System.out.println();
-
         Assert.assertTrue(from.containsAll(initial));
 
         for (String key : initial) {
@@ -135,8 +133,6 @@ public class MetaFileUtilTest {
         ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.readMetaFile();
         Set<String> from = fromFile.keySet();
         Set<String> modified = modifiedMap.keySet();
-
-        System.out.println();
 
         Assert.assertTrue(from.containsAll(modified));
 

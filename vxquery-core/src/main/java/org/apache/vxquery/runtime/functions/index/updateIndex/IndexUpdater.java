@@ -217,8 +217,9 @@ public class IndexUpdater {
                                         nodeId);
                         indexDocumentBuilder.printStart();
 
-                        if (LOGGER.isDebugEnabled())
+                        if (LOGGER.isDebugEnabled()) {
                             LOGGER.log(Level.DEBUG, "New Index is created for updated file " + file.getCanonicalPath());
+                        }
 
                         //Update the metadata map.
                         XmlMetadata metadata = updateEntry(file, data);
@@ -233,8 +234,9 @@ public class IndexUpdater {
                             .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
                     indexDocumentBuilder.printStart();
 
-                    if (LOGGER.isDebugEnabled())
+                    if (LOGGER.isDebugEnabled()) {
                         LOGGER.log(Level.DEBUG, "New Index is created for newly added file " + file.getCanonicalPath());
+                    }
 
                     XmlMetadata metadata = updateEntry(file, null);
                     metadataMap.put(file.getCanonicalPath(), metadata);
@@ -287,8 +289,9 @@ public class IndexUpdater {
             for (String s : sfm) {
                 metadataMap.remove(s);
                 indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, s));
-                if (LOGGER.isDebugEnabled())
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.log(Level.DEBUG, "Index of the deleted file " + s + " was deleted from the index!");
+                }
             }
         }
     }
