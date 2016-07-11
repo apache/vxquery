@@ -25,6 +25,7 @@ import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class SimpleObjectUnionScalarEvaluator extends ObjectConstructorScalarEva
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new SystemException(ErrorCode.SYSE0001, e);
             } finally {
                 ppool.giveBack(tempKey);
                 ppool.giveBack(tempTvp);

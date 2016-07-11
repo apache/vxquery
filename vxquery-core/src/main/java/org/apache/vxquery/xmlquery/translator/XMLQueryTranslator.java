@@ -1206,14 +1206,16 @@ public class XMLQueryTranslator {
     private LogicalVariable translateObjectConstructor(TranslationContext tCtx, ObjectConstructor obj)
             throws SystemException {
         List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
+        PairConstructor pc;
         for (ASTNode aVal : obj.getContent()) {
-            if (aVal instanceof PairConstructor) {
-                ILogicalExpression ke = string(data(vre(translateExpression(((PairConstructor) aVal).getKey(), tCtx))));
+            if (aVal.getTag()==ASTTag.PAIR_CONSTRUCTOR) {
+                pc=(PairConstructor) aVal;
+                ILogicalExpression ke = string(data(vre(translateExpression(pc.getKey(), tCtx))));
                 content.add(ke);
-                ILogicalExpression ve = vre(translateExpression(((PairConstructor) aVal).getValue(), tCtx));
+                ILogicalExpression ve = vre(translateExpression(pc.getValue(), tCtx));
                 content.add(ve);
                 ILogicalExpression qmce = ce(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE),
-                        ((PairConstructor) aVal).isQuestionMarkColon());
+                        pc.isQuestionMarkColon());
                 content.add(qmce);
             } else {
                 ILogicalExpression aExpr = aVal == null ? sfce(BuiltinOperators.CONCATENATE)
