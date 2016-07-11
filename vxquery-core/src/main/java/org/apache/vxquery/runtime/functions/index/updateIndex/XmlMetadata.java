@@ -27,7 +27,7 @@ import java.io.Serializable;
  * - Path to the xml file
  * - MD5 Checksum String
  * - File name
- * - LastModified date
+ * - Last modified date
  */
 @XmlRootElement(name = "index")
 @XmlAccessorType(XmlAccessType.FIELD)
