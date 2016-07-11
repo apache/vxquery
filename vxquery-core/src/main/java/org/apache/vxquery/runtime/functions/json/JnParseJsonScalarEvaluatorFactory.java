@@ -16,9 +16,12 @@
  */
 package org.apache.vxquery.runtime.functions.json;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -69,6 +72,7 @@ public class JnParseJsonScalarEvaluatorFactory extends AbstractTaggedValueArgume
                 tvp.getValue(stringp);
                 if (args.length == 1) {
                     callParser(result);
+                    result.set(abvs);
                 }
                 if (args.length > 1) {
                     TaggedValuePointable tvp1 = args[1];
@@ -82,28 +86,38 @@ public class JnParseJsonScalarEvaluatorFactory extends AbstractTaggedValueArgume
                         tvp1.getValue(stringp2);
                         op.getValue(stringp2, tempTvp);
                     } catch (IOException e1) {
-                        e1.printStackTrace();
+                        throw new SystemException(ErrorCode.SYSE0001, e1);
                     }
                     if (tempTvp.getTag() != ValueTag.XS_BOOLEAN_TAG) {
-                        throw new SystemException(ErrorCode.FORG0006);
+                        throw new SystemException(ErrorCode.JNTY0020);
                     }
                     tempTvp.getValue(bp);
                     if (bp.getBoolean() == true) {
                         callParser(result);
+                        result.set(abvs);
+                    } else {
+                        int items = callParser(result);
+                        if (items > 1) {
+                            throw new SystemException(ErrorCode.JNDY0021);
+                        } else {
+                            result.set(abvs);
+                        }
                     }
                     ppool.giveBack(tempTvp);
                 }
             }
 
-            public void callParser(IPointable result) throws SystemException {
+            public int callParser(IPointable result) throws SystemException {
+                int items = 0;
                 try {
                     IParser parser = new JSONParser();
                     String input = FunctionHelper.getStringFromPointable(stringp, bbis, di);
-                    parser.parseString(input, abvs);
+                    InputStreamReader isr = new InputStreamReader(IOUtils.toInputStream(input));
+                    items = parser.parse(new BufferedReader(isr), abvs);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.FODC0002, e);
                 }
-                result.set(abvs);
+                return items;
             }
 
         };

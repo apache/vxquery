@@ -16,16 +16,12 @@
  */
 package org.apache.vxquery.xmlparser;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public interface IParser {
-    public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException;
+    public int parse(Reader input, ArrayBackedValueStorage abvs) throws HyracksDataException;
 
-    public void parseString(String input, ArrayBackedValueStorage abvs) throws HyracksDataException;
-
-    public void parseHDFSDocument(InputStream in, ArrayBackedValueStorage abvs) throws HyracksDataException;
 }

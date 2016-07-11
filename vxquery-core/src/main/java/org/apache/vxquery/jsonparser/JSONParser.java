@@ -15,9 +15,8 @@
 package org.apache.vxquery.jsonparser;
 
 import java.io.DataOutput;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,21 +72,34 @@ public class JSONParser implements IParser {
 
     }
 
-    public void parseString(String input, ArrayBackedValueStorage result) throws HyracksDataException {
-        try {
-            JsonParser parser = factory.createParser(input);
-            parse(parser, result);
-        } catch (Exception e) {
-            throw new HyracksDataException(e.toString());
+    public void atomicValues(int tag, JsonParser parser, DataOutput out, StringValueBuilder svb, int levelArray,
+            int levelObject) throws IOException {
+        abvsStack.get(0).reset();
+        out.write(tag);
+        if (tag == ValueTag.XS_DOUBLE_TAG) {
+            out.writeDouble(parser.getDoubleValue());
+        } else if (tag == ValueTag.XS_STRING_TAG) {
+            svb.write(parser.getText(), out);
+        } else if (tag == ValueTag.XS_INTEGER_TAG) {
+            out.writeLong(parser.getLongValue());
+        }
+        if (itemStack.size() != 0) {
+            if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
+                abStack.get(levelArray - 1).addItem(abvsStack.get(0));
+            } else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
+                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
+            }
         }
     }
 
-    public void parse(JsonParser parser, ArrayBackedValueStorage result) throws HyracksDataException {
+    public int parse(Reader input, ArrayBackedValueStorage result) throws HyracksDataException {
+        int items = 0;
         try {
-
             DataOutput outResult = result.getDataOutput();
+            JsonParser parser = factory.createParser(input);
             JsonToken token = parser.nextToken();
             checkItem = null;
+
             levelArray = 0;
             levelObject = 0;
             sb.reset(result);
@@ -153,6 +165,7 @@ public class JSONParser implements IParser {
                         levelArray--;
                         if (levelArray + levelObject == 0) {
                             sb.addItem(abvsStack.get(1));
+                            items++;
                         }
                         break;
                     case END_OBJECT:
@@ -169,6 +182,7 @@ public class JSONParser implements IParser {
                         levelObject--;
                         if (levelObject + levelArray == 0) {
                             sb.addItem(abvsStack.get(1));
+                            items++;
                         }
                         break;
                     default:
@@ -181,39 +195,7 @@ public class JSONParser implements IParser {
         } catch (Exception e) {
             throw new HyracksDataException(e.toString());
         }
+        return items;
     }
 
-    public void parseDocument(File file, ArrayBackedValueStorage result) throws HyracksDataException {
-        try {
-            JsonParser parser = factory.createParser(file);
-            parse(parser, result);
-        } catch (Exception e) {
-            throw new HyracksDataException(e.toString());
-        }
-    }
-
-    public void atomicValues(int tag, JsonParser parser, DataOutput out, StringValueBuilder svb, int levelArray,
-            int levelObject) throws IOException {
-        abvsStack.get(0).reset();
-        out.write(tag);
-        if (tag == ValueTag.XS_DOUBLE_TAG) {
-            out.writeDouble(parser.getDoubleValue());
-        } else if (tag == ValueTag.XS_STRING_TAG) {
-            svb.write(parser.getText(), out);
-        } else if (tag == ValueTag.XS_INTEGER_TAG) {
-            out.writeLong(parser.getLongValue());
-        }
-        if (itemStack.size() != 0) {
-            if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
-                abStack.get(levelArray - 1).addItem(abvsStack.get(0));
-            } else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
-                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
-            }
-        }
-    }
-
-    @Override
-    public void parseHDFSDocument(InputStream in, ArrayBackedValueStorage abvs) throws HyracksDataException {
-
-    }
 }
