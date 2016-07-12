@@ -73,31 +73,18 @@ public class XMLParser implements IParser {
         }
     }
 
-    public void parseDocument(File file, ArrayBackedValueStorage abvs) throws HyracksDataException {
+    public int parse(Reader input, ArrayBackedValueStorage abvs) throws HyracksDataException {
         try {
-            Reader input;
-            if (bufferSize > 0) {
-                input = new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize);
-            } else {
-                input = new InputStreamReader(new FileInputStream(file));
-            }
             in.setCharacterStream(input);
             parser.parse(in);
             handler.writeDocument(abvs);
             input.close();
-        } catch (FileNotFoundException e) {
-            HyracksDataException hde = new VXQueryFileNotFoundException(e, file);
-            hde.setNodeId(nodeId);
-            throw hde;
-        } catch (SAXException e) {
-            HyracksDataException hde = new VXQueryParseException(e, file);
-            hde.setNodeId(nodeId);
-            throw hde;
-        } catch (IOException e) {
+        } catch (Exception e) {
             HyracksDataException hde = new HyracksDataException(e);
             hde.setNodeId(nodeId);
             throw hde;
         }
+        return 0;
     }
 
     public void parseElements(File file, IFrameWriter writer, int tupleIndex) throws HyracksDataException {
@@ -147,22 +134,4 @@ public class XMLParser implements IParser {
         }
     }
 
-    public void parseHDFSDocument(InputStream inputStream, ArrayBackedValueStorage abvs) throws HyracksDataException {
-        try {
-            Reader input;
-            if (bufferSize > 0) {
-                input = new BufferedReader(new InputStreamReader(inputStream), bufferSize);
-            } else {
-                input = new InputStreamReader(inputStream);
-            }
-            in.setCharacterStream(input);
-            parser.parse(in);
-            handler.writeDocument(abvs);
-            input.close();
-        } catch (Exception e) {
-            HyracksDataException hde = new HyracksDataException(e);
-            hde.setNodeId(nodeId);
-            throw hde;
-        }
-    }
 }

@@ -16,11 +16,15 @@
  */
 package org.apache.vxquery.runtime.functions.util;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -1232,10 +1236,18 @@ public class FunctionHelper {
     public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
             ArrayBackedValueStorage abvs, IParser parser)
                     throws NumberFormatException, JsonParseException, IOException {
+        int bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1"));
+        Reader input;
         if (!fName.contains("hdfs:/")) {
             File file = new File(fName);
+
             if (file.exists()) {
-                parser.parseDocument(file, abvs);
+                if (bufferSize > 0) {
+                    input = new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize);
+                } else {
+                    input = new InputStreamReader(new FileInputStream(file));
+                }
+                parser.parse(input, abvs);
             }
         }
         //else check in HDFS file system
@@ -1248,7 +1260,12 @@ public class FunctionHelper {
                     Path xmlDocument = new Path(fHdfsName);
                     if (fs.exists(xmlDocument)) {
                         InputStream in = fs.open(xmlDocument).getWrappedStream();
-                        parser.parseHDFSDocument(in, abvs);
+                        if (bufferSize > 0) {
+                            input = new BufferedReader(new InputStreamReader(in), bufferSize);
+                        } else {
+                            input = new InputStreamReader(in);
+                        }
+                        parser.parse(input, abvs);
                         in.close();
                     }
                     fs.close();
