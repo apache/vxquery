@@ -39,6 +39,7 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
     private final SequencePointable sp;
     private final ArrayBackedValueStorage abvs;
     private final SequenceBuilder sb;
+    private final TaggedValuePointable tempTvp;
 
     public KeysOrMembersScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -48,6 +49,7 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
         abvs = new ArrayBackedValueStorage();
         sb = new SequenceBuilder();
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        tempTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     }
 
     @Override
@@ -67,7 +69,6 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
         } else if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
             abvs.reset();
             sb.reset(abvs);
-            TaggedValuePointable tempTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
             tvp1.getValue(ap);
             tvp1.getValue(sp);
             int size = sp.getEntryCount();
