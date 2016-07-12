@@ -14,9 +14,8 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-
-(: Json Parser Query :)
-(: parse a string with multiple items :)
-let $x:="{&quot;foo&quot;:&quot;bar&quot;} [1]"
-let $y:={"jsoniq-multiple-top-level-items":xs:boolean("false")}
-return jn:parse-json($x,$y)
+   
+(: Json Array Navigation Query :)
+(: Ask for an index out of the array size:)
+let $x:=[1,2]
+return $x()
