@@ -87,6 +87,7 @@ public class SimpleObjectUnionScalarEvaluator extends ObjectConstructorScalarEva
 
                     }
                 }
+                super.evaluate(tvps.toArray(new TaggedValuePointable[tvps.size()]), result);
             } catch (IOException e) {
                 throw new SystemException(ErrorCode.SYSE0001, e);
             } finally {
@@ -98,6 +99,5 @@ public class SimpleObjectUnionScalarEvaluator extends ObjectConstructorScalarEva
                 }
             }
         }
-        super.evaluate(tvps.toArray(new TaggedValuePointable[tvps.size()]), result);
     }
 }
