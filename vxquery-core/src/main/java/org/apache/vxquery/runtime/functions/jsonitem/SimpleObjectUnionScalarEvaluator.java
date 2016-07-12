@@ -62,8 +62,8 @@ public class SimpleObjectUnionScalarEvaluator extends ObjectConstructorScalarEva
                     tempTvp.getValue(op);
                     op.getKeys(tempTvp);
                     if (tempTvp.getTag() == ValueTag.XS_STRING_TAG) {
-                        key = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                        value = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                        key = ppool.takeOne(TaggedValuePointable.class);
+                        value = ppool.takeOne(TaggedValuePointable.class);
                         tempTvp.getValue(tempKey);
                         op.getValue(tempKey, value);
                         key.set(tempTvp);
@@ -74,8 +74,8 @@ public class SimpleObjectUnionScalarEvaluator extends ObjectConstructorScalarEva
                     } else if (tempTvp.getTag() == ValueTag.SEQUENCE_TAG) {
                         tempTvp.getValue(sp1);
                         for (int j = 0; j < sp1.getEntryCount(); ++j) {
-                            key = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                            value = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                            key = ppool.takeOne(TaggedValuePointable.class);
+                            value = ppool.takeOne(TaggedValuePointable.class);
                             sp1.getEntry(j, tempTvp);
                             tempTvp.getValue(tempKey);
                             op.getValue(tempKey, value);
@@ -93,6 +93,9 @@ public class SimpleObjectUnionScalarEvaluator extends ObjectConstructorScalarEva
                 ppool.giveBack(tempKey);
                 ppool.giveBack(tempTvp);
                 ppool.giveBack(boolTvp);
+                for (TaggedValuePointable pointable : tvps) {
+                    ppool.giveBack(pointable);
+                }
             }
         }
         super.evaluate(tvps.toArray(new TaggedValuePointable[tvps.size()]), result);
