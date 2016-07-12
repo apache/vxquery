@@ -19,8 +19,12 @@ package org.apache.vxquery.runtime.functions.json;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -31,11 +35,19 @@ import java.io.IOException;
 public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
     private final ObjectPointable op;
+    private final ArrayPointable ap;
+    private final SequencePointable sp;
+    private final ArrayBackedValueStorage abvs;
+    private final SequenceBuilder sb;
 
     public KeysOrMembersScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
         this.ctx = ctx;
         op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+        ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
+        abvs = new ArrayBackedValueStorage();
+        sb = new SequenceBuilder();
+        sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
     }
 
     @Override
@@ -52,6 +64,27 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
                 throw new SystemException(ErrorCode.SYSE0001, e);
 
             }
+        } else if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
+            abvs.reset();
+            sb.reset(abvs);
+            TaggedValuePointable tempTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+            tvp1.getValue(ap);
+            tvp1.getValue(sp);
+            int size = sp.getEntryCount();
+            for (int i = 0; i < size; i++) {
+                sp.getEntry(i, tempTvp);
+                try {
+                    sb.addItem(tempTvp);
+                } catch (IOException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
+            }
+            try {
+                sb.finish();
+            } catch (IOException e) {
+                throw new SystemException(ErrorCode.SYSE0001, e);
+            }
+            result.set(abvs);
         }
     }
 

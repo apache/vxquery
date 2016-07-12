@@ -45,4 +45,9 @@
         <query name="q05_array_navigation" date="2016-06-18"/>
         <output-file compare="Text">q05_array_navigation.txt</output-file>
     </test-case>
+    <test-case name="json-array-navigation-q06" FilePath="Json/Array/Navigation" Creator="Christina Pavlopoulou">
+        <description>Ask for the whole array.</description>
+        <query name="q06_array_navigation" date="2016-07-12"/>
+        <output-file compare="Text">q06_array_navigation.txt</output-file>
+    </test-case>
 </test-group>
