@@ -1,0 +1,22 @@
+{
+    "metadata": {
+            "pageCount": 1,
+            "count": 2
+    },
+    "results": [
+        {
+            "date": "2004-04-04T00:00:00.000",
+            "datatype": "PRCP",
+            "station": "GHCND:US000000004",
+            "attributes": ",,",
+            "value": 40
+        },
+        {
+            "date": "2003-03-03T00:00:00.000",
+            "datatype": "AWND",
+            "station": "GHCND:US000000004",
+            "attributes": ",,",
+            "value": 4
+        }
+    ]
+}

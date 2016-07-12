@@ -16,9 +16,14 @@
  */
 package org.apache.vxquery.metadata;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -42,6 +47,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.htrace.fasterxml.jackson.core.JsonParseException;
 import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
@@ -52,6 +58,8 @@ import org.apache.hyracks.api.dataflow.value.IRecordDescriptorProvider;
 import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.api.job.IOperatorDescriptorRegistry;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
 import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
@@ -60,6 +68,7 @@ import org.apache.hyracks.hdfs.ContextFactory;
 import org.apache.hyracks.hdfs2.dataflow.FileSplitsFactory;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
+import org.apache.vxquery.jsonparser.JSONParser;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
@@ -119,6 +128,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             public void nextFrame(ByteBuffer buffer) throws HyracksDataException {
                 fta.reset(buffer);
                 String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
+                Reader input;
+                ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
                 if (!collectionModifiedName.contains("hdfs:/")) {
                     File collectionDirectory = new File(collectionModifiedName);
                     //check if directory is in the local file system
@@ -128,12 +139,27 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
                                 Iterator<File> it = FileUtils.iterateFiles(collectionDirectory,
                                         new VXQueryIOFileFilter(), TrueFileFilter.INSTANCE);
+                                int bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1"));
                                 while (it.hasNext()) {
-                                    File xmlDocument = it.next();
-                                    if (LOGGER.isLoggable(Level.FINE)) {
-                                        LOGGER.fine("Starting to read XML document: " + xmlDocument.getAbsolutePath());
+                                    File file = it.next();
+                                    if (file.getName().toLowerCase().endsWith(".xml")) {
+                                        //                                    File xmlDocument = it.next();
+                                        if (LOGGER.isLoggable(Level.FINE)) {
+                                            LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
+                                        }
+                                        parser.parseElements(file, writer, tupleIndex);
+                                    } else if (file.getName().toLowerCase().endsWith(".json")) {
+                                        if (LOGGER.isLoggable(Level.FINE)) {
+                                            LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());
+                                        }
+                                        try {
+                                            JSONParser jparser = new JSONParser();
+                                            input = new InputStreamReader(new FileInputStream(file));
+                                            jparser.parse(input, abvs);
+                                        } catch (Exception e) {
+                                            throw new HyracksDataException(e.toString());
+                                        }
                                     }
-                                    parser.parseElements(xmlDocument, writer, tupleIndex);
                                 }
                             }
                         } else {
