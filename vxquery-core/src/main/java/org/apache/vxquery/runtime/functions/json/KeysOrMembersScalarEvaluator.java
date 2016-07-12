@@ -28,11 +28,11 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 
 import java.io.IOException;
 
-public class KeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
     private final ObjectPointable op;
 
-    public KeysScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
+    public KeysOrMembersScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
         this.ctx = ctx;
         op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
@@ -41,15 +41,17 @@ public class KeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEvalua
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable tvp1 = args[0];
-        if (!(tvp1.getTag() == ValueTag.OBJECT_TAG)) {
+        if (!((tvp1.getTag() == ValueTag.OBJECT_TAG) || (tvp1.getTag() == ValueTag.ARRAY_TAG))) {
             throw new SystemException(ErrorCode.FORG0006);
         }
-        try {
-            tvp1.getValue(op);
-            op.getKeys(result);
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
+        if (tvp1.getTag() == ValueTag.OBJECT_TAG) {
+            try {
+                tvp1.getValue(op);
+                op.getKeys(result);
+            } catch (IOException e) {
+                throw new SystemException(ErrorCode.SYSE0001, e);
 
+            }
         }
     }
 

@@ -1561,7 +1561,7 @@ public class XMLQueryTranslator {
                                     }
                                 }
                                 if (arguments.size() == 0) {
-                                    ctxExpr = sfce(BuiltinOperators.KEYS, expr);
+                                    ctxExpr = sfce(BuiltinOperators.KEYS_OR_MEMBERS, expr);
                                 }
                             } else {
                                 predicates = postfixNode.getArgs();

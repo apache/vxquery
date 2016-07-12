@@ -22,18 +22,18 @@ import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
-public class KeysScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class KeysOrMembersScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
 
     private static final long serialVersionUID = 1L;
 
-    public KeysScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public KeysOrMembersScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        return new KeysScalarEvaluator(ctx, args);
+        return new KeysOrMembersScalarEvaluator(ctx, args);
     }
 
 }
