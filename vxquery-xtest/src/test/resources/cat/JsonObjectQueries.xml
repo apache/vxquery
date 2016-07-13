@@ -80,4 +80,14 @@
         <query name="q12_object" date="2016-07-05"/>
         <output-file compare="Text">q12_object.txt</output-file>
     </test-case>
+    <test-case name="json-object-q13" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q13_object" date="2016-07-09"/>
+        <output-file compare="Text">q13_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q14" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q14_object" date="2016-07-09"/>
+        <output-file compare="Text">q14_object.txt</output-file>
+    </test-case>
 </test-group>

@@ -1206,14 +1206,22 @@ public class XMLQueryTranslator {
     private LogicalVariable translateObjectConstructor(TranslationContext tCtx, ObjectConstructor obj)
             throws SystemException {
         List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
+        PairConstructor pc;
         for (ASTNode aVal : obj.getContent()) {
-            ILogicalExpression ke = string(data(vre(translateExpression(((PairConstructor) aVal).getKey(), tCtx))));
-            content.add(ke);
-            ILogicalExpression ve = vre(translateExpression(((PairConstructor) aVal).getValue(), tCtx));
-            content.add(ve);
-            ILogicalExpression qmce = ce(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE),
-                    ((PairConstructor) aVal).isQuestionMarkColon());
-            content.add(qmce);
+            if (aVal.getTag()==ASTTag.PAIR_CONSTRUCTOR) {
+                pc=(PairConstructor) aVal;
+                ILogicalExpression ke = string(data(vre(translateExpression(pc.getKey(), tCtx))));
+                content.add(ke);
+                ILogicalExpression ve = vre(translateExpression(pc.getValue(), tCtx));
+                content.add(ve);
+                ILogicalExpression qmce = ce(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE),
+                        pc.isQuestionMarkColon());
+                content.add(qmce);
+            } else {
+                ILogicalExpression aExpr = aVal == null ? sfce(BuiltinOperators.CONCATENATE)
+                        : vre(translateExpression(aVal, tCtx));
+                return createAssignment(sfce(BuiltinOperators.SIMPLE_OBJECT_UNION, aExpr), tCtx);
+            }
         }
 
         return createAssignment(
