@@ -62,6 +62,7 @@ import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
 import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
+import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
 import org.apache.hyracks.hdfs.ContextFactory;
@@ -111,7 +112,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-
+        final ArrayBackedValueStorage jsonAbvs = new ArrayBackedValueStorage();
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
                 dCtx.getStaticContext());
@@ -129,7 +130,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 fta.reset(buffer);
                 String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
                 Reader input;
-                ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
                 if (!collectionModifiedName.contains("hdfs:/")) {
                     File collectionDirectory = new File(collectionModifiedName);
                     //check if directory is in the local file system
@@ -139,7 +139,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
                                 Iterator<File> it = FileUtils.iterateFiles(collectionDirectory,
                                         new VXQueryIOFileFilter(), TrueFileFilter.INSTANCE);
-                                int bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1"));
                                 while (it.hasNext()) {
                                     File file = it.next();
                                     if (file.getName().toLowerCase().endsWith(".xml")) {
@@ -155,7 +154,10 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                         try {
                                             JSONParser jparser = new JSONParser();
                                             input = new InputStreamReader(new FileInputStream(file));
-                                            jparser.parse(input, abvs);
+                                            jsonAbvs.reset();
+                                            jparser.parse(input, jsonAbvs);
+                                            FrameUtils.appendFieldToWriter(writer, appender, jsonAbvs.getByteArray(),
+                                                    jsonAbvs.getStartOffset(), jsonAbvs.getLength());
                                         } catch (Exception e) {
                                             throw new HyracksDataException(e.toString());
                                         }

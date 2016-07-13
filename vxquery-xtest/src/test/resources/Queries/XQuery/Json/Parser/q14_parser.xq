@@ -17,6 +17,6 @@
 
 (: Json Parser Query :)
 (: parse a string with arrays :)
-let $x:="{&quot;foo&quot;:&quot;bar&quot;} [1]"
-let $y:={"jsoniq-multiple-top-level-items":xs:boolean("false")}
-return jn:parse-json($x,$y)
+let $x:="jsonCollection"
+for $r in collection($x)
+return $r

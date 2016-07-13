@@ -29,8 +29,7 @@ public class VXQueryIOFileFilter implements IOFileFilter {
 
     @Override
     public boolean accept(final File file, final String name) {
-        if (name.toLowerCase().endsWith(".xml") || name.toLowerCase().endsWith(".xml.gz")
-                || name.toLowerCase().endsWith(".json") || name.toLowerCase().endsWith(".json.gz")) {
+        if (name.toLowerCase().endsWith(".xml") || name.toLowerCase().endsWith(".json")) {
             return true;
         }
         return false;
