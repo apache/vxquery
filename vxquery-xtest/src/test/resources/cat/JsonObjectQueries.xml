@@ -90,4 +90,14 @@
         <query name="q14_object" date="2016-07-09"/>
         <output-file compare="Text">q14_object.txt</output-file>
     </test-case>
+    <test-case name="json-object-q15" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q15_object" date="2016-07-16"/>
+        <output-file compare="Text">q15_object.txt</output-file>
+    </test-case>
+    <test-case name="json-object-q16" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q16_object" date="2016-07-16"/>
+        <output-file compare="Text">q16_object.txt</output-file>
+    </test-case>
 </test-group>
