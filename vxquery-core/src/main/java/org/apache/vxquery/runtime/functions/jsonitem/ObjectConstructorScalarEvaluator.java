@@ -35,10 +35,12 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     private ObjectBuilder ob;
-    private TaggedValuePointable[] pointables;
+    private List<TaggedValuePointable> pointables;
     private IPointable vp;
     private UTF8StringPointable sp;
     private SequencePointable seqp;
@@ -59,35 +61,24 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
         ab = new ArrayBuilder();
-    }
-
-    private boolean isDuplicate(TaggedValuePointable tempKey) {
-        for (TaggedValuePointable tvp : pointables) {
-            tempKey.getValue(vp);
-            if (tvp != null && FunctionHelper.arraysEqual(tvp, vp)) {
-                return true;
-            }
-        }
-        return false;
+        pointables = new ArrayList<>();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        TaggedValuePointable key, value, qmc;
+        TaggedValuePointable key, value, qmc, tvp;
         try {
             abvs.reset();
             ob.reset(abvs);
-
+            pointables.clear();
             int len = args.length;
-            pointables = new TaggedValuePointable[len / 3];
             for (int i = 0; i < len; i += 3) {
                 key = args[i];
                 value = args[i + 1];
                 qmc = args[i + 2];
-                if (!isDuplicate(key)) {
-                    pointables[i / 3] = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-                    key.getValue(pointables[i / 3]);
-                    sp.set(vp);
+                if (!FunctionHelper.isDuplicateKeys(key, pointables)) {
+                    pointables.add(key);
+                    key.getValue(sp);
                     if (value.getTag() == ValueTag.SEQUENCE_TAG) {
                         qmc.getValue(bp);
                         value.getValue(seqp);

@@ -20,84 +20,95 @@ import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
+import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleObjectUnionScalarEvaluator extends ObjectConstructorScalarEvaluator {
+public class SimpleObjectUnionScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
 
     private final SequencePointable sp, sp1;
+    private final ObjectBuilder ob;
+    private final ArrayBackedValueStorage abvs;
+    private final List<TaggedValuePointable> tvps;
+    private ObjectPointable op;
+    private TaggedValuePointable key;
+    protected final IHyracksTaskContext ctx;
 
     public SimpleObjectUnionScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(ctx, args);
+        super(args);
+        this.ctx = ctx;
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        abvs = new ArrayBackedValueStorage();
+        ob = new ObjectBuilder();
+        tvps = new ArrayList<>();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        List<TaggedValuePointable> tvps = new ArrayList<>();
-
-        ObjectPointable op;
-        TaggedValuePointable key, value;
-        TaggedValuePointable arg = args[0];
-        if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
-            arg.getValue(sp);
-            TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
-            TaggedValuePointable boolTvp = ppool.takeOne(TaggedValuePointable.class);
-            UTF8StringPointable tempKey = ppool.takeOne(UTF8StringPointable.class);
-            XDMConstants.setFalse(boolTvp);
-            try {
+        TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+        TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
+        UTF8StringPointable tempKey = ppool.takeOne(UTF8StringPointable.class);
+        try {
+            abvs.reset();
+            ob.reset(abvs);
+            tvps.clear();
+            TaggedValuePointable arg = args[0];
+            if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
+                arg.getValue(sp);
                 for (int i = 0; i < sp.getEntryCount(); ++i) {
                     op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
                     sp.getEntry(i, tempTvp);
                     tempTvp.getValue(op);
                     op.getKeys(tempTvp);
                     if (tempTvp.getTag() == ValueTag.XS_STRING_TAG) {
-                        key = ppool.takeOne(TaggedValuePointable.class);
-                        value = ppool.takeOne(TaggedValuePointable.class);
-                        tempTvp.getValue(tempKey);
-                        op.getValue(tempKey, value);
-                        key.set(tempTvp);
-                        tvps.add(key);
-                        tvps.add(value);
-                        tvps.add(boolTvp);
-
+                        addPair(tempTvp, tempKey, tempValue);
                     } else if (tempTvp.getTag() == ValueTag.SEQUENCE_TAG) {
                         tempTvp.getValue(sp1);
                         for (int j = 0; j < sp1.getEntryCount(); ++j) {
                             key = ppool.takeOne(TaggedValuePointable.class);
-                            value = ppool.takeOne(TaggedValuePointable.class);
                             sp1.getEntry(j, tempTvp);
-                            tempTvp.getValue(tempKey);
-                            op.getValue(tempKey, value);
-                            key.set(tempTvp);
-                            tvps.add(key);
-                            tvps.add(value);
-                            tvps.add(boolTvp);
+                            addPair(tempTvp, tempKey, tempValue);
                         }
-
                     }
                 }
-                super.evaluate(tvps.toArray(new TaggedValuePointable[tvps.size()]), result);
-            } catch (IOException e) {
-                throw new SystemException(ErrorCode.SYSE0001, e);
-            } finally {
-                ppool.giveBack(tempKey);
-                ppool.giveBack(tempTvp);
-                ppool.giveBack(boolTvp);
-                for (TaggedValuePointable pointable : tvps) {
-                    ppool.giveBack(pointable);
-                }
+            }
+            ob.finish();
+            result.set(abvs);
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        } finally {
+            ppool.giveBack(tempKey);
+            ppool.giveBack(tempTvp);
+            for (TaggedValuePointable pointable : tvps) {
+                ppool.giveBack(pointable);
             }
         }
     }
+
+    private void addPair(TaggedValuePointable tempTvp, UTF8StringPointable tempKey, TaggedValuePointable tempValue)
+            throws IOException, SystemException {
+        if (!FunctionHelper.isDuplicateKeys(tempTvp, tvps)) {
+            key = ppool.takeOne(TaggedValuePointable.class);
+            key.set(tempTvp);
+            tvps.add(key);
+            tempTvp.getValue(tempKey);
+            op.getValue(tempKey, tempValue);
+            ob.addItem(tempKey, tempValue);
+        } else {
+            throw new SystemException(ErrorCode.JNDY0003);
+        }
+    }
+
 }

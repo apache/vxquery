@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -1369,9 +1370,9 @@ public class FunctionHelper {
     /**
      * Writes a number to the DataOutput with zeros as place holders if the number is too small to fill the padding.
      *
-     * @param value
+     * @param valueArg
      *            value
-     * @param padding
+     * @param paddingArg
      *            padding
      * @param dOut
      *            data output
@@ -1439,4 +1440,12 @@ public class FunctionHelper {
         }
     }
 
+    public static boolean isDuplicateKeys(IPointable key, List<TaggedValuePointable> pointables) {
+        for (TaggedValuePointable tvp : pointables) {
+            if (tvp != null && arraysEqual(tvp, key)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
