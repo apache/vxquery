@@ -34,68 +34,46 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 
 public class JnMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
-    private final SequencePointable sp1, sp2;
+    private final SequencePointable sp;
     private final ArrayBackedValueStorage abvs;
     private final SequenceBuilder sb;
     private ArrayPointable ap;
+    private TaggedValuePointable tempTvp;
 
     public JnMembersScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
         this.ctx = ctx;
-        sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        sp2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         abvs = new ArrayBackedValueStorage();
         sb = new SequenceBuilder();
         ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
+        tempTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable tvp = args[0];
-        TaggedValuePointable tvp1 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        abvs.reset();
-        sb.reset(abvs);
-        if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
-            TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
-            try {
-                tvp.getValue(sp1);
-                int size1 = sp1.getEntryCount();
+        try {
+            abvs.reset();
+            sb.reset(abvs);
+            if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                tvp.getValue(sp);
+                int size1 = sp.getEntryCount();
                 for (int i = 0; i < size1; i++) {
-                    sp1.getEntry(i, tempTvp);
+                    sp.getEntry(i, tempTvp);
                     if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
-                        membersSequence(tempTvp, result, tvp1);
-                    } else {
-                        XDMConstants.setEmptySequence(result);
+                        tempTvp.getValue(ap);
+                        ap.appendItems(sb);
                     }
                 }
-            } finally {
-                ppool.giveBack(tempTvp);
+            } else if (tvp.getTag() == ValueTag.ARRAY_TAG) {
+                tvp.getValue(ap);
+                ap.appendItems(sb);
             }
-        } else if (tvp.getTag() == ValueTag.ARRAY_TAG) {
-            membersSequence(tvp, result, tvp1);
-        } else {
-            XDMConstants.setEmptySequence(result);
-        }
-        try {
             sb.finish();
             result.set(abvs);
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void membersSequence(TaggedValuePointable tvp, IPointable result, TaggedValuePointable tvp1)
-            throws SystemException {
-        tvp.getValue(ap);
-        tvp.getValue(sp2);
-        int size = sp2.getEntryCount();
-        for (int j = 0; j < size; j++) {
-            sp2.getEntry(j, tvp1);
-            try {
-                sb.addItem(tvp1);
-            } catch (IOException e) {
-                throw new SystemException(ErrorCode.SYSE0001, e);
-            }
+            throw new SystemException(ErrorCode.SYSE0001, e);
         }
     }
 }
