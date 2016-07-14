@@ -1,0 +1,29 @@
+{
+    "metadata": {
+            "pageCount": 1,
+            "count": 3
+    },
+    "results": [
+        {
+            "date": "2002-02-02T00:00:00.000",
+            "datatype": "TMIN",
+            "station": "GHCND:US000000002",
+            "attributes": ",,",
+            "value": 12.5
+        },
+        {
+            "date": "2002-02-02T00:00:00.000",
+            "datatype": "TMAX",
+            "station": "GHCND:US000000002",
+            "attributes": ",,",
+            "value": 32
+        },
+        {
+            "date": "2002-02-02T00:00:00.000",
+            "datatype": "PRCP",
+            "station": "GHCND:US000000002",
+            "attributes": ",,",
+            "value": 20
+        }
+    ]
+}

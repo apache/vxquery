@@ -70,4 +70,19 @@
       <query name="q13_parser" date="2016-07-12"/>
       <expected-error>JNDY0021</expected-error>
    </test-case>
+   <test-case name="json-parser-q14" FilePath="Json/Parser/Partition-1" Creator="Christina Pavlopoulou">
+      <description>Parsing a collection of json files.</description>
+      <query name="q14_parser" date="2016-07-12"/>
+     <output-file compare="Text">q14_parser.txt</output-file>
+   </test-case>
+   <test-case name="json-parser-q15" FilePath="Json/Parser/Partition-2" Creator="Christina Pavlopoulou">
+      <description>Parsing a collection of json files.</description>
+      <query name="q15_parser" date="2016-07-15"/>
+     <output-file compare="Text">q15_parser.txt</output-file>
+   </test-case>
+   <test-case name="json-parser-q16" FilePath="Json/Parser/Partition-4" Creator="Christina Pavlopoulou">
+      <description>Parsing a collection of json files.</description>
+      <query name="q16_parser" date="2016-07-15"/>
+     <output-file compare="Text">q16_parser.txt</output-file>
+   </test-case>
 </test-group>
