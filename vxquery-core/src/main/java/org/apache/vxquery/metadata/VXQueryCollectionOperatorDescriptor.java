@@ -142,7 +142,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                 while (it.hasNext()) {
                                     File file = it.next();
                                     if (file.getName().toLowerCase().endsWith(".xml")) {
-                                        //                                    File xmlDocument = it.next();
                                         if (LOGGER.isLoggable(Level.FINE)) {
                                             LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
                                         }
