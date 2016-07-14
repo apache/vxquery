@@ -70,4 +70,9 @@
       <query name="q13_parser" date="2016-07-12"/>
       <expected-error>JNDY0021</expected-error>
    </test-case>
+   <test-case name="json-parser-q14" FilePath="Json/Parser/" Creator="Christina Pavlopoulou">
+      <description>Parsing a collection of json files.</description>
+      <query name="q14_parser" date="2016-07-12"/>
+     <output-file compare="Text">q14_parser.txt</output-file>
+   </test-case>
 </test-group>

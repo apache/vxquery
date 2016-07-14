@@ -19,4 +19,8 @@
 (: parse a string with arrays :)
 let $x:="jsonCollection"
 for $r in collection($x)
-return $r
+
+    let $z:=$r("results")()
+    for $i in $z()  
+where $i("date")="2001-01-01T00:00:00.000"
+return $i
