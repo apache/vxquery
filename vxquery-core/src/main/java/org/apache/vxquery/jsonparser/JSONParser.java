@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.htrace.fasterxml.jackson.core.JsonFactory;
-import org.apache.htrace.fasterxml.jackson.core.JsonParseException;
 import org.apache.htrace.fasterxml.jackson.core.JsonParser;
 import org.apache.htrace.fasterxml.jackson.core.JsonToken;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
@@ -56,7 +55,7 @@ public class JSONParser implements IParser {
 
     protected final List<itemType> itemStack;
 
-    public JSONParser() throws JsonParseException {
+    public JSONParser() {
         factory = new JsonFactory();
         atomic = new ArrayBackedValueStorage();
         abStack = new ArrayList<ArrayBuilder>();

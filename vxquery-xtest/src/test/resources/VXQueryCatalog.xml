@@ -94,6 +94,27 @@
       <source ID="ghcnd_quarter_4" FileName="TestSources/ghcnd/half_2/quarter_4" Creator="Preston Carman">
          <description last-mod="2014-04-02">Collection of files</description>
       </source>
+      <source ID="jsonCollection" FileName="TestSources/jsonCollection" Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-12">Collection of files</description>
+      </source>
+      <source ID="json_half_1" FileName="TestSources/jsonCollection/half_1" Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-12">Collection of files</description>
+      </source>
+      <source ID="json_half_2" FileName="TestSources/jsonCollection/half_2" Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-12">Collection of files</description>
+      </source>
+      <source ID="json_quarter_1" FileName="TestSources/jsonCollection/half_1/quarter_1" Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-12">Collection of files</description>
+      </source>
+      <source ID="json_quarter_2" FileName="TestSources/jsonCollection/half_1/quarter_2" Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-12">Collection of files</description>
+      </source>
+      <source ID="json_quarter_3" FileName="TestSources/jsonCollection/half_2/quarter_3" Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-12">Collection of files</description>
+      </source>
+      <source ID="json_quarter_4" FileName="TestSources/jsonCollection/half_2/quarter_4" Creator="Christina Pavlopoulou">
+         <description last-mod="2016-07-12">Collection of files</description>
+      </source>
       <source ID="station_xml_file" FileName="TestSources/ghcnd/half_1/quarter_1/stations/US000000001.xml"
               Creator="Shivani Mall">
          <description last-mod="2015-06-26">File</description>
