@@ -43,7 +43,7 @@ public class ArrayPointable extends AbstractSequencePointable {
 
     private TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
-    public void appendSequence(SequenceBuilder sb) throws IOException {
+    public void appendItems(SequenceBuilder sb) throws IOException {
         final int size = getEntryCount();
         for (int j = 0; j < size; j++) {
             getEntry(j, tvp);

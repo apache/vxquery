@@ -53,9 +53,9 @@ public class JnMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarE
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable tvp = args[0];
-        abvs.reset();
-        sb.reset(abvs);
         try {
+            abvs.reset();
+            sb.reset(abvs);
             if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
                 tvp.getValue(sp);
                 int size1 = sp.getEntryCount();
@@ -63,16 +63,12 @@ public class JnMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarE
                     sp.getEntry(i, tempTvp);
                     if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
                         tempTvp.getValue(ap);
-                        ap.appendSequence(sb);
-                    } else {
-                        XDMConstants.setEmptySequence(result);
+                        ap.appendItems(sb);
                     }
                 }
             } else if (tvp.getTag() == ValueTag.ARRAY_TAG) {
                 tvp.getValue(ap);
-                ap.appendSequence(sb);
-            } else {
-                XDMConstants.setEmptySequence(result);
+                ap.appendItems(sb);
             }
             sb.finish();
             result.set(abvs);

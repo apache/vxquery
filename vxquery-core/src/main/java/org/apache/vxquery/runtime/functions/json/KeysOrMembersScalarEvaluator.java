@@ -51,18 +51,18 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        final TaggedValuePointable tvp1 = args[0];
+        final TaggedValuePointable tvp = args[0];
         try {
-            switch (tvp1.getTag()) {
+            switch (tvp.getTag()) {
                 case ValueTag.OBJECT_TAG:
-                    tvp1.getValue(op);
+                    tvp.getValue(op);
                     op.getKeys(result);
                     break;
                 case ValueTag.ARRAY_TAG:
                     abvs.reset();
                     sb.reset(abvs);
-                    tvp1.getValue(ap);
-                    ap.appendSequence(sb);
+                    tvp.getValue(ap);
+                    ap.appendItems(sb);
                     sb.finish();
                     result.set(abvs);
                     break;
