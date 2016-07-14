@@ -24,9 +24,8 @@ import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.junit.Assert;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class ArrayByteTest extends AbstractPointableTest {
     ArrayBackedValueStorage abvsResult = new ArrayBackedValueStorage();

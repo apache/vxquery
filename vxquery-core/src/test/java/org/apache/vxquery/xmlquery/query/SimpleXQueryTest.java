@@ -30,9 +30,8 @@ import org.apache.hyracks.api.dataset.ResultSetId;
 import org.apache.vxquery.compiler.CompilerControlBlock;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
+import org.junit.Assert;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class SimpleXQueryTest {
     @Test
