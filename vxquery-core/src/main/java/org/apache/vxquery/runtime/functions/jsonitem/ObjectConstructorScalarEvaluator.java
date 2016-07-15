@@ -26,19 +26,15 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
-import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ObjectConstructorScalarEvaluator  extends AbstractObjectConstructorScalarEvaluator{
+public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorScalarEvaluator {
     private IPointable vp;
     private UTF8StringPointable sp;
     private SequencePointable seqp;
@@ -47,7 +43,7 @@ public class ObjectConstructorScalarEvaluator  extends AbstractObjectConstructor
     private final ArrayBuilder ab;
 
     public ObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(ctx,args);
+        super(ctx, args);
         abvs1 = new ArrayBackedValueStorage();
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
