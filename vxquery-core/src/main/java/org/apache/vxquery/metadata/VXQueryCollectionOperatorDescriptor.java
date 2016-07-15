@@ -16,11 +16,9 @@
  */
 package org.apache.vxquery.metadata;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -47,7 +45,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.htrace.fasterxml.jackson.core.JsonParseException;
 import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
@@ -58,7 +55,6 @@ import org.apache.hyracks.api.dataflow.value.IRecordDescriptorProvider;
 import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.api.job.IOperatorDescriptorRegistry;
-import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
 import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
@@ -116,6 +112,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
                 dCtx.getStaticContext());
+        final JSONParser jparser = new JSONParser();
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -151,7 +148,6 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                             LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());
                                         }
                                         try {
-                                            JSONParser jparser = new JSONParser();
                                             input = new InputStreamReader(new FileInputStream(file));
                                             jsonAbvs.reset();
                                             jparser.parse(input, jsonAbvs);

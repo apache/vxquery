@@ -17,10 +17,9 @@
 
 (: Json Parser Query :)
 (: parse a string with arrays :)
-let $x:="jsonCollection"
+let $x:="json_quarter_1|json_quarter_2|json_quarter_3|json_quarter_4"
 for $r in collection($x)
-
     let $z:=$r("results")()
     for $i in $z()  
-where $i("date")="2001-01-01T00:00:00.000"
+where $i("station")="GHCND:US000000001"
 return $i
