@@ -35,24 +35,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleObjectUnionScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorScalarEvaluator {
 
     private final SequencePointable sp, sp1;
-    private final ObjectBuilder ob;
-    private final ArrayBackedValueStorage abvs;
-    private final List<TaggedValuePointable> tvps;
     private ObjectPointable op;
     private TaggedValuePointable key;
-    protected final IHyracksTaskContext ctx;
 
     public SimpleObjectUnionScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(args);
-        this.ctx = ctx;
+        super(ctx,args);
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
-        abvs = new ArrayBackedValueStorage();
-        ob = new ObjectBuilder();
-        tvps = new ArrayList<>();
     }
 
     @Override

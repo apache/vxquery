@@ -38,30 +38,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
-    private ObjectBuilder ob;
-    private List<TaggedValuePointable> pointables;
+public class ObjectConstructorScalarEvaluator  extends AbstractObjectConstructorScalarEvaluator{
     private IPointable vp;
     private UTF8StringPointable sp;
     private SequencePointable seqp;
-    protected final IHyracksTaskContext ctx;
-    private final ArrayBackedValueStorage abvs;
     private final ArrayBackedValueStorage abvs1;
     private final BooleanPointable bp;
     private final ArrayBuilder ab;
 
     public ObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(args);
-        this.ctx = ctx;
-        abvs = new ArrayBackedValueStorage();
+        super(ctx,args);
         abvs1 = new ArrayBackedValueStorage();
-        ob = new ObjectBuilder();
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
         ab = new ArrayBuilder();
-        pointables = new ArrayList<>();
     }
 
     @Override
@@ -70,14 +62,14 @@ public class ObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumen
         try {
             abvs.reset();
             ob.reset(abvs);
-            pointables.clear();
+            tvps.clear();
             int len = args.length;
             for (int i = 0; i < len; i += 3) {
                 key = args[i];
                 value = args[i + 1];
                 qmc = args[i + 2];
-                if (!FunctionHelper.isDuplicateKeys(key, pointables)) {
-                    pointables.add(key);
+                if (!FunctionHelper.isDuplicateKeys(key, tvps)) {
+                    tvps.add(key);
                     key.getValue(sp);
                     if (value.getTag() == ValueTag.SEQUENCE_TAG) {
                         qmc.getValue(bp);
