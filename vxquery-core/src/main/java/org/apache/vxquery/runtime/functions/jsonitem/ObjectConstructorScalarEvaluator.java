@@ -30,7 +30,6 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import java.io.IOException;
 
@@ -64,7 +63,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
                 key = args[i];
                 value = args[i + 1];
                 qmc = args[i + 2];
-                if (!FunctionHelper.isDuplicateKeys(key, tvps)) {
+                if (!isDuplicateKeys(key, tvps)) {
                     tvps.add(key);
                     key.getValue(sp);
                     if (value.getTag() == ValueTag.SEQUENCE_TAG) {

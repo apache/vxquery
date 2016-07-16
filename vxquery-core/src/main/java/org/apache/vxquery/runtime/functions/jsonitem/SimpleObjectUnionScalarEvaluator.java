@@ -26,7 +26,6 @@ import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import java.io.IOException;
 
@@ -35,18 +34,19 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
     private final SequencePointable sp, sp1;
     private ObjectPointable op;
     private TaggedValuePointable key;
+    private final UTF8StringPointable stringKey;
 
     public SimpleObjectUnionScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        stringKey = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
-        UTF8StringPointable tempKey = ppool.takeOne(UTF8StringPointable.class);
         try {
             abvs.reset();
             ob.reset(abvs);
@@ -59,24 +59,18 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
                     sp.getEntry(i, tempTvp);
                     tempTvp.getValue(op);
                     op.getKeys(tempTvp);
-                    if (tempTvp.getTag() == ValueTag.XS_STRING_TAG) {
-                        addPair(tempTvp, tempKey, tempValue);
-                    } else if (tempTvp.getTag() == ValueTag.SEQUENCE_TAG) {
-                        tempTvp.getValue(sp1);
-                        for (int j = 0; j < sp1.getEntryCount(); ++j) {
-                            key = ppool.takeOne(TaggedValuePointable.class);
-                            sp1.getEntry(j, tempTvp);
-                            addPair(tempTvp, tempKey, tempValue);
-                        }
-                    }
+                    addPairs(tempTvp, tempValue);
                 }
+            } else {
+                op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+                arg.getValue(op);
+                addPairs(tempTvp, tempValue);
             }
             ob.finish();
             result.set(abvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         } finally {
-            ppool.giveBack(tempKey);
             ppool.giveBack(tempTvp);
             for (TaggedValuePointable pointable : tvps) {
                 ppool.giveBack(pointable);
@@ -84,18 +78,32 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
         }
     }
 
-    private void addPair(TaggedValuePointable tempTvp, UTF8StringPointable tempKey, TaggedValuePointable tempValue)
+    private void addPair(TaggedValuePointable tempTvp, TaggedValuePointable tempValue)
             throws IOException, SystemException {
-        if (!FunctionHelper.isDuplicateKeys(tempTvp, tvps)) {
+        if (!isDuplicateKeys(tempTvp, tvps)) {
             key = ppool.takeOne(TaggedValuePointable.class);
             key.set(tempTvp);
             tvps.add(key);
-            tempTvp.getValue(tempKey);
-            op.getValue(tempKey, tempValue);
-            ob.addItem(tempKey, tempValue);
+            tempTvp.getValue(stringKey);
+            op.getValue(stringKey, tempValue);
+            ob.addItem(stringKey, tempValue);
         } else {
             throw new SystemException(ErrorCode.JNDY0003);
         }
     }
 
+    private void addPairs(TaggedValuePointable tempTvp, TaggedValuePointable tempValue)
+            throws IOException, SystemException {
+        op.getKeys(tempTvp);
+        if (tempTvp.getTag() == ValueTag.XS_STRING_TAG) {
+            addPair(tempTvp, tempValue);
+        } else if (tempTvp.getTag() == ValueTag.SEQUENCE_TAG) {
+            tempTvp.getValue(sp1);
+            for (int j = 0; j < sp1.getEntryCount(); ++j) {
+                key = ppool.takeOne(TaggedValuePointable.class);
+                sp1.getEntry(j, tempTvp);
+                addPair(tempTvp, tempValue);
+            }
+        }
+    }
 }

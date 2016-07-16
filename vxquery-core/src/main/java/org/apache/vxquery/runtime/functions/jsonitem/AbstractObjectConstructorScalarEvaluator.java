@@ -18,10 +18,12 @@ package org.apache.vxquery.runtime.functions.jsonitem;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,5 +40,14 @@ public abstract class AbstractObjectConstructorScalarEvaluator extends AbstractT
         ob = new ObjectBuilder();
         abvs = new ArrayBackedValueStorage();
         tvps = new ArrayList<>();
+    }
+
+    protected boolean isDuplicateKeys(IPointable key, List<TaggedValuePointable> pointables) {
+        for (TaggedValuePointable tvp : pointables) {
+            if (tvp != null && FunctionHelper.arraysEqual(tvp, key)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
