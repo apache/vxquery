@@ -119,12 +119,12 @@ public class IndexUpdater {
 
             // Read the metadata file and load the metadata map into memory.
             metaFileUtil = MetaFileUtil.create(indexFolder);
-            metadataMap = metaFileUtil.readMetaFile();
+            metaFileUtil.readMetadataFile();
+            metadataMap = metaFileUtil.getMetadata(indexFolder);
 
             // Retrieve the collection folder path.
             // Remove the entry for ease of the next steps.
-            collectionMetadata = metadataMap.get(Constants.COLLECTION_ENTRY);
-            collectionFolder = collectionMetadata.getPath();
+            collectionFolder = metaFileUtil.getCollection(indexFolder);
 
         } catch (IOException | ClassNotFoundException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
@@ -177,11 +177,9 @@ public class IndexUpdater {
      * @throws IOException
      */
     public synchronized void updateMetadataFile() throws IOException, JAXBException {
-        // Add collection path entry back
-        metadataMap.put(Constants.COLLECTION_ENTRY, collectionMetadata);
-
         //Write the updated metadata to the file.
-        metaFileUtil.writeMetaFile(metadataMap);
+        metaFileUtil.updateMetadataMap(metadataMap, indexFolder);
+        metaFileUtil.writeMetadataToFile();
     }
 
     /**

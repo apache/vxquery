@@ -83,6 +83,7 @@ public class IndexConstructorUtil {
 
             metaFileUtil = MetaFileUtil.create(indexFolder);
             isMetaFilePresent = metaFileUtil.isMetaFilePresent();
+            metaFileUtil.setCollectionForIndex(indexFolder, collectionFolder);
 
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
@@ -111,13 +112,9 @@ public class IndexConstructorUtil {
                     nodeId);
 
             if (!isMetaFilePresent) {
-                // Add collection information to the map.
-                XmlMetadata data = new XmlMetadata();
-                data.setPath(collectionFolder);
-                metadataMap.put(Constants.COLLECTION_ENTRY, data);
-
                 // Write metadata map to a file.
-                metaFileUtil.writeMetaFile(metadataMap);
+                metaFileUtil.updateMetadataMap(metadataMap, indexFolder);
+                metaFileUtil.writeMetadataToFile();
             }
 
             //This makes write slower but search faster.

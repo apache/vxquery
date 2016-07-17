@@ -29,7 +29,7 @@ import java.io.Serializable;
  * - File name
  * - Last modified date
  */
-@XmlRootElement(name = "index")
+@XmlRootElement(name = "file")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class XmlMetadata implements Serializable {
 
