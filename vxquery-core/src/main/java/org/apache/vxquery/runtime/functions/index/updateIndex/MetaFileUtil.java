@@ -145,7 +145,6 @@ public class MetaFileUtil {
         Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
         jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         jaxbMarshaller.marshal(index, fileOutputStream);
-        jaxbMarshaller.marshal(index, System.out);
 
         if (LOGGER.isDebugEnabled())
             LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
