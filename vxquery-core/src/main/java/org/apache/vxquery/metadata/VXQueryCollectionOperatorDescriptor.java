@@ -19,6 +19,7 @@ package org.apache.vxquery.metadata;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -138,22 +139,23 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                         new VXQueryIOFileFilter(), TrueFileFilter.INSTANCE);
                                 while (it.hasNext()) {
                                     File file = it.next();
-                                    if (file.getName().toLowerCase().endsWith(".xml")) {
+                                    String fileName = file.getName().toLowerCase();
+                                    if (fileName.endsWith(".xml")) {
                                         if (LOGGER.isLoggable(Level.FINE)) {
                                             LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
                                         }
                                         parser.parseElements(file, writer, tupleIndex);
-                                    } else if (file.getName().toLowerCase().endsWith(".json")) {
+                                    } else if (fileName.endsWith(".json")) {
                                         if (LOGGER.isLoggable(Level.FINE)) {
                                             LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());
                                         }
                                         try {
-                                            input = new InputStreamReader(new FileInputStream(file));
                                             jsonAbvs.reset();
+                                            input = new InputStreamReader(new FileInputStream(file));
                                             jparser.parse(input, jsonAbvs);
                                             FrameUtils.appendFieldToWriter(writer, appender, jsonAbvs.getByteArray(),
                                                     jsonAbvs.getStartOffset(), jsonAbvs.getLength());
-                                        } catch (Exception e) {
+                                        } catch (FileNotFoundException e) {
                                             throw new HyracksDataException(e.toString());
                                         }
                                     }
