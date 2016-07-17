@@ -73,7 +73,8 @@ public class MetaFileUtilTest {
     @Test
     public void step2_testCreateMetaDataFile() throws IOException, JAXBException {
         ConcurrentHashMap<String, XmlMetadata> initialMap = TestConstants.getInitialMap();
-        metaFileUtil.writeMetaFile(initialMap);
+        metaFileUtil.updateMetadataMap(initialMap, "");
+        metaFileUtil.writeMetadataToFile();
         Assert.assertEquals(true, metaFileUtil.isMetaFilePresent());
     }
 
@@ -82,7 +83,7 @@ public class MetaFileUtilTest {
      */
     @Test
     public void step3_testValidateMetadataFile() throws IOException, ClassNotFoundException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.readMetaFile();
+        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata("");
         Set<String> from = fromFile.keySet();
         Set<String> initial = initialMap.keySet();
 
@@ -111,7 +112,7 @@ public class MetaFileUtilTest {
     @Test
     public void step5_testUpdateMetadata()
             throws IOException, ClassNotFoundException, NoSuchAlgorithmException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFileMap = metaFileUtil.readMetaFile();
+        ConcurrentHashMap<String, XmlMetadata> fromFileMap = metaFileUtil.getMetadata("");
         XmlMetadata modified = fromFileMap.get(TestConstants.XML_FILE);
 
         File xml = new File(TestConstants.XML_FILE);
@@ -119,9 +120,9 @@ public class MetaFileUtilTest {
 
         fromFileMap.replace(TestConstants.XML_FILE, modified);
 
-        metaFileUtil.writeMetaFile(fromFileMap);
+        metaFileUtil.updateMetadataMap(fromFileMap, TestConstants.INDEX_DIR);
 
-        Assert.assertNotNull(metaFileUtil.readMetaFile());
+        Assert.assertNotNull(metaFileUtil.getMetadata(TestConstants.INDEX_DIR));
 
     }
 
@@ -130,7 +131,7 @@ public class MetaFileUtilTest {
      */
     @Test
     public void step6_testVerifyMetadataChange() throws IOException, ClassNotFoundException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.readMetaFile();
+        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata(TestConstants.INDEX_DIR);
         Set<String> from = fromFile.keySet();
         Set<String> modified = modifiedMap.keySet();
 

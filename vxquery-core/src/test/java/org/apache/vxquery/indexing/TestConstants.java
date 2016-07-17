@@ -47,10 +47,10 @@ public class TestConstants {
         metadata.setPath(XML_FILE);
         metadata.setMd5(INITIAL_MD5);
 
-        XmlMetadata collection = new XmlMetadata();
-        collection.setPath(COLLECTION);
+//        XmlMetadata collection = new XmlMetadata();
+//        collection.setPath(COLLECTION);
 
-        initialMetadataMap.put(COLLECTION, collection);
+//        initialMetadataMap.put(COLLECTION, collection);
         initialMetadataMap.put(XML_FILE, metadata);
 
         return initialMetadataMap;
@@ -67,10 +67,10 @@ public class TestConstants {
         metadata.setPath(XML_FILE);
         metadata.setMd5(CHANGED_MD5);
 
-        XmlMetadata collection = new XmlMetadata();
-        collection.setPath(COLLECTION);
-
-        modifiedMetadataMap.put(COLLECTION, collection);
+//        XmlMetadata collection = new XmlMetadata();
+//        collection.setPath(COLLECTION);
+//
+//        modifiedMetadataMap.put(COLLECTION, collection);
         modifiedMetadataMap.put(XML_FILE, metadata);
 
         return modifiedMetadataMap;
