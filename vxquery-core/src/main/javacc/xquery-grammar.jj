@@ -2000,8 +2000,8 @@ ASTNode JsonConstructor() :
 {
     (
         result = ArrayConstructor()
-        | LOOKAHEAD(2) result = ObjectConstructor()
-        | LOOKAHEAD(2) result = SimpleObjectUnionConstructor()
+        | result = ObjectConstructor()
+        | result = SimpleObjectUnionConstructor()
     ) {
         return result;
     }
