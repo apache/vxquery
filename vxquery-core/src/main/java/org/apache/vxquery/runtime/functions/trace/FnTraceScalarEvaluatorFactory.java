@@ -44,14 +44,15 @@ public class FnTraceScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                TaggedValuePointable tvp = args[0];
-                TaggedValuePointable tvp1 = args[1];
-                if (tvp1.getTag() != ValueTag.XS_STRING_TAG) {
+                TaggedValuePointable tvpValue = args[0];
+                TaggedValuePointable tvpLabel = args[1];
+                if (tvpLabel.getTag() != ValueTag.XS_STRING_TAG) {
                     throw new SystemException(ErrorCode.FORG0006);
                 }
                 XMLSerializer printer = new XMLSerializer();
-                printer.printTaggedValuePointable(System.err, tvp1);
-                printer.printTaggedValuePointable(System.err, tvp);
+                printer.printTaggedValuePointable(System.err, tvpLabel);
+                printer.printTaggedValuePointable(System.err, tvpValue);
+                result.set(tvpValue);
             }
 
         };
