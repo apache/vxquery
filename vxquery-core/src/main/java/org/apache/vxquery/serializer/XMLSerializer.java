@@ -402,7 +402,7 @@ public class XMLSerializer implements IPrinter {
         UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
         TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
         try {
-            printQuotedString(ps, key);
+            printQuotedTaggedValuePointable(ps, key);
             key.getValue(utf8sp);
             ps.append(":");
             op.getValue(utf8sp, tvp);
@@ -433,16 +433,27 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printJsonValue(PrintStream ps, TaggedValuePointable tvp) {
-        if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
-            printQuotedString(ps, tvp);
-        } else {
+        if (tvp.getTag() == ValueTag.XS_DECIMAL_TAG || tvp.getTag() == ValueTag.XS_DOUBLE_TAG
+                || tvp.getTag() == ValueTag.XS_INT_TAG || tvp.getTag() == ValueTag.XS_INTEGER_TAG
+                || tvp.getTag() == ValueTag.XS_LONG_TAG || tvp.getTag() == ValueTag.XS_NEGATIVE_INTEGER_TAG
+                || tvp.getTag() == ValueTag.XS_NON_POSITIVE_INTEGER_TAG
+                || tvp.getTag() == ValueTag.XS_NON_NEGATIVE_INTEGER_TAG
+                || tvp.getTag() == ValueTag.XS_POSITIVE_INTEGER_TAG || tvp.getTag() == ValueTag.XS_UNSIGNED_INT_TAG
+                || tvp.getTag() == ValueTag.XS_UNSIGNED_LONG_TAG || tvp.getTag() == ValueTag.ARRAY_TAG
+                || tvp.getTag() == ValueTag.XS_BOOLEAN_TAG || tvp.getTag() == ValueTag.OBJECT_TAG
+                || tvp.getTag() == ValueTag.XS_BYTE_TAG || tvp.getTag() == ValueTag.XS_UNSIGNED_BYTE_TAG
+                || tvp.getTag() == ValueTag.JS_NULL_TAG || tvp.getTag() == ValueTag.XS_FLOAT_TAG
+                || tvp.getTag() == ValueTag.XS_UNSIGNED_SHORT_TAG || tvp.getTag() == ValueTag.XS_SHORT_TAG
+                || tvp.getTag() == ValueTag.XS_UNSIGNED_BYTE_TAG) {
             printTaggedValuePointable(ps, tvp);
+        } else {
+            printQuotedTaggedValuePointable(ps, tvp);
         }
     }
 
-    private void printQuotedString(PrintStream ps, TaggedValuePointable tvp) {
+    private void printQuotedTaggedValuePointable(PrintStream ps, TaggedValuePointable tvp) {
         ps.append('\"');
-        printString(ps, tvp);
+        printTaggedValuePointable(ps, tvp);
         ps.append('\"');
     }
 
