@@ -61,7 +61,8 @@ public class ArithmeticHelper {
         castToDouble = new CastToDoubleOperation();
     }
 
-    public void compute(TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result) throws SystemException {
+    public void compute(TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result)
+            throws SystemException {
         abvs.reset();
         try {
             int tid1 = getBaseTypeForArithmetics(tvp1.getTag());
@@ -98,6 +99,8 @@ public class ArithmeticHelper {
                     doublep1.set(abvsArgument1.getByteArray(), abvsArgument1.getStartOffset() + 1,
                             DoublePointable.TYPE_TRAITS.getFixedLength());
                     break;
+                case ValueTag.JS_NULL_TAG:
+                    throw new SystemException(ErrorCode.XPTY0004);
             }
             LongPointable longp2 = (LongPointable) LongPointable.FACTORY.createPointable();
             DoublePointable doublep2 = (DoublePointable) DoublePointable.FACTORY.createPointable();
@@ -131,6 +134,8 @@ public class ArithmeticHelper {
                     doublep2.set(abvsArgument2.getByteArray(), abvsArgument2.getStartOffset() + 1,
                             DoublePointable.TYPE_TRAITS.getFixedLength());
                     break;
+                case ValueTag.JS_NULL_TAG:
+                    throw new SystemException(ErrorCode.XPTY0004);
             }
             switch (tid1) {
                 case ValueTag.XS_DECIMAL_TAG:
