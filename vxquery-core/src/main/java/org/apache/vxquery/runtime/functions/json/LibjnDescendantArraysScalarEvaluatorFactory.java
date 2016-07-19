@@ -68,7 +68,7 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
                 for (int i = 0; i < size; i++) {
                     sp.getEntry(i, tempTvp);
                     if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
-                        nested(tempTvp);
+                        nested(tempTvp, ap);
                     }
                     if (tempTvp.getTag() == ValueTag.OBJECT_TAG) {
                         insideObject(tempTvp);
@@ -83,32 +83,18 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
                 ppool.giveBack(tempTvp);
             }
 
-            public TaggedValuePointable nested(TaggedValuePointable tvp) throws SystemException {
+            public void nested(TaggedValuePointable tvp, ArrayPointable ap) throws SystemException {
                 TaggedValuePointable tvp1 = ppool.takeOne(TaggedValuePointable.class);
-                boolean inArray = false;
                 appendSequence(tvp, ap);
-                ap.getEntry(0, tvp1);
-                if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
-                    inArray = true;
-                }
                 int size = ap.getEntryCount();
-                if (size > 1) {
-                    for (int i = 1; i < size; i++) {
-                        if (inArray) {
-                            appendSequence(tvp1, ap1);
-                            ap.getEntry(i, tvp1);
-                            if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
-                                inArray = true;
-                            }
-                        }
+                for (int i = 0; i < size; i++) {
+
+                    ap.getEntry(i, tvp1);
+                    if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
+                        nested(tvp1, ap1);
                     }
                 }
                 ppool.giveBack(tvp1);
-                if (inArray) {
-                    return nested(tvp1);
-                } else {
-                    return null;
-                }
             }
 
             public void appendSequence(TaggedValuePointable tvp, ArrayPointable ap) throws SystemException {
@@ -120,7 +106,7 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
                 }
             }
 
-            public TaggedValuePointable insideObject(TaggedValuePointable tvp) throws SystemException {
+            public void insideObject(TaggedValuePointable tvp) throws SystemException {
                 boolean inObject = false;
                 tvp.getValue(op);
                 TaggedValuePointable tempTvp1 = ppool.takeOne(TaggedValuePointable.class);
@@ -136,9 +122,9 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
                 }
                 ppool.giveBack(tempTvp1);
                 if (inObject) {
-                    return insideObject(tempTvp1);
+                    insideObject(tempTvp1);
                 } else {
-                    return nested(tempTvp1);
+                    nested(tempTvp1, ap);
                 }
             }
         };
