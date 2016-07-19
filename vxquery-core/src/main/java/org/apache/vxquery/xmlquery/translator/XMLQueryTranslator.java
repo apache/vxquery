@@ -168,6 +168,7 @@ import org.apache.vxquery.xmlquery.ast.QueryBodyNode;
 import org.apache.vxquery.xmlquery.ast.RelativePathExprNode;
 import org.apache.vxquery.xmlquery.ast.SchemaImportNode;
 import org.apache.vxquery.xmlquery.ast.SequenceTypeNode;
+import org.apache.vxquery.xmlquery.ast.SimpleObjectUnionConstructor;
 import org.apache.vxquery.xmlquery.ast.SingleTypeNode;
 import org.apache.vxquery.xmlquery.ast.TypeDeclNode;
 import org.apache.vxquery.xmlquery.ast.TypeExprNode;
@@ -837,6 +838,11 @@ public class XMLQueryTranslator {
                 return translateObjectConstructor(tCtx, obj);
             }
 
+            case SIMPLE_OBJECT_UNION_CONSTRUCTOR: {
+                SimpleObjectUnionConstructor aNode = (SimpleObjectUnionConstructor) value;
+                return translateSimpleObjectUnionConstructor(tCtx, aNode);
+            }
+
             case QNAME: {
                 QNameNode qnNode = (QNameNode) value;
                 return translateQNameNode(tCtx, qnNode);
@@ -1208,25 +1214,28 @@ public class XMLQueryTranslator {
         List<ILogicalExpression> content = new ArrayList<ILogicalExpression>();
         PairConstructor pc;
         for (ASTNode aVal : obj.getContent()) {
-            if (aVal.getTag()==ASTTag.PAIR_CONSTRUCTOR) {
-                pc=(PairConstructor) aVal;
-                ILogicalExpression ke = string(data(vre(translateExpression(pc.getKey(), tCtx))));
-                content.add(ke);
-                ILogicalExpression ve = vre(translateExpression(pc.getValue(), tCtx));
-                content.add(ve);
-                ILogicalExpression qmce = ce(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE),
-                        pc.isQuestionMarkColon());
-                content.add(qmce);
-            } else {
-                ILogicalExpression aExpr = aVal == null ? sfce(BuiltinOperators.CONCATENATE)
-                        : vre(translateExpression(aVal, tCtx));
-                return createAssignment(sfce(BuiltinOperators.SIMPLE_OBJECT_UNION, aExpr), tCtx);
-            }
+            pc = (PairConstructor) aVal;
+            ILogicalExpression ke = string(data(vre(translateExpression(pc.getKey(), tCtx))));
+            content.add(ke);
+            ILogicalExpression ve = vre(translateExpression(pc.getValue(), tCtx));
+            content.add(ve);
+            ILogicalExpression qmce = ce(SequenceType.create(BuiltinTypeRegistry.XS_BOOLEAN, Quantifier.QUANT_ONE),
+                    pc.isQuestionMarkColon());
+            content.add(qmce);
         }
 
         return createAssignment(
                 sfce(BuiltinOperators.OBJECT_CONSTRUCTOR, content.toArray(new ILogicalExpression[content.size()])),
                 tCtx);
+    }
+
+    private LogicalVariable translateSimpleObjectUnionConstructor(TranslationContext tCtx,
+            SimpleObjectUnionConstructor aNode) throws SystemException {
+        ASTNode expression = aNode.getExpression();
+        ILogicalExpression aExpr = expression == null ? sfce(BuiltinOperators.CONCATENATE)
+                : vre(translateExpression(expression, tCtx));
+        LogicalVariable lVar = createAssignment(sfce(BuiltinOperators.SIMPLE_OBJECT_UNION, aExpr), tCtx);
+        return lVar;
     }
 
     private LogicalVariable translateDirectElementConstructorNode(TranslationContext tCtx,
