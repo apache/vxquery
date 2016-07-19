@@ -35,6 +35,9 @@ public class TestClusterUtil {
     private static String ccHost = "localhost";
     private static String nodeId = "nc1";
 
+    private TestClusterUtil() {
+    }
+
     public static CCConfig createCCConfig() throws UnknownHostException {
         String publicAddress = InetAddress.getLocalHost().getHostAddress();
         CCConfig ccConfig = new CCConfig();

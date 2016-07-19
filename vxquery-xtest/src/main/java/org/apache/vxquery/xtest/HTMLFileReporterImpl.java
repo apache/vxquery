@@ -76,12 +76,12 @@ public class HTMLFileReporterImpl implements ResultReporter {
                 ++userErrors;
             } else {
                 ++internalErrors;
-                Integer count = exDistribution.get(result.error.getClass());
-                if (count == null) {
-                    count = 0;
+                Integer internalCount = exDistribution.get(result.error.getClass());
+                if (internalCount == null) {
+                    internalCount = 0;
                 }
-                count++;
-                exDistribution.put(result.error.getClass(), count);
+                internalCount++;
+                exDistribution.put(result.error.getClass(), internalCount);
             }
         }
         Integer stCount = stDistribution.get(result.state);
