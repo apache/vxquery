@@ -45,13 +45,16 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+        TaggedValuePointable arg = args[0];
+        if (!(arg.getTag() == ValueTag.SEQUENCE_TAG || arg.getTag() == ValueTag.OBJECT_TAG)) {
+            throw new SystemException(ErrorCode.FORG0006);
+        }
         TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
         try {
             abvs.reset();
             ob.reset(abvs);
             tvps.clear();
-            TaggedValuePointable arg = args[0];
             if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
                 arg.getValue(sp);
                 for (int i = 0; i < sp.getEntryCount(); ++i) {

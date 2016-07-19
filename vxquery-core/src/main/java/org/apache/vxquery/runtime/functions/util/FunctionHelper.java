@@ -64,8 +64,8 @@ public class FunctionHelper {
     }
 
     public static void arithmeticOperation(AbstractArithmeticOperation aOp, DynamicContext dCtx,
-                                           TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result, TypedPointables tp1,
-                                           TypedPointables tp2) throws SystemException {
+            TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result, TypedPointables tp1,
+            TypedPointables tp2) throws SystemException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
         final ArrayBackedValueStorage abvsArgument1 = new ArrayBackedValueStorage();
@@ -473,7 +473,7 @@ public class FunctionHelper {
     }
 
     public static boolean arraysEqual(byte[] bytes1, int offset1, int length1, byte[] bytes2, int offset2,
-                                      int length2) {
+            int length2) {
         if (length1 != length2) {
             return false;
         }
@@ -486,8 +486,8 @@ public class FunctionHelper {
     }
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
-                                              TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-            throws SystemException {
+            TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
+                    throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1134,7 +1134,7 @@ public class FunctionHelper {
     }
 
     public static String getStringFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-                                                DataInputStream di) throws SystemException {
+            DataInputStream di) throws SystemException {
         try {
             bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
                     stringp.getLength() + stringp.getStartOffset())), 0);
@@ -1222,8 +1222,8 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-                                              DataInputStream di, ArrayBackedValueStorage abvs, IParser parser)
-            throws NumberFormatException, JsonParseException, IOException {
+            DataInputStream di, ArrayBackedValueStorage abvs, IParser parser)
+                    throws NumberFormatException, JsonParseException, IOException {
         String fName;
         try {
             fName = getStringFromPointable(stringp, bbis, di);
@@ -1234,8 +1234,8 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
-                                           ArrayBackedValueStorage abvs, IParser parser)
-            throws NumberFormatException, JsonParseException, IOException {
+            ArrayBackedValueStorage abvs, IParser parser)
+                    throws NumberFormatException, JsonParseException, IOException {
         int bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1"));
         Reader input;
         if (!fName.contains("hdfs:/")) {
@@ -1277,8 +1277,8 @@ public class FunctionHelper {
     }
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,
-                                                                 TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1,
-                                                                 TypedPointables tp2) throws SystemException {
+            TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1,
+            TypedPointables tp2) throws SystemException {
         TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
