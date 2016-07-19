@@ -37,12 +37,15 @@ import org.apache.vxquery.runtime.functions.index.CaseSensitiveAnalyzer;
 import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 
+import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -67,13 +70,17 @@ public class IndexUpdater {
     private String nodeId;
     private IndexWriter indexWriter;
     private Set<String> pathsFromFileList;
+    private String collectionFolder;
+    private XmlMetadata collectionMetadata;
+    private String indexFolder;
     private Logger LOGGER = Logger.getLogger("Index Updater");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     //TODO : Implement for paralleizing
     public IndexUpdater(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
-                        ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
-                        ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode,
-                        TaggedValuePointable nodep,  String nodeId) {
+            ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
+            ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
+            String nodeId) {
         this.args = args;
         this.result = result;
         this.stringp = stringp;
@@ -88,16 +95,21 @@ public class IndexUpdater {
         this.pathsFromFileList = new HashSet<>();
     }
 
-    public void evaluate() throws SystemException, IOException, NoSuchAlgorithmException {
-        String collectionFolder;
-        String indexFolder;
+    /**
+     * Perform the initial configuration for index update/ delete processes.
+     *
+     * @throws SystemException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+    public void setup() throws SystemException, IOException, NoSuchAlgorithmException, JAXBException {
+
         TaggedValuePointable indexTVP = args[0];
 
         if (indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
             throw new SystemException(ErrorCode.FORG0006);
         }
 
-        XmlMetadata collectionMetadata;
         try {
             // Get the index folder
             indexTVP.getValue(stringp);
@@ -107,20 +119,15 @@ public class IndexUpdater {
 
             // Read the metadata file and load the metadata map into memory.
             metaFileUtil = MetaFileUtil.create(indexFolder);
-            metadataMap = metaFileUtil.readMetaFile();
+            metaFileUtil.readMetadataFile();
+            metadataMap = metaFileUtil.getMetadata(indexFolder);
 
             // Retrieve the collection folder path.
             // Remove the entry for ease of the next steps.
-            collectionMetadata = metadataMap.remove(Constants.COLLECTION_ENTRY);
-            collectionFolder = collectionMetadata.getPath();
+            collectionFolder = metaFileUtil.getCollection(indexFolder);
 
         } catch (IOException | ClassNotFoundException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
-        }
-
-        File collectionDirectory = new File(collectionFolder);
-        if (!collectionDirectory.exists()) {
-            throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
         }
 
         abvs.reset();
@@ -129,25 +136,50 @@ public class IndexUpdater {
         Directory fsdir = FSDirectory.open(Paths.get(indexFolder));
         indexWriter = new IndexWriter(fsdir, new IndexWriterConfig(new CaseSensitiveAnalyzer()).
                 setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
+    }
+
+    /**
+     * Wrapper for update index function.
+     *
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+    public void updateIndex() throws IOException, NoSuchAlgorithmException {
+        File collectionDirectory = new File(collectionFolder);
+        if (!collectionDirectory.exists()) {
+            throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
+        }
 
         //Execute update index process
         updateIndex(collectionDirectory);
 
         //Detect deleted files and execute the delete index process.
         deleteIndexOfDeletedFiles(metadataMap.keySet(), pathsFromFileList);
+    }
 
-        // Add collection path entry back
-        metadataMap.put(Constants.COLLECTION_ENTRY, collectionMetadata);
-
-        //Write the updated metadata to the file.
-        metaFileUtil.writeMetaFile(metadataMap);
-
+    /**
+     * Close opened IndexWriter and terminate the index update/ delete process.
+     *
+     * @throws IOException
+     */
+    public void exit() throws IOException {
         indexWriter.forceMerge(1);
 
         indexWriter.close();
 
         sb.finish();
         result.set(abvs);
+    }
+
+    /**
+     * Functional wrapper to update Metadata file.
+     *
+     * @throws IOException
+     */
+    public synchronized void updateMetadataFile() throws IOException, JAXBException {
+        //Write the updated metadata to the file.
+        metaFileUtil.updateMetadataMap(metadataMap, indexFolder);
+        metaFileUtil.writeMetadataToFile();
     }
 
     /**
@@ -180,12 +212,14 @@ public class IndexUpdater {
 
                         //Update index corresponding to the xml file.
                         indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, file.getCanonicalPath()));
-                        indexDocumentBuilder = IndexConstructorUtil.getIndexBuilder(file, indexWriter,
-                                nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
+                        indexDocumentBuilder = IndexConstructorUtil
+                                .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di,
+                                        nodeId);
                         indexDocumentBuilder.printStart();
 
-                        if (LOGGER.isDebugEnabled())
+                        if (LOGGER.isDebugEnabled()) {
                             LOGGER.log(Level.DEBUG, "New Index is created for updated file " + file.getCanonicalPath());
+                        }
 
                         //Update the metadata map.
                         XmlMetadata metadata = updateEntry(file, data);
@@ -196,12 +230,13 @@ public class IndexUpdater {
 
                     // In this case, the xml file has not added to the index. (It is a newly added file)
                     // Therefore generate a new index for this file and add it to the existing index.
-                    indexDocumentBuilder = IndexConstructorUtil.getIndexBuilder(file, indexWriter,
-                            nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
+                    indexDocumentBuilder = IndexConstructorUtil
+                            .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
                     indexDocumentBuilder.printStart();
 
-                    if (LOGGER.isDebugEnabled())
+                    if (LOGGER.isDebugEnabled()) {
                         LOGGER.log(Level.DEBUG, "New Index is created for newly added file " + file.getCanonicalPath());
+                    }
 
                     XmlMetadata metadata = updateEntry(file, null);
                     metadataMap.put(file.getCanonicalPath(), metadata);
@@ -212,17 +247,16 @@ public class IndexUpdater {
         }
     }
 
-
     /**
      * Update the current XmlMetadata object related to the currently reading XML file.
      *
-     * @param file : XML file
+     * @param file     : XML file
      * @param metadata : Existing metadata object
      * @return : XML metadata object with updated fields.
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
-    public XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException, NoSuchAlgorithmException {
+    private XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException, NoSuchAlgorithmException {
 
         if (metadata == null)
             metadata = new XmlMetadata();
@@ -230,6 +264,7 @@ public class IndexUpdater {
         metadata.setPath(file.getCanonicalPath());
         metadata.setFileName(file.getName());
         metadata.setMd5(metaFileUtil.generateMD5(file));
+        metadata.setLastModified(sdf.format(file.lastModified()));
         return metadata;
     }
 
@@ -240,7 +275,7 @@ public class IndexUpdater {
      * @param pathsFromFileList : Set of paths taken from list of existing files.
      * @throws IOException
      */
-    public void deleteIndexOfDeletedFiles(Set<String> pathsFromMap, Set<String> pathsFromFileList) throws IOException {
+    private void deleteIndexOfDeletedFiles(Set<String> pathsFromMap, Set<String> pathsFromFileList) throws IOException {
         Set<String> sfm = new HashSet<>(pathsFromMap);
 
         // If any file has been deleted from the collection, the number of files stored in metadata is higher  than
@@ -255,10 +290,45 @@ public class IndexUpdater {
             for (String s : sfm) {
                 metadataMap.remove(s);
                 indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, s));
-                if (LOGGER.isDebugEnabled())
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.log(Level.DEBUG, "Index of the deleted file " + s + " was deleted from the index!");
+                }
             }
         }
+    }
+
+    /**
+     * Delete all indexes in the given directory.
+     * This will also remove the existing metadata file.
+     * It will be created when recreating the index.
+     * When deleting indexes, if any error occurred, the process will be rolled back and all the indexes will be
+     * restored.
+     * Otherwise the changes will be committed.
+     */
+    public void deleteAllIndexes() throws SystemException {
+        try {
+            indexWriter.deleteAll();
+            indexWriter.commit();
+            indexWriter.close();
+            metaFileUtil.deleteMetaDataFile();
+
+            for (File f : (new File(indexFolder)).listFiles())
+                Files.delete(f.toPath());
+
+            sb.finish();
+            result.set(abvs);
+        } catch (IOException e) {
+            try {
+                indexWriter.rollback();
+                indexWriter.close();
+
+                sb.finish();
+                result.set(abvs);
+            } catch (IOException e1) {
+                throw new SystemException(ErrorCode.FOAR0001);
+            }
+        }
+
     }
 
 }
