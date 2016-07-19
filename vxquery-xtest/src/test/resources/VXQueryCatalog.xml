@@ -51,6 +51,8 @@
 <!ENTITY JsonArrayNavigationQueries SYSTEM "cat/JsonArrayNavigationQueries.xml">
 <!ENTITY JsonParserQueries SYSTEM "cat/JsonParserQueries.xml">
 
+<!ENTITY TraceQuery SYSTEM "cat/TraceQuery.xml">
+
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -326,6 +328,18 @@
          &JsonObjectNavigationQueries;
          &JsonArrayNavigationQueries;
          &JsonParserQueries;
+      </test-group>
+   </test-group>
+   <test-group name="TraceQuery" featureOwner="Christina Pavlopoulou">
+      <GroupInfo>
+         <title>Trace function</title>
+         <description>Trace function test</description>
+      </GroupInfo>
+      <test-group name="TraceTesting" featureOwner="Christina Pavlopoulou">
+         <GroupInfo>
+            <title>Trace functions tests</title>
+         </GroupInfo>
+         &TraceQuery;
       </test-group>
    </test-group>
 </test-suite>
