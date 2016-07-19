@@ -1190,4 +1190,10 @@
         <return type="js:null"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnNullScalarEvaluatorFactory"/>
     </function>
+    <!-- libjn:descendant-arrays($sequence as item()*) as array()* -->
+    <function name="libjn:descendant-arrays">
+        <param name="sequence" type="item()*"/>
+        <return type="json-item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnDescendantArraysScalarEvaluatorFactory"/>
+    </function>
 </functions>
