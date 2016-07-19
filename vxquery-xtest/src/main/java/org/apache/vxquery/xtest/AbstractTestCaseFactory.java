@@ -83,7 +83,7 @@ public abstract class AbstractTestCaseFactory {
     }
 
     private static Set<String> getPreviousTests(String previousTestResults) {
-        Set<String> tests = new LinkedHashSet<String>();
+        Set<String> tests = new LinkedHashSet<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader(previousTestResults));
             String line;
