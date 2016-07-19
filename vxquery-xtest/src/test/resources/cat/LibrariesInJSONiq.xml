@@ -25,4 +25,9 @@
       <query name="descendant_arrays" date="2016-07-18"/>
       <output-file compare="Text">descendant_arrays.txt</output-file>
    </test-case>
+   <test-case name="descendant-arrays2" FilePath="Json/Libraries/" Creator="Christina Pavlopoulou">
+      <description>Json Libraries.</description>
+      <query name="descendant_arrays2" date="2016-07-19"/>
+      <output-file compare="Text">descendant_arrays2.txt</output-file>
+   </test-case>
 </test-group>

@@ -49,6 +49,7 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
             throws AlgebricksException {
         final SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
+        final ArrayPointable ap1 = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
         final ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final SequenceBuilder sb = new SequenceBuilder();
@@ -83,18 +84,24 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
             }
 
             public TaggedValuePointable nested(TaggedValuePointable tvp) throws SystemException {
-                boolean inArray = false;
-                tvp.getValue(ap);
-                try {
-                    sb.addItem(tvp);
-                } catch (IOException e) {
-                    throw new SystemException(ErrorCode.SYSE0001, e);
-                }
                 TaggedValuePointable tvp1 = ppool.takeOne(TaggedValuePointable.class);
+                boolean inArray = false;
+                appendSequence(tvp, ap);
                 ap.getEntry(0, tvp1);
-
                 if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
                     inArray = true;
+                }
+                int size = ap.getEntryCount();
+                if (size > 1) {
+                    for (int i = 1; i < size; i++) {
+                        if (inArray) {
+                            appendSequence(tvp1, ap1);
+                            ap.getEntry(i, tvp1);
+                            if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
+                                inArray = true;
+                            }
+                        }
+                    }
                 }
                 ppool.giveBack(tvp1);
                 if (inArray) {
@@ -102,7 +109,15 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
                 } else {
                     return null;
                 }
-                
+            }
+
+            public void appendSequence(TaggedValuePointable tvp, ArrayPointable ap) throws SystemException {
+                tvp.getValue(ap);
+                try {
+                    sb.addItem(tvp);
+                } catch (IOException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
             }
 
             public TaggedValuePointable insideObject(TaggedValuePointable tvp) throws SystemException {
