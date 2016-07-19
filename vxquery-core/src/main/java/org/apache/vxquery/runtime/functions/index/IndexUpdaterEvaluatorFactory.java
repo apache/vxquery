@@ -26,6 +26,7 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -72,6 +73,7 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
                     updater.updateIndex();
                     updater.updateMetadataFile();
                     updater.exit();
+                    XDMConstants.setTrue(result);
                 } catch (IOException | NoSuchAlgorithmException | JAXBException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
