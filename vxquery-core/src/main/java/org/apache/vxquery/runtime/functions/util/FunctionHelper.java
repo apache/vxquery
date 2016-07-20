@@ -21,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -487,7 +488,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-            throws SystemException {
+                    throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1231,24 +1232,29 @@ public class FunctionHelper {
             if (file.exists()) {
                 input = new InputStreamReader(new FileInputStream(file));
                 parser.parse(input, abvs);
-            }
-            else{
-                throw new IOException();
+            } else {
+                throw new FileNotFoundException(file.getAbsolutePath());
             }
         } else {
             // else check in HDFS file system
-            HDFSFunctions hdfs = new HDFSFunctions(null, null);
-            FileSystem fs = hdfs.getFileSystem();
-            if (fs != null) {
-                String fHdfsName = fName.replaceAll("hdfs:/", "");
-                Path xmlDocument = new Path(fHdfsName);
-                if (fs.exists(xmlDocument)) {
-                    InputStream in = fs.open(xmlDocument).getWrappedStream();
-                    input = new InputStreamReader(in);
-                    parser.parse(input, abvs);
-                    in.close();
+            try {
+                HDFSFunctions hdfs = new HDFSFunctions(null, null);
+                FileSystem fs = hdfs.getFileSystem();
+                if (fs != null) {
+                    String fHdfsName = fName.replaceAll("hdfs:/", "");
+                    Path xmlDocument = new Path(fHdfsName);
+                    if (fs.exists(xmlDocument)) {
+                        InputStream in = fs.open(xmlDocument).getWrappedStream();
+                        input = new InputStreamReader(in);
+                        parser.parse(input, abvs);
+                        in.close();
+                    } else {
+                        throw new FileNotFoundException(xmlDocument.getName());
+                    }
+                    fs.close();
                 }
-                fs.close();
+            } catch (IOException e) {
+                throw e;
             }
         }
     }
