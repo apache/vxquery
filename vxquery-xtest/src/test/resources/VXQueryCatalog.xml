@@ -50,6 +50,7 @@
 <!ENTITY JsonObjectNavigationQueries SYSTEM "cat/JsonObjectNavigationQueries.xml">
 <!ENTITY JsonArrayNavigationQueries SYSTEM "cat/JsonArrayNavigationQueries.xml">
 <!ENTITY JsonParserQueries SYSTEM "cat/JsonParserQueries.xml">
+<!ENTITY LibrariesInJSONiq SYSTEM "cat/LibrariesInJSONiq.xml">
 
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
@@ -326,6 +327,18 @@
          &JsonObjectNavigationQueries;
          &JsonArrayNavigationQueries;
          &JsonParserQueries;
+      </test-group>
+   </test-group>
+   <test-group name="LibrariesInJSONiq" featureOwner="Christina Pavlopoulou">
+      <GroupInfo>
+         <title>Libraries in JSONiq</title>
+         <description>Libraries created for JSONiq</description>
+      </GroupInfo>
+      <test-group name="LibrariesInJSONiqTesting" featureOwner="Christina Pavlopoulou">
+         <GroupInfo>
+            <title>Tests for libraries in JSONiq</title>
+         </GroupInfo>
+         &LibrariesInJSONiq;
       </test-group>
    </test-group>
 </test-suite>
