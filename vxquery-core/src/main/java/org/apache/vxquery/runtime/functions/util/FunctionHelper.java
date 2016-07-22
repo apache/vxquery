@@ -1237,24 +1237,22 @@ public class FunctionHelper {
             }
         } else {
             // else check in HDFS file system
-            try {
-                HDFSFunctions hdfs = new HDFSFunctions(null, null);
-                FileSystem fs = hdfs.getFileSystem();
-                if (fs != null) {
-                    String fHdfsName = fName.replaceAll("hdfs:/", "");
-                    Path xmlDocument = new Path(fHdfsName);
-                    if (fs.exists(xmlDocument)) {
-                        InputStream in = fs.open(xmlDocument).getWrappedStream();
-                        input = new InputStreamReader(in);
-                        parser.parse(input, abvs);
-                        in.close();
-                    } else {
-                        throw new FileNotFoundException(xmlDocument.getName());
-                    }
-                    fs.close();
+            HDFSFunctions hdfs = new HDFSFunctions(null, null);
+            FileSystem fs = hdfs.getFileSystem();
+            if (fs != null) {
+                String fHdfsName = fName.replaceAll("hdfs:/", "");
+                Path xmlDocument = new Path(fHdfsName);
+                if (fs.exists(xmlDocument)) {
+                    InputStream in = fs.open(xmlDocument).getWrappedStream();
+                    input = new InputStreamReader(in);
+                    parser.parse(input, abvs);
+                    in.close();
+                } else {
+                    throw new FileNotFoundException(xmlDocument.getName());
                 }
-            } catch (IOException e) {
-                throw e;
+                fs.close();
+            } else {
+                throw new IOException();
             }
         }
     }
