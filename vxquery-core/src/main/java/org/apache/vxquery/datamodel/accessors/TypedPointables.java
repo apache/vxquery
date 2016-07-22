@@ -23,6 +23,8 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.DocumentNodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.ElementNodePointable;
@@ -65,6 +67,8 @@ public class TypedPointables {
     public XSDurationPointable durationp = (XSDurationPointable) XSDurationPointable.FACTORY.createPointable();
     public XSTimePointable timep = (XSTimePointable) XSTimePointable.FACTORY.createPointable();
     public XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
+    public ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
+    public ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
 
     // XQuery Nodes
     public AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY.createPointable();

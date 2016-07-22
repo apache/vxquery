@@ -26,6 +26,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
@@ -228,6 +229,10 @@ public abstract class AbstractCastToOperation {
     }
 
     public void convertNull(DataOutput dOut) throws SystemException, IOException {
+        throw new SystemException(ErrorCode.XPTY0004);
+    }
+
+    public void convertArray(ArrayPointable ap, DataOutput dOut) throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 }

@@ -1171,6 +1171,13 @@
             <argument value="0"/>
         </property>
     </function>
+    
+    <!-- fn:serialize($data  as item()*) as  xs:string  -->
+    <function name="fn:serialize">
+        <param name="data" type="item()*"/>
+        <return type="xs:string"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.serialize.FnSerializeScalarEvaluatorFactory"/>
+    </function>
 
     <!-- jn:keys($arg as item()*) as xs:string* -->
     <function name="jn:keys">
