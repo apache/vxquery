@@ -17,6 +17,7 @@
 package org.apache.vxquery.runtime.functions.error;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -76,9 +77,13 @@ public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                     tvp1.getValue(qnamep);
                     qnamep.getUri(urip);
                     qnamep.getLocalName(localnamep);
-                    namespaceURI = FunctionHelper.getStringFromPointable(urip, bbis, di);
-                    localPart = FunctionHelper.getStringFromPointable(localnamep, bbis, di);
+                    try {
+                        namespaceURI = FunctionHelper.getStringFromPointable(urip, bbis, di);
 
+                        localPart = FunctionHelper.getStringFromPointable(localnamep, bbis, di);
+                    } catch (IOException e) {
+                        throw new SystemException(ErrorCode.FOER0000);
+                    }
                     // TODO Update to dynamic error.
                     throw new SystemException(ErrorCode.FOER0000);
                 }
@@ -98,8 +103,13 @@ public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                         tvp1.getValue(qnamep);
                         qnamep.getUri(urip);
                         qnamep.getLocalName(localnamep);
-                        namespaceURI = FunctionHelper.getStringFromPointable(urip, bbis, di);
-                        localPart = FunctionHelper.getStringFromPointable(localnamep, bbis, di);
+                        try {
+                            namespaceURI = FunctionHelper.getStringFromPointable(urip, bbis, di);
+
+                            localPart = FunctionHelper.getStringFromPointable(localnamep, bbis, di);
+                        } catch (IOException e) {
+                            throw new SystemException(ErrorCode.FORG0006);
+                        }
                     } else {
                         throw new SystemException(ErrorCode.FORG0006);
                     }

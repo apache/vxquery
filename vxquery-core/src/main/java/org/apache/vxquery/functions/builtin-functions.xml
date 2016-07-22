@@ -1106,6 +1106,7 @@
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.trace.FnTraceScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:translate($arg  as xs:string?, $mapString as xs:string, $transString as xs:string)  as xs:string -->

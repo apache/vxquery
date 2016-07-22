@@ -21,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1134,14 +1135,10 @@ public class FunctionHelper {
     }
 
     public static String getStringFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di) throws SystemException {
-        try {
-            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                    stringp.getLength() + stringp.getStartOffset())), 0);
-            return di.readUTF();
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        }
+            DataInputStream di) throws IOException {
+        bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                stringp.getLength() + stringp.getStartOffset())), 0);
+        return di.readUTF();
     }
 
     public static long getTimezone(ITimezone timezonep) {
@@ -1222,56 +1219,40 @@ public class FunctionHelper {
     }
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, IParser parser)
-                    throws NumberFormatException, JsonParseException, IOException {
-        String fName;
-        try {
-            fName = getStringFromPointable(stringp, bbis, di);
-        } catch (SystemException e) {
-            throw new HyracksDataException(e);
-        }
+            DataInputStream di, ArrayBackedValueStorage abvs, IParser parser) throws IOException {
+        String fName = getStringFromPointable(stringp, bbis, di);
         readInDocFromString(fName, bbis, di, abvs, parser);
     }
 
     public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
-            ArrayBackedValueStorage abvs, IParser parser)
-                    throws NumberFormatException, JsonParseException, IOException {
-        int bufferSize = Integer.parseInt(System.getProperty("vxquery.buffer_size", "-1"));
+            ArrayBackedValueStorage abvs, IParser parser) throws IOException {
         Reader input;
         if (!fName.contains("hdfs:/")) {
             File file = new File(fName);
-
             if (file.exists()) {
-                if (bufferSize > 0) {
-                    input = new BufferedReader(new InputStreamReader(new FileInputStream(file)), bufferSize);
-                } else {
-                    input = new InputStreamReader(new FileInputStream(file));
-                }
+                input = new InputStreamReader(new FileInputStream(file));
                 parser.parse(input, abvs);
+            } else {
+                throw new FileNotFoundException(file.getAbsolutePath());
             }
-        }
-        //else check in HDFS file system
-        else {
+        } else {
+            // else check in HDFS file system
             HDFSFunctions hdfs = new HDFSFunctions(null, null);
             FileSystem fs = hdfs.getFileSystem();
             if (fs != null) {
-                try {
-                    String fHdfsName = fName.replaceAll("hdfs:/", "");
-                    Path xmlDocument = new Path(fHdfsName);
-                    if (fs.exists(xmlDocument)) {
-                        InputStream in = fs.open(xmlDocument).getWrappedStream();
-                        if (bufferSize > 0) {
-                            input = new BufferedReader(new InputStreamReader(in), bufferSize);
-                        } else {
-                            input = new InputStreamReader(in);
-                        }
-                        parser.parse(input, abvs);
-                        in.close();
-                    }
-                    fs.close();
-                } catch (IOException e) {
-                    throw new HyracksDataException(e);
+                String fHdfsName = fName.replaceAll("hdfs:/", "");
+                Path xmlDocument = new Path(fHdfsName);
+                if (fs.exists(xmlDocument)) {
+                    InputStream in = fs.open(xmlDocument).getWrappedStream();
+                    input = new InputStreamReader(in);
+                    parser.parse(input, abvs);
+                    in.close();
+                } else {
+                    throw new FileNotFoundException(xmlDocument.getName());
                 }
+                fs.close();
+            } else {
+                throw new IOException();
             }
         }
     }
