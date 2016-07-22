@@ -17,6 +17,9 @@
 package org.apache.vxquery.runtime.functions.index;
 
 import java.io.DataInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -66,10 +69,26 @@ public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueA
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 try {
-                    IndexConstructorUtil.evaluate(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider, abvsFileNode,
+                    String collectionFolder;
+                    String indexFolder;
+                    TaggedValuePointable collectionTVP = args[0];
+                    TaggedValuePointable indexTVP = args[1];
+                    collectionTVP.getValue(stringp);
+                    bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                            stringp.getLength() + stringp.getStartOffset())), 0);
+                    collectionFolder = di.readUTF();
+
+                    // Get the index folder
+                    indexTVP.getValue(stringp);
+                    bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                            stringp.getLength() + stringp.getStartOffset())), 0);
+                    indexFolder = di.readUTF();
+
+                    IndexConstructorUtil.evaluate(collectionFolder, indexFolder, result, stringp, bbis, di, sb, abvs,
+                            nodeIdProvider, abvsFileNode,
                             nodep, false, nodeId);
                     XDMConstants.setTrue(result);
-                } catch (JAXBException e) {
+                } catch (JAXBException | IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }

@@ -17,6 +17,7 @@
 package org.apache.vxquery.metadata;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -52,17 +53,27 @@ import org.apache.hyracks.api.dataflow.value.IRecordDescriptorProvider;
 import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.api.job.IOperatorDescriptorRegistry;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
 import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
+import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
 import org.apache.hyracks.hdfs.ContextFactory;
 import org.apache.hyracks.hdfs2.dataflow.FileSplitsFactory;
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
+import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
+
+import javax.xml.bind.JAXBException;
 
 // Create a IndexOperatorDescriptor for create index.
 public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
@@ -137,6 +148,25 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                     File xmlDocument = it.next();
                                     if (LOGGER.isLoggable(Level.FINE)) {
                                         LOGGER.fine("Starting to read XML document: " + xmlDocument.getAbsolutePath());
+                                    }
+                                    IPointable result = new TaggedValuePointable();
+
+                                    final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+                                    final TaggedValuePointable nodep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+
+                                    final ByteBufferInputStream bbis = new ByteBufferInputStream();
+                                    final DataInputStream di = new DataInputStream(bbis);
+                                    final SequenceBuilder sb = new SequenceBuilder();
+                                    final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+                                    final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
+
+                                    try {
+                                        IndexConstructorUtil.evaluate(collectionModifiedName, indexModifiedName, result, stringp, bbis,
+                                                di, sb, abvs, nodeIdProvider, abvsFileNode, nodep, false, nodeId);
+                                    } catch (SystemException e) {
+                                        e.printStackTrace();
+                                    } catch (JAXBException e) {
+                                        e.printStackTrace();
                                     }
                                     parser.parseElements(xmlDocument, writer, tupleIndex);
                                 }
