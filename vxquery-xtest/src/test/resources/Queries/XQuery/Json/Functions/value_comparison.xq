@@ -16,4 +16,21 @@
    under the License. :)
 
 (: JSONiq Changes to value comparison semantics :)
-1 eq null, null eq null, 1 ne null, null lt 1
+1 eq null,
+null eq 1,
+null eq null,
+1 ne null,
+null ne 1,
+null ne null,
+null lt 1,
+1 lt null,
+null lt null,
+null gt 1,
+1 gt null,
+null gt null,
+2 ge null,
+null ge 1,
+null ge null,
+null le 2,
+1 le null,
+null le null
