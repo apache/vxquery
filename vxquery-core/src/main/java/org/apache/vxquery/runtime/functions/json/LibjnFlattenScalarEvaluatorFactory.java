@@ -24,6 +24,7 @@ import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.accessors.AbstractSequencePointable;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
@@ -46,6 +47,8 @@ public class LibjnFlattenScalarEvaluatorFactory extends AbstractTaggedValueArgum
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
         final SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final AbstractSequencePointable asp1 = new AbstractSequencePointable();
+        final AbstractSequencePointable asp2 = new AbstractSequencePointable();
         final ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
         final ArrayPointable ap1 = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
         final SequenceBuilder sb = new SequenceBuilder();
@@ -64,7 +67,7 @@ public class LibjnFlattenScalarEvaluatorFactory extends AbstractTaggedValueArgum
                 for (int i = 0; i < size; i++) {
                     sp.getEntry(i, tempTvp);
                     if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
-                        flatten(tempTvp, ap);
+                        flatten(tempTvp);
                     } else {
                         try {
                             sb.addItem(tempTvp);
@@ -73,6 +76,7 @@ public class LibjnFlattenScalarEvaluatorFactory extends AbstractTaggedValueArgum
                         }
                     }
                 }
+                ppool.giveBack(tempTvp);
                 try {
                     sb.finish();
                     result.set(abvs);
@@ -81,14 +85,15 @@ public class LibjnFlattenScalarEvaluatorFactory extends AbstractTaggedValueArgum
                 }
             }
 
-            public void flatten(TaggedValuePointable tvp, ArrayPointable ap) throws SystemException {
+            public void flatten(TaggedValuePointable tvp) throws SystemException {
                 TaggedValuePointable tvp1 = ppool.takeOne(TaggedValuePointable.class);
+                ArrayPointable ap=ppool.takeOne(ArrayPointable.class);
                 tvp.getValue(ap);
                 int size = ap.getEntryCount();
                 for (int i = 0; i < size; i++) {
                     ap.getEntry(i, tvp1);
                     if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
-                        flatten(tvp1, ap1);
+                        flatten(tvp1);
                     } else {
                         try {
                             sb.addItem(tvp1);
@@ -97,17 +102,9 @@ public class LibjnFlattenScalarEvaluatorFactory extends AbstractTaggedValueArgum
                         }
                     }
                 }
+                ppool.giveBack(tvp1);
+                ppool.giveBack(ap);
             }
-
-            //            public void appendSequence(TaggedValuePointable tvp, ArrayPointable ap) throws SystemException {
-            //                tvp.getValue(ap);
-            //                try {
-            //                    ap.appendItems(sb);
-            //                } catch (IOException e1) {
-            //                    throw new SystemException(ErrorCode.SYSE0001, e1);
-            //                }
-            //            }
-
         };
     }
 
