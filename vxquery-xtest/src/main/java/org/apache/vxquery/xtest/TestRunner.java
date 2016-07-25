@@ -175,5 +175,6 @@ public class TestRunner {
     }
 
     public void close() throws Exception {
+        // TODO add a close statement for the hyracks connection.
     }
 }

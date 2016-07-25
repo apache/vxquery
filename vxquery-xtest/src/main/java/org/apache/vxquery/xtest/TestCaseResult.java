@@ -57,9 +57,10 @@ public class TestCaseResult {
 
     public void compare() {
         String eErr = testCase.getExpectedError();
+        File[] resFiles = testCase.getExpectedResultFiles();
         report = "No result file found";
         state = State.NO_RESULT_FILE;
-        if (eErr != null) {
+        if (eErr != null && !(!error() && resFiles.length > 0)) {
             if (userError()) {
                 String aErr = String.valueOf(((SystemException) error).getCode());
                 if (eErr.equals(aErr)) {
@@ -85,7 +86,6 @@ public class TestCaseResult {
                 report = "Expected result, Got failure: " + error;
                 state = State.EXPECTED_RESULT_GOT_FAILURE;
             } else {
-                File[] resFiles = testCase.getExpectedResultFiles();
                 for (int i = 0; i < resFiles.length; ++i) {
                     File resFile = resFiles[i];
                     String expResult = slurpFile(resFile);
