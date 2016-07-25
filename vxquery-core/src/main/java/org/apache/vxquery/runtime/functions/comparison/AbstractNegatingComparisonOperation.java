@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.comparison;
 import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -26,6 +27,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
@@ -53,8 +55,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateBooleanBoolean(BooleanPointable boolp1, BooleanPointable boolp2) throws SystemException,
-            IOException {
+    public boolean operateBooleanBoolean(BooleanPointable boolp1, BooleanPointable boolp2)
+            throws SystemException, IOException {
         return !aOp.operateBooleanBoolean(boolp1, boolp2);
     }
 
@@ -71,14 +73,14 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         return !aOp.operateDecimalDecimal(decp1, decp2);
     }
 
     @Override
-    public boolean operateDecimalDouble(XSDecimalPointable decp1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateDecimalDouble(XSDecimalPointable decp1, DoublePointable doublep2)
+            throws SystemException, IOException {
         if (Double.isNaN(doublep2.getDouble())) {
             return false;
         }
@@ -86,8 +88,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDecimalFloat(XSDecimalPointable decp1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateDecimalFloat(XSDecimalPointable decp1, FloatPointable floatp2)
+            throws SystemException, IOException {
         if (Float.isNaN(floatp2.getFloat())) {
             return false;
         }
@@ -95,14 +97,14 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2)
+            throws SystemException, IOException {
         return !aOp.operateDecimalInteger(decp1, longp2);
     }
 
     @Override
-    public boolean operateDoubleDecimal(DoublePointable doublep1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateDoubleDecimal(DoublePointable doublep1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         if (Double.isNaN(doublep1.getDouble())) {
             return false;
         }
@@ -110,8 +112,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2)
+            throws SystemException, IOException {
         if (Double.isNaN(doublep1.getDouble()) || Double.isNaN(doublep2.getDouble())) {
             return false;
         }
@@ -119,8 +121,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDoubleFloat(DoublePointable doublep1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateDoubleFloat(DoublePointable doublep1, FloatPointable floatp2)
+            throws SystemException, IOException {
         if (Double.isNaN(doublep1.getDouble()) || Float.isNaN(floatp2.getFloat())) {
             return false;
         }
@@ -128,8 +130,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDoubleInteger(DoublePointable doublep1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateDoubleInteger(DoublePointable doublep1, LongPointable longp2)
+            throws SystemException, IOException {
         if (Double.isNaN(doublep1.getDouble())) {
             return false;
         }
@@ -137,8 +139,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2)
+            throws SystemException, IOException {
         return !aOp.operateDTDurationDTDuration(longp1, longp2);
     }
 
@@ -149,8 +151,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2) throws SystemException,
-            IOException {
+    public boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2)
+            throws SystemException, IOException {
         return !aOp.operateDTDurationYMDuration(longp1, intp2);
     }
 
@@ -173,8 +175,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         if (Float.isNaN(floatp1.getFloat())) {
             return false;
         }
@@ -182,8 +184,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateFloatDouble(FloatPointable floatp1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateFloatDouble(FloatPointable floatp1, DoublePointable doublep2)
+            throws SystemException, IOException {
         if (Float.isNaN(floatp1.getFloat()) || Double.isNaN(doublep2.doubleValue())) {
             return false;
         }
@@ -191,8 +193,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2)
+            throws SystemException, IOException {
         if (Float.isNaN(floatp1.getFloat()) || Float.isNaN(floatp2.getFloat())) {
             return false;
         }
@@ -200,8 +202,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateFloatInteger(FloatPointable floatp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateFloatInteger(FloatPointable floatp1, LongPointable longp2)
+            throws SystemException, IOException {
         if (Float.isNaN(floatp1.getFloat())) {
             return false;
         }
@@ -245,14 +247,14 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         return !aOp.operateIntegerDecimal(longp1, decp2);
     }
 
     @Override
-    public boolean operateIntegerDouble(LongPointable longp1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateIntegerDouble(LongPointable longp1, DoublePointable doublep2)
+            throws SystemException, IOException {
         if (Double.isNaN(doublep2.doubleValue())) {
             return false;
         }
@@ -260,8 +262,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateIntegerFloat(LongPointable longp1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateIntegerFloat(LongPointable longp1, FloatPointable floatp2)
+            throws SystemException, IOException {
         if (Float.isNaN(floatp2.floatValue())) {
             return false;
         }
@@ -269,8 +271,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateIntegerInteger(LongPointable longp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateIntegerInteger(LongPointable longp1, LongPointable longp2)
+            throws SystemException, IOException {
         return !aOp.operateIntegerInteger(longp1, longp2);
     }
 
@@ -281,8 +283,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateQNameQName(XSQNamePointable qnamep1, XSQNamePointable qnamep2) throws SystemException,
-            IOException {
+    public boolean operateQNameQName(XSQNamePointable qnamep1, XSQNamePointable qnamep2)
+            throws SystemException, IOException {
         return !aOp.operateQNameQName(qnamep1, qnamep2);
     }
 
@@ -299,8 +301,8 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2)
+            throws SystemException, IOException {
         return !aOp.operateYMDurationDTDuration(intp1, longp2);
     }
 
@@ -311,9 +313,15 @@ public abstract class AbstractNegatingComparisonOperation extends AbstractValueC
     }
 
     @Override
-    public boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2) throws SystemException,
-            IOException {
+    public boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2)
+            throws SystemException, IOException {
         return !aOp.operateYMDurationYMDuration(intp1, intp2);
+    }
+
+    @Override
+    public boolean operateNull(TaggedValuePointable tvp1, TaggedValuePointable tvp2)
+            throws SystemException, IOException {
+        return !aOp.operateNull(tvp1, tvp2);
     }
 
 }

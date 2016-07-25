@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -28,6 +29,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.util.DateTime;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
@@ -57,8 +59,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateBooleanBoolean(BooleanPointable boolp1, BooleanPointable boolp2) throws SystemException,
-            IOException {
+    public boolean operateBooleanBoolean(BooleanPointable boolp1, BooleanPointable boolp2)
+            throws SystemException, IOException {
         return (boolp1.compareTo(boolp2) == -1);
     }
 
@@ -105,14 +107,14 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateDecimalDecimal(XSDecimalPointable decp1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         return (decp1.compareTo(decp2) == -1);
     }
 
     @Override
-    public boolean operateDecimalDouble(XSDecimalPointable decp1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateDecimalDouble(XSDecimalPointable decp1, DoublePointable doublep2)
+            throws SystemException, IOException {
         double double1 = decp1.doubleValue();
         double double2 = doublep2.doubleValue();
         if (Double.isNaN(doublep2.getDouble())) {
@@ -122,8 +124,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDecimalFloat(XSDecimalPointable decp1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateDecimalFloat(XSDecimalPointable decp1, FloatPointable floatp2)
+            throws SystemException, IOException {
         float float1 = decp1.floatValue();
         float float2 = floatp2.floatValue();
         if (Float.isNaN(floatp2.getFloat())) {
@@ -133,18 +135,19 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateDecimalInteger(XSDecimalPointable decp1, LongPointable longp2)
+            throws SystemException, IOException {
         abvsInner.reset();
         XSDecimalPointable decp2 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
+        decp2.set(abvsInner.getByteArray(), abvsInner.getStartOffset(),
+                XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp2.setDecimal(longp2.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == -1);
     }
 
     @Override
-    public boolean operateDoubleDecimal(DoublePointable doublep1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateDoubleDecimal(DoublePointable doublep1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         double double1 = doublep1.doubleValue();
         double double2 = decp2.doubleValue();
         if (Double.isNaN(doublep1.getDouble())) {
@@ -154,8 +157,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateDoubleDouble(DoublePointable doublep1, DoublePointable doublep2)
+            throws SystemException, IOException {
         if (Double.isNaN(doublep1.getDouble()) || Double.isNaN(doublep2.getDouble())) {
             return false;
         }
@@ -163,8 +166,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDoubleFloat(DoublePointable doublep1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateDoubleFloat(DoublePointable doublep1, FloatPointable floatp2)
+            throws SystemException, IOException {
         double double1 = doublep1.doubleValue();
         double double2 = floatp2.doubleValue();
         if (Double.isNaN(doublep1.getDouble()) || Float.isNaN(floatp2.getFloat())) {
@@ -174,8 +177,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDoubleInteger(DoublePointable doublep1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateDoubleInteger(DoublePointable doublep1, LongPointable longp2)
+            throws SystemException, IOException {
         double double1 = doublep1.doubleValue();
         double double2 = longp2.doubleValue();
         if (Double.isNaN(doublep1.getDouble())) {
@@ -185,8 +188,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateDTDurationDTDuration(LongPointable longp1, LongPointable longp2)
+            throws SystemException, IOException {
         return (longp1.compareTo(longp2) == -1);
     }
 
@@ -197,8 +200,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2) throws SystemException,
-            IOException {
+    public boolean operateDTDurationYMDuration(LongPointable longp1, IntegerPointable intp2)
+            throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
@@ -221,8 +224,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateFloatDecimal(FloatPointable floatp1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         float float1 = floatp1.floatValue();
         float float2 = decp2.floatValue();
         if (Float.isNaN(floatp1.getFloat())) {
@@ -232,8 +235,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateFloatDouble(FloatPointable floatp1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateFloatDouble(FloatPointable floatp1, DoublePointable doublep2)
+            throws SystemException, IOException {
         double double1 = floatp1.doubleValue();
         double double2 = doublep2.doubleValue();
         if (Float.isNaN(floatp1.getFloat()) || Double.isNaN(double2)) {
@@ -243,8 +246,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateFloatFloat(FloatPointable floatp1, FloatPointable floatp2)
+            throws SystemException, IOException {
         if (Float.isNaN(floatp1.getFloat()) || Float.isNaN(floatp2.getFloat())) {
             return false;
         }
@@ -252,8 +255,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateFloatInteger(FloatPointable floatp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateFloatInteger(FloatPointable floatp1, LongPointable longp2)
+            throws SystemException, IOException {
         float float1 = floatp1.floatValue();
         float float2 = longp2.floatValue();
         if (Float.isNaN(floatp1.getFloat())) {
@@ -299,18 +302,19 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2) throws SystemException,
-            IOException {
+    public boolean operateIntegerDecimal(LongPointable longp1, XSDecimalPointable decp2)
+            throws SystemException, IOException {
         abvsInner.reset();
         XSDecimalPointable decp1 = (XSDecimalPointable) XSDecimalPointable.FACTORY.createPointable();
-        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), XSDecimalPointable.TYPE_TRAITS.getFixedLength());
+        decp1.set(abvsInner.getByteArray(), abvsInner.getStartOffset(),
+                XSDecimalPointable.TYPE_TRAITS.getFixedLength());
         decp1.setDecimal(longp1.getLong(), (byte) 0);
         return (decp1.compareTo(decp2) == -1);
     }
 
     @Override
-    public boolean operateIntegerDouble(LongPointable longp1, DoublePointable doublep2) throws SystemException,
-            IOException {
+    public boolean operateIntegerDouble(LongPointable longp1, DoublePointable doublep2)
+            throws SystemException, IOException {
         double double1 = longp1.doubleValue();
         double double2 = doublep2.doubleValue();
         if (Double.isNaN(double2)) {
@@ -320,8 +324,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateIntegerFloat(LongPointable longp1, FloatPointable floatp2) throws SystemException,
-            IOException {
+    public boolean operateIntegerFloat(LongPointable longp1, FloatPointable floatp2)
+            throws SystemException, IOException {
         float float1 = longp1.floatValue();
         float float2 = floatp2.floatValue();
         if (Float.isNaN(float2)) {
@@ -331,8 +335,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateIntegerInteger(LongPointable longp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateIntegerInteger(LongPointable longp1, LongPointable longp2)
+            throws SystemException, IOException {
         return (longp1.compareTo(longp2) == -1);
     }
 
@@ -343,8 +347,8 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateQNameQName(XSQNamePointable qnamep1, XSQNamePointable qnamep2) throws SystemException,
-            IOException {
+    public boolean operateQNameQName(XSQNamePointable qnamep1, XSQNamePointable qnamep2)
+            throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
@@ -363,16 +367,16 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
         DateTime.getUtcTimezoneDateTime(timep2, ctxDatetimep, dOutInner);
         int startOffset1 = abvsInner.getStartOffset() + 1;
         int startOffset2 = startOffset1 + 1 + XSDateTimePointable.TYPE_TRAITS.getFixedLength();
-        if (XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable.getDayTime(
-                abvsInner.getByteArray(), startOffset2)) {
+        if (XSDateTimePointable.getDayTime(abvsInner.getByteArray(), startOffset1) < XSDateTimePointable
+                .getDayTime(abvsInner.getByteArray(), startOffset2)) {
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2) throws SystemException,
-            IOException {
+    public boolean operateYMDurationDTDuration(IntegerPointable intp1, LongPointable longp2)
+            throws SystemException, IOException {
         throw new SystemException(ErrorCode.XPTY0004);
     }
 
@@ -383,9 +387,21 @@ public class ValueLtComparisonOperation extends AbstractValueComparisonOperation
     }
 
     @Override
-    public boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2) throws SystemException,
-            IOException {
+    public boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2)
+            throws SystemException, IOException {
         return (intp1.compareTo(intp2) == -1);
+    }
+
+    @Override
+    public boolean operateNull(TaggedValuePointable tvp1, TaggedValuePointable tvp2)
+            throws SystemException, IOException {
+        if (tvp1.getTag() == ValueTag.JS_NULL_TAG) {
+            if (tvp2.getTag() == ValueTag.JS_NULL_TAG) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
 }
