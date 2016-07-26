@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -28,6 +29,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.util.DateTime;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
@@ -408,6 +410,12 @@ public class ValueEqComparisonOperation extends AbstractValueComparisonOperation
     public boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2)
             throws SystemException, IOException {
         return (intp1.compareTo(intp2) == 0);
+    }
+
+    @Override
+    public boolean operateNull(TaggedValuePointable tvp1, TaggedValuePointable tvp2)
+            throws SystemException, IOException {
+        return tvp1.getTag() == ValueTag.JS_NULL_TAG && tvp2.getTag() == ValueTag.JS_NULL_TAG;
     }
 
 }
