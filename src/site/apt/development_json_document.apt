@@ -1,0 +1,178 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+JSONiq Data Model Example 
+
+
+*Byte Array Break Down
+
+  Every JSONiq document in VXQuery is stored in memory as one continuous array of 
+  bytes. Pointables are used to refer to these bytes in the memory.
+  This document covers VXQuery's representation of all the different types of 
+  json-items of a JSONiq document. As a result, we use a lots of pointables 
+  (same and different) through out the document. 
+  Refer to the following link for details on the various pointables used: 
+  {{{http://vxquery.apache.org/development_xml_node_details.html} XML Node Details }}.
+
+**JSONiq Document
+  
+  We use the following JSONiq document as an example to explain VXQuery's json-item 
+  types. The different json-item types are Array Pointable (AP) and 
+  Object Pointable (OP). 
+   
+---
+{
+  "book":{
+    "isbn":"0812416139",
+    "title":"XQuery Kick Start",
+    "year":2005, 
+    "category":null,
+    "authors":["James McGovern", "James Linn"]
+  }
+}
+---
+
+** {Bytes}
+  
+  Following are the bytes for the JSONiq document above. Elements in VXQuery are
+  accessed using Tagged Value Pointables. Similarly, the JSONiq document is also 
+  accessed using a Tagged Value Pointable. The first byte is represents the 
+  value tag. It indicates the type of the bytes that follow. 
+    
+***  <<<109, 0, 0, 0, 1, 0, 0, 0, -101, 0, 4, 98, 111, 111, 107, 109, 0, 0, 0, 5, 0, 0, 0, 19, 0, 0, 0, 46, 0, 0, 0, 61, 0, 0, 0, 72, 0, 0, 0, 124, 0, 4, 105, 115, 98, 110, 4, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 5, 116, 105, 116, 108, 101, 4, 0, 17, 88, 81, 117, 101, 114, 121, 32, 75, 105, 99, 107, 32, 83, 116, 97, 114, 116, 0, 4, 121, 101, 97, 114, 25, 0, 0, 0, 0, 0, 0, 7, -43, 0, 8, 99, 97, 116, 101, 103, 111, 114, 52, 0, 7, 97, 117, 116, 104, 111, 114, 115, 108, 0, 0, 0, 2, 0, 0, 0, 17, 0, 0, 0, 30, 4, 0, 14, 74, 97, 109, 101, 115, 32, 77, 99, 71, 111, 118, 101, 114, 110, 4, 0, 10, 74, 97, 109, 101, 115, 32, 76, 105, 110, 110>>>
+
+
+=========================================================================
+** {Object}
+  
+  <<<109>>> The first byte as described above is the value tag for Object
+  Pointable.
+  
+  The rest of the bytes represent an Object Pointable. Refer to this link
+  to view the {{Bytes}} for the Object Pointable(OP).
+
+  Following are the bytes and contents of the Object Pointable for this JSONiq
+  document.
+  
+  <<< 0, 0, 0, 1 >>>  These 4 bytes represent the
+  number of key-value pairs in the object which is <<1>>
+  
+  <<< 0, 0, 0, -101 >>>  These 4 bytes represent the
+  offset for the key-value pair in the object which is <<-101>>
+
+
+  Following is the key in the object followed by the value of the key. Each key is a StringPointable  and the value of the key will be the respective Pointable starting with its Value Tag. The byte array break down is explained in details further ahead.
+ 
+*** <<<0, 4, 98, 111, 111, 107, 109, 0, 0, 0, 5, 0, 0, 0, 19, 0, 0, 0, 46, 0, 0, 0, 61, 0, 0, 0, 72, 0, 0, 0, 124, 0, 4, 105, 115, 98, 110, 4, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 5, 116, 105, 116, 108, 101, 4, 0, 17, 88, 81, 117, 101, 114, 121, 32, 75, 105, 99, 107, 32, 83, 116, 97, 114, 116, 0, 4, 121, 101, 97, 114, 25, 0, 0, 0, 0, 0, 0, 7, -43, 0, 8, 99, 97, 116, 101, 103, 111, 114, 121, 52, 0, 7, 97, 117, 116, 104, 111, 114, 115, 108, 0, 0, 0, 2, 0, 0, 0, 17, 0, 0, 0, 30, 4, 0, 14, 74, 97, 109, 101, 115, 32, 77, 99, 71, 111, 118, 101, 114, 110, 4, 0, 10, 74, 97, 109, 101, 115, 32, 76, 105, 110, 110>>>
+
+  The size of the string is <<4>>. The string value is <<book>>. The value of the key is an Object.
+ 
+  Object in OP(value):
+  
+  In this OP, the value  is again an Object Pointable 
+  (OP) ({{OP:0}}). <<109>> is the <Value Tag> for Object Pointable. 
+   
+  Following are the byte contents for the Object Pointable 
+  ({{OP:0}}). The byte array break down is explained further ahead.
+ 
+*** <<<109, 0, 0, 0, 5, 0, 0, 0, 19, 0, 0, 0, 46, 0, 0, 0, 61, 0, 0, 0, 72, 0, 0, 0, 124, 0, 4, 105, 115, 98, 110, 4, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 5, 116, 105, 116, 108, 101, 4, 0, 17, 88, 81, 117, 101, 114, 121, 32, 75, 105, 99, 107, 32, 83, 116, 97, 114, 116, 0, 4, 121, 101, 97, 114, 25, 0, 0, 0, 0, 0, 0, 7, -43, 0, 8, 99, 97, 116, 101, 103, 111, 114, 121, 52, 0, 7, 97, 117, 116, 104, 111, 114, 115, 108, 0, 0, 0, 2, 0, 0, 0, 17, 0, 0, 0, 30, 4, 0, 14, 74, 97, 109, 101, 115, 32, 77, 99, 71, 111, 118, 101, 114, 110, 4, 0, 10, 74, 97, 109, 101, 115, 32, 76, 105, 110, 110>>>
+
+=========================================================================
+** Object ({OP:0})
+  
+  This child is contained in the parent {{Object}}.
+   
+  Byte Array for Object (OP:0)
+  
+***  <<<109, 0, 0, 0, 5, 0, 0, 0, 19, 0, 0, 0, 46, 0, 0, 0, 61, 0, 0, 0, 72, 0, 0, 0, 124, 0, 4, 105, 115, 98, 110, 4, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57, 0, 5, 116, 105, 116, 108, 101, 4, 0, 17, 88, 81, 117, 101, 114, 121, 32, 75, 105, 99, 107, 32, 83, 116, 97, 114, 116, 0, 4, 121, 101, 97, 114, 25, 0, 0, 0, 0, 0, 0, 7, -43, 0, 8, 99, 97, 116, 101, 103, 111, 114, 121, 52, 0, 7, 97, 117, 116, 104, 111, 114, 115, 108, 0, 0, 0, 2, 0, 0, 0, 17, 0, 0, 0, 30, 4, 0, 14, 74, 97, 109, 101, 115, 32, 77, 99, 71, 111, 118, 101, 114, 110, 4, 0, 10, 74, 97, 109, 101, 115, 32, 76, 105, 110, 110>>>
+  
+  <<<109>>> is the value tag for the Object Pointable.
+ 
+  Following are the bytes and contents of the Object Pointable.
+  
+  <<< 0, 0, 0, 5 >>>  These 4 bytes represent the
+  number of key-value pairs in the object which is <<5>>.
+  
+  Following are the bytes that represent the offsets of the three key-value pairs.
+  
+  <<< 0, 0, 0, 19 >>> The offset for the key <<isbn>>.
+  
+  <<< 0, 0, 0, 46 >>> The offset for the key <<title>>.
+  
+  <<< 0, 0, 0, 61 >>> The offset for the key <<year>>.
+  
+  <<< 0, 0, 0, 72 >>> The offset for the key <<category>>.
+  
+  <<< 0, 0, 0, 124 >>> The offset for the key <<authors>>.
+ 
+  As above, the following bytes represent the three key-value pairs inside the Object. 
+  
+  <<<0, 4, 105, 115, 98, 110, 4, 0, 10, 48, 56, 49, 50, 52, 49, 54, 49, 51, 57>>>
+  
+  The size of the string is <<4>>. The string value is <<isbn>>. The String Pointable is followed by a String Pointable.
+  The Value Tag of it is <<4>>. Its size is <<10>>. Its value is <<0812416139>>.
+ 
+  <<<0, 5, 116, 105, 116, 108, 101, 4, 0, 17, 88, 81, 117, 101, 114, 121, 32, 75, 105, 99, 107, 32, 83, 116, 97, 114, 116>>>
+  
+  The size of the string is <<5>>. The string value is <<title>>. The String Pointable is followed by a String Pointable.
+  Its Value Tag is <<4>>. Its size is <<17>>. Its value is <<XQuery Kick Start>>.
+  
+  <<<0, 4, 121, 101, 97, 114, 25, 0, 0, 0, 0, 0, 0, 7, -43>>>
+  
+  The size of the string is <<4>>. The string value is <<year>>. The String Pointable is followed by a Long Pointalbe.
+  Its Value Tag is <<25>>. Its value is <<2005>>.
+  
+  <<<0, 8, 99, 97, 116, 101, 103, 111, 114, 121, 52>>>
+  
+  The size of the string is <<8>>. The string value is <<category>>. The String Pointable is followed by a NULL Pointable.
+  Its Value Tag is <<52>>. Its value is <<null>>.
+  
+  <<<0, 7, 97, 117, 116, 104, 111, 114, 115, 108, 0, 0, 0, 2, 0, 0, 0, 17, 0, 0, 0, 30, 4, 0, 14, 74, 97, 109, 101, 115, 32, 77, 99, 71, 111, 118, 101, 114, 110, 4, 0, 10, 74, 97, 109, 101, 115, 32, 76, 105, 110, 110>>>
+  
+  The size of the string is <<7>>. The string value is <<authors>>. The String Pointable is followed by an Array Pointable.
+  The byte array break down of the Array Pointable ({{AP}}) is explained further ahead.
+ 
+  
+================================================================ 
+**  Array ({AP})
+
+  This child is contained in the parent Object ({{OP:0}}).
+  
+  Byte Array for Array AP
+  
+***  <<<108, 0, 0, 0, 2, 0, 0, 0, 17, 0, 0, 0, 30, 4, 0, 14, 74, 97, 109, 101, 115, 32, 77, 99, 71, 111, 118, 101, 114, 110, 4, 0, 10, 74, 97, 109, 101, 115, 32, 76, 105, 110, 110>>>
+ 
+  <<<108>>> is the value tag for Array Pointable.
+ 
+  Following are the bytes and contents of the Array Pointable.
+ 
+  <<<0, 0, 0, 2>>>  The number of items in the array which is <<2>>.
+          
+  <<<0, 0, 0, 17>>> The offset of the first item which is <<17>>. 
+ 
+  <<<0, 0, 0, 30>>> The offset of the second item which is <<30>>.
+ 
+  Following are the byte contents for each of the two items of the array.
+
+  <<<4, 0, 14, 74, 97, 109, 101, 115, 32, 77, 99, 71, 111, 118, 101, 114, 110>>>.
+  
+  The first item is a String Pointable with value tag <<4>>. The size of the string is <<14>>. The value of the string is <<James McGovern>>.
+  
+  <<<4, 0, 10, 74, 97, 109, 101, 115, 32, 76, 105, 110, 110>>>.  
+  
+  The second item is a String Pointable with value tag <<4>>. The size of the string is <<10>>. The value of the string is <<James Linn>>.
+ 
+
+================================================================

@@ -129,8 +129,7 @@ Developer Data Handling
 *-------------------------+----------------------+---------------:
 | xs:string               | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
-  
-  
+   
 * String Iterators
 
   For many string functions, we have used string iterators to traverse the
@@ -160,3 +159,4 @@ Developer Data Handling
   to hold your output. Adding to the result, if necessary. The array can be
   reused and can hold multiple pointable results due to the starting offset
   parameter in the pointable.
+  
