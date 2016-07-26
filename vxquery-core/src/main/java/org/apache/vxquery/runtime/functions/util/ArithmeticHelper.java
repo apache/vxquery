@@ -61,7 +61,8 @@ public class ArithmeticHelper {
         castToDouble = new CastToDoubleOperation();
     }
 
-    public void compute(TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result) throws SystemException {
+    public void compute(TaggedValuePointable tvp1, TaggedValuePointable tvp2, IPointable result)
+            throws SystemException {
         abvs.reset();
         try {
             int tid1 = getBaseTypeForArithmetics(tvp1.getTag());
