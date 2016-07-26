@@ -31,6 +31,7 @@ import org.apache.vxquery.datamodel.accessors.jsonitem.ArrayPointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
@@ -49,7 +50,6 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
             throws AlgebricksException {
         final SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
-        final ArrayPointable ap1 = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
         final ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final SequenceBuilder sb = new SequenceBuilder();
@@ -62,17 +62,26 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
                 abvs.reset();
                 sb.reset(abvs);
                 TaggedValuePointable tvp = args[0];
-                TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
-                tvp.getValue(sp);
-                int size = sp.getEntryCount();
-                for (int i = 0; i < size; i++) {
-                    sp.getEntry(i, tempTvp);
-                    if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
-                        nested(tempTvp, ap);
+                if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                    TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+                    tvp.getValue(sp);
+                    int size = sp.getEntryCount();
+                    for (int i = 0; i < size; i++) {
+                        sp.getEntry(i, tempTvp);
+                        if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
+                            nested(tempTvp, ap);
+                        }
+                        if (tempTvp.getTag() == ValueTag.OBJECT_TAG) {
+                            insideObject(tempTvp);
+                        }
                     }
-                    if (tempTvp.getTag() == ValueTag.OBJECT_TAG) {
-                        insideObject(tempTvp);
-                    }
+                    ppool.giveBack(tempTvp);
+                } else if (tvp.getTag() == ValueTag.ARRAY_TAG) {
+                    nested(tvp, ap);
+                } else if (tvp.getTag() == ValueTag.OBJECT_TAG) {
+                    insideObject(tvp);
+                } else {
+                    XDMConstants.setEmptySequence(tvp);
                 }
                 try {
                     sb.finish();
@@ -80,21 +89,22 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
-                ppool.giveBack(tempTvp);
             }
 
             public void nested(TaggedValuePointable tvp, ArrayPointable ap) throws SystemException {
-                TaggedValuePointable tvp1 = ppool.takeOne(TaggedValuePointable.class);
+                TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+                ArrayPointable tempAp = ppool.takeOne(ArrayPointable.class);
                 appendSequence(tvp, ap);
                 int size = ap.getEntryCount();
                 for (int i = 0; i < size; i++) {
 
-                    ap.getEntry(i, tvp1);
-                    if (tvp1.getTag() == ValueTag.ARRAY_TAG) {
-                        nested(tvp1, ap1);
+                    ap.getEntry(i, tempTvp);
+                    if (tempTvp.getTag() == ValueTag.ARRAY_TAG) {
+                        nested(tempTvp, tempAp);
                     }
                 }
-                ppool.giveBack(tvp1);
+                ppool.giveBack(tempTvp);
+                ppool.giveBack(tempAp);
             }
 
             public void appendSequence(TaggedValuePointable tvp, ArrayPointable ap) throws SystemException {
@@ -109,23 +119,23 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
             public void insideObject(TaggedValuePointable tvp) throws SystemException {
                 boolean inObject = false;
                 tvp.getValue(op);
-                TaggedValuePointable tempTvp1 = ppool.takeOne(TaggedValuePointable.class);
+                TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
                 try {
                     op.getKeys(tvp);
                     tvp.getValue(stringp);
-                    op.getValue(stringp, tempTvp1);
+                    op.getValue(stringp, tempTvp);
                 } catch (IOException e1) {
                     throw new SystemException(ErrorCode.SYSE0001, e1);
                 }
-                if (tempTvp1.getTag() == ValueTag.OBJECT_TAG) {
+                if (tempTvp.getTag() == ValueTag.OBJECT_TAG) {
                     inObject = true;
                 }
-                ppool.giveBack(tempTvp1);
                 if (inObject) {
-                    insideObject(tempTvp1);
+                    insideObject(tempTvp);
                 } else {
-                    nested(tempTvp1, ap);
+                    nested(tempTvp, ap);
                 }
+                ppool.giveBack(tempTvp);
             }
         };
     }
