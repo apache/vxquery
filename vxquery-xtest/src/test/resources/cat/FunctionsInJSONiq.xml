@@ -86,4 +86,24 @@
         <query name="jn_members3" date="2016-07-05"/>
         <output-file compare="Text">jn_members3.txt</output-file>
     </test-case>
+    <test-case name="changes-to-arithmetic-operation-semantics" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Changes to arithmetic operation semantics</description>
+        <query name="arithmetic1" date="2016-07-19"/>
+        <expected-error>XPTY0004</expected-error>
+    </test-case>
+    <test-case name="changes-to-arithmetic-operation-semantics" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Changes to arithmetic operation semantics</description>
+        <query name="arithmetic2" date="2016-07-26"/>
+        <expected-error>XPTY0004</expected-error>
+    </test-case>
+    <test-case name="changes-to-arithmetic-operation-semantics" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Changes to arithmetic operation semantics</description>
+        <query name="arithmetic3" date="2016-07-26"/>
+        <expected-error>XPTY0004</expected-error>
+    </test-case>
+    <test-case name="changes-to-arithmetic-operation-semantics" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Changes to arithmetic operation semantics</description>
+        <query name="arithmetic4" date="2016-07-26"/>
+        <expected-error>XPTY0004</expected-error>
+    </test-case>
 </test-group>
