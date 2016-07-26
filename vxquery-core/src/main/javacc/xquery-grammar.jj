@@ -1999,8 +1999,9 @@ ASTNode JsonConstructor() :
 }
 {
     (
-        result = ObjectConstructor()
-        | result = ArrayConstructor()
+        result = ArrayConstructor()
+        | result = ObjectConstructor()
+        | result = SimpleObjectUnionConstructor()
     ) {
         return result;
     }
@@ -2013,27 +2014,17 @@ ASTNode ObjectConstructor() :
     ASTNode pc;
 }
 {
+    t = <LbraceExprEnclosure>
     (
-        (
-            t = <LbraceExprEnclosure>
-            (
-                pc = PairConstructor() {
-                    content.add(pc);
-                } (
-                    "," pc = PairConstructor() {
-                        content.add(pc);
-                    }
-                )*
-            )*
-            <Rbrace>
-        )
-        | (
-                t = "{|" pc = Expr() "|}"
-                {
-                    content.add(pc);
-                }
-        )
-    )
+        pc = PairConstructor() {
+            content.add(pc);
+        } (
+            "," pc = PairConstructor() {
+                content.add(pc);
+            }
+        )*
+    )*
+    <Rbrace>
     {
         ObjectConstructor obj = new ObjectConstructor(createSourceLocation(t));
         obj.setContent(content);
@@ -2074,6 +2065,20 @@ ASTNode ArrayConstructor()  :
         ArrayConstructor an = new ArrayConstructor(createSourceLocation(start));
         an.setExpression(expr);
         return an;
+    }
+}
+
+ASTNode SimpleObjectUnionConstructor() :
+{
+    ASTNode expr = null;
+    Token start;
+}
+{
+    start = "{|" expr = Expr() "|}"
+    {
+        SimpleObjectUnionConstructor souc = new SimpleObjectUnionConstructor(createSourceLocation(start));
+        souc.setExpression(expr);
+        return souc;
     }
 }
 
