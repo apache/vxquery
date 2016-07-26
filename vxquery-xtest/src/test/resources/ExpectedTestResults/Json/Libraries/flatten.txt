@@ -1,0 +1,9 @@
+{"foo":{"bar":[1,2]}}
+1
+2
+{"foo":"bar","bar":"foo"}
+3
+4
+true
+1
+null
