@@ -81,15 +81,8 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         }
         functionCall = (AbstractFunctionCallExpression) logicalExpression;
 
-        boolean check = false;
-
-        if (functions.contains(functionCall.getFunctionIdentifier())){
-            check = true;
-        }
-
-        if (!check) {
+        if (!functions.contains(functionCall.getFunctionIdentifier())){
             return null;
-
         }
 
         // Get arguments

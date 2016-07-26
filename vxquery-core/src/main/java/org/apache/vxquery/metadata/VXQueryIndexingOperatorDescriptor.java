@@ -16,14 +16,11 @@
  */
 package org.apache.vxquery.metadata;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.net.InetAddress;
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,17 +29,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
@@ -61,21 +47,23 @@ import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
-import org.apache.hyracks.hdfs.ContextFactory;
-import org.apache.hyracks.hdfs2.dataflow.FileSplitsFactory;
+import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
+import org.apache.vxquery.runtime.functions.index.updateIndex.IndexUpdater;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 
 import javax.xml.bind.JAXBException;
 
-// Create a IndexOperatorDescriptor for create index.
 public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     private static final long serialVersionUID = 1L;
     private short dataSourceId;
@@ -142,8 +130,8 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                         // Go through each tuple.
                         if (collectionDirectory.isDirectory()) {
                             for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-                                Iterator<File> it = FileUtils
-                                        .iterateFiles(collectionDirectory, new VXQueryIOFileFilter(), TrueFileFilter.INSTANCE);
+                                Iterator<File> it = FileUtils.iterateFiles(collectionDirectory,
+                                        new VXQueryIOFileFilter(), TrueFileFilter.INSTANCE);
                                 while (it.hasNext()) {
                                     File xmlDocument = it.next();
                                     if (LOGGER.isLoggable(Level.FINE)) {
@@ -151,8 +139,10 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                     }
                                     IPointable result = new TaggedValuePointable();
 
-                                    final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-                                    final TaggedValuePointable nodep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                                    final UTF8StringPointable stringp =
+                                            (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+                                    final TaggedValuePointable nodep =
+                                            (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
                                     final ByteBufferInputStream bbis = new ByteBufferInputStream();
                                     final DataInputStream di = new DataInputStream(bbis);
@@ -161,12 +151,37 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                     final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
 
                                     try {
-                                        IndexConstructorUtil.evaluate(collectionModifiedName, indexModifiedName, result, stringp, bbis,
-                                                di, sb, abvs, nodeIdProvider, abvsFileNode, nodep, false, nodeId);
-                                    } catch (SystemException e) {
-                                        e.printStackTrace();
-                                    } catch (JAXBException e) {
-                                        e.printStackTrace();
+
+                                        if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals
+                                                (BuiltinFunctions.FN_BUILD_INDEX_ON_COLLECTION_2.getFunctionIdentifier())) {
+                                            IndexConstructorUtil.evaluate(collectionModifiedName, indexModifiedName, result,
+                                                    stringp, bbis, di, sb, abvs, nodeIdProvider,
+                                                    abvsFileNode, nodep, false, nodeId);
+                                        } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals
+                                                (BuiltinFunctions.FN_UPDATE_INDEX_1.getFunctionIdentifier())){
+                                            IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb,
+                                                    abvs, nodeIdProvider,
+                                                    abvsFileNode, nodep, nodeId);
+                                            updater.setup();
+                                            updater.updateIndex();
+                                            updater.updateMetadataFile();
+                                            updater.exit();
+                                            XDMConstants.setTrue(result);
+                                        } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals
+                                                (BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier())) {
+                                            IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb,
+                                                    abvs, nodeIdProvider,
+                                                    abvsFileNode, nodep, nodeId);
+                                            updater.setup();
+                                            updater.deleteAllIndexes();
+                                        } else {}
+
+                                    } catch (SystemException | JAXBException | NoSuchAlgorithmException | IOException e) {
+                                        try {
+                                            throw new SystemException(ErrorCode.SYSE0001, e);
+                                        } catch (SystemException e1) {
+                                            e1.printStackTrace();
+                                        }
                                     }
                                     parser.parseElements(xmlDocument, writer, tupleIndex);
                                 }

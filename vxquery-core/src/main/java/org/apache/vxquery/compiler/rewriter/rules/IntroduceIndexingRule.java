@@ -25,6 +25,7 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogi
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
@@ -39,18 +40,12 @@ import java.util.Set;
  *
  */
 public class IntroduceIndexingRule extends AbstractCollectionRule {
-    private static final Set<FunctionIdentifier> IDENTIFIERS = new HashSet<>();
-    static {
-        IDENTIFIERS.add(BuiltinFunctions.FN_BUILD_INDEX_ON_COLLECTION_2.getFunctionIdentifier());
-        IDENTIFIERS.add(BuiltinFunctions.FN_UPDATE_INDEX_1.getFunctionIdentifier());
-        IDENTIFIERS.add(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier());
-    }
 
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String args[] = getFunctionalArguments(opRef, IDENTIFIERS);
-
+        VXQueryCommons vxQueryCommons = VXQueryCommons.getInstance();
+        String args[] = getFunctionalArguments(opRef, vxQueryCommons.getIndexingFunctions());
 
         if (args != null) {
 
@@ -74,12 +69,6 @@ public class IntroduceIndexingRule extends AbstractCollectionRule {
                     functionCall.getFunctionIdentifier().getName());
             if (ids != null) {
                 ids.setTotalDataSources(vxqueryContext.getTotalDataSources());
-
-//                // Check if the call is for build-index-on-collection
-//                if (args.length == 2) {
-//                    ids.setTotalDataSources(vxqueryContext.getTotalDataSources());
-//                    ids.setTag(args[1]);
-//                }
 
                 // Known to be true because of collection name.
                 AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();

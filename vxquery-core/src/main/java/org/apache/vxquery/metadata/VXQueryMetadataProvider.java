@@ -18,7 +18,9 @@ package org.apache.vxquery.metadata;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import org.apache.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
@@ -49,10 +51,9 @@ import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
 import org.apache.hyracks.api.dataset.ResultSetId;
 import org.apache.hyracks.api.job.JobSpecification;
 import org.apache.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
+import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.functions.BuiltinFunction;
-import org.apache.vxquery.functions.BuiltinFunctions;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
     private final String[] nodeList;
@@ -61,17 +62,6 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     private final String hdfsConf;
 
     private final Map<String, NodeControllerInfo> nodeControllerInfos;
-    private static final Set<FunctionIdentifier> collectionFunctions = new HashSet<>();
-    private static final Set<FunctionIdentifier> indexingFunctions = new HashSet<>();
-
-    static {
-        collectionFunctions.add(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier());
-        collectionFunctions.add(BuiltinFunctions.FN_COLLECTION_WITH_TAG_2.getFunctionIdentifier());
-        indexingFunctions.add(BuiltinFunctions.FN_BUILD_INDEX_ON_COLLECTION_2.getFunctionIdentifier());
-        indexingFunctions.add(BuiltinFunctions.FN_COLLECTION_FROM_INDEX_2.getFunctionIdentifier());
-        indexingFunctions.add(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier());
-        indexingFunctions.add(BuiltinFunctions.FN_UPDATE_INDEX_1.getFunctionIdentifier());
-    }
 
     public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap, StaticContext staticCtx,
             String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos) {
@@ -102,13 +92,16 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             IVariableTypeEnvironment typeEnv, JobGenContext context, JobSpecification jobSpec, Object implConfig)
                     throws AlgebricksException {
 
+        VXQueryCommons vxQueryCommons = VXQueryCommons.getInstance();
+
+        //Remove following redundant code
         IOperatorDescriptor scanner = null;
         AlgebricksPartitionConstraint constraint = null;
-        if (indexingFunctions.contains(AbstractCollectionRule.functionCall.getFunctionIdentifier())) {
+        if (vxQueryCommons.getIndexingFunctions().contains(
+                AbstractCollectionRule.functionCall.getFunctionIdentifier())) {
             //Indexing
             VXQueryIndexingDataSource ds = (VXQueryIndexingDataSource) dataSource;
             if (sourceFileMap != null) {
-                //            final int len = ds.getPartitions().length;
                 final int len = ds.getCollectionPartitions().length;
                 String[] collectionPartitions = new String[len];
                 for (int i = 0; i < len; ++i) {
@@ -124,11 +117,12 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
                     this.nodeControllerInfos);
             constraint = getClusterLocations(nodeList, ds.getPartitionCount());
 
-        } else if (collectionFunctions.contains(AbstractCollectionRule.functionCall.getFunctionIdentifier())){
+        } else if (vxQueryCommons.getCollectionFunctions().contains(
+                AbstractCollectionRule.functionCall.getFunctionIdentifier())){
             // collection
                     VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
             if (sourceFileMap != null) {
-                            final int len = ds.getPartitions().length;
+                final int len = ds.getPartitions().length;
                 String[] collectionPartitions = new String[len];
                 for (int i = 0; i < len; ++i) {
                     String partition = ds.getPartitions()[i];

@@ -60,33 +60,12 @@ public class IndexConstructorUtil {
             ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
             boolean isElementPath, String nodeId) throws SystemException, JAXBException {
-        //        TaggedValuePointable collectionTVP = args[0];
-//        TaggedValuePointable indexTVP = args[1];
-//
-//        if (collectionTVP.getTag() != ValueTag.XS_STRING_TAG || indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
-//            throw new SystemException(ErrorCode.FORG0006);
-//        }
 
-//        try {
-            // Get the list of files.
-//            collectionTVP.getValue(stringp);
-//            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-//                    stringp.getLength() + stringp.getStartOffset())), 0);
-//            collectionFolder = di.readUTF();
-//
-//            // Get the index folder
-//            indexTVP.getValue(stringp);
-//            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-//                    stringp.getLength() + stringp.getStartOffset())), 0);
-//            indexFolder = di.readUTF();
-
-            metaFileUtil = MetaFileUtil.create(indexFolder);
+            metaFileUtil = new MetaFileUtil(indexFolder);
+//            metaFileUtil = .create(indexFolder);
             isMetaFilePresent = metaFileUtil.isMetaFilePresent();
             metaFileUtil.setCollectionForIndex(indexFolder, collectioFolder);
-//
-//        } catch (IOException e) {
-//            throw new SystemException(ErrorCode.SYSE0001, e);
-//        }
+
         File collectionDirectory = new File(collectioFolder);
         if (!collectionDirectory.exists()) {
             throw new RuntimeException("The collection directory (" + collectioFolder + ") does not exist.");

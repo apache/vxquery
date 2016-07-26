@@ -18,6 +18,7 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
@@ -66,16 +67,11 @@ import java.util.Set;
  */
 public class IntroduceCollectionRule extends AbstractCollectionRule {
 
-    private static final Set<FunctionIdentifier> IDENTIFIERS = new HashSet<>();
-    static {
-        IDENTIFIERS.add(BuiltinFunctions.FN_COLLECTION_WITH_TAG_2.getFunctionIdentifier());
-        IDENTIFIERS.add(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier());
-    }
-
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String args[] = getFunctionalArguments(opRef, IDENTIFIERS);
+        VXQueryCommons vxQueryCommons = VXQueryCommons.getInstance();
+        String args[] = getFunctionalArguments(opRef, vxQueryCommons.getCollectionFunctions());
 
         if (args != null) {
             String collectionName = args[0];

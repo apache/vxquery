@@ -77,11 +77,11 @@ public class IndexUpdater {
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     //TODO : Implement for paralleizing
-    public IndexUpdater(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
+    public IndexUpdater(String indexFolder, IPointable result, UTF8StringPointable stringp,
             ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
             String nodeId) {
-        this.args = args;
+        this.indexFolder = indexFolder;
         this.result = result;
         this.stringp = stringp;
         this.bbis = bbis;
@@ -111,14 +111,9 @@ public class IndexUpdater {
         }
 
         try {
-            // Get the index folder
-            indexTVP.getValue(stringp);
-            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                    stringp.getLength() + stringp.getStartOffset())), 0);
-            indexFolder = di.readUTF();
-
             // Read the metadata file and load the metadata map into memory.
-            metaFileUtil = MetaFileUtil.create(indexFolder);
+            metaFileUtil = new MetaFileUtil(indexFolder);
+//            metaFileUtil = metaFileUtil.create(indexFolder);
             metaFileUtil.readMetadataFile();
             metadataMap = metaFileUtil.getMetadata(indexFolder);
 
