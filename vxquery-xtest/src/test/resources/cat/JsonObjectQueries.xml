@@ -100,4 +100,9 @@
         <query name="q16_object" date="2016-07-16"/>
         <output-file compare="Text">q16_object.txt</output-file>
     </test-case>
+    <test-case name="json-object-q17" FilePath="Json/Object/" Creator="Riyafa Abdul Hameed">
+        <description>Object.</description>
+        <query name="q17_object" date="2016-07-26"/>
+        <expected-error>JNDY0003</expected-error>
+    </test-case>
 </test-group>

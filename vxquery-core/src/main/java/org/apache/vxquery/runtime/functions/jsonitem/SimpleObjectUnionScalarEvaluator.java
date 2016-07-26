@@ -64,7 +64,7 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
                     op.getKeys(tempTvp);
                     addPairs(tempTvp, tempValue);
                 }
-            } else {
+            } else if (arg.getTag() == ValueTag.OBJECT_TAG) {
                 op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
                 arg.getValue(op);
                 addPairs(tempTvp, tempValue);
