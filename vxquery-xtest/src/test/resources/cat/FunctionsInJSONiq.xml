@@ -91,4 +91,9 @@
         <query name="value_comparison" date="2016-07-19"/>
         <output-file compare="Text">value_comparison.txt</output-file>
     </test-case>
+    <test-case name="changes-to-value-comparison-semantics" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Changes to value comparison semantics</description>
+        <query name="general_comparison" date="2016-07-19"/>
+        <output-file compare="Text">general_comparison.txt</output-file>
+    </test-case>
 </test-group>

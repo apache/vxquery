@@ -939,6 +939,7 @@ public class FunctionHelper {
                 case ValueTag.XS_TIME_TAG:
                 case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                 case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                case ValueTag.JS_NULL_TAG:
                     return tid;
                 case ValueTag.XS_DECIMAL_TAG:
                 case ValueTag.XS_DOUBLE_TAG:
