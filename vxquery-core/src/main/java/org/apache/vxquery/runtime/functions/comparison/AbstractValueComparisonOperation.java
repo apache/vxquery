@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.comparison;
 import java.io.IOException;
 
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -154,5 +155,8 @@ public abstract class AbstractValueComparisonOperation {
             throws SystemException, IOException;
 
     public abstract boolean operateYMDurationYMDuration(IntegerPointable intp1, IntegerPointable intp2)
+            throws SystemException, IOException;
+
+    public abstract boolean operateNull(TaggedValuePointable tvp1, TaggedValuePointable tvp2)
             throws SystemException, IOException;
 }
