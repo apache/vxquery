@@ -493,6 +493,9 @@ public class FunctionHelper {
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
         try {
+            if (tid1 == ValueTag.JS_NULL_TAG || tid2 == ValueTag.JS_NULL_TAG) {
+                return aOp.operateNull(tvp1, tvp2);
+            }
             switch (tid1) {
                 case ValueTag.XS_DECIMAL_TAG:
                     tvp1.getValue(tp1.decp);
@@ -886,6 +889,7 @@ public class FunctionHelper {
                 case ValueTag.XS_TIME_TAG:
                 case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                 case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                case ValueTag.JS_NULL_TAG:
                     return tid;
 
                 case ValueTag.XS_LONG_TAG:
@@ -935,6 +939,7 @@ public class FunctionHelper {
                 case ValueTag.XS_TIME_TAG:
                 case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                 case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
+                case ValueTag.JS_NULL_TAG:
                     return tid;
                 case ValueTag.XS_DECIMAL_TAG:
                 case ValueTag.XS_DOUBLE_TAG:
