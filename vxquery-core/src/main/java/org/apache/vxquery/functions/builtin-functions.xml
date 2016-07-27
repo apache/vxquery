@@ -1257,4 +1257,18 @@
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnRemoveKeysScalarEvaluatorFactory"/>
     </function>
+
+    <!-- libjn:accumulate($sequence as item()*) as object() -->
+    <function name="libjn:accumulate">
+        <param name="sequence" type="item()*"/>
+        <return type="object()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnAccumulateScalarEvaluatorFactory"/>
+    </function>
+
+    <!-- libjn:intersect($sequence as item()*) as object() -->
+    <function name="libjn:intersect">
+        <param name="sequence" type="item()*"/>
+        <return type="object()"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnIntersectScalarEvaluatorFactory"/>
+    </function>
 </functions>

@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -1421,6 +1422,20 @@ public class FunctionHelper {
                 writeNumberWithPadding(timezoneHour, 2, dOut);
                 writeChar(':', dOut);
                 writeNumberWithPadding(timezoneMinute, 2, dOut);
+            }
+        }
+    }
+
+    public static void removeDuplicates(List<TaggedValuePointable> pointables) {
+        int size = pointables.size();
+        for (int i = 0; i < size - 1; i++) {
+            for (int j = i + 1; j < size; j++) {
+                if (!FunctionHelper.arraysEqual(pointables.get(j), pointables.get(i))) {
+                    continue;
+                }
+                pointables.remove(j);
+                j--;
+                size--;
             }
         }
     }
