@@ -15,14 +15,35 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: JSONiq Changes to value comparison semantics :)
+(: JSONiq Changes to general comparison semantics :)
 (null, 2) = (1, 3),
+(null, 2) = (2, 3),
+(null, 2) = (1, null),
 (null, 2) != (1, 3),
+(null, 2) != (2, 3),
+(null, 2) != null,
 (null, 2) < (1, 3),
+(null, 2) < null,
+(null, 2) < 2,
 (null, 2) <= (1, 3),
+(null, 2) <= (null, 1),
+(null, 1) > (1, 3),
+(null, 1) > (2, 3),
+(null, 1) > (null, 3),
 (null, 1) > (1, 3),
 (null, 0) >= (1, 3),
+(null, 0) >= (null, 3),
+(null, 0) >= (1, 0),
+(null, 0) >= (-1, 3),
+null = 1,
+null != 1,
 null < 1,
 null > 1,
 null <= 1,
-null >= 1
+null >= 1,
+null = null,
+null != null,
+null > null,
+null < null,
+null >= null,
+null <= null
