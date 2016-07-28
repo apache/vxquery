@@ -50,7 +50,6 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
             throws AlgebricksException {
         final SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
-        final ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final SequenceBuilder sb = new SequenceBuilder();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
@@ -117,21 +116,40 @@ public class LibjnDescendantArraysScalarEvaluatorFactory extends AbstractTaggedV
             }
 
             public void insideObject(TaggedValuePointable tvp) throws SystemException {
-                tvp.getValue(op);
                 TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+                ObjectPointable op = ppool.takeOne(ObjectPointable.class);
+                SequencePointable sp = ppool.takeOne(SequencePointable.class);
+                tvp.getValue(op);
                 try {
                     op.getKeys(tvp);
-                    tvp.getValue(stringp);
-                    op.getValue(stringp, tempTvp);
+                    if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                        tvp.getValue(stringp);
+                        op.getValue(stringp, tempTvp);
+                        checkFunction(tempTvp);
+                    } else if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
+                        tvp.getValue(sp);
+                        int size = sp.getEntryCount();
+                        for (int i = 0; i < size; i++) {
+                            sp.getEntry(i, tempTvp);
+                            tempTvp.getValue(stringp);
+                            op.getValue(stringp, tempTvp);
+                            checkFunction(tempTvp);
+                        }
+                    }
                 } catch (IOException e1) {
                     throw new SystemException(ErrorCode.SYSE0001, e1);
                 }
-                if (tempTvp.getTag() == ValueTag.OBJECT_TAG) {
-                    insideObject(tempTvp);
-                } else {
-                    nested(tempTvp, ap);
-                }
+                ppool.giveBack(sp);
+                ppool.giveBack(op);
                 ppool.giveBack(tempTvp);
+            }
+
+            public void checkFunction(TaggedValuePointable tvp) throws SystemException {
+                if (tvp.getTag() == ValueTag.OBJECT_TAG) {
+                    insideObject(tvp);
+                } else {
+                    nested(tvp, ap);
+                }
             }
         };
     }
