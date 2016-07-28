@@ -1,0 +1,5 @@
+{"foo":{"bar":[1,2]}}
+{"bar":[1,2]}
+{"foo":"bar","bar":"foo","array":["x",{"name":"riyafa","key":"value"},122,{"xy":123}]}
+{"name":"riyafa","key":"value"}
+{"xy":123}
