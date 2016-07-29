@@ -40,4 +40,9 @@
       <query name="flatten" date="2016-07-20"/>
       <output-file compare="Text">flatten.txt</output-file>
    </test-case>
+   <test-case name="descendant_pairs" FilePath="Json/Libraries/" Creator="Riyafa Abdul Hameed">
+      <description>Json Libraries.</description>
+      <query name="descendant_pairs" date="2016-07-29"/>
+      <output-file compare="Text">descendant_pairs.txt</output-file>
+   </test-case>
 </test-group>
