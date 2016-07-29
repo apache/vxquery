@@ -18,12 +18,12 @@ package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
+import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
 import org.apache.vxquery.types.AnyItemType;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
@@ -64,7 +64,8 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String args[] = getCollectionName(opRef);
+        String args[] = getFunctionalArguments(opRef, BuiltinFunctions.FN_COLLECTION_WITH_TAG_2, BuiltinFunctions
+                .FN_COLLECTION_1);
 
         if (args != null) {
             String collectionName = args[0];

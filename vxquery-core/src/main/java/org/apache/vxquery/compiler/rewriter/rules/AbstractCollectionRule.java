@@ -41,6 +41,7 @@ import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
@@ -50,6 +51,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
     final DataInputStream di = new DataInputStream(bbis);
     final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
     final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    AbstractFunctionCallExpression functionCall;
 
     /**
      * Get the arguments for the collection and collection-with-tag. Return null for not a collection.
@@ -58,7 +60,10 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
      *            Logical operator
      * @return collection name
      */
-    protected String[] getCollectionName(Mutable<ILogicalOperator> opRef) {
+
+    // Add functional identifies.
+    // Rename getFunctionArguments
+    protected String[] getFunctionalArguments(Mutable<ILogicalOperator> opRef, Function... functions) {
 
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
@@ -78,11 +83,16 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
             return null;
         }
-        AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier()
-                .equals(BuiltinFunctions.FN_COLLECTION_WITH_TAG_2.getFunctionIdentifier())
-                && !functionCall.getFunctionIdentifier()
-                        .equals(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier())) {
+        functionCall = (AbstractFunctionCallExpression) logicalExpression;
+
+        boolean check = false;
+        for (Function f : functions) {
+            if (functionCall.getFunctionIdentifier().equals(f.getFunctionIdentifier())){
+                check = true;
+            }
+        }
+
+        if (!check) {
             return null;
         }
 

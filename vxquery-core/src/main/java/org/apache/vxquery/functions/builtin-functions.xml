@@ -22,7 +22,7 @@
         <return type="xsext:numeric?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnAbsScalarEvaluatorFactory"/>
     </function>
-
+    
     <!-- fn:adjust-date-to-timezone( $arg as xs:date?) as  xs:date? -->
     <function name="fn:adjust-date-to-timezone">
         <param name="arg" type="xs:date?"/>
@@ -100,7 +100,7 @@
         <return type="xsext:numeric?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.numeric.FnCeilingScalarEvaluatorFactory"/>
     </function>
-
+    
     <!-- fn:codepoint-equal($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:boolean? -->
     <function name="fn:codepoint-equal">
         <param name="comparand1" type="xs:string?"/>
@@ -108,48 +108,56 @@
         <return type="xs:boolean?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCodepointEqualEvaluatorFactory"/>
     </function>
-
+    
     <!-- fn:codepoints-to-string( $arg as xs:integer*)  as xs:string -->
     <function name="fn:codepoints-to-string">
         <param name="arg" type="xs:integer*"/>
         <return type="xs:string"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCodepointsToStringEvaluatorFactory"/>
     </function>
-
+    
     <!-- fn:collection() as  node()* -->
     <function name="fn:collection">
         <return type="node()*"/>
     </function>
-
+    
     <!-- fn:collection($arg  as xs:string?) as  node()* -->
     <function name="fn:collection">
         <param name="arg" type="xs:string?"/>
         <return type="node()*"/>
         <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
-
+    
     <!-- fn:build-index-on-collection($arg  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
     <function name="fn:build-index-on-collection">
         <param name="collection-folder" type="xs:string?"/>
         <param name="index-folder" type="xs:string?"/>
-        <return type="node()*"/>
+        <return type="node()*"/> 
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:update-index($indexFolder  as xs:string?) as  node()* -->
     <function name="fn:update-index">
         <param name="index-folder" type="xs:string?"/>
-        <return type="node()*"/>
+        <return type="xs:boolean?"/>
         <runtime type="scalar"
                  class="org.apache.vxquery.runtime.functions.index.IndexUpdaterEvaluatorFactory"/>
+    </function>
+
+    <!-- fn:delete-index($indexFolder  as xs:string?) as  node()* -->
+    <function name="fn:delete-index">
+        <param name="index-folder" type="xs:string?"/>
+        <return type="xs:boolean?"/>
+        <runtime type="scalar"
+                 class="org.apache.vxquery.runtime.functions.index.IndexDeleteEvaluatorFactory"/>
     </function>
 
     <!-- fn:collection-from-index($indexfolder  as xs:string?, $elementpath as xs:string?) as  node()* -->
     <function name="fn:collection-from-index">
         <param name="index-folder" type="xs:string?"/>
         <param name="element-path" type="xs:string?"/>
-        <return type="node()*"/>
-        <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.CollectionFromIndexUnnestingEvaluatorFactory"/>
+        <return type="xs:boolean?"/>
+         <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.CollectionFromIndexUnnestingEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
@@ -157,7 +165,7 @@
             <argument value="0"/>
         </property>
     </function>
-
+    
     <!-- fn:collection-with-tag($arg1  as xs:string?, $arg2 as xs:string?) as  node()* -->
     <function name="fn:collection-with-tag">
         <param name="arg1" type="xs:string?"/>
@@ -165,7 +173,7 @@
         <return type="node()*"/>
         <!-- CollectionWithTag operator is added during the rewrite rules phase.  -->
     </function>
-
+    
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?)  as xs:integer?  -->
     <function name="fn:compare">
         <param name="comparand1" type="xs:string?"/>
@@ -173,7 +181,7 @@
         <return type="xs:integer?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCompareEvaluatorFactory"/>
     </function>
-
+    
     <!-- fn:compare($comparand1  as xs:string?, $comparand2 as xs:string?, $collation as xs:string)  as xs:integer?  -->
     <function name="fn:compare">
         <param name="comparand1" type="xs:string?"/>
@@ -182,7 +190,7 @@
         <return type="xs:integer?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnCompareEvaluatorFactory"/>
     </function>
-
+    
     <!-- fn:concat($arg1 as  xs:anyAtomicType?, $arg2 as xs:anyAtomicType?, ...) as xs:string -->
     <function name="fn:concat" varargs="true">
         <param name="arg1" type="xs:anyAtomicType?"/>
@@ -190,7 +198,7 @@
         <return type="xs:string"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnConcatEvaluatorFactory"/>
     </function>
-
+ 
     <!-- fn:contains($arg1  as xs:string?, $arg2 as xs:string?)  as xs:boolean -->
     <function name="fn:contains">
         <param name="arg1" type="xs:string?"/>
@@ -198,7 +206,7 @@
         <return type="xs:boolean"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.strings.FnContainsEvaluatorFactory"/>
     </function>
-
+ 
     <!-- fn:contains($arg1  as xs:string?, $arg2 as xs:string?, $collation as xs:string)  as xs:boolean -->
     <function name="fn:contains">
         <param name="arg1" type="xs:string?"/>
