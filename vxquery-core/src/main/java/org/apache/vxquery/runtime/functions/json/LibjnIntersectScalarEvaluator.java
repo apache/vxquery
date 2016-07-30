@@ -35,7 +35,6 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class LibjnIntersectScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
@@ -91,13 +90,18 @@ public class LibjnIntersectScalarEvaluator extends AbstractTaggedValueArgumentSc
                 key1.getValue(stringKey);
                 TaggedValuePointable[] values = tvps.get(key1);
                 if (values.length > 1) {
-                    abvs1.reset();
-                    ab.reset(abvs1);
-                    for (TaggedValuePointable value1 : values) {
-                        ab.addItem(value1);
+                    int end = removeDuplicates(values);
+                    if (end > 1) {
+                        abvs1.reset();
+                        ab.reset(abvs1);
+                        for (int i = 0; i < end; i++) {
+                            ab.addItem(values[i]);
+                        }
+                        ab.finish();
+                        ob.addItem(stringKey, abvs1);
+                    } else {
+                        ob.addItem(stringKey, values[0]);
                     }
-                    ab.finish();
-                    ob.addItem(stringKey, abvs1);
                 }
             }
             ob.finish();
@@ -116,7 +120,7 @@ public class LibjnIntersectScalarEvaluator extends AbstractTaggedValueArgumentSc
     }
 
     private void addPair(TaggedValuePointable tempTvp) throws IOException, SystemException {
-        TaggedValuePointable tvp = isDuplicateKeys(tempTvp, tvps.keySet());
+        TaggedValuePointable tvp = isDuplicate(tempTvp, tvps.keySet());
         value = ppool.takeOne(TaggedValuePointable.class);
         tempTvp.getValue(stringKey);
         op.getValue(stringKey, value);
@@ -127,12 +131,14 @@ public class LibjnIntersectScalarEvaluator extends AbstractTaggedValueArgumentSc
             tvps.put(key, values);
         } else {
             TaggedValuePointable[] values = tvps.get(tvp);
+
             TaggedValuePointable[] values1 = new TaggedValuePointable[values.length + 1];
             for (int i = 0; i < values.length; i++) {
                 values1[i] = values[i];
             }
             values1[values.length] = value;
             tvps.replace(tvp, values1);
+
         }
     }
 
@@ -150,12 +156,27 @@ public class LibjnIntersectScalarEvaluator extends AbstractTaggedValueArgumentSc
         }
     }
 
-    protected TaggedValuePointable isDuplicateKeys(TaggedValuePointable key, Set<TaggedValuePointable> pointables) {
+    private TaggedValuePointable isDuplicate(TaggedValuePointable key, Iterable<TaggedValuePointable> pointables) {
         for (TaggedValuePointable tvp : pointables) {
             if (tvp != null && FunctionHelper.arraysEqual(tvp, key)) {
                 return tvp;
             }
         }
         return null;
+    }
+
+    public static int removeDuplicates(TaggedValuePointable[] arr) {
+        int end = arr.length;
+
+        for (int i = 0; i < end; i++) {
+            for (int j = i + 1; j < end; j++) {
+                if (FunctionHelper.arraysEqual(arr[i], arr[j])) {
+                    arr[j] = arr[end - 1];
+                    end--;
+                    j--;
+                }
+            }
+        }
+        return end;
     }
 }
