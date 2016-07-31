@@ -1212,4 +1212,10 @@
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnFlattenScalarEvaluatorFactory"/>
     </function>
+    <!-- libjn:values($sequence as item()*) as item()* -->
+    <function name="libjn:values">
+        <param name="sequence" type="item()*"/>
+        <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnValuesScalarEvaluatorFactory"/>
+    </function>
 </functions>
