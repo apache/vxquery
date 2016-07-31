@@ -103,7 +103,6 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
         } else if (tempTvp.getTag() == ValueTag.SEQUENCE_TAG) {
             tempTvp.getValue(sp1);
             for (int j = 0; j < sp1.getEntryCount(); ++j) {
-                key = ppool.takeOne(TaggedValuePointable.class);
                 sp1.getEntry(j, tempTvp);
                 addPair(tempTvp, tempValue);
             }
