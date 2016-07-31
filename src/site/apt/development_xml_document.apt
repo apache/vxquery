@@ -13,6 +13,130 @@
 ~~ See the License for the specific language governing permissions and
 ~~ limitations under the License.
 
+* XML Mapping
+
+  The XML mapping to Hyracks pointables is fairly straight forward. The following example
+  shows how each node is mapped and saved into a byte array used by Hyracks.
+
+** Example XML File
+
+  The example XML file comes from W3School XQuery tutorial.
+  
+----------------------------------------
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Edited by XMLSpyÆ -->
+<bookstore>
+
+    <book category="COOKING">
+        <title lang="en">Everyday Italian</title>
+        <author>Giada De Laurentiis</author>
+        <year>2005</year>
+        <price>30.00</price>
+    </book>
+    
+    <book category="CHILDREN">
+        <title lang="en">Harry Potter</title>
+        <author>J K. Rowling</author>
+        <year>2005</year>
+        <price>29.99</price>
+    </book>
+    
+    <book category="WEB">
+        <title lang="en">XQuery Kick Start</title>
+        <author>James McGovern</author>
+        <author>Per Bothner</author>
+        <author>Kurt Cagle</author>
+        <author>James Linn</author>
+        <author>Vaidyanathan Nagarajan</author>
+        <year>2003</year>
+        <price>49.99</price>
+    </book>
+    
+    <book category="WEB">
+        <title lang="en">Learning XML</title>
+        <author>Erik T. Ray</author>
+        <year>2003</year>
+        <price>39.95</price>
+    </book>
+
+</bookstore>
+----------------------------------------
+  
+** Example Hyracks Mapping
+
+  The mapping is explained through using some short hand for the above example XML file.
+  Realize the direct bytes will not be explained although the pointable names are used for
+  each piece of information.
+  
+----------------------------------------
+NodeTree {
+    DocumentNode {bookstore}
+        sequence (children) {
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:Everyday Italian}
+                        sequence (attributes) {
+                            AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:Harry Potter}
+                        sequence (attributes) {
+                           AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:XQuery Kick Start}
+                        sequence (attributes) {
+                            AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+            ElementNode {book}
+                sequence (attributes) {
+                    AttributeNode {category}
+                }
+                sequence (children) {
+                    ElementNode {title:Learning XML}
+                        sequence (attributes) {
+                            AttributeNode {lang}
+                        }
+                    ElementNode {author}
+                    ElementNode {year}
+                    ElementNode {price}
+                }
+        }
+}
+----------------------------------------
+
+  Following is a detailed example of the byte representation of an XML document.
+   
+
+=========================================================================
+
 XML Data Model Example 
 
 
