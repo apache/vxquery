@@ -65,4 +65,9 @@
       <query name="updateIndex" date="2016-06-24"/>
       <output-file compare="Text">updateIndex.txt</output-file>
    </test-case>
+   <test-case name="delete-index" FilePath="Indexing/" Creator="Menaka Jayawardena">
+      <description>Delete the existing index</description>
+      <query name="deleteIndex" date="2016-06-24"/>
+      <output-file compare="Text">deleteIndex.txt</output-file>
+   </test-case>
 </test-group>

@@ -16,11 +16,27 @@
 */
 package org.apache.vxquery.runtime.functions.index.updateIndex;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
 /**
- * Constants used in updating index
+ * Class for storing metadata information for vxquery index.
  */
-public class Constants {
-    public static String FIELD_PATH = "path";
-    public static String META_FILE_NAME = "vxquery_index.xml";
-    public static String COLLECTION_ENTRY = "collection";
+@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlRootElement(name = "indexes")
+public class VXQueryIndex {
+
+    private List<XmlMetadataCollection> indexes;
+
+    public List<XmlMetadataCollection> getIndex() {
+        return indexes;
+    }
+
+    @XmlElement(name = "index", type = XmlMetadataCollection.class)
+    public void setIndex(List<XmlMetadataCollection> index) {
+        this.indexes = index;
+    }
 }
