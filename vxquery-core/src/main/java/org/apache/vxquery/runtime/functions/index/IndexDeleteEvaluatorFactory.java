@@ -16,11 +16,6 @@
 */
 package org.apache.vxquery.runtime.functions.index;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -36,17 +31,22 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.index.updateIndex.IndexUpdater;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 
 import javax.xml.bind.JAXBException;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
-public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
-    //Creates one Lucene doc per file
-
-    private static final long serialVersionUID = 1L;
-
-    public IndexConstructorScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+/**
+ * Delete the index of a given index directory
+ */
+public class IndexDeleteEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+    public IndexDeleteEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
@@ -69,28 +69,19 @@ public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueA
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 try {
-                    String collectionFolder;
-                    String indexFolder;
-                    TaggedValuePointable collectionTVP = args[0];
-                    TaggedValuePointable indexTVP = args[1];
-                    collectionTVP.getValue(stringp);
+                    args[0].getValue(stringp);
                     bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
                             stringp.getLength() + stringp.getStartOffset())), 0);
-                    collectionFolder = di.readUTF();
-
-                    // Get the index folder
-                    indexTVP.getValue(stringp);
-                    bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                            stringp.getLength() + stringp.getStartOffset())), 0);
-                    indexFolder = di.readUTF();
-
-                    IndexConstructorUtil.evaluate(collectionFolder, indexFolder, result, stringp, bbis, di, sb, abvs,
-                            nodeIdProvider, abvsFileNode,
-                            nodep, false, nodeId);
+                    String indexFolder = di.readUTF();
+                    IndexUpdater updater = new IndexUpdater(indexFolder, result, stringp, bbis, di, sb, abvs, nodeIdProvider,
+                            abvsFileNode, nodep, nodeId);
+                    updater.setup();
+                    updater.deleteAllIndexes();
                     XDMConstants.setTrue(result);
-                } catch (JAXBException | IOException e) {
+                } catch (IOException | NoSuchAlgorithmException | JAXBException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
+
             }
 
         };

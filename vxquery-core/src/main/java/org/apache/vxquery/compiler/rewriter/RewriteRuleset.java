@@ -25,9 +25,10 @@ import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSingleItemsRule;
-import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
+import org.apache.vxquery.compiler.rewriter.rules.IntroduceIndexingRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
@@ -130,6 +131,7 @@ public class RewriteRuleset {
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        normalization.add(new IntroduceIndexingRule());
 
         normalization.add(new ConsolidateDescandantChild());
 

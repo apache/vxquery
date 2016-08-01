@@ -26,6 +26,8 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
@@ -33,9 +35,12 @@ import org.apache.vxquery.runtime.functions.index.updateIndex.IndexUpdater;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 
+import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Update the index of collection
@@ -46,7 +51,8 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
     }
 
     @Override
-    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws AlgebricksException {
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final TaggedValuePointable nodep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -62,12 +68,22 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                IndexUpdater updater = new IndexUpdater(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider,
-                        abvsFileNode, nodep, nodeId);
+                //            // Get the index folder
+
                 try {
-                    updater.evaluate();
-                } catch (IOException | NoSuchAlgorithmException e) {
-                    e.printStackTrace();
+                    args[0].getValue(stringp);
+                    bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                            stringp.getLength() + stringp.getStartOffset())), 0);
+                    String indexFolder = di.readUTF();
+                    IndexUpdater updater = new IndexUpdater(indexFolder, result, stringp, bbis, di, sb, abvs, nodeIdProvider,
+                            abvsFileNode, nodep, nodeId);
+                    updater.setup();
+                    updater.updateIndex();
+                    updater.updateMetadataFile();
+                    updater.exit();
+                    XDMConstants.setTrue(result);
+                } catch (IOException | NoSuchAlgorithmException | JAXBException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }
 
