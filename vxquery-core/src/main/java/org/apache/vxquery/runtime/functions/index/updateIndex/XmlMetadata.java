@@ -16,20 +16,27 @@
 */
 package org.apache.vxquery.runtime.functions.index.updateIndex;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
- *Class to store metadata related to an XML file.
+ * Class to store metadata related to an XML file.
  * This contains
- *      - Path to the xml file
- *      - MD5 Checksum String
- *      - File name
+ * - Path to the xml file
+ * - MD5 Checksum String
+ * - File name
+ * - Last modified date
  */
-public class XmlMetadata implements Serializable{
+@XmlRootElement(name = "file")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class XmlMetadata implements Serializable {
 
     private String path;
     private String md5;
     private String fileName;
+    private String lastModified;
 
     public String getPath() {
         return path;
@@ -53,5 +60,13 @@ public class XmlMetadata implements Serializable{
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
     }
 }

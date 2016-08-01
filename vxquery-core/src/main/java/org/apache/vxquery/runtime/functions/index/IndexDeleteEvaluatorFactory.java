@@ -41,10 +41,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Update the index of collection
+ * Delete the index of a given index directory
  */
-public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
-    public IndexUpdaterEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+public class IndexDeleteEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+    public IndexDeleteEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
@@ -70,13 +70,12 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
                         abvsFileNode, nodep, nodeId);
                 try {
                     updater.setup();
-                    updater.updateIndex();
-                    updater.updateMetadataFile();
-                    updater.exit();
+                    updater.deleteAllIndexes();
                     XDMConstants.setTrue(result);
                 } catch (IOException | NoSuchAlgorithmException | JAXBException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
+
             }
 
         };
