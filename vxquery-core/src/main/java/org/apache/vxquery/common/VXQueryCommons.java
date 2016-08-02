@@ -22,9 +22,6 @@ import org.apache.vxquery.functions.BuiltinFunctions;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- *
- */
 public class VXQueryCommons {
 
     public static final Set<FunctionIdentifier> collectionFunctions = new HashSet<>();
