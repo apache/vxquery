@@ -155,6 +155,10 @@ public class LibjnRemoveKeysScalarEvaluator extends AbstractTaggedValueArgumentS
                         return true;
                     }
                 }
+            } else if (keys.getTag() == ValueTag.XS_STRING_TAG) {
+                if (FunctionHelper.arraysEqual(tvp, keys)) {
+                    return true;
+                }
             }
         } finally {
             ppool.giveBack(tempTvp);

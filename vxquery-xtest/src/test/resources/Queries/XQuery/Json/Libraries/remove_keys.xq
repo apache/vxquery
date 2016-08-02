@@ -15,7 +15,7 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: JSONiq libjn:project :)
+(: JSONiq libjn:remove-keys :)
 libjn:remove-keys(
     (
         {
@@ -33,5 +33,28 @@ libjn:remove-keys(
         jn:null()
     ),
     ("Captain", "First Officer", "XQuery Evangelist")
+),
+libjn:remove-keys(
+    (
+        {
+            "Captain" : "Archer",
+            "Engineer" : "Trip"
+        },
+        true(),
+        1,
+        jn:null()
+    ),
+    "Captain"
+),
+libjn:remove-keys(
+    (
+        {
+            "Captain" : "Archer",
+            "Engineer" : "Trip"
+        },
+        true(),
+        1,
+        jn:null()
+    ),
+    ()
 )
-
