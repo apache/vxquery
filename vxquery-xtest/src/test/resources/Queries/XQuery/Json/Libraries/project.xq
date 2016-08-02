@@ -33,5 +33,29 @@ libjn:project(
         jn:null()
     ),
     ("Captain", "First Officer", "XQuery Evangelist")
+),
+libjn:project(
+    (
+        {
+            "Captain" : "Archer",
+            "Engineer" : "Trip"
+        },
+        true(),
+        1,
+        jn:null()
+    ),
+    "Captain"
+),
+libjn:project(
+    (
+        {
+            "Captain" : "Archer",
+            "Engineer" : "Trip"
+        },
+        true(),
+        1,
+        jn:null()
+    ),
+    ()
 )
 
