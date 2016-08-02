@@ -402,7 +402,7 @@ public class XMLSerializer implements IPrinter {
         UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
         TaggedValuePointable tvp = pp.takeOne(TaggedValuePointable.class);
         try {
-            printQuotedString(ps, key);
+            printQuotedTaggedValuePointable(ps, key);
             key.getValue(utf8sp);
             ps.append(":");
             op.getValue(utf8sp, tvp);
@@ -433,16 +433,45 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printJsonValue(PrintStream ps, TaggedValuePointable tvp) {
-        if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
-            printQuotedString(ps, tvp);
-        } else {
-            printTaggedValuePointable(ps, tvp);
+        int tag = tvp.getTag();
+        switch (tag) {
+            case ValueTag.ARRAY_TAG:
+            case ValueTag.ATTRIBUTE_NODE_TAG:
+            case ValueTag.COMMENT_NODE_TAG:
+            case ValueTag.DOCUMENT_NODE_TAG:
+            case ValueTag.ELEMENT_NODE_TAG:
+            case ValueTag.JS_NULL_TAG:
+            case ValueTag.NODE_TREE_TAG:
+            case ValueTag.OBJECT_TAG:
+            case ValueTag.PI_NODE_TAG:
+            case ValueTag.TEXT_NODE_TAG:
+            case ValueTag.XS_BOOLEAN_TAG:
+            case ValueTag.XS_BYTE_TAG:
+            case ValueTag.XS_DECIMAL_TAG:
+            case ValueTag.XS_DOUBLE_TAG:
+            case ValueTag.XS_FLOAT_TAG:
+            case ValueTag.XS_INT_TAG:
+            case ValueTag.XS_INTEGER_TAG:
+            case ValueTag.XS_LONG_TAG:
+            case ValueTag.XS_NEGATIVE_INTEGER_TAG:
+            case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
+            case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
+            case ValueTag.XS_POSITIVE_INTEGER_TAG:
+            case ValueTag.XS_SHORT_TAG:
+            case ValueTag.XS_UNSIGNED_BYTE_TAG:
+            case ValueTag.XS_UNSIGNED_INT_TAG:
+            case ValueTag.XS_UNSIGNED_LONG_TAG:
+            case ValueTag.XS_UNSIGNED_SHORT_TAG:
+                printTaggedValuePointable(ps, tvp);
+                break;
+            default:
+                printQuotedTaggedValuePointable(ps, tvp);
         }
     }
 
-    private void printQuotedString(PrintStream ps, TaggedValuePointable tvp) {
+    private void printQuotedTaggedValuePointable(PrintStream ps, TaggedValuePointable tvp) {
         ps.append('\"');
-        printString(ps, tvp);
+        printTaggedValuePointable(ps, tvp);
         ps.append('\"');
     }
 
