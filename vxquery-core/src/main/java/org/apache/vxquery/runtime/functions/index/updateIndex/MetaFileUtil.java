@@ -43,19 +43,11 @@ public class MetaFileUtil {
     private String index;
     private String collection;
     private ConcurrentHashMap<String, XmlMetadata> indexMap = new ConcurrentHashMap<>();
-    private Map<String, ConcurrentHashMap<String, XmlMetadata>> indexes = new ConcurrentHashMap<>();
-    private Map<String, String> indexToCollection = new ConcurrentHashMap<>();
 
     public MetaFileUtil(String indexFolder) {
         this.metaFile = new File(indexFolder + "/" + Constants.META_FILE_NAME);
     }
 
-//    public MetaFileUtil create(String indexFolder) {
-//        return new MetaFileUtil(indexFolder);
-//    }
-//
-//    public MetaFileUtil(){}
-//
     /**
      * Checks for existing metadata file.
      *
@@ -78,28 +70,19 @@ public class MetaFileUtil {
 
         this.indexMap = metadataMap;
         this.index = index;
-//        if (this.indexes.get(index) == null) {
-//            this.indexes.put(index, metadataMap);
-//        } else {
-//            this.indexes.replace(index, metadataMap);
-//        }
-
     }
 
     /**
-     * Method to get the set of xml metadata for a given collection
+     * Method to get the set of xml metadata.
      *
-     * @param index : The collection from which the metadata should be read.
      * @return : Map containing the set of XmlMetadata objects.
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public ConcurrentHashMap<String, XmlMetadata> getMetadata(String index)
+    public ConcurrentHashMap<String, XmlMetadata> getMetadata()
             throws IOException, ClassNotFoundException, JAXBException {
 
         return this.indexMap;
-
-//        return this.indexes.get(index);
     }
 
     /**
@@ -109,24 +92,14 @@ public class MetaFileUtil {
     public void readMetadataFile() throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(VXQueryIndex.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-//        VXQueryIndex indexes = (VXQueryIndex) jaxbUnmarshaller.unmarshal(metaFile);
         XmlMetadataCollection indexes = (XmlMetadataCollection) jaxbUnmarshaller.unmarshal(metaFile);
-
-//        List<XmlMetadataCollection> list = indexes.getIndex();
 
         this.collection = indexes.getCollection();
         this.index = indexes.getIndexLocation();
         ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
 
         for (XmlMetadata metadata : indexes.getMetadataList()) {
-//            List<XmlMetadata> metadata = collection.getMetadataList();
             this.indexMap.put(index, metadata);
-//            this.indexToCollection.put(indexPath, collection.getCollection());
-
-//            for (XmlMetadata mData : metadata) {
-//                metadataMap.put(mData.getPath(), mData);
-//            }
-//            this.indexes.put(indexPath, metadataMap);
         }
     }
 
@@ -136,9 +109,6 @@ public class MetaFileUtil {
      * @throws JAXBException
      */
     public void writeMetadataToFile() throws FileNotFoundException, JAXBException {
-//        VXQueryIndex index = new VXQueryIndex();
-//        List<XmlMetadataCollection> xmlMetadataCollections = new ArrayList<>();
-
         XmlMetadataCollection collection = new XmlMetadataCollection();
         List<XmlMetadata> metadataList = new ArrayList<>();
 
@@ -149,18 +119,6 @@ public class MetaFileUtil {
         collection.setMetadataList(metadataList);
         collection.setCollection(this.collection);
         collection.setIndexLocation(this.index);
-
-//        for (Map.Entry<String, ConcurrentHashMap<String, XmlMetadata>> entry : indexes.entrySet()) {
-//            XmlMetadataCollection metadataCollection = new XmlMetadataCollection();
-//            List<XmlMetadata> metadataList = new ArrayList<>();
-//            metadataCollection.setIndexLocation(entry.getKey());
-//            metadataCollection.setCollection(indexToCollection.get(entry.getKey()));
-//            metadataList.addAll(entry.getValue().values());
-//            metadataCollection.setMetadataList(metadataList);
-//            xmlMetadataCollections.add(metadataCollection);
-//        }
-//        index.setIndex(xmlMetadataCollections);
-
 
         FileOutputStream fileOutputStream = new FileOutputStream(this.metaFile);
         JAXBContext jaxbContext = JAXBContext.newInstance(VXQueryIndex.class);

@@ -84,7 +84,7 @@ public class MetaFileUtilTest {
      */
     @Test
     public void step3_testValidateMetadataFile() throws IOException, ClassNotFoundException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata("");
+        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata();
         Set<String> from = fromFile.keySet();
         Set<String> initial = initialMap.keySet();
 
@@ -113,7 +113,7 @@ public class MetaFileUtilTest {
     @Test
     public void step5_testUpdateMetadata()
             throws IOException, ClassNotFoundException, NoSuchAlgorithmException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFileMap = metaFileUtil.getMetadata("");
+        ConcurrentHashMap<String, XmlMetadata> fromFileMap = metaFileUtil.getMetadata();
         XmlMetadata modified = fromFileMap.get(TestConstants.XML_FILE);
 
         File xml = new File(TestConstants.XML_FILE);
@@ -123,7 +123,7 @@ public class MetaFileUtilTest {
 
         metaFileUtil.updateMetadataMap(fromFileMap, TestConstants.INDEX_DIR);
 
-        Assert.assertNotNull(metaFileUtil.getMetadata(TestConstants.INDEX_DIR));
+        Assert.assertNotNull(metaFileUtil.getMetadata());
 
     }
 
@@ -132,7 +132,7 @@ public class MetaFileUtilTest {
      */
     @Test
     public void step6_testVerifyMetadataChange() throws IOException, ClassNotFoundException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata(TestConstants.INDEX_DIR);
+        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata();
         Set<String> from = fromFile.keySet();
         Set<String> modified = modifiedMap.keySet();
 

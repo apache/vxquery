@@ -16,8 +16,7 @@
  */
 package org.apache.vxquery.metadata;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
@@ -42,11 +41,10 @@ import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.BuiltinFunctions;
-import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
+import org.apache.vxquery.runtime.functions.index.VXQueryIndexReader;
 import org.apache.vxquery.runtime.functions.index.updateIndex.IndexUpdater;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
@@ -58,10 +56,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
@@ -170,7 +166,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             updater.updateIndex();
                             updater.updateMetadataFile();
                             updater.exit();
-                            XDMConstants.setTrue(result);
+//                            XDMConstants.setTrue(result);
                         } catch (NoSuchAlgorithmException | IOException | JAXBException | SystemException e) {
                             throw new HyracksDataException("Could not update index in " + indexName + " " + e.getMessage());
                         }
@@ -182,6 +178,19 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             updater.deleteAllIndexes();
                         } catch (SystemException | JAXBException | IOException | NoSuchAlgorithmException e) {
                             throw new HyracksDataException("Could not delete index in " + indexName + " " + e.getMessage());
+                        }
+
+                    } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions
+                            .FN_COLLECTION_FROM_INDEX_2.getFunctionIdentifier())) {
+                        // In this scenario, collectionModifiedName represents the index directory, and
+                        // indexModifiedName represents the path.
+                        VXQueryIndexReader indexReader = new VXQueryIndexReader(ctx, indexModifiedName,
+                                collectionModifiedName);
+                        try {
+                            indexReader.init();
+                            indexReader.step(result);
+                        } catch (AlgebricksException e) {
+                            e.printStackTrace();
                         }
 
                     } else {

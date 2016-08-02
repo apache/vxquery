@@ -107,7 +107,7 @@ public class IndexUpdater {
             // Read the metadata file and load the metadata map into memory.
             metaFileUtil = new MetaFileUtil(indexFolder);
             metaFileUtil.readMetadataFile();
-            metadataMap = metaFileUtil.getMetadata(indexFolder);
+            metadataMap = metaFileUtil.getMetadata();
 
             // Retrieve the collection folder path.
             // Remove the entry for ease of the next steps.
