@@ -63,12 +63,12 @@ public class LibjnValuesScalarEvaluator extends AbstractTaggedValueArgumentScala
                     sp.getEntry(i, tempTvp);
                     if (tempTvp.getTag() == ValueTag.OBJECT_TAG) {
                         tempTvp.getValue(op);
-                        addPairs(tempTvp);
+                        addValues(tempTvp);
                     }
                 }
             } else if (sequence.getTag() == ValueTag.OBJECT_TAG) {
                 sequence.getValue(op);
-                addPairs(tempTvp);
+                addValues(tempTvp);
             }
             sb.finish();
             result.set(abvs1);
@@ -80,7 +80,7 @@ public class LibjnValuesScalarEvaluator extends AbstractTaggedValueArgumentScala
         }
     }
 
-    private void addPairs(TaggedValuePointable tempTvp) throws IOException, SystemException {
+    private void addValues(TaggedValuePointable tempTvp) throws IOException, SystemException {
         TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
         SequencePointable sp1 = ppool.takeOne(SequencePointable.class);
         try {
