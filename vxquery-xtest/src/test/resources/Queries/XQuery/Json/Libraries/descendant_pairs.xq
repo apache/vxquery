@@ -15,7 +15,7 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: JSONiq libjn:descendant_pairt :)
+(: JSONiq libjn:descendant_pairs :)
 libjn:descendant-pairs(
     (
         { "foo" : { "bar" : [ 1, 2 ] } },
