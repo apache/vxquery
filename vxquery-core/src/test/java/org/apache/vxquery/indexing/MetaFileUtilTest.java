@@ -49,7 +49,8 @@ public class MetaFileUtilTest {
     @BeforeClass
     public static void setup() {
         new File(TestConstants.INDEX_DIR).mkdir();
-        metaFileUtil = MetaFileUtil.create(TestConstants.INDEX_DIR);
+        //        metaFileUtil = MetaFileUtil.create(TestConstants.INDEX_DIR);
+        metaFileUtil = new MetaFileUtil(TestConstants.INDEX_DIR);
         initialMap = TestConstants.getInitialMap();
         modifiedMap = TestConstants.getModifiedMap();
     }
