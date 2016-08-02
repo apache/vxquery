@@ -38,7 +38,9 @@ import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Delete the index of a given index directory
@@ -66,9 +68,13 @@ public class IndexDeleteEvaluatorFactory extends AbstractTaggedValueArgumentScal
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                IndexUpdater updater = new IndexUpdater(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider,
-                        abvsFileNode, nodep, nodeId);
                 try {
+                    args[0].getValue(stringp);
+                    bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
+                            stringp.getLength() + stringp.getStartOffset())), 0);
+                    String indexFolder = di.readUTF();
+                    IndexUpdater updater = new IndexUpdater(indexFolder, result, stringp, bbis, di, sb, abvs, nodeIdProvider,
+                            abvsFileNode, nodep, nodeId);
                     updater.setup();
                     updater.deleteAllIndexes();
                     XDMConstants.setTrue(result);

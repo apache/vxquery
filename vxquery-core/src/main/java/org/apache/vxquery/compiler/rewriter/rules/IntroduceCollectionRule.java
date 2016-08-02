@@ -17,19 +17,18 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
-import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
-import org.apache.vxquery.types.AnyItemType;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SequenceType;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import org.apache.vxquery.common.VXQueryCommons;
+import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
+import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.types.AnyItemType;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 
 /**
  * Find the default query plan created for collection and updated it to use
@@ -61,10 +60,11 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperat
  * @author prestonc
  */
 public class IntroduceCollectionRule extends AbstractCollectionRule {
+
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String args[] = getCollectionName(opRef);
+        String args[] = getFunctionalArguments(opRef, VXQueryCommons.collectionFunctions);
 
         if (args != null) {
             String collectionName = args[0];

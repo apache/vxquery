@@ -28,7 +28,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
-import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexDocumentBuilder;
@@ -43,54 +42,30 @@ import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class IndexConstructorUtil {
-    static boolean isMetaFilePresent = false;
-    static MetaFileUtil metaFileUtil;
-    static ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
+     boolean isMetaFilePresent = false;
+     MetaFileUtil metaFileUtil;
+     ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
 
-    public static void evaluate(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
+    public void evaluate(String collectioFolder, String indexFolder, IPointable result, UTF8StringPointable
+            stringp,
             ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
             boolean isElementPath, String nodeId) throws SystemException, JAXBException {
-        String collectionFolder;
-        String indexFolder;
-        TaggedValuePointable collectionTVP = args[0];
-        TaggedValuePointable indexTVP = args[1];
 
-        if (collectionTVP.getTag() != ValueTag.XS_STRING_TAG || indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
-            throw new SystemException(ErrorCode.FORG0006);
-        }
-
-        try {
-            // Get the list of files.
-            collectionTVP.getValue(stringp);
-            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                    stringp.getLength() + stringp.getStartOffset())), 0);
-            collectionFolder = di.readUTF();
-
-            // Get the index folder
-            indexTVP.getValue(stringp);
-            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                    stringp.getLength() + stringp.getStartOffset())), 0);
-            indexFolder = di.readUTF();
-
-            metaFileUtil = MetaFileUtil.create(indexFolder);
+            metaFileUtil = new MetaFileUtil(indexFolder);
+//            metaFileUtil = .create(indexFolder);
             isMetaFilePresent = metaFileUtil.isMetaFilePresent();
-            metaFileUtil.setCollectionForIndex(indexFolder, collectionFolder);
+            metaFileUtil.setCollection(collectioFolder);
 
-        } catch (IOException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        }
-        File collectionDirectory = new File(collectionFolder);
+        File collectionDirectory = new File(collectioFolder);
         if (!collectionDirectory.exists()) {
-            throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
+            throw new RuntimeException("The collection directory (" + collectioFolder + ") does not exist.");
         }
 
         try {
@@ -132,7 +107,7 @@ public class IndexConstructorUtil {
     /*This function goes recursively one file at a time. First it turns the file into an ABVS document node, then
      * it indexes that document node.
      */
-    public static void indexXmlFiles(File collectionDirectory, IndexWriter writer, boolean isElementPath,
+    public void indexXmlFiles(File collectionDirectory, IndexWriter writer, boolean isElementPath,
             TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider,
             SequenceBuilder sb, ByteBufferInputStream bbis, DataInputStream di, String nodeId)
             throws SystemException, IOException {
@@ -168,14 +143,14 @@ public class IndexConstructorUtil {
         }
     }
 
-    public static boolean readableXmlFile(String path) {
+    public boolean readableXmlFile(String path) {
         return (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".xml.gz"));
     }
 
     /**
      * Separated from create index method so that it could be used as a helper function in IndexUpdater
      */
-    public static IndexDocumentBuilder getIndexBuilder(File file, IndexWriter writer, TaggedValuePointable nodep,
+    public IndexDocumentBuilder getIndexBuilder(File file, IndexWriter writer, TaggedValuePointable nodep,
             ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider, ByteBufferInputStream bbis,
             DataInputStream di, String nodeId) throws IOException {
 
