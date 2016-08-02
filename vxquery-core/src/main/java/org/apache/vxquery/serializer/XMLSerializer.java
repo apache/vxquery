@@ -436,15 +436,22 @@ public class XMLSerializer implements IPrinter {
         int tag = tvp.getTag();
         switch (tag) {
             case ValueTag.ARRAY_TAG:
+            case ValueTag.ATTRIBUTE_NODE_TAG:
+            case ValueTag.COMMENT_NODE_TAG:
+            case ValueTag.DOCUMENT_NODE_TAG:
+            case ValueTag.ELEMENT_NODE_TAG:
             case ValueTag.JS_NULL_TAG:
+            case ValueTag.NODE_TREE_TAG:
             case ValueTag.OBJECT_TAG:
+            case ValueTag.PI_NODE_TAG:
+            case ValueTag.TEXT_NODE_TAG:
             case ValueTag.XS_BOOLEAN_TAG:
             case ValueTag.XS_BYTE_TAG:
             case ValueTag.XS_DECIMAL_TAG:
             case ValueTag.XS_DOUBLE_TAG:
             case ValueTag.XS_FLOAT_TAG:
-            case ValueTag.XS_INTEGER_TAG:
             case ValueTag.XS_INT_TAG:
+            case ValueTag.XS_INTEGER_TAG:
             case ValueTag.XS_LONG_TAG:
             case ValueTag.XS_NEGATIVE_INTEGER_TAG:
             case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
