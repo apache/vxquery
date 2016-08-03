@@ -45,4 +45,9 @@
       <query name="project" date="2016-07-31"/>
       <output-file compare="Text">project.txt</output-file>
    </test-case>
+   <test-case name="remove-keys" FilePath="Json/Libraries/" Creator="Riyafa Abdul Hameed">
+      <description>Json Libraries.</description>
+      <query name="remove_keys" date="2016-07-31"/>
+      <output-file compare="Text">remove_keys.txt</output-file>
+   </test-case>
 </test-group>

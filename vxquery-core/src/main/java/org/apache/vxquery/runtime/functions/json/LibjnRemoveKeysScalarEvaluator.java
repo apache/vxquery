@@ -21,15 +21,15 @@ import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.exceptions.SystemException;
 
-public class LibjnProjectScalarEvaluator extends AbstractLibjnProjectScalarEvaluator {
+public class LibjnRemoveKeysScalarEvaluator extends AbstractLibjnProjectScalarEvaluator {
 
-    public LibjnProjectScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
+    public LibjnRemoveKeysScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
     }
 
     @Override
     protected boolean keyCheck(TaggedValuePointable objTvp, TaggedValuePointable keys) throws SystemException {
-        return isKeyFound(objTvp, keys);
+        return !isKeyFound(objTvp, keys);
     }
 
 }

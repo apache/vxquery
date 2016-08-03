@@ -1219,4 +1219,12 @@
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnProjectScalarEvaluatorFactory"/>
     </function>
+
+    <!-- libjn:remove-keys($sequence as item()*, $keys as xs:string*) as item()* -->
+    <function name="libjn:remove-keys">
+        <param name="sequence" type="item()*"/>
+        <param name="keys" type="xs:string*"/>
+        <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnRemoveKeysScalarEvaluatorFactory"/>
+    </function>
 </functions>

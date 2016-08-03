@@ -16,20 +16,24 @@
 */
 package org.apache.vxquery.runtime.functions.json;
 
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
-public class LibjnProjectScalarEvaluator extends AbstractLibjnProjectScalarEvaluator {
+public class LibjnRemoveKeysScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
 
-    public LibjnProjectScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(ctx, args);
+    private static final long serialVersionUID = 1L;
+
+    public LibjnRemoveKeysScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+        super(args);
     }
 
     @Override
-    protected boolean keyCheck(TaggedValuePointable objTvp, TaggedValuePointable keys) throws SystemException {
-        return isKeyFound(objTvp, keys);
+    protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
+            throws AlgebricksException {
+        return new LibjnRemoveKeysScalarEvaluator(ctx, args);
     }
 
 }
