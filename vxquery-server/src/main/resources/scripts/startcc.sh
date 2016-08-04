@@ -51,13 +51,15 @@ mkdir -p ${CCLOGS_DIR}
 
 # Set up the options for the cc.
 CC_OPTIONS=" -client-net-ip-address ${CCHOST} -cluster-net-ip-address ${CCHOST} "
-[ "${CCPORT}" ] {
-    CC_OPTIONS=" ${CC_OPTIONS} -client-net-port ${CCPORT} "
-}
+[ "${CCPORT}" ] &&
 
-[ "$CCOPTS" ] && {
+    CC_OPTIONS=" ${CC_OPTIONS} -client-net-port ${CCPORT} "
+
+
+[ "${CCOPTS}" ] &&
+
     CC_OPTIONS=" ${CC_OPTIONS} ${CCOPTS}"
-}
+
 
 echo "${JAVA_OPTS}" &> ${CCLOGS_DIR}/cc.log
 

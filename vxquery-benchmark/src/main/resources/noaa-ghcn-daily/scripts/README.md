@@ -17,6 +17,11 @@
 
 Weather Data Conversion To XML
 =====================
+Before procceeding to the actual process, be sure that you are familiar with
+deploying a server and then getting it started. You can find information about
+these steps in the official VXQuery website. It would, also, be good to verify
+that you can ssh in different nodes without verifying the password since the
+scripts require to ssh from the current node to different ones.
 
 # Introduction
 
@@ -39,13 +44,41 @@ folders:
  - downloads (All files taken from the NOAA HTTP site)
  - dataset-[name] (all files related to a single dataset)
      
+To convert the weather data to XML, 4 stages have to be completed. The stages
+are described below:
+
+ - download (Dowload the weather data from the website)
+ - progress_file (Verify that all the data have been downloaded)
+ - sensor_build (Convert the sensor readings to XML files)
+ - station_build (Convert the station data to XML files)
+
+After the convertion is completed, the system has to be setup to execute some
+queries to evaluate its performance. The steps for this procedure are described
+below:
+
+ - partition (The partition schemes are configured in an XML file. An example of
+this file is the weather_example_cluster.xml. This stage configures in how many
+partitions the raw data will be partitioned in each node)
+ - test_links (establish the correspondence between the partitioned data and the raw data)
+ - queries (creates a folder with all the XML queries)
+
      
 # Examples commands
+Downloading 
+python weather_cli.py -l download -x weather_example.xml
 
 Building
-
+python weather_cli.py -l sensor_build -x weather_example.xml (-l station_build for the station data)
 
 Partitioning
-python weather_cli.py -x weather_example.xml
+python weather_cli.py -l partition -x weather_example.xml
 
 Linking
+python weather_cli.py -l test_links -x weather_example.xml
+
+Building queries
+python weather_cli.py -l queries -x weather_example.xml
+
+Executing queries
+run_group_test.sh cluster_ip path/to/weather_folder
+
