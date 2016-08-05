@@ -20,6 +20,6 @@
 let $x:="json_half_1|json_half_2"
 for $r in collection($x)
     let $z:=$r("results")()
-    for $i in $z()  
+    for $i in $z
 where $i("datatype")="TMIN"
 return $i

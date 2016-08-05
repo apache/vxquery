@@ -1565,6 +1565,7 @@ public class XMLQueryTranslator {
                         for (ASTNode an : args) {
                             if (an.getTag() == ASTTag.ARGUMENT_LIST) {
                                 ArgumentListNode argNode = (ArgumentListNode) an;
+                                arguments.clear();
                                 for (ASTNode en : argNode.getArg()) {
                                     ILogicalExpression argument = vre(translateExpression(en, tCtx));
                                     arguments.add(argument);
@@ -1578,7 +1579,11 @@ public class XMLQueryTranslator {
                                     }
                                 }
                                 if (arguments.size() == 0) {
-                                    ctxExpr = sfce(BuiltinOperators.KEYS_OR_MEMBERS, expr);
+                                    if (ctxExpr == null) {
+                                        ctxExpr = sfce(BuiltinOperators.KEYS_OR_MEMBERS, expr);
+                                    } else {
+                                        ctxExpr = sfce(BuiltinOperators.KEYS_OR_MEMBERS, ctxExpr);
+                                    }
                                 }
                             } else {
                                 predicates = postfixNode.getArgs();
