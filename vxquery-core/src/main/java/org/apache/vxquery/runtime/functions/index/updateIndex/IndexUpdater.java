@@ -142,6 +142,12 @@ public class IndexUpdater {
 
         //Detect deleted files and execute the delete index process.
         deleteIndexOfDeletedFiles(metadataMap.keySet(), pathsFromFileList);
+
+        try {
+            updateMetadataFile();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

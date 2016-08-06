@@ -48,7 +48,11 @@ import org.apache.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.StaticContext;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
