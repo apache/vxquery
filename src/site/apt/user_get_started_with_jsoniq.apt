@@ -1,0 +1,97 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+JSONiq extension to XQuery
+
+  The {{{http://jsoniq.org/docs/JSONiqExtensionToXQuery/html-single/index.html}JSONiq}} extension to XQuery allows processing XML and JSON natively and with a single language.
+
+
+* Example
+
+  This example uses the XML file (books.xml) from {{{http://www.w3schools.com/xsl/xquery_intro.asp}W3Schools XQuery Tutorial}}
+
+  [[i]] Query:
+
+----------------------------------------
+[
+  for $book in doc("books.xml")/bookstore/book
+  return
+  {
+    "category":data($book/@category),
+    "title":data($book/title),
+    "author":data($book/author)
+    "year":xs:integer($book/year),
+    "price":xs:float($book/price)
+  }
+]
+----------------------------------------
+
+  [[i]] Result:
+
+----------------------------------------
+[
+   {
+      "category":"COOKING",
+      "title":"Everyday Italian",
+      "author":"Giada De Laurentiis",
+      "year":2005,
+      "price":30
+   },
+   {
+      "category":"CHILDREN",
+      "title":"Harry Potter",
+      "author":"J K. Rowling",
+      "year":2005,
+      "price":29.99
+   },
+   {
+      "category":"WEB",
+      "title":"XQuery Kick Start",
+      "author":[
+         "James McGovern",
+         "Per Bothner",
+         "Kurt Cagle",
+         "James Linn",
+         "Vaidyanathan Nagarajan"
+      ],
+      "year":2003,
+      "price":49.99
+   },
+   {
+      "category":"WEB",
+      "title":"Learning XML",
+      "author":"Erik T. Ray",
+      "year":2003,
+      "price":39.95
+   }
+]
+----------------------------------------
+
+  [[i]] The following query uses the above result (given in a file books.json):
+
+----------------------------------------
+let $books := jn:json-doc("books.json")
+for $x in $books()
+where $x("price")>30
+order by $x("title")
+return $x("title")
+----------------------------------------
+
+  [[i]] Result
+
+----------------------------------------
+Learning XML
+XQuery Kick Start
+----------------------------------------
