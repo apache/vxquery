@@ -48,7 +48,11 @@ import org.apache.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
 import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.StaticContext;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -100,10 +104,10 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             //Indexing
             VXQueryIndexingDataSource ds = (VXQueryIndexingDataSource) dataSource;
             if (sourceFileMap != null) {
-                final int len = ds.getIndexPartitions().length;
+                final int len = ds.getCollectionPartitions().length;
                 String[] collectionPartitions = new String[len];
                 for (int i = 0; i < len; ++i) {
-                    String partition = ds.getIndexPartitions()[i];
+                    String partition = ds.getCollectionPartitions()[i];
                     File mapped = sourceFileMap.get(partition);
                     collectionPartitions[i] = mapped != null ? mapped.toString() : partition;
                 }

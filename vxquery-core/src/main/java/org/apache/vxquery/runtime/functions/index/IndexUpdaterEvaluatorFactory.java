@@ -68,8 +68,7 @@ public class IndexUpdaterEvaluatorFactory extends AbstractTaggedValueArgumentSca
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                //            // Get the index folder
-
+                // Get the index folder
                 try {
                     args[0].getValue(stringp);
                     bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),

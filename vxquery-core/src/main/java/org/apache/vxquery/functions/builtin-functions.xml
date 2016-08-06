@@ -131,14 +131,13 @@
     <!-- fn:build-index-on-collection($arg  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
     <function name="fn:build-index-on-collection">
         <param name="collection-folder" type="xs:string?"/>
-        <param name="index-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:update-index($indexFolder  as xs:string?) as  node()* -->
     <function name="fn:update-index">
-        <param name="index-folder" type="xs:string?"/>
+        <param name="collection-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
         <runtime type="scalar"
                  class="org.apache.vxquery.runtime.functions.index.IndexUpdaterEvaluatorFactory"/>
@@ -146,7 +145,7 @@
 
     <!-- fn:delete-index($indexFolder  as xs:string?) as  node()* -->
     <function name="fn:delete-index">
-        <param name="index-folder" type="xs:string?"/>
+        <param name="collection-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
         <runtime type="scalar"
                  class="org.apache.vxquery.runtime.functions.index.IndexDeleteEvaluatorFactory"/>

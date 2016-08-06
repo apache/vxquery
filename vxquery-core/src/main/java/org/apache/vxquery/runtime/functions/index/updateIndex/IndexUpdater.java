@@ -75,7 +75,6 @@ public class IndexUpdater {
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private IndexConstructorUtil indexConstructorUtil = new IndexConstructorUtil();
 
-    //TODO : Implement for paralleizing
     public  IndexUpdater(String indexFolder, IPointable result, UTF8StringPointable stringp,
             ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
@@ -142,6 +141,12 @@ public class IndexUpdater {
 
         //Detect deleted files and execute the delete index process.
         deleteIndexOfDeletedFiles(metadataMap.keySet(), pathsFromFileList);
+
+        try {
+            updateMetadataFile();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -36,6 +36,7 @@ import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
+import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -53,6 +54,7 @@ import org.apache.vxquery.xmlparser.XMLParser;
 import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
@@ -69,14 +71,12 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
     private short dataSourceId;
     private short totalDataSources;
     private String[] collectionPartitions;
-    private String[] indexPartitions;
     private List<Integer> childSeq;
 
     public VXQueryIndexingOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryIndexingDataSource ds,
             RecordDescriptor rDesc, String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos) {
         super(spec, 1, 1);
         collectionPartitions = ds.getCollectionPartitions();
-        indexPartitions = ds.getIndexPartitions();
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
         recordDescriptors[0] = rDesc;
@@ -97,16 +97,11 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        final String indexName = indexPartitions[partition % indexPartitions.length];
-        final String collectionName = collectionPartitions != null?collectionPartitions[partition %
-                collectionPartitions.length]:"";
-
+        final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
-        String indexModifiedName = indexName.replace("${nodeId}", nodeId);
 
         final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
                 dCtx.getStaticContext());
-
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -131,12 +126,16 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                 final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
                 final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
 
-                if (collectionModifiedName.contains("hdfs://") || indexModifiedName.contains("hdfs://")) {
+                String indexModifiedName;
+
+                if (collectionModifiedName.contains("hdfs://")) {
                     throw new HyracksDataException("Indexing support for HDFS not yet implemented.");
                 } else {
 
-                    if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_BUILD_INDEX_ON_COLLECTION_2.getFunctionIdentifier())) {
-
+                    if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions
+                            .FN_BUILD_INDEX_ON_COLLECTION_1.getFunctionIdentifier())) {
+                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.putIndexForCollection
+                                (collectionModifiedName);
                         File collectionDirectory = new File(collectionModifiedName);
 
                         //check if directory is in the local file system
@@ -151,14 +150,15 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                         result.getLength());
                             } catch (SystemException | JAXBException e) {
                                 throw new HyracksDataException("Could not create index for collection: " +
-                                        collectionName + " in dir: " + indexName + " " + e.getMessage());
+                                        collectionName + " in dir: " + null + " " + e.getMessage());
                             }
                         } else {
                             throw new HyracksDataException("Cannot find Collection Directory (" + nodeId + ":" +
                                     collectionDirectory.getAbsolutePath() + ")");
                         }
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_UPDATE_INDEX_1.getFunctionIdentifier())) {
-
+                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.getIndexForCollection
+                                (collectionModifiedName);
                         IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb, abvs,
                                 nodeIdProvider, abvsFileNode, nodep, nodeId);
                         try {
@@ -168,20 +168,25 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             updater.exit();
 //                            XDMConstants.setTrue(result);
                         } catch (NoSuchAlgorithmException | IOException | JAXBException | SystemException e) {
-                            throw new HyracksDataException("Could not update index in " + indexName + " " + e.getMessage());
+                            throw new HyracksDataException("Could not update index in " + indexModifiedName + " " + e.getMessage());
                         }
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier())) {
+                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.getIndexForCollection
+                                (collectionModifiedName);
                         IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb, abvs,
                                 nodeIdProvider, abvsFileNode, nodep, nodeId);
+                        VXQueryCommons.INDEX_CENTRALIZER_UTIL.deleteEntryForCollection(collectionModifiedName);
                         try {
                             updater.setup();
                             updater.deleteAllIndexes();
                         } catch (SystemException | JAXBException | IOException | NoSuchAlgorithmException e) {
-                            throw new HyracksDataException("Could not delete index in " + indexName + " " + e.getMessage());
+                            throw new HyracksDataException("Could not delete index in " + indexModifiedName + " " + e.getMessage());
                         }
 
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions
                             .FN_COLLECTION_FROM_INDEX_2.getFunctionIdentifier())) {
+                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.getIndexForCollection
+                                (collectionModifiedName);
                         // In this scenario, collectionModifiedName represents the index directory, and
                         // indexModifiedName represents the path.
                         VXQueryIndexReader indexReader = new VXQueryIndexReader(ctx, indexModifiedName,
@@ -212,6 +217,11 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                     appender.flush(writer, true);
                 }
                 writer.close();
+                try {
+                    VXQueryCommons.INDEX_CENTRALIZER_UTIL.writeIndexDirectory();
+                } catch (JAXBException | FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         };
     }
