@@ -40,4 +40,9 @@
       <query name="flatten" date="2016-07-20"/>
       <output-file compare="Text">flatten.txt</output-file>
    </test-case>
+   <test-case name="intersect" FilePath="Json/Libraries/" Creator="Riyafa Abdul Hameed">
+      <description>Json Libraries.</description>
+      <query name="intersect" date="2016-07-30"/>
+      <output-file compare="Text">intersect.txt</output-file>
+   </test-case>
 </test-group>
