@@ -32,28 +32,33 @@
         <output-file compare="Text">q02_object_navigation.txt</output-file>
     </test-case>
     <test-case name="json-object-navigation-q03" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
-        <description>Size of an object.</description>
+        <description>Navigate through an object.</description>
         <query name="q03_object_navigation" date="2016-06-25"/>
         <output-file compare="Text">q03_object_navigation.txt</output-file>
     </test-case>
     <test-case name="json-object-navigation-q04" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
-        <description>Navigate through an empty object.</description>
+        <description>List keys of the object.</description>
         <query name="q04_object_navigation" date="2016-06-25"/>
         <output-file compare="Text">q04_object_navigation.txt</output-file>
     </test-case>
     <test-case name="json-object-navigation-q05" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
-        <description>Ask for an index out of the object size.</description>
+        <description>Navigate through an empty object.</description>
         <query name="q05_object_navigation" date="2016-06-25"/>
         <output-file compare="Text">q05_object_navigation.txt</output-file>
     </test-case>
     <test-case name="json-object-navigation-q06" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
-        <description>Ask for an index out of the object size.</description>
+        <description>Navigate through an empty object</description>
         <query name="q06_object_navigation" date="2016-06-25"/>
         <output-file compare="Text">q06_object_navigation.txt</output-file>
     </test-case>
     <test-case name="json-object-navigation-q07" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
-        <description>Ask for an index out of the object size.</description>
+        <description>List non existing key</description>
         <query name="q07_object_navigation" date="2016-06-25"/>
         <output-file compare="Text">q07_object_navigation.txt</output-file>
+    </test-case>
+    <test-case name="json-object-navigation-q08" FilePath="Json/Object/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Navigate through an object</description>
+        <query name="q08_object_navigation" date="2016-08-05"/>
+        <output-file compare="Text">q08_object_navigation.txt</output-file>
     </test-case>
 </test-group>
