@@ -132,16 +132,24 @@
     <function name="fn:build-index-on-collection">
         <param name="collection-folder" type="xs:string?"/>
         <param name="index-folder" type="xs:string?"/>
-        <return type="node()*"/>
+        <return type="xs:boolean"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:update-index($indexFolder  as xs:string?) as  node()* -->
     <function name="fn:update-index">
         <param name="index-folder" type="xs:string?"/>
-        <return type="node()*"/>
+        <return type="xs:boolean"/>
         <runtime type="scalar"
                  class="org.apache.vxquery.runtime.functions.index.IndexUpdaterEvaluatorFactory"/>
+    </function>
+
+    <!-- fn:delete-index($indexFolder  as xs:string?) as  node()* -->
+    <function name="fn:delete-index">
+        <param name="index-folder" type="xs:string?"/>
+        <return type="xs:boolean"/>
+        <runtime type="scalar"
+                 class="org.apache.vxquery.runtime.functions.index.IndexDeleteEvaluatorFactory"/>
     </function>
 
     <!-- fn:collection-from-index($indexfolder  as xs:string?, $elementpath as xs:string?) as  node()* -->
@@ -323,21 +331,21 @@
         <return type="document-node()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.node.FnDocScalarEvaluatorFactory"/>
     </function>
-    
+
     <!-- jn:json-doc($uri as  xs:string?) as json-item()?  -->
     <function name="jn:json-doc">
         <param name="uri" type="xs:string?"/>
         <return type="json-item()?"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnDocScalarEvaluatorFactory"/>
     </function>
-    
+
     <!-- jn:parse-json($arg as  xs:string?) as json-item()*  -->
     <function name="jn:parse-json">
         <param name="arg" type="xs:string?"/>
         <return type="json-item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnParseJsonScalarEvaluatorFactory"/>
     </function>
-    
+
     <!-- jn:parse-json($arg as  xs:string?, $options as object()) as json-item()*  -->
     <function name="jn:parse-json">
         <param name="arg" type="xs:string?"/>
@@ -1171,7 +1179,7 @@
             <argument value="0"/>
         </property>
     </function>
-    
+
     <!-- fn:serialize($data  as item()*) as  xs:string  -->
     <function name="fn:serialize">
         <param name="data" type="item()*"/>
@@ -1185,7 +1193,7 @@
         <return type="xs:string*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnKeysScalarEvaluatorFactory"/>
     </function>
-    
+
     <!-- jn:members($arg as item()*) as item()* -->
     <function name="jn:members">
         <param name="arg" type="item()*"/>
@@ -1198,14 +1206,14 @@
         <return type="js:null"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.JnNullScalarEvaluatorFactory"/>
     </function>
-    
+
     <!-- libjn:descendant-arrays($sequence as item()*) as array()* -->
     <function name="libjn:descendant-arrays">
         <param name="sequence" type="item()*"/>
         <return type="json-item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnDescendantArraysScalarEvaluatorFactory"/>
     </function>
-    
+
     <!-- libjn:flatten($sequence as item()*) as item()* -->
     <function name="libjn:flatten">
         <param name="sequence" type="item()*"/>

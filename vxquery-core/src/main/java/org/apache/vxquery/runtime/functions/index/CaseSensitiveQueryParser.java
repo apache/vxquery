@@ -16,14 +16,14 @@
 */
 package org.apache.vxquery.runtime.functions.index;
 
-import java.io.StringReader;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.FastCharStream;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
+
+import java.io.StringReader;
 
 public class CaseSensitiveQueryParser extends QueryParser {
 

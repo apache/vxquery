@@ -16,8 +16,6 @@
 */
 package org.apache.vxquery.runtime.functions.index;
 
-import java.io.DataInputStream;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -28,11 +26,16 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
+
+import javax.xml.bind.JAXBException;
+import java.io.DataInputStream;
 
 public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     //Creates one Lucene doc per file
@@ -61,8 +64,14 @@ public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueA
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-                IndexConstructorUtil.evaluate(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider, abvsFileNode,
-                        nodep, false, nodeId);
+                try {
+                    IndexConstructorUtil
+                            .evaluate(args, result, stringp, bbis, di, sb, abvs, nodeIdProvider, abvsFileNode,
+                            nodep, false, nodeId);
+                    XDMConstants.setTrue(result);
+                } catch (JAXBException e) {
+                    throw new SystemException(ErrorCode.SYSE0001, e);
+                }
             }
 
         };
