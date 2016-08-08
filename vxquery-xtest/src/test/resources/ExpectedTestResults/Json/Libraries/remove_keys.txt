@@ -1,0 +1,14 @@
+{"Engineer":"Scott"}
+[1,2,3,4]
+{"Engineer":"Trip"}
+true
+1
+null
+{"Engineer":"Trip"}
+true
+1
+null
+{"Captain":"Archer","Engineer":"Trip"}
+true
+1
+null
