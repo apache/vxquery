@@ -16,6 +16,9 @@
  */
 package org.apache.vxquery.runtime.functions.index.indexCentralizer;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,10 +31,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,8 +54,9 @@ public class IndexCentralizerUtil {
     private ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
     private final File XML_FILE;
     private final List<String> collections = new ArrayList<>();
+    private final Logger LOGGER = Logger.getLogger("IndexCentralizerUtil");
 
-    public IndexCentralizerUtil() throws IOException, SAXException, ParserConfigurationException {
+    public IndexCentralizerUtil() {
         XML_FILE = new File(getIndexLocation()+"/"+FILE_NAME);
     }
 
@@ -93,48 +94,70 @@ public class IndexCentralizerUtil {
     }
 
     /**
-     * Get all collections which have index created.
-     * @return List of collection directories.
+     * Prints all collections which have an index created.
+     * @param dataOutput : DataOutPut object which, result should be written.
+     * @throws IOException
      */
-    public List<String> getAllCollections () {
-        return this.collections;
+    public void getAllCollections (DataOutput dataOutput) throws IOException {
+        dataOutput.write(ValueTag.XS_STRING_TAG);
+        dataOutput.write("Aa".getBytes());
+        if (this.collections.size()!=0) {
+            dataOutput.write("Following collections have indexes.\n".getBytes());
+            for (String collection : collections) {
+                dataOutput.write((collection + "\n").getBytes());
+            }
+        } else {
+            dataOutput.write("You have no indexes created!\n".getBytes());
+        }
     }
 
     /**
      * Get the collection location which is specified in local.xml file.
      * @return : Collection location
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
      */
-    private String getIndexLocation() throws ParserConfigurationException, IOException, SAXException {
+    private String getIndexLocation() {
         File f = new File(LOCATION);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(f);
+        DocumentBuilder dBuilder;
+        Document doc;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+            doc = dBuilder.parse(f);
+            doc.getDocumentElement().normalize();   
 
-        doc.getDocumentElement().normalize();
+            NodeList nList = doc.getElementsByTagName("indexDirectory");
+            Node nNode = nList.item(0);
+            this.INDEX_LOCATION = nNode.getTextContent();
+            return INDEX_LOCATION;
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.log(Level.DEBUG, "Could not parse xml file due to " + e.getMessage());
+            }
+            return null;
+        }
 
-        NodeList nList = doc.getElementsByTagName("indexDirectory");
-        Node nNode = nList.item(0);
-        this.INDEX_LOCATION = nNode.getTextContent();
-        return INDEX_LOCATION;
     }
 
     /**
      * Read the collection, index directory file and populate the HashMap.
-     * @throws JAXBException
      */
-    public void readIndexDirectory() throws JAXBException {
+    public void readIndexDirectory() {
         if (this.XML_FILE.exists()) {
-            JAXBContext jaxbContext = JAXBContext.newInstance(IndexDirectory.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            IndexDirectory indexDirectory = (IndexDirectory) jaxbUnmarshaller.unmarshal(this.XML_FILE);
+            try {
+                JAXBContext jaxbContext = JAXBContext.newInstance(IndexDirectory.class);
+                Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                IndexDirectory indexDirectory = (IndexDirectory) jaxbUnmarshaller.unmarshal(this.XML_FILE);
 
-            for (IndexLocator il : indexDirectory.getDirectory()) {
-                this.indexCollectionMap.put(il.getCollection(), il);
-                this.collections.add(il.getCollection());
+                for (IndexLocator il : indexDirectory.getDirectory()) {
+                    this.indexCollectionMap.put(il.getCollection(), il);
+                    this.collections.add(il.getCollection());
+                }
+            } catch (JAXBException e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.log(Level.DEBUG, "Could not read the XML file due to " + e);
+                }
             }
+
         }
 
     }

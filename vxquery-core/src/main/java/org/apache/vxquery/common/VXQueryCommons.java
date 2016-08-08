@@ -35,21 +35,10 @@ public class VXQueryCommons {
 
     public static IndexCentralizerUtil INDEX_CENTRALIZER_UTIL = null;
     static {
-        try {
-            INDEX_CENTRALIZER_UTIL = new IndexCentralizerUtil();
-            INDEX_CENTRALIZER_UTIL.readIndexDirectory();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
+        INDEX_CENTRALIZER_UTIL = new IndexCentralizerUtil();
+        INDEX_CENTRALIZER_UTIL.readIndexDirectory();
 
     }
-
 
     static {
         collectionFunctions.add(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier());

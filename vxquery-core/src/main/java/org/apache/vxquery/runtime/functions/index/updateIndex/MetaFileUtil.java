@@ -87,8 +87,6 @@ public class MetaFileUtil {
             throws IOException, ClassNotFoundException, JAXBException {
 
         return this.indexMap;
-
-//        return this.indexes.get(index);
     }
 
     /**
