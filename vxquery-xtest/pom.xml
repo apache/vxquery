@@ -115,6 +115,7 @@
                         <exclude>**/VXQueryXMarkTest.java</exclude>
                         <exclude>**/XMarkTest.java</exclude>
                         <exclude>**/XQTSTest.java</exclude>
+                        <exclude>**/VXQueryCheckXQTSTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

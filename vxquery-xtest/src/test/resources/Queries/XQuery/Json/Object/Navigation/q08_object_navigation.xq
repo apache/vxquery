@@ -15,11 +15,14 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Parser Query :)
-(: parse a string with arrays :)
-let $x:="json_quarter_1|json_quarter_2|json_quarter_3|json_quarter_4"
-for $r in collection($x)
-    let $z:=$r("results")()
-    for $i in $z
-where $i("station")="GHCND:US000000001"
-return $i
+(: Json Object Navigation :)
+let $x := {
+    "name" : {
+        "id" : {
+            "number" : 123,
+            "letter" : "g"
+        },
+        "first" : "Riyafa",
+        "Last" : "Abdul Hameed"}
+}
+return $x("name")("id")()

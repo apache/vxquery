@@ -15,11 +15,21 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Parser Query :)
-(: parse a string with arrays :)
-let $x:="json_quarter_1|json_quarter_2|json_quarter_3|json_quarter_4"
-for $r in collection($x)
-    let $z:=$r("results")()
-    for $i in $z
-where $i("station")="GHCND:US000000001"
-return $i
+(: JSONiq libjn:values :)
+libjn:values(
+    (
+        {
+            "Captain" : "Kirk",
+            "First Officer" : "Spock",
+            "Engineer" : "Scott"
+        },
+        [ 1, 2, 3, 4 ],
+        {
+            "Captain" : "Archer",
+            "Engineer" : "Trip"
+        },
+        true(),
+        1,
+        jn:null()
+    )
+)

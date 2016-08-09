@@ -129,8 +129,46 @@ Developer Data Handling
 *-------------------------+----------------------+---------------:
 | xs:string               | UTF8StringPointable  |    2 + length |
 *-------------------------+----------------------+---------------:
+   
+
+* XPath Node Types
+
+  XML is used as the data source for XQuery and must be parsed into Hyracks data. Each
+  node type defined in XPath and XQuery can be mapped into pointable defined in Apache 
+  VXQuery\x99.
   
+*-----------------------------------+----------------------+---------------+
+| <<Data Type>>                     | <<Pointable Name>>   | <<Data Size>> |
+*-----------------------------------+----------------------+---------------:
+| Attribute Nodes(ANP)              | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/AttributeNodePointable.java}AttributeNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Document Nodes(DNP)               | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/DocumentNodePointable.java}DocumentNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Element Nodes(ENP)                | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/ElementNodePointable.java}ElementNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Node Tree(NTP)                    | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/NodeTreePointable.java}NodeTreePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Processing Instruction Node(PINP) | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/PINodePointable.java}PINodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Comment Node(CNP)                 | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+| Text Node(TNP)                    | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/nodes/TextOrCommentNodePointable.java}TextOrCommentNodePointable}}      |    1 + length |
+*-----------------------------------+----------------------+---------------:
+
+
+* JSONiq Data Types
+
+  Json-items are used as a data source for JSONiq and must be parsed into Hyracks data. Each json-item defined in JSONiq can be mapped into pointable defined in Apache VXQuery\x99.
   
+*-------------------------+----------------------+---------------:
+| Array(AP)               | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/jsonitem/ArrayPointable.java}ArrayPointable}}     |    1 + length |
+*-------------------------+----------------------+---------------:  
+| Object(OP)              | {{{https://git-wip-us.apache.org/repos/asf?p=vxquery.git;a=blob;f=vxquery-core/src/main/java/org/apache/vxquery/datamodel/accessors/jsonitem/ObjectPointable.java}ObjectPointable}}   |    1 + length |
+*-------------------------+----------------------+---------------: 
+| js:null(null)           |                      |             1 |
+*-------------------------+----------------------+---------------: 
+
+
 * String Iterators
 
   For many string functions, we have used string iterators to traverse the
@@ -160,3 +198,4 @@ Developer Data Handling
   to hold your output. Adding to the result, if necessary. The array can be
   reused and can hold multiple pointable results due to the starting offset
   parameter in the pointable.
+  

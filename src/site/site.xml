@@ -96,11 +96,11 @@ limitations under the License.
                 name="XMark Benchmark Status"
                 href="development_xmark_status.html" />
             <item
-                name="XML Data and Node Types"
-                href="development_xml_node_details.html" />
-            <item
                 name="XML Data Model Example"
                 href="development_xml_document.html" />
+            <item
+                name="JSONiq Data Model Example"
+                href="development_json_document.html" />
         </menu>
         <menu ref="reports" />
         <menu ref="modules" />
