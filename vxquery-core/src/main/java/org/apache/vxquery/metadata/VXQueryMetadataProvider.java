@@ -16,12 +16,6 @@
  */
 package org.apache.vxquery.metadata;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.hyracks.algebricks.common.constraints.AlgebricksAbsolutePartitionConstraint;
 import org.apache.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
@@ -51,7 +45,15 @@ import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
 import org.apache.hyracks.api.dataset.ResultSetId;
 import org.apache.hyracks.api.job.JobSpecification;
 import org.apache.hyracks.dataflow.std.result.ResultWriterOperatorDescriptor;
+import org.apache.vxquery.common.VXQueryCommons;
+import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.StaticContext;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class VXQueryMetadataProvider implements IMetadataProvider<String, String> {
     private final String[] nodeList;
@@ -88,22 +90,51 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             List<LogicalVariable> minFilterVars, List<LogicalVariable> maxFilterVars, IOperatorSchema opSchema,
             IVariableTypeEnvironment typeEnv, JobGenContext context, JobSpecification jobSpec, Object implConfig)
                     throws AlgebricksException {
-        VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
-        if (sourceFileMap != null) {
-            final int len = ds.getPartitions().length;
-            String[] collectionPartitions = new String[len];
-            for (int i = 0; i < len; ++i) {
-                String partition = ds.getPartitions()[i];
-                File mapped = sourceFileMap.get(partition);
-                collectionPartitions[i] = mapped != null ? mapped.toString() : partition;
-            }
-            ds.setPartitions(collectionPartitions);
-        }
-        RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
-        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf,
-                this.nodeControllerInfos);
 
-        AlgebricksPartitionConstraint constraint = getClusterLocations(nodeList, ds.getPartitionCount());
+
+        //Remove following redundant code
+        IOperatorDescriptor scanner = null;
+        AlgebricksPartitionConstraint constraint = null;
+        if (VXQueryCommons.indexingFunctions.contains(
+                AbstractCollectionRule.functionCall.getFunctionIdentifier())) {
+            //Indexing
+            VXQueryIndexingDataSource ds = (VXQueryIndexingDataSource) dataSource;
+            if (sourceFileMap != null) {
+                final int len = ds.getIndexPartitions().length;
+                String[] collectionPartitions = new String[len];
+                for (int i = 0; i < len; ++i) {
+                    String partition = ds.getIndexPartitions()[i];
+                    File mapped = sourceFileMap.get(partition);
+                    collectionPartitions[i] = mapped != null ? mapped.toString() : partition;
+                }
+                ds.setCollectionPartitions(collectionPartitions);
+
+            }
+            RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
+            scanner = new VXQueryIndexingOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf,
+                    this.nodeControllerInfos);
+            constraint = getClusterLocations(nodeList, ds.getPartitionCount());
+
+        } else if (VXQueryCommons.collectionFunctions.contains(
+                AbstractCollectionRule.functionCall.getFunctionIdentifier())){
+            // collection
+                    VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
+            if (sourceFileMap != null) {
+                final int len = ds.getPartitions().length;
+                String[] collectionPartitions = new String[len];
+                for (int i = 0; i < len; ++i) {
+                    String partition = ds.getPartitions()[i];
+                    File mapped = sourceFileMap.get(partition);
+                    collectionPartitions[i] = mapped != null ? mapped.toString() : partition;
+                }
+                ds.setPartitions(collectionPartitions);
+            }
+            RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
+            scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf,
+                    this.nodeControllerInfos);
+            constraint = getClusterLocations(nodeList, ds.getPartitionCount());
+        }
+
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
     }
 

@@ -41,12 +41,10 @@ import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,13 +73,14 @@ public class IndexUpdater {
     private String indexFolder;
     private Logger LOGGER = Logger.getLogger("Index Updater");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private IndexConstructorUtil indexConstructorUtil = new IndexConstructorUtil();
 
     //TODO : Implement for paralleizing
-    public IndexUpdater(TaggedValuePointable[] args, IPointable result, UTF8StringPointable stringp,
+    public  IndexUpdater(String indexFolder, IPointable result, UTF8StringPointable stringp,
             ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
             String nodeId) {
-        this.args = args;
+        this.indexFolder = indexFolder;
         this.result = result;
         this.stringp = stringp;
         this.bbis = bbis;
@@ -104,27 +103,15 @@ public class IndexUpdater {
      */
     public void setup() throws SystemException, IOException, NoSuchAlgorithmException, JAXBException {
 
-        TaggedValuePointable indexTVP = args[0];
-
-        if (indexTVP.getTag() != ValueTag.XS_STRING_TAG) {
-            throw new SystemException(ErrorCode.FORG0006);
-        }
-
         try {
-            // Get the index folder
-            indexTVP.getValue(stringp);
-            bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                    stringp.getLength() + stringp.getStartOffset())), 0);
-            indexFolder = di.readUTF();
-
             // Read the metadata file and load the metadata map into memory.
-            metaFileUtil = MetaFileUtil.create(indexFolder);
+            metaFileUtil = new MetaFileUtil(indexFolder);
             metaFileUtil.readMetadataFile();
-            metadataMap = metaFileUtil.getMetadata(indexFolder);
+            metadataMap = metaFileUtil.getMetadata();
 
             // Retrieve the collection folder path.
             // Remove the entry for ease of the next steps.
-            collectionFolder = metaFileUtil.getCollection(indexFolder);
+            collectionFolder = metaFileUtil.getCollection();
 
         } catch (IOException | ClassNotFoundException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
@@ -195,7 +182,7 @@ public class IndexUpdater {
         assert list != null;
         for (File file : list) {
             pathsFromFileList.add(file.getCanonicalPath());
-            if (IndexConstructorUtil.readableXmlFile(file.getCanonicalPath())) {
+            if (indexConstructorUtil.readableXmlFile(file.getCanonicalPath())) {
                 XmlMetadata data = metadataMap.get(file.getCanonicalPath());
                 String md5 = metaFileUtil.generateMD5(file);
 
@@ -212,7 +199,7 @@ public class IndexUpdater {
 
                         //Update index corresponding to the xml file.
                         indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, file.getCanonicalPath()));
-                        indexDocumentBuilder = IndexConstructorUtil
+                        indexDocumentBuilder = indexConstructorUtil
                                 .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di,
                                         nodeId);
                         indexDocumentBuilder.printStart();
@@ -230,7 +217,7 @@ public class IndexUpdater {
 
                     // In this case, the xml file has not added to the index. (It is a newly added file)
                     // Therefore generate a new index for this file and add it to the existing index.
-                    indexDocumentBuilder = IndexConstructorUtil
+                    indexDocumentBuilder = indexConstructorUtil
                             .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
                     indexDocumentBuilder.printStart();
 
