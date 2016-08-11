@@ -43,8 +43,6 @@ public class MetaFileUtil {
     private String index;
     private String collection;
     private ConcurrentHashMap<String, XmlMetadata> indexMap = new ConcurrentHashMap<>();
-    private Map<String, ConcurrentHashMap<String, XmlMetadata>> indexes = new ConcurrentHashMap<>();
-    private Map<String, String> indexToCollection = new ConcurrentHashMap<>();
 
     public MetaFileUtil(String indexFolder) {
         this.metaFile = new File(indexFolder + "/" + Constants.META_FILE_NAME);
@@ -78,12 +76,11 @@ public class MetaFileUtil {
     /**
      * Method to get the set of xml metadata for a given collection
      *
-     * @param index : The collection from which the metadata should be read.
      * @return : Map containing the set of XmlMetadata objects.
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public ConcurrentHashMap<String, XmlMetadata> getMetadata(String index)
+    public ConcurrentHashMap<String, XmlMetadata> getMetadata()
             throws IOException, ClassNotFoundException, JAXBException {
 
         return this.indexMap;

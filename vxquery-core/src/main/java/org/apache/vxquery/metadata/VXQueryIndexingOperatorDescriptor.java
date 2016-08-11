@@ -100,9 +100,6 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
 
-        final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
-                dCtx.getStaticContext());
-
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
             public void open() throws HyracksDataException {

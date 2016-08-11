@@ -52,10 +52,9 @@ public class VXQueryIndexingDataSource implements IDataSource<String> {
         this.collectionName = collection;
         this.indexName = index;
         this.function = functionCall;
-        if (collectionName != null){
-            collectionPartitions = collectionName.split(DELIMITER);
-        }
-        indexPartitions = indexName.split(DELIMITER);
+        collectionPartitions = collectionName.split(DELIMITER);
+
+//        indexPartitions = indexName.split(DELIMITER);
         this.types = types;
         final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
                 new RandomPartitioningProperty(new CollectionFileDomain(indexName)),
@@ -96,7 +95,7 @@ public class VXQueryIndexingDataSource implements IDataSource<String> {
     }
 
     public int getPartitionCount() {
-        return indexPartitions.length;
+        return collectionPartitions.length;
     }
 
     public String getTag() {

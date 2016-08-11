@@ -16,7 +16,7 @@
 -->
 <cluster xmlns="cluster">
     <name>local</name>
-    <indexDirectory></indexDirectory>
+    <indexDirectory>/home/menaka/index</indexDirectory>
     <master_node>
         <id>master</id>
         <client_ip>127.0.0.1</client_ip>

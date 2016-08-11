@@ -100,14 +100,14 @@ public class IndexCentralizerUtil {
      */
     public void getAllCollections (DataOutput dataOutput) throws IOException {
         dataOutput.write(ValueTag.XS_STRING_TAG);
-        dataOutput.write("Aa".getBytes());
+        dataOutput.write(0);
         if (this.collections.size()!=0) {
-            dataOutput.write("Following collections have indexes.\n".getBytes());
             for (String collection : collections) {
-                dataOutput.write((collection + "\n").getBytes());
+                dataOutput.write((collection).getBytes());
             }
+            dataOutput.write(0);
         } else {
-            dataOutput.write("You have no indexes created!\n".getBytes());
+            dataOutput.write(0);
         }
     }
 
