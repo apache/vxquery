@@ -166,7 +166,9 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             updater.updateIndex();
                             updater.updateMetadataFile();
                             updater.exit();
-//                            XDMConstants.setTrue(result);
+                            XDMConstants.setTrue(result);
+                            FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(),
+                                    result.getLength());
                         } catch (NoSuchAlgorithmException | IOException | JAXBException | SystemException e) {
                             throw new HyracksDataException("Could not update index in " + indexModifiedName + " " + e.getMessage());
                         }
@@ -179,6 +181,9 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                         try {
                             updater.setup();
                             updater.deleteAllIndexes();
+                            XDMConstants.setTrue(result);
+                            FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(),
+                                    result.getLength());
                         } catch (SystemException | JAXBException | IOException | NoSuchAlgorithmException e) {
                             throw new HyracksDataException("Could not delete index in " + indexModifiedName + " " + e.getMessage());
                         }
@@ -193,9 +198,12 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                 collectionModifiedName);
                         try {
                             indexReader.init();
-                            indexReader.step(result);
+                            while (indexReader.step(result)) {
+                                FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result
+                                        .getStartOffset(), result.getLength());
+                            }
                         } catch (AlgebricksException e) {
-                            e.printStackTrace();
+                            throw new HyracksDataException("Could not read index.");
                         }
 
                     } else {
