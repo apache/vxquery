@@ -53,8 +53,7 @@ public class IndexConstructorUtil {
      ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
 
     public void evaluate(String collectioFolder, String indexFolder, IPointable result, UTF8StringPointable
-            stringp,
-            ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
+            stringp, ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
             boolean isElementPath, String nodeId) throws SystemException, JAXBException {
 

@@ -128,25 +128,24 @@
         <!-- Collection operator is added during the rewrite rules phase.  -->
     </function>
 
-    <!-- fn:build-index-on-collection($arg  as xs:string?, $indexFolder  as xs:string?) as  node()* -->
+    <!-- fn:build-index-on-collection($arg  as xs:string?, $indexFolder  as xs:string?) as  boolean -->
     <function name="fn:build-index-on-collection">
         <param name="collection-folder" type="xs:string?"/>
-        <param name="index-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
     </function>
 
-    <!-- fn:update-index($indexFolder  as xs:string?) as  node()* -->
+    <!-- fn:update-index($indexFolder  as xs:string?) as  boolean -->
     <function name="fn:update-index">
-        <param name="index-folder" type="xs:string?"/>
+        <param name="collection-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
         <runtime type="scalar"
                  class="org.apache.vxquery.runtime.functions.index.IndexUpdaterEvaluatorFactory"/>
     </function>
 
-    <!-- fn:delete-index($indexFolder  as xs:string?) as  node()* -->
+    <!-- fn:delete-index($indexFolder  as xs:string?) as  boolean -->
     <function name="fn:delete-index">
-        <param name="index-folder" type="xs:string?"/>
+        <param name="collection-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
         <runtime type="scalar"
                  class="org.apache.vxquery.runtime.functions.index.IndexDeleteEvaluatorFactory"/>
@@ -164,6 +163,12 @@
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
+    </function>
+
+    <!-- fn:show-index as node()* -->
+    <function name="fn:show-index">
+        <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.ShowIndexScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:collection-with-tag($arg1  as xs:string?, $arg2 as xs:string?) as  node()* -->

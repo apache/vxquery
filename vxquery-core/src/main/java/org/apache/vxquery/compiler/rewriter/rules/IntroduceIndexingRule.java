@@ -43,22 +43,11 @@ public class IntroduceIndexingRule extends AbstractCollectionRule {
 
         if (args != null) {
 
-            // Check if the function call is for build-collection-on-index.
-            // In build-collection-on-index, args[0] contains collection and args[1] contains index.
-            // In all other queries, args[0] contains index.
-            String index;
-            String collection;
-            if (args.length == 2) {
-                collection = args[0];
-                index = args[1];
-            } else {
-                collection = null;
-                index = args[0];
-            }
+            String collection = args[0];
 
             // Build the new operator and update the query plan.
             int collectionId = vxqueryContext.newCollectionId();
-            VXQueryIndexingDataSource ids = VXQueryIndexingDataSource.create(collectionId, collection, index,
+            VXQueryIndexingDataSource ids = VXQueryIndexingDataSource.create(collectionId, collection, null,
                     SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR),
                     functionCall.getFunctionIdentifier().getName());
             if (ids != null) {
