@@ -16,8 +16,11 @@
  */
 package org.apache.vxquery.runtime.functions.index.indexCentralizer;
 
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -31,14 +34,17 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.DataOutput;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class for maintaining the centralized index information file.
- *
  * Index centralization procedure.
  * User can specify the collection directory in local.xml file.
  * Then all the indexes will be created in that particular directory in sub-folders corresponding to collections.
@@ -48,20 +54,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class IndexCentralizerUtil {
 
-    private String INDEX_LOCATION;
-    private String LOCATION = "./vxquery-server/src/main/resources/conf/local.xml";
     private final String FILE_NAME = "VXQuery-Index-Directory.xml";
-    private ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
     private final File XML_FILE;
     private final List<String> collections = new ArrayList<>();
     private final Logger LOGGER = Logger.getLogger("IndexCentralizerUtil");
+    private String INDEX_LOCATION;
+    private String LOCATION = "./vxquery-server/src/main/resources/conf/local.xml";
+    private ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
 
     public IndexCentralizerUtil() {
-        XML_FILE = new File(getIndexLocation()+"/"+FILE_NAME);
+        XML_FILE = new File(getIndexLocation() + "/" + FILE_NAME);
     }
 
     /**
      * Get the index directory containing index of the given collection
+     *
      * @param collection : Collection folder
      * @return Index folder.
      */
@@ -72,6 +79,7 @@ public class IndexCentralizerUtil {
     /**
      * Put the index location corresponding to given collection.
      * Index location is created by using the last 100 characters of collection.
+     *
      * @param collection : Collection directory
      */
     public String putIndexForCollection(String collection) {
@@ -87,6 +95,7 @@ public class IndexCentralizerUtil {
 
     /**
      * Remove the entry for given collection directory.
+     *
      * @param collection : Collection directory
      */
     public void deleteEntryForCollection(String collection) {
@@ -95,24 +104,23 @@ public class IndexCentralizerUtil {
 
     /**
      * Prints all collections which have an index created.
-     * @param dataOutput : DataOutPut object which, result should be written.
+     *
      * @throws IOException
      */
-    public void getAllCollections (DataOutput dataOutput) throws IOException {
-        dataOutput.write(ValueTag.XS_STRING_TAG);
-        dataOutput.write(0);
-        if (this.collections.size()!=0) {
-            for (String collection : collections) {
-                dataOutput.write((collection).getBytes());
-            }
-            dataOutput.write(0);
-        } else {
-            dataOutput.write(0);
+    public void getAllCollections(SequenceBuilder sb) throws IOException {
+        for (String s : collections) {
+            StringValueBuilder svb = new StringValueBuilder();
+            ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+            DataOutput output = abvs.getDataOutput();
+            output.write(ValueTag.XS_STRING_TAG);
+            svb.write(s, output);
+            sb.addItem(abvs);
         }
     }
 
     /**
      * Get the collection location which is specified in local.xml file.
+     *
      * @return : Collection location
      */
     private String getIndexLocation() {
@@ -123,15 +131,15 @@ public class IndexCentralizerUtil {
         try {
             dBuilder = dbFactory.newDocumentBuilder();
             doc = dBuilder.parse(f);
-            doc.getDocumentElement().normalize();   
+            doc.getDocumentElement().normalize();
 
             NodeList nList = doc.getElementsByTagName("indexDirectory");
             Node nNode = nList.item(0);
             this.INDEX_LOCATION = nNode.getTextContent();
             return INDEX_LOCATION;
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            if (LOGGER.isDebugEnabled()){
-                LOGGER.log(Level.DEBUG, "Could not parse xml file due to " + e.getMessage());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.log(Level.ERROR, "Could not parse xml file due to " + e.getMessage());
             }
             return null;
         }
@@ -153,30 +161,32 @@ public class IndexCentralizerUtil {
                     this.collections.add(il.getCollection());
                 }
             } catch (JAXBException e) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.log(Level.DEBUG, "Could not read the XML file due to " + e);
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.log(Level.ERROR, "Could not read the XML file due to " + e);
                 }
             }
-
         }
 
     }
 
     /**
      * Write back the contents of the HashMap to the file.
-     * @throws JAXBException
-     * @throws FileNotFoundException
      */
-    public void writeIndexDirectory() throws JAXBException, FileNotFoundException {
+    public void writeIndexDirectory() {
         IndexDirectory id = new IndexDirectory();
         List<IndexLocator> indexLocators = new ArrayList<>(this.indexCollectionMap.values());
         id.setDirectory(indexLocators);
 
-        FileOutputStream fileOutputStream = new FileOutputStream(this.XML_FILE);
-        JAXBContext context = JAXBContext.newInstance(IndexDirectory.class);
-        Marshaller jaxbMarshaller = context.createMarshaller();
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        jaxbMarshaller.marshal(id, fileOutputStream);
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(this.XML_FILE);
+            JAXBContext context = JAXBContext.newInstance(IndexDirectory.class);
+            Marshaller jaxbMarshaller = context.createMarshaller();
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.marshal(id, fileOutputStream);
+        } catch (JAXBException | FileNotFoundException e) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.log(Level.ERROR, "Could not read the XML file due to " + e);
+            }
+        }
     }
-
 }
