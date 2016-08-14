@@ -1,0 +1,108 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one or more
+~~ contributor license agreements.  See the NOTICE file distributed with
+~~ this work for additional information regarding copyright ownership.
+~~ The ASF licenses this file to You under the Apache License, Version 2.0
+~~ (the "License"); you may not use this file except in compliance with
+~~ the License.  You may obtain a copy of the License at
+~~
+~~     http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+How to use Indexing Features in VXQuery.
+
+In VXQuery, all the indexes are created in user specified directory. So, before you execute an indexing related
+query, you should do the following.
+
+*** Configuring VXQuery to use indexing queries.
+Open local.xml file in your vxquery/vxquery-server/src/main/resources/conf directory. Then add the following line.
+
+--------
+<indexDirectory>path_to_index_directory</indexDirectory>
+--------
+(You should create the index_directory)
+
+** Using indexing queries.
+
+VXQuery offers following indexing functionality.
+
+[[a]] Create an index for collection.
+[[b]] Use the index in executing a query.
+[[c]] View existing indexes.
+[[d]] Update the index.
+[[e]] Delete the index.
+
+*1. Scenario I - When collection is a single directory.
+In this scenario, all the XML files are stored in a single directory. (There can be sub directories)
+
+*** Creating an index for collection
+If I need to create index for xml collection stored <path_to_collection>/collection1,
+
+--------
+build-index-on-collection("<path_to_collection>/collection1")
+--------
+This function takes the collection path as an argument.
+
+*** Using index in query.
+If we need to use the index and execute a query, use the following structure.
+
+------
+for $r in collection-from-index("<path_to_collection>/collection1", "/dataCollection/data")/data
+where $r/dataType eq "AWND" and xs:decimal($r/value) gt 491.744
+return $r
+------
+Here the index access function is,
+------
+collection-from-index
+------
+which takes two arguments, collection folder and the path element.
+
+Result
+
+------
+<data><date>2001-01-01T00:00:00.000</date><dataType>AWND</dataType><station>GHCND:US000000001</station><value>1000</value><attributes><attribute/><attribute/><attribute>a</attribute></attributes></data>
+------
+
+*** Updating the index.
+
+-------
+update-index("<path_to_collection>/collection1")
+-------
+
+*** Deleting the index.
+
+-------
+delete-index("<path_to_collection>/collection1")
+-------
+
+*2. Scenario II - When the collection is distributed.
+In this scenario, the collection is distributed among several directories.
+
+Consider the collection has now distributed among, <path_1>/collection1, <path_2>/collection2,
+<path_3>/collection3 and <path_4>/collection4.
+
+*** Creating indexes for collections.
+
+To create indexes for all of the above collections,
+
+-------
+build-index-on-collection("<path_1>/collection1|<path_2>/collection2|<path_3>/collection3|<path_4>/collection4")
+-------
+
+The parameters must be separated by '|'.
+
+In this case, a separate index will be created for each collection and stored in the directory which is specified in
+local.xml file.
+
+*** Using the indexes in query.
+
+
+*** Updating the indexes.
+
+*** Deleting the indexes.
+
+** Viewing Index information.
