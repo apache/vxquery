@@ -78,7 +78,7 @@ public class IndexDeleteEvaluatorFactory extends AbstractTaggedValueArgumentScal
                     updater.setup();
                     updater.deleteAllIndexes();
                     XDMConstants.setTrue(result);
-                } catch (IOException | NoSuchAlgorithmException | JAXBException e) {
+                } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
 

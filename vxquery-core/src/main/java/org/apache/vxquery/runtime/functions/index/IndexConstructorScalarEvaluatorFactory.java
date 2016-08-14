@@ -88,7 +88,7 @@ public class IndexConstructorScalarEvaluatorFactory extends AbstractTaggedValueA
                             nodeIdProvider, abvsFileNode,
                             nodep, false, nodeId);
                     XDMConstants.setTrue(result);
-                } catch (JAXBException | IOException e) {
+                } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
             }
