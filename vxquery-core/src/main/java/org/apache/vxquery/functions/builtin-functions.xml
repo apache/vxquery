@@ -132,23 +132,21 @@
     <function name="fn:build-index-on-collection">
         <param name="collection-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
-        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.IndexConstructorScalarEvaluatorFactory"/>
+        <!-- build-index-on-collection operator is added during the rewrite rules phase.  -->
     </function>
 
     <!-- fn:update-index($indexFolder  as xs:string?) as  boolean -->
     <function name="fn:update-index">
         <param name="collection-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.index.IndexUpdaterEvaluatorFactory"/>
+        <!-- update-index operator is added during the rewrite rules phase.  -->
     </function>
 
     <!-- fn:delete-index($indexFolder  as xs:string?) as  boolean -->
     <function name="fn:delete-index">
         <param name="collection-folder" type="xs:string?"/>
         <return type="xs:boolean"/>
-        <runtime type="scalar"
-                 class="org.apache.vxquery.runtime.functions.index.IndexDeleteEvaluatorFactory"/>
+        <!-- delete-index operator is added during the rewrite rules phase.  -->
     </function>
 
     <!-- fn:collection-from-index($indexfolder  as xs:string?, $elementpath as xs:string?) as  node()* -->
@@ -156,13 +154,13 @@
         <param name="index-folder" type="xs:string?"/>
         <param name="element-path" type="xs:string?"/>
         <return type="node()*"/>
-        <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.index.CollectionFromIndexUnnestingEvaluatorFactory"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
         <property type="UniqueNodes" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
         </property>
+        <!-- collection-from-index operator is added during the rewrite rules phase.  -->
     </function>
 
     <!-- fn:show-index as node()* -->
