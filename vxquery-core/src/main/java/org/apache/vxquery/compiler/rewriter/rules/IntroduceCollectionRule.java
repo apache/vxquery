@@ -82,16 +82,7 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
                 }
 
                 // Known to be true because of collection name.
-                AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-                UnnestOperator unnest = (UnnestOperator) op;
-                Mutable<ILogicalOperator> opRef2 = unnest.getInputs().get(0);
-                AbstractLogicalOperator op2 = (AbstractLogicalOperator) opRef2.getValue();
-                AssignOperator assign = (AssignOperator) op2;
-
-                DataSourceScanOperator opNew = new DataSourceScanOperator(assign.getVariables(), ds);
-                opNew.getInputs().addAll(assign.getInputs());
-                opRef2.setValue(opNew);
-                return true;
+                return setDataSourceScan(ds, opRef);
             }
         }
         return false;

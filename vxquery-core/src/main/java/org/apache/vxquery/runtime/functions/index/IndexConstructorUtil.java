@@ -55,7 +55,7 @@ public class IndexConstructorUtil {
     public void evaluate(String collectioFolder, String indexFolder, IPointable result, UTF8StringPointable
             stringp, ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
             ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
-            boolean isElementPath, String nodeId) throws SystemException, JAXBException {
+            boolean isElementPath, String nodeId) throws SystemException {
 
             metaFileUtil = new MetaFileUtil(indexFolder);
 //            metaFileUtil = .create(indexFolder);
@@ -127,11 +127,7 @@ public class IndexConstructorUtil {
                     xmlMetadata.setPath(file.getCanonicalPath());
                     xmlMetadata.setFileName(file.getName());
                     xmlMetadata.setLastModified(sdf.format(file.lastModified()));
-                    try {
-                        xmlMetadata.setMd5(metaFileUtil.generateMD5(file));
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new SystemException(ErrorCode.SYSE0001, e);
-                    }
+                    xmlMetadata.setMd5(metaFileUtil.generateMD5(file));
                     metadataMap.put(file.getCanonicalPath(), xmlMetadata);
                 }
 

@@ -112,7 +112,6 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
                     collectionPartitions[i] = mapped != null ? mapped.toString() : partition;
                 }
                 ds.setCollectionPartitions(collectionPartitions);
-
             }
             RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
             scanner = new VXQueryIndexingOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf,
@@ -122,7 +121,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         } else if (VXQueryCommons.collectionFunctions.contains(
                 AbstractCollectionRule.functionCall.getFunctionIdentifier())){
             // collection
-                    VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
+            VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
             if (sourceFileMap != null) {
                 final int len = ds.getPartitions().length;
                 String[] collectionPartitions = new String[len];
@@ -162,6 +161,9 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         return new AlgebricksAbsolutePartitionConstraint(cluster);
     }
 
+    private void setSourceFileMap(IDataSource dataSource) {
+
+    }
     @Override
     public boolean scannerOperatorIsLeaf(IDataSource<String> dataSource) {
         return false;

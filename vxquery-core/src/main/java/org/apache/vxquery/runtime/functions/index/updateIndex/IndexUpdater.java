@@ -55,7 +55,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IndexUpdater {
     private MetaFileUtil metaFileUtil;
     private ConcurrentHashMap<String, XmlMetadata> metadataMap;
-    private TaggedValuePointable[] args;
     private IPointable result;
     private UTF8StringPointable stringp;
     private ByteBufferInputStream bbis;
@@ -69,7 +68,6 @@ public class IndexUpdater {
     private IndexWriter indexWriter;
     private Set<String> pathsFromFileList;
     private String collectionFolder;
-    private XmlMetadata collectionMetadata;
     private String indexFolder;
     private Logger LOGGER = Logger.getLogger("Index Updater");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -98,23 +96,17 @@ public class IndexUpdater {
      *
      * @throws SystemException
      * @throws IOException
-     * @throws NoSuchAlgorithmException
      */
-    public void setup() throws SystemException, IOException, NoSuchAlgorithmException, JAXBException {
+    public void setup() throws SystemException, IOException {
 
-        try {
-            // Read the metadata file and load the metadata map into memory.
-            metaFileUtil = new MetaFileUtil(indexFolder);
-            metaFileUtil.readMetadataFile();
-            metadataMap = metaFileUtil.getMetadata();
+        // Read the metadata file and load the metadata map into memory.
+        metaFileUtil = new MetaFileUtil(indexFolder);
+        metaFileUtil.readMetadataFile();
+        metadataMap = metaFileUtil.getMetadata();
 
-            // Retrieve the collection folder path.
-            // Remove the entry for ease of the next steps.
-            collectionFolder = metaFileUtil.getCollection();
-
-        } catch (IOException | ClassNotFoundException e) {
-            throw new SystemException(ErrorCode.SYSE0001, e);
-        }
+        // Retrieve the collection folder path.
+        // Remove the entry for ease of the next steps.
+        collectionFolder = metaFileUtil.getCollection();
 
         abvs.reset();
         sb.reset(abvs);
@@ -128,9 +120,8 @@ public class IndexUpdater {
      * Wrapper for update index function.
      *
      * @throws IOException
-     * @throws NoSuchAlgorithmException
      */
-    public void updateIndex() throws IOException, NoSuchAlgorithmException {
+    public void updateIndex() throws IOException {
         File collectionDirectory = new File(collectionFolder);
         if (!collectionDirectory.exists()) {
             throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
@@ -141,12 +132,7 @@ public class IndexUpdater {
 
         //Detect deleted files and execute the delete index process.
         deleteIndexOfDeletedFiles(metadataMap.keySet(), pathsFromFileList);
-
-        try {
-            updateMetadataFile();
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
+        updateMetadataFile();
     }
 
     /**
@@ -168,7 +154,7 @@ public class IndexUpdater {
      *
      * @throws IOException
      */
-    public synchronized void updateMetadataFile() throws IOException, JAXBException {
+    public synchronized void updateMetadataFile() throws IOException {
         //Write the updated metadata to the file.
         metaFileUtil.updateMetadataMap(metadataMap, indexFolder);
         metaFileUtil.writeMetadataToFile();
@@ -180,7 +166,7 @@ public class IndexUpdater {
      *
      * @param collection : Collection folder path
      */
-    private void updateIndex(File collection) throws IOException, NoSuchAlgorithmException {
+    private void updateIndex(File collection) throws IOException {
 
         File[] list = collection.listFiles();
 
@@ -246,15 +232,14 @@ public class IndexUpdater {
      * @param metadata : Existing metadata object
      * @return : XML metadata object with updated fields.
      * @throws IOException
-     * @throws NoSuchAlgorithmException
      */
-    private XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException, NoSuchAlgorithmException {
+    private XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException {
 
-        if (metadata == null)
+        if (metadata == null) {
             metadata = new XmlMetadata();
-
-        metadata.setPath(file.getCanonicalPath());
+        }
         metadata.setFileName(file.getName());
+        metadata.setPath(file.getCanonicalPath());
         metadata.setMd5(metaFileUtil.generateMD5(file));
         metadata.setLastModified(sdf.format(file.lastModified()));
         return metadata;

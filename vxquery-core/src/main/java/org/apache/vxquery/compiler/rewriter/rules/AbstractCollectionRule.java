@@ -22,8 +22,10 @@ import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCa
 import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSource;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DistributeResultOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -33,6 +35,7 @@ import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.metadata.AbstractVXQueryDataSource;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
@@ -53,8 +56,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
     /**
      * Get the arguments for the collection and collection-with-tag. Return null for not a collection.
      *
-     * @param opRef
-     *            Logical operator
+     * @param opRef Logical operator
      * @return collection name
      */
     protected String[] getFunctionalArguments(Mutable<ILogicalOperator> opRef, Set<FunctionIdentifier> functions) {
@@ -138,6 +140,20 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
             }
         }
         return null;
+    }
+
+    protected boolean setDataSourceScan(IDataSource<String> ids, Mutable<ILogicalOperator> opRef) {
+        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
+        UnnestOperator unnest = (UnnestOperator) op;
+        Mutable<ILogicalOperator> opRef2 = unnest.getInputs().get(0);
+        AbstractLogicalOperator op2 = (AbstractLogicalOperator) opRef2.getValue();
+        AssignOperator assign = (AssignOperator) op2;
+
+        DataSourceScanOperator opNew = new DataSourceScanOperator(assign.getVariables(), ids);
+        opNew.getInputs().addAll(assign.getInputs());
+        opRef2.setValue(opNew);
+
+        return true;
     }
 
     @Override

@@ -29,20 +29,22 @@ import java.util.Set;
 
 public class VXQueryCommons {
 
-    public static final Set<FunctionIdentifier> collectionFunctions = new HashSet<>();
+    public static IndexCentralizerUtil INDEX_CENTRALIZER_UTIL = new IndexCentralizerUtil();
 
-    public static final Set<FunctionIdentifier> indexingFunctions = new HashSet<>();
-
-    public static IndexCentralizerUtil INDEX_CENTRALIZER_UTIL = null;
     static {
-        INDEX_CENTRALIZER_UTIL = new IndexCentralizerUtil();
         INDEX_CENTRALIZER_UTIL.readIndexDirectory();
-
     }
+
+    public static final Set<FunctionIdentifier> collectionFunctions = new HashSet<>();
 
     static {
         collectionFunctions.add(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier());
         collectionFunctions.add(BuiltinFunctions.FN_COLLECTION_WITH_TAG_2.getFunctionIdentifier());
+    }
+
+    public static final Set<FunctionIdentifier> indexingFunctions = new HashSet<>();
+
+    static {
         indexingFunctions.add(BuiltinFunctions.FN_BUILD_INDEX_ON_COLLECTION_1.getFunctionIdentifier());
         indexingFunctions.add(BuiltinFunctions.FN_COLLECTION_FROM_INDEX_2.getFunctionIdentifier());
         indexingFunctions.add(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier());

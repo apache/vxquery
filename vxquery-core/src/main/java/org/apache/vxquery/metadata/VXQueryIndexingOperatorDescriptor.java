@@ -65,13 +65,10 @@ import java.util.logging.Logger;
 public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOperatorDescriptor {
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
     private static final long serialVersionUID = 1L;
-    private final String START_TAG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
-    private final String hdfsConf;
-    private final Map<String, NodeControllerInfo> nodeControllerInfos;
     private short dataSourceId;
     private short totalDataSources;
     private String[] collectionPartitions;
-    private List<Integer> childSeq;
+    private String elementPath;
 
     public VXQueryIndexingOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryIndexingDataSource ds,
             RecordDescriptor rDesc, String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos) {
@@ -80,9 +77,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
         recordDescriptors[0] = rDesc;
-        this.childSeq = ds.getChildSeq();
-        this.hdfsConf = hdfsConf;
-        this.nodeControllerInfos = nodeControllerInfos;
+        this.elementPath = ds.getElementPath();
     }
 
     @Override
@@ -145,7 +140,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                 XDMConstants.setTrue(result);
                                 FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(),
                                         result.getLength());
-                            } catch (SystemException | JAXBException e) {
+                            } catch (SystemException e) {
                                 throw new HyracksDataException("Could not create index for collection: " +
                                         collectionName + " in dir: " + null + " " + e.getMessage());
                             }
@@ -166,7 +161,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             XDMConstants.setTrue(result);
                             FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(),
                                     result.getLength());
-                        } catch (NoSuchAlgorithmException | IOException | JAXBException | SystemException e) {
+                        } catch (IOException |SystemException e) {
                             throw new HyracksDataException("Could not update index in " + indexModifiedName + " " + e.getMessage());
                         }
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier())) {
@@ -181,7 +176,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             XDMConstants.setTrue(result);
                             FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(),
                                     result.getLength());
-                        } catch (SystemException | JAXBException | IOException | NoSuchAlgorithmException e) {
+                        } catch (SystemException | IOException  e) {
                             throw new HyracksDataException("Could not delete index in " + indexModifiedName + " " + e.getMessage());
                         }
 
@@ -192,7 +187,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                         // In this scenario, collectionModifiedName represents the index directory, and
                         // indexModifiedName represents the path.
                         VXQueryIndexReader indexReader = new VXQueryIndexReader(ctx, indexModifiedName,
-                                collectionModifiedName);
+                                elementPath);
                         try {
                             indexReader.init();
                             while (indexReader.step(result)) {
@@ -222,11 +217,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                     appender.flush(writer, true);
                 }
                 writer.close();
-                try {
-                    VXQueryCommons.INDEX_CENTRALIZER_UTIL.writeIndexDirectory();
-                } catch (JAXBException | FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+                VXQueryCommons.INDEX_CENTRALIZER_UTIL.writeIndexDirectory();
             }
         };
     }

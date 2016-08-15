@@ -21,6 +21,7 @@ import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -51,7 +52,7 @@ public class ShowIndexScalarEvaluatorFactory extends AbstractTaggedValueArgument
                 try {
                     abvs.reset();
                     sb.reset(abvs);
-                    VXQueryCommons.INDEX_CENTRALIZER_UTIL.getAllCollections(dOut);
+                    VXQueryCommons.INDEX_CENTRALIZER_UTIL.getAllCollections(sb);
                     sb.finish();
                     result.set(abvs);
                 } catch (IOException e) {
