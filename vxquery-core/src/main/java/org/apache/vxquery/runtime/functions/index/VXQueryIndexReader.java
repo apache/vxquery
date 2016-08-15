@@ -19,6 +19,7 @@ package org.apache.vxquery.runtime.functions.index;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringWriter;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.lucene.analysis.Analyzer;
@@ -94,6 +95,7 @@ public class VXQueryIndexReader {
             }
             indexPlace += 1;
             result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
+            String s ;
             return true;
         }
         return false;

@@ -44,26 +44,18 @@ public class IntroduceIndexingRule extends AbstractCollectionRule {
         if (args != null) {
 
             String collection = args[0];
+            String elementPath = args.length > 1?args[1]:null;
 
             // Build the new operator and update the query plan.
             int collectionId = vxqueryContext.newCollectionId();
-            VXQueryIndexingDataSource ids = VXQueryIndexingDataSource.create(collectionId, collection, null,
+            VXQueryIndexingDataSource ids = VXQueryIndexingDataSource.create(collectionId, collection, elementPath,
                     SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR),
                     functionCall.getFunctionIdentifier().getName());
             if (ids != null) {
                 ids.setTotalDataSources(vxqueryContext.getTotalDataSources());
 
                 // Known to be true because of collection name.
-                AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
-                UnnestOperator unnest = (UnnestOperator) op;
-                Mutable<ILogicalOperator> opRef2 = unnest.getInputs().get(0);
-                AbstractLogicalOperator op2 = (AbstractLogicalOperator) opRef2.getValue();
-                AssignOperator assign = (AssignOperator) op2;
-
-                DataSourceScanOperator opNew = new DataSourceScanOperator(assign.getVariables(), ids);
-                opNew.getInputs().addAll(assign.getInputs());
-                opRef2.setValue(opNew);
-                return true;
+                return setDataSourceScan(ids, opRef);
             }
         }
         return false;
