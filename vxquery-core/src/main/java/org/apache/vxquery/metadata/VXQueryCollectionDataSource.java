@@ -30,18 +30,7 @@ import org.apache.hyracks.algebricks.core.algebra.properties.IPhysicalProperties
 import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
 
-public class VXQueryCollectionDataSource implements IDataSource<String> {
-    private static final String DELIMITER = "\\|";
-    private final int dataSourceId;
-    private final String collectionName;
-    private String[] collectionPartitions;
-    private final List<Integer> childSeq;
-    private int totalDataSources;
-    private String tag;
-
-    private final Object[] types;
-
-    private IDataSourcePropertiesProvider propProvider;
+public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
 
     private VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
@@ -127,5 +116,10 @@ public class VXQueryCollectionDataSource implements IDataSource<String> {
     @Override
     public String toString() {
         return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + "]";
+    }
+
+    @Override
+    public String getDataSourceType() {
+        return "Collection";
     }
 }

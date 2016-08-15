@@ -19,7 +19,6 @@ package org.apache.vxquery.metadata;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSource;
 import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSourcePropertiesProvider;
-import org.apache.hyracks.algebricks.core.algebra.properties.ILocalStructuralProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.IPhysicalPropertiesVector;
 import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
@@ -31,34 +30,19 @@ import java.util.List;
 /**
  * Datasource object for indexing.
  */
-public class VXQueryIndexingDataSource implements IDataSource<String> {
-    private static final String DELIMITER = "\\|";
-    private final int dataSourceId;
-    private final String collectionName;
-    private final String indexName;
-    private final ArrayList<Integer> childSeq;
-    private String[] collectionPartitions;
-    private String[] indexPartitions;
-    private int totalDataSources;
-    private String tag;
-    private String function;
-
-    private final Object[] types;
-
-    private IDataSourcePropertiesProvider propProvider;
+public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
 
     private VXQueryIndexingDataSource(int id, String collection, String index, Object[] types, String functionCall) {
         this.dataSourceId = id;
         this.collectionName = collection;
-        this.indexName = index;
+        this.elementPath = index;
         this.function = functionCall;
-        collectionPartitions = collectionName.split(DELIMITER);
+        this.collectionPartitions = collectionName.split(DELIMITER);
 
-//        indexPartitions = indexName.split(DELIMITER);
         this.types = types;
         final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
-                new RandomPartitioningProperty(new CollectionFileDomain(indexName)),
-                new ArrayList<ILocalStructuralProperty>());
+                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
+                new ArrayList<>());
         propProvider = new IDataSourcePropertiesProvider() {
             @Override
             public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
@@ -66,7 +50,6 @@ public class VXQueryIndexingDataSource implements IDataSource<String> {
             }
         };
         this.tag = null;
-        this.childSeq = new ArrayList<>();
     }
 
     public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type, String
@@ -84,6 +67,10 @@ public class VXQueryIndexingDataSource implements IDataSource<String> {
 
     public int getDataSourceId() {
         return dataSourceId;
+    }
+
+    public String getElementPath() {
+        return elementPath;
     }
 
     public String[] getCollectionPartitions() {
@@ -106,22 +93,6 @@ public class VXQueryIndexingDataSource implements IDataSource<String> {
         this.tag = tag;
     }
 
-    public String[] getIndexPartitions() {
-        return indexPartitions;
-    }
-
-    public void setIndexPartitions(String[] indexPartitions) {
-        this.indexPartitions = indexPartitions;
-    }
-
-    public void addChildSeq(int integer) {
-        childSeq.add(integer);
-    }
-
-    public List<Integer> getChildSeq() {
-        return childSeq;
-    }
-
     @Override
     public String getId() {
         return collectionName;
@@ -139,12 +110,15 @@ public class VXQueryIndexingDataSource implements IDataSource<String> {
 
     @Override
     public void computeFDs(List scanVariables, List fdList) {
-
     }
 
     @Override
     public String toString() {
-        return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", indexName=" + indexName + ", "
-                + "function=" + function + "]";
+        return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", " + "function=" + function + "]";
+    }
+
+    @Override
+    public String getDataSourceType() {
+        return "Indexing";
     }
 }
