@@ -1223,10 +1223,41 @@
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnFlattenScalarEvaluatorFactory"/>
     </function>
+
     <!-- libjn:values($sequence as item()*) as item()* -->
     <function name="libjn:values">
         <param name="sequence" type="item()*"/>
         <return type="item()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnValuesScalarEvaluatorFactory"/>
+    </function>
+
+    <!-- libjn:descendant-objects($sequence as item()*) as object()* -->
+    <function name="libjn:descendant-objects">
+        <param name="sequence" type="item()*"/>
+        <return type="object()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnDescendantObjectsScalarEvaluatorFactory"/>
+    </function>
+
+    <!-- libjn:descendant-pairs($sequence as item()*) object()* -->
+    <function name="libjn:descendant-pairs">
+        <param name="sequence" type="item()*"/>
+        <return type="object()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnDescendantPairsScalarEvaluatorFactory"/>
+    </function>
+
+    <!-- libjn:project($sequence as item()*, $keys as xs:string*) as item()* -->
+    <function name="libjn:project">
+        <param name="sequence" type="item()*"/>
+        <param name="keys" type="xs:string*"/>
+        <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnProjectScalarEvaluatorFactory"/>
+    </function>
+
+    <!-- libjn:remove-keys($sequence as item()*, $keys as xs:string*) as item()* -->
+    <function name="libjn:remove-keys">
+        <param name="sequence" type="item()*"/>
+        <param name="keys" type="xs:string*"/>
+        <return type="item()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.LibjnRemoveKeysScalarEvaluatorFactory"/>
     </function>
 </functions>

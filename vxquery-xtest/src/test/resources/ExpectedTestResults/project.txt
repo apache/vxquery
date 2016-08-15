@@ -1,0 +1,13 @@
+{"Captain":"Kirk","First Officer":"Spock"}
+[1,2,3,4]
+{"Captain":"Archer"}
+true
+1
+null
+{"Captain":"Archer"}
+true
+1
+null
+true
+1
+null

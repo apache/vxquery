@@ -64,6 +64,9 @@ limitations under the License.
                 name="Executing a Query"
                 href="user_query.html" />
             <item
+                name="Get Started with JSONiq"
+                href="user_get_started_with_jsoniq.html" />
+            <item
                 name="Using HDFS with VXQuery"
                 href="user_query_hdfs.html" />
             <item
