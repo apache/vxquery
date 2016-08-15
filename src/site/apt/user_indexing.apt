@@ -194,6 +194,7 @@ show-index()
 
 Result:
 ------
-<path_1/collection1>,<path_2/collection2>
+<path_1/collection1>
+<path_2/collection2>
 ------
 
