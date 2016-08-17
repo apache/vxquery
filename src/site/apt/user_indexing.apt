@@ -44,14 +44,14 @@ If I need to create index for xml collection stored <path_to_collection>/collect
 
 Query structure:
 --------
-build-index-on-collection("<path_to_collection>")
+build-index-on-collection("collection")
 --------
 
 You can see the index has created in a new sub-directory in the index_directory specified in local.xml
 
 Example:
 --------
-build-index-on-collection("<path1>/collection1")
+build-index-on-collection("<path_to_collection>/collection1")
 --------
 This function takes the collection path as an argument.
 
@@ -113,7 +113,8 @@ delete-index("<path_to_collection>/collection1")
 -------
 
 *2. Scenario II - When the collection is distributed.
-In this scenario, the collection is distributed among several partitions.
+In this scenario, the collection is distributed among several directories. We can distribute the queries among
+partitions.
 
 *** Creating indexes for collections.
 
@@ -125,7 +126,7 @@ build-index-on-collection("<partition_1_path>|<partition_2_path>|<partition_3_pa
 In here the parameter contains the list of collection partitions separated by '|' character.
 
 Example:
-Consider the collection has now distributed among four partitions, <path_1>/collection1, <path_2>/collection2,
+Consider the collection has now distributed among four directories, <path_1>/collection1, <path_2>/collection2,
 <path_3>/collection3 and <path_4>/collection4.
 
 To create indexes for all of the above collections,
@@ -133,7 +134,8 @@ To create indexes for all of the above collections,
 build-index-on-collection("<path_1>/collection1|<path_2>/collection2|<path_3>/collection3|<path_4>/collection4")
 -------
 
-In this case, all indexes will be created in separate sub-directories corresponding to each partition.
+In this case, all indexes will be created in separate sub-directories corresponding to each partition. Also note that
+ this query requires each node to have four partitions available
 
 *** Using the indexes in query.
 In this case, suppose you need to run a query on indexes of two collection partitions.
@@ -154,9 +156,9 @@ Result:
 
 *** Updating the indexes.
 In cases of updating the collection files stored in several partitions, we can use this function to update the
-indexes of those partitions.
+indexes of those directories.
 
-In this case, give a '|' separated list of collection partitions.
+In this case, give a '|' separated list of collection directories.
 Query structure:
 --------
 update-index("<partition_1_path>|<partition_2_path>|<partition_3_path>|...|<partition_n_path>")
@@ -176,9 +178,9 @@ delete-index("<partition_1_path>|<partition_2_path>|<partition_3_path>|...|<part
 --------
 
 Example:
-Suppose that we need to update the indexes in partition2 and partition3
+Suppose that we need to update the indexes in collection2 and collection3
 --------
-delete-index("<path_1>/collection2|<path_4>/collection3")
+delete-index("<path_2>/collection2|<path_3>/collection3")
 --------
 
 ** Viewing Index information.
@@ -197,4 +199,3 @@ Result:
 <path_1/collection1>
 <path_2/collection2>
 ------
-
