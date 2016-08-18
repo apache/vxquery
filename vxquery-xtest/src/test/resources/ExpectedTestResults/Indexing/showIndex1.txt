@@ -1,1 +1,1 @@
-src/test/resources/TestSources/ghcnd
+/home/menaka/vxquery/vxquery-xtest/src/test/resources/./TestSources/ghcnd

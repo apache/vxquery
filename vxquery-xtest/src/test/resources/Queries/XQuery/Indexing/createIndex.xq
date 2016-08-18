@@ -17,3 +17,4 @@
    
 (: Build Lucene Index :)
 build-index-on-collection("src/test/resources/TestSources/ghcnd")
+

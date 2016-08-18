@@ -16,4 +16,4 @@
    under the License. :)
 
 (: Update Lucene Index :)
-update-index("src/test/resources/TestSources/ghcnd")
+update-index("ghcnd")
