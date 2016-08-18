@@ -29,7 +29,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
-import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexDocumentBuilder;
@@ -37,13 +36,11 @@ import org.apache.vxquery.runtime.functions.index.CaseSensitiveAnalyzer;
 import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 
-import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +53,6 @@ public class IndexUpdater {
     private MetaFileUtil metaFileUtil;
     private ConcurrentHashMap<String, XmlMetadata> metadataMap;
     private IPointable result;
-    private UTF8StringPointable stringp;
     private ByteBufferInputStream bbis;
     private DataInputStream di;
     private SequenceBuilder sb;
@@ -79,7 +75,6 @@ public class IndexUpdater {
             String nodeId) {
         this.indexFolder = indexFolder;
         this.result = result;
-        this.stringp = stringp;
         this.bbis = bbis;
         this.di = di;
         this.sb = sb;
