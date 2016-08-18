@@ -36,12 +36,10 @@ import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
-import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
-import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.BuiltinFunctions;
@@ -51,17 +49,11 @@ import org.apache.vxquery.runtime.functions.index.indexCentralizer.IndexCentrali
 import org.apache.vxquery.runtime.functions.index.updateIndex.IndexUpdater;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
-import org.apache.vxquery.xmlparser.XMLParser;
 
-import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -97,8 +89,8 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
-        IndexCentralizerUtil indexConstructorUtil = new IndexCentralizerUtil(ctx.getIOManager().getIODevices().get(0).getPath());
-        indexConstructorUtil.readIndexDirectory();
+        IndexCentralizerUtil indexCentralizerUtil = new IndexCentralizerUtil(ctx.getIOManager().getIODevices().get(0).getPath());
+        indexCentralizerUtil.readIndexDirectory();
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -130,7 +122,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
 
                     if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions
                             .FN_BUILD_INDEX_ON_COLLECTION_1.getFunctionIdentifier())) {
-                        indexModifiedName = indexConstructorUtil.putIndexForCollection(collectionModifiedName);
+                        indexModifiedName = indexCentralizerUtil.putIndexForCollection(collectionModifiedName);
                         File collectionDirectory = new File(collectionModifiedName);
 
                         //check if directory is in the local file system
@@ -152,7 +144,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                     collectionDirectory.getAbsolutePath() + ")");
                         }
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_UPDATE_INDEX_1.getFunctionIdentifier())) {
-                        indexModifiedName = indexConstructorUtil.getIndexForCollection(collectionModifiedName);
+                        indexModifiedName = indexCentralizerUtil.getIndexForCollection(collectionModifiedName);
                         IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb, abvs,
                                 nodeIdProvider, abvsFileNode, nodep, nodeId);
                         try {
@@ -167,10 +159,10 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             throw new HyracksDataException("Could not update index in " + indexModifiedName + " " + e.getMessage());
                         }
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier())) {
-                        indexModifiedName = indexConstructorUtil.getIndexForCollection(collectionModifiedName);
+                        indexModifiedName = indexCentralizerUtil.getIndexForCollection(collectionModifiedName);
                         IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb, abvs,
                                 nodeIdProvider, abvsFileNode, nodep, nodeId);
-                        indexConstructorUtil.deleteEntryForCollection(collectionModifiedName);
+                        indexCentralizerUtil.deleteEntryForCollection(collectionModifiedName);
                         try {
                             updater.setup();
                             updater.deleteAllIndexes();
@@ -183,7 +175,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
 
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions
                             .FN_COLLECTION_FROM_INDEX_2.getFunctionIdentifier())) {
-                        indexModifiedName = indexConstructorUtil.getIndexForCollection(collectionModifiedName);
+                        indexModifiedName = indexCentralizerUtil.getIndexForCollection(collectionModifiedName);
                         VXQueryIndexReader indexReader = new VXQueryIndexReader(ctx, indexModifiedName,
                                 elementPath);
                         try {
@@ -215,7 +207,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                     appender.flush(writer, true);
                 }
                 writer.close();
-                indexConstructorUtil.writeIndexDirectory();
+                indexCentralizerUtil.writeIndexDirectory();
             }
         };
     }

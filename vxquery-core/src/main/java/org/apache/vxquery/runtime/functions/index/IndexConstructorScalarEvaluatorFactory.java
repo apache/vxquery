@@ -34,7 +34,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 
-import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
