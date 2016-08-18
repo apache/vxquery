@@ -361,9 +361,12 @@ public class XMLSerializer implements IPrinter {
     private void printObject(PrintStream ps, TaggedValuePointable tvp) {
         ObjectPointable op = pp.takeOne(ObjectPointable.class);
         TaggedValuePointable keys = pp.takeOne(TaggedValuePointable.class);
+        ArrayBackedValueStorage mvs = new ArrayBackedValueStorage();
+
         tvp.getValue(op);
         try {
-            op.getKeys(keys);
+            op.getKeys(mvs);
+            keys.set(mvs);
             ps.append('{');
             if (keys.getTag() == ValueTag.SEQUENCE_TAG) {
                 printObjectPairs(ps, keys, op);

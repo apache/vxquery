@@ -31,14 +31,12 @@ import java.util.List;
 public abstract class AbstractObjectConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
     protected final ObjectBuilder ob;
-    protected final ArrayBackedValueStorage abvs;
     protected final List<TaggedValuePointable> tvps;
 
     public AbstractObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
         this.ctx = ctx;
         ob = new ObjectBuilder();
-        abvs = new ArrayBackedValueStorage();
         tvps = new ArrayList<>();
     }
 

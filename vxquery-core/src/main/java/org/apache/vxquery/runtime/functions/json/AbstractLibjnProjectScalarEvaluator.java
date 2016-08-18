@@ -39,7 +39,6 @@ public abstract class AbstractLibjnProjectScalarEvaluator extends AbstractTagged
     protected final ObjectPointable op;
     protected final UTF8StringPointable stringKey;
     protected final ObjectBuilder ob;
-    protected final ArrayBackedValueStorage abvs, abvs1;
     protected final SequenceBuilder sb;
     protected final SequencePointable sp1;
     protected final TaggedValuePointable tvp1;
@@ -49,8 +48,6 @@ public abstract class AbstractLibjnProjectScalarEvaluator extends AbstractTagged
         this.ctx = ctx;
         stringKey = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         ob = new ObjectBuilder();
-        abvs = new ArrayBackedValueStorage();
-        abvs1 = new ArrayBackedValueStorage();
         sb = new SequenceBuilder();
         op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
@@ -66,16 +63,19 @@ public abstract class AbstractLibjnProjectScalarEvaluator extends AbstractTagged
         }
         TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         SequencePointable sp = ppool.takeOne(SequencePointable.class);
+        ArrayBackedValueStorage abvsKeys = abvsPool.takeOne();
+        ArrayBackedValueStorage abvsResult = abvsPool.takeOne();
         try {
-            abvs1.reset();
-            sb.reset(abvs1);
+            abvsResult.reset();
+            sb.reset(abvsResult);
             if (sequence.getTag() == ValueTag.SEQUENCE_TAG) {
                 sequence.getValue(sp);
                 for (int i = 0; i < sp.getEntryCount(); ++i) {
                     sp.getEntry(i, tempTvp);
                     if (tempTvp.getTag() == ValueTag.OBJECT_TAG) {
                         tempTvp.getValue(op);
-                        op.getKeys(tempTvp);
+                        op.getKeys(abvsKeys);
+                        tempTvp.set(abvsKeys);
                         addPairs(tempTvp, keys);
                     } else {
                         sb.addItem(tempTvp);
@@ -88,12 +88,14 @@ public abstract class AbstractLibjnProjectScalarEvaluator extends AbstractTagged
                 sb.addItem(sequence);
             }
             sb.finish();
-            result.set(abvs1);
+            result.set(abvsResult);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         } finally {
             ppool.giveBack(tempTvp);
             ppool.giveBack(sp);
+            abvsPool.giveBack(abvsResult);
+            abvsPool.giveBack(abvsKeys);
         }
     }
 
@@ -105,33 +107,39 @@ public abstract class AbstractLibjnProjectScalarEvaluator extends AbstractTagged
     }
 
     private void addPairs(TaggedValuePointable tvp2, TaggedValuePointable keys) throws IOException, SystemException {
-        op.getKeys(tvp2);
-        if (tvp2.getTag() == ValueTag.XS_STRING_TAG) {
-            if (keyCheck(tvp2, keys)) {
-                abvs.reset();
-                ob.reset(abvs);
-                addPair(tvp2, tvp1);
-                ob.finish();
-                sb.addItem(abvs);
-            }
-        } else if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
-            tvp2.getValue(sp1);
-            boolean found = false;
-            for (int j = 0; j < sp1.getEntryCount(); ++j) {
-                sp1.getEntry(j, tvp2);
+        ArrayBackedValueStorage abvs = abvsPool.takeOne();
+        try {
+            op.getKeys(abvs);
+            tvp2.set(abvs);
+            if (tvp2.getTag() == ValueTag.XS_STRING_TAG) {
                 if (keyCheck(tvp2, keys)) {
-                    if (!found) {
-                        abvs.reset();
-                        ob.reset(abvs);
-                        found = true;
-                    }
+                    abvs.reset();
+                    ob.reset(abvs);
                     addPair(tvp2, tvp1);
+                    ob.finish();
+                    sb.addItem(abvs);
+                }
+            } else if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
+                tvp2.getValue(sp1);
+                boolean found = false;
+                for (int j = 0; j < sp1.getEntryCount(); ++j) {
+                    sp1.getEntry(j, tvp2);
+                    if (keyCheck(tvp2, keys)) {
+                        if (!found) {
+                            abvs.reset();
+                            ob.reset(abvs);
+                            found = true;
+                        }
+                        addPair(tvp2, tvp1);
+                    }
+                }
+                if (found) {
+                    ob.finish();
+                    sb.addItem(abvs);
                 }
             }
-            if (found) {
-                ob.finish();
-                sb.addItem(abvs);
-            }
+        } finally {
+            abvsPool.giveBack(abvs);
         }
 
     }

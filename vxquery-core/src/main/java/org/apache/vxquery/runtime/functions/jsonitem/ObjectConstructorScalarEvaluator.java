@@ -37,13 +37,11 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
     private IPointable vp;
     private UTF8StringPointable sp;
     private SequencePointable seqp;
-    private final ArrayBackedValueStorage abvs1;
     private final BooleanPointable bp;
     private final ArrayBuilder ab;
 
     public ObjectConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
-        abvs1 = new ArrayBackedValueStorage();
         vp = VoidPointable.FACTORY.createPointable();
         sp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
@@ -54,9 +52,11 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable key, value, qmc, tvp;
+        ArrayBackedValueStorage abvsResult = abvsPool.takeOne();
+        ArrayBackedValueStorage abvsItem = abvsPool.takeOne();
         try {
-            abvs.reset();
-            ob.reset(abvs);
+            abvsResult.reset();
+            ob.reset(abvsResult);
             tvps.clear();
             int len = args.length;
             for (int i = 0; i < len; i += 3) {
@@ -76,15 +76,15 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
                             XDMConstants.setJsNull(value);
                             ob.addItem(sp, value);
                         } else {
-                            abvs1.reset();
-                            ab.reset(abvs1);
+                            abvsItem.reset();
+                            ab.reset(abvsItem);
                             int l = seqp.getEntryCount();
                             for (int j = 0; j < l; j++) {
                                 seqp.getEntry(j, value);
                                 ab.addItem(value);
                             }
                             ab.finish();
-                            vp.set(abvs1);
+                            vp.set(abvsItem);
                             ob.addItem(sp, vp);
                         }
                     } else {
@@ -96,9 +96,12 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
             }
 
             ob.finish();
-            result.set(abvs);
+            result.set(abvsResult);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
+        } finally {
+            abvsPool.giveBack(abvsResult);
+            abvsPool.giveBack(abvsItem);
         }
     }
 }

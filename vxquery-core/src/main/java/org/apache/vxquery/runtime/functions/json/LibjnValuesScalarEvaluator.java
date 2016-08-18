@@ -36,14 +36,12 @@ public class LibjnValuesScalarEvaluator extends AbstractTaggedValueArgumentScala
     protected final IHyracksTaskContext ctx;
     private final ObjectPointable op;
     private final UTF8StringPointable stringKey;
-    private final ArrayBackedValueStorage abvs1;
     private final SequenceBuilder sb;
 
     public LibjnValuesScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
         this.ctx = ctx;
         stringKey = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        abvs1 = new ArrayBackedValueStorage();
         sb = new SequenceBuilder();
         op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
     }
@@ -54,9 +52,10 @@ public class LibjnValuesScalarEvaluator extends AbstractTaggedValueArgumentScala
 
         TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         SequencePointable sp = ppool.takeOne(SequencePointable.class);
+        ArrayBackedValueStorage abvs = abvsPool.takeOne();
         try {
-            abvs1.reset();
-            sb.reset(abvs1);
+            abvs.reset();
+            sb.reset(abvs);
             if (sequence.getTag() == ValueTag.SEQUENCE_TAG) {
                 sequence.getValue(sp);
                 for (int i = 0; i < sp.getEntryCount(); ++i) {
@@ -71,20 +70,23 @@ public class LibjnValuesScalarEvaluator extends AbstractTaggedValueArgumentScala
                 addValues(tempTvp);
             }
             sb.finish();
-            result.set(abvs1);
+            result.set(abvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         } finally {
             ppool.giveBack(tempTvp);
             ppool.giveBack(sp);
+            abvsPool.giveBack(abvs);
         }
     }
 
     private void addValues(TaggedValuePointable tempTvp) throws IOException, SystemException {
         TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
         SequencePointable sp1 = ppool.takeOne(SequencePointable.class);
+        ArrayBackedValueStorage abvsKeys = abvsPool.takeOne();
         try {
-            op.getKeys(tempTvp);
+            op.getKeys(abvsKeys);
+            tempTvp.set(abvsKeys);
             if (tempTvp.getTag() == ValueTag.XS_STRING_TAG) {
                 tempTvp.getValue(stringKey);
                 op.getValue(stringKey, tempValue);
@@ -101,6 +103,7 @@ public class LibjnValuesScalarEvaluator extends AbstractTaggedValueArgumentScala
         } finally {
             ppool.giveBack(tempValue);
             ppool.giveBack(sp1);
+            abvsPool.giveBack(abvsKeys);
         }
     }
 

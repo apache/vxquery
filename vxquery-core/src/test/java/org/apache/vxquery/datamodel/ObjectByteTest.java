@@ -14,8 +14,6 @@
  */
 package org.apache.vxquery.datamodel;
 
-import java.io.IOException;
-
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
@@ -29,8 +27,11 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class ObjectByteTest extends AbstractPointableTest {
     private ArrayBackedValueStorage abvsResult = new ArrayBackedValueStorage();
+    private ArrayBackedValueStorage abvsKeys = new ArrayBackedValueStorage();
     private ObjectBuilder ob = new ObjectBuilder();
     private TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     private UTF8StringPointable tvpKey1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
@@ -90,7 +91,8 @@ public class ObjectByteTest extends AbstractPointableTest {
             Assert.fail("Object size is incorrect. Expected: 1 Got: " + op.getEntryCount());
         }
         try {
-            op.getKeys(tvp);
+            op.getKeys(abvsKeys);
+            tvp.set(abvsKeys);
         } catch (IOException e) {
             Assert.fail("Test failed to write the object pointable.");
         }
@@ -142,7 +144,8 @@ public class ObjectByteTest extends AbstractPointableTest {
 
         //Test keys
         try {
-            op.getKeys(tvp);
+            op.getKeys(abvsKeys);
+            tvp.set(abvsKeys);
         } catch (IOException e) {
             Assert.fail("Test failed to write the object pointable.");
         }

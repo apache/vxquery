@@ -20,6 +20,7 @@ import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.jsonitem.ObjectPointable;
@@ -28,19 +29,24 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorScalarEvaluator {
 
     private final SequencePointable sp, sp1;
-    private ObjectPointable op;
+    private final ObjectPointable op;
     private TaggedValuePointable key;
     private final UTF8StringPointable stringKey;
+    private final List<ArrayBackedValueStorage> abvsList;
 
     public SimpleObjectUnionScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         stringKey = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+        op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+        abvsList = new ArrayList<>();
     }
 
     @Override
@@ -51,6 +57,9 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
         }
         TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         TaggedValuePointable tempValue = ppool.takeOne(TaggedValuePointable.class);
+        ArrayBackedValueStorage abvs = abvsPool.takeOne();
+        abvsList.add(abvs);
+
         try {
             abvs.reset();
             ob.reset(abvs);
@@ -58,13 +67,13 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
             if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
                 arg.getValue(sp);
                 for (int i = 0; i < sp.getEntryCount(); ++i) {
-                    op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+
                     sp.getEntry(i, tempTvp);
                     tempTvp.getValue(op);
                     addPairs(tempTvp, tempValue);
                 }
             } else if (arg.getTag() == ValueTag.OBJECT_TAG) {
-                op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+
                 arg.getValue(op);
                 addPairs(tempTvp, tempValue);
             }
@@ -76,6 +85,9 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
             ppool.giveBack(tempTvp);
             for (TaggedValuePointable pointable : tvps) {
                 ppool.giveBack(pointable);
+            }
+            for (ArrayBackedValueStorage arrayBackedValueStorage : abvsList) {
+                abvsPool.giveBack(arrayBackedValueStorage);
             }
         }
     }
@@ -96,7 +108,10 @@ public class SimpleObjectUnionScalarEvaluator extends AbstractObjectConstructorS
 
     private void addPairs(TaggedValuePointable tempTvp, TaggedValuePointable tempValue)
             throws IOException, SystemException {
-        op.getKeys(tempTvp);
+        ArrayBackedValueStorage abvs = abvsPool.takeOne();
+        abvsList.add(abvs);
+        op.getKeys(abvs);
+        tempTvp.set(abvs);
         if (tempTvp.getTag() == ValueTag.XS_STRING_TAG) {
             addPair(tempTvp, tempValue);
         } else if (tempTvp.getTag() == ValueTag.SEQUENCE_TAG) {

@@ -16,8 +16,6 @@
 */
 package org.apache.vxquery.runtime.functions.json;
 
-import java.io.IOException;
-
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
@@ -31,11 +29,12 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 
+import java.io.IOException;
+
 public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
     protected final IHyracksTaskContext ctx;
     private final ObjectPointable op;
     private final ArrayPointable ap;
-    private final ArrayBackedValueStorage abvs;
     private final SequenceBuilder sb;
     private final TaggedValuePointable tempTvp;
 
@@ -44,7 +43,6 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
         this.ctx = ctx;
         op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
         ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
-        abvs = new ArrayBackedValueStorage();
         sb = new SequenceBuilder();
         tempTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
     }
@@ -52,11 +50,13 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         final TaggedValuePointable tvp = args[0];
+        ArrayBackedValueStorage abvs = abvsPool.takeOne();
         try {
             switch (tvp.getTag()) {
                 case ValueTag.OBJECT_TAG:
                     tvp.getValue(op);
-                    op.getKeys(result);
+                    op.getKeys(abvs);
+                    result.set(abvs);
                     break;
                 case ValueTag.ARRAY_TAG:
                     abvs.reset();
@@ -71,6 +71,8 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
             }
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
+        } finally {
+            abvsPool.giveBack(abvs);
         }
     }
 }

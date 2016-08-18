@@ -46,9 +46,10 @@ public abstract class AbstractLibjnAccumulateScalarEvaluator extends AbstractTag
     private final ArrayBuilder ab;
     protected TaggedValuePointable key, value;
     private final UTF8StringPointable stringKey;
-    private final ArrayBackedValueStorage abvs, abvs1;
+    private final List<ArrayBackedValueStorage> abvsList;
     private final Map<TaggedValuePointable, List<TaggedValuePointable>> tvps;
     protected List<TaggedValuePointable> values;
+    protected final ObjectPointable op;
 
     public AbstractLibjnAccumulateScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -56,12 +57,11 @@ public abstract class AbstractLibjnAccumulateScalarEvaluator extends AbstractTag
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         stringKey = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-        abvs = new ArrayBackedValueStorage();
-        abvs1 = new ArrayBackedValueStorage();
         ob = new ObjectBuilder();
         ab = new ArrayBuilder();
         tvps = new LinkedHashMap<>();
-
+        op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+        abvsList = new ArrayList<>();
     }
 
     @Override
@@ -71,9 +71,13 @@ public abstract class AbstractLibjnAccumulateScalarEvaluator extends AbstractTag
             throw new SystemException(ErrorCode.FORG0006);
         }
         TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
+        ArrayBackedValueStorage abvsResult = abvsPool.takeOne();
+        abvsList.add(abvsResult);
+        ArrayBackedValueStorage abvsItem = abvsPool.takeOne();
+        abvsList.add(abvsItem);
         try {
-            abvs.reset();
-            ob.reset(abvs);
+            abvsResult.reset();
+            ob.reset(abvsResult);
             tvps.clear();
             if (arg.getTag() == ValueTag.SEQUENCE_TAG) {
                 arg.getValue(sp);
@@ -92,13 +96,13 @@ public abstract class AbstractLibjnAccumulateScalarEvaluator extends AbstractTag
                 if (values.size() > 1) {
                     FunctionHelper.removeDuplicates(values);
                     if (values.size() > 1) {
-                        abvs1.reset();
-                        ab.reset(abvs1);
+                        abvsItem.reset();
+                        ab.reset(abvsItem);
                         for (TaggedValuePointable pointable : values) {
                             ab.addItem(pointable);
                         }
                         ab.finish();
-                        ob.addItem(stringKey, abvs1);
+                        ob.addItem(stringKey, abvsItem);
                     } else {
                         ob.addItem(stringKey, values.get(0));
                     }
@@ -107,7 +111,7 @@ public abstract class AbstractLibjnAccumulateScalarEvaluator extends AbstractTag
                 }
             }
             ob.finish();
-            result.set(abvs);
+            result.set(abvsResult);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
         } finally {
@@ -117,6 +121,9 @@ public abstract class AbstractLibjnAccumulateScalarEvaluator extends AbstractTag
                     ppool.giveBack(value1);
                 }
                 ppool.giveBack(key1);
+            }
+            for (ArrayBackedValueStorage arrayBackedValueStorage : abvsList) {
+                abvsPool.giveBack(arrayBackedValueStorage);
             }
         }
     }
@@ -141,9 +148,11 @@ public abstract class AbstractLibjnAccumulateScalarEvaluator extends AbstractTag
     }
 
     private void addPairs(TaggedValuePointable tvp1) throws IOException, SystemException {
-        ObjectPointable op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
+        ArrayBackedValueStorage mvs = abvsPool.takeOne();
+        abvsList.add(mvs);
         tvp1.getValue(op);
-        op.getKeys(tvp1);
+        op.getKeys(mvs);
+        tvp1.set(mvs);
         if (tvp1.getTag() == ValueTag.XS_STRING_TAG) {
             addPair(tvp1, op);
         } else if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {

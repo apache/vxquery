@@ -38,7 +38,6 @@ public abstract class AbstractLibjnDescendantScalarEvaluator extends AbstractTag
     protected final UTF8StringPointable stringp;
     protected final SequencePointable sp, sp1;
     protected final SequenceBuilder sb;
-    protected final ArrayBackedValueStorage abvs;
 
     public AbstractLibjnDescendantScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -47,11 +46,12 @@ public abstract class AbstractLibjnDescendantScalarEvaluator extends AbstractTag
         sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sb = new SequenceBuilder();
-        abvs = new ArrayBackedValueStorage();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+
+        ArrayBackedValueStorage abvs = abvsPool.takeOne();
         try {
             abvs.reset();
             sb.reset(abvs);
@@ -72,14 +72,18 @@ public abstract class AbstractLibjnDescendantScalarEvaluator extends AbstractTag
             result.set(abvs);
         } catch (IOException e) {
             throw new SystemException(ErrorCode.SYSE0001, e);
+        } finally {
+            abvsPool.giveBack(abvs);
         }
     }
 
     protected void processObject(TaggedValuePointable tvp) throws IOException {
         TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
         ObjectPointable tempOp = ppool.takeOne(ObjectPointable.class);
+        ArrayBackedValueStorage abvs = abvsPool.takeOne();
         tvp.getValue(tempOp);
-        tempOp.getKeys(tempTvp);
+        tempOp.getKeys(abvs);
+        tempTvp.set(abvs);
         if (tempTvp.getTag() == ValueTag.XS_STRING_TAG) {
             processPair(tempTvp, tempOp);
             process(tempTvp);
@@ -94,6 +98,7 @@ public abstract class AbstractLibjnDescendantScalarEvaluator extends AbstractTag
         }
         ppool.giveBack(tempOp);
         ppool.giveBack(tempTvp);
+        abvsPool.giveBack(abvs);
     }
 
     protected abstract void processPair(TaggedValuePointable tempTvp, ObjectPointable tempOp) throws IOException;

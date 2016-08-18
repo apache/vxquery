@@ -39,8 +39,8 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
     protected final IHyracksTaskContext ctx;
     private final SequencePointable sp1, sp2;
     private final SequenceBuilder sb;
-    private final ArrayBackedValueStorage abvs;
     private List<TaggedValuePointable> pointables;
+    private final ObjectPointable op;
 
     public JnKeysScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -48,17 +48,19 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
         sp1 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sp2 = (SequencePointable) SequencePointable.FACTORY.createPointable();
         sb = new SequenceBuilder();
-        abvs = new ArrayBackedValueStorage();
         pointables = new ArrayList<>();
+        op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
     }
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
         TaggedValuePointable tvp1 = args[0];
-        ObjectPointable op;
         pointables.clear();
         if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
+            List<ArrayBackedValueStorage> abvsList = new ArrayList<>();
             TaggedValuePointable temptvp = ppool.takeOne(TaggedValuePointable.class);
+            ArrayBackedValueStorage abvsResult = abvsPool.takeOne();
+            abvsList.add(abvsResult);
             try {
                 tvp1.getValue(sp1);
                 int size1 = sp1.getEntryCount();
@@ -66,9 +68,11 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
                 for (int i = 0; i < size1; i++) {
                     sp1.getEntry(i, temptvp);
                     if (temptvp.getTag() == ValueTag.OBJECT_TAG) {
-                        op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
                         temptvp.getValue(op);
-                        op.getKeys(temptvp);
+                        ArrayBackedValueStorage abvsKeys = new ArrayBackedValueStorage();
+                        abvsList.add(abvsKeys);
+                        op.getKeys(abvsKeys);
+                        temptvp.set(abvsKeys);
                         temptvp.getValue(sp2);
                         size2 = sp2.getEntryCount();
                         for (int j = 0; j < size2; j++) {
@@ -80,25 +84,31 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
                     }
                 }
                 FunctionHelper.removeDuplicates(pointables);
-                abvs.reset();
-                sb.reset(abvs);
+                abvsResult.reset();
+                sb.reset(abvsResult);
                 for (TaggedValuePointable tvp : pointables) {
                     sb.addItem(tvp);
                 }
                 sb.finish();
-                result.set(abvs);
+                result.set(abvsResult);
             } catch (IOException e) {
                 throw new SystemException(ErrorCode.SYSE0001, e);
             } finally {
+                for (ArrayBackedValueStorage arrayBackedValueStorage : abvsList) {
+                    abvsPool.giveBack(arrayBackedValueStorage);
+                }
                 ppool.giveBack(temptvp);
             }
         } else if (tvp1.getTag() == ValueTag.OBJECT_TAG) {
+            ArrayBackedValueStorage abvsResult = abvsPool.takeOne();
             try {
-                op = (ObjectPointable) ObjectPointable.FACTORY.createPointable();
                 tvp1.getValue(op);
-                op.getKeys(result);
+                op.getKeys(abvsResult);
+                result.set(abvsResult);
             } catch (IOException e) {
                 throw new SystemException(ErrorCode.SYSE0001, e);
+            } finally {
+                abvsPool.giveBack(abvsResult);
             }
         } else {
             XDMConstants.setEmptySequence(result);

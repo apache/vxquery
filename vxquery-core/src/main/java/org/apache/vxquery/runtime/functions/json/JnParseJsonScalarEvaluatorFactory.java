@@ -16,11 +16,6 @@
  */
 package org.apache.vxquery.runtime.functions.json;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
@@ -42,6 +37,11 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.IParser;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class JnParseJsonScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
 
     private static final long serialVersionUID = 1L;
@@ -60,6 +60,7 @@ public class JnParseJsonScalarEvaluatorFactory extends AbstractTaggedValueArgume
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+        final ArrayBackedValueStorage abvs1 = new ArrayBackedValueStorage();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
 
@@ -82,7 +83,8 @@ public class JnParseJsonScalarEvaluatorFactory extends AbstractTaggedValueArgume
                     tvp1.getValue(op);
                     TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
                     try {
-                        op.getKeys(tvp1);
+                        op.getKeys(abvs1);
+                        tvp1.set(abvs1);
                         tvp1.getValue(stringp2);
                         op.getValue(stringp2, tempTvp);
                     } catch (IOException e1) {

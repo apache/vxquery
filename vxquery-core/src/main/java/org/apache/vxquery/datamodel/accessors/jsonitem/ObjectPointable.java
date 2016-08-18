@@ -16,19 +16,19 @@
  */
 package org.apache.vxquery.datamodel.accessors.jsonitem;
 
-import java.io.IOException;
-
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.data.std.api.AbstractPointable;
+import org.apache.hyracks.data.std.api.IMutableValueStorage;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.api.IPointableFactory;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+
+import java.io.IOException;
 
 /**
  * The datamodel of the JSON object is represented in this class:
@@ -54,7 +54,6 @@ public class ObjectPointable extends AbstractPointable {
     };
     private static final int ENTRY_COUNT_SIZE = IntegerPointable.TYPE_TRAITS.getFixedLength();
     private static final int SLOT_SIZE = IntegerPointable.TYPE_TRAITS.getFixedLength();
-    private final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
     private final SequenceBuilder sb = new SequenceBuilder();
     private final UTF8StringPointable key = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
 
@@ -78,7 +77,7 @@ public class ObjectPointable extends AbstractPointable {
         return getSlotArrayOffset(start) + getEntryCount(bytes, start) * SLOT_SIZE;
     }
 
-    public void getKeys(IPointable result) throws IOException {
+    public void getKeys(IMutableValueStorage abvs) throws IOException {
         abvs.reset();
         sb.reset(abvs);
         int dataAreaOffset = getDataAreaOffset(bytes, start);
@@ -90,7 +89,6 @@ public class ObjectPointable extends AbstractPointable {
             sb.addItem(ValueTag.XS_STRING_TAG, key);
         }
         sb.finish();
-        result.set(abvs);
     }
 
     //here the UTF8StringPointable of key is without the tag
