@@ -1,0 +1,5 @@
+{"Sunday":1,"Monday":2,"Tuesday":3,"Wednesday":4,"Thursday":5,"Friday":6,"Saturday":7}
+{"a":"b","c":"d"}
+{"a":["b","d"]}
+{"foo":[{"bar":[1,2]},"bar"],"bar":"foo","coa":123,"456":[789,"number"]}
+{"a":[{"c":"d"},{"e":"f"}]}

@@ -79,7 +79,7 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
                         }
                     }
                 }
-                removeDuplicates(pointables);
+                FunctionHelper.removeDuplicates(pointables);
                 abvs.reset();
                 sb.reset(abvs);
                 for (TaggedValuePointable tvp : pointables) {
@@ -102,20 +102,6 @@ public class JnKeysScalarEvaluator extends AbstractTaggedValueArgumentScalarEval
             }
         } else {
             XDMConstants.setEmptySequence(result);
-        }
-    }
-
-    private void removeDuplicates(List<TaggedValuePointable> pointables) {
-        int size = pointables.size();
-        for (int i = 0; i < size - 1; i++) {
-            for (int j = i + 1; j < size; j++) {
-                if (!FunctionHelper.arraysEqual(pointables.get(j), pointables.get(i))) {
-                    continue;
-                }
-                pointables.remove(j);
-                j--;
-                size--;
-            }
         }
     }
 }

@@ -18,23 +18,20 @@ package org.apache.vxquery.runtime.functions.json;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 
-public class JnNullScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
-    protected final IHyracksTaskContext ctx;
+import java.io.IOException;
 
-    public JnNullScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
-        super(args);
-        this.ctx = ctx;
+public class LibjnIntersectScalarEvaluator extends AbstractLibjnAccumulateScalarEvaluator {
+
+    public LibjnIntersectScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
+        super(ctx, args);
     }
 
     @Override
-    protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        XDMConstants.setJsNull(result);
+    protected void addKeyValue(UTF8StringPointable stringKey, TaggedValuePointable taggedValuePointable)
+            throws IOException {
     }
+
 }
