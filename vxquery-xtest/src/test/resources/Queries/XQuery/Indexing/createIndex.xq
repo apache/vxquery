@@ -16,5 +16,5 @@
    under the License. :)
    
 (: Build Lucene Index :)
-build-index-on-collection( "src/test/resources/TestSources/ghcnd", "target/tmp/indexFolder")
+build-index-on-collection( "src/test/resources/TestSources/ghcnd")
    
