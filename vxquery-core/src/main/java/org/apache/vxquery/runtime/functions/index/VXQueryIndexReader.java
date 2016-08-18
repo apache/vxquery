@@ -95,7 +95,6 @@ public class VXQueryIndexReader {
             }
             indexPlace += 1;
             result.set(nodeAbvs.getByteArray(), nodeAbvs.getStartOffset(), nodeAbvs.getLength());
-            String s ;
             return true;
         }
         return false;

@@ -30,6 +30,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
+import org.apache.vxquery.runtime.functions.index.indexCentralizer.IndexCentralizerUtil;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -52,7 +53,10 @@ public class ShowIndexScalarEvaluatorFactory extends AbstractTaggedValueArgument
                 try {
                     abvs.reset();
                     sb.reset(abvs);
-                    VXQueryCommons.INDEX_CENTRALIZER_UTIL.getAllCollections(sb);
+                    IndexCentralizerUtil indexCentralizerUtil = new IndexCentralizerUtil(ctx.getIOManager()
+                            .getIODevices().get(0).getPath());
+                    indexCentralizerUtil.readIndexDirectory();
+                    indexCentralizerUtil.getAllCollections(sb);
                     sb.finish();
                     result.set(abvs);
                 } catch (IOException e) {

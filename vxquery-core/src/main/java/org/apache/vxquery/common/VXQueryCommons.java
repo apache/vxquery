@@ -23,17 +23,12 @@ import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class VXQueryCommons {
-
-    public static IndexCentralizerUtil INDEX_CENTRALIZER_UTIL = new IndexCentralizerUtil();
-
-    static {
-        INDEX_CENTRALIZER_UTIL.readIndexDirectory();
-    }
 
     public static final Set<FunctionIdentifier> collectionFunctions = new HashSet<>();
 

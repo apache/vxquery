@@ -16,6 +16,8 @@
  */
 package org.apache.vxquery.runtime.functions.index.indexCentralizer;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -46,24 +48,34 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Class for maintaining the centralized index information file.
  * Index centralization procedure.
- * User can specify the collection directory in local.xml file.
+ * User can specify the collection directory in VXQuery.java, ncConfig.ioDevices = <index_directory>.
  * Then all the indexes will be created in that particular directory in sub-folders corresponding to collections.
  * There will be a single xml file, located in the directory specified in local.xml, which contains all information
- * about what existing indexes.
+ * about the existing indexes.
  * This class can be used to read, add, delete, modify the entries and write the file back to the disk.
  */
 public class IndexCentralizerUtil {
 
     private final String FILE_NAME = "VXQuery-Index-Directory.xml";
-    private final File XML_FILE;
     private final List<String> collections = new ArrayList<>();
     private final Logger LOGGER = Logger.getLogger("IndexCentralizerUtil");
+    private File XML_FILE;
     private String INDEX_LOCATION;
-    private String LOCATION = "./vxquery-server/src/main/resources/conf/local.xml";
     private ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
 
-    public IndexCentralizerUtil() {
-        XML_FILE = new File(getIndexLocation() + "/" + FILE_NAME);
+    public IndexCentralizerUtil(File index) {
+        this.INDEX_LOCATION = index.getPath();
+        if (!index.exists()){
+            try {
+                FileUtils.forceMkdir(index);
+            } catch (IOException e) {
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.log(Level.ERROR, "Could not create the index directory for path: " + INDEX_LOCATION + " "
+                            + e);
+                }
+            }
+        }
+        XML_FILE = new File(index.getPath() + "/" + FILE_NAME);
     }
 
     /**
@@ -116,34 +128,6 @@ public class IndexCentralizerUtil {
             svb.write(s, output);
             sb.addItem(abvs);
         }
-    }
-
-    /**
-     * Get the collection location which is specified in local.xml file.
-     *
-     * @return : Collection location
-     */
-    private String getIndexLocation() {
-        File f = new File(LOCATION);
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder;
-        Document doc;
-        try {
-            dBuilder = dbFactory.newDocumentBuilder();
-            doc = dBuilder.parse(f);
-            doc.getDocumentElement().normalize();
-
-            NodeList nList = doc.getElementsByTagName("indexDirectory");
-            Node nNode = nList.item(0);
-            this.INDEX_LOCATION = nNode.getTextContent();
-            return INDEX_LOCATION;
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.log(Level.ERROR, "Could not parse xml file due to " + e.getMessage());
-            }
-            return null;
-        }
-
     }
 
     /**

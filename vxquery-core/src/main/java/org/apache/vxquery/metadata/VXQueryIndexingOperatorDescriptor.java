@@ -41,11 +41,13 @@ import org.apache.vxquery.compiler.rewriter.rules.AbstractCollectionRule;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
 import org.apache.vxquery.runtime.functions.index.VXQueryIndexReader;
+import org.apache.vxquery.runtime.functions.index.indexCentralizer.IndexCentralizerUtil;
 import org.apache.vxquery.runtime.functions.index.updateIndex.IndexUpdater;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
@@ -53,6 +55,7 @@ import org.apache.vxquery.xmlparser.XMLParser;
 
 import javax.xml.bind.JAXBException;
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -94,6 +97,8 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
+        IndexCentralizerUtil indexConstructorUtil = new IndexCentralizerUtil(ctx.getIOManager().getIODevices().get(0).getPath());
+        indexConstructorUtil.readIndexDirectory();
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -119,15 +124,13 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                 final ArrayBackedValueStorage abvsFileNode = new ArrayBackedValueStorage();
 
                 String indexModifiedName;
-
                 if (collectionModifiedName.contains("hdfs://")) {
                     throw new HyracksDataException("Indexing support for HDFS not yet implemented.");
                 } else {
 
                     if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions
                             .FN_BUILD_INDEX_ON_COLLECTION_1.getFunctionIdentifier())) {
-                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.putIndexForCollection
-                                (collectionModifiedName);
+                        indexModifiedName = indexConstructorUtil.putIndexForCollection(collectionModifiedName);
                         File collectionDirectory = new File(collectionModifiedName);
 
                         //check if directory is in the local file system
@@ -149,8 +152,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                                     collectionDirectory.getAbsolutePath() + ")");
                         }
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_UPDATE_INDEX_1.getFunctionIdentifier())) {
-                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.getIndexForCollection
-                                (collectionModifiedName);
+                        indexModifiedName = indexConstructorUtil.getIndexForCollection(collectionModifiedName);
                         IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb, abvs,
                                 nodeIdProvider, abvsFileNode, nodep, nodeId);
                         try {
@@ -165,11 +167,10 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             throw new HyracksDataException("Could not update index in " + indexModifiedName + " " + e.getMessage());
                         }
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier())) {
-                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.getIndexForCollection
-                                (collectionModifiedName);
+                        indexModifiedName = indexConstructorUtil.getIndexForCollection(collectionModifiedName);
                         IndexUpdater updater = new IndexUpdater(indexModifiedName, result, stringp, bbis, di, sb, abvs,
                                 nodeIdProvider, abvsFileNode, nodep, nodeId);
-                        VXQueryCommons.INDEX_CENTRALIZER_UTIL.deleteEntryForCollection(collectionModifiedName);
+                        indexConstructorUtil.deleteEntryForCollection(collectionModifiedName);
                         try {
                             updater.setup();
                             updater.deleteAllIndexes();
@@ -182,10 +183,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
 
                     } else if (AbstractCollectionRule.functionCall.getFunctionIdentifier().equals(BuiltinFunctions
                             .FN_COLLECTION_FROM_INDEX_2.getFunctionIdentifier())) {
-                        indexModifiedName = VXQueryCommons.INDEX_CENTRALIZER_UTIL.getIndexForCollection
-                                (collectionModifiedName);
-                        // In this scenario, collectionModifiedName represents the index directory, and
-                        // indexModifiedName represents the path.
+                        indexModifiedName = indexConstructorUtil.getIndexForCollection(collectionModifiedName);
                         VXQueryIndexReader indexReader = new VXQueryIndexReader(ctx, indexModifiedName,
                                 elementPath);
                         try {
@@ -217,7 +215,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                     appender.flush(writer, true);
                 }
                 writer.close();
-                VXQueryCommons.INDEX_CENTRALIZER_UTIL.writeIndexDirectory();
+                indexConstructorUtil.writeIndexDirectory();
             }
         };
     }

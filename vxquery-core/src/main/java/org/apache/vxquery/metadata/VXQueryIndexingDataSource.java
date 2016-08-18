@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
 
+    protected Object[] types;
+
+    protected IDataSourcePropertiesProvider propProvider;
     private VXQueryIndexingDataSource(int id, String collection, String index, Object[] types, String functionCall) {
         this.dataSourceId = id;
         this.collectionName = collection;
@@ -50,6 +53,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
             }
         };
         this.tag = null;
+        this.childSeq = new ArrayList<>();
     }
 
     public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type, String
@@ -121,4 +125,11 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
     public String getDataSourceType() {
         return "Indexing";
     }
+
+    public List<Integer> getChildSeq() {
+        return childSeq;
+    }
+
 }
+
+

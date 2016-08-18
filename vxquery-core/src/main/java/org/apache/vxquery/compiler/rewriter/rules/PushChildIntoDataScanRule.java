@@ -93,12 +93,20 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
         if (!usedVariables.contains(datascan.getVariables())) {
            VXQueryCollectionDataSource ds = null;
             VXQueryIndexingDataSource ids = null;
-            // Find all child functions.
-            if (VXQueryCommons.indexingFunctions.contains(AbstractCollectionRule.functionCall.getFunctionIdentifier())) {
+
+            try {
                 ids = (VXQueryIndexingDataSource) datascan.getDataSource();
-            } else {
-                 ds = (VXQueryCollectionDataSource) datascan.getDataSource();
+            } catch (ClassCastException e) {
+                ds = (VXQueryCollectionDataSource) datascan.getDataSource();
             }
+
+
+            // Find all child functions.
+//            if (VXQueryCommons.indexingFunctions.contains(AbstractCollectionRule.functionCall.getFunctionIdentifier())) {
+//                ids = (VXQueryIndexingDataSource) datascan.getDataSource();
+//            } else {
+//                 ds = (VXQueryCollectionDataSource) datascan.getDataSource();
+//            }
             if (!updateDataSource(ds, unnest.getExpressionRef())) {
                 return false;
             }
