@@ -53,13 +53,15 @@ mkdir -p $NCLOGS_DIR
 
 # Set up the options for the cc.
 NC_OPTIONS=" -cc-host ${CCHOST} -cluster-net-ip-address ${IPADDR}  -data-ip-address ${IPADDR} -result-ip-address ${IPADDR}  -node-id ${NODEID} "
-[ "${CCPORT}" ] {
-	NC_OPTIONS=" ${NC_OPTIONS} -cc-port ${CCPORT} "
-}
+[ "${CCPORT}" ] &&
 
-[ "${NCOPTS}" ] {
+	NC_OPTIONS=" ${NC_OPTIONS} -cc-port ${CCPORT} "
+
+
+[ "${NCOPTS}" ] &&
+
     NC_OPTIONS=" ${NC_OPTIONS} ${NCOPTS} "
-}
+
 
 echo "${JAVA_OPTS}" &> ${NCLOGS_DIR}/nc.log
 
