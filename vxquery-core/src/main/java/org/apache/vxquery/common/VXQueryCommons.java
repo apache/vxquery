@@ -18,13 +18,7 @@ package org.apache.vxquery.common;
 
 import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import org.apache.vxquery.functions.BuiltinFunctions;
-import org.apache.vxquery.runtime.functions.index.indexCentralizer.IndexCentralizerUtil;
-import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
