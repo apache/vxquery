@@ -18,5 +18,5 @@
 (: Json Array Size Query :)
 (: Size of an array :)
     let $x:=[2,[2,1,3]]
-    return size($x)
+    return jn:size($x)
     
