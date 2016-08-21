@@ -15,7 +15,7 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: JSONiq fn:data :)
+(: JSONiq fn:string :)
 (
     fn:string([1])
 )

@@ -17,6 +17,8 @@
 
 (: Json Array Navigation Query :)
 (: Just navigate through an array :)
-    let $x:=[1,[2]]
-    return $x(2)(1)
-    
+let $x := [
+    [ "mercury", "venus", "earth", "mars" ],
+    [ "monday", "tuesday", "wednesday", "thursday" ]
+]
+return $x(2)(2)

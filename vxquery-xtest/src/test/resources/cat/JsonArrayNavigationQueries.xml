@@ -55,4 +55,9 @@
         <query name="q07_array_navigation" date="2016-08-05"/>
         <output-file compare="Text">q07_array_navigation.txt</output-file>
     </test-case>
+    <test-case name="json-array-navigation-q08" FilePath="Json/Array/Navigation" Creator="Riyafa Abdul Hameed">
+        <description>Navigate through an array</description>
+        <query name="q08_array_navigation" date="2016-08-21"/>
+        <output-file compare="Text">q08_array_navigation.txt</output-file>
+    </test-case>
 </test-group>

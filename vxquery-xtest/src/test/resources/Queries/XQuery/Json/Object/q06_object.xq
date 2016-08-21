@@ -18,10 +18,9 @@
 (: Json Object Query :)
 (: Pasrse object with arrays :)
 {
-    "a": [
-        1,
-        2,
-        3
-    ],
-    "b": 2
+    "id" : 404,
+    "name" : "Stanco Grease Pot",
+    "price" : 6.49,
+    "weight" : 3.8,
+    "uses" : ["Grease storage","Backpacking pot"]
 }

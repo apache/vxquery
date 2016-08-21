@@ -15,7 +15,5 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Array Navigation Query :)
-(: Just navigate through an array :)
-let $wd := ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-return $wd(1)
+(: JSONiq fn:data :)
+fn:data( {"foo" : 3, "bar" : 4 } )

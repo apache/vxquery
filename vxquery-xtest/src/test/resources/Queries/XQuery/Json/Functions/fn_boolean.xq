@@ -16,7 +16,5 @@
    under the License. :)
 
 (: JSONiq fn:boolean :)
-(
-    fn:boolean(null), fn:boolean({}), fn:boolean({"foo": 3, "bar":4}), fn:boolean({"foo": 3}), fn:boolean([]),
-    fn:boolean([1]), fn:boolean([1, 2]), fn:boolean(( [1], null ))
-)
+fn:boolean(jn:null()), fn:boolean({}), fn:boolean({ "foo": false() }), fn:boolean({"foo": 3, "bar":4}), fn:boolean({"foo": 3}), fn:boolean([]),
+fn:boolean([1]), fn:boolean([1, 2]), fn:boolean(( [1], jn:null()))

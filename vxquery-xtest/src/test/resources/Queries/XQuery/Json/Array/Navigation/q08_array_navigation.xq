@@ -14,8 +14,10 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-
+   
 (: Json Array Navigation Query :)
-(: Just navigate through an array :)
-let $wd := ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-return $wd(1)
+let $x := [
+    [ "mercury", "venus", "earth", "mars" ],
+    [ "monday", "tuesday", "wednesday", "thursday" ]
+]
+return $x(1)
