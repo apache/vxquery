@@ -23,7 +23,7 @@ Count max temperature (TMAX) readings for 2000-01-01.
 count(
     let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($sensor_collection)
-    for $data in $r("dataCollection")("data")
+    for $data in $r("results")()
     where $data("dataType") eq "TMAX" 
         and fn:year-from-dateTime(xs:dateTime(fn:data($data("date")))) eq 2000
     return $data

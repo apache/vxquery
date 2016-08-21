@@ -19,7 +19,7 @@ import sys, getopt
 # Custom modules.
 from weather_data_files import *
 from weather_download_files import *
-from weather_convert_to_xml import *
+from weather_convert import *
 from weather_config import *
 from weather_benchmark import *
 

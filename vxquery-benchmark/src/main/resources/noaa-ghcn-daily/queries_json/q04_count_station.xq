@@ -23,7 +23,7 @@ Count all the weather stations for Washington state.
 count(
     let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
     for $s in collection($station_collection)
-    for $station in $s("stationCollection")("station")
+    for $station in $s("results")()
     where (some $x in $station("locationLabels") satisfies ($x("type") eq "ST" and fn:upper-case(fn:data($x("displayName"))) eq "WASHINGTON"))
     return $station
 )

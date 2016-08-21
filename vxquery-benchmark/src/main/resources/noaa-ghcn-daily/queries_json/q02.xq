@@ -23,7 +23,7 @@ weather station (USW00014771) report for 1999.
 fn:sum(
     let $collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($collection)
-    for $data in $r("dataCollection")("data")
+    for $data in $r("results")()
     where $data("station") eq "GHCND:USW00014771" 
         and $data("dataType") eq "PRCP" 
         and fn:year-from-dateTime(xs:dateTime(fn:data($data("date")))) eq 1999

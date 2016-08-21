@@ -15,21 +15,14 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(:
-Convert xml structure to json structure
-:)
+(: XQuery Join Query :)
+(: Find the highest recorded temperature (TMAX) for each station      :)
+let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
+for $s in collection($station_collection)/stationCollection/station
+
 let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
-for $d in collection($sensor_collection)/dataCollection/data
-let $date := xs:date(fn:substring(xs:string(fn:data($d/date)), 0, 11))
-where $date eq xs:date("2001-01-01") and $d/dataType eq "TMIN"
-return 
-{
-    "dataCollection":{
-        "data":{
-            "date":data($d/date),
-            "dataType":data($d/dataType),
-            "station":data($d/station),
-            "value":data($d/value),
-        }
-    }
-}
+for $r in collection($sensor_collection)/dataCollection/data
+
+where $s/id eq $r/station
+    and $r/dataType eq "TMAX" 
+return ($r/station, $r/value)

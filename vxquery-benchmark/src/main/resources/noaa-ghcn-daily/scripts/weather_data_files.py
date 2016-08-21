@@ -19,7 +19,7 @@ import os.path
 import linecache
 import distutils.core
 
-from weather_convert_to_xml import *
+from weather_convert import *
 from collections import OrderedDict
 
 # Weather data files created to manage the conversion process.

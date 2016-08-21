@@ -20,7 +20,7 @@
 fn:max(
     let $collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($collection)
-    for $data in $r("dataCollection")("data")
+    for $data in $r("results")()
     where $data("dataType") eq "TMAX"
     return $data("value")
 ) div 10

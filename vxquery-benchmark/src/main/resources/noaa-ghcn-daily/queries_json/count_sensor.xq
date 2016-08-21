@@ -15,19 +15,15 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: XQuery Join Aggregate Query :)
-(: Find the lowest recorded temperature (TMIN) in the United States for     :)
-(: 2001.                                                                      :)
-fn:min(
-    let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
-    for $s in collection($station_collection)
-    for $station in $s("results")()
+(:
+JSON Join Query
+-------------------
+Count all the weather sensor readings available.
+:)
+count(
     let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($sensor_collection)
-    for $data in $r("results")()
-    where $station("id") eq $data("station")
-        and (some $x in $station("locationLabels") satisfies ($x("type") eq "CNTRY" and $x("id") eq "FIPS:US"))
-        and $data("dataType") eq "TMIN" 
-        and fn:year-from-dateTime(xs:dateTime(fn:data($data("date")))) eq 2001
-    return $data("value")
-) div 10
+        let $x:=$r("results")()
+        for $i in $x
+        return $i
+)
