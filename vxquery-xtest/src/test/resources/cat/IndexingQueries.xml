@@ -25,6 +25,11 @@
       <query name="createIndex" date="2016-05-26"/>
       <output-file compare="Text">createIndex.txt</output-file>
    </test-case>
+   <test-case name="show-index-1" FilePath="Indexing/" Creator="Menaka Jayawardena">
+      <description>Show indexes after creating index.</description>
+      <query name="showIndex" date="2016-08-18"/>
+      <output-file compare="Text">showIndex1.txt</output-file>
+   </test-case>
    <test-case name="use-index-1" FilePath="Indexing/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex1" date="2016-05-26"/>
@@ -69,5 +74,10 @@
       <description>Delete the existing index</description>
       <query name="deleteIndex" date="2016-06-24"/>
       <output-file compare="Text">deleteIndex.txt</output-file>
+   </test-case>
+   <test-case name="show-index-2" FilePath="Indexing/" Creator="Menaka Jayawardena">
+      <description>Show indexes after deletion.</description>
+      <query name="showIndex" date="2016-08-18"/>
+      <output-file compare="Text">showIndex2.txt</output-file>
    </test-case>
 </test-group>

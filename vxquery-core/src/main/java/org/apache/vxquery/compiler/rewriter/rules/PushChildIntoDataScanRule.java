@@ -25,15 +25,18 @@ import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSource;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
+import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.types.ElementType;
 
@@ -69,6 +72,8 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
 
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
+
+
         if (dCtx == null) {
             VXQueryOptimizationContext vxqueryCtx = (VXQueryOptimizationContext) context;
             dCtx = ((VXQueryMetadataProvider) vxqueryCtx.getMetadataProvider()).getStaticContext();
@@ -86,8 +91,16 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
         DataSourceScanOperator datascan = (DataSourceScanOperator) op2;
 
         if (!usedVariables.contains(datascan.getVariables())) {
+           VXQueryCollectionDataSource ds = null;
+            VXQueryIndexingDataSource ids = null;
+
             // Find all child functions.
-            VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) datascan.getDataSource();
+            try {
+                ids = (VXQueryIndexingDataSource) datascan.getDataSource();
+            } catch (ClassCastException e) {
+                ds = (VXQueryCollectionDataSource) datascan.getDataSource();
+            }
+
             if (!updateDataSource(ds, unnest.getExpressionRef())) {
                 return false;
             }

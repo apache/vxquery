@@ -5,9 +5,9 @@
    to you under the Apache License, Version 2.0 (the
    "License"); you may not use this file except in compliance
    with the License.  You may obtain a copy of the License at
-   
+
      http://www.apache.org/licenses/LICENSE-2.0
-   
+
    Unless required by applicable law or agreed to in writing,
    software distributed under the License is distributed on an
    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,7 +21,7 @@ XQuery Join Query
 Count all the stations.
 :)
 count(
-    let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
-    for $s in collection($station_collection)
-    return $s("stationCollection")("station")
+        let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
+        for $s in collection($station_collection)/stationCollection/station
+        return $s
 )

@@ -16,4 +16,4 @@
    under the License. :)
 
 (: Update Lucene Index :)
-delete-index("target/tmp/indexFolder")
+delete-index("src/test/resources/TestSources/ghcnd")

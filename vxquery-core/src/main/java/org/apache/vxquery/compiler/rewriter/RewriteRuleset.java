@@ -16,35 +16,6 @@
  */
 package org.apache.vxquery.compiler.rewriter;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConsolidateDescandantChild;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSingleItemsRule;
-import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
-import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
-import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
-import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
-import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
-import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantPromoteExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantTreatExpressionsRule;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
-import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedUnnestIterateRule;
-import org.apache.vxquery.compiler.rewriter.rules.ReplaceSourceMapInDocExpression;
-import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
-import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
-import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.ExtractFunctionsFromJoinConditionRule;
-import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.InlineNestedVariablesRule;
-import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.MoveFreeVariableOperatorOutOfSubplanRule;
-
 import org.apache.hyracks.algebricks.core.rewriter.base.HeuristicOptimizer;
 import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import org.apache.hyracks.algebricks.rewriter.rules.BreakSelectIntoConjunctsRule;
@@ -86,6 +57,35 @@ import org.apache.hyracks.algebricks.rewriter.rules.SetAlgebricksPhysicalOperato
 import org.apache.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 import org.apache.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
 import org.apache.hyracks.algebricks.rewriter.rules.SubplanOutOfGroupRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConsolidateDescandantChild;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateSubplanForSingleItemsRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSequencesRule;
+import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubplanRule;
+import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
+import org.apache.vxquery.compiler.rewriter.rules.IntroduceIndexingRule;
+import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantPromoteExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantTreatExpressionsRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedSortDistinctNodesRule;
+import org.apache.vxquery.compiler.rewriter.rules.RemoveUnusedUnnestIterateRule;
+import org.apache.vxquery.compiler.rewriter.rules.ReplaceSourceMapInDocExpression;
+import org.apache.vxquery.compiler.rewriter.rules.SetCollectionDataSourceRule;
+import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
+import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.ExtractFunctionsFromJoinConditionRule;
+import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.InlineNestedVariablesRule;
+import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.MoveFreeVariableOperatorOutOfSubplanRule;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class RewriteRuleset {
     /**
@@ -130,6 +130,7 @@ public class RewriteRuleset {
         normalization.add(new SetCollectionDataSourceRule());
         normalization.add(new IntroduceCollectionRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        normalization.add(new IntroduceIndexingRule());
 
         normalization.add(new ConsolidateDescandantChild());
 
