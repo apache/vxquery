@@ -15,7 +15,13 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Array Navigation Query :)
-(: Just navigate through an array :)
-let $wd := ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-return $wd(1)
+(: XML in JSON :)
+{
+    "element" : <mercury>Hg</mercury>,
+    "atomic value" : xs:date("1896-01-24")
+    "several dates" : [ xs:date("1066-10-14"), xs:date("1935-01-11"), xs:date("1989-11-09") ]
+},
+[ xs:date("1066-10-14"), <mercury>Hg</mercury>, "ice cream" ],
+let $object := { "x" : 10, "y" : 12 }
+let $x := $object("x")
+return <x>{ $x }</x>

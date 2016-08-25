@@ -17,4 +17,8 @@
 
 (: Json Array Query :)
 (: Just parse an array with nested arrays :)
-    [[1,2],[2,3]]
+[
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]

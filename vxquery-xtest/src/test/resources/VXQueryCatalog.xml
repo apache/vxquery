@@ -51,6 +51,7 @@
 <!ENTITY JsonArrayNavigationQueries SYSTEM "cat/JsonArrayNavigationQueries.xml">
 <!ENTITY JsonParserQueries SYSTEM "cat/JsonParserQueries.xml">
 <!ENTITY LibrariesInJSONiq SYSTEM "cat/LibrariesInJSONiq.xml">
+<!ENTITY XMLInJSONQueries SYSTEM "cat/XMLInJSONQueries.xml">
 
 <!ENTITY TraceQuery SYSTEM "cat/TraceQuery.xml">
 
@@ -351,4 +352,16 @@
          &SerializationQueries;
       </test-group>
    </test-group>
+    <test-group name="XMLInJSONQueries" featureOwner="Riyafa Abdul Hameed">
+        <GroupInfo>
+            <title>XML in JSON</title>
+            <description>XML in JSON</description>
+        </GroupInfo>
+        <test-group name="XMLInJSONQueries" featureOwner="Riyafa Abdul Hameed">
+            <GroupInfo>
+                <title>Tests for XML in JSON</title>
+            </GroupInfo>
+            &XMLInJSONQueries;
+        </test-group>
+    </test-group>
 </test-suite>

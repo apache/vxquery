@@ -40,6 +40,16 @@
         <query name="fn_data3" date="2016-06-17"/>
         <expected-error>JNTY0004</expected-error>
     </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:data for JSON objects, arrays and null</description>
+        <query name="fn_data4" date="2016-08-21"/>
+        <expected-error>JNTY0004</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:data for JSON objects, arrays and null</description>
+        <query name="fn_data5" date="2016-08-21"/>
+        <expected-error>JNTY0004</expected-error>
+    </test-case>
     <test-case name="functions-in-jsoniq-fn_string" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
         <description>Query for fn:string for JSON null</description>
         <query name="fn_string1" date="2016-06-17"/>
@@ -54,6 +64,16 @@
     <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
         <description>Query for fn:string for JSON arrays</description>
         <query name="fn_string3" date="2016-06-17"/>
+        <expected-error>JNTY0024</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:string for JSON arrays</description>
+        <query name="fn_string4" date="2016-08-21"/>
+        <expected-error>JNTY0024</expected-error>
+    </test-case>
+    <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">
+        <description>Query for fn:string for JSON arrays</description>
+        <query name="fn_string5" date="2016-08-21"/>
         <expected-error>JNTY0024</expected-error>
     </test-case>
     <test-case name="functions-in-jsoniq-fn_data" FilePath="Json/Functions/" Creator="Riyafa Abdul Hameed">

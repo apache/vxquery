@@ -33,25 +33,25 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
-public class FnSizeScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class JnSizeScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
 
     private static final long serialVersionUID = 1L;
 
-    public FnSizeScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public JnSizeScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws AlgebricksException {
-        return new FnSizeScalarEvaluator(args);
+        return new JnSizeScalarEvaluator(args);
     }
 
-    private static class FnSizeScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+    private static class JnSizeScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final ArrayPointable ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
 
-        public FnSizeScalarEvaluator(IScalarEvaluator[] args) {
+        public JnSizeScalarEvaluator(IScalarEvaluator[] args) {
             super(args);
         }
 

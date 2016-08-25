@@ -1,0 +1,3 @@
+{"element":<mercury>Hg</mercury>,"atomic value":"1896-01-24","several dates":["1066-10-14","1935-01-11","1989-11-09"]}
+["1066-10-14",<mercury>Hg</mercury>,"ice cream"]
+<x>10</x>

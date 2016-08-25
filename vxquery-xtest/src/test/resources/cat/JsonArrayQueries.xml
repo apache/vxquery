@@ -40,4 +40,14 @@
       <query name="q04_array" date="2016-06-09"/>
       <output-file compare="Text">q04_array.txt</output-file>
    </test-case>
+   <test-case name="json-array-q05" FilePath="Json/Array/" Creator="Riyafa Abdul Hameed">
+      <description>Array with strings.</description>
+      <query name="q05_array" date="2016-08-21"/>
+      <output-file compare="Text">q05_array.txt</output-file>
+   </test-case>
+    <test-case name="json-array-q06" FilePath="Json/Array/" Creator="Riyafa Abdul Hameed">
+        <description>Array with XQuery expressions.</description>
+        <query name="q06_array" date="2016-08-21"/>
+        <output-file compare="Text">q06_array.txt</output-file>
+    </test-case>
 </test-group>

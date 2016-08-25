@@ -15,7 +15,6 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Array Navigation Query :)
-(: Just navigate through an array :)
-let $wd := ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-return $wd(1)
+(: Json Array Query :)
+(: Parse an array with XQuery expressions:)
+[ 10 to 15 ]

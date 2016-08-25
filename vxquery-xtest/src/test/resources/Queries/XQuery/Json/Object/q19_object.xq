@@ -15,7 +15,15 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Json Array Navigation Query :)
-(: Just navigate through an array :)
-let $wd := ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-return $wd(1)
+(: Json Object Query :)
+(: Object Constructor with XQuery expressions :)
+{
+    "Sunday" : 1,
+    "Monday" : 1 + 1,
+    "Tuesday" : 3 * 1,
+    "Wednesday" : 8 div 2,
+    "Thursday" : 5,
+    "Friday" : count(for $i in 1 to 6 return $i),
+    "Saturday" : 10 - 3,
+    "NotADay" ?: ()
+}
