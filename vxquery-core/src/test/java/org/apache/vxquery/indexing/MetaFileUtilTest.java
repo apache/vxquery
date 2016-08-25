@@ -49,7 +49,8 @@ public class MetaFileUtilTest {
     @BeforeClass
     public static void setup() {
         new File(TestConstants.INDEX_DIR).mkdir();
-        metaFileUtil = MetaFileUtil.create(TestConstants.INDEX_DIR);
+        //        metaFileUtil = MetaFileUtil.create(TestConstants.INDEX_DIR);
+        metaFileUtil = new MetaFileUtil(TestConstants.INDEX_DIR);
         initialMap = TestConstants.getInitialMap();
         modifiedMap = TestConstants.getModifiedMap();
     }
@@ -58,7 +59,7 @@ public class MetaFileUtilTest {
      * Test case for generating MD5 string for an XML file.
      */
     @Test
-    public void step1_testGenerateMD5ForXML() throws IOException, NoSuchAlgorithmException {
+    public void step1_testGenerateMD5ForXML() throws IOException {
         TestConstants.createXML("catalog.xml");
         File xml = new File(TestConstants.XML_FILE);
         String md5 = metaFileUtil.generateMD5(xml);
@@ -71,7 +72,7 @@ public class MetaFileUtilTest {
      * Test the creation of metadata file.
      */
     @Test
-    public void step2_testCreateMetaDataFile() throws IOException, JAXBException {
+    public void step2_testCreateMetaDataFile() {
         ConcurrentHashMap<String, XmlMetadata> initialMap = TestConstants.getInitialMap();
         metaFileUtil.updateMetadataMap(initialMap, "");
         metaFileUtil.writeMetadataToFile();
@@ -82,8 +83,8 @@ public class MetaFileUtilTest {
      * Validate the content of the file.
      */
     @Test
-    public void step3_testValidateMetadataFile() throws IOException, ClassNotFoundException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata("");
+    public void step3_testValidateMetadataFile() {
+        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata();
         Set<String> from = fromFile.keySet();
         Set<String> initial = initialMap.keySet();
 
@@ -100,7 +101,7 @@ public class MetaFileUtilTest {
      * Change the xml file and test whether the changes are detected.
      */
     @Test
-    public void step4_testDetectFileChanges() throws IOException, NoSuchAlgorithmException {
+    public void step4_testDetectFileChanges() throws IOException {
         TestConstants.createXML("catalog_edited.xml");
         File xml = new File(TestConstants.XML_FILE);
         Assert.assertTrue(metaFileUtil.generateMD5(xml).equals(TestConstants.CHANGED_MD5));
@@ -112,7 +113,7 @@ public class MetaFileUtilTest {
     @Test
     public void step5_testUpdateMetadata()
             throws IOException, ClassNotFoundException, NoSuchAlgorithmException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFileMap = metaFileUtil.getMetadata("");
+        ConcurrentHashMap<String, XmlMetadata> fromFileMap = metaFileUtil.getMetadata();
         XmlMetadata modified = fromFileMap.get(TestConstants.XML_FILE);
 
         File xml = new File(TestConstants.XML_FILE);
@@ -122,7 +123,7 @@ public class MetaFileUtilTest {
 
         metaFileUtil.updateMetadataMap(fromFileMap, TestConstants.INDEX_DIR);
 
-        Assert.assertNotNull(metaFileUtil.getMetadata(TestConstants.INDEX_DIR));
+        Assert.assertNotNull(metaFileUtil.getMetadata());
 
     }
 
@@ -130,8 +131,8 @@ public class MetaFileUtilTest {
      * Validate the updated metadata.
      */
     @Test
-    public void step6_testVerifyMetadataChange() throws IOException, ClassNotFoundException, JAXBException {
-        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata(TestConstants.INDEX_DIR);
+    public void step6_testVerifyMetadataChange() {
+        ConcurrentHashMap<String, XmlMetadata> fromFile = metaFileUtil.getMetadata();
         Set<String> from = fromFile.keySet();
         Set<String> modified = modifiedMap.keySet();
 

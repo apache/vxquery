@@ -16,9 +16,6 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -34,8 +31,12 @@ import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.context.StaticContext;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.types.ElementType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The rule searches for an unnest operator immediately following a data scan
@@ -69,6 +70,8 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
 
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
+
+
         if (dCtx == null) {
             VXQueryOptimizationContext vxqueryCtx = (VXQueryOptimizationContext) context;
             dCtx = ((VXQueryMetadataProvider) vxqueryCtx.getMetadataProvider()).getStaticContext();
@@ -86,8 +89,16 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
         DataSourceScanOperator datascan = (DataSourceScanOperator) op2;
 
         if (!usedVariables.contains(datascan.getVariables())) {
+            VXQueryCollectionDataSource ds = null;
+            VXQueryIndexingDataSource ids = null;
+
             // Find all child functions.
-            VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) datascan.getDataSource();
+            try {
+                ids = (VXQueryIndexingDataSource) datascan.getDataSource();
+            } catch (ClassCastException e) {
+                ds = (VXQueryCollectionDataSource) datascan.getDataSource();
+            }
+
             if (!updateDataSource(ds, unnest.getExpressionRef())) {
                 return false;
             }

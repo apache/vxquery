@@ -305,7 +305,7 @@ public class VXQuery {
             ncConfig.dataIPAddress = localAddress;
             ncConfig.resultIPAddress = localAddress;
             ncConfig.nodeId = "nc" + (i + 1);
-            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
+            ncConfig.ioDevices = "/tmp/indexFolder";
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
         }
