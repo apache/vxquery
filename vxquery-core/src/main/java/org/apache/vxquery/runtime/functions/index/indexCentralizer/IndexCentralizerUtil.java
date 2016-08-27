@@ -53,6 +53,7 @@ public class IndexCentralizerUtil {
     private final Logger LOGGER = Logger.getLogger("IndexCentralizerUtil");
     private File XML_FILE;
     private String INDEX_LOCATION;
+    private static List<IndexLocator> tmpList = new ArrayList<>();
     private ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
 
     public IndexCentralizerUtil(File index) {
@@ -93,7 +94,7 @@ public class IndexCentralizerUtil {
         IndexLocator il = new IndexLocator();
         il.setCollection(collection);
         il.setIndex(index);
-        this.indexCollectionMap.put(collection, il);
+        tmpList.add(il);
         return index;
     }
 
@@ -150,9 +151,7 @@ public class IndexCentralizerUtil {
      */
     public void writeIndexDirectory() {
         IndexDirectory id = new IndexDirectory();
-        List<IndexLocator> indexLocators = new ArrayList<>(this.indexCollectionMap.values());
-        id.setDirectory(indexLocators);
-
+        id.setDirectory(tmpList);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(this.XML_FILE);
             JAXBContext context = JAXBContext.newInstance(IndexDirectory.class);
