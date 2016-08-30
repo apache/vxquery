@@ -17,15 +17,15 @@
 
 package org.apache.vxquery.xtest;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import org.apache.hyracks.control.cc.ClusterControllerService;
 import org.apache.hyracks.control.common.controllers.CCConfig;
 import org.apache.hyracks.control.common.controllers.NCConfig;
 import org.apache.hyracks.control.nc.NodeControllerService;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class TestClusterUtil {
 
@@ -34,6 +34,7 @@ public class TestClusterUtil {
     private static int profileDumpPeriod = 10000;
     private static String ccHost = "localhost";
     private static String nodeId = "nc1";
+    private static String ioDevices = "target/tmp/indexFolder";
 
     private TestClusterUtil() {
     }
@@ -58,6 +59,7 @@ public class TestClusterUtil {
         ncConfig1.dataIPAddress = publicAddress;
         ncConfig1.resultIPAddress = publicAddress;
         ncConfig1.nodeId = nodeId;
+        ncConfig1.ioDevices = ioDevices;
         return ncConfig1;
     }
 
