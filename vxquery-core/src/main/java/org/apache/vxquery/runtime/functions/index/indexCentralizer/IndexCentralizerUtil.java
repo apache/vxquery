@@ -53,8 +53,7 @@ public class IndexCentralizerUtil {
     private final Logger LOGGER = Logger.getLogger("IndexCentralizerUtil");
     private File XML_FILE;
     private String INDEX_LOCATION;
-    private static List<IndexLocator> tmpList = new ArrayList<>();
-    private ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
 
     public IndexCentralizerUtil(File index) {
         this.INDEX_LOCATION = index.getPath();
@@ -78,7 +77,7 @@ public class IndexCentralizerUtil {
      * @return Index folder.
      */
     public String getIndexForCollection(String collection) {
-        return this.indexCollectionMap.get(collection).getIndex();
+        return indexCollectionMap.get(collection).getIndex();
     }
 
     /**
@@ -94,7 +93,10 @@ public class IndexCentralizerUtil {
         IndexLocator il = new IndexLocator();
         il.setCollection(collection);
         il.setIndex(index);
-        tmpList.add(il);
+        if (indexCollectionMap.get(collection)!=null) {
+            return index;
+        }
+        indexCollectionMap.put(collection, il);
         return index;
     }
 
@@ -104,7 +106,7 @@ public class IndexCentralizerUtil {
      * @param collection : Collection directory
      */
     public void deleteEntryForCollection(String collection) {
-        this.indexCollectionMap.remove(collection);
+        indexCollectionMap.remove(collection);
     }
 
     /**
@@ -134,7 +136,7 @@ public class IndexCentralizerUtil {
                 IndexDirectory indexDirectory = (IndexDirectory) jaxbUnmarshaller.unmarshal(this.XML_FILE);
 
                 for (IndexLocator il : indexDirectory.getDirectory()) {
-                    this.indexCollectionMap.put(il.getCollection(), il);
+                    indexCollectionMap.put(il.getCollection(), il);
                     this.collections.add(il.getCollection());
                 }
             } catch (JAXBException e) {
@@ -151,7 +153,8 @@ public class IndexCentralizerUtil {
      */
     public void writeIndexDirectory() {
         IndexDirectory id = new IndexDirectory();
-        id.setDirectory(tmpList);
+        List<IndexLocator> indexLocators = new ArrayList<>(indexCollectionMap.values());
+        id.setDirectory(indexLocators);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(this.XML_FILE);
             JAXBContext context = JAXBContext.newInstance(IndexDirectory.class);
