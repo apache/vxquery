@@ -19,7 +19,11 @@ package org.apache.vxquery.runtime.functions.index.updateIndex;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import javax.xml.bind.*;
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -40,15 +44,12 @@ public class MetaFileUtil {
 
     private File metaFile;
     private Logger LOGGER = Logger.getLogger("MetadataFileUtil");
-    private Map<String, ConcurrentHashMap<String, XmlMetadata>> indexes = new ConcurrentHashMap<>();
-    private Map<String, String> indexToCollection = new ConcurrentHashMap<>();
+    private String index;
+    private String collection;
+    private ConcurrentHashMap<String, XmlMetadata> indexMap = new ConcurrentHashMap<>();
 
-    private MetaFileUtil(String indexFolder) {
+    public MetaFileUtil(String indexFolder) {
         this.metaFile = new File(indexFolder + "/" + Constants.META_FILE_NAME);
-    }
-
-    public static MetaFileUtil create(String indexFolder) {
-        return new MetaFileUtil(indexFolder);
     }
 
     /**
@@ -66,88 +67,74 @@ public class MetaFileUtil {
      * Otherwise insert new.
      * @param metadataMap : Set of XmlMetaData objects.
      * @param index : The path to index location.
-     * @throws IOException
      */
-    public void updateMetadataMap(ConcurrentHashMap<String, XmlMetadata> metadataMap, String index) throws
-            IOException, JAXBException {
-
-        if (this.indexes.get(index) == null) {
-            this.indexes.put(index, metadataMap);
-        } else {
-            this.indexes.replace(index, metadataMap);
-        }
+    public void updateMetadataMap(ConcurrentHashMap<String, XmlMetadata> metadataMap, String index) {
+        this.indexMap = metadataMap;
+        this.index = index;
 
     }
 
     /**
      * Method to get the set of xml metadata for a given collection
      *
-     * @param index : The collection from which the metadata should be read.
-     * @return : Map containing the set of XmlMetadata objects.
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @return : Map containing the set of XmlMetadata objects.\
      */
-    public ConcurrentHashMap<String, XmlMetadata> getMetadata(String index)
-            throws IOException, ClassNotFoundException, JAXBException {
-
-        return this.indexes.get(index);
+    public ConcurrentHashMap<String, XmlMetadata> getMetadata() {
+        return this.indexMap;
     }
 
     /**
      * Read the metadata file and create an in-memory map containing collection paths and xml files.
-     * @throws JAXBException
      */
-    public void readMetadataFile() throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(VXQueryIndex.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        VXQueryIndex indexes = (VXQueryIndex) jaxbUnmarshaller.unmarshal(metaFile);
+    public void readMetadataFile() {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(VXQueryIndex.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            XmlMetadataCollection indexes = (XmlMetadataCollection) jaxbUnmarshaller.unmarshal(metaFile);
 
-        List<XmlMetadataCollection> list = indexes.getIndex();
+            this.collection = indexes.getCollection();
+            this.index = indexes.getIndexLocation();
 
-
-        for (XmlMetadataCollection collection : list) {
-            String indexPath = collection.getIndexLocation();
-            ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
-            List<XmlMetadata> metadata = collection.getMetadataList();
-
-            this.indexToCollection.put(indexPath, collection.getCollection());
-
-            for (XmlMetadata mData : metadata) {
-                metadataMap.put(mData.getPath(), mData);
+            for (XmlMetadata metadata : indexes.getMetadataList()) {
+                this.indexMap.put(index, metadata);
             }
-            this.indexes.put(indexPath, metadataMap);
+        } catch (JAXBException e) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.log(Level.ERROR, "Could not read the XML file due to " + e);
+            }
         }
     }
 
     /**
      * Write the content of the ConcurrentHashMap to the xml metadata file.
-     * @throws FileNotFoundException
-     * @throws JAXBException
      */
-    public void writeMetadataToFile() throws FileNotFoundException, JAXBException {
-        VXQueryIndex index = new VXQueryIndex();
-        List<XmlMetadataCollection> xmlMetadataCollections = new ArrayList<>();
+    public void writeMetadataToFile() {
+        XmlMetadataCollection collection = new XmlMetadataCollection();
+        List<XmlMetadata> metadataList = new ArrayList<>();
 
-        for (Map.Entry<String, ConcurrentHashMap<String, XmlMetadata>> entry : indexes.entrySet()) {
-            XmlMetadataCollection metadataCollection = new XmlMetadataCollection();
-            List<XmlMetadata> metadataList = new ArrayList<>();
-            metadataCollection.setIndexLocation(entry.getKey());
-            metadataCollection.setCollection(indexToCollection.get(entry.getKey()));
-            metadataList.addAll(entry.getValue().values());
-            metadataCollection.setMetadataList(metadataList);
-            xmlMetadataCollections.add(metadataCollection);
+        for (Map.Entry<String, XmlMetadata> entry : this.indexMap.entrySet()) {
+            metadataList.add(entry.getValue());
         }
-        index.setIndex(xmlMetadataCollections);
 
+        collection.setMetadataList(metadataList);
+        collection.setCollection(this.collection);
+        collection.setIndexLocation(this.index);
+        try{
+            FileOutputStream fileOutputStream = new FileOutputStream(this.metaFile);
+            JAXBContext jaxbContext = JAXBContext.newInstance(VXQueryIndex.class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.marshal(collection, fileOutputStream);
 
-        FileOutputStream fileOutputStream = new FileOutputStream(this.metaFile);
-        JAXBContext jaxbContext = JAXBContext.newInstance(VXQueryIndex.class);
-        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        jaxbMarshaller.marshal(index, fileOutputStream);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
+            }
+        } catch (JAXBException | FileNotFoundException e) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.log(Level.ERROR, "Could not read the XML file due to " + e);
+            }
+        }
 
-        if (LOGGER.isDebugEnabled())
-            LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
 
     }
 
@@ -157,14 +144,20 @@ public class MetaFileUtil {
      *
      * @param file : File which the checksum should be generated.
      * @return : Checksum String
-     * @throws NoSuchAlgorithmException
      * @throws IOException
      */
-    public String generateMD5(File file) throws NoSuchAlgorithmException, IOException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(Files.readAllBytes(file.toPath()));
-        byte[] md5 = md.digest();
-        return DatatypeConverter.printHexBinary(md5);
+    public String generateMD5(File file) throws  IOException {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(Files.readAllBytes(file.toPath()));
+            byte[] md5 = md.digest();
+            return DatatypeConverter.printHexBinary(md5);
+        } catch (NoSuchAlgorithmException e) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.log(Level.ERROR, "No Such Algorithm Error " + e.getMessage());
+            }
+            return null;
+        }
     }
 
     /**
@@ -189,21 +182,17 @@ public class MetaFileUtil {
 
     /**
      * Get the collection for a given index location.
-     * @param index : path to index
-     * @return
+     * @return collection folder for a given index.
      */
-    public String getCollection(String index) {
-        return this.indexToCollection.get(index);
+    public String getCollection() {
+        return this.collection;
     }
 
     /**
      * Set the entry for given index and collection.
-     * @param index : path to index
      * @param collection : path to corresponding collection
      */
-    public void setCollectionForIndex(String index, String collection) {
-        if (this.indexToCollection.get(index)==null) {
-            this.indexToCollection.put(index, collection);
-        }
+    public void setCollection(String collection) {
+        this.collection = collection;
     }
 }

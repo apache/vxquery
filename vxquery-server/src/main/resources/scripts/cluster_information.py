@@ -28,6 +28,9 @@ class ClusterInformation:
     def get_java_opts(self):
         return get_tag_text(self.config, "java_opts")
 
+    def get_index_directory(self):
+        return get_tag_text(self.config, "index_directory");
+
     def get_master_node_machine(self):
         master_node = self.config.getElementsByTagName("master_node")[0]
         id = NodeXmlReader.get_cluster_id(master_node)

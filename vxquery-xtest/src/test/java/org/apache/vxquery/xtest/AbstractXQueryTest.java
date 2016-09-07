@@ -80,6 +80,7 @@ public abstract class AbstractXQueryTest {
             case EXPECTED_RESULT_GOT_SAME_RESULT:
                 break;
             case NO_RESULT_FILE:
+                fail(result.state + " (" + result.time + " ms): " + result.testCase.getXQueryDisplayName());
                 break;
         }
     }
