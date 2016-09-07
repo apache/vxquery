@@ -88,22 +88,44 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             List<LogicalVariable> minFilterVars, List<LogicalVariable> maxFilterVars, IOperatorSchema opSchema,
             IVariableTypeEnvironment typeEnv, JobGenContext context, JobSpecification jobSpec, Object implConfig)
                     throws AlgebricksException {
-        VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) dataSource;
+        VXQueryCollectionDataSource ds = null;
+        VXQueryIndexingDataSource ids = null;
+
+        try {
+            ids = (VXQueryIndexingDataSource) dataSource;
+        } catch (ClassCastException e) {
+            ds = (VXQueryCollectionDataSource) dataSource;
+        }
         if (sourceFileMap != null) {
-            final int len = ds.getPartitions().length;
+            final int len = ds != null ? ds.getPartitions().length : ids.getCollectionPartitions().length;
             String[] collectionPartitions = new String[len];
             for (int i = 0; i < len; ++i) {
-                String partition = ds.getPartitions()[i];
+                String partition = ds != null ? ds.getPartitions()[i] : ids.getCollectionPartitions()[i];
                 File mapped = sourceFileMap.get(partition);
                 collectionPartitions[i] = mapped != null ? mapped.toString() : partition;
             }
-            ds.setPartitions(collectionPartitions);
+            if (ds != null) {
+                ds.setPartitions(collectionPartitions);
+            } else {
+                ids.setCollectionPartitions(collectionPartitions);
+            }
         }
-        RecordDescriptor rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
-        IOperatorDescriptor scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf,
-                this.nodeControllerInfos);
+        RecordDescriptor rDesc;
+        IOperatorDescriptor scanner;
+        AlgebricksPartitionConstraint constraint;
 
-        AlgebricksPartitionConstraint constraint = getClusterLocations(nodeList, ds.getPartitionCount());
+        if (ds != null) {
+            rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
+            scanner = new VXQueryCollectionOperatorDescriptor(jobSpec, ds, rDesc, this.hdfsConf,
+                    this.nodeControllerInfos);
+            constraint = getClusterLocations(nodeList, ds.getPartitionCount());
+        } else {
+            rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
+            scanner = new VXQueryIndexingOperatorDescriptor(jobSpec, ids, rDesc, this.hdfsConf,
+                    this.nodeControllerInfos);
+            constraint = getClusterLocations(nodeList, ids.getPartitionCount());
+        }
+
         return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
     }
 

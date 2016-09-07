@@ -1,0 +1,2 @@
+src/test/resources/TestSources/ghcnd/half_1
+src/test/resources/TestSources/ghcnd/half_2

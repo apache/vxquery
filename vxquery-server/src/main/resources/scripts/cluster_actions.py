@@ -120,7 +120,7 @@ class ClusterActions:
     def start_nc(self, machine, cc):
         print "Start Node Controller."
         print "  " + machine.get_id() + " " + machine.get_ip()
-        command = "./vxquery-server/target/appassembler/bin/startnc.sh " + machine.get_id() + " " + machine.get_ip() + " " + cc.get_client_ip() + " \"" + cc.get_client_port() + "\" \"" + machine.get_java_opts() + "\""
+        command = "./vxquery-server/target/appassembler/bin/startnc.sh " + machine.get_id() + " " + machine.get_ip() + " " + cc.get_client_ip() + " \"" + cc.get_client_port() + "\" \"" + machine.get_java_opts() + "\" \"" + self.ci.get_index_directory() + "\""
         self.run_remote_command(machine.get_username(), machine.get_id(), command)
 
     def stop_cc_and_all_ncs(self, machine):

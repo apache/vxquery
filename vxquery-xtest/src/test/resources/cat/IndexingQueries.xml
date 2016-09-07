@@ -20,54 +20,164 @@
       <title>Indexing</title>
       <description/>
    </GroupInfo>
-   <test-case name="create-index" FilePath="Indexing/" Creator="Steven Jacobs">
+   <test-case name="create-index" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Create Lucene Index from Collection.</description>
       <query name="createIndex" date="2016-05-26"/>
       <output-file compare="Text">createIndex.txt</output-file>
    </test-case>
-   <test-case name="use-index-1" FilePath="Indexing/" Creator="Steven Jacobs">
+   <test-case name="show-index-1" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
+      <description>Show indexes after creating index.</description>
+      <query name="showIndex" date="2016-08-18"/>
+      <output-file compare="Text">showIndex1.txt</output-file>
+   </test-case>
+   <test-case name="use-index-1" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex1" date="2016-05-26"/>
       <output-file compare="Text">useIndex1.txt</output-file>
    </test-case>
-   <test-case name="use-index-2" FilePath="Indexing/" Creator="Steven Jacobs">
+   <test-case name="use-index-2" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex2" date="2016-05-26"/>
       <output-file compare="Text">useIndex2.txt</output-file>
    </test-case>
-   <test-case name="use-index-3" FilePath="Indexing/" Creator="Steven Jacobs">
+   <test-case name="use-index-3" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex3" date="2016-05-26"/>
       <output-file compare="Text">useIndex3.txt</output-file>
    </test-case>
-   <test-case name="use-index-4" FilePath="Indexing/" Creator="Steven Jacobs">
+   <test-case name="use-index-4" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex4" date="2016-05-26"/>
       <output-file compare="Text">useIndex4.txt</output-file>
    </test-case>
-   <test-case name="use-index-5" FilePath="Indexing/" Creator="Steven Jacobs">
+   <test-case name="use-index-5" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex5" date="2016-05-26"/>
       <output-file compare="Text">useIndex5.txt</output-file>
    </test-case>
-   <!--<test-case name="use-index-6" FilePath="Indexing/" Creator="Steven Jacobs">
+   <test-case name="use-index-6" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex6" date="2016-05-26"/>
       <output-file compare="Text">useIndex6.txt</output-file>
-   </test-case>-->
-   <test-case name="use-index-7" FilePath="Indexing/" Creator="Steven Jacobs">
+   </test-case>
+   <test-case name="use-index-7" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex7" date="2016-05-26"/>
       <output-file compare="Text">useIndex7.txt</output-file>
    </test-case>
-   <test-case name="update-index" FilePath="Indexing/" Creator="Menaka Jayawardena">
+   <test-case name="update-index" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
       <description>Update the existing index</description>
       <query name="updateIndex" date="2016-06-24"/>
       <output-file compare="Text">updateIndex.txt</output-file>
    </test-case>
-   <test-case name="delete-index" FilePath="Indexing/" Creator="Menaka Jayawardena">
+   <test-case name="delete-index" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
       <description>Delete the existing index</description>
       <query name="deleteIndex" date="2016-06-24"/>
       <output-file compare="Text">deleteIndex.txt</output-file>
+   </test-case>
+   <test-case name="show-index-2" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
+      <description>Show indexes after deletion.</description>
+      <query name="showIndex" date="2016-08-18"/>
+      <output-file compare="Text">showIndex2.txt</output-file>
+   </test-case>
+   <test-case name="create-index" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Create Lucene Index from Collection.</description>
+      <query name="createIndex" date="2016-05-26"/>
+      <output-file compare="Text">createIndex.txt</output-file>
+   </test-case>
+   <test-case name="show-index-1" FilePath="Indexing/Partition-2/" Creator="Menaka Jayawardena">
+      <description>Show indexes after creating index.</description>
+      <query name="showIndex" date="2016-08-18"/>
+      <output-file compare="Text">showIndex1.txt</output-file>
+   </test-case>
+   <test-case name="use-index-1" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex1" date="2016-05-26"/>
+      <output-file compare="Text">useIndex1.txt</output-file>
+   </test-case>
+   <test-case name="use-index-2" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex2" date="2016-05-26"/>
+      <output-file compare="Text">useIndex2.txt</output-file>
+   </test-case>
+   <test-case name="use-index-3" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex3" date="2016-05-26"/>
+      <output-file compare="Text">useIndex3.txt</output-file>
+   </test-case>
+   <test-case name="use-index-4" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex4" date="2016-05-26"/>
+      <output-file compare="Text">useIndex4.txt</output-file>
+   </test-case>
+   <test-case name="use-index-5" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex5" date="2016-05-26"/>
+      <output-file compare="Text">useIndex5.txt</output-file>
+   </test-case>
+   <test-case name="use-index-6" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex6" date="2016-05-26"/>
+      <output-file compare="Text">useIndex6.txt</output-file>
+   </test-case>
+   <test-case name="use-index-7" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex7" date="2016-05-26"/>
+      <output-file compare="Text">useIndex7.txt</output-file>
+   </test-case>
+   <test-case name="update-index" FilePath="Indexing/Partition-2/" Creator="Menaka Jayawardena">
+      <description>Update the existing index</description>
+      <query name="updateIndex" date="2016-06-24"/>
+      <output-file compare="Text">updateIndex.txt</output-file>
+   </test-case>
+   <test-case name="create-index" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Create Lucene Index from Collection.</description>
+      <query name="createIndex" date="2016-05-26"/>
+      <output-file compare="Text">createIndex.txt</output-file>
+   </test-case>
+   <test-case name="show-index-1" FilePath="Indexing/Partition-4/" Creator="Menaka Jayawardena">
+      <description>Show indexes after creating index.</description>
+      <query name="showIndex" date="2016-08-18"/>
+      <output-file compare="Text">showIndex1.txt</output-file>
+   </test-case>
+   <test-case name="use-index-1" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex1" date="2016-05-26"/>
+      <output-file compare="Text">useIndex1.txt</output-file>
+   </test-case>
+   <test-case name="use-index-2" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex2" date="2016-05-26"/>
+      <output-file compare="Text">useIndex2.txt</output-file>
+   </test-case>
+   <test-case name="use-index-3" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex3" date="2016-05-26"/>
+      <output-file compare="Text">useIndex3.txt</output-file>
+   </test-case>
+   <test-case name="use-index-4" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex4" date="2016-05-26"/>
+      <output-file compare="Text">useIndex4.txt</output-file>
+   </test-case>
+   <test-case name="use-index-5" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex5" date="2016-05-26"/>
+      <output-file compare="Text">useIndex5.txt</output-file>
+   </test-case>
+   <test-case name="use-index-6" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex6" date="2016-05-26"/>
+      <output-file compare="Text">useIndex6.txt</output-file>
+   </test-case>
+   <test-case name="use-index-7" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex7" date="2016-05-26"/>
+      <output-file compare="Text">useIndex7.txt</output-file>
+   </test-case>
+   <test-case name="update-index" FilePath="Indexing/Partition-4/" Creator="Menaka Jayawardena">
+      <description>Update the existing index</description>
+      <query name="updateIndex" date="2016-06-24"/>
+      <output-file compare="Text">updateIndex.txt</output-file>
    </test-case>
 </test-group>

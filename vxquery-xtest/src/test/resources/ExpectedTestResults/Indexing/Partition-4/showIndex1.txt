@@ -1,0 +1,6 @@
+src/test/resources/TestSources/ghcnd/half_2/quarter_3
+src/test/resources/TestSources/ghcnd/half_1
+src/test/resources/TestSources/ghcnd/half_2/quarter_4
+src/test/resources/TestSources/ghcnd/half_2
+src/test/resources/TestSources/ghcnd/half_1/quarter_2
+src/test/resources/TestSources/ghcnd/half_1/quarter_1

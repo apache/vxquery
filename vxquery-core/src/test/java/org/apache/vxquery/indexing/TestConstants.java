@@ -16,7 +16,13 @@ package org.apache.vxquery.indexing;
 
 import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;

@@ -305,6 +305,7 @@ public class VXQuery {
             ncConfig.dataIPAddress = localAddress;
             ncConfig.resultIPAddress = localAddress;
             ncConfig.nodeId = "nc" + (i + 1);
+            //TODO: enable index folder as a cli option for on-the-fly indexing queries
             ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
