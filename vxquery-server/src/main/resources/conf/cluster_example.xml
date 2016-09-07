@@ -17,6 +17,7 @@
 <cluster xmlns="cluster">
     <name>local</name>
     <username>joe</username>
+    <index_directory>/tmp/indexFolder</index_directory>
     <master_node>
         <id>master</id>
         <client_ip>128.195.52.177</client_ip>

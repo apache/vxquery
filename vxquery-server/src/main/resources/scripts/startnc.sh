@@ -24,6 +24,7 @@ IPADDR=$2
 CCHOST=$3
 CCPORT=$4
 J_OPTS=$5
+IO_DEVICES=$6
 
 #Import cluster properties
 MYDIR="$(dirname -- $0)"
@@ -61,6 +62,9 @@ NC_OPTIONS=" -cc-host ${CCHOST} -cluster-net-ip-address ${IPADDR}  -data-ip-addr
 [ "${NCOPTS}" ] &&
 
     NC_OPTIONS=" ${NC_OPTIONS} ${NCOPTS} "
+
+[ "${IO_DEVICES}" ] &&
+    NC_OPTIONS=" ${NC_OPTIONS} -iodevices ${IO_DEVICES} "
 
 
 echo "${JAVA_OPTS}" &> ${NCLOGS_DIR}/nc.log
