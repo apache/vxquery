@@ -25,16 +25,16 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class VXQueryCheckXQTSTest extends AbstractXQueryTest {
+public class VXQueryIT extends AbstractXQueryTest {
 
     private static String XQTS_CATALOG = StringUtils.join(new String[] { "test-suites", "xqts", "XQTSCatalog.xml" },
             File.separator);
 
-    public VXQueryCheckXQTSTest(TestCase tc) throws Exception {
+    public VXQueryIT(TestCase tc) throws Exception {
         super(tc);
     }
 
-    @Parameters(name = "VXQueryCheckXQTSTest {index}: {0}")
+    @Parameters(name = "VXQueryIT {index}: {0}")
     public static Collection<Object[]> tests() throws Exception {
         JUnitTestCaseFactory jtcf_vxquery = new JUnitTestCaseFactory(getOptions());
         Collection<Object[]> tests = jtcf_vxquery.getList();

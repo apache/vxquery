@@ -92,7 +92,7 @@ public abstract class AbstractXQueryTest {
 
     @BeforeClass
     public static void setup() throws IOException {
-        cc = TestClusterUtil.startCC();
+        cc = TestClusterUtil.startCC(getDefaultTestOptions());
         nc = TestClusterUtil.startNC();
         setupFS();
     }

@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hyracks.api.client.HyracksConnection;
 import org.apache.hyracks.api.client.IHyracksClientConnection;
 import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
@@ -38,7 +37,6 @@ import org.apache.hyracks.api.job.JobFlag;
 import org.apache.hyracks.api.job.JobId;
 import org.apache.hyracks.api.job.JobSpecification;
 import org.apache.hyracks.client.dataset.HyracksDataset;
-import org.apache.hyracks.control.common.controllers.CCConfig;
 import org.apache.hyracks.control.nc.resources.memory.FrameManager;
 import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 import org.apache.vxquery.compiler.CompilerControlBlock;
@@ -66,8 +64,8 @@ public class TestRunner {
     }
 
     public void open() throws Exception {
-        CCConfig ccConfig = TestClusterUtil.createCCConfig();
-        hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
+        hcc = TestClusterUtil.getConnection();
+        hds = TestClusterUtil.getDataset();
     }
 
     public TestCaseResult run(final TestCase testCase) {
@@ -111,9 +109,6 @@ public class TestRunner {
                 spec.setMaxReattempts(0);
                 JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
 
-                if (hds == null) {
-                    hds = new HyracksDataset(hcc, spec.getFrameSize(), opts.threads);
-                }
                 FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
                 IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
                 IHyracksDatasetReader reader = hds.createReader(jobId, ccb.getResultSetId());

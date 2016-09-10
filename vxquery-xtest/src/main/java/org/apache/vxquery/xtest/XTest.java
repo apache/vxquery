@@ -81,7 +81,7 @@ public class XTest {
                 }
             }
         });
-        cc = TestClusterUtil.startCC();
+        cc = TestClusterUtil.startCC(opts);
         nc = TestClusterUtil.startNC();
         trf = new TestRunnerFactory(opts);
         trf.registerReporters(reporters);
