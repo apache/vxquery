@@ -141,10 +141,17 @@ public class RewriteRuleset {
         // TODO Replace consolidate with a new child function that takes multiple paths.
         //        normalization.add(new ConsolidateUnnestsRule());
         normalization.add(new RemoveUnusedUnnestIterateRule());
+       // normalization.add(new RemoveRedundantVariablesRule());
+        
+        normalization.add(new PushValueIntoDatascanRule());
         normalization.add(new PushChildIntoDataScanRule());
 
         // json
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
         //normalization.add(new PushValueIntoDatascanRule());
+=======
+       // normalization.add(new PushValueIntoDatascanRule());
+>>>>>>> Implementation of PushValueIntoDatascanRule
         normalization.add(new InlineNestedVariablesRule());
         
 

@@ -16,6 +16,12 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
+=======
+import java.util.ArrayList;
+import java.util.List;
+
+>>>>>>> Implementation of PushValueIntoDatascanRule
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -29,9 +35,17 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperat
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.context.StaticContext;
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
 import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+=======
+import org.apache.vxquery.functions.BuiltinOperators;
+import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
+import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+import org.apache.vxquery.types.ElementType;
+>>>>>>> Implementation of PushValueIntoDatascanRule
 
 /**
  * The rule searches for two assign operators immediately following a data scan
@@ -75,6 +89,7 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
             return false;
         }
         AssignOperator assign = (AssignOperator) op1;
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
         //UnnestOperator unnest = (UnnestOperator) op1;
 
         AbstractLogicalOperator op2 = (AbstractLogicalOperator) opRef.getValue();
@@ -88,6 +103,26 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
             return false;
         }
         DataSourceScanOperator datascan = (DataSourceScanOperator) op3;
+=======
+
+        //        AbstractLogicalOperator op2 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
+        //        if (op2.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+        //            return false;
+        //        }
+        //        AssignOperator assign2 = (AssignOperator) op2;
+        //
+        //        AbstractLogicalOperator op3 = (AbstractLogicalOperator) assign2.getInputs().get(0).getValue();
+        //        if (op3.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+        //            return false;
+        //        }
+        //        AssignOperator assign3 = (AssignOperator) op3;
+
+        AbstractLogicalOperator op4 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
+        if (op4.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
+            return false;
+        }
+        DataSourceScanOperator datascan = (DataSourceScanOperator) op4;
+>>>>>>> Implementation of PushValueIntoDatascanRule
 
         if (!usedVariables.contains(datascan.getVariables())) {
             VXQueryCollectionDataSource ds = null;
@@ -100,6 +135,12 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
                 ds = (VXQueryCollectionDataSource) datascan.getDataSource();
             }
 
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
+=======
+            if (!updateDataSource(ds, assign.getExpressions().get(0))) {
+                return false;
+            }
+>>>>>>> Implementation of PushValueIntoDatascanRule
             // Replace assign with noop assign. Keeps variable chain.
             Mutable<ILogicalExpression> varExp = ExpressionToolbox
                     .findVariableExpression(assign.getExpressions().get(0), datascan.getVariables().get(0));
@@ -111,4 +152,21 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
         return false;
     }
 
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
+=======
+    private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
+        boolean added = false;
+        List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+        ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.VALUE.getFunctionIdentifier(), finds);
+        for (int i = finds.size(); i > 0; --i) {
+            Byte[] value = ExpressionToolbox.getConstantArgument(finds.get(i - 1), 1);
+            if (value != null) {
+                ds.addValueSeq(value);
+                added = true;
+            }
+        }
+        return added;
+    }
+
+>>>>>>> Implementation of PushValueIntoDatascanRule
 }

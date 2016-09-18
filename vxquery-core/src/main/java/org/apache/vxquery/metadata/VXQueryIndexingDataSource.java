@@ -133,9 +133,22 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
         return childSeq;
     }
     
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
     public List<Integer> getValueSeq() {
         return valueSeq;
     }
+=======
+    
+    public void addValueSeq(Byte[] value) {
+        valueSeq.add(value);
+    }
+
+    public List<Byte[]> getValueSeq() {
+        return valueSeq;
+    }
+
+ 
+>>>>>>> Implementation of PushValueIntoDatascanRule
 
 }
 

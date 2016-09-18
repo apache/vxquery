@@ -18,6 +18,7 @@ package org.apache.vxquery.compiler.rewriter.rules.util;
 
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.context.StaticContext;
@@ -209,6 +210,18 @@ public class ExpressionToolbox {
         IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
         tvp.getValue(pTypeCode);
         return pTypeCode.getInteger();
+    }
+    
+    public static Byte[] getConstantArgument(Mutable<ILogicalExpression> searchM, int arg) {
+        AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+        ILogicalExpression argType = searchFunction.getArguments().get(arg).getValue();
+        if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+            return null;
+        }
+        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
+
+        return ArrayUtils.toObject(tvp.getByteArray());
     }
 
     public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM, StaticContext dCtx) {

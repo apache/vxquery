@@ -27,7 +27,11 @@ public abstract class AbstractVXQueryDataSource {
     protected String[] collectionPartitions;
     protected String elementPath;
     protected List<Integer> childSeq;
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
     protected List<Integer> valueSeq;
+=======
+    protected List<Byte[]> valueSeq;
+>>>>>>> Implementation of PushValueIntoDatascanRule
     protected int totalDataSources;
     protected String tag;
     protected String function;

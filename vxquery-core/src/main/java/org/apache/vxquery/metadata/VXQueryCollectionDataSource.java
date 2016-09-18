@@ -29,9 +29,10 @@ import org.apache.hyracks.algebricks.core.algebra.properties.ILocalStructuralPro
 import org.apache.hyracks.algebricks.core.algebra.properties.IPhysicalPropertiesVector;
 import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
-
+//ArrayBackedValueStoragedValueStorage abvs=new ArrayBackedValueStorage();
     private VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
         this.collectionName = file;
@@ -114,17 +115,25 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
         return childSeq;
     }
     
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
     public void addValueSeq(int integer) {
         valueSeq.add(integer);
     }
 
     public List<Integer> getValueSeq() {
+=======
+    public void addValueSeq(Byte[] value) {
+        valueSeq.add(value);
+    }
+
+    public List<Byte[]> getValueSeq() {
+>>>>>>> Implementation of PushValueIntoDatascanRule
         return valueSeq;
     }
 
     @Override
     public String toString() {
-        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + "]";
+        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + ", valueSeq=" + valueSeq +"]";
     }
 
     @Override

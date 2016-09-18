@@ -30,6 +30,7 @@ import org.apache.vxquery.runtime.functions.step.ChildPathStepUnnesting;
 import java.io.IOException;
 
 public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
 	protected final IHyracksTaskContext ctx;
 	private ArrayBackedValueStorage abvs;
 	private final SequenceBuilder sb;
@@ -63,4 +64,36 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
 			abvsPool.giveBack(abvs);
 		}
 	}
+=======
+    protected final IHyracksTaskContext ctx;
+    private final ArrayBackedValueStorage abvs;
+    private final SequenceBuilder sb;
+    private final TaggedValuePointable tempTvp;
+    private final KeysOrMembersUnnesting keysOrMembers;
+
+    public KeysOrMembersScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
+        super(args);
+        this.ctx = ctx;
+        abvs = new ArrayBackedValueStorage();
+        sb = new SequenceBuilder();
+        tempTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        keysOrMembers = new KeysOrMembersUnnesting(ctx, ppool);
+    }
+
+    @Override
+    protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+        keysOrMembers.init(args);
+        try {
+            abvs.reset();
+            sb.reset(abvs);
+            while (keysOrMembers.step(tempTvp)) {
+                sb.addItem(tempTvp);
+            }
+            sb.finish();
+            result.set(abvs);
+        } catch (IOException e) {
+            throw new SystemException(ErrorCode.SYSE0001, e);
+        }
+    }
+>>>>>>> Implementation of PushValueIntoDatascanRule
 }
