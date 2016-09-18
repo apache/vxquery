@@ -47,6 +47,7 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
             }
         };
         this.childSeq = new ArrayList<>();
+        this.valueSeq = new ArrayList<>();
         this.tag = null;
     }
 
@@ -111,6 +112,14 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
 
     public List<Integer> getChildSeq() {
         return childSeq;
+    }
+    
+    public void addValueSeq(int integer) {
+        valueSeq.add(integer);
+    }
+
+    public List<Integer> getValueSeq() {
+        return valueSeq;
     }
 
     @Override

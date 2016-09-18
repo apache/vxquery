@@ -32,6 +32,7 @@ import org.apache.vxquery.compiler.rewriter.rules.IntroduceIndexingRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
+import org.apache.vxquery.compiler.rewriter.rules.PushValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
@@ -141,6 +142,11 @@ public class RewriteRuleset {
         //        normalization.add(new ConsolidateUnnestsRule());
         normalization.add(new RemoveUnusedUnnestIterateRule());
         normalization.add(new PushChildIntoDataScanRule());
+
+        // json
+        //normalization.add(new PushValueIntoDatascanRule());
+        normalization.add(new InlineNestedVariablesRule());
+        
 
         // Improvement for scalar child expressions
         normalization.add(new EliminateSubplanForSingleItemsRule());
