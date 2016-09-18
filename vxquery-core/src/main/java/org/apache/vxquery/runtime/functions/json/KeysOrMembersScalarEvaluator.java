@@ -28,6 +28,7 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
+import org.apache.vxquery.runtime.functions.step.ChildPathStepUnnesting;
 
 import java.io.IOException;
 
@@ -37,6 +38,7 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
     private final ArrayPointable ap;
     private final SequenceBuilder sb;
     private final TaggedValuePointable tempTvp;
+    private final KeysOrMembersUnnesting keysOrMembers;
 
     public KeysOrMembersScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -45,6 +47,7 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
         ap = (ArrayPointable) ArrayPointable.FACTORY.createPointable();
         sb = new SequenceBuilder();
         tempTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        keysOrMembers = new KeysOrMembersUnnesting(ctx, ppool);
     }
 
     @Override
@@ -61,8 +64,11 @@ public class KeysOrMembersScalarEvaluator extends AbstractTaggedValueArgumentSca
                 case ValueTag.ARRAY_TAG:
                     abvs.reset();
                     sb.reset(abvs);
-                    tvp.getValue(ap);
-                    ap.appendItems(sb);
+                    while (keysOrMembers.step(tempTvp)) {
+                        sb.addItem(tempTvp);
+                    }
+                    //                    tvp.getValue(ap);
+                    //                    ap.appendItems(sb);
                     sb.finish();
                     result.set(abvs);
                     break;
