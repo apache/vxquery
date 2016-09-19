@@ -36,18 +36,16 @@ import org.apache.hyracks.data.std.primitive.ShortPointable;
  * The datetime is split up into eight sections. Due to leap year, we have decided to keep the
  * storage simple by saving each datetime section separately. For calculations you can access
  * YearMonth (months) and DayTime (milliseconds) values.
- * 
- * @author prestoncarman
  */
 public class XSDateTimePointable extends AbstractPointable implements IDate, ITime, ITimezone {
-    public final static int YEAR_OFFSET = 0;
-    public final static int MONTH_OFFSET = 2;
-    public final static int DAY_OFFSET = 3;
-    public final static int HOUR_OFFSET = 4;
-    public final static int MINUTE_OFFSET = 5;
-    public final static int MILLISECOND_OFFSET = 6;
-    public final static int TIMEZONE_HOUR_OFFSET = 10;
-    public final static int TIMEZONE_MINUTE_OFFSET = 11;
+    public static final int YEAR_OFFSET = 0;
+    public static final int MONTH_OFFSET = 2;
+    public static final int DAY_OFFSET = 3;
+    public static final int HOUR_OFFSET = 4;
+    public static final int MINUTE_OFFSET = 5;
+    public static final int MILLISECOND_OFFSET = 6;
+    public static final int TIMEZONE_HOUR_OFFSET = 10;
+    public static final int TIMEZONE_MINUTE_OFFSET = 11;
 
     public static final ITypeTraits TYPE_TRAITS = new ITypeTraits() {
         private static final long serialVersionUID = 1L;
@@ -84,25 +82,12 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
         int ms = cal.get(Calendar.MILLISECOND);
-        int tzOffsetInMs = tz.getOffset(
-                cal.get(Calendar.ERA),
-                year,
-                month, 
-                day, 
-                cal.get(Calendar.DAY_OF_WEEK), 
-                ms);
+        int tzOffsetInMs = tz.getOffset(cal.get(Calendar.ERA), year, month, day, cal.get(Calendar.DAY_OF_WEEK), ms);
         int tzOffsetInMin = tzOffsetInMs / 1000 / 60;
-        setDateTime(
-                year,
-                month + 1,
-                day,
-                cal.get(Calendar.HOUR_OF_DAY),
-                cal.get(Calendar.MINUTE),
-                cal.get(Calendar.SECOND) * 1000 + ms,
-                tzOffsetInMin / 60,
-                tzOffsetInMin % 60);
+        setDateTime(year, month + 1L, day, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
+                cal.get(Calendar.SECOND) * 1000L + ms, tzOffsetInMin / 60L, tzOffsetInMin % 60);
     }
-    
+
     public void setDateTime(long year, long month, long day, long hour, long minute, long milliSecond,
             long timezoneHour, long timezoneMinute) {
         setDateTime(bytes, start, year, month, day, hour, minute, milliSecond, timezoneHour, timezoneMinute);
@@ -198,7 +183,7 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
     }
 
     public static long getTimezone(byte[] bytes, int start) {
-        return (getTimezoneHour(bytes, start) * 60 + getTimezoneMinute(bytes, start));
+        return getTimezoneHour(bytes, start) * 60 + getTimezoneMinute(bytes, start);
     }
 
     @Override
@@ -207,7 +192,7 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
     }
 
     public static long getYearMonth(byte[] bytes, int start) {
-        return (getYear(bytes, start) * 12 + getMonth(bytes, start));
+        return getYear(bytes, start) * 12 + getMonth(bytes, start);
     }
 
     @Override
@@ -216,33 +201,26 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
     }
 
     public static long getDayTime(byte[] bytes, int start) {
-        return (getDay(bytes, start) * DateTime.CHRONON_OF_DAY + getHour(bytes, start) * DateTime.CHRONON_OF_HOUR
-                + getMinute(bytes, start) * DateTime.CHRONON_OF_MINUTE + getMilliSecond(bytes, start));
+        return getDay(bytes, start) * DateTime.CHRONON_OF_DAY + getHour(bytes, start) * DateTime.CHRONON_OF_HOUR
+                + getMinute(bytes, start) * DateTime.CHRONON_OF_MINUTE + getMilliSecond(bytes, start);
     }
 
+    @Override
     public String toString() {
         return toString(bytes, start);
     }
 
     public static String toString(byte[] bytes, int start) {
         final long millis = getMilliSecond(bytes, start);
-        return getYear(bytes, start)
-                + "-"
-                + getMonth(bytes, start)
-                + "-"
-                + getDay(bytes, start)
-                + "T"
-                + getHour(bytes, start)
-                + ":"
-                + getMinute(bytes, start)
-                + ":"
-                + millis / 1000
-                + "."
-                + millis % 1000
-                + (getTimezoneHour(bytes, start) != DateTime.TIMEZONE_HOUR_NULL
-                        && getTimezoneMinute(bytes, start) != DateTime.TIMEZONE_MINUTE_NULL ? (getTimezoneHour(bytes,
-                        start) < 0 || getTimezoneMinute(bytes, start) < 0 ? "" : "+")
-                        + getTimezoneHour(bytes, start) + ":" + getTimezoneMinute(bytes, start) : "");
+        String timezone = "";
+        if (getTimezoneHour(bytes, start) != DateTime.TIMEZONE_HOUR_NULL
+                && getTimezoneMinute(bytes, start) != DateTime.TIMEZONE_MINUTE_NULL) {
+            timezone = (getTimezoneHour(bytes, start) < 0 || getTimezoneMinute(bytes, start) < 0 ? "" : "+")
+                    + getTimezoneHour(bytes, start) + ":" + getTimezoneMinute(bytes, start);
+        }
+        return getYear(bytes, start) + "-" + getMonth(bytes, start) + "-" + getDay(bytes, start) + "T"
+                + getHour(bytes, start) + ":" + getMinute(bytes, start) + ":" + millis / 1000 + "." + millis % 1000
+                + timezone;
     }
 
 }

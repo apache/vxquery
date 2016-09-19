@@ -60,6 +60,8 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
      *
      * @param opRef
      *            Logical operator
+     * @param functions
+     *            Functions identifiers
      * @return collection name
      */
     protected String[] getFunctionalArguments(Mutable<ILogicalOperator> opRef, Set<FunctionIdentifier> functions) {

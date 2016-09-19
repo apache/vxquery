@@ -140,9 +140,6 @@ public class IndexConstructorUtil {
         return (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".xml.gz"));
     }
 
-    /**
-     * Separated from create index method so that it could be used as a helper function in IndexUpdater
-     */
     public IndexDocumentBuilder getIndexBuilder(File file, IndexWriter writer, TaggedValuePointable nodep,
             ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider, ByteBufferInputStream bbis,
             DataInputStream di, String nodeId) throws IOException {

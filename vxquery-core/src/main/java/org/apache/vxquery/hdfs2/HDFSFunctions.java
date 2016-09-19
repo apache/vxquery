@@ -58,15 +58,15 @@ public class HDFSFunctions {
 
     private Configuration conf;
     private FileSystem fs;
-    private String conf_path;
+    private String confPath;
     private Job job;
     private InputFormat inputFormat;
     private List<InputSplit> splits;
     private ArrayList<ArrayList<String>> nodes;
     private HashMap<Integer, String> schedule;
-    private final String TEMP = "java.io.tmpdir";
-    private final String dfs_path = "vxquery_splits_schedule.txt";
-    private final String filepath = System.getProperty(TEMP) + "splits_schedule.txt";
+    private static final String TEMP = "java.io.tmpdir";
+    private static final String DFS_PATH = "vxquery_splits_schedule.txt";
+    private static final String FILEPATH = System.getProperty(TEMP) + "splits_schedule.txt";
     protected static final Logger LOGGER = Logger.getLogger(HDFSFunctions.class.getName());
     private final Map<String, NodeControllerInfo> nodeControllerInfos;
 
@@ -75,12 +75,14 @@ public class HDFSFunctions {
      * Initialize an instance of HDFS FileSystem for this configuration.
      *
      * @param nodeControllerInfos
+     *            Map of the node to its attributes
      * @param hdfsConf
+     *            Hdfs path to config
      */
     public HDFSFunctions(Map<String, NodeControllerInfo> nodeControllerInfos, String hdfsConf) {
         this.conf = new Configuration();
         this.nodeControllerInfos = nodeControllerInfos;
-        this.conf_path = hdfsConf;
+        this.confPath = hdfsConf;
     }
 
     /**
@@ -88,6 +90,9 @@ public class HDFSFunctions {
      * This method should run before the scheduleSplits method.
      *
      * @param filepath
+     *            Path to config.
+     * @param tag
+     *            Tag to read.
      */
     @SuppressWarnings({ "deprecation", "unchecked" })
     public void setJob(String filepath, String tag) {
@@ -112,9 +117,11 @@ public class HDFSFunctions {
      * Searches in subdirectories of the home directory too.
      *
      * @param filename
-     * @return
+     *            HDFS file path.
+     * @return boolean
+     *         True if located in HDFS.
      * @throws IOException
-     * @throws IllegalArgumentException
+     *         If searching for the filepath throws {@link IOException}
      */
     public boolean isLocatedInHDFS(String filename) throws IllegalArgumentException, IOException {
         //search file path
@@ -161,20 +168,22 @@ public class HDFSFunctions {
      * @return true if is successfully finds the Hadoop/HDFS home directory
      */
     private boolean locateConf() {
-        if (this.conf_path == null) {
+        if (this.confPath == null) {
             //As a last resort, try getting the configuration from the system environment
             //Some systems won't have this set.
-            this.conf_path = System.getenv("HADOOP_CONF_DIR");
+            this.confPath = System.getenv("HADOOP_CONF_DIR");
         }
-        return this.conf_path != null;
+        return this.confPath != null;
     }
 
     /**
      * Upload a file/directory to HDFS.Filepath is the path in the local file system.dir is the destination path.
      *
      * @param filepath
+     *            file to upload
      * @param dir
-     * @return
+     *            HDFS directory to save the file
+     * @return boolean
      */
     public boolean put(String filepath, String dir) {
         if (this.fs != null) {
@@ -204,12 +213,12 @@ public class HDFSFunctions {
      * Get instance of the HDFSfile system if it is configured correctly.
      * Return null if there is no instance.
      *
-     * @return
+     * @return FileSystem
      */
     public FileSystem getFileSystem() {
         if (locateConf()) {
-            conf.addResource(new Path(this.conf_path + "/core-site.xml"));
-            conf.addResource(new Path(this.conf_path + "/hdfs-site.xml"));
+            conf.addResource(new Path(this.confPath + "/core-site.xml"));
+            conf.addResource(new Path(this.confPath + "/hdfs-site.xml"));
             try {
                 fs = FileSystem.get(conf);
                 return this.fs;
@@ -226,19 +235,13 @@ public class HDFSFunctions {
         return null;
     }
 
-    /**
-     * Create a HashMap that has as key the hostname and values the splits that belong to this hostname;
-     *
-     * @return
-     * @throws IOException
-     */
     public HashMap<String, ArrayList<Integer>> getLocationsOfSplits() throws IOException {
         HashMap<String, ArrayList<Integer>> splitsMap = new HashMap<>();
         ArrayList<Integer> temp;
         int i = 0;
         String hostname;
         for (InputSplit s : this.splits) {
-            SplitLocationInfo info[] = s.getLocationInfo();
+            SplitLocationInfo[] info = s.getLocationInfo();
             hostname = info[0].getLocation();
             if (splitsMap.containsKey(hostname)) {
                 temp = splitsMap.get(hostname);
@@ -318,16 +321,18 @@ public class HDFSFunctions {
      * Writes the schedule to a temporary file, then uploads the file to the HDFS.
      *
      * @throws UnsupportedEncodingException
+     *            The encoding of the file is not correct     
      * @throws FileNotFoundException
+     *            The file doesn't exist
      */
     public void addScheduleToDistributedCache() throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter(filepath, "UTF-8");
+        PrintWriter writer = new PrintWriter(FILEPATH, "UTF-8");
         for (int split : this.schedule.keySet()) {
             writer.write(split + "," + this.schedule.get(split));
         }
         writer.close();
         // Add file to HDFS
-        this.put(filepath, dfs_path);
+        this.put(FILEPATH, DFS_PATH);
     }
 
     public RecordReader getReader() {
@@ -377,7 +382,8 @@ public class HDFSFunctions {
      * Return the splits belonging to this node for the existing schedule.
      *
      * @param node
-     * @return
+     *            HDFS node
+     * @return List
      */
     public ArrayList<Integer> getScheduleForNode(String node) {
         ArrayList<Integer> nodeSchedule = new ArrayList<>();

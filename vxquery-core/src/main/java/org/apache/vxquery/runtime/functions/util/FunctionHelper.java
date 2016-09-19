@@ -1356,9 +1356,9 @@ public class FunctionHelper {
     /**
      * Writes a number to the DataOutput with zeros as place holders if the number is too small to fill the padding.
      *
-     * @param value
+     * @param valueArg
      *            value
-     * @param padding
+     * @param paddingArg
      *            padding
      * @param dOut
      *            data output

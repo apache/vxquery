@@ -38,7 +38,7 @@ import java.io.Reader;
  * Filters {@link StandardTokenizer} with {@link StandardFilter},
  * and {@link StopFilter}, using a list of
  * English stop words.
- * <a name="version"/>
+ * <a name="version"></a>
  * <p>
  * You must specify the required {@link Version}
  * compatibility when creating StandardAnalyzer:
@@ -92,6 +92,7 @@ public final class CaseSensitiveAnalyzer extends StopwordAnalyzerBase {
      * @see WordlistLoader#getWordSet(Reader)
      * @param stopwords
      *            Reader to read stop words from
+     * @throws IOException : If loading stop words generates {@link IOException}
      */
     public CaseSensitiveAnalyzer(Reader stopwords) throws IOException {
         this(loadStopwordSet(stopwords));
@@ -102,6 +103,7 @@ public final class CaseSensitiveAnalyzer extends StopwordAnalyzerBase {
      * that exceeds this length then it is discarded. This
      * setting only takes effect the next time tokenStream or
      * tokenStream is called.
+     * @param length : maximum token length
      */
     public void setMaxTokenLength(int length) {
         maxTokenLength = length;
@@ -109,6 +111,7 @@ public final class CaseSensitiveAnalyzer extends StopwordAnalyzerBase {
 
     /**
      * @see #setMaxTokenLength
+     * @return maxTokenLength
      */
     public int getMaxTokenLength() {
         return maxTokenLength;

@@ -69,10 +69,9 @@ public class IndexUpdater {
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private IndexConstructorUtil indexConstructorUtil = new IndexConstructorUtil();
 
-    public  IndexUpdater(String indexFolder, IPointable result, UTF8StringPointable stringp,
-            ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
-            ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
-            String nodeId) {
+    public IndexUpdater(String indexFolder, IPointable result, UTF8StringPointable stringp, ByteBufferInputStream bbis,
+            DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs, ITreeNodeIdProvider nodeIdProvider,
+            ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep, String nodeId) {
         this.indexFolder = indexFolder;
         this.result = result;
         this.bbis = bbis;
@@ -88,9 +87,11 @@ public class IndexUpdater {
 
     /**
      * Perform the initial configuration for index update/ delete processes.
-     *
+     * 
      * @throws SystemException
+     *             : If getting the index folder generates {@link SystemException}
      * @throws IOException
+     *             : If getting the index folder generates {@link IOException}
      */
     public void setup() throws SystemException, IOException {
 
@@ -107,14 +108,15 @@ public class IndexUpdater {
         sb.reset(abvs);
 
         Directory fsdir = FSDirectory.open(Paths.get(indexFolder));
-        indexWriter = new IndexWriter(fsdir, new IndexWriterConfig(new CaseSensitiveAnalyzer()).
-                setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
+        indexWriter = new IndexWriter(fsdir, new IndexWriterConfig(new CaseSensitiveAnalyzer())
+                .setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
     }
 
     /**
      * Wrapper for update index function.
-     *
+     * 
      * @throws IOException
+     *             : If the directory doesn't exist
      */
     public void updateIndex() throws IOException {
         File collectionDirectory = new File(collectionFolder);
@@ -132,8 +134,9 @@ public class IndexUpdater {
 
     /**
      * Close opened IndexWriter and terminate the index update/ delete process.
-     *
+     * 
      * @throws IOException
+     *             : If exiting the index folder generates {@link IOException}
      */
     public void exit() throws IOException {
         indexWriter.forceMerge(1);
@@ -146,8 +149,9 @@ public class IndexUpdater {
 
     /**
      * Functional wrapper to update Metadata file.
-     *
+     * 
      * @throws IOException
+     *             : If updating metadata folder generates {@link IOException}
      */
     public synchronized void updateMetadataFile() throws IOException {
         //Write the updated metadata to the file.
@@ -159,7 +163,8 @@ public class IndexUpdater {
      * Check the collection for changes.
      * If changes are detected, update the index
      *
-     * @param collection : Collection folder path
+     * @param collection
+     *            : Collection folder path
      */
     private void updateIndex(File collection) throws IOException {
 
@@ -185,9 +190,8 @@ public class IndexUpdater {
 
                         //Update index corresponding to the xml file.
                         indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, file.getCanonicalPath()));
-                        indexDocumentBuilder = indexConstructorUtil
-                                .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di,
-                                        nodeId);
+                        indexDocumentBuilder = indexConstructorUtil.getIndexBuilder(file, indexWriter, nodep,
+                                abvsFileNode, nodeIdProvider, bbis, di, nodeId);
                         indexDocumentBuilder.printStart();
 
                         if (LOGGER.isDebugEnabled()) {
@@ -203,8 +207,8 @@ public class IndexUpdater {
 
                     // In this case, the xml file has not added to the index. (It is a newly added file)
                     // Therefore generate a new index for this file and add it to the existing index.
-                    indexDocumentBuilder = indexConstructorUtil
-                            .getIndexBuilder(file, indexWriter, nodep, abvsFileNode, nodeIdProvider, bbis, di, nodeId);
+                    indexDocumentBuilder = indexConstructorUtil.getIndexBuilder(file, indexWriter, nodep, abvsFileNode,
+                            nodeIdProvider, bbis, di, nodeId);
                     indexDocumentBuilder.printStart();
 
                     if (LOGGER.isDebugEnabled()) {
@@ -223,10 +227,13 @@ public class IndexUpdater {
     /**
      * Update the current XmlMetadata object related to the currently reading XML file.
      *
-     * @param file     : XML file
-     * @param metadata : Existing metadata object
+     * @param file
+     *            : XML file
+     * @param metadata
+     *            : Existing metadata object
      * @return : XML metadata object with updated fields.
      * @throws IOException
+     *             : If getting the file info generates {@link IOException}
      */
     private XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException {
 
@@ -243,9 +250,12 @@ public class IndexUpdater {
     /**
      * Delete the index of deleted files.
      *
-     * @param pathsFromMap      : Set of paths taken from metafile.
-     * @param pathsFromFileList : Set of paths taken from list of existing files.
+     * @param pathsFromMap
+     *            : Set of paths taken from metafile.
+     * @param pathsFromFileList
+     *            : Set of paths taken from list of existing files.
      * @throws IOException
+     *             : If deleting Documents generates {@link IOException}
      */
     private void deleteIndexOfDeletedFiles(Set<String> pathsFromMap, Set<String> pathsFromFileList) throws IOException {
         Set<String> sfm = new HashSet<>(pathsFromMap);
@@ -276,6 +286,9 @@ public class IndexUpdater {
      * When deleting indexes, if any error occurred, the process will be rolled back and all the indexes will be
      * restored.
      * Otherwise the changes will be committed.
+     * 
+     * @throws SystemException
+     *             : An attempt to divide by zero
      */
     public void deleteAllIndexes() throws SystemException {
         try {

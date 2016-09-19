@@ -22,7 +22,7 @@ JSONiq extension to XQuery
 
   This example uses the XML file (books.xml) from {{{http://www.w3schools.com/xsl/xquery_intro.asp}W3Schools XQuery Tutorial}}
 
-  [[i]] Query:
+  XML conversion to JSON
 
 ----------------------------------------
 [
@@ -38,7 +38,7 @@ JSONiq extension to XQuery
 ]
 ----------------------------------------
 
-  [[i]] Result:
+  Result:
 
 ----------------------------------------
 [
@@ -79,7 +79,7 @@ JSONiq extension to XQuery
 ]
 ----------------------------------------
 
-  [[i]] The following query uses the above result (given in a file books.json):
+  Book ordered titles whose price is greater than 30.
 
 ----------------------------------------
 let $books := jn:json-doc("books.json")
@@ -89,7 +89,7 @@ order by $x("title")
 return $x("title")
 ----------------------------------------
 
-  [[i]] Result
+  Result
 
 ----------------------------------------
 Learning XML

@@ -72,6 +72,9 @@ limitations under the License.
             <item
                 name="Running the Test Suite"
                 href="user_running_tests.html" />
+            <item
+                name="XML Indexing"
+                href="user_indexing.html" />
         </menu>
         <menu name="For Developers">
             <item

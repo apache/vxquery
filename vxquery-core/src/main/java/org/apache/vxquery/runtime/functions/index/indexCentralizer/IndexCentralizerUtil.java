@@ -41,7 +41,7 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 /**
  * Class for maintaining the centralized index information file.
  * Index centralization procedure.
- * User can specify the collection directory in VXQuery.java, ncConfig.ioDevices = <index_directory>.
+ * User can specify the collection directory in VXQuery.java, ncConfig.ioDevices = &lt; index_directory &gt; .
  * Then all the indexes will be created in that particular directory in sub-folders corresponding to collections.
  * There will be a single xml file, located in the directory specified in local.xml, which contains all information
  * about the existing indexes.
@@ -83,6 +83,7 @@ public class IndexCentralizerUtil {
      * Index location is created by using the last 100 characters of collection.
      *
      * @param collection : Collection directory
+     * @return index
      */
     public String putIndexForCollection(String collection) {
         int length = collection.replaceAll("/", "").length();
@@ -109,8 +110,8 @@ public class IndexCentralizerUtil {
 
     /**
      * Prints all collections which have an index created.
-     *
-     * @throws IOException
+     * @param sb : The output is stored in a sequence
+     * @throws IOException : If writing the dataOutput generates {@link IOException}
      */
     public void getAllCollections(SequenceBuilder sb) throws IOException {
         for (String s : collections) {

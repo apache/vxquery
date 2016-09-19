@@ -144,7 +144,7 @@ public class MetaFileUtil {
      *
      * @param file : File which the checksum should be generated.
      * @return : Checksum String
-     * @throws IOException
+     * @throws IOException : The file is not available
      */
     public String generateMD5(File file) throws  IOException {
         try {
