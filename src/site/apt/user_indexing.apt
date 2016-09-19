@@ -15,188 +15,244 @@
 
 How to use Indexing Features in VXQuery.
 
-In VXQuery, all the indexes are created in user specified directory. In order to use indexing,
-you will need to set this directory in your cluster configuration file.
+  In VXQuery, all the indexes are created in user specified directory. In order to use indexing,
+  you will need to set this directory in your cluster configuration file.
 
-*** Configuring VXQuery to use indexing functions.
-Add the following line to your cluster configuration (e.g. cluster.xml)
+* Configuring VXQuery to use indexing functions.
+
+  Add the following line to your cluster configuration (e.g. cluster.xml)
 
 --------
-    <index_directory><path_to_index_directory></index_directory>
+<index_directory><path_to_index_directory></index_directory>
 --------
 
-(You should create this index_directory)
+  (You should create this index_directory)
 
-** Using indexing queries.
+* Using indexing queries.
 
-VXQuery offers following indexing functionality.
+  VXQuery offers following indexing functionality.
 
-[[a]] Create an index for collection.
-[[b]] Use the index in executing a query.
-[[c]] Update the index.
-[[d]] Delete the index.
-[[e]] View existing indexes.
+  [[a]] Create an index for collection.
+  [[b]] Use the index in executing a query.
+  [[c]] Update the index.
+  [[d]] Delete the index.
+  [[e]] View existing indexes.
 
-*1. Scenario I - When collection is a single directory.
-In this scenario, all the XML files are stored in a single directory. (There can be sub directories)
+*Scenario I - When collection is a single directory.
 
-*** Creating an index for collection
-If I need to create index for xml collection stored in <path_1>/collection1,
+  In this scenario, all the XML files are stored in a single directory. (There can be sub directories)
 
-Query structure:
+** Creating an index for collection
+
+  If I need to create index for xml collection stored in <path_to_collection_1>,
+
+  Query structure:
+
 --------
-build-index-on-collection("collection")
+build-index-on-collection("<path_to_collection_1>")
 --------
 
-You can see the index has created in a new sub-directory in the index_directory specified in local.xml
+  You can see the index has created in a new sub-directory in the index_directory specified in local.xml
 
-Example:
---------
-build-index-on-collection("<path_1>/collection1")
---------
-This function takes the collection path as an argument.
+  Example:
 
-*** Using index in query.
-If we need to use the index and execute a query, use the following structure.
+--------
+build-index-on-collection("<path_to_collection_1>")
+--------
+
+  This function takes the collection path as an argument.
+
+** Using index in query.
+
+  If we need to use the index and execute a query, use the following structure.
 
 ------
 for $r in collection-from-index("<path1>/collection1", "/dataCollection/data")/data
 where $r/dataType eq "AWND" and xs:decimal($r/value) gt 491.744
 return $r
 ------
-Here the index access function is,
+
+  Here the index access function is,
 
 ------
 collection-from-index
 ------
 
-which takes two arguments, collection folder and the path element.
+  which takes two arguments, collection folder and the path element.
 
-Result
+  Result:
 
 ------
-<data><date>2001-01-01T00:00:00.000</date><dataType>AWND</dataType><station>GHCND:US000000001</station><value>1000</value><attributes><attribute/><attribute/><attribute>a</attribute></attributes></data>
+<data>
+  <date>2001-01-01T00:00:00.000</date>
+  <dataType>AWND</dataType>
+  <station>GHCND:US000000001</station>
+  <value>1000</value>
+  <attributes>
+    <attribute/>
+    <attribute/>
+    <attribute>a</attribute>
+  </attributes>
+</data>
 ------
 
-*** Updating the index.
-A collection can be modified or changed by following ways.
-[[1]] Inserting new XML files.
-[[2]] Deleting files.
-[[3]] Add/ remove or modify the content of XML files.
+** Updating the index.
 
-In this type of situation, the index corresponding to the modified collection must also be modified. To achieve this
-the update-index function can be used.
+  A collection can be modified or changed by following ways.
+  [[1]] Inserting new XML files.
+  [[2]] Deleting files.
+  [[3]] Add/ remove or modify the content of XML files.
 
-Query structure:
+  In this type of situation, the index corresponding to the modified collection must also be modified.
+  To achieve this the update-index function can be used.
+
+  Query structure:
+
 --------
-update-index("<path_to_collection>")
---------
-
-Example:
--------
-update-index("<path_1>/collection1")
--------
-
-This function takes the collection which was modified.
-
-*** Deleting the index.
-If we want to delete the entire index created for a collection, the delete-index function can be used.
-This function also takes the collection path of which the index is needed to be deleted.
-
-Query structure:
---------
-delete-index("<path_to_collection>")
+update-index("<path_to_collection_1>")
 --------
 
-Example:
+  Example:
+
 -------
-delete-index("<path_11>/collection1")
+update-index("<path_to_collection_1>")
 -------
 
-*2. Scenario II - When the collection is distributed.
-In this scenario, the collection is distributed among several directories. We can distribute the queries among
-partitions.
+  This function takes the collection which was modified.
 
-*** Creating indexes for collections.
+** Deleting the index.
 
-Query structure:
+  If we want to delete the entire index created for a collection, the delete-index function can be used.
+  This function also takes the collection path of which the index is needed to be deleted.
+
+  Query structure:
+
 --------
-build-index-on-collection("<partition_1_path>|<partition_2_path>|<partition_3_path>|...|<partition_n_path>")
+delete-index("<path_to_collection_1>")
 --------
 
-In here the parameter contains the list of collection partitions separated by '|' character.
+  Example:
 
-Example:
-Consider the collection has now distributed among four directories, <path_1>/collection1, <path_2>/collection2,
-<path_3>/collection3 and <path_4>/collection4.
-
-To create indexes for all of the above collections,
 -------
-build-index-on-collection("<path_1>/collection1|<path_2>/collection2|<path_3>/collection3|<path_4>/collection4")
+delete-index("<path_to_collection_1>")
 -------
 
-In this case, all indexes will be created in separate sub-directories corresponding to each partition. Also note that
- this query requires each node to have four partitions available
+*Scenario II - When the collection is distributed.
 
-*** Using the indexes in query.
-In this case, suppose you need to run a query on indexes of two collection partitions.
+  In this scenario, the collection is distributed among several directories.
+  We can distribute the queries among partitions.
 
-Example:
+** Creating indexes for collections.
+
+  Query structure:
+
+--------
+build-index-on-collection("<path_to_collection_1>|<path_to_collection_2>|...|<path_to_collection_n>")
+--------
+
+  In here the parameter contains the list of collection partitions separated by '|' character.
+
+  Example:
+
+  Consider the collection has now distributed among four directories, path_to_collection_1, path_to_collection_2,
+  path_to_collection_3 and path_to_collection_4.
+
+  To create indexes for all of the above collections,
+
+-------
+build-index-on-collection("path_to_collection_1|path_to_collection_2|path_to_collection_3|path_to_collection_4")
+-------
+
+  In this case, all indexes will be created in separate sub-directories corresponding to each partition.
+  Also note that this query requires each node to have four partitions available.
+
+** Using the indexes in query.
+
+  In this case, suppose you need to run a query on indexes of two collection partitions.
+
+  Example:
+
 -----
-for $r in collection-from-index("<path_1>/collection1|<path-2>collection2", "/dataCollection/data")/data
+for $r in collection-from-index("<path_to_collection_1>|<path_to_collection_2>", "/dataCollection/data")/data
 where $r/dataType eq "AWND" and xs:decimal($r/value) gt 491.744
 return $r
 -----
 
-The result will be taken from the indexes of both collection1 and collection2.
+  The result will be taken from the indexes of both path_to_collection_1 and path_to_collection_2.
 
-Result:
+  Result:
+
 ------
-<data><date>2001-01-01T00:00:00.000</date><dataType>AWND</dataType><station>GHCND:US000000001</station><value>1000</value><attributes><attribute/><attribute/><attribute>a</attribute></attributes></data>
+<data>
+  <date>2001-01-01T00:00:00.000</date>
+  <dataType>AWND</dataType>
+  <station>GHCND:US000000001</station>
+  <value>1000</value>
+  <attributes>
+    <attribute/>
+    <attribute/>
+    <attribute>a</attribute>
+  </attributes>
+</data>
 ------
 
-*** Updating the indexes.
-In cases of updating the collection files stored in several partitions, we can use this function to update the
-indexes of those directories.
+** Updating the indexes.
 
-In this case, give a '|' separated list of collection directories.
-Query structure:
---------
-update-index("<partition_1_path>|<partition_2_path>|<partition_3_path>|...|<partition_n_path>")
---------
+  In cases of updating the collection files stored in several partitions, we can use this function to update the
+  indexes of those directories.
 
-Example:
-Suppose that we need to update the indexes in partition1 and partition4
+  In this case, give a '|' separated list of collection directories.
+
+  Query structure:
+
 --------
-update-index("<path_1>/collection1|<path_4>/collection4")
+update-index("<path_to_collection_1>|<path_to_collection_2>|...|<path_to_collection_n>")
 --------
 
-*** Deleting the indexes.
-If we want to delete indexes of collections in several partitions, we can use this function.
-Query structure:
+  Example:
+
+  Suppose that we need to update the indexes in partition1 and partition4
+
 --------
-delete-index("<partition_1_path>|<partition_2_path>|<partition_3_path>|...|<partition_n_path>")
+update-index("<path_to_collection_1>|<path_to_collection_4>")
 --------
 
-Example:
-Suppose that we need to update the indexes in collection2 and collection3
+** Deleting the indexes.
+
+  If we want to delete indexes of collections in several partitions, we can use this function.
+
+  Query structure:
+
 --------
-delete-index("<path_2>/collection2|<path_3>/collection3")
+delete-index("<path_to_collection_1>|<path_to_collection_2>|...|<path_to_collection_n>")
+--------
+
+  Example:
+
+  Suppose that we need to update the indexes in collection2 and collection3
+
+--------
+delete-index("<path_to_collection_2>|<path_to_collection_3>")
 --------
 
 ** Viewing Index information.
-Suppose you need to check, what are the collections have indexes created. To do this, the show-index function can be
-used. This function takes no arguments and returns a sequence of collection paths, which an index is already created.
-If there are no indexes created for any collection, the result will be null.
 
-Suppose we have two collections, <path_1/collection1>, <path_2/collection2>  have indexes created.
-Example:
+  Suppose you need to check, what are the collections have indexes created.
+  To do this, the show-index function can be used.
+  This function takes no arguments and returns a sequence of collection paths, which an index is already created.
+  If there are no indexes created for any collection, the result will be null.
+
+  Suppose we have two collections, <path_to_collection_1>, <path_to_collection_2>  have indexes created.
+
+  Example:
+
 ------
 show-index()
 ------
 
-Result:
+  Result:
+
 ------
-<path_1/collection1>
-<path_2/collection2>
+<path_to_collection_1>
+<path_to_collection_2>
 ------
