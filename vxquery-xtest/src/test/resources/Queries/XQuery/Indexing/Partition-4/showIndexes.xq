@@ -15,5 +15,5 @@
    specific language governing permissions and limitations
    under the License. :)
 
-(: Show indexes after createion :)
-show-index()
+(: Show indexes after creation :)
+show-indexes()

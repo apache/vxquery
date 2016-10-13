@@ -25,10 +25,10 @@
       <query name="createIndex" date="2016-05-26"/>
       <output-file compare="Text">createIndex.txt</output-file>
    </test-case>
-   <test-case name="show-index-1" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
+   <test-case name="show-indexes-1" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
       <description>Show indexes after creating index.</description>
-      <query name="showIndex" date="2016-08-18"/>
-      <output-file compare="Text">showIndex1.txt</output-file>
+      <query name="showIndexes" date="2016-08-18"/>
+      <output-file compare="Text">showIndexes1.txt</output-file>
    </test-case>
    <test-case name="use-index-1" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
@@ -75,20 +75,20 @@
       <query name="deleteIndex" date="2016-06-24"/>
       <output-file compare="Text">deleteIndex.txt</output-file>
    </test-case>
-   <test-case name="show-index-2" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
+   <test-case name="show-indexes-2" FilePath="Indexing/Partition-1/" Creator="Menaka Jayawardena">
       <description>Show indexes after deletion.</description>
-      <query name="showIndex" date="2016-08-18"/>
-      <output-file compare="Text">showIndex2.txt</output-file>
+      <query name="showIndexes" date="2016-08-18"/>
+      <output-file compare="Text">showIndexes2.txt</output-file>
    </test-case>
    <test-case name="create-index" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
       <description>Create Lucene Index from Collection.</description>
       <query name="createIndex" date="2016-05-26"/>
       <output-file compare="Text">createIndex.txt</output-file>
    </test-case>
-   <test-case name="show-index-1" FilePath="Indexing/Partition-2/" Creator="Menaka Jayawardena">
+   <test-case name="show-indexes-1" FilePath="Indexing/Partition-2/" Creator="Menaka Jayawardena">
       <description>Show indexes after creating index.</description>
-      <query name="showIndex" date="2016-08-18"/>
-      <output-file compare="Text">showIndex1.txt</output-file>
+      <query name="showIndexes" date="2016-08-18"/>
+      <output-file compare="Text">showIndexes1.txt</output-file>
    </test-case>
    <test-case name="use-index-1" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
@@ -135,10 +135,10 @@
       <query name="createIndex" date="2016-05-26"/>
       <output-file compare="Text">createIndex.txt</output-file>
    </test-case>
-   <test-case name="show-index-1" FilePath="Indexing/Partition-4/" Creator="Menaka Jayawardena">
+   <test-case name="show-indexes-1" FilePath="Indexing/Partition-4/" Creator="Menaka Jayawardena">
       <description>Show indexes after creating index.</description>
-      <query name="showIndex" date="2016-08-18"/>
-      <output-file compare="Text">showIndex1.txt</output-file>
+      <query name="showIndexes" date="2016-08-18"/>
+      <output-file compare="Text">showIndexes1.txt</output-file>
    </test-case>
    <test-case name="use-index-1" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>

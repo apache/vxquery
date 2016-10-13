@@ -163,8 +163,8 @@
         <!-- collection-from-index operator is added during the rewrite rules phase.  -->
     </function>
 
-    <!-- fn:show-index as node()* -->
-    <function name="fn:show-index">
+    <!-- fn:show-indexes as node()* -->
+    <function name="fn:show-indexes">
         <return type="node()*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.ShowIndexScalarEvaluatorFactory"/>
     </function>
