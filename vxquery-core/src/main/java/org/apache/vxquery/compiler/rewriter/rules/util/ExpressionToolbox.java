@@ -16,6 +16,7 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -222,6 +223,15 @@ public class ExpressionToolbox {
         ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
 
         return ArrayUtils.toObject(tvp.getByteArray());
+    }
+    
+    public static List<ILogicalExpression> getFullArguments(Mutable<ILogicalExpression> searchM) {
+        AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+        ArrayList<ILogicalExpression> args = new ArrayList<ILogicalExpression>();
+        for (int i = 0; i < searchFunction.getArguments().size(); i++) {
+            args.add(searchFunction.getArguments().get(i).getValue());
+        }
+        return args;
     }
 
     public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM, StaticContext dCtx) {

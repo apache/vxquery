@@ -77,6 +77,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private short totalDataSources;
     private String[] collectionPartitions;
     private List<Integer> childSeq;
+    private List<Byte[]> valueSeq;
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
     private HDFSFunctions hdfs;
     private String tag;
@@ -91,6 +92,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
         childSeq = ds.getChildSeq();
+        valueSeq=ds.getValueSeq();
         recordDescriptors[0] = rDesc;
         this.tag = ds.getTag();
         this.hdfsConf = hdfsConf;
@@ -113,7 +115,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
                 dCtx.getStaticContext());
-        final JSONParser jparser = new JSONParser();
+        final JSONParser jparser = new JSONParser(valueSeq);
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
