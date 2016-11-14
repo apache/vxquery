@@ -227,7 +227,7 @@ public class JSONParser implements IParser {
                     itemStack.remove(itemStack.size() - 1);
                     levelObject--;
                     if (levelObject + levelArray == 0) {
-                        sb.addItem(abvsStack.get(1));
+                        sb.addItem(abvsStack.get(2));
                         items++;
                     }
                     break;
