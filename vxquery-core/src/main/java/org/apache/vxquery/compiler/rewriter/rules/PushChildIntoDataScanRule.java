@@ -135,18 +135,6 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
                 }
             }
         }
-        //        } else if (fi == BuiltinOperators.VALUE.getFunctionIdentifier()) {
-        //            ExpressionToolbox.findAllFunctionExpressions(expression, fi, finds);
-        //            for (int i = finds.size(); i > 0; --i) {
-        //                int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
-        //                if (typeId > 0) {
-        //                    if (dCtx.lookupSequenceType(typeId).getItemType().equals(ElementType.ANYELEMENT) && typeId > 0) {
-        //                        ds.addValueSeq(typeId);
-        //                        added = true;
-        //                    }
-        //                }
-        //            }
-        //        }
         return added;
     }
 }

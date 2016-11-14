@@ -16,8 +16,12 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
+<<<<<<< f8ae7ed4f95db6b94a7a81fd078d62d02fc58b69
 <<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
 =======
+=======
+import java.io.ByteArrayOutputStream;
+>>>>>>> update JSONParser
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +50,8 @@ import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.types.ElementType;
 >>>>>>> Implementation of PushValueIntoDatascanRule
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * The rule searches for two assign operators immediately following a data scan
@@ -152,6 +158,7 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
         return false;
     }
 
+<<<<<<< f8ae7ed4f95db6b94a7a81fd078d62d02fc58b69
 <<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
 =======
     private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
@@ -167,6 +174,41 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
         }
         return added;
     }
+=======
+	private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
+		boolean added = false;
+		ILogicalExpression comparison = null;
+		List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+		ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.VALUE.getFunctionIdentifier(), finds);
+		if (finds.size() > 0) {
+			List<ILogicalExpression> listComparison = ExpressionToolbox.getFullArguments(finds.get(finds.size() - 1));
+			comparison = listComparison.get(0);
+		}
+		
+		byte[] b = new byte[4];
+		b[0] = (byte) 0xff;
+		b[1] = (byte) 0x00;
+		b[2] = (byte) 0x00;
+		b[3] = (byte) 0x00;
+		
+		for (int i = finds.size(); i > 0; --i) {
+			Byte[] value = ExpressionToolbox.getConstantArgument(finds.get(i - 1), 1);
+			List<ILogicalExpression> values = ExpressionToolbox.getFullArguments(finds.get(i - 1));
+			
+			ILogicalExpression one = values.get(0);
+			if (one.equals(comparison)) {
+				ds.addValueSeq(ArrayUtils.toObject(b));				
+			}
+			
+			if (values.size() != 0) {
+				ds.addValueSeq(value);
+				added = true;
+			}
+		}
+		
+		return added;
+	}
+>>>>>>> update JSONParser
 
 >>>>>>> Implementation of PushValueIntoDatascanRule
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,258 +45,267 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperat
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 
 public class ExpressionToolbox {
-    public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe,
-            LogicalVariable lv) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
-            VariableReferenceExpression vre = (VariableReferenceExpression) le;
-            if (vre.getVariableReference() == lv) {
-                return mutableLe;
-            }
-        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                Mutable<ILogicalExpression> resultLe = findVariableExpression(argExp, lv);
-                if (resultLe != null) {
-                    return resultLe;
-                }
-            }
-        }
-        return null;
-    }
+	public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe,
+			LogicalVariable lv) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+			VariableReferenceExpression vre = (VariableReferenceExpression) le;
+			if (vre.getVariableReference() == lv) {
+				return mutableLe;
+			}
+		} else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+				Mutable<ILogicalExpression> resultLe = findVariableExpression(argExp, lv);
+				if (resultLe != null) {
+					return resultLe;
+				}
+			}
+		}
+		return null;
+	}
 
-    public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
-            return mutableLe;
-        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                Mutable<ILogicalExpression> resultLe = findVariableExpression(argExp);
-                if (resultLe != null) {
-                    return resultLe;
-                }
-            }
-        }
-        return null;
-    }
+	public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+			return mutableLe;
+		} else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+				Mutable<ILogicalExpression> resultLe = findVariableExpression(argExp);
+				if (resultLe != null) {
+					return resultLe;
+				}
+			}
+		}
+		return null;
+	}
 
-    public static void findVariableExpressions(Mutable<ILogicalExpression> mutableLe,
-            List<Mutable<ILogicalExpression>> finds) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
-            finds.add(mutableLe);
-        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                findVariableExpressions(argExp, finds);
-            }
-        }
-    }
+	public static void findVariableExpressions(Mutable<ILogicalExpression> mutableLe,
+			List<Mutable<ILogicalExpression>> finds) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+			finds.add(mutableLe);
+		} else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+				findVariableExpressions(argExp, finds);
+			}
+		}
+	}
 
-    public static Mutable<ILogicalExpression> findLastFunctionExpression(Mutable<ILogicalExpression> mutableLe) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
-            return null;
-        } else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                if (argExp.getValue().getExpressionTag() == LogicalExpressionTag.VARIABLE) {
-                    return mutableLe;
-                }
-                Mutable<ILogicalExpression> resultLe = findLastFunctionExpression(argExp);
-                if (resultLe != null) {
-                    return resultLe;
-                }
-            }
-        }
-        return null;
-    }
+	public static Mutable<ILogicalExpression> findLastFunctionExpression(Mutable<ILogicalExpression> mutableLe) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+			return null;
+		} else if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+				if (argExp.getValue().getExpressionTag() == LogicalExpressionTag.VARIABLE) {
+					return mutableLe;
+				}
+				Mutable<ILogicalExpression> resultLe = findLastFunctionExpression(argExp);
+				if (resultLe != null) {
+					return resultLe;
+				}
+			}
+		}
+		return null;
+	}
 
-    public static Mutable<ILogicalExpression> findFirstFunctionExpression(Mutable<ILogicalExpression> mutableLe,
-            FunctionIdentifier fi) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            if (afce.getFunctionIdentifier().equals(fi)) {
-                return mutableLe;
-            }
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                Mutable<ILogicalExpression> resultLe = findFirstFunctionExpression(argExp, fi);
-                if (resultLe != null) {
-                    return resultLe;
-                }
-            }
-        }
-        return null;
-    }
+	public static Mutable<ILogicalExpression> findFirstFunctionExpression(Mutable<ILogicalExpression> mutableLe,
+			FunctionIdentifier fi) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			if (afce.getFunctionIdentifier().equals(fi)) {
+				return mutableLe;
+			}
+			for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+				Mutable<ILogicalExpression> resultLe = findFirstFunctionExpression(argExp, fi);
+				if (resultLe != null) {
+					return resultLe;
+				}
+			}
+		}
+		return null;
+	}
 
-    /**
-     * Finds all functions for a given expression.
-     *
-     * @param mutableLe
-     *            Search logical expression
-     * @param finds
-     *            Logical expressions found
-     */
-    public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe,
-            List<Mutable<ILogicalExpression>> finds) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            finds.add(mutableLe);
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                findAllFunctionExpressions(argExp, finds);
-            }
-        }
-    }
+	/**
+	 * Finds all functions for a given expression.
+	 *
+	 * @param mutableLe
+	 *            Search logical expression
+	 * @param finds
+	 *            Logical expressions found
+	 */
+	public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe,
+			List<Mutable<ILogicalExpression>> finds) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			finds.add(mutableLe);
+			for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+				findAllFunctionExpressions(argExp, finds);
+			}
+		}
+	}
 
-    /**
-     * Finds all functions for a given expression and function identifier.
-     *
-     * @param mutableLe
-     *            Search logical expression
-     * @param fi
-     *            Function indentifier
-     * @param finds
-     *            Logical expressions found
-     */
-    public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi,
-            List<Mutable<ILogicalExpression>> finds) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            if (afce.getFunctionIdentifier().equals(fi)) {
-                finds.add(mutableLe);
-            }
-            for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
-                findAllFunctionExpressions(argExp, fi, finds);
-            }
-        }
-    }
+	/**
+	 * Finds all functions for a given expression and function identifier.
+	 *
+	 * @param mutableLe
+	 *            Search logical expression
+	 * @param fi
+	 *            Function indentifier
+	 * @param finds
+	 *            Logical expressions found
+	 */
+	public static void findAllFunctionExpressions(Mutable<ILogicalExpression> mutableLe, FunctionIdentifier fi,
+			List<Mutable<ILogicalExpression>> finds) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			if (afce.getFunctionIdentifier().equals(fi)) {
+				finds.add(mutableLe);
+			}
+			for (Mutable<ILogicalExpression> argExp : afce.getArguments()) {
+				findAllFunctionExpressions(argExp, fi, finds);
+			}
+		}
+	}
 
-    public static Function getBuiltIn(Mutable<ILogicalExpression> mutableLe) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            for (Function function : BuiltinFunctions.FUNCTION_COLLECTION) {
-                if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
-                    return function;
-                }
-            }
-            for (Function function : BuiltinOperators.OPERATOR_COLLECTION) {
-                if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
-                    return function;
-                }
-            }
-        }
-        return null;
-    }
+	public static Function getBuiltIn(Mutable<ILogicalExpression> mutableLe) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+			AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
+			for (Function function : BuiltinFunctions.FUNCTION_COLLECTION) {
+				if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
+					return function;
+				}
+			}
+			for (Function function : BuiltinOperators.OPERATOR_COLLECTION) {
+				if (function.getFunctionIdentifier().equals(afce.getFunctionIdentifier())) {
+					return function;
+				}
+			}
+		}
+		return null;
+	}
 
-    public static void getConstantAsPointable(ConstantExpression typeExpression, TaggedValuePointable tvp) {
-        VXQueryConstantValue treatTypeConstant = (VXQueryConstantValue) typeExpression.getValue();
-        tvp.set(treatTypeConstant.getValue(), 0, treatTypeConstant.getValue().length);
-    }
+	public static void getConstantAsPointable(ConstantExpression typeExpression, TaggedValuePointable tvp) {
+		VXQueryConstantValue treatTypeConstant = (VXQueryConstantValue) typeExpression.getValue();
+		tvp.set(treatTypeConstant.getValue(), 0, treatTypeConstant.getValue().length);
+	}
 
-    public static int getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM) {
-        final int ARG_TYPE = 1;
-        AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
-        ILogicalExpression argType = searchFunction.getArguments().get(ARG_TYPE).getValue();
-        if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-            return -1;
-        }
-        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
+	public static int getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM) {
+		final int ARG_TYPE = 1;
+		AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+		ILogicalExpression argType = searchFunction.getArguments().get(ARG_TYPE).getValue();
+		if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+			return -1;
+		}
+		TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+		ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
 
-        IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        tvp.getValue(pTypeCode);
-        return pTypeCode.getInteger();
-    }
-    
-    public static Byte[] getConstantArgument(Mutable<ILogicalExpression> searchM, int arg) {
-        AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
-        ILogicalExpression argType = searchFunction.getArguments().get(arg).getValue();
-        if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-            return null;
-        }
-        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
+		IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
+		tvp.getValue(pTypeCode);
+		return pTypeCode.getInteger();
+	}
 
-        return ArrayUtils.toObject(tvp.getByteArray());
-    }
+	public static Byte[] getConstantArgument(Mutable<ILogicalExpression> searchM, int arg) {
+		AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+		ILogicalExpression argType = searchFunction.getArguments().get(arg).getValue();
+		searchFunction.getArguments().size();
+		if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+			return null;
+		}
+		TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+		ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
+		return ArrayUtils.toObject(tvp.getByteArray());
+	}
 
-    public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM, StaticContext dCtx) {
-        int typeId = getTypeExpressionTypeArgument(searchM);
-        if (typeId > 0) {
-            return dCtx.lookupSequenceType(typeId);
-        } else {
-            return null;
-        }
-    }
+	public static List<ILogicalExpression> getFullArguments(Mutable<ILogicalExpression> searchM) {
+		AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+		ArrayList<ILogicalExpression> args = new ArrayList<ILogicalExpression>();
+		for (int i = 0; i < searchFunction.getArguments().size(); i++) {
+			args.add(searchFunction.getArguments().get(i).getValue());
+		}
+		return args;
+	}
 
-    public static SequenceType getOutputSequenceType(Mutable<ILogicalOperator> opRef,
-            Mutable<ILogicalExpression> argFirstM, StaticContext dCtx) {
-        ILogicalExpression argFirstLe = argFirstM.getValue();
-        switch (argFirstLe.getExpressionTag()) {
-            case FUNCTION_CALL:
-                // Only process defined functions.
-                Function function = ExpressionToolbox.getBuiltIn(argFirstM);
-                if (function == null) {
-                    return null;
-                } else if (function.getFunctionIdentifier().equals(BuiltinOperators.CAST.getFunctionIdentifier())) {
-                    // Special case since case has multiple type outputs.
-                    return ExpressionToolbox.getTypeExpressionTypeArgument(argFirstM, dCtx);
-                } else {
-                    return function.getSignature().getReturnType();
-                }
-            case CONSTANT:
-                // Consider constant values.
-                ConstantExpression constantExpression = (ConstantExpression) argFirstLe;
-                VXQueryConstantValue constantValue = (VXQueryConstantValue) constantExpression.getValue();
-                return constantValue.getType();
-            case VARIABLE:
-                VariableReferenceExpression variableRefExp = (VariableReferenceExpression) argFirstLe;
-                LogicalVariable variableId = variableRefExp.getVariableReference();
-                Mutable<ILogicalOperator> variableProducer = OperatorToolbox.findProducerOf(opRef, variableId);
-                if (variableProducer == null) {
-                    return null;
-                }
-                AbstractLogicalOperator variableOp = (AbstractLogicalOperator) variableProducer.getValue();
-                switch (variableOp.getOperatorTag()) {
-                    case ASSIGN:
-                    case AGGREGATE:
-                    case RUNNINGAGGREGATE:
-                        AbstractAssignOperator assign = (AbstractAssignOperator) variableOp;
-                        for (int i = 0; i < assign.getVariables().size(); ++i) {
-                            if (variableId.equals(assign.getVariables().get(i))) {
-                                return getOutputSequenceType(variableProducer, assign.getExpressions().get(i), dCtx);
-                            }
-                        }
-                        return null;
-                    case DATASOURCESCAN:
-                        return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
-                    case UNNEST:
-                        UnnestOperator unnest = (UnnestOperator) variableOp;
-                        return getOutputSequenceType(variableProducer, unnest.getExpressionRef(), dCtx);
-                    default:
-                        // TODO Consider support for other operators. i.e. Assign.
-                        break;
-                }
+	public static SequenceType getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM, StaticContext dCtx) {
+		int typeId = getTypeExpressionTypeArgument(searchM);
+		if (typeId > 0) {
+			return dCtx.lookupSequenceType(typeId);
+		} else {
+			return null;
+		}
+	}
 
-        }
-        return null;
-    }
+	public static SequenceType getOutputSequenceType(Mutable<ILogicalOperator> opRef,
+			Mutable<ILogicalExpression> argFirstM, StaticContext dCtx) {
+		ILogicalExpression argFirstLe = argFirstM.getValue();
+		switch (argFirstLe.getExpressionTag()) {
+		case FUNCTION_CALL:
+			// Only process defined functions.
+			Function function = ExpressionToolbox.getBuiltIn(argFirstM);
+			if (function == null) {
+				return null;
+			} else if (function.getFunctionIdentifier().equals(BuiltinOperators.CAST.getFunctionIdentifier())) {
+				// Special case since case has multiple type outputs.
+				return ExpressionToolbox.getTypeExpressionTypeArgument(argFirstM, dCtx);
+			} else {
+				return function.getSignature().getReturnType();
+			}
+		case CONSTANT:
+			// Consider constant values.
+			ConstantExpression constantExpression = (ConstantExpression) argFirstLe;
+			VXQueryConstantValue constantValue = (VXQueryConstantValue) constantExpression.getValue();
+			return constantValue.getType();
+		case VARIABLE:
+			VariableReferenceExpression variableRefExp = (VariableReferenceExpression) argFirstLe;
+			LogicalVariable variableId = variableRefExp.getVariableReference();
+			Mutable<ILogicalOperator> variableProducer = OperatorToolbox.findProducerOf(opRef, variableId);
+			if (variableProducer == null) {
+				return null;
+			}
+			AbstractLogicalOperator variableOp = (AbstractLogicalOperator) variableProducer.getValue();
+			switch (variableOp.getOperatorTag()) {
+			case ASSIGN:
+			case AGGREGATE:
+			case RUNNINGAGGREGATE:
+				AbstractAssignOperator assign = (AbstractAssignOperator) variableOp;
+				for (int i = 0; i < assign.getVariables().size(); ++i) {
+					if (variableId.equals(assign.getVariables().get(i))) {
+						return getOutputSequenceType(variableProducer, assign.getExpressions().get(i), dCtx);
+					}
+				}
+				return null;
+			case DATASOURCESCAN:
+				return SequenceType.create(AnyNodeType.INSTANCE, Quantifier.QUANT_ONE);
+			case UNNEST:
+				UnnestOperator unnest = (UnnestOperator) variableOp;
+				return getOutputSequenceType(variableProducer, unnest.getExpressionRef(), dCtx);
+			default:
+				// TODO Consider support for other operators. i.e. Assign.
+				break;
+			}
 
-    public static boolean isFunctionExpression(Mutable<ILogicalExpression> mutableLe,
-            AbstractFunctionCallExpression afce) {
-        ILogicalExpression le = mutableLe.getValue();
-        if (le.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
-        }
-        AbstractFunctionCallExpression fc = (AbstractFunctionCallExpression) le;
-        if (!fc.getFunctionIdentifier().equals(afce)) {
-            return false;
-        }
-        return true;
-    }
+		}
+		return null;
+	}
+
+	public static boolean isFunctionExpression(Mutable<ILogicalExpression> mutableLe,
+			AbstractFunctionCallExpression afce) {
+		ILogicalExpression le = mutableLe.getValue();
+		if (le.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+			return false;
+		}
+		AbstractFunctionCallExpression fc = (AbstractFunctionCallExpression) le;
+		if (!fc.getFunctionIdentifier().equals(afce)) {
+			return false;
+		}
+		return true;
+	}
 }
