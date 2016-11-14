@@ -25,7 +25,6 @@ import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
-import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
@@ -40,36 +39,36 @@ import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.types.ElementType;
 
 /**
- * The rule searches for an unnest operator immediately following a data scan
+ * The rule searches for two assign operators immediately following a data scan
  * operator.
  *
  * <pre>
  * Before
  *
  *   plan__parent
- *   UNNEST( $v2 : child( $v1 ) )
+ *   ASSIGN( $v3 : value( $v1, $v2 ) )
+ *   ASSIGN( $v2 : constant )
  *   DATASCAN( $source : $v1 )
  *   plan__child
  *
- *   Where $v1 is not used in plan__parent.
+ *   Where $v1 and $v2 is not used in plan__parent.
  *
  * After
  *
  *   plan__parent
- *   ASSIGN( $v2 : $v1 ) 
+ *   ASSIGN( $v3 : $v1 )
+ *   ASSIGN( $v2 : constant )
  *   DATASCAN( $source : $v1 )
  *   plan__child
  *
- *   $source is encoded with the child parameters.
+ *   $source is encoded with the value parameters.
  * </pre>
- *
- * @author prestonc
  */
-public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRule {
-    StaticContext dCtx = null;
-    final int ARG_DATA = 0;
-    final int ARG_TYPE = 1;
 
+public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRule {
+    StaticContext dCtx = null;
+
+    @Override
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
         if (dCtx == null) {
@@ -77,62 +76,66 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
             dCtx = ((VXQueryMetadataProvider) vxqueryCtx.getMetadataProvider()).getStaticContext();
         }
         AbstractLogicalOperator op1 = (AbstractLogicalOperator) opRef.getValue();
-        if (op1.getOperatorTag() != LogicalOperatorTag.UNNEST) {
+        if (op1.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
             return false;
         }
-        UnnestOperator unnest = (UnnestOperator) op1;
+        AssignOperator assign = (AssignOperator) op1;
 
-        AbstractLogicalOperator op2 = (AbstractLogicalOperator) unnest.getInputs().get(0).getValue();
-        if (op2.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
+        //        AbstractLogicalOperator op2 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
+        //        if (op2.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+        //            return false;
+        //        }
+        //        AssignOperator assign2 = (AssignOperator) op2;
+        //
+        //        AbstractLogicalOperator op3 = (AbstractLogicalOperator) assign2.getInputs().get(0).getValue();
+        //        if (op3.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+        //            return false;
+        //        }
+        //        AssignOperator assign3 = (AssignOperator) op3;
+
+        AbstractLogicalOperator op4 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
+        if (op4.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
             return false;
         }
-        DataSourceScanOperator datascan = (DataSourceScanOperator) op2;
+        DataSourceScanOperator datascan = (DataSourceScanOperator) op4;
 
         if (!usedVariables.contains(datascan.getVariables())) {
             VXQueryCollectionDataSource ds = null;
             VXQueryIndexingDataSource ids = null;
 
-            // Find all child functions.
+            // Find all value functions.
             try {
                 ids = (VXQueryIndexingDataSource) datascan.getDataSource();
             } catch (ClassCastException e) {
                 ds = (VXQueryCollectionDataSource) datascan.getDataSource();
             }
 
-            if (!updateDataSource(ds, unnest.getExpressionRef())) {
+            if (!updateDataSource(ds, assign.getExpressions().get(0))) {
                 return false;
             }
-
-            // Replace unnest with noop assign. Keeps variable chain.
-            Mutable<ILogicalExpression> varExp = ExpressionToolbox.findVariableExpression(unnest.getExpressionRef(),
-                    datascan.getVariables().get(0));
-            AssignOperator noOp = new AssignOperator(unnest.getVariable(), varExp);
-            noOp.getInputs().addAll(unnest.getInputs());
+            // Replace assign with noop assign. Keeps variable chain.
+            Mutable<ILogicalExpression> varExp = ExpressionToolbox
+                    .findVariableExpression(assign.getExpressions().get(0), datascan.getVariables().get(0));
+            AssignOperator noOp = new AssignOperator(assign.getVariables().get(0), varExp);
+            noOp.getInputs().addAll(assign.getInputs());
             opRef.setValue(noOp);
             return true;
         }
         return false;
     }
 
-    /**
-     * In reverse add them to the data source.
-     *
-     * @param ds
-     * @param expression
-     */
     private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
         boolean added = false;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
-        ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
+        ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.VALUE.getFunctionIdentifier(), finds);
         for (int i = finds.size(); i > 0; --i) {
-            int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
-            if (typeId > 0) {
-                if (dCtx.lookupSequenceType(typeId).getItemType().equals(ElementType.ANYELEMENT) && typeId > 0) {
-                    ds.addChildSeq(typeId);
-                    added = true;
-                }
+            Byte[] value = ExpressionToolbox.getConstantArgument(finds.get(i - 1), 1);
+            if (value != null) {
+                ds.addValueSeq(value);
+                added = true;
             }
         }
         return added;
     }
+
 }

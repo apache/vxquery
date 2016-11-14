@@ -29,9 +29,10 @@ import org.apache.hyracks.algebricks.core.algebra.properties.ILocalStructuralPro
 import org.apache.hyracks.algebricks.core.algebra.properties.IPhysicalPropertiesVector;
 import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
-
+//ArrayBackedValueStoragedValueStorage abvs=new ArrayBackedValueStorage();
     private VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
         this.collectionName = file;
@@ -47,6 +48,7 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
             }
         };
         this.childSeq = new ArrayList<>();
+        this.valueSeq = new ArrayList<>();
         this.tag = null;
     }
 
@@ -112,10 +114,18 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
     public List<Integer> getChildSeq() {
         return childSeq;
     }
+    
+    public void addValueSeq(Byte[] value) {
+        valueSeq.add(value);
+    }
+
+    public List<Byte[]> getValueSeq() {
+        return valueSeq;
+    }
 
     @Override
     public String toString() {
-        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + "]";
+        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + ", valueSeq=" + valueSeq +"]";
     }
 
     @Override
