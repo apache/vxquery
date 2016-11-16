@@ -24,7 +24,6 @@ import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluatorFactory;
 
 public class KeysOrMembersUnnestingEvaluatorFactory extends AbstractTaggedValueArgumentUnnestingEvaluatorFactory {
-<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
 	private static final long serialVersionUID = 1L;
 
 	public KeysOrMembersUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) {
@@ -36,18 +35,5 @@ public class KeysOrMembersUnnestingEvaluatorFactory extends AbstractTaggedValueA
 			throws AlgebricksException {
 		return new KeysOrMembersUnnestingEvaluator(ctx, args);
 	}
-=======
-    private static final long serialVersionUID = 1L;
-
-    public KeysOrMembersUnnestingEvaluatorFactory(IScalarEvaluatorFactory[] args) {
-        super(args);
-    }
-
-    @Override
-    protected IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
-        return new KeysOrMembersUnnestingEvaluator(ctx, args);
-    }
->>>>>>> Implementation of PushValueIntoDatascanRule
 
 }

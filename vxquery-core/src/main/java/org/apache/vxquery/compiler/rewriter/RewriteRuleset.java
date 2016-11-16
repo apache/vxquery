@@ -147,11 +147,7 @@ public class RewriteRuleset {
         normalization.add(new PushChildIntoDataScanRule());
 
         // json
-<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
-        //normalization.add(new PushValueIntoDatascanRule());
-=======
        // normalization.add(new PushValueIntoDatascanRule());
->>>>>>> Implementation of PushValueIntoDatascanRule
         normalization.add(new InlineNestedVariablesRule());
         
 

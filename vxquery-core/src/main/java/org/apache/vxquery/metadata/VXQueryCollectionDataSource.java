@@ -32,112 +32,105 @@ import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertie
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
-//ArrayBackedValueStoragedValueStorage abvs=new ArrayBackedValueStorage();
-    private VXQueryCollectionDataSource(int id, String file, Object[] types) {
-        this.dataSourceId = id;
-        this.collectionName = file;
-        collectionPartitions = collectionName.split(DELIMITER);
-        this.types = types;
-        final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
-                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
-                new ArrayList<ILocalStructuralProperty>());
-        propProvider = new IDataSourcePropertiesProvider() {
-            @Override
-            public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
-                return vec;
-            }
-        };
-        this.childSeq = new ArrayList<>();
-        this.valueSeq = new ArrayList<>();
-        this.tag = null;
-    }
+	// ArrayBackedValueStoragedValueStorage abvs=new ArrayBackedValueStorage();
+	private VXQueryCollectionDataSource(int id, String file, Object[] types) {
+		this.dataSourceId = id;
+		this.collectionName = file;
+		collectionPartitions = collectionName.split(DELIMITER);
+		this.types = types;
+		final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
+				new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
+				new ArrayList<ILocalStructuralProperty>());
+		propProvider = new IDataSourcePropertiesProvider() {
+			@Override
+			public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
+				return vec;
+			}
+		};
+		this.childSeq = new ArrayList<>();
+		this.valueSeq = new ArrayList<>();
+		this.tag = null;
+	}
 
-    public static VXQueryCollectionDataSource create(int id, String file, Object type) {
-        return new VXQueryCollectionDataSource(id, file, new Object[] { type });
-    }
+	public static VXQueryCollectionDataSource create(int id, String file, Object type) {
+		return new VXQueryCollectionDataSource(id, file, new Object[] { type });
+	}
 
-    public int getTotalDataSources() {
-        return totalDataSources;
-    }
+	public int getTotalDataSources() {
+		return totalDataSources;
+	}
 
-    public void setTotalDataSources(int totalDataSources) {
-        this.totalDataSources = totalDataSources;
-    }
+	public void setTotalDataSources(int totalDataSources) {
+		this.totalDataSources = totalDataSources;
+	}
 
-    public int getDataSourceId() {
-        return dataSourceId;
-    }
+	public int getDataSourceId() {
+		return dataSourceId;
+	}
 
-    public String[] getPartitions() {
-        return collectionPartitions;
-    }
+	public String[] getPartitions() {
+		return collectionPartitions;
+	}
 
-    public void setPartitions(String[] collectionPartitions) {
-        this.collectionPartitions = collectionPartitions;
-    }
+	public void setPartitions(String[] collectionPartitions) {
+		this.collectionPartitions = collectionPartitions;
+	}
 
-    public int getPartitionCount() {
-        return collectionPartitions.length;
-    }
+	public int getPartitionCount() {
+		return collectionPartitions.length;
+	}
 
-    public String getTag() {
-        return this.tag;
-    }
+	public String getTag() {
+		return this.tag;
+	}
 
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
 
-    @Override
-    public String getId() {
-        return collectionName;
-    }
+	@Override
+	public String getId() {
+		return collectionName;
+	}
 
-    @Override
-    public Object[] getSchemaTypes() {
-        return types;
-    }
+	@Override
+	public Object[] getSchemaTypes() {
+		return types;
+	}
 
-    @Override
-    public IDataSourcePropertiesProvider getPropertiesProvider() {
-        return propProvider;
-    }
+	@Override
+	public IDataSourcePropertiesProvider getPropertiesProvider() {
+		return propProvider;
+	}
 
-    @Override
-    public void computeFDs(List<LogicalVariable> scanVariables, List<FunctionalDependency> fdList) {
-    }
+	@Override
+	public void computeFDs(List<LogicalVariable> scanVariables, List<FunctionalDependency> fdList) {
+	}
 
-    public void addChildSeq(int integer) {
-        childSeq.add(integer);
-    }
+	public void addChildSeq(int integer) {
+		childSeq.add(integer);
+	}
 
-    public List<Integer> getChildSeq() {
-        return childSeq;
-    }
-    
-<<<<<<< 9f1b465c615e96008beb2f6ef02e530302b6bfe9
-    public void addValueSeq(int integer) {
-        valueSeq.add(integer);
-    }
+	public List<Integer> getChildSeq() {
+		return childSeq;
+	}
 
-    public List<Integer> getValueSeq() {
-=======
-    public void addValueSeq(Byte[] value) {
-        valueSeq.add(value);
-    }
+	public void addValueSeq(Byte[] value) {
+		valueSeq.add(value);
+	}
 
-    public List<Byte[]> getValueSeq() {
->>>>>>> Implementation of PushValueIntoDatascanRule
-        return valueSeq;
-    }
+	public List<Byte[]> getValueSeq() {
+		return valueSeq;
+	}
 
-    @Override
-    public String toString() {
-        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + ", valueSeq=" + valueSeq +"]";
-    }
+	@Override
+	public String toString() {
+		return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq
+				+ ", valueSeq=" + valueSeq + "]";
+	}
 
-    @Override
-    public String getFunctionCall() {
-        return function;
-    }
+	@Override
+	public String getFunctionCall() {
+		return function;
+	}
 }
