@@ -122,7 +122,9 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
      */
     private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
         boolean added = false;
+        //  FunctionIdentifier fi = null;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+        // if (fi == BuiltinOperators.CHILD.getFunctionIdentifier()) {
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
         for (int i = finds.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));

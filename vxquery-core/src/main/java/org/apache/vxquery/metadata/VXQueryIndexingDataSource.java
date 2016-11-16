@@ -35,6 +35,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
     protected Object[] types;
 
     protected IDataSourcePropertiesProvider propProvider;
+
     private VXQueryIndexingDataSource(int id, String collection, String elementPath, Object[] types,
             String functionCall) {
         this.dataSourceId = id;
@@ -45,8 +46,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
 
         this.types = types;
         final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
-                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
-                new ArrayList<>());
+                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)), new ArrayList<>());
         propProvider = new IDataSourcePropertiesProvider() {
             @Override
             public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
@@ -58,8 +58,8 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
         this.valueSeq = new ArrayList<>();
     }
 
-    public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type, String
-            function) {
+    public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type,
+            String function) {
         return new VXQueryIndexingDataSource(id, collection, index, new Object[] { type }, function);
     }
 
@@ -132,8 +132,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
     public List<Integer> getChildSeq() {
         return childSeq;
     }
-    
-    
+
     public void addValueSeq(Byte[] value) {
         valueSeq.add(value);
     }
@@ -142,8 +141,4 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource impleme
         return valueSeq;
     }
 
- 
-
 }
-
-

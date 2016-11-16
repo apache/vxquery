@@ -32,7 +32,7 @@ import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertie
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
-//ArrayBackedValueStoragedValueStorage abvs=new ArrayBackedValueStorage();
+    // ArrayBackedValueStoragedValueStorage abvs=new ArrayBackedValueStorage();
     private VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
         this.collectionName = file;
@@ -114,7 +114,7 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
     public List<Integer> getChildSeq() {
         return childSeq;
     }
-    
+
     public void addValueSeq(Byte[] value) {
         valueSeq.add(value);
     }
@@ -125,7 +125,8 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
 
     @Override
     public String toString() {
-        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + ", valueSeq=" + valueSeq +"]";
+        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq
+                + ", valueSeq=" + valueSeq + "]";
     }
 
     @Override

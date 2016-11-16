@@ -19,7 +19,6 @@ package org.apache.vxquery.compiler.rewriter.rules;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -32,10 +31,12 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceSc
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
 import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+import org.apache.vxquery.functions.BuiltinOperators;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * The rule searches for two assign operators immediately following a data scan
@@ -80,11 +81,11 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
         }
         AssignOperator assign = (AssignOperator) op1;
 
-        AbstractLogicalOperator op2 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
-        if (op2.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
+        AbstractLogicalOperator op4 = (AbstractLogicalOperator) assign.getInputs().get(0).getValue();
+        if (op4.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
             return false;
         }
-        DataSourceScanOperator datascan = (DataSourceScanOperator) op2;
+        DataSourceScanOperator datascan = (DataSourceScanOperator) op4;
 
         if (!usedVariables.contains(datascan.getVariables())) {
             VXQueryCollectionDataSource ds = null;
@@ -144,5 +145,4 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
 
         return added;
     }
-
 }

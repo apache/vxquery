@@ -212,19 +212,19 @@ public class ExpressionToolbox {
         tvp.getValue(pTypeCode);
         return pTypeCode.getInteger();
     }
-    
+
     public static Byte[] getConstantArgument(Mutable<ILogicalExpression> searchM, int arg) {
         AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
         ILogicalExpression argType = searchFunction.getArguments().get(arg).getValue();
+        searchFunction.getArguments().size();
         if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
             return null;
         }
         TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
-
         return ArrayUtils.toObject(tvp.getByteArray());
     }
-    
+
     public static List<ILogicalExpression> getFullArguments(Mutable<ILogicalExpression> searchM) {
         AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
         ArrayList<ILogicalExpression> args = new ArrayList<ILogicalExpression>();
