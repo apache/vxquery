@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -53,7 +52,7 @@ public class JSONParser implements IParser {
 	protected itemType checkItem;
 	protected int levelArray, levelObject;
 	protected final List<Byte[]> allKeys;
-	// protected HashSet<Byte[]> paths;
+	protected List<Integer> nestedPaths;
 	protected List<Byte[]> paths;
 	protected ByteArrayOutputStream outputStream;
 	protected Byte[] b = { (byte) 0xff, 0x00, 0x00, 0x00 };
@@ -71,6 +70,7 @@ public class JSONParser implements IParser {
 
 	public JSONParser(List<Byte[]> valueSeq) {
 		factory = new JsonFactory();
+		int count = 0;
 		this.valueSeq = valueSeq;
 		atomic = new ArrayBackedValueStorage();
 		abStack = new ArrayList<ArrayBuilder>();
@@ -83,11 +83,13 @@ public class JSONParser implements IParser {
 		sb = new SequenceBuilder();
 		allKeys = new ArrayList<Byte[]>();
 		abvsStack.add(atomic);
+		nestedPaths = new ArrayList<Integer>();
 		out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
 		paths = new ArrayList<Byte[]>();
 
 		outputStream = new ByteArrayOutputStream();
 		int size = 0;
+		int temp = -1;
 		byte[] barr;
 		for (int i = 0; i < this.valueSeq.size(); i++) {
 			if (Arrays.equals(this.valueSeq.get(i), b)) {
@@ -117,6 +119,14 @@ public class JSONParser implements IParser {
 		if (this.valueSeq.size() > 0) {
 			barr = Arrays.copyOfRange(outputStream.toByteArray(), 0, size);
 			paths.add(ArrayUtils.toObject(barr));
+		}
+		for (int i = 0; i < this.valueSeq.size(); i++) {
+			if (!Arrays.equals(this.valueSeq.get(i), b)) {
+				count++;
+				nestedPaths.add(temp, count);
+			} else {
+				temp++;
+			}
 		}
 	}
 
@@ -157,8 +167,10 @@ public class JSONParser implements IParser {
 						abvsStack.add(new ArrayBackedValueStorage());
 					}
 					itemStack.add(itemType.OBJECT);
-					abvsStack.get(levelArray + levelObject).reset();
-					obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
+					if (this.pathMatch()) {
+						abvsStack.get(levelArray + levelObject).reset();
+						obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
+					}
 					break;
 				case FIELD_NAME:
 					if (levelObject > spStack.size()) {
@@ -177,19 +189,22 @@ public class JSONParser implements IParser {
 					if (this.pathMatch()) {
 						atomicValues(ValueTag.XS_INTEGER_TAG, parser, out, svb, levelArray, levelObject);
 					}
-					if(allKeys.size()-1 >= 0) allKeys.remove(allKeys.size()-1);
+					if (allKeys.size() - 1 >= 0)
+						allKeys.remove(allKeys.size() - 1);
 					break;
 				case VALUE_STRING:
 					if (this.pathMatch()) {
 						atomicValues(ValueTag.XS_STRING_TAG, parser, out, svb, levelArray, levelObject);
 					}
-					if(allKeys.size()-1 >= 0) allKeys.remove(allKeys.size()-1);
+					if (allKeys.size() - 1 >= 0)
+						allKeys.remove(allKeys.size() - 1);
 					break;
 				case VALUE_NUMBER_FLOAT:
 					if (this.pathMatch()) {
 						atomicValues(ValueTag.XS_DOUBLE_TAG, parser, out, svb, levelArray, levelObject);
 					}
-					if(allKeys.size()-1 >= 0) allKeys.remove(allKeys.size()-1);
+					if (allKeys.size() - 1 >= 0)
+						allKeys.remove(allKeys.size() - 1);
 					break;
 				case END_ARRAY:
 					abStack.get(levelArray - 1).finish();
@@ -221,13 +236,16 @@ public class JSONParser implements IParser {
 							}
 						}
 					}
-					if(allKeys.size()-1 >= 0){
-						allKeys.remove(allKeys.size()-1);
+					if (allKeys.size() - 1 >= 0) {
+						allKeys.remove(allKeys.size() - 1);
 					}
 					itemStack.remove(itemStack.size() - 1);
 					levelObject--;
-					if (levelObject + levelArray == 0) {
-						sb.addItem(abvsStack.get(1));
+					if ((levelObject + levelArray == 0) && abvsStack.size() > nestedPaths.get(0) + 1) {
+						sb.addItem(abvsStack.get(nestedPaths.get(0) + 1));
+						items++;
+					} else if (levelObject + levelArray == 0) {
+						sb.addItem(abvsStack.get(0));
 						items++;
 					}
 					break;
