@@ -56,6 +56,8 @@ public class JSONParser implements IParser {
 	protected List<Byte[]> paths;
 	protected ByteArrayOutputStream outputStream;
 	protected Byte[] b = { (byte) 0xff, 0x00, 0x00, 0x00 };
+	protected int exactMatchLevel;
+	protected boolean matched;
 
 	enum itemType {
 		ARRAY, OBJECT
@@ -86,7 +88,9 @@ public class JSONParser implements IParser {
 		nestedPaths = new ArrayList<Integer>();
 		out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
 		paths = new ArrayList<Byte[]>();
-
+		exactMatchLevel = 1;
+		matched = false;
+		
 		outputStream = new ByteArrayOutputStream();
 		int size = 0;
 		int temp = -1;
@@ -167,10 +171,10 @@ public class JSONParser implements IParser {
 						abvsStack.add(new ArrayBackedValueStorage());
 					}
 					itemStack.add(itemType.OBJECT);
-//					if (this.pathMatch()) {
+					if (this.pathMatch()) {
 						abvsStack.get(levelArray + levelObject).reset();
 						obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
-//					}
+					}
 					break;
 				case FIELD_NAME:
 					if (levelObject > spStack.size()) {
@@ -229,8 +233,13 @@ public class JSONParser implements IParser {
 						obStack.get(levelObject - 1).finish();
 						if (itemStack.size() > 1) {
 							if (checkItem == itemType.OBJECT) {
-								obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
-										abvsStack.get(levelArray + levelObject));
+								if(levelObject > this.exactMatchLevel){
+									obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
+											abvsStack.get(levelArray + levelObject));
+								}else if(this.matched){
+									sb.addItem(abvsStack.get(levelArray + levelObject));
+									this.matched = false;
+								}
 							} else if (checkItem == itemType.ARRAY) {
 								abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
 							}
@@ -242,14 +251,10 @@ public class JSONParser implements IParser {
 					itemStack.remove(itemStack.size() - 1);
 					levelObject--;
 					if (levelObject + levelArray == 0) {
-						// && abvsStack.size() > nestedPaths.get(0) + 1) {
-						sb.addItem(abvsStack.get(1));
+						//sb.addItem(abvsStack.get(1));
+						//sb.addItem(abvsStack.get(this.exactMatchLevel));
 						items++;
-					}
-					// } else if (levelObject + levelArray == 0) {
-					// sb.addItem(abvsStack.get(0));
-					// items++;
-					// }
+					}					
 					break;
 				default:
 					break;
@@ -280,15 +285,20 @@ public class JSONParser implements IParser {
 		}
 
 		curr = ArrayUtils.toObject(Arrays.copyOfRange(outputStream.toByteArray(), 0, size));
-		boolean contains = true;
+		boolean contains = false;
 		Byte[] prefix;
 		for (Byte[] path : paths) {
 			if (path.length < curr.length) {
 				prefix = Arrays.copyOfRange(curr, 0, path.length);
-				contains = Arrays.equals(prefix, path);
+				contains = contains || Arrays.equals(prefix, path);
 			} else {
 				prefix = Arrays.copyOfRange(path, 0, curr.length);
-				contains = Arrays.equals(prefix, curr);
+				contains = contains || Arrays.equals(prefix, curr);
+			}
+			
+			if(path.length == curr.length && contains){
+				this.exactMatchLevel = this.levelObject;
+				this.matched = true;
 			}
 		}
 
