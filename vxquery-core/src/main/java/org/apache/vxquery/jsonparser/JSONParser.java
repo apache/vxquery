@@ -167,10 +167,10 @@ public class JSONParser implements IParser {
 						abvsStack.add(new ArrayBackedValueStorage());
 					}
 					itemStack.add(itemType.OBJECT);
-					if (this.pathMatch()) {
+//					if (this.pathMatch()) {
 						abvsStack.get(levelArray + levelObject).reset();
 						obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
-					}
+//					}
 					break;
 				case FIELD_NAME:
 					if (levelObject > spStack.size()) {
@@ -241,13 +241,15 @@ public class JSONParser implements IParser {
 					}
 					itemStack.remove(itemStack.size() - 1);
 					levelObject--;
-					if ((levelObject + levelArray == 0) && abvsStack.size() > nestedPaths.get(0) + 1) {
-						sb.addItem(abvsStack.get(nestedPaths.get(0) + 1));
-						items++;
-					} else if (levelObject + levelArray == 0) {
-						sb.addItem(abvsStack.get(0));
+					if (levelObject + levelArray == 0) {
+						// && abvsStack.size() > nestedPaths.get(0) + 1) {
+						sb.addItem(abvsStack.get(1));
 						items++;
 					}
+					// } else if (levelObject + levelArray == 0) {
+					// sb.addItem(abvsStack.get(0));
+					// items++;
+					// }
 					break;
 				default:
 					break;
