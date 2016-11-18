@@ -32,106 +32,113 @@ import java.util.List;
  */
 public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
 
-    protected Object[] types;
+	protected Object[] types;
 
-    protected IDataSourcePropertiesProvider propProvider;
-    private VXQueryIndexingDataSource(int id, String collection, String elementPath, Object[] types,
-            String functionCall) {
-        this.dataSourceId = id;
-        this.collectionName = collection;
-        this.elementPath = elementPath;
-        this.function = functionCall;
-        this.collectionPartitions = collectionName.split(DELIMITER);
+	protected IDataSourcePropertiesProvider propProvider;
 
-        this.types = types;
-        final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
-                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
-                new ArrayList<>());
-        propProvider = new IDataSourcePropertiesProvider() {
-            @Override
-            public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
-                return vec;
-            }
-        };
-        this.tag = null;
-        this.childSeq = new ArrayList<>();
-    }
+	private VXQueryIndexingDataSource(int id, String collection, String elementPath, Object[] types,
+			String functionCall) {
+		this.dataSourceId = id;
+		this.collectionName = collection;
+		this.elementPath = elementPath;
+		this.function = functionCall;
+		this.collectionPartitions = collectionName.split(DELIMITER);
 
-    public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type, String
-            function) {
-        return new VXQueryIndexingDataSource(id, collection, index, new Object[] { type }, function);
-    }
+		this.types = types;
+		final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
+				new RandomPartitioningProperty(new CollectionFileDomain(collectionName)), new ArrayList<>());
+		propProvider = new IDataSourcePropertiesProvider() {
+			@Override
+			public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
+				return vec;
+			}
+		};
+		this.tag = null;
+		this.childSeq = new ArrayList<>();
+		this.valueSeq = new ArrayList<>();
+	}
 
-    public int getTotalDataSources() {
-        return totalDataSources;
-    }
+	public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type,
+			String function) {
+		return new VXQueryIndexingDataSource(id, collection, index, new Object[] { type }, function);
+	}
 
-    public void setTotalDataSources(int totalDataSources) {
-        this.totalDataSources = totalDataSources;
-    }
+	public int getTotalDataSources() {
+		return totalDataSources;
+	}
 
-    public int getDataSourceId() {
-        return dataSourceId;
-    }
+	public void setTotalDataSources(int totalDataSources) {
+		this.totalDataSources = totalDataSources;
+	}
 
-    public String getElementPath() {
-        return elementPath;
-    }
+	public int getDataSourceId() {
+		return dataSourceId;
+	}
 
-    public String[] getCollectionPartitions() {
-        return collectionPartitions;
-    }
+	public String getElementPath() {
+		return elementPath;
+	}
 
-    public void setCollectionPartitions(String[] collectionPartitions) {
-        this.collectionPartitions = collectionPartitions;
-    }
+	public String[] getCollectionPartitions() {
+		return collectionPartitions;
+	}
 
-    public int getPartitionCount() {
-        return collectionPartitions.length;
-    }
+	public void setCollectionPartitions(String[] collectionPartitions) {
+		this.collectionPartitions = collectionPartitions;
+	}
 
-    public String getTag() {
-        return this.tag;
-    }
+	public int getPartitionCount() {
+		return collectionPartitions.length;
+	}
 
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
+	public String getTag() {
+		return this.tag;
+	}
 
-    @Override
-    public String getId() {
-        return collectionName;
-    }
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
 
-    @Override
-    public Object[] getSchemaTypes() {
-        return types;
-    }
+	@Override
+	public String getId() {
+		return collectionName;
+	}
 
-    @Override
-    public IDataSourcePropertiesProvider getPropertiesProvider() {
-        return propProvider;
-    }
+	@Override
+	public Object[] getSchemaTypes() {
+		return types;
+	}
 
-    @Override
-    public void computeFDs(List scanVariables, List fdList) {
-    }
+	@Override
+	public IDataSourcePropertiesProvider getPropertiesProvider() {
+		return propProvider;
+	}
 
-    @Override
-    public String toString() {
-        return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", elementPath=" + elementPath + " "
-                + "function=" + function + "]";
-    }
+	@Override
+	public void computeFDs(List scanVariables, List fdList) {
+	}
 
-    @Override
-    public String getFunctionCall() {
-        return function;
-    }
+	@Override
+	public String toString() {
+		return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", elementPath=" + elementPath + " "
+				+ "function=" + function + "]";
+	}
 
-    public List<Integer> getChildSeq() {
-        return childSeq;
-    }
+	@Override
+	public String getFunctionCall() {
+		return function;
+	}
+
+	public List<Integer> getChildSeq() {
+		return childSeq;
+	}
+
+	public void addValueSeq(Byte[] value) {
+		valueSeq.add(value);
+	}
+
+	public List<Byte[]> getValueSeq() {
+		return valueSeq;
+	}
 
 }
-
-

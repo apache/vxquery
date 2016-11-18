@@ -25,6 +25,7 @@ import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
@@ -55,6 +56,7 @@ import org.apache.vxquery.types.ElementType;
  * After
  *
  *   plan__parent
+ *   ASSIGN( $v2 : $v1 ) 
  *   DATASCAN( $source : $v1 )
  *   plan__child
  *
@@ -120,7 +122,9 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
      */
     private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
         boolean added = false;
+        //  FunctionIdentifier fi = null;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+        // if (fi == BuiltinOperators.CHILD.getFunctionIdentifier()) {
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
         for (int i = finds.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
