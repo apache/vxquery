@@ -116,7 +116,9 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
 		boolean added = false;
 		ILogicalExpression comparison = null;
 		List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+		List<Mutable<ILogicalExpression>> finds2 = new ArrayList<Mutable<ILogicalExpression>>();
 		ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.VALUE.getFunctionIdentifier(), finds);
+		ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), finds2);
 		if (finds.size() > 0) {
 			List<ILogicalExpression> listComparison = ExpressionToolbox.getFullArguments(finds.get(finds.size() - 1));
 			comparison = listComparison.get(0);

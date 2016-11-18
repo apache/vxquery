@@ -18,6 +18,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Reader;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +58,9 @@ public class JSONParser implements IParser {
 	protected List<Byte[]> paths;
 	protected ByteArrayOutputStream outputStream;
 	protected Byte[] b = { (byte) 0xff, 0x00, 0x00, 0x00 };
-	protected int exactMatchLevel;
+	protected Byte[] arr_nav = { (byte) 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+	protected int objectMatchLevel;
+	protected int arrayMatchLevel;
 	protected boolean matched;
 	protected List<Integer> arrayCounters;
 
@@ -89,14 +93,15 @@ public class JSONParser implements IParser {
 		nestedPaths = new ArrayList<Integer>();
 		out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
 		paths = new ArrayList<Byte[]>();
-		exactMatchLevel = 1;
+		this.objectMatchLevel = 1;
+		this.arrayMatchLevel = 1;
 		matched = false;
 		arrayCounters = new ArrayList<Integer>();
 
 		outputStream = new ByteArrayOutputStream();
 		int size = 0;
 		int temp = -1;
-		byte[] barr;
+		byte[] barr=null;
 		for (int i = 0; i < this.valueSeq.size(); i++) {
 			if (Arrays.equals(this.valueSeq.get(i), b)) {
 				if (outputStream.size() != 0) {
@@ -112,9 +117,15 @@ public class JSONParser implements IParser {
 				}
 			} else {
 				try {
-					size = size + valueSeq.get(i)[2] + 2;
-					barr = ArrayUtils.toPrimitive(valueSeq.get(i));
-					barr = Arrays.copyOfRange(barr, 1, barr[2] + 3);
+					if(valueSeq.get(i)[0] == 0x19){
+						size = size + 9;
+						barr = ArrayUtils.toPrimitive(valueSeq.get(i));
+						barr = Arrays.copyOfRange(barr, 0, 9);
+					}else{
+						size = size + valueSeq.get(i)[2] + 2;
+						barr = ArrayUtils.toPrimitive(valueSeq.get(i));
+						barr = Arrays.copyOfRange(barr, 1, barr[2] + 3);
+					}
 					outputStream.write(barr);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -136,6 +147,12 @@ public class JSONParser implements IParser {
 		}
 	}
 
+	Byte[] toBytes(Integer v){
+		Byte[] barr = ArrayUtils.toObject(ByteBuffer.allocate(9).putLong(1,v).array());
+		barr[0] = 0x19;
+		return barr;
+	}
+	
 	public int parse(Reader input, ArrayBackedValueStorage result) throws HyracksDataException {
 		int items = 0;
 		try {
@@ -144,6 +161,10 @@ public class JSONParser implements IParser {
 			JsonToken token = parser.nextToken();
 			checkItem = null;
 
+			this.objectMatchLevel = 0;
+			this.arrayMatchLevel = 0;
+			matched = false;
+			
 			levelArray = 0;
 			levelObject = 0;
 			sb.reset(result);
@@ -168,11 +189,6 @@ public class JSONParser implements IParser {
 					}
 					break;
 				case START_OBJECT:
-//					if (this.arrayCounters.size() > 0) {
-//						this.arrayCounters.set(levelArray - 1, this.arrayCounters.get(levelArray - 1) + 1);
-//						// allKeys.add(this.arrayCounters.get(levelArray).t);
-//						// //Add as Byte the counter value
-//					}
 					levelObject++;
 					if (levelObject > obStack.size()) {
 						obStack.add(new ObjectBuilder());
@@ -180,11 +196,21 @@ public class JSONParser implements IParser {
 					if (levelArray + levelObject > abvsStack.size() - 1) {
 						abvsStack.add(new ArrayBackedValueStorage());
 					}
+					
+					if (this.arrayCounters.size() > 0) {						
+						if(itemStack.get(itemStack.size()-1) == itemType.ARRAY){
+							this.arrayCounters.set(levelArray - 1,this.arrayCounters.get(levelArray-1) + 1);
+							this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - 1)));
+						}
+					}
+					
 					itemStack.add(itemType.OBJECT);
 					if (this.pathMatch()) {
 						abvsStack.get(levelArray + levelObject).reset();
 						obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
 					}
+					
+					
 					break;
 				case FIELD_NAME:
 					if (levelObject > spStack.size()) {
@@ -221,20 +247,20 @@ public class JSONParser implements IParser {
 						allKeys.remove(allKeys.size() - 1);
 					break;
 				case END_ARRAY:
+					
 					if (this.pathMatch()) {
 						abStack.get(levelArray - 1).finish();
 						if (itemStack.size() > 1) {
 							if (checkItem == itemType.ARRAY) {
 								abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
-							} else if (checkItem == itemType.OBJECT) {
-//								obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
-//										abvsStack.get(levelArray + levelObject));
-								if (levelArray > this.exactMatchLevel) {
+							} else if (checkItem == itemType.OBJECT) {								
+								if (levelArray > this.arrayMatchLevel) {
 									obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
 											abvsStack.get(levelArray + levelObject));
-								} else if (this.matched) {
-									sb.addItem(abvsStack.get(levelArray + levelObject));
-									this.matched = false;
+								} else if (this.matched) {//TODO: Array inside array no objects
+									//sb.addItem(abvsStack.get(levelArray + levelObject));
+									//this.matched = false;
+									items++;
 								}
 							}
 						}
@@ -243,9 +269,10 @@ public class JSONParser implements IParser {
 						allKeys.remove(allKeys.size() - 1);
 					}
 
+					this.arrayCounters.remove(levelArray-1);
 					itemStack.remove(itemStack.size() - 1);
 					levelArray--;
-					if (levelArray + levelObject == 0) {
+					if (levelArray + levelObject == 0) {//TODO: Nested Arrays
 						sb.addItem(abvsStack.get(1));
 						items++;
 					}
@@ -255,16 +282,22 @@ public class JSONParser implements IParser {
 						obStack.get(levelObject - 1).finish();
 						if (itemStack.size() > 1) {
 							if (checkItem == itemType.OBJECT) {
-								if (levelObject > this.exactMatchLevel) {
+								if (levelObject > this.objectMatchLevel) {
 									obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
 											abvsStack.get(levelArray + levelObject));
 								} else if (this.matched) {
 									sb.addItem(abvsStack.get(levelArray + levelObject));
 									this.matched = false;
+									items++;
 								}
 							} else if (checkItem == itemType.ARRAY) {
-								abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-								allKeys.add(allKeys.get(allKeys.size()-1));
+								if(levelArray > this.arrayMatchLevel){
+									abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+								//}else if (this.matched){
+								}else if (levelArray == this.arrayMatchLevel && this.matched){
+									sb.addItem(abvsStack.get(levelArray + levelObject));
+									//this.matched = false;
+								}
 							}
 						}
 					}
@@ -273,11 +306,11 @@ public class JSONParser implements IParser {
 					}
 					itemStack.remove(itemStack.size() - 1);
 					levelObject--;
-					if (levelObject + levelArray == 0) {
+					//if (levelObject + levelArray == 0) {
 						// sb.addItem(abvsStack.get(1));
 						// sb.addItem(abvsStack.get(this.exactMatchLevel));
-						items++;
-					}
+						//items++;//TODO: Make sure it does not crash
+					//}
 					break;
 				default:
 					break;
@@ -300,7 +333,11 @@ public class JSONParser implements IParser {
 			outputStream.close();
 			outputStream = new ByteArrayOutputStream();
 			for (Byte[] bb : allKeys) {
-				size = size + ArrayUtils.toPrimitive(bb)[1] + 2;
+				if(bb[0] == 0x19){
+					size = size + 9;
+				}else{
+					size = size + ArrayUtils.toPrimitive(bb)[1] + 2;
+				}
 				outputStream.write(ArrayUtils.toPrimitive(bb));
 			}
 		} catch (IOException e1) {
@@ -315,14 +352,15 @@ public class JSONParser implements IParser {
 				prefix = Arrays.copyOfRange(curr, 0, path.length);
 				contains = contains || Arrays.equals(prefix, path);
 			} else {
-				if (curr.length > 0) {
-					prefix = Arrays.copyOfRange(path, 0, curr.length);
-					contains = contains || Arrays.equals(prefix, curr);
-				}
+				//if (curr.length > 0) {
+				prefix = Arrays.copyOfRange(path, 0, curr.length);
+				contains = contains || Arrays.equals(prefix, curr);
+				//}
 			}
 
 			if (path.length == curr.length && contains) {
-				this.exactMatchLevel = this.levelObject;
+				this.objectMatchLevel = this.levelObject;
+				this.arrayMatchLevel = this.levelArray;
 				this.matched = true;
 			}
 		}
@@ -344,8 +382,10 @@ public class JSONParser implements IParser {
 		if (itemStack.size() != 0) {
 			if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
 				abStack.get(levelArray - 1).addItem(abvsStack.get(0));
+				//if (this.matched && levelArray == this.arrayMatchLevel) { sb.addItem(abvsStack.get(0)); this.matched = false; }
 			} else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
 				obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
+				//if (this.matched && levelObject == this.objectMatchLevel) { sb.addItem(abvsStack.get(0)); this.matched = false;  }
 			}
 		}
 	}
