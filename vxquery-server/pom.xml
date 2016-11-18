@@ -138,19 +138,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.vxquery</groupId>
-            <artifactId>apache-vxquery-core</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-api</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hyracks</groupId>
-            <artifactId>hyracks-control-cc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hyracks</groupId>
-            <artifactId>hyracks-control-nc</artifactId>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
         </dependency>
     </dependencies>
 
