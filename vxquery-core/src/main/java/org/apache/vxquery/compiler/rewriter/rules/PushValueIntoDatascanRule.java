@@ -46,18 +46,16 @@ import org.apache.commons.lang3.ArrayUtils;
  * Before
  *
  *   plan__parent
- *   ASSIGN( $v3 : value( $v1, $v2 ) )
- *   ASSIGN( $v2 : constant )
+ *   ASSIGN( $v2 : value( $v1, constant) )
  *   DATASCAN( $source : $v1 )
  *   plan__child
  *
- *   Where $v1 and $v2 is not used in plan__parent.
+ *   Where $v1 is not used in plan__parent.
  *
  * After
  *
  *   plan__parent
- *   ASSIGN( $v3 : $v1 )
- *   ASSIGN( $v2 : constant )
+ *   ASSIGN( $v2 : $v1 )
  *   DATASCAN( $source : $v1 )
  *   plan__child
  *
@@ -118,7 +116,7 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
 		List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
 		List<Mutable<ILogicalExpression>> finds2 = new ArrayList<Mutable<ILogicalExpression>>();
 		ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.VALUE.getFunctionIdentifier(), finds);
-		ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), finds2);
+		//ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), finds2);
 		if (finds.size() > 0) {
 			List<ILogicalExpression> listComparison = ExpressionToolbox.getFullArguments(finds.get(finds.size() - 1));
 			comparison = listComparison.get(0);

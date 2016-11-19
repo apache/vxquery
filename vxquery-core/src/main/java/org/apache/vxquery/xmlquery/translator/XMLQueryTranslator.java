@@ -1580,8 +1580,10 @@ public class XMLQueryTranslator {
                                 }
                                 if (arguments.size() == 0) {
                                     if (ctxExpr == null) {
+                                    	ctxExpr = vre(createAssignment(expr, tCtx));
                                         ctxExpr = sfce(BuiltinOperators.KEYS_OR_MEMBERS, expr);
                                     } else {
+                                    	ctxExpr = vre(createAssignment(ctxExpr, tCtx));
                                         ctxExpr = sfce(BuiltinOperators.KEYS_OR_MEMBERS, ctxExpr);
                                     }
                                 }

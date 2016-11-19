@@ -28,9 +28,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.htrace.fasterxml.jackson.core.JsonFactory;
 import org.apache.htrace.fasterxml.jackson.core.JsonParser;
 import org.apache.htrace.fasterxml.jackson.core.JsonToken;
+import org.apache.hyracks.api.comm.IFrameFieldAppender;
+import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
+import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ArrayBuilder;
 import org.apache.vxquery.datamodel.builders.jsonitem.ObjectBuilder;
@@ -62,8 +66,12 @@ public class JSONParser implements IParser {
 	protected int objectMatchLevel;
 	protected int arrayMatchLevel;
 	protected boolean matched;
+	protected ArrayBackedValueStorage tempABVS;		
 	protected List<Integer> arrayCounters;
-
+	protected List<Boolean> keysOrMembers;
+	protected IFrameWriter writer;
+	protected IFrameFieldAppender appender;
+	
 	enum itemType {
 		ARRAY, OBJECT
 	}
@@ -93,12 +101,14 @@ public class JSONParser implements IParser {
 		nestedPaths = new ArrayList<Integer>();
 		out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
 		paths = new ArrayList<Byte[]>();
+		tempABVS=new ArrayBackedValueStorage();
 		this.objectMatchLevel = 1;
 		this.arrayMatchLevel = 1;
 		matched = false;
 		arrayCounters = new ArrayList<Integer>();
-
 		outputStream = new ByteArrayOutputStream();
+		this.keysOrMembers = new ArrayList<Boolean>();
+		
 		int size = 0;
 		int temp = -1;
 		byte[] barr=null;
@@ -118,9 +128,15 @@ public class JSONParser implements IParser {
 			} else {
 				try {
 					if(valueSeq.get(i)[0] == 0x19){
-						size = size + 9;
 						barr = ArrayUtils.toPrimitive(valueSeq.get(i));
+						size = size + 9;
 						barr = Arrays.copyOfRange(barr, 0, 9);
+						//long val = ByteBuffer.wrap(Arrays.copyOfRange(barr, 1, 9)).getLong();
+						if(ByteBuffer.wrap(Arrays.copyOfRange(barr, 1, 9)).getLong() == 0){
+							this.keysOrMembers.add(new Boolean(false));
+						}else{
+							this.keysOrMembers.add(new Boolean(true));
+						}
 					}else{
 						size = size + valueSeq.get(i)[2] + 2;
 						barr = ArrayUtils.toPrimitive(valueSeq.get(i));
@@ -153,6 +169,12 @@ public class JSONParser implements IParser {
 		return barr;
 	}
 	
+	public int parse(Reader input, ArrayBackedValueStorage result, IFrameWriter writer,IFrameFieldAppender appender) throws HyracksDataException{
+		this.writer=writer;
+		this.appender=appender;
+		return parse(input, result);
+	}
+	
 	public int parse(Reader input, ArrayBackedValueStorage result) throws HyracksDataException {
 		int items = 0;
 		try {
@@ -160,10 +182,10 @@ public class JSONParser implements IParser {
 			JsonParser parser = factory.createParser(input);
 			JsonToken token = parser.nextToken();
 			checkItem = null;
-
+			
 			this.objectMatchLevel = 0;
 			this.arrayMatchLevel = 0;
-			matched = false;
+			this.matched = false;
 			
 			levelArray = 0;
 			levelObject = 0;
@@ -197,10 +219,15 @@ public class JSONParser implements IParser {
 						abvsStack.add(new ArrayBackedValueStorage());
 					}
 					
-					if (this.arrayCounters.size() > 0) {						
+					if (this.arrayCounters.size() > 0) {
+						boolean addCounter = levelArray-1 < this.keysOrMembers.size() ? this.keysOrMembers.get(levelArray-1) : true;					
 						if(itemStack.get(itemStack.size()-1) == itemType.ARRAY){
-							this.arrayCounters.set(levelArray - 1,this.arrayCounters.get(levelArray-1) + 1);
-							this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - 1)));
+							if(addCounter){
+								this.arrayCounters.set(levelArray - 1,this.arrayCounters.get(levelArray-1) + 1);
+								this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - 1)));
+							}else{
+								this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - 1)));
+							}
 						}
 					}
 					
@@ -258,8 +285,8 @@ public class JSONParser implements IParser {
 									obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
 											abvsStack.get(levelArray + levelObject));
 								} else if (this.matched) {//TODO: Array inside array no objects
-									//sb.addItem(abvsStack.get(levelArray + levelObject));
-									//this.matched = false;
+									sb.addItem(abvsStack.get(levelArray + levelObject));
+									this.matched = false;
 									items++;
 								}
 							}
@@ -291,16 +318,25 @@ public class JSONParser implements IParser {
 									items++;
 								}
 							} else if (checkItem == itemType.ARRAY) {
-								if(levelArray > this.arrayMatchLevel){
+								//if(levelArray > this.arrayMatchLevel){
 									abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
 								//}else if (this.matched){
-								}else if (levelArray == this.arrayMatchLevel && this.matched){
-									sb.addItem(abvsStack.get(levelArray + levelObject));
+								//}else if (levelArray == this.arrayMatchLevel && this.matched){
+								//	abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+//									sb.addItem(abvsStack.get(levelArray + levelObject));
+//									sb.finish();
+									//tempABVS.reset();
+							        //DataOutput outTemp = tempABVS.getDataOutput();
+									//outTemp.write(ValueTag.ARRAY_TAG);
+									//	outTemp.write(abvsStack.get(levelArray + levelObject).getByteArray(), abvsStack.get(levelArray + levelObject).getStartOffset(), abvsStack.get(levelArray + levelObject).getLength());
+//									FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(), result.getLength());
+//							        tvp.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
 									//this.matched = false;
-								}
+								//}
 							}
 						}
 					}
+					//boolean addCounter = levelArray-1 < this.keysOrMembers.size() ? this.keysOrMembers.get(levelArray-1) : true;
 					if (allKeys.size() - 1 >= 0) {
 						allKeys.remove(allKeys.size() - 1);
 					}
@@ -389,4 +425,25 @@ public class JSONParser implements IParser {
 			}
 		}
 	}
+	
+	public void writeElement(itemType child, itemType parent) throws IOException {
+        tempABVS.reset();
+        DataOutput out = tempABVS.getDataOutput();
+        
+        //if(child == itemType.ARRAY) out.write(ValueTag.ARRAY_TAG); 
+        //else if(child == itemType.OBJECT) out.write(ValueTag.OBJECT_TAG); 
+        
+        //if(child == itemType.)
+        
+        //if(child == itemType.ARRAY){
+        out.write(abvsStack.get(levelArray + levelObject).getByteArray(), 
+        		abvsStack.get(levelArray + levelObject).getStartOffset(), 
+        		abvsStack.get(levelArray + levelObject).getLength());
+        //}
+        
+        //out.write(abvsStack.get(level), resultABVS.getStartOffset(), resultABVS.getLength());
+        //tvp.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
+        //.addNodeToTuple(tvp, tupleIndex);
+        //skipping = true;
+    }
 }

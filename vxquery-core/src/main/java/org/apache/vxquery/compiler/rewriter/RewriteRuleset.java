@@ -143,13 +143,14 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedUnnestIterateRule());
        // normalization.add(new RemoveRedundantVariablesRule());
         
-        normalization.add(new PushValueIntoDatascanRule());
+       // normalization.add(new PushValueIntoDatascanRule());
         normalization.add(new PushChildIntoDataScanRule());
 
         // json
-       // normalization.add(new PushValueIntoDatascanRule());
         normalization.add(new InlineNestedVariablesRule());
-        
+        normalization.add(new RemoveUnusedAssignAndAggregateRule());
+
+        normalization.add(new PushValueIntoDatascanRule());
 
         // Improvement for scalar child expressions
         normalization.add(new EliminateSubplanForSingleItemsRule());
