@@ -26,12 +26,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.vxquery.runtime.functions.index.updateIndex.MetaFileUtil;
 import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import junit.framework.Assert;
 
 /**
  * Test cases for testing MetaFileUtil functions.
