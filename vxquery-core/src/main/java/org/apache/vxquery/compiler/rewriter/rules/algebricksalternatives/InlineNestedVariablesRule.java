@@ -39,59 +39,63 @@ import org.apache.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
  */
 public class InlineNestedVariablesRule extends InlineVariablesRule {
 
-    protected boolean inlineVariables(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
-            throws AlgebricksException {
-        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
+	protected boolean inlineVariables(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+			throws AlgebricksException {
+		AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
 
-        // Update mapping from variables to expressions during top-down traversal.
-        if (op.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
-            AssignOperator assignOp = (AssignOperator) op;
-            List<LogicalVariable> vars = assignOp.getVariables();
-            List<Mutable<ILogicalExpression>> exprs = assignOp.getExpressions();
-            for (int i = 0; i < vars.size(); i++) {
-                ILogicalExpression expr = exprs.get(i).getValue();
-                // Ignore functions that are either in the doNotInline set or are non-functional
-                if (expr.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-                    AbstractFunctionCallExpression funcExpr = (AbstractFunctionCallExpression) expr;
-                    if (doNotInlineFuncs.contains(funcExpr.getFunctionIdentifier()) || !funcExpr.isFunctional()) {
-                        continue;
-                    }
-                }
-                varAssignRhs.put(vars.get(i), exprs.get(i).getValue());
-            }
-        }
+		// Update mapping from variables to expressions during top-down
+		// traversal.
+		if (op.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
+			AssignOperator assignOp = (AssignOperator) op;
+			List<LogicalVariable> vars = assignOp.getVariables();
+			List<Mutable<ILogicalExpression>> exprs = assignOp.getExpressions();
+			for (int i = 0; i < vars.size(); i++) {
+				ILogicalExpression expr = exprs.get(i).getValue();
+				// Ignore functions that are either in the doNotInline set or
+				// are non-functional
+				if (expr.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+					AbstractFunctionCallExpression funcExpr = (AbstractFunctionCallExpression) expr;
+					if (doNotInlineFuncs.contains(funcExpr.getFunctionIdentifier()) || !funcExpr.isFunctional()) {
+						continue;
+					}
+				}
+				varAssignRhs.put(vars.get(i), exprs.get(i).getValue());
+			}
+		}
 
-        boolean modified = false;
-        // Descend into nested plans inlining along the way.
-        if (op.hasNestedPlans()) {
-            AbstractOperatorWithNestedPlans nestedOp = (AbstractOperatorWithNestedPlans) op;
-            for (ILogicalPlan nestedPlan : nestedOp.getNestedPlans()) {
-                for (Mutable<ILogicalOperator> nestedOpRef : nestedPlan.getRoots()) {
-                    if (inlineVariables(nestedOpRef, context)) {
-                        modified = true;
-                    }
-                }
-            }
-        }
+		boolean modified = false;
+		// Descend into nested plans inlining along the way.
+		if (op.hasNestedPlans()) {
+			AbstractOperatorWithNestedPlans nestedOp = (AbstractOperatorWithNestedPlans) op;
+			for (ILogicalPlan nestedPlan : nestedOp.getNestedPlans()) {
+				for (Mutable<ILogicalOperator> nestedOpRef : nestedPlan.getRoots()) {
+					if (inlineVariables(nestedOpRef, context)) {
+						modified = true;
+					}
+				}
+			}
+		}
 
-        // Descend into children inlining along on the way.
-        for (Mutable<ILogicalOperator> inputOpRef : op.getInputs()) {
-            if (inlineVariables(inputOpRef, context)) {
-                modified = true;
-            }
-        }
+		// Descend into children inlining along on the way.
+		for (Mutable<ILogicalOperator> inputOpRef : op.getInputs()) {
+			if (inlineVariables(inputOpRef, context)) {
+				modified = true;
+			}
+		}
 
-        if (performBottomUpAction(op)) {
-            modified = true;
-        }
+		if (performBottomUpAction(op)) {
+			modified = true;
+		}
 
-        if (modified) {
-            context.computeAndSetTypeEnvironmentForOperator(op);
-            context.addToDontApplySet(this, op);
-            // Re-enable rules that we may have already tried. They could be applicable now after inlining.
-            context.removeFromAlreadyCompared(opRef.getValue());
-        }
+		if (modified) {
+			context.computeAndSetTypeEnvironmentForOperator(op);
+			context.addToDontApplySet(this, op);
+			// Re-enable rules that we may have already tried. They could be
+			// applicable now after inlining.
+			context.removeFromAlreadyCompared(opRef.getValue());
+		}
 
-        return modified;
-    }
+		return modified;
+	}
+
 }
