@@ -154,9 +154,9 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
 										try {
 											jsonAbvs.reset();
 											input = new InputStreamReader(new FileInputStream(file));
-											jparser.parse(input, jsonAbvs);
-											FrameUtils.appendFieldToWriter(writer, appender, jsonAbvs.getByteArray(),
-													jsonAbvs.getStartOffset(), jsonAbvs.getLength());
+											jparser.parse(input, jsonAbvs, writer, appender);
+//											FrameUtils.appendFieldToWriter(writer, appender, jsonAbvs.getByteArray(),
+//													jsonAbvs.getStartOffset(), jsonAbvs.getLength());
 										} catch (FileNotFoundException e) {
 											throw new HyracksDataException(e.toString());
 										}

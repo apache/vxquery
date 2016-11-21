@@ -287,9 +287,10 @@ public class JSONParser implements IParser {
                                         obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
                                                 abvsStack.get(levelArray + levelObject));
                                     } else if (this.matched) {//TODO: Array inside array no objects
-                                        sb.addItem(abvsStack.get(levelArray + levelObject));
+                                        //sb.addItem(abvsStack.get(levelArray + levelObject));
                                         this.matched = false;
                                         items++;
+                                        // writeElement();
                                     }
                                 }
                             }
@@ -315,13 +316,15 @@ public class JSONParser implements IParser {
                                         obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
                                                 abvsStack.get(levelArray + levelObject));
                                     } else if (this.matched) {
-                                        sb.addItem(abvsStack.get(levelArray + levelObject));
+                                        //sb.addItem(abvsStack.get(levelArray + levelObject));
                                         this.matched = false;
                                         items++;
+                                        writeElement();
                                     }
                                 } else if (checkItem == itemType.ARRAY) {
                                     //if(levelArray > this.arrayMatchLevel){
                                     abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+                                    writeElement();
                                     //}else if (this.matched){
                                     //}else if (levelArray == this.arrayMatchLevel && this.matched){
                                     //	abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
@@ -390,10 +393,8 @@ public class JSONParser implements IParser {
                 prefix = Arrays.copyOfRange(curr, 0, path.length);
                 contains = contains || Arrays.equals(prefix, path);
             } else {
-                //if (curr.length > 0) {
                 prefix = Arrays.copyOfRange(path, 0, curr.length);
                 contains = contains || Arrays.equals(prefix, curr);
-                //}
             }
 
             if (path.length == curr.length && contains) {
@@ -427,29 +428,17 @@ public class JSONParser implements IParser {
                     sb.addItem(abvsStack.get(0));
                     this.matched = false;
                 }
-                //				&& levelObject == this.objectMatchLevel
             }
         }
     }
 
-    public void writeElement(itemType child, itemType parent) throws IOException {
+    public void writeElement() throws IOException {
         tempABVS.reset();
         DataOutput out = tempABVS.getDataOutput();
-
-        //if(child == itemType.ARRAY) out.write(ValueTag.ARRAY_TAG); 
-        //else if(child == itemType.OBJECT) out.write(ValueTag.OBJECT_TAG); 
-
-        //if(child == itemType.)
-
-        //if(child == itemType.ARRAY){
         out.write(abvsStack.get(levelArray + levelObject).getByteArray(),
                 abvsStack.get(levelArray + levelObject).getStartOffset(),
                 abvsStack.get(levelArray + levelObject).getLength());
-        //}
-
-        //out.write(abvsStack.get(level), resultABVS.getStartOffset(), resultABVS.getLength());
-        //tvp.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
-        //.addNodeToTuple(tvp, tupleIndex);
-        //skipping = true;
+        FrameUtils.appendFieldToWriter(writer, appender, tempABVS.getByteArray(), tempABVS.getStartOffset(),
+                tempABVS.getLength());
     }
 }
