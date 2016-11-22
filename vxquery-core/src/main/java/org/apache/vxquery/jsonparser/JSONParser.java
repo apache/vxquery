@@ -65,7 +65,7 @@ public class JSONParser implements IParser {
     protected Byte[] arr_nav = { (byte) 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
     protected int objectMatchLevel;
     protected int arrayMatchLevel;
-    protected boolean matched;
+    protected boolean matched, literal;
     protected ArrayBackedValueStorage tempABVS;
     protected List<Integer> arrayCounters;
     protected List<Boolean> keysOrMembers;
@@ -106,6 +106,7 @@ public class JSONParser implements IParser {
         this.objectMatchLevel = 1;
         this.arrayMatchLevel = 1;
         matched = false;
+        literal = false;
         arrayCounters = new ArrayList<Integer>();
         outputStream = new ByteArrayOutputStream();
         this.keysOrMembers = new ArrayList<Boolean>();
@@ -290,7 +291,7 @@ public class JSONParser implements IParser {
                                         //sb.addItem(abvsStack.get(levelArray + levelObject));
                                         this.matched = false;
                                         items++;
-                                        // writeElement();
+                                        //  writeElement();
                                     }
                                 }
                             }
@@ -308,40 +309,42 @@ public class JSONParser implements IParser {
                         }
                         break;
                     case END_OBJECT:
-                        if (this.pathMatch()) {
-                            obStack.get(levelObject - 1).finish();
-                            if (itemStack.size() > 1) {
-                                if (checkItem == itemType.OBJECT) {
-                                    if (levelObject > this.objectMatchLevel) {
-                                        obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
-                                                abvsStack.get(levelArray + levelObject));
-                                    } else if (this.matched) {
-                                        //sb.addItem(abvsStack.get(levelArray + levelObject));
+                        if (!this.literal) {
+                            if (this.pathMatch()) {
+                                obStack.get(levelObject - 1).finish();
+                                if (itemStack.size() > 1) {
+                                    if (checkItem == itemType.OBJECT) {
+                                        if (levelObject > this.objectMatchLevel) {
+                                            obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
+                                                    abvsStack.get(levelArray + levelObject));
+                                        } else if (this.matched) {
+                                            //sb.addItem(abvsStack.get(levelArray + levelObject));
+                                            this.matched = false;
+                                            items++;
+                                            writeElement(abvsStack.get(levelArray + levelObject));
+                                        }
+                                    } else if (checkItem == itemType.ARRAY) {
+                                        //if(levelArray > this.arrayMatchLevel){
                                         this.matched = false;
-                                        items++;
-                                        writeElement();
+                                        abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+                                        writeElement(abvsStack.get(levelArray + levelObject));
+                                        //}else if (this.matched){
+                                        //}else if (levelArray == this.arrayMatchLevel && this.matched){
+                                        //	abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+                                        //									sb.addItem(abvsStack.get(levelArray + levelObject));
+                                        //									sb.finish();
+                                        //tempABVS.reset();
+                                        //DataOutput outTemp = tempABVS.getDataOutput();
+                                        //outTemp.write(ValueTag.ARRAY_TAG);
+                                        //	outTemp.write(abvsStack.get(levelArray + levelObject).getByteArray(), abvsStack.get(levelArray + levelObject).getStartOffset(), abvsStack.get(levelArray + levelObject).getLength());
+                                        //									FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(), result.getLength());
+                                        //							        tvp.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
+
+                                        //}
                                     }
-                                } else if (checkItem == itemType.ARRAY) {
-                                    //if(levelArray > this.arrayMatchLevel){
-                                    abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-                                    writeElement();
-                                    //}else if (this.matched){
-                                    //}else if (levelArray == this.arrayMatchLevel && this.matched){
-                                    //	abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-                                    //									sb.addItem(abvsStack.get(levelArray + levelObject));
-                                    //									sb.finish();
-                                    //tempABVS.reset();
-                                    //DataOutput outTemp = tempABVS.getDataOutput();
-                                    //outTemp.write(ValueTag.ARRAY_TAG);
-                                    //	outTemp.write(abvsStack.get(levelArray + levelObject).getByteArray(), abvsStack.get(levelArray + levelObject).getStartOffset(), abvsStack.get(levelArray + levelObject).getLength());
-                                    //									FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(), result.getStartOffset(), result.getLength());
-                                    //							        tvp.set(tempABVS.getByteArray(), tempABVS.getStartOffset(), tempABVS.getLength());
-                                    //this.matched = false;
-                                    //}
                                 }
                             }
                         }
-                        //boolean addCounter = levelArray-1 < this.keysOrMembers.size() ? this.keysOrMembers.get(levelArray-1) : true;
                         if (allKeys.size() - 1 >= 0) {
                             allKeys.remove(allKeys.size() - 1);
                         }
@@ -387,6 +390,7 @@ public class JSONParser implements IParser {
 
         curr = ArrayUtils.toObject(Arrays.copyOfRange(outputStream.toByteArray(), 0, size));
         boolean contains = false;
+        this.matched=false;
         Byte[] prefix;
         for (Byte[] path : paths) {
             if (path.length < curr.length) {
@@ -401,6 +405,7 @@ public class JSONParser implements IParser {
                 this.objectMatchLevel = this.levelObject;
                 this.arrayMatchLevel = this.levelArray;
                 this.matched = true;
+                this.literal = false;
             }
         }
 
@@ -421,23 +426,22 @@ public class JSONParser implements IParser {
         if (itemStack.size() != 0) {
             if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
                 abStack.get(levelArray - 1).addItem(abvsStack.get(0));
-                //if (this.matched && levelArray == this.arrayMatchLevel) { sb.addItem(abvsStack.get(0)); this.matched = false; }
             } else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
                 obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
-                if (this.matched) {
-                    sb.addItem(abvsStack.get(0));
+                if (this.matched && levelObject == this.objectMatchLevel) {
+                    this.literal = true;
                     this.matched = false;
+                    writeElement(abvsStack.get(0));
+
                 }
             }
         }
     }
 
-    public void writeElement() throws IOException {
+    public void writeElement(ArrayBackedValueStorage abvs) throws IOException {
         tempABVS.reset();
         DataOutput out = tempABVS.getDataOutput();
-        out.write(abvsStack.get(levelArray + levelObject).getByteArray(),
-                abvsStack.get(levelArray + levelObject).getStartOffset(),
-                abvsStack.get(levelArray + levelObject).getLength());
+        out.write(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
         FrameUtils.appendFieldToWriter(writer, appender, tempABVS.getByteArray(), tempABVS.getStartOffset(),
                 tempABVS.getLength());
     }

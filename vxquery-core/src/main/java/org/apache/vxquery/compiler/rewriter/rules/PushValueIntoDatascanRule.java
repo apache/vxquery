@@ -115,12 +115,26 @@ public class PushValueIntoDatascanRule extends AbstractUsedVariablesProcessingRu
         ILogicalExpression comparison = null;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
         List<Mutable<ILogicalExpression>> finds2 = new ArrayList<Mutable<ILogicalExpression>>();
+        List<ILogicalExpression> listComparison = new ArrayList<ILogicalExpression>();
+        List<ILogicalExpression> listValues = new ArrayList<ILogicalExpression>();
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.VALUE.getFunctionIdentifier(), finds);
-        //ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), finds2);
+        //        ExpressionToolbox.findAllFunctionExpressions(expression,
+        //                BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), finds2);
         if (finds.size() > 0) {
-            List<ILogicalExpression> listComparison = ExpressionToolbox.getFullArguments(finds.get(finds.size() - 1));
+            listComparison = ExpressionToolbox.getFullArguments(finds.get(finds.size() - 1));
             comparison = listComparison.get(0);
         }
+        for (int i = finds.size(); i > 0; --i) {
+            listValues.add(ExpressionToolbox.getFullArguments(finds.get(i-1)).get(0));
+            listValues.add(ExpressionToolbox.getFullArguments(finds.get(i-1)).get(1));
+        }
+//        for (int i = listValues.size(); i > 0; --i) {
+//            for (int j = finds2.size(); j > 0; --j) {
+//                if (finds.get(i).equals(finds2.get(j))) {
+//                    int ena = 0;
+//                }
+//            }
+//        }
 
         byte[] b = new byte[4];
         b[0] = (byte) 0xff;
