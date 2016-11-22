@@ -144,6 +144,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-api</artifactId>
         </dependency>
@@ -165,12 +170,17 @@
 
         <dependency>
             <groupId>org.apache.hyracks</groupId>
-            <artifactId>hyracks-dataflow-std</artifactId>
+            <artifactId>hyracks-dataflow-common</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.apache.hyracks</groupId>
-            <artifactId>hyracks-hdfs-2.x</artifactId>
+            <artifactId>hyracks-control-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
         </dependency>
 
         <dependency>
@@ -184,9 +194,40 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
-            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
