@@ -660,6 +660,7 @@
         <param name="expr" type="json-item()"/>
         <return type="xs:string*"/>
         <runtime type="scalar" class="org.apache.vxquery.runtime.functions.json.KeysOrMembersScalarEvaluatorFactory"/>
+        <runtime type="unnesting" class="org.apache.vxquery.runtime.functions.json.KeysOrMembersUnnestingEvaluatorFactory"/>
     </operator>
 
     <!-- opext:subtract($arg1 as xs:anyAtomicType?, $arg2 as xs:anyAtomicType?) as xs:anyAtomicType? -->

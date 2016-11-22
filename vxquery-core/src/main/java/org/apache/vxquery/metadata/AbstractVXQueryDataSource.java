@@ -27,6 +27,7 @@ public abstract class AbstractVXQueryDataSource {
     protected String[] collectionPartitions;
     protected String elementPath;
     protected List<Integer> childSeq;
+    protected List<Byte[]> valueSeq;
     protected int totalDataSources;
     protected String tag;
     protected String function;

@@ -31,7 +31,6 @@ import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningP
 import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
 
 public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
-
     private VXQueryCollectionDataSource(int id, String file, Object[] types) {
         this.dataSourceId = id;
         this.collectionName = file;
@@ -47,6 +46,7 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
             }
         };
         this.childSeq = new ArrayList<>();
+        this.valueSeq = new ArrayList<>();
         this.tag = null;
     }
 
@@ -113,9 +113,18 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource imple
         return childSeq;
     }
 
+    public void addValueSeq(Byte[] value) {
+        valueSeq.add(value);
+    }
+
+    public List<Byte[]> getValueSeq() {
+        return valueSeq;
+    }
+
     @Override
     public String toString() {
-        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + "]";
+        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq
+                + ", valueSeq=" + valueSeq + "]";
     }
 
     @Override
