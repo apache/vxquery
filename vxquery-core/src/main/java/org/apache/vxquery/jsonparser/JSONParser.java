@@ -362,7 +362,7 @@ public class JSONParser implements IParser {
                 token = parser.nextToken();
             }
             sb.finish();
-            outResult.write(result.getByteArray());
+            //outResult.write(result.getByteArray());
         } catch (Exception e) {
             throw new HyracksDataException(e.toString());
         }
