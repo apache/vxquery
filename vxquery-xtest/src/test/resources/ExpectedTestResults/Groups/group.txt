@@ -1,0 +1,4 @@
+{"date":"2001-01-01T00:00:00.000","value":[<value>11.25</value>,<value>31</value>,<value>1000</value>]}
+{"date":"2002-02-02T00:00:00.000","value":[<value>12.5</value>,<value>32</value>,<value>20</value>]}
+{"date":"2003-03-03T00:00:00.000","value":[<value>13.75</value>,<value>33</value>]}
+{"date":"2004-04-04T00:00:00.000","value":[<value>40</value>,<value>4</value>]}

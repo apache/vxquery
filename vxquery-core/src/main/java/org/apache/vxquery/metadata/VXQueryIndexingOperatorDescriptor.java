@@ -68,7 +68,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
             RecordDescriptor rDesc, String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos) {
         super(spec, 1, 1);
         this.functionCall = ds.getFunctionCall();
-        collectionPartitions = ds.getCollectionPartitions();
+        collectionPartitions = ds.getPartitions();
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
         recordDescriptors[0] = rDesc;

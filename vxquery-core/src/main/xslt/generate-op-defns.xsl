@@ -57,31 +57,29 @@
                             );
                         </xsl:if>
                     </xsl:for-each>
-                    <xsl:for-each select="runtime">
-                        <xsl:if test="@type = 'scalar'">
-                        this.scalarEvaluatorFactory = true;
-                        </xsl:if>
-                        <xsl:if test="@type = 'aggregate'">
-                        this.aggregateEvaluatorFactory = true;
-                        </xsl:if>
-                        <xsl:if test="@type = 'unnesting'">
-                        this.unnestingEvaluatorFactory = true;
-                        </xsl:if>
-                    </xsl:for-each>
                     }
                 </xsl:if>
                 <xsl:for-each select="runtime">
                     <xsl:if test="@type = 'scalar'">
+                    {
+                         this.scalarEvaluatorFactory = true;
+                    }
                     public org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory createScalarEvaluatorFactory(org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
                         return new <xsl:value-of select="@class"/>(args);
                     }
                     </xsl:if>
                     <xsl:if test="@type = 'aggregate'">
+                    {
+                        this.aggregateEvaluatorFactory = true;
+                    }
                     public org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluatorFactory createAggregateEvaluatorFactory(org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
                         return new <xsl:value-of select="@class"/>(args);
                     }
                     </xsl:if>
                     <xsl:if test="@type = 'unnesting'">
+                    {
+                        this.unnestingEvaluatorFactory = true;
+                    }
                     public org.apache.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory createUnnestingEvaluatorFactory(org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory[] args) {
                         return new <xsl:value-of select="@class"/>(args);
                     }

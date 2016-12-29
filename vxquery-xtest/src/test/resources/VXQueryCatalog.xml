@@ -52,6 +52,7 @@
 <!ENTITY JsonParserQueries SYSTEM "cat/JsonParserQueries.xml">
 <!ENTITY LibrariesInJSONiq SYSTEM "cat/LibrariesInJSONiq.xml">
 <!ENTITY XMLInJSONQueries SYSTEM "cat/XMLInJSONQueries.xml">
+<!ENTITY GroupQueries SYSTEM "cat/GroupQueries.xml">
 
 <!ENTITY TraceQuery SYSTEM "cat/TraceQuery.xml">
 
@@ -272,6 +273,19 @@
                 <description/>
             </GroupInfo>
          &IndexingQueries;
+        </test-group>
+    </test-group>
+    <test-group name="GroupQueries" featureOwner="Christina Pavlopoulou">
+        <GroupInfo>
+            <title>Group Queries</title>
+            <description/>
+        </GroupInfo>
+        <test-group name="GroupTests" featureOwner="Christina Pavlopoulou">
+            <GroupInfo>
+                <title>Group-by Tests</title>
+                <description/>
+            </GroupInfo>
+         &GroupQueries;
         </test-group>
     </test-group>
     <test-group name="JsoniqQueries" featureOwner="Christina Pavlopoulou">

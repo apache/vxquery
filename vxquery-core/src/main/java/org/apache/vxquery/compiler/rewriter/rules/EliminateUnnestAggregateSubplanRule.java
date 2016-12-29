@@ -65,7 +65,8 @@ import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
  */
 public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRule {
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.UNNEST) {
             return false;
@@ -121,7 +122,8 @@ public class EliminateUnnestAggregateSubplanRule implements IAlgebraicRewriteRul
         }
         functionCall.getArguments().get(0).setValue(new VariableReferenceExpression(assignVariable));
         unnest.getInputs().get(0).setValue(aOp);
-
+        context.computeAndSetTypeEnvironmentForOperator(aOp);
+        context.computeAndSetTypeEnvironmentForOperator(unnest);
         return true;
     }
 
