@@ -52,6 +52,7 @@
 <!ENTITY JsonParserQueries SYSTEM "cat/JsonParserQueries.xml">
 <!ENTITY LibrariesInJSONiq SYSTEM "cat/LibrariesInJSONiq.xml">
 <!ENTITY XMLInJSONQueries SYSTEM "cat/XMLInJSONQueries.xml">
+<!ENTITY SimpleQueries SYSTEM "cat/SimpleQueries.xml">
 
 <!ENTITY TraceQuery SYSTEM "cat/TraceQuery.xml">
 
@@ -140,6 +141,9 @@
         </source>
         <source ID="nested_array_object_json_file" FileName="TestSources/json/array/nested_array_object.json" Creator="Christina Pavlopoulou">
             <description last-mod="2016-07-05">File</description>
+        </source>
+        <source ID="books" FileName="TestSources/jsons/books.xml" Creator="Shivani Mall">
+            <description last-mod="2015-06-26">File</description>
         </source>
     </sources>
     <test-group name="SingleQuery" featureOwner="Preston Carman">
@@ -272,6 +276,19 @@
                 <description/>
             </GroupInfo>
          &IndexingQueries;
+        </test-group>
+    </test-group>
+    <test-group name="SimpleQueries" featureOwner="Christina Pavlopoulou">
+        <GroupInfo>
+            <title>Simple Queries</title>
+            <description/>
+        </GroupInfo>
+        <test-group name="SimpleTests" featureOwner="Christina Pavlopoulou">
+            <GroupInfo>
+                <title>Simple Tests</title>
+                <description/>
+            </GroupInfo>
+         &SimpleQueries;
         </test-group>
     </test-group>
     <test-group name="JsoniqQueries" featureOwner="Christina Pavlopoulou">

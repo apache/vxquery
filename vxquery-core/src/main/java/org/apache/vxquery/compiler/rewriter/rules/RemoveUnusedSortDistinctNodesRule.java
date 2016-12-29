@@ -41,6 +41,7 @@ import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceE
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AssignOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.GroupByOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.NestedTupleSourceOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.OrderOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
@@ -94,7 +95,8 @@ import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule {
 
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         return false;
     }
 
@@ -178,8 +180,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             return 0;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-        if (!functionCall.getFunctionIdentifier().equals(
-                BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
+        if (!functionCall.getFunctionIdentifier()
+                .equals(BuiltinOperators.SORT_DISTINCT_NODES_ASC_OR_ATOMICS.getFunctionIdentifier())) {
             return 0;
         }
 
@@ -314,7 +316,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
      * @param uniqueNodesVariables
      * @param uniqueNodes
      */
-    private void resetUniqueNodesVariables(HashMap<Integer, UniqueNodes> uniqueNodesVariables, UniqueNodes uniqueNodes) {
+    private void resetUniqueNodesVariables(HashMap<Integer, UniqueNodes> uniqueNodesVariables,
+            UniqueNodes uniqueNodes) {
         for (Entry<Integer, UniqueNodes> entry : uniqueNodesVariables.entrySet()) {
             uniqueNodesVariables.put(entry.getKey(), uniqueNodes);
         }
@@ -349,8 +352,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
             case ASSIGN:
                 AssignOperator assign = (AssignOperator) op;
                 for (int index = 0; index < assign.getExpressions().size(); index++) {
-                    ILogicalExpression assignLogicalExpression = (ILogicalExpression) assign.getExpressions()
-                            .get(index).getValue();
+                    ILogicalExpression assignLogicalExpression = (ILogicalExpression) assign.getExpressions().get(index)
+                            .getValue();
                     variableId = assign.getVariables().get(index).getId();
                     documentOrder = propagateDocumentOrder(assignLogicalExpression, documentOrderVariablesForOperator);
                     uniqueNodes = propagateUniqueNodes(assignLogicalExpression, uniqueNodesVariablesForOperator);
@@ -384,8 +387,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 // Find the last operator to set a variable and call this function again.
                 SubplanOperator subplan = (SubplanOperator) op;
                 for (int index = 0; index < subplan.getNestedPlans().size(); index++) {
-                    AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans()
-                            .get(index).getRoots().get(0).getValue();
+                    AbstractLogicalOperator lastOperator = (AbstractLogicalOperator) subplan.getNestedPlans().get(index)
+                            .getRoots().get(0).getValue();
                     updateVariableMap(lastOperator, cardinalityVariable, documentOrderVariables, uniqueNodesVariables,
                             vxqueryContext);
                 }
@@ -395,8 +398,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 UnnestOperator unnest = (UnnestOperator) op;
                 ILogicalExpression unnestLogicalExpression = (ILogicalExpression) unnest.getExpressionRef().getValue();
                 variableId = unnest.getVariables().get(0).getId();
-                Cardinality inputCardinality = vxqueryContext.getCardinalityOperatorMap(op.getInputs().get(0)
-                        .getValue());
+                Cardinality inputCardinality = vxqueryContext
+                        .getCardinalityOperatorMap(op.getInputs().get(0).getValue());
                 documentOrder = propagateDocumentOrder(unnestLogicalExpression, documentOrderVariablesForOperator);
                 uniqueNodes = propagateUniqueNodes(unnestLogicalExpression, uniqueNodesVariablesForOperator);
 
@@ -425,10 +428,12 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 break;
 
             // The following operators do not change or add to the variable map.
+
             case DATASOURCESCAN:
             case DISTRIBUTE_RESULT:
             case EMPTYTUPLESOURCE:
             case EXCHANGE:
+            case GROUP:
             case NESTEDTUPLESOURCE:
             case PROJECT:
             case SELECT:
@@ -438,8 +443,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
 
             // The following operators' analysis has not yet been implemented.
             default:
-                throw new RuntimeException("Operator (" + op.getOperatorTag()
-                        + ") has not been implemented in rewrite rule.");
+                throw new RuntimeException(
+                        "Operator (" + op.getOperatorTag() + ") has not been implemented in rewrite rule.");
         }
     }
 
