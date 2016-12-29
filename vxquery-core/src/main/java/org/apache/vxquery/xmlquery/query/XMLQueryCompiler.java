@@ -84,6 +84,8 @@ public class XMLQueryCompiler {
 
     private LogicalOperatorPrettyPrintVisitor pprinter;
 
+    private VXQueryLogicalExpressionPrettyPrintVisitor epprinter;
+
     private ModuleNode moduleNode;
 
     private Module module;

@@ -20,30 +20,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
-import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
-import org.apache.vxquery.context.RootStaticContextImpl;
-import org.apache.vxquery.context.StaticContextImpl;
-import org.apache.vxquery.types.SequenceType;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractOperatorWithNestedPlans;
 import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
+import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
+import org.apache.vxquery.context.RootStaticContextImpl;
+import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.types.SequenceType;
 
 public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlgebraicRewriteRule {
     final StaticContextImpl dCtx = new StaticContextImpl(RootStaticContextImpl.INSTANCE);
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
     final List<Mutable<ILogicalExpression>> functionList = new ArrayList<Mutable<ILogicalExpression>>();
-    
+
     protected abstract FunctionIdentifier getSearchFunction();
 
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         return false;
     }
 
@@ -54,6 +56,7 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
         List<Mutable<ILogicalExpression>> expressions = OperatorToolbox.getExpressions(opRef);
         for (Mutable<ILogicalExpression> expression : expressions) {
             if (processTypeExpression(opRef, expression)) {
+                context.computeAndSetTypeEnvironmentForOperator(opRef.getValue());
                 modified = true;
             }
         }
@@ -70,11 +73,14 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
             // Get input function
             AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
             Mutable<ILogicalExpression> argFirstM = searchFunction.getArguments().get(ARG_DATA);
-
             // Find the input return type.
             inputSequenceType = ExpressionToolbox.getOutputSequenceType(opRef, argFirstM, dCtx);
-
             // Find the argument type.
+            if (inputSequenceType == null && !isNestedPlanOperator(opRef).isEmpty()) {
+                for (Mutable<ILogicalOperator> agg : isNestedPlanOperator(opRef)) {
+                    inputSequenceType = ExpressionToolbox.getOutputSequenceType(agg, argFirstM, dCtx);
+                }
+            }
             sTypeArg = null;
             if (hasTypeArgument()) {
                 sTypeArg = ExpressionToolbox.getTypeExpressionTypeArgument(searchM, dCtx);
@@ -87,6 +93,18 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
             }
         }
         return modified;
+    }
+
+    public List<Mutable<ILogicalOperator>> isNestedPlanOperator(Mutable<ILogicalOperator> opRef) {
+        List<Mutable<ILogicalOperator>> nestedPlans = new ArrayList<Mutable<ILogicalOperator>>();
+        AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue().getInputs().get(0).getValue();
+        if (op.hasNestedPlans()) {
+            AbstractOperatorWithNestedPlans aownp = (AbstractOperatorWithNestedPlans) op;
+            for (Mutable<ILogicalOperator> input : aownp.getNestedPlans().get(0).getRoots()) {
+                nestedPlans.add(input);
+            }
+        }
+        return nestedPlans;
     }
 
     public abstract boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput);

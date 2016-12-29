@@ -31,9 +31,9 @@ import org.apache.vxquery.compiler.rewriter.rules.CollectionFileDomain;
  */
 public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
 
-    protected Object[] types;
+    private String elementPath;
+    private String function;
 
-    protected IDataSourcePropertiesProvider propProvider;
     private VXQueryIndexingDataSource(int id, String collection, String elementPath, Object[] types,
             String functionCall) {
         this.dataSourceId = id;
@@ -41,12 +41,11 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
         this.elementPath = elementPath;
         this.function = functionCall;
         this.collectionPartitions = collectionName.split(DELIMITER);
-
         this.types = types;
+
         final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
-                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
-                new ArrayList<>());
-        propProvider = new IDataSourcePropertiesProvider() {
+                new RandomPartitioningProperty(new CollectionFileDomain(collectionName)), new ArrayList<>());
+        this.propProvider = new IDataSourcePropertiesProvider() {
             @Override
             public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
                 return vec;
@@ -54,83 +53,30 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
         };
         this.tag = null;
         this.childSeq = new ArrayList<>();
+        this.valueSeq = new ArrayList<>();
     }
 
-    public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type, String
-            function) {
+    public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type,
+            String function) {
         return new VXQueryIndexingDataSource(id, collection, index, new Object[] { type }, function);
-    }
-
-    public int getTotalDataSources() {
-        return totalDataSources;
-    }
-
-    public void setTotalDataSources(int totalDataSources) {
-        this.totalDataSources = totalDataSources;
-    }
-
-    public int getDataSourceId() {
-        return dataSourceId;
     }
 
     public String getElementPath() {
         return elementPath;
     }
 
-    public String[] getCollectionPartitions() {
-        return collectionPartitions;
-    }
-
-    public void setCollectionPartitions(String[] collectionPartitions) {
-        this.collectionPartitions = collectionPartitions;
-    }
-
-    public int getPartitionCount() {
-        return collectionPartitions.length;
-    }
-
-    public String getTag() {
-        return this.tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    @Override
-    public String getId() {
-        return collectionName;
-    }
-
-    @Override
-    public Object[] getSchemaTypes() {
-        return types;
-    }
-
-    @Override
-    public IDataSourcePropertiesProvider getPropertiesProvider() {
-        return propProvider;
-    }
-
-    @Override
-    public void computeFDs(List scanVariables, List fdList) {
-    }
-
-    @Override
-    public String toString() {
-        return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", elementPath=" + elementPath + " "
-                + "function=" + function + "]";
-    }
-
-    @Override
     public String getFunctionCall() {
         return function;
     }
 
-    public List<Integer> getChildSeq() {
-        return childSeq;
+    @Override
+    public String toString() {
+        return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", elementPath=" + elementPath
+                + ", function=" + function + "]";
+    }
+
+    public boolean usingIndex() {
+        return true;
     }
 
 }
-
-

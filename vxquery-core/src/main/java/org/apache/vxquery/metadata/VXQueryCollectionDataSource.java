@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSourcePropertiesProvider;
-import org.apache.hyracks.algebricks.core.algebra.properties.FunctionalDependency;
 import org.apache.hyracks.algebricks.core.algebra.properties.ILocalStructuralProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.IPhysicalPropertiesVector;
 import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
@@ -29,95 +28,38 @@ import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertie
 import org.apache.vxquery.compiler.rewriter.rules.CollectionFileDomain;
 
 public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource {
-
-    private VXQueryCollectionDataSource(int id, String file, Object[] types) {
+    private VXQueryCollectionDataSource(int id, String collection, Object[] types) {
         this.dataSourceId = id;
-        this.collectionName = file;
-        collectionPartitions = collectionName.split(DELIMITER);
+        this.collectionName = collection;
+        this.collectionPartitions = collectionName.split(DELIMITER);
         this.types = types;
+
         final IPhysicalPropertiesVector vec = new StructuralPropertiesVector(
                 new RandomPartitioningProperty(new CollectionFileDomain(collectionName)),
                 new ArrayList<ILocalStructuralProperty>());
-        propProvider = new IDataSourcePropertiesProvider() {
+        this.propProvider = new IDataSourcePropertiesProvider() {
             @Override
             public IPhysicalPropertiesVector computePropertiesVector(List<LogicalVariable> scanVariables) {
                 return vec;
             }
         };
-        this.childSeq = new ArrayList<>();
         this.tag = null;
+        this.childSeq = new ArrayList<>();
+        this.valueSeq = new ArrayList<>();
     }
 
-    public static VXQueryCollectionDataSource create(int id, String file, Object type) {
-        return new VXQueryCollectionDataSource(id, file, new Object[] { type });
-    }
-
-    public int getTotalDataSources() {
-        return totalDataSources;
-    }
-
-    public void setTotalDataSources(int totalDataSources) {
-        this.totalDataSources = totalDataSources;
-    }
-
-    public int getDataSourceId() {
-        return dataSourceId;
-    }
-
-    public String[] getPartitions() {
-        return collectionPartitions;
-    }
-
-    public void setPartitions(String[] collectionPartitions) {
-        this.collectionPartitions = collectionPartitions;
-    }
-
-    public int getPartitionCount() {
-        return collectionPartitions.length;
-    }
-
-    public String getTag() {
-        return this.tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    @Override
-    public String getId() {
-        return collectionName;
-    }
-
-    @Override
-    public Object[] getSchemaTypes() {
-        return types;
-    }
-
-    @Override
-    public IDataSourcePropertiesProvider getPropertiesProvider() {
-        return propProvider;
-    }
-
-    @Override
-    public void computeFDs(List<LogicalVariable> scanVariables, List<FunctionalDependency> fdList) {
-    }
-
-    public void addChildSeq(int integer) {
-        childSeq.add(integer);
-    }
-
-    public List<Integer> getChildSeq() {
-        return childSeq;
+    public static VXQueryCollectionDataSource create(int id, String collection, Object type) {
+        return new VXQueryCollectionDataSource(id, collection, new Object[] { type });
     }
 
     @Override
     public String toString() {
-        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq + "]";
+        return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq
+                + ", valueSeq=" + valueSeq + "]";
     }
 
-    @Override
-    public String getFunctionCall() {
-        return function;
+    public boolean usingIndex() {
+        return false;
     }
+
 }

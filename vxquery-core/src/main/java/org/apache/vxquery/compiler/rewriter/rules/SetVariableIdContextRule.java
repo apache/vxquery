@@ -28,11 +28,13 @@ import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 /**
  * Set the default context for the variable id in the optimization context.
+ * 
  * @author prestonc
  */
 public class SetVariableIdContextRule implements IAlgebraicRewriteRule {
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         if (context.checkIfInDontApplySet(this, opRef.getValue())) {
             return false;
         }
@@ -44,7 +46,9 @@ public class SetVariableIdContextRule implements IAlgebraicRewriteRule {
             case ASSIGN:
             case AGGREGATE:
                 AbstractAssignOperator assign = (AbstractAssignOperator) op;
-                variableId = assign.getVariables().get(0).getId();
+                if (assign.getVariables().size() > 0) {
+                    variableId = assign.getVariables().get(0).getId();
+                }
                 break;
             case UNNEST:
                 UnnestOperator unnest = (UnnestOperator) op;
@@ -62,7 +66,8 @@ public class SetVariableIdContextRule implements IAlgebraicRewriteRule {
     }
 
     @Override
-    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         return false;
     }
 }

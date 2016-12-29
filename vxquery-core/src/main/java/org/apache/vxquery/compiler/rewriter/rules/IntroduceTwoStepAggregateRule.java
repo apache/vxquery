@@ -71,27 +71,30 @@ public class IntroduceTwoStepAggregateRule implements IAlgebraicRewriteRule {
     final Map<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>> AGGREGATE_MAP = new HashMap<FunctionIdentifier, Pair<IFunctionInfo, IFunctionInfo>>();
 
     public IntroduceTwoStepAggregateRule() {
-        AGGREGATE_MAP.put(BuiltinFunctions.FN_AVG_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
-                BuiltinOperators.AVG_LOCAL, BuiltinOperators.AVG_GLOBAL));
-        AGGREGATE_MAP.put(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
-                BuiltinFunctions.FN_COUNT_1, BuiltinFunctions.FN_SUM_1));
-        AGGREGATE_MAP.put(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
-                BuiltinFunctions.FN_MAX_1, BuiltinFunctions.FN_MAX_1));
-        AGGREGATE_MAP.put(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
-                BuiltinFunctions.FN_MIN_1, BuiltinFunctions.FN_MIN_1));
-        AGGREGATE_MAP.put(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier(), new Pair<IFunctionInfo, IFunctionInfo>(
-                BuiltinFunctions.FN_SUM_1, BuiltinFunctions.FN_SUM_1));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_AVG_1.getFunctionIdentifier(),
+                new Pair<IFunctionInfo, IFunctionInfo>(BuiltinOperators.AVG_LOCAL, BuiltinOperators.AVG_GLOBAL));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier(),
+                new Pair<IFunctionInfo, IFunctionInfo>(BuiltinFunctions.FN_COUNT_1, BuiltinFunctions.FN_SUM_1));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_MAX_1.getFunctionIdentifier(),
+                new Pair<IFunctionInfo, IFunctionInfo>(BuiltinFunctions.FN_MAX_1, BuiltinFunctions.FN_MAX_1));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_MIN_1.getFunctionIdentifier(),
+                new Pair<IFunctionInfo, IFunctionInfo>(BuiltinFunctions.FN_MIN_1, BuiltinFunctions.FN_MIN_1));
+        AGGREGATE_MAP.put(BuiltinFunctions.FN_SUM_1.getFunctionIdentifier(),
+                new Pair<IFunctionInfo, IFunctionInfo>(BuiltinFunctions.FN_SUM_1, BuiltinFunctions.FN_SUM_1));
     }
 
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         // Check if aggregate function.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.AGGREGATE) {
             return false;
         }
         AggregateOperator aggregate = (AggregateOperator) op;
-
+        if (aggregate.getExpressions().size() == 0) {
+            return false;
+        }
         Mutable<ILogicalExpression> mutableLogicalExpression = aggregate.getExpressions().get(0);
         ILogicalExpression logicalExpression = mutableLogicalExpression.getValue();
         if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
