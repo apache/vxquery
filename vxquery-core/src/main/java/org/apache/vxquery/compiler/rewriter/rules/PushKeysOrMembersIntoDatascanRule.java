@@ -39,38 +39,9 @@ import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
 import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
-import org.apache.vxquery.types.ElementType;
 
-/**
- * The rule searches for an unnest operator immediately following a data scan
- * operator.
- *
- * <pre>
- * Before
- *
- *   plan__parent
- *   UNNEST( $v2 : child( $v1 ) )
- *   DATASCAN( $source : $v1 )
- *   plan__child
- *
- *   Where $v1 is not used in plan__parent.
- *
- * After
- *
- *   plan__parent
- *   ASSIGN( $v2 : $v1 ) 
- *   DATASCAN( $source : $v1 )
- *   plan__child
- *
- *   $source is encoded with the child parameters.
- * </pre>
- *
- * @author prestonc
- */
-public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRule {
+public class PushKeysOrMembersIntoDatascanRule extends AbstractUsedVariablesProcessingRule {
     StaticContext dCtx = null;
-    final int ARG_DATA = 0;
-    final int ARG_TYPE = 1;
 
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
@@ -124,22 +95,11 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
      */
     private boolean updateDataSource(VXQueryCollectionDataSource ds, Mutable<ILogicalExpression> expression) {
         boolean added = false;
-        List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
-        ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
         BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        List<Mutable<ILogicalExpression>> findkeys = new ArrayList<Mutable<ILogicalExpression>>();
+        List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
         ExpressionToolbox.findAllFunctionExpressions(expression,
-                BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), findkeys);
+                BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), finds);
         for (int i = finds.size(); i > 0; --i) {
-            int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
-            if (typeId > 0) {
-                if (dCtx.lookupSequenceType(typeId).getItemType().equals(ElementType.ANYELEMENT) && typeId > 0) {
-                    ds.addChildSeq(typeId);
-                    added = true;
-                }
-            }
-        }
-        for (int i = findkeys.size(); i > 0; --i) {
             XDMConstants.setTrue(bp);
             ds.addValueSeq(ArrayUtils.toObject(bp.getByteArray()));
             added = true;
