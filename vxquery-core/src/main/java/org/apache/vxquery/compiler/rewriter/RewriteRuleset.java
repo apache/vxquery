@@ -97,7 +97,7 @@ public class RewriteRuleset {
     public final static List<IAlgebraicRewriteRule> buildPathStepNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<IAlgebraicRewriteRule>();
         normalization.add(new SetVariableIdContextRule());
-
+//        normalization.add(new InferTypesRule());
         // Remove unused functions.
         normalization.add(new RemoveUnusedSortDistinctNodesRule());
         normalization.add(new RemoveRedundantTreatExpressionsRule());

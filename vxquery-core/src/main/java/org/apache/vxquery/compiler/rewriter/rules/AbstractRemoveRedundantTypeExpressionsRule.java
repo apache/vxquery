@@ -39,11 +39,12 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
     final List<Mutable<ILogicalExpression>> functionList = new ArrayList<Mutable<ILogicalExpression>>();
-    
+
     protected abstract FunctionIdentifier getSearchFunction();
 
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         return false;
     }
 
@@ -54,6 +55,7 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
         List<Mutable<ILogicalExpression>> expressions = OperatorToolbox.getExpressions(opRef);
         for (Mutable<ILogicalExpression> expression : expressions) {
             if (processTypeExpression(opRef, expression)) {
+                context.computeAndSetTypeEnvironmentForOperator(opRef.getValue());
                 modified = true;
             }
         }

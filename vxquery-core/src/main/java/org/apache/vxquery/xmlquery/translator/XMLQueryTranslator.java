@@ -1160,13 +1160,14 @@ public class XMLQueryTranslator {
                     GroupByOperator group = new GroupByOperator();
                     ArrayList<XQueryVariable> al = new ArrayList<XQueryVariable>();
                     ArrayList<ILogicalExpression> e = new ArrayList<ILogicalExpression>();
-                    ArrayList<ILogicalExpression> expr = new ArrayList<ILogicalExpression>();
+                   // ArrayList<LogicalVariable> expr = new ArrayList<LogicalVariable>();
+                   ArrayList<ILogicalExpression> expr = new ArrayList<ILogicalExpression>();
                     ArrayList<QName> qvar = new ArrayList<QName>();
                     ArrayList<LogicalVariable> lvar = new ArrayList<LogicalVariable>();
                     //set the groupbyexpression list of the group by operator
                     for (GroupSpecNode gsNode : gcNode.getGroupSpec()) {//data and createAssignment
                         lvar.add(translateExpression(gsNode.getExpr(), tCtx));
-                        e.add(data(vre(lvar.get(lvar.size() - 1))));
+                        e.add(vre(lvar.get(lvar.size() - 1)));
                         expr.add(vre(createAssignment(e.get(e.size() - 1), tCtx)));
                         qvar.add(createQName(gsNode.getVar()));
                     }
@@ -1177,20 +1178,21 @@ public class XMLQueryTranslator {
                     for (int k = 0; k < al.size(); k++) {
                         --pushCount;
                     }
-
+                    group.getInputs().add(mutable(tCtx.op));
                     for (int i = 0; i < e.size(); i++) {
-                        tCtx.pushVariableScope();
                         LogicalVariable groupVar = newLogicalVariable();
-                        // XQueryVariable x = tCtx.varScope.lookupVariable(createQName(gsNode.getVar()));
+                        tCtx.pushVariableScope();
+                        //LogicalVariable gvar=createAssignment(e.get(i),tCtx);
                         SequenceType groupVarType = SequenceType.create(BuiltinTypeRegistry.XS_ANY_ATOMIC,
                                 Quantifier.QUANT_QUESTION);
                         XQueryVariable z = new XQueryVariable(qvar.get(i), groupVarType, groupVar);
                         tCtx.varScope.registerVariable(z);
+                        // XQueryVariable x = tCtx.varScope.lookupVariable(createQName(gsNode.getVar()));
                         group.addGbyExpression(groupVar, expr.get(i));
                         ++pushCount;
                     }
 
-                    group.getInputs().add(mutable(tCtx.op));
+                    
                     //set the nested plans of the group by operator
                     for (int j = 0; j < al.size(); j++) {
                         XQueryVariable xqv = al.get(j);
@@ -1211,7 +1213,7 @@ public class XMLQueryTranslator {
                         tCtx.varScope.registerVariable(nagg);
                         pushCount++;
                     }
-                    group.getInputs().add(mutable(tCtx.op));
+                   // group.getInputs().add(mutable(tCtx.op));
                     tCtx.op = group;
                     break;
                 }

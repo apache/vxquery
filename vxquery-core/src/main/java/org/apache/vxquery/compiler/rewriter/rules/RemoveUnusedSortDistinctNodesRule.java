@@ -101,7 +101,8 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
     }
 
     @Override
-    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
+    public boolean rewritePost(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         boolean operatorChanged = false;
         // Do not process empty or nested tuple source.
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
@@ -153,7 +154,9 @@ public class RemoveUnusedSortDistinctNodesRule implements IAlgebraicRewriteRule 
                 }
             }
         }
-
+        if (operatorChanged) {
+            context.computeAndSetTypeEnvironmentForOperator(op);
+        }
         // Now with the new operator, update the variable mappings.
         cardinalityVariable = CardinalityRuleToolbox.updateCardinalityVariable(op, cardinalityVariable, vxqueryContext);
         updateVariableMap(op, cardinalityVariable, documentOrderVariables, uniqueNodesVariables, vxqueryContext);
