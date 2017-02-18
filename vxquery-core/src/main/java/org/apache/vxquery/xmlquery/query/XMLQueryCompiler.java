@@ -80,6 +80,8 @@ public class XMLQueryCompiler {
 
     private LogicalOperatorPrettyPrintVisitor pprinter;
 
+    private VXQueryLogicalExpressionPrettyPrintVisitor epprinter;
+
     private ModuleNode moduleNode;
 
     private Module module;
@@ -219,8 +221,8 @@ public class XMLQueryCompiler {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
-        pprinter = new LogicalOperatorPrettyPrintVisitor(
-                new VXQueryLogicalExpressionPrettyPrintVisitor(module.getModuleContext()));
+        epprinter = new VXQueryLogicalExpressionPrettyPrintVisitor(module.getModuleContext());
+        pprinter = new LogicalOperatorPrettyPrintVisitor(epprinter);
         VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap(),
                 module.getModuleContext(), this.hdfsConf, nodeControllerInfos);
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);

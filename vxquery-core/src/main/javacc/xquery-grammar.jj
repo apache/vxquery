@@ -947,18 +947,19 @@ GroupSpecNode GroupSpec()  :
 {
    
    QNameNode varName;
-   ASTNode expr;
-   Token start;
+   ASTNode expr=null;
    TypeDeclNode type = null;
    GroupSpecNode gs;
+   String collation=null;
 }
 {
-   varName=GroupingVariable() [type=TypeDeclaration()] ":=" expr=ExprSingle()
+   varName=GroupingVariable() [[type=TypeDeclaration()] ":=" expr=ExprSingle()]["collation" collation = URILiteral()]
     {
-    	gs = new GroupSpecNode(expr.getSourceLocation());
+    	gs = new GroupSpecNode(varName.getSourceLocation());
     	gs.setDefaultVar(varName);
     	gs.setType(type);
     	gs.setExpression(expr);
+    	gs.setCollation(collation);
     	return gs;
     } 
 }

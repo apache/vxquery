@@ -1159,40 +1159,41 @@ public class XMLQueryTranslator {
                     GroupbyClauseNode gcNode = (GroupbyClauseNode) cNode;
                     GroupByOperator group = new GroupByOperator();
                     ArrayList<XQueryVariable> al = new ArrayList<XQueryVariable>();
-                    ArrayList<ILogicalExpression> e = new ArrayList<ILogicalExpression>();
-                   // ArrayList<LogicalVariable> expr = new ArrayList<LogicalVariable>();
-                   ArrayList<ILogicalExpression> expr = new ArrayList<ILogicalExpression>();
+                    ArrayList<ILogicalExpression> expr = new ArrayList<ILogicalExpression>();
                     ArrayList<QName> qvar = new ArrayList<QName>();
-                    ArrayList<LogicalVariable> lvar = new ArrayList<LogicalVariable>();
+                    ArrayList<TypeDeclNode> stype = new ArrayList<TypeDeclNode>();
                     //set the groupbyexpression list of the group by operator
                     for (GroupSpecNode gsNode : gcNode.getGroupSpec()) {//data and createAssignment
-                        lvar.add(translateExpression(gsNode.getExpr(), tCtx));
-                        e.add(vre(lvar.get(lvar.size() - 1)));
-                        expr.add(vre(createAssignment(e.get(e.size() - 1), tCtx)));
+                        if (gsNode.getExpr() != null) {
+                            expr.add(vre(createAssignment(
+                                    zeroOrOne(data(vre(translateExpression(gsNode.getExpr(), tCtx)))), tCtx)));
+                        } else {
+                            XQueryVariable x = tCtx.varScope.lookupVariable(createQName(gsNode.getVar()));
+                            expr.add(vre(createAssignment(data(vre(x.getLogicalVariable())), tCtx)));
+                        }
                         qvar.add(createQName(gsNode.getVar()));
+                        stype.add(gsNode.getType());
                     }
-                    for (int i = 0; i < pushCount; ++i) {
+                    while (pushCount > 0) {
                         al.add(tCtx.varScope.listVariables().next());
                         tCtx.popVariableScope();
-                    }
-                    for (int k = 0; k < al.size(); k++) {
                         --pushCount;
                     }
                     group.getInputs().add(mutable(tCtx.op));
-                    for (int i = 0; i < e.size(); i++) {
+                    for (int i = 0; i < qvar.size(); i++) {
                         LogicalVariable groupVar = newLogicalVariable();
                         tCtx.pushVariableScope();
-                        //LogicalVariable gvar=createAssignment(e.get(i),tCtx);
                         SequenceType groupVarType = SequenceType.create(BuiltinTypeRegistry.XS_ANY_ATOMIC,
                                 Quantifier.QUANT_QUESTION);
+                        if (stype.get(i) != null) {
+                            groupVarType = createSequenceType(stype.get(i));
+                        }
                         XQueryVariable z = new XQueryVariable(qvar.get(i), groupVarType, groupVar);
                         tCtx.varScope.registerVariable(z);
-                        // XQueryVariable x = tCtx.varScope.lookupVariable(createQName(gsNode.getVar()));
                         group.addGbyExpression(groupVar, expr.get(i));
                         ++pushCount;
                     }
 
-                    
                     //set the nested plans of the group by operator
                     for (int j = 0; j < al.size(); j++) {
                         XQueryVariable xqv = al.get(j);
@@ -1201,8 +1202,8 @@ public class XMLQueryTranslator {
                         AggregateFunctionCallExpression fsequence = (AggregateFunctionCallExpression) afce(
                                 BuiltinOperators.SEQUENCE, false, sequenceInput);
                         LogicalVariable aggVar = newLogicalVariable();
-                        AggregateOperator agg = new AggregateOperator(Collections.singletonList(aggVar),
-                                Collections.singletonList(new MutableObject<>(fsequence)));
+                        AggregateOperator agg = new AggregateOperator(mkSingletonArrayList(aggVar),
+                                mkSingletonArrayList(new MutableObject<>(fsequence)));
                         agg.getInputs()
                                 .add(new MutableObject<>(new NestedTupleSourceOperator(new MutableObject<>(group))));
                         ILogicalPlan plan = new ALogicalPlanImpl(new MutableObject<>(agg));
@@ -1213,7 +1214,6 @@ public class XMLQueryTranslator {
                         tCtx.varScope.registerVariable(nagg);
                         pushCount++;
                     }
-                   // group.getInputs().add(mutable(tCtx.op));
                     tCtx.op = group;
                     break;
                 }
@@ -1235,6 +1235,12 @@ public class XMLQueryTranslator {
         }
         tCtx = tCtx.popContext();
         return var;
+    }
+
+    protected <T> List<T> mkSingletonArrayList(T item) {
+        ArrayList<T> array = new ArrayList<>(1);
+        array.add(item);
+        return array;
     }
 
     private LogicalVariable translateVarRefNode(TranslationContext tCtx, VarRefNode vrNode) throws SystemException {
@@ -2178,6 +2184,11 @@ public class XMLQueryTranslator {
 
     private ILogicalExpression data(ILogicalExpression expr) throws SystemException {
         return new ScalarFunctionCallExpression(BuiltinFunctions.FN_DATA_1, Collections.singletonList(mutable(expr)));
+    }
+
+    private ILogicalExpression zeroOrOne(ILogicalExpression expr) throws SystemException {
+        return new ScalarFunctionCallExpression(BuiltinFunctions.FN_ZERO_OR_ONE_1,
+                Collections.singletonList(mutable(expr)));
     }
 
     private ILogicalExpression string(ILogicalExpression expr) throws SystemException {
