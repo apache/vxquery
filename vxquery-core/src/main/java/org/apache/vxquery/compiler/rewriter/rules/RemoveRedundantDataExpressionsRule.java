@@ -47,6 +47,10 @@ public class RemoveRedundantDataExpressionsRule extends AbstractRemoveRedundantT
     protected FunctionIdentifier getSearchFunction() {
         return BuiltinFunctions.FN_DATA_1.getFunctionIdentifier();
     }
+    
+    protected boolean getTreatFunction() {
+        return false;
+    }
 
     @Override
     public boolean hasTypeArgument() {

@@ -51,6 +51,10 @@ public class RemoveRedundantPromoteExpressionsRule extends AbstractRemoveRedunda
     protected FunctionIdentifier getSearchFunction() {
         return BuiltinOperators.PROMOTE.getFunctionIdentifier();
     }
+    
+    protected boolean getTreatFunction() {
+        return false;
+    }
 
     @Override
     public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {

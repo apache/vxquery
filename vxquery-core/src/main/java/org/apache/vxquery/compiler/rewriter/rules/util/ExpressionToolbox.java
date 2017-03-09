@@ -197,8 +197,11 @@ public class ExpressionToolbox {
     }
 
     public static int getTypeExpressionTypeArgument(Mutable<ILogicalExpression> searchM) {
-        final int ARG_TYPE = 1;
+        int ARG_TYPE = 1;
         AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
+        if (searchFunction.getFunctionIdentifier().equals(BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier())) {
+            ARG_TYPE = 0;
+        }
         ILogicalExpression argType = searchFunction.getArguments().get(ARG_TYPE).getValue();
         if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
             return -1;

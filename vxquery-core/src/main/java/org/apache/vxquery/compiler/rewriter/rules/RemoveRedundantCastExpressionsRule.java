@@ -49,6 +49,10 @@ public class RemoveRedundantCastExpressionsRule extends AbstractRemoveRedundantT
     protected FunctionIdentifier getSearchFunction() {
         return BuiltinOperators.CAST.getFunctionIdentifier();
     }
+    
+    protected boolean getTreatFunction() {
+        return false;
+    }
 
     @Override
     public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {

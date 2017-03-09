@@ -716,7 +716,7 @@ ASTNode FLWORExpr()  :
     ASTNode rExpr;
 }
 {
-    ((ForClause(clauses) | LetClause(clauses)))+  [WhereClause(clauses)] [GroupByClause(clauses)] [OrderByClause(clauses)] "return" rExpr = ExprSingle()
+    (ForClause(clauses) | LetClause(clauses)) (ForClause(clauses) | LetClause(clauses) | WhereClause(clauses) | GroupByClause(clauses) | OrderByClause(clauses))* "return" rExpr = ExprSingle()
     {
         FLWORExprNode flwor = new FLWORExprNode(clauses.get(0).getSourceLocation());
         flwor.setClauses(clauses);
@@ -724,6 +724,19 @@ ASTNode FLWORExpr()  :
         return flwor;
     }
 }
+
+/*ASTNode InitialClause(List<FLWORClauseNode> clauses)  :
+{
+    ASTNode expr;
+    Token start;
+}
+{
+    start = "where" expr = ExprSingle() {
+        WhereClauseNode wc = new WhereClauseNode(createSourceLocation(start));
+        wc.setCondition(expr);
+        clauses.add(wc);
+    }
+}*/
 
 void ForClause(List<FLWORClauseNode> clauses)  :
 {

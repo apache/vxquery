@@ -145,6 +145,7 @@ public class ConvertAssignToAggregateRule extends AbstractVXQueryAggregateRule {
         subplanOperator.getInputs().add(assign.getInputs().get(0));
         subplanOperator.setRootOp(nextOperatorRef);
 
+        assign.getInputs().clear();
         opRef.setValue(subplanOperator);
 
         return true;
@@ -164,7 +165,7 @@ public class ConvertAssignToAggregateRule extends AbstractVXQueryAggregateRule {
         aggregateSequenceArgs.add(aggregateArgs);
 
         List<Mutable<ILogicalExpression>> exprs = new ArrayList<Mutable<ILogicalExpression>>();
-        ILogicalExpression aggregateExp = new AggregateFunctionCallExpression(aggregateFunction, true,
+        ILogicalExpression aggregateExp = new AggregateFunctionCallExpression(aggregateFunction, false,
                 aggregateSequenceArgs);
         Mutable<ILogicalExpression> aggregateExpRef = new MutableObject<ILogicalExpression>(aggregateExp);
         exprs.add(aggregateExpRef);

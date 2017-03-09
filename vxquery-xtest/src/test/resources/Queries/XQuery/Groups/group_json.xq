@@ -15,8 +15,11 @@
    specific language governing permissions and limitations
    under the License. :)
    
-   let $x:=doc("books")/bookstore/book
-   for $i in $x
-   group by $y:=$i/title
-   return $y
+   
+    let $sensor_collection := "json_quarter_1"
+    for $r in collection($sensor_collection)
+    for $i in $r("results")()
+    
+group by $url:= $i("date")
+return $url
    

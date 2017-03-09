@@ -52,6 +52,10 @@ public class RemoveRedundantTreatExpressionsRule extends AbstractRemoveRedundant
     protected FunctionIdentifier getSearchFunction() {
         return BuiltinOperators.TREAT.getFunctionIdentifier();
     }
+    
+    protected boolean getTreatFunction() {
+        return true;
+    }
 
     @Override
     public boolean matchesAllInstancesOf(SequenceType sTypeArg, SequenceType sTypeOutput) {
