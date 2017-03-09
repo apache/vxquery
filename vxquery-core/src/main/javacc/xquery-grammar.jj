@@ -716,7 +716,7 @@ ASTNode FLWORExpr()  :
     ASTNode rExpr;
 }
 {
-    ((ForClause(clauses) | LetClause(clauses)))+  [WhereClause(clauses)] [OrderByClause(clauses)] "return" rExpr = ExprSingle()
+    (ForClause(clauses) | LetClause(clauses)) (ForClause(clauses) | LetClause(clauses) | WhereClause(clauses) | GroupByClause(clauses) | OrderByClause(clauses))* "return" rExpr = ExprSingle()
     {
         FLWORExprNode flwor = new FLWORExprNode(clauses.get(0).getSourceLocation());
         flwor.setClauses(clauses);
@@ -724,6 +724,19 @@ ASTNode FLWORExpr()  :
         return flwor;
     }
 }
+
+/*ASTNode InitialClause(List<FLWORClauseNode> clauses)  :
+{
+    ASTNode expr;
+    Token start;
+}
+{
+    start = "where" expr = ExprSingle() {
+        WhereClauseNode wc = new WhereClauseNode(createSourceLocation(start));
+        wc.setCondition(expr);
+        clauses.add(wc);
+    }
+}*/
 
 void ForClause(List<FLWORClauseNode> clauses)  :
 {
@@ -835,6 +848,7 @@ void LetClause(List<FLWORClauseNode> clauses)  :
     }
 }
 
+
 void WhereClause(List<FLWORClauseNode> clauses)  :
 {
     ASTNode expr;
@@ -909,6 +923,67 @@ void OrderModifier(OrderSpecNode os)  :
         os.setDirection(desc != null ? XQueryConstants.OrderDirection.DESCENDING : XQueryConstants.OrderDirection.ASCENDING);
         os.setEmptyOrder(greatest != null ? StaticContext.EmptyOrderProperty.GREATEST : (least != null ? StaticContext.EmptyOrderProperty.LEAST : null));
         os.setCollation(collation);
+    }
+}
+
+void GroupByClause(List<FLWORClauseNode> clauses)  :
+{
+    List<GroupSpecNode> gsList;
+    Token start;
+}
+{
+    start = "group" "by" gsList = GroupSpecList() {
+        GroupbyClauseNode gc = new GroupbyClauseNode(createSourceLocation(start));
+        gc.setGroupSpec(gsList);
+        clauses.add(gc);
+    }
+}
+
+List<GroupSpecNode> GroupSpecList()  :
+{
+    List<GroupSpecNode> gsList = new ArrayList<GroupSpecNode>();
+    GroupSpecNode gs;
+}
+{
+    gs = GroupSpec() {
+        gsList.add(gs);
+    } (
+        "," gs = GroupSpec() {
+            gsList.add(gs);
+        }
+    )* {
+        return gsList;
+    }
+}
+
+GroupSpecNode GroupSpec()  :
+{
+   
+   QNameNode varName;
+   ASTNode expr=null;
+   TypeDeclNode type = null;
+   GroupSpecNode gs;
+   String collation=null;
+}
+{
+   varName=GroupingVariable() [[type=TypeDeclaration()] ":=" expr=ExprSingle()]["collation" collation = URILiteral()]
+    {
+    	gs = new GroupSpecNode(varName.getSourceLocation());
+    	gs.setDefaultVar(varName);
+    	gs.setType(type);
+    	gs.setExpression(expr);
+    	gs.setCollation(collation);
+    	return gs;
+    } 
+}
+
+QNameNode GroupingVariable()  :
+{
+    QNameNode qname;
+}
+{
+    "$" qname = VarName() {
+        return qname;
     }
 }
 

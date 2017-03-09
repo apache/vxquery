@@ -26,6 +26,7 @@ import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSiz
 import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
 import org.apache.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
+import org.apache.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
 import org.apache.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import org.apache.hyracks.algebricks.core.rewriter.base.AlgebricksOptimizationContext;
 import org.apache.hyracks.algebricks.core.rewriter.base.PhysicalOptimizationConfig;
@@ -35,7 +36,9 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
     private final Map<ILogicalOperator, HashMap<Integer, DocumentOrder>> documentOrderOperatorVariableMap = new HashMap<ILogicalOperator, HashMap<Integer, DocumentOrder>>();
     private final Map<ILogicalOperator, HashMap<Integer, UniqueNodes>> uniqueNodesOperatorVariableMap = new HashMap<ILogicalOperator, HashMap<Integer, UniqueNodes>>();
     private final Map<ILogicalOperator, Cardinality> cardinalityOperatorMap = new HashMap<ILogicalOperator, Cardinality>();
+    private Map<ILogicalOperator, IVariableTypeEnvironment> typeEnvMap = new HashMap<ILogicalOperator, IVariableTypeEnvironment>();
 
+    
     private int totalDataSources = 0;
     private int collectionId = 0;
 
@@ -94,5 +97,19 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
     public void putUniqueNodesOperatorVariableMap(ILogicalOperator op, HashMap<Integer, UniqueNodes> variableMap) {
         this.uniqueNodesOperatorVariableMap.put(op, variableMap);
     }
+    
+    public IVariableTypeEnvironment getOutputTypeEnvironment(ILogicalOperator op) {
+        return typeEnvMap.get(op);
+    }
+
+    @Override
+    public void setOutputTypeEnvironment(ILogicalOperator op, IVariableTypeEnvironment env) {
+        typeEnvMap.put(op, env);
+    }
+
+    public void invalidateTypeEnvironmentForOperator(ILogicalOperator op) {
+        typeEnvMap.put(op, null);
+    }
+
 
 }

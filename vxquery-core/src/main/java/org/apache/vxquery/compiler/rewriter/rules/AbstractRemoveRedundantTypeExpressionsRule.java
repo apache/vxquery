@@ -24,14 +24,21 @@ import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.functions.Function;
 import org.apache.vxquery.types.SequenceType;
 
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
+import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
+import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
 import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
+import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceExpression;
 import org.apache.hyracks.algebricks.core.algebra.functions.FunctionIdentifier;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractAssignOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 
 public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlgebraicRewriteRule {
@@ -39,11 +46,14 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
     final int ARG_DATA = 0;
     final int ARG_TYPE = 1;
     final List<Mutable<ILogicalExpression>> functionList = new ArrayList<Mutable<ILogicalExpression>>();
-    
+
     protected abstract FunctionIdentifier getSearchFunction();
 
+    protected abstract boolean getTreatFunction();
+
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         return false;
     }
 
@@ -54,6 +64,7 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
         List<Mutable<ILogicalExpression>> expressions = OperatorToolbox.getExpressions(opRef);
         for (Mutable<ILogicalExpression> expression : expressions) {
             if (processTypeExpression(opRef, expression)) {
+                context.computeAndSetTypeEnvironmentForOperator(opRef.getValue());
                 modified = true;
             }
         }
@@ -62,27 +73,68 @@ public abstract class AbstractRemoveRedundantTypeExpressionsRule implements IAlg
 
     private boolean processTypeExpression(Mutable<ILogicalOperator> opRef, Mutable<ILogicalExpression> search) {
         boolean modified = false;
+        boolean betweenAssigns = false;
         SequenceType inputSequenceType;
         SequenceType sTypeArg;
         functionList.clear();
+        List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
         ExpressionToolbox.findAllFunctionExpressions(search, getSearchFunction(), functionList);
+        if (functionList.isEmpty()
+                && opRef.getValue().getInputs().get(0).getValue().getOperatorTag().equals(LogicalOperatorTag.ASSIGN)) {
+
+            ExpressionToolbox.findAllFunctionExpressions(search, BuiltinFunctions.FN_COUNT_1.getFunctionIdentifier(),
+                    functionList);
+            ExpressionToolbox.findAllFunctionExpressions(search, BuiltinFunctions.FN_SUM_1.getFunctionIdentifier(),
+                    functionList);
+            ExpressionToolbox.findAllFunctionExpressions(search, BuiltinFunctions.FN_AVG_1.getFunctionIdentifier(),
+                    functionList);
+            betweenAssigns = true;
+
+        }
         for (Mutable<ILogicalExpression> searchM : functionList) {
             // Get input function
             AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
             Mutable<ILogicalExpression> argFirstM = searchFunction.getArguments().get(ARG_DATA);
+            if (betweenAssigns && getTreatFunction()) {
+                VariableReferenceExpression variableRefExp = (VariableReferenceExpression) argFirstM.getValue();
+                LogicalVariable variableId = variableRefExp.getVariableReference();
+                Mutable<ILogicalOperator> variableProducer = OperatorToolbox.findProducerOf(opRef, variableId);
+                if (variableProducer != null) {
+                    AbstractLogicalOperator variableOp = (AbstractLogicalOperator) variableProducer.getValue();
+                    if (variableOp.getOperatorTag().equals(LogicalOperatorTag.ASSIGN)) {
+                        AbstractAssignOperator assign = (AbstractAssignOperator) variableOp;
 
+                        ExpressionToolbox.findAllFunctionExpressions(assign.getExpressions().get(0),
+                                getSearchFunction(), finds);
+                    }
+                }
+            }
             // Find the input return type.
             inputSequenceType = ExpressionToolbox.getOutputSequenceType(opRef, argFirstM, dCtx);
-
+            if (!finds.isEmpty() && betweenAssigns && getTreatFunction()) {
+                Function function = ExpressionToolbox.getBuiltIn(finds.get(0));
+                if (function.getFunctionIdentifier().equals(getSearchFunction())) {
+                    //betweenAssigns = true;
+                    searchFunction = (AbstractFunctionCallExpression) finds.get(0).getValue();
+                    argFirstM = searchFunction.getArguments().get(ARG_DATA);
+                }
+            }
             // Find the argument type.
             sTypeArg = null;
             if (hasTypeArgument()) {
                 sTypeArg = ExpressionToolbox.getTypeExpressionTypeArgument(searchM, dCtx);
             }
+            if (betweenAssigns && getTreatFunction()) {
+                sTypeArg = inputSequenceType;
+            }
 
             // remove
             if (matchesAllInstancesOf(sTypeArg, inputSequenceType)) {
-                searchM.setValue(argFirstM.getValue());
+                if (betweenAssigns) {
+                    finds.get(0).setValue(argFirstM.getValue());
+                } else {
+                    searchM.setValue(argFirstM.getValue());
+                }
                 modified = true;
             }
         }

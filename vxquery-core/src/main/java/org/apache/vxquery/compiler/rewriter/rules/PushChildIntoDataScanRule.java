@@ -37,6 +37,9 @@ import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
 import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.types.ElementType;
+import org.apache.vxquery.types.ItemType;
+import org.apache.vxquery.types.SequenceType;
+import org.apache.vxquery.xmlquery.ast.ItemTypeNode;
 
 /**
  * The rule searches for an unnest operator immediately following a data scan
@@ -125,7 +128,10 @@ public class PushChildIntoDataScanRule extends AbstractUsedVariablesProcessingRu
         for (int i = finds.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));
             if (typeId > 0) {
-                if (dCtx.lookupSequenceType(typeId).getItemType().equals(ElementType.ANYELEMENT) && typeId > 0) {
+                ElementType it = (ElementType) dCtx.lookupSequenceType(typeId).getItemType();
+                ElementType et = ElementType.ANYELEMENT;
+
+                if (it.getContentType().equals(et.getContentType())) {
                     ds.addChildSeq(typeId);
                     added = true;
                 }

@@ -53,6 +53,10 @@ public class RemoveRedundantBooleanExpressionsRule extends AbstractRemoveRedunda
     protected FunctionIdentifier getSearchFunction() {
         return BuiltinFunctions.FN_BOOLEAN_1.getFunctionIdentifier();
     }
+    
+    protected boolean getTreatFunction() {
+        return false;
+    }
 
     @Override
     public boolean hasTypeArgument() {
