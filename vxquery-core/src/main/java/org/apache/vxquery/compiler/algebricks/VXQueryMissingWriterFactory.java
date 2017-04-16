@@ -19,22 +19,21 @@ package org.apache.vxquery.compiler.algebricks;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.vxquery.datamodel.values.XDMConstants;
-
-import org.apache.hyracks.api.dataflow.value.INullWriter;
-import org.apache.hyracks.api.dataflow.value.INullWriterFactory;
+import org.apache.hyracks.api.dataflow.value.IMissingWriter;
+import org.apache.hyracks.api.dataflow.value.IMissingWriterFactory;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.vxquery.datamodel.values.XDMConstants;
 
-public class VXQueryNullWriterFactory implements INullWriterFactory {
+public class VXQueryMissingWriterFactory implements IMissingWriterFactory {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public INullWriter createNullWriter() {
+    public IMissingWriter createMissingWriter() {
         final VoidPointable vp = (VoidPointable) VoidPointable.FACTORY.createPointable();
-        return new INullWriter() {
+        return new IMissingWriter() {
             @Override
-            public void writeNull(DataOutput out) throws HyracksDataException {
+            public void writeMissing(DataOutput out) throws HyracksDataException {
                 XDMConstants.setEmptySequence(vp);
                 try {
                     out.write(vp.getByteArray(), vp.getStartOffset(), vp.getLength());

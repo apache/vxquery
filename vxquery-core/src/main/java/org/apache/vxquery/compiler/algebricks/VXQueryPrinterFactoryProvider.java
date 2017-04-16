@@ -16,15 +16,15 @@
  */
 package org.apache.vxquery.compiler.algebricks;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.data.IPrinterFactory;
 import org.apache.hyracks.algebricks.data.IPrinterFactoryProvider;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 
 public class VXQueryPrinterFactoryProvider implements IPrinterFactoryProvider {
     public static final IPrinterFactoryProvider INSTANCE = new VXQueryPrinterFactoryProvider();
 
     @Override
-    public IPrinterFactory getPrinterFactory(Object type) throws AlgebricksException {
+    public IPrinterFactory getPrinterFactory(Object type) throws HyracksDataException {
 
         return new VXQueryPrinterFactory();
     }

@@ -16,6 +16,8 @@
  */
 package org.apache.vxquery.datamodel.accessors.jsonitem;
 
+import java.io.IOException;
+
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.data.std.api.AbstractPointable;
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
@@ -24,11 +26,10 @@ import org.apache.hyracks.data.std.api.IPointableFactory;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-
-import java.io.IOException;
 
 /**
  * The datamodel of the JSON object is represented in this class:
@@ -65,8 +66,9 @@ public class ObjectPointable extends AbstractPointable {
         return IntegerPointable.getInteger(bytes, start);
     }
 
-    private static int getKeyLength(byte[] b, int s) {
-        return UTF8StringPointable.getUTFLength(b, s) + 2;
+    private static int getKeyLength(byte[] bytes, int start) {
+        int utfLength = UTF8StringUtil.getUTFLength(bytes, start);
+        return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
     }
 
     private static int getSlotArrayOffset(int start) {

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.common.exceptions.NotImplementedException;
 import org.apache.hyracks.algebricks.common.utils.Pair;
@@ -33,12 +34,14 @@ import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
+import org.apache.hyracks.algebricks.core.algebra.expressions.IConflictingTypeResolver;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionTypeComputer;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IMergeAggregationExpressionFactory;
-import org.apache.hyracks.algebricks.core.algebra.expressions.INullableTypeComputer;
+import org.apache.hyracks.algebricks.core.algebra.expressions.IMissableTypeComputer;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IVariableTypeEnvironment;
 import org.apache.hyracks.algebricks.core.algebra.metadata.IMetadataProvider;
+import org.apache.hyracks.algebricks.core.algebra.prettyprint.AlgebricksAppendable;
 import org.apache.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import org.apache.hyracks.algebricks.core.rewriter.base.AbstractRuleController;
 import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
@@ -57,11 +60,12 @@ import org.apache.vxquery.compiler.algebricks.VXQueryBinaryIntegerInspectorFacto
 import org.apache.vxquery.compiler.algebricks.VXQueryComparatorFactoryProvider;
 import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
 import org.apache.vxquery.compiler.algebricks.VXQueryExpressionRuntimeProvider;
-import org.apache.vxquery.compiler.algebricks.VXQueryNullWriterFactory;
+import org.apache.vxquery.compiler.algebricks.VXQueryMissingWriterFactory;
 import org.apache.vxquery.compiler.algebricks.VXQueryPrinterFactoryProvider;
 import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
 import org.apache.vxquery.compiler.rewriter.RewriteRuleset;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
+import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFactoryProvider;
 import org.apache.vxquery.runtime.provider.VXQueryBinaryHashFunctionFamilyProvider;
@@ -115,24 +119,26 @@ public class XMLQueryCompiler {
                     public IOptimizationContext createOptimizationContext(int varCounter,
                             IExpressionEvalSizeComputer expressionEvalSizeComputer,
                             IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
-                            IExpressionTypeComputer expressionTypeComputer, INullableTypeComputer nullableTypeComputer,
-                            PhysicalOptimizationConfig physicalOptimizationConfig) {
+                            IExpressionTypeComputer expressionTypeComputer, IMissableTypeComputer missableTypeComputer,
+                            IConflictingTypeResolver conflictintTypeResolver,
+                            PhysicalOptimizationConfig physicalOptimizationConfig,
+                            AlgebricksPartitionConstraint clusterLocations) {
                         return new VXQueryOptimizationContext(varCounter, expressionEvalSizeComputer,
-                                mergeAggregationExpressionFactory, expressionTypeComputer, nullableTypeComputer,
-                                physicalOptimizationConfig, pprinter);
+                                mergeAggregationExpressionFactory, expressionTypeComputer, missableTypeComputer,
+                                conflictintTypeResolver, physicalOptimizationConfig, pprinter);
                     }
                 });
         builder.getPhysicalOptimizationConfig().setFrameSize(this.frameSize);
         if (joinHashSize > 0) {
-            builder.getPhysicalOptimizationConfig().setMaxFramesHybridHash((int) (joinHashSize / this.frameSize));
+            builder.getPhysicalOptimizationConfig().setMaxFramesForJoin((int) (joinHashSize / this.frameSize));
         }
         if (maximumDataSize > 0) {
             builder.getPhysicalOptimizationConfig()
-                    .setMaxFramesLeftInputHybridHash((int) (maximumDataSize / this.frameSize));
+                    .setMaxFramesForJoinLeftInput((int) (maximumDataSize / this.frameSize));
+        } else {
+            builder.getPhysicalOptimizationConfig()
+                    .setMaxFramesForJoinLeftInput((int) (60L * 1024 * 1048576 / this.frameSize));
         }
-
-        builder.getPhysicalOptimizationConfig()
-                .setMaxFramesLeftInputHybridHash((int) (60L * 1024 * 1048576 / this.frameSize));
 
         builder.setLogicalRewrites(buildDefaultLogicalRewrites());
         builder.setPhysicalRewrites(buildDefaultPhysicalRewrites());
@@ -172,9 +178,9 @@ public class XMLQueryCompiler {
                 return null;
             }
         });
-        builder.setNullableTypeComputer(new INullableTypeComputer() {
+        builder.setMissableTypeComputer(new IMissableTypeComputer() {
             @Override
-            public Object makeNullableType(Object type) throws AlgebricksException {
+            public Object makeMissableType(Object type) throws AlgebricksException {
                 SequenceType st = (SequenceType) type;
                 if (st.getQuantifier().allowsEmptySequence()) {
                     return type;
@@ -185,7 +191,7 @@ public class XMLQueryCompiler {
             }
 
             @Override
-            public boolean canBeNull(Object type) {
+            public boolean canBeMissing(Object type) {
                 return false;
             }
 
@@ -194,7 +200,7 @@ public class XMLQueryCompiler {
                 throw new NotImplementedException("NullableTypeComputer is not implented (getNonOptionalType)");
             }
         });
-        builder.setNullWriterFactory(new VXQueryNullWriterFactory());
+        builder.setMissingWriterFactory(new VXQueryMissingWriterFactory());
         if (availableProcessors < 1) {
             builder.setClusterLocations(VXQueryMetadataProvider.getClusterLocations(nodeList));
         } else {
@@ -215,11 +221,11 @@ public class XMLQueryCompiler {
     }
 
     public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel)
-            throws AlgebricksException {
+            throws AlgebricksException, SystemException {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
         module = new XMLQueryTranslator(ccb).translateModule(moduleNode);
-        pprinter = new LogicalOperatorPrettyPrintVisitor(
+        pprinter = new LogicalOperatorPrettyPrintVisitor(new AlgebricksAppendable(),
                 new VXQueryLogicalExpressionPrettyPrintVisitor(module.getModuleContext()));
         VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap(),
                 module.getModuleContext(), this.hdfsConf, nodeControllerInfos);
@@ -278,7 +284,7 @@ public class XMLQueryCompiler {
     }
 
     private static List<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>> buildDefaultPhysicalRewrites() {
-        List<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>> defaultPhysicalRewrites = new ArrayList<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>>();
+        List<Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>> defaultPhysicalRewrites = new ArrayList<>();
         SequentialOnceRuleController seqOnceCtrlAllLevels = new SequentialOnceRuleController(true);
         SequentialOnceRuleController seqOnceCtrlTopLevel = new SequentialOnceRuleController(false);
         defaultPhysicalRewrites.add(new Pair<AbstractRuleController, List<IAlgebraicRewriteRule>>(seqOnceCtrlAllLevels,

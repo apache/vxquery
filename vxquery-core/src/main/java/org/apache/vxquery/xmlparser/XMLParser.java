@@ -80,8 +80,7 @@ public class XMLParser implements IParser {
             handler.writeDocument(abvs);
             input.close();
         } catch (Exception e) {
-            HyracksDataException hde = new HyracksDataException(e);
-            hde.setNodeId(nodeId);
+            HyracksDataException hde = new HyracksDataException(e, nodeId);
             throw hde;
         }
         return 0;
@@ -100,16 +99,13 @@ public class XMLParser implements IParser {
             parser.parse(in);
             input.close();
         } catch (FileNotFoundException e) {
-            HyracksDataException hde = new VXQueryFileNotFoundException(e, file);
-            hde.setNodeId(nodeId);
+            HyracksDataException hde = new VXQueryFileNotFoundException(e, file, nodeId);
             throw hde;
         } catch (SAXException e) {
-            HyracksDataException hde = new VXQueryParseException(e, file);
-            hde.setNodeId(nodeId);
+            HyracksDataException hde = new VXQueryParseException(e, file, nodeId);
             throw hde;
         } catch (IOException e) {
-            HyracksDataException hde = new HyracksDataException(e);
-            hde.setNodeId(nodeId);
+            HyracksDataException hde = new HyracksDataException(e, nodeId);
             throw hde;
         }
     }
@@ -128,8 +124,7 @@ public class XMLParser implements IParser {
             parser.parse(in);
             input.close();
         } catch (Exception e) {
-            HyracksDataException hde = new HyracksDataException(e);
-            hde.setNodeId(nodeId);
+            HyracksDataException hde = new HyracksDataException(e, nodeId);
             throw hde;
         }
     }

@@ -19,8 +19,8 @@ package org.apache.vxquery.datamodel.accessors.nodes;
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.api.IPointableFactory;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 
 /*
  * PI {
@@ -66,7 +66,8 @@ public class PINodePointable extends AbstractNodePointable {
     }
 
     private int getTargetSize(NodeTreePointable nodeTree) {
-        return UTF8StringPointable.getUTFLength(bytes, getTargetOffset(nodeTree)) + 2;
+        int utfLength = UTF8StringUtil.getUTFLength(bytes, getTargetOffset(nodeTree));
+        return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
     }
 
     private int getContentOffset(NodeTreePointable nodeTree) {
@@ -74,6 +75,7 @@ public class PINodePointable extends AbstractNodePointable {
     }
 
     private int getContentSize(NodeTreePointable nodeTree) {
-        return UTF8StringPointable.getUTFLength(bytes, getContentOffset(nodeTree)) + 2;
+        int utfLength = UTF8StringUtil.getUTFLength(bytes, getContentOffset(nodeTree));
+        return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
     }
 }

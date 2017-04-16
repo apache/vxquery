@@ -17,12 +17,11 @@
 
 package org.apache.vxquery.runtime.functions.node;
 
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
 public class OpNodeBeforeEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
 
@@ -34,7 +33,7 @@ public class OpNodeBeforeEvaluatorFactory extends AbstractTaggedValueArgumentSca
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         return new OpNodeBeforeEvaluator(args);
     }
 

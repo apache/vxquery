@@ -16,8 +16,6 @@
  */
 package org.apache.vxquery.datamodel.accessors.nodes;
 
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.data.std.algorithms.BinarySearchAlgorithm;
 import org.apache.hyracks.data.std.api.AbstractPointable;
@@ -28,6 +26,8 @@ import org.apache.hyracks.data.std.primitive.BytePointable;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.util.string.UTF8StringUtil;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 
 /*
  * NodeTree {
@@ -36,17 +36,17 @@ import org.apache.hyracks.data.std.primitive.VoidPointable;
  *  Dictionary dictionary?;
  *  ElementNode rootNode;
  * }
- * 
+ *
  * ElementHeader (padded) {
  *  bit nodeIdExists;
  *  bit dictionaryExists;
  *  bit headerTypeExists;
  * }
- * 
+ *
  * NodeId {
  *  int32 id;
  * }
- * 
+ *
  * Dictionary {
  *  int32 numberOfItems
  *  int32[numberOfItems] lengthOfItem
@@ -104,7 +104,8 @@ public class NodeTreePointable extends AbstractPointable {
 
         @Override
         public int getLength(int index) {
-            return UTF8StringPointable.getUTFLength(bytes, getStart(index)) + 2;
+            int utfLength = UTF8StringUtil.getUTFLength(bytes, getStart(index));
+            return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
         }
     };
 
@@ -138,7 +139,7 @@ public class NodeTreePointable extends AbstractPointable {
         int dataAreaStart = getDictionaryDataAreaStartOffset();
         int idxSlotValue = idx == 0 ? 0 : IntegerPointable.getInteger(bytes, getDictionaryIndexPointerArrayOffset()
                 + (idx - 1) * IDX_PTR_SLOT_SIZE);
-        int strLen = UTF8StringPointable.getUTFLength(bytes, dataAreaStart + idxSlotValue);
+        int strLen = UTF8StringUtil.getUTFLength(bytes, dataAreaStart + idxSlotValue);
         string.set(bytes, dataAreaStart + idxSlotValue, strLen + 2);
     }
 

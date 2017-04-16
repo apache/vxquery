@@ -22,8 +22,8 @@ public class VXQueryFileNotFoundException extends VXQueryDataException {
 
     private static final long serialVersionUID = 1L;
 
-    public VXQueryFileNotFoundException(Exception ex, File file) {
-        super("The file ([nodeId]:[path]) can not be found.", ex, file);
+    public VXQueryFileNotFoundException(Exception ex, File file, String nodeId) {
+        super("The file ([nodeId]:[path]) can not be found.", ex, file, nodeId);
     }
 
 }

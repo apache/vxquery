@@ -18,10 +18,10 @@ package org.apache.vxquery.runtime.functions.index;
 
 import java.io.IOException;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -33,13 +33,15 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.index.indexCentralizer.IndexCentralizerUtil;
 
 public class ShowIndexScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+    private static final long serialVersionUID = 1L;
+
     public ShowIndexScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
 
@@ -50,7 +52,7 @@ public class ShowIndexScalarEvaluatorFactory extends AbstractTaggedValueArgument
                     abvs.reset();
                     sb.reset(abvs);
                     IndexCentralizerUtil indexCentralizerUtil = new IndexCentralizerUtil(
-                            ctx.getIOManager().getIODevices().get(0).getPath());
+                            ctx.getIOManager().getIODevices().get(0).getMount());
                     indexCentralizerUtil.readIndexDirectory();
                     indexCentralizerUtil.getAllCollections(sb);
                     sb.finish();

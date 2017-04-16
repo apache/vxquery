@@ -22,9 +22,9 @@ import java.util.List;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
 import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.atomic.UTF8StringBuilder;
@@ -559,7 +559,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        UTF8StringPointable.toString(sb, bytes, 0);
+        UTF8StringUtil.toString(sb, bytes, 0);
         return sb.toString();
     }
 

@@ -19,6 +19,13 @@ package org.apache.vxquery.runtime.functions.strings;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -27,14 +34,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -45,7 +44,7 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final TaggedValuePointable tvp = new TaggedValuePointable();
         final UTF8StringPointable stringp1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
@@ -98,8 +97,8 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
                         for (int j = 0; j < seqLen; ++j) {
                             // Add separator if more than one value.
                             if (j > 0) {
-                                out.write(stringp2.getByteArray(), stringp2.getStartOffset() + 2,
-                                        stringp2.getUTFLength());
+                                out.write(stringp2.getByteArray(), stringp2.getCharStartOffset(),
+                                        stringp2.getUTF8Length());
                             }
                             // Get string from sequence.
                             seq.getEntry(j, tvp);
@@ -107,7 +106,7 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
                                 throw new SystemException(ErrorCode.FORG0006);
                             }
                             tvp.getValue(stringp1);
-                            out.write(stringp1.getByteArray(), stringp1.getStartOffset() + 2, stringp1.getUTFLength());
+                            out.write(stringp1.getByteArray(), stringp1.getCharStartOffset(), stringp1.getUTF8Length());
                         }
 
                         // Update the full length string in the byte array.

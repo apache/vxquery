@@ -87,7 +87,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             List<LogicalVariable> scanVariables, List<LogicalVariable> projectVariables, boolean projectPushed,
             List<LogicalVariable> minFilterVars, List<LogicalVariable> maxFilterVars, IOperatorSchema opSchema,
             IVariableTypeEnvironment typeEnv, JobGenContext context, JobSpecification jobSpec, Object implConfig)
-                    throws AlgebricksException {
+            throws AlgebricksException {
         VXQueryCollectionDataSource ds = null;
         VXQueryIndexingDataSource ids = null;
 
@@ -126,10 +126,10 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             constraint = getClusterLocations(nodeList, ids.getPartitionCount());
         }
 
-        return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(scanner, constraint);
+        return new Pair<>(scanner, constraint);
     }
 
-    public static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList) {
+    public static AlgebricksAbsolutePartitionConstraint getClusterLocations(String[] nodeList) {
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         if (availableProcessors < 1) {
             availableProcessors = 1;
@@ -137,8 +137,8 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         return getClusterLocations(nodeList, availableProcessors);
     }
 
-    public static AlgebricksPartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
-        ArrayList<String> locs = new ArrayList<String>();
+    public static AlgebricksAbsolutePartitionConstraint getClusterLocations(String[] nodeList, int partitions) {
+        ArrayList<String> locs = new ArrayList<>();
         for (String node : nodeList) {
             for (int j = 0; j < partitions; j++) {
                 locs.add(node);
@@ -150,14 +150,9 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     }
 
     @Override
-    public boolean scannerOperatorIsLeaf(IDataSource<String> dataSource) {
-        return false;
-    }
-
-    @Override
     public Pair<IPushRuntimeFactory, AlgebricksPartitionConstraint> getWriteFileRuntime(IDataSink sink,
             int[] printColumns, IPrinterFactory[] printerFactories, RecordDescriptor inputDesc)
-                    throws AlgebricksException {
+            throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
 
@@ -183,7 +178,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             IOperatorSchema[] inputSchemas, IVariableTypeEnvironment typeEnv, List<LogicalVariable> primaryKeys,
             List<LogicalVariable> secondaryKeys, List<LogicalVariable> additionalNonKeyFields,
             ILogicalExpression filterExpr, RecordDescriptor recordDesc, JobGenContext context, JobSpecification spec)
-                    throws AlgebricksException {
+            throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
 
@@ -201,6 +196,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
                 return fid;
             }
 
+            @Override
             public boolean isFunctional() {
                 return true;
             }
@@ -212,7 +208,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             int[] printColumns, IPrinterFactory[] printerFactories, RecordDescriptor inputDesc, boolean ordered,
             JobSpecification spec) throws AlgebricksException {
         QueryResultSetDataSink rsds = (QueryResultSetDataSink) sink;
-        ResultSetId rssId = (ResultSetId) rsds.getId();
+        ResultSetId rssId = rsds.getId();
 
         IResultSerializerFactoryProvider resultSerializerFactoryProvider = ResultSerializerFactoryProvider.INSTANCE;
         IAWriterFactory writerFactory = PrinterBasedWriterFactory.INSTANCE;
@@ -227,15 +223,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             throw new AlgebricksException(e);
         }
 
-        return new Pair<IOperatorDescriptor, AlgebricksPartitionConstraint>(resultWriter, null);
-    }
-
-    @Override
-    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getInsertRuntime(IDataSource<String> dataSource,
-            IOperatorSchema propagatedSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
-            LogicalVariable payLoadVar, List<LogicalVariable> additionalNonKeyFields, RecordDescriptor recordDesc,
-            JobGenContext context, JobSpecification jobSpec, boolean bulkload) throws AlgebricksException {
-        throw new UnsupportedOperationException();
+        return new Pair<>(resultWriter, null);
     }
 
     @Override
@@ -255,6 +243,44 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             List<LogicalVariable> secondaryKeys, ILogicalExpression filterExpr, RecordDescriptor recordDesc,
             JobGenContext context, JobSpecification spec, boolean bulkload) throws AlgebricksException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getInsertRuntime(IDataSource<String> dataSource,
+            IOperatorSchema propagatedSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
+            LogicalVariable payLoadVar, List<LogicalVariable> additionalFilterKeyFields,
+            List<LogicalVariable> additionalNonFilteringFields, RecordDescriptor recordDesc, JobGenContext context,
+            JobSpecification jobSpec, boolean bulkload) throws AlgebricksException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getUpsertRuntime(IDataSource<String> dataSource,
+            IOperatorSchema inputSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
+            LogicalVariable payLoadVar, List<LogicalVariable> additionalFilterFields,
+            List<LogicalVariable> additionalNonFilteringFields, RecordDescriptor recordDesc, JobGenContext context,
+            JobSpecification jobSpec) throws AlgebricksException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getIndexUpsertRuntime(
+            IDataSourceIndex<String, String> dataSourceIndex, IOperatorSchema propagatedSchema,
+            IOperatorSchema[] inputSchemas, IVariableTypeEnvironment typeEnv, List<LogicalVariable> primaryKeys,
+            List<LogicalVariable> secondaryKeys, List<LogicalVariable> additionalFilteringKeys,
+            ILogicalExpression filterExpr, List<LogicalVariable> prevSecondaryKeys,
+            LogicalVariable prevAdditionalFilteringKeys, RecordDescriptor inputDesc, JobGenContext context,
+            JobSpecification spec) throws AlgebricksException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getConfig() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -16,17 +16,16 @@
  */
 package org.apache.vxquery.runtime.functions.bool;
 
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.dataflow.common.data.accessors.IFrameTupleReference;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
 public class OrScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -37,7 +36,7 @@ public class OrScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         return new OrScalarEvaluator(args);
     }
 
@@ -53,7 +52,7 @@ public class OrScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
         }
 
         @Override
-        public final void evaluate(IFrameTupleReference tuple, IPointable result) throws AlgebricksException {
+        public final void evaluate(IFrameTupleReference tuple, IPointable result) throws HyracksDataException {
             for (int i = 0; i < args.length; ++i) {
                 args[i].evaluate(tuple, tvp);
                 tvp.getValue(bp);

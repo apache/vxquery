@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
 import org.apache.hyracks.data.std.primitive.LongPointable;
@@ -1212,7 +1213,7 @@ public class FunctionHelper {
     }
 
     public static void printUTF8String(UTF8StringPointable stringp) {
-        System.err.println(" printUTF8String START length = " + stringp.getUTFLength());
+        System.err.println(" printUTF8String START length = " + stringp.getUTF8Length());
         ICharacterIterator charIterator = new UTF8StringCharacterIterator(stringp);
         charIterator.reset();
         for (int c = charIterator.next(); c != ICharacterIterator.EOS_CHAR; c = charIterator.next()) {
@@ -1262,7 +1263,7 @@ public class FunctionHelper {
 
     public static boolean transformThenCompareMinMaxTaggedValues(AbstractValueComparisonOperation aOp,
             TaggedValuePointable tvp1, TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1,
-            TypedPointables tp2) throws SystemException {
+            TypedPointables tp2) throws HyracksDataException {
         TaggedValuePointable tvp1new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         TaggedValuePointable tvp2new = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 

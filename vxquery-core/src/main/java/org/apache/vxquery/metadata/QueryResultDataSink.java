@@ -20,7 +20,7 @@ import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSink;
 import org.apache.hyracks.algebricks.core.algebra.properties.FileSplitDomain;
 import org.apache.hyracks.algebricks.core.algebra.properties.IPartitioningProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
-import org.apache.hyracks.dataflow.std.file.FileSplit;
+import org.apache.hyracks.api.io.FileSplit;
 
 public class QueryResultDataSink implements IDataSink {
     private final FileSplit[] fileSplits;

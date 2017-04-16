@@ -16,14 +16,12 @@
  */
 package org.apache.vxquery.runtime.functions.step;
 
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluator;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentUnnestingEvaluator;
 
 public class ChildPathStepUnnestingEvaluator extends AbstractTaggedValueArgumentUnnestingEvaluator {
     final ChildPathStepUnnesting childPathStep;
@@ -33,12 +31,12 @@ public class ChildPathStepUnnestingEvaluator extends AbstractTaggedValueArgument
         childPathStep = new ChildPathStepUnnesting(ctx, ppool);
     }
 
-    public boolean step(IPointable result) throws AlgebricksException {
+    public boolean step(IPointable result) throws HyracksDataException {
         return childPathStep.step(result);
     }
 
     @Override
-    protected void init(TaggedValuePointable[] args) throws SystemException {
+    protected void init(TaggedValuePointable[] args) throws HyracksDataException {
         childPathStep.init(args);
     }
 }

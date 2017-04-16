@@ -23,18 +23,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
-import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
-import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.functions.BuiltinFunctions;
-import org.apache.vxquery.metadata.VXQueryMetadataProvider;
-import org.apache.vxquery.types.BuiltinTypeRegistry;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SequenceType;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
@@ -47,27 +35,38 @@ import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
+import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
+import org.apache.vxquery.compiler.rewriter.rules.util.OperatorToolbox;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.metadata.VXQueryMetadataProvider;
+import org.apache.vxquery.types.BuiltinTypeRegistry;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 
 /**
  * The rule searches for where the function_doc1 function is in the plan in place of XQuery function.
  * It replaces the string contained in the function with its absolute file path.
- * 
+ *
  * <pre>
  * Before
- * 
+ *
  *   plan__parent
  *   %OPERATOR( $v1 : fn:doc( \@string ) )
  *   plan__child
- *   
+ *
  *   Where xquery_function creates an atomic value.
- *   
- * After 
- * 
+ *
+ * After
+ *
  *   plan__parent
  *   %OPERATOR( $v1 : fn:doc( \@absolute_file_path ) ) )
  *   plan__child
  * </pre>
- * 
+ *
  * @author shivanim
  */
 

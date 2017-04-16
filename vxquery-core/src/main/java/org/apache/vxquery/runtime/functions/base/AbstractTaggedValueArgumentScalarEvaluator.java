@@ -16,16 +16,14 @@
  */
 package org.apache.vxquery.runtime.functions.base;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.dataflow.common.data.accessors.IFrameTupleReference;
 import org.apache.vxquery.datamodel.accessors.ArrayBackedValueStoragePool;
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.exceptions.SystemException;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.dataflow.common.data.accessors.IFrameTupleReference;
 
 public abstract class AbstractTaggedValueArgumentScalarEvaluator implements IScalarEvaluator {
     private final IScalarEvaluator[] args;
@@ -44,12 +42,12 @@ public abstract class AbstractTaggedValueArgumentScalarEvaluator implements ISca
     }
 
     @Override
-    public final void evaluate(IFrameTupleReference tuple, IPointable result) throws AlgebricksException {
+    public final void evaluate(IFrameTupleReference tuple, IPointable result) throws HyracksDataException {
         for (int i = 0; i < args.length; ++i) {
             args[i].evaluate(tuple, tvps[i]);
         }
         evaluate(tvps, result);
     }
 
-    protected abstract void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException;
+    protected abstract void evaluate(TaggedValuePointable[] args, IPointable result) throws HyracksDataException;
 }

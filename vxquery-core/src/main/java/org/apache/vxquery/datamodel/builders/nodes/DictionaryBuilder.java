@@ -22,14 +22,14 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.vxquery.util.GrowableIntArray;
-
 import org.apache.hyracks.data.std.algorithms.BinarySearchAlgorithm;
 import org.apache.hyracks.data.std.collections.api.IValueReferenceVector;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
+import org.apache.hyracks.util.string.UTF8StringUtil;
+import org.apache.vxquery.util.GrowableIntArray;
 
 public class DictionaryBuilder {
     private final GrowableIntArray stringEndOffsets;
@@ -60,7 +60,8 @@ public class DictionaryBuilder {
 
         @Override
         public int getLength(int index) {
-            return UTF8StringPointable.getUTFLength(dataBuffer.getByteArray(), getStart(index)) + 2;
+            int utfLength = UTF8StringUtil.getUTFLength(dataBuffer.getByteArray(), getStart(index));
+            return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
         }
 
         @Override
