@@ -60,7 +60,7 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
     @Override
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
-        String args[] = getFunctionalArguments(opRef, VXQueryCommons.collectionFunctions);
+        String[] args = getFunctionalArguments(opRef, VXQueryCommons.collectionFunctions);
 
         if (args != null) {
             String collectionName = args[0];

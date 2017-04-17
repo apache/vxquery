@@ -873,7 +873,7 @@ public class XMLSerializer implements IPrinter {
 
     private void printString(PrintStream ps, UTF8StringPointable utf8sp) {
         int utfLen = utf8sp.getUTF8Length();
-        int offset = 2;
+        int offset = utf8sp.getMetaDataLength();
         while (utfLen > 0) {
             char c = utf8sp.charAt(offset);
             switch (c) {

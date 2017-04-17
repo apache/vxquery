@@ -29,6 +29,7 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 import org.apache.hyracks.util.string.UTF8StringUtil;
+import org.apache.hyracks.util.string.UTF8StringWriter;
 import org.apache.vxquery.util.GrowableIntArray;
 
 public class DictionaryBuilder {
@@ -45,6 +46,8 @@ public class DictionaryBuilder {
     private final TreeMap<String, Integer> hashSlotIndexes;
 
     private boolean cacheReady;
+
+    private final UTF8StringWriter UTF8Writer = new UTF8StringWriter();
 
     private final IValueReferenceVector sortedStringsVector = new IValueReferenceVector() {
         @Override
@@ -128,7 +131,7 @@ public class DictionaryBuilder {
         Integer slotIndex = hashSlotIndexes.get(str);
         if (slotIndex == null) {
             try {
-                dataBufferOut.writeUTF(str);
+                UTF8Writer.writeUTF8(str, dataBufferOut);
                 slotIndex = stringEndOffsets.getSize();
                 dataBufferOut.writeInt(slotIndex);
             } catch (IOException e) {
