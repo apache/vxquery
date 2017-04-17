@@ -78,7 +78,7 @@ public class DictionaryBuilder {
         dataBuffer = new ByteArrayAccessibleOutputStream();
         dataBufferOut = new DataOutputStream(dataBuffer);
         cache = new ArrayBackedValueStorage();
-        hashSlotIndexes = new TreeMap<String, Integer>();
+        hashSlotIndexes = new TreeMap<>();
         cacheReady = false;
     }
 

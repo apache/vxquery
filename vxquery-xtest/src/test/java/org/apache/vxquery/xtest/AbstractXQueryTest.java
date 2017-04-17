@@ -94,7 +94,7 @@ public abstract class AbstractXQueryTest {
     public static void setup() throws IOException {
         cc = TestClusterUtil.startCC(getDefaultTestOptions());
         nc = TestClusterUtil.startNC();
-        setupFS();
+//        setupFS();
     }
 
     public static void setupFS() throws IOException {
@@ -115,17 +115,16 @@ public abstract class AbstractXQueryTest {
 
     @AfterClass
     public static void shutdown() throws IOException {
-        removeFS();
+//        removeFS();
         TestClusterUtil.stopCluster(cc, nc);
-
     }
 
     public static void removeFS() throws IOException {
+        dfs.shutdownHDFS();
         File tmp = new File(TMP);
         if (tmp.exists()) {
             FileUtils.deleteDirectory(tmp);
         }
-        dfs.shutdownHDFS();
     }
 
 }

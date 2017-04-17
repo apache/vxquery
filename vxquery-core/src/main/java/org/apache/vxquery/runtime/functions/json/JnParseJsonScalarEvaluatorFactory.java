@@ -39,7 +39,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.jsonparser.JSONParser;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.IParser;
 
 public class JnParseJsonScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -113,7 +112,7 @@ public class JnParseJsonScalarEvaluatorFactory extends AbstractTaggedValueArgume
                 int items = 0;
                 try {
                     IParser parser = new JSONParser();
-                    String input = FunctionHelper.getStringFromPointable(stringp, bbis, di);
+                    String input = stringp.toString();
                     InputStreamReader isr = new InputStreamReader(IOUtils.toInputStream(input));
                     items = parser.parse(new BufferedReader(isr), abvs);
                 } catch (IOException e) {

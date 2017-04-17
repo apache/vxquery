@@ -125,7 +125,7 @@ public class XMLQueryCompiler {
                             AlgebricksPartitionConstraint clusterLocations) {
                         return new VXQueryOptimizationContext(varCounter, expressionEvalSizeComputer,
                                 mergeAggregationExpressionFactory, expressionTypeComputer, missableTypeComputer,
-                                conflictintTypeResolver, physicalOptimizationConfig, pprinter);
+                                conflictintTypeResolver, physicalOptimizationConfig, clusterLocations, pprinter);
                     }
                 });
         builder.getPhysicalOptimizationConfig().setFrameSize(this.frameSize);

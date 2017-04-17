@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.hadoop.fs.FileSystem;
@@ -1138,13 +1136,6 @@ public class FunctionHelper {
         return max;
     }
 
-    public static String getStringFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di) throws IOException {
-        bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                stringp.getLength() + stringp.getStartOffset())), 0);
-        return di.readUTF();
-    }
-
     public static long getTimezone(ITimezone timezonep) {
         return timezonep.getTimezoneHour() * DateTime.CHRONON_OF_HOUR
                 + timezonep.getTimezoneMinute() * DateTime.CHRONON_OF_MINUTE;
@@ -1224,8 +1215,7 @@ public class FunctionHelper {
 
     public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
             DataInputStream di, ArrayBackedValueStorage abvs, IParser parser) throws IOException {
-        String fName = getStringFromPointable(stringp, bbis, di);
-        readInDocFromString(fName, bbis, di, abvs, parser);
+        readInDocFromString(stringp.toString(), bbis, di, abvs, parser);
     }
 
     public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,

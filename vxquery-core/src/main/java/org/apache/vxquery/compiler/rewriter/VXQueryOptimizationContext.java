@@ -17,6 +17,7 @@ package org.apache.vxquery.compiler.rewriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.hyracks.algebricks.common.constraints.AlgebricksPartitionConstraint;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IConflictingTypeResolver;
 import org.apache.hyracks.algebricks.core.algebra.expressions.IExpressionEvalSizeComputer;
@@ -43,9 +44,9 @@ public class VXQueryOptimizationContext extends AlgebricksOptimizationContext {
             IMergeAggregationExpressionFactory mergeAggregationExpressionFactory,
             IExpressionTypeComputer expressionTypeComputer, IMissableTypeComputer missableTypeComputer,
             IConflictingTypeResolver conflictingTypeResovler, PhysicalOptimizationConfig physicalOptimizationConfig,
-            LogicalOperatorPrettyPrintVisitor prettyPrintVisitor) {
+            AlgebricksPartitionConstraint clusterLocations, LogicalOperatorPrettyPrintVisitor prettyPrintVisitor) {
         super(varCounter, expressionEvalSizeComputer, mergeAggregationExpressionFactory, expressionTypeComputer,
-                missableTypeComputer, conflictingTypeResovler, physicalOptimizationConfig, null, prettyPrintVisitor);
+                missableTypeComputer, conflictingTypeResovler, physicalOptimizationConfig, clusterLocations, prettyPrintVisitor);
     }
 
     public void incrementTotalDataSources() {
