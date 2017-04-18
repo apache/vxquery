@@ -55,7 +55,7 @@ public class UTF8StringCharacterIterator implements ICharacterIterator {
 
     @Override
     public void reset() {
-        byteOffset = stringp.getCharStartOffset();
+        byteOffset = stringp.getMetaDataLength();
     }
 
     public void setByteOffset(int byteOffset) {

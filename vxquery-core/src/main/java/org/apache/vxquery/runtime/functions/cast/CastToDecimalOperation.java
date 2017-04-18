@@ -19,13 +19,6 @@ package org.apache.vxquery.runtime.functions.cast;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
-import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
-import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
-
 import org.apache.hyracks.data.std.api.INumeric;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.data.std.primitive.BytePointable;
@@ -36,12 +29,20 @@ import org.apache.hyracks.data.std.primitive.LongPointable;
 import org.apache.hyracks.data.std.primitive.ShortPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.util.string.UTF8StringWriter;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
+import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
 
 public class CastToDecimalOperation extends AbstractCastToOperation {
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private DataOutput dOutInner = abvsInner.getDataOutput();
     private CastToStringOperation castToString = new CastToStringOperation();
     private UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
+    private UTF8StringWriter sw = new UTF8StringWriter();
 
     @Override
     public void convertBoolean(BooleanPointable boolp, DataOutput dOut) throws SystemException, IOException {
@@ -70,9 +71,11 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
             throw new SystemException(ErrorCode.FORG0001);
         }
         abvsInner.reset();
-        dOutInner.write(ValueTag.XS_STRING_TAG);
-        dOutInner.writeUTF(Double.toString(doublep.getDouble()));
-        stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
+        sw.writeUTF8(Double.toString(doublep.getDouble()), dOutInner);
+        stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset(), abvsInner.getLength());
+//        dOutInner.write(ValueTag.XS_STRING_TAG);
+//        sw.writeUTF8(Double.toString(doublep.getDouble()), dOutInner);
+//        stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1, abvsInner.getLength() - 1);
         convertStringExtra(stringp, dOut, true);
     }
 
@@ -169,7 +172,7 @@ public class CastToDecimalOperation extends AbstractCastToOperation {
 
         dOut.write(ValueTag.XS_DECIMAL_TAG);
         dOut.write(decimalPlace);
-        dOut.writeLong((negativeValue ? -value : value));
+        dOut.writeLong(negativeValue ? -value : value);
     }
 
     @Override
