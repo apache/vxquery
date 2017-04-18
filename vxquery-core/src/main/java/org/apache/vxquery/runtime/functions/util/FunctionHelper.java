@@ -35,6 +35,8 @@ import org.apache.hyracks.data.std.primitive.DoublePointable;
 import org.apache.hyracks.data.std.primitive.LongPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -485,7 +487,7 @@ public class FunctionHelper {
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
             TaggedValuePointable tvp2, DynamicContext dCtx, TypedPointables tp1, TypedPointables tp2)
-                    throws SystemException {
+            throws SystemException {
         int tid1 = getBaseTypeForComparisons(tvp1.getTag());
         int tid2 = getBaseTypeForComparisons(tvp2.getTag());
 
@@ -1299,46 +1301,61 @@ public class FunctionHelper {
         }
     }
 
-    public static void writeChar(char c, DataOutput dOut) {
-        try {
-            if ((c >= 0x0001) && (c <= 0x007F)) {
-                dOut.write((byte) c);
-            } else if (c > 0x07FF) {
-                dOut.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
-                dOut.write((byte) (0x80 | ((c >> 6) & 0x3F)));
-                dOut.write((byte) (0x80 | ((c >> 0) & 0x3F)));
-            } else {
-                dOut.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
-                dOut.write((byte) (0x80 | ((c >> 0) & 0x3F)));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void writeChar(char c, UTF8StringBuilder sb) throws IOException {
+        sb.appendChar(c);
     }
 
-    public static void writeCharSequence(CharSequence charSequence, DataOutput dOut) {
+    public static void stringToGrowableArray(String value, GrowableArray ga, UTF8StringBuilder sb, int expectedLength)
+            throws IOException {
+        ga.reset();
+        sb.reset(ga, expectedLength);
+        sb.appendString(value);
+        sb.finish();
+    }
+
+    public static void charSequenceToGrowableArray(CharSequence charSequence, GrowableArray ga, UTF8StringBuilder sb,
+            int expectedLength) throws IOException {
+        ga.reset();
+        sb.reset(ga, expectedLength);
         for (int i = 0; i < charSequence.length(); ++i) {
-            writeChar(charSequence.charAt(i), dOut);
+            sb.appendChar(charSequence.charAt(i));
         }
+        sb.finish();
     }
 
-    public static void writeCharArray(char[] ch, int start, int length, DataOutput dOut) {
+    public static void charArrayToGrowableArray(char[] ch, int start, int length, GrowableArray ga,
+            UTF8StringBuilder sb, int expectedLength) throws IOException {
+        ga.reset();
+        sb.reset(ga, expectedLength);
         for (int i = start; i < start + length; ++i) {
-            writeChar(ch[i], dOut);
+            sb.appendChar(ch[i]);
+        }
+        sb.finish();
+    }
+
+    public static void writeCharSequence(CharSequence charSequence, UTF8StringBuilder sb) throws IOException {
+        for (int i = 0; i < charSequence.length(); ++i) {
+            sb.appendChar(charSequence.charAt(i));
         }
     }
 
-    public static void writeDateAsString(IDate date, DataOutput dOut) {
+    public static void writeCharArray(char[] ch, int start, int length, UTF8StringBuilder sb) throws IOException {
+        for (int i = start; i < start + length; ++i) {
+            sb.appendChar(ch[i]);
+        }
+    }
+
+    public static void writeDateAsString(IDate date, UTF8StringBuilder sb) throws IOException {
         // Year
-        writeNumberWithPadding(date.getYear(), 4, dOut);
-        writeChar('-', dOut);
+        writeNumberWithPadding(date.getYear(), 4, sb);
+        sb.appendChar('-');
 
         // Month
-        writeNumberWithPadding(date.getMonth(), 2, dOut);
-        writeChar('-', dOut);
+        writeNumberWithPadding(date.getMonth(), 2, sb);
+        sb.appendChar('-');
 
         // Day
-        writeNumberWithPadding(date.getDay(), 2, dOut);
+        writeNumberWithPadding(date.getDay(), 2, sb);
     }
 
     /**
@@ -1350,66 +1367,66 @@ public class FunctionHelper {
      *            padding
      * @param dOut
      *            data output
+     * @throws IOException
      */
-
-    public static void writeNumberWithPadding(long valueArg, int paddingArg, DataOutput dOut) {
+    public static void writeNumberWithPadding(long valueArg, int paddingArg, UTF8StringBuilder sb) throws IOException {
         long value = valueArg;
         int padding = paddingArg;
         if (value < 0) {
-            writeChar('-', dOut);
+            sb.appendChar('-');
             value = Math.abs(value);
         }
         int nDigits = getNumberOfDigits(value);
 
         // Add zero padding for set length numbers.
         while (padding > nDigits) {
-            writeChar('0', dOut);
+            sb.appendChar('0');
             --padding;
         }
 
         // Write the actual number.
         long pow10 = (long) Math.pow(10, nDigits - 1.0);
         for (int i = nDigits - 1; i >= 0; --i) {
-            writeChar((char) ('0' + (value / pow10)), dOut);
+            sb.appendChar((char) ('0' + (value / pow10)));
             value %= pow10;
             pow10 /= 10;
         }
     }
 
-    public static void writeTimeAsString(ITime time, DataOutput dOut) {
+    public static void writeTimeAsString(ITime time, UTF8StringBuilder sb) throws IOException {
         // Hours
-        writeNumberWithPadding(time.getHour(), 2, dOut);
-        writeChar(':', dOut);
+        writeNumberWithPadding(time.getHour(), 2, sb);
+        sb.appendChar(':');
 
         // Minute
-        writeNumberWithPadding(time.getMinute(), 2, dOut);
-        writeChar(':', dOut);
+        writeNumberWithPadding(time.getMinute(), 2, sb);
+        sb.appendChar(':');
 
         // Milliseconds
-        writeNumberWithPadding(time.getMilliSecond() / DateTime.CHRONON_OF_SECOND, 2, dOut);
+        writeNumberWithPadding(time.getMilliSecond() / DateTime.CHRONON_OF_SECOND, 2, sb);
         if (time.getMilliSecond() % DateTime.CHRONON_OF_SECOND != 0) {
-            writeChar('.', dOut);
-            writeNumberWithPadding(time.getMilliSecond() % DateTime.CHRONON_OF_SECOND, 3, dOut);
+            sb.appendChar('.');
+            writeNumberWithPadding(time.getMilliSecond() % DateTime.CHRONON_OF_SECOND, 3, sb);
         }
     }
 
-    public static void writeTimezoneAsString(ITimezone timezone, DataOutput dOut) {
+    public static void writeTimezoneAsString(ITimezone timezone, UTF8StringBuilder sb) throws IOException {
         long timezoneHour = timezone.getTimezoneHour();
         long timezoneMinute = timezone.getTimezoneMinute();
         if (timezoneHour != DateTime.TIMEZONE_HOUR_NULL && timezoneMinute != DateTime.TIMEZONE_MINUTE_NULL) {
             if (timezoneHour == 0 && timezoneMinute == 0) {
-                writeChar('Z', dOut);
+                sb.appendChar('Z');
             } else {
                 if (timezoneHour >= 0 && timezoneMinute >= 0) {
-                    writeChar('+', dOut);
+                    sb.appendChar('+');
                 } else {
-                    writeChar('-', dOut);
+                    sb.appendChar('-');
                     timezoneHour = Math.abs(timezoneHour);
                     timezoneMinute = Math.abs(timezoneMinute);
                 }
-                writeNumberWithPadding(timezoneHour, 2, dOut);
-                writeChar(':', dOut);
-                writeNumberWithPadding(timezoneMinute, 2, dOut);
+                writeNumberWithPadding(timezoneHour, 2, sb);
+                sb.appendChar(':');
+                writeNumberWithPadding(timezoneMinute, 2, sb);
             }
         }
     }

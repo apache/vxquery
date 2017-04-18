@@ -20,6 +20,19 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import org.apache.hyracks.data.std.primitive.BytePointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.FloatPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.ShortPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -33,22 +46,14 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
-import org.apache.hyracks.data.std.primitive.BytePointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.FloatPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.ShortPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
-
 public class CastToStringOperation extends AbstractCastToOperation {
+    private static final int STRING_EXPECTED_LENGTH = 300;
+    private final GrowableArray ga = new GrowableArray();
+    private final UTF8StringBuilder sb = new UTF8StringBuilder();
     private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private DataOutput dOutInner = abvsInner.getDataOutput();
-    int returnTag = ValueTag.XS_STRING_TAG;
+    protected int returnTag = ValueTag.XS_STRING_TAG;
     private final char[] hex = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
     @Override
@@ -65,6 +70,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
         b64os.write(binaryp.getByteArray(), binaryp.getStartOffset() + 2, binaryp.getLength() - 2);
 
         dOut.write(returnTag);
+        UTF8StringUtil.getNumBytesToStoreLength(baaos.size());
         dOut.write((byte) ((baaos.size() >>> 8) & 0xFF));
         dOut.write((byte) ((baaos.size() >>> 0) & 0xFF));
         dOut.write(baaos.getByteArray(), 0, baaos.size());
@@ -74,9 +80,9 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertBoolean(BooleanPointable boolp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         if (boolp.getBoolean()) {
-            FunctionHelper.writeCharSequence("true", dOutInner);
+            FunctionHelper.writeCharSequence("true", sb);
         } else {
-            FunctionHelper.writeCharSequence("false", dOutInner);
+            FunctionHelper.writeCharSequence("false", sb);
         }
         sendStringDataOutput(dOut);
     }
@@ -84,8 +90,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertDate(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeDateAsString(datep, dOutInner);
-        FunctionHelper.writeTimezoneAsString(datep, dOutInner);
+        FunctionHelper.writeDateAsString(datep, sb);
+        FunctionHelper.writeTimezoneAsString(datep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -93,10 +99,10 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertDatetime(XSDateTimePointable datetimep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeDateAsString(datetimep, dOutInner);
-        FunctionHelper.writeChar('T', dOutInner);
-        FunctionHelper.writeTimeAsString(datetimep, dOutInner);
-        FunctionHelper.writeTimezoneAsString(datetimep, dOutInner);
+        FunctionHelper.writeDateAsString(datetimep, sb);
+        FunctionHelper.writeChar('T', sb);
+        FunctionHelper.writeTimeAsString(datetimep, sb);
+        FunctionHelper.writeTimezoneAsString(datetimep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -110,12 +116,12 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
         if (!FunctionHelper.isNumberPostive(value)) {
             // Negative result, but the rest of the calculations can be based on a positive value.
-            FunctionHelper.writeChar('-', dOutInner);
+            FunctionHelper.writeChar('-', sb);
             value *= -1;
         }
 
         if (value == 0) {
-            FunctionHelper.writeChar('0', dOutInner);
+            FunctionHelper.writeChar('0', sb);
         } else {
             long pow10 = (long) Math.pow(10, nDigits - 1);
             int start = Math.max(decimalPlace, nDigits - 1);
@@ -123,14 +129,14 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
             for (int i = start; i >= end; --i) {
                 if (i >= nDigits || i < 0) {
-                    FunctionHelper.writeChar('0', dOutInner);
+                    FunctionHelper.writeChar('0', sb);
                 } else {
-                    FunctionHelper.writeChar((char) ('0' + (value / pow10)), dOutInner);
+                    FunctionHelper.writeChar((char) ('0' + (value / pow10)), sb);
                     value %= pow10;
                     pow10 /= 10;
                 }
                 if (i == decimalPlace && value > 0) {
-                    FunctionHelper.writeChar('.', dOutInner);
+                    FunctionHelper.writeChar('.', sb);
                 }
             }
         }
@@ -144,25 +150,25 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
         if (Double.isInfinite(value)) {
             if (value == Double.NEGATIVE_INFINITY) {
-                FunctionHelper.writeCharSequence("-", dOutInner);
+                FunctionHelper.writeCharSequence("-", sb);
             }
-            FunctionHelper.writeCharSequence("INF", dOutInner);
+            FunctionHelper.writeCharSequence("INF", sb);
             sendStringDataOutput(dOut);
         } else if (Double.isNaN(value)) {
-            FunctionHelper.writeCharSequence("NaN", dOutInner);
+            FunctionHelper.writeCharSequence("NaN", sb);
             sendStringDataOutput(dOut);
         } else if (value == -0.0 || value == 0.0) {
             long bits = Double.doubleToLongBits(value);
             boolean negative = ((bits >> 63) == 0) ? false : true;
 
             if (negative) {
-                FunctionHelper.writeChar('-', dOutInner);
+                FunctionHelper.writeCharSequence("-", sb);
             }
-            FunctionHelper.writeCharSequence("0", dOutInner);
+            FunctionHelper.writeCharSequence("0", sb);
             sendStringDataOutput(dOut);
         } else if (Math.abs(value) >= 0.000001 && Math.abs(value) <= 10000000) {
-            //the jdk (toString function) does not output number in desired format when 
-            //a number is between one and ten million, so we take care of this 
+            //the jdk (toString function) does not output number in desired format when
+            //a number is between one and ten million, so we take care of this
             //case separately here.
             CastToDecimalOperation castToDecimal = new CastToDecimalOperation();
             castToDecimal.convertDouble(doublep, dOutInner);
@@ -195,47 +201,47 @@ public class CastToStringOperation extends AbstractCastToOperation {
         long dayTime = longp.getLong();
 
         if (dayTime == 0) {
-            FunctionHelper.writeCharSequence("PT0S", dOutInner);
+            FunctionHelper.writeCharSequence("PT0S", sb);
         } else {
             if (dayTime < 0) {
-                FunctionHelper.writeChar('-', dOutInner);
+                FunctionHelper.writeChar('-', sb);
                 dayTime *= -1;
             }
-            FunctionHelper.writeChar('P', dOutInner);
+            FunctionHelper.writeChar('P', sb);
 
             // Day
             if (dayTime >= DateTime.CHRONON_OF_DAY) {
-                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_DAY, 1, dOutInner);
-                FunctionHelper.writeChar('D', dOutInner);
+                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_DAY, 1, sb);
+                FunctionHelper.writeChar('D', sb);
                 dayTime %= DateTime.CHRONON_OF_DAY;
             }
 
             if (dayTime > 0) {
-                FunctionHelper.writeChar('T', dOutInner);
+                FunctionHelper.writeChar('T', sb);
             }
 
             // Hour
             if (dayTime >= DateTime.CHRONON_OF_HOUR) {
-                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_HOUR, 1, dOutInner);
-                FunctionHelper.writeChar('H', dOutInner);
+                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_HOUR, 1, sb);
+                FunctionHelper.writeChar('H', sb);
                 dayTime %= DateTime.CHRONON_OF_HOUR;
             }
 
             // Minute
             if (dayTime >= DateTime.CHRONON_OF_MINUTE) {
-                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_MINUTE, 1, dOutInner);
-                FunctionHelper.writeChar('M', dOutInner);
+                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_MINUTE, 1, sb);
+                FunctionHelper.writeChar('M', sb);
                 dayTime %= DateTime.CHRONON_OF_MINUTE;
             }
 
             // Milliseconds
             if (dayTime > 0) {
-                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_SECOND, 1, dOutInner);
+                FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_SECOND, 1, sb);
                 if (dayTime % DateTime.CHRONON_OF_SECOND != 0) {
-                    FunctionHelper.writeChar('.', dOutInner);
-                    FunctionHelper.writeNumberWithPadding(dayTime % DateTime.CHRONON_OF_SECOND, 3, dOutInner);
+                    FunctionHelper.writeChar('.', sb);
+                    FunctionHelper.writeNumberWithPadding(dayTime % DateTime.CHRONON_OF_SECOND, 3, sb);
                 }
-                FunctionHelper.writeChar('S', dOutInner);
+                FunctionHelper.writeChar('S', sb);
             }
         }
         sendStringDataOutput(dOut);
@@ -248,57 +254,57 @@ public class CastToStringOperation extends AbstractCastToOperation {
         long dayTime = durationp.getDayTime();
 
         if (yearMonth < 0 || dayTime < 0) {
-            FunctionHelper.writeChar('-', dOutInner);
+            FunctionHelper.writeChar('-', sb);
             yearMonth *= -1;
             dayTime *= -1;
         }
-        FunctionHelper.writeChar('P', dOutInner);
+        FunctionHelper.writeChar('P', sb);
 
         // Year
         if (yearMonth >= 12) {
-            FunctionHelper.writeNumberWithPadding(yearMonth / 12, 1, dOutInner);
-            FunctionHelper.writeChar('Y', dOutInner);
+            FunctionHelper.writeNumberWithPadding(yearMonth / 12, 1, sb);
+            FunctionHelper.writeChar('Y', sb);
         }
 
         // Month
         if (yearMonth % 12 > 0) {
-            FunctionHelper.writeNumberWithPadding(yearMonth % 12, 1, dOutInner);
-            FunctionHelper.writeChar('M', dOutInner);
+            FunctionHelper.writeNumberWithPadding(yearMonth % 12, 1, sb);
+            FunctionHelper.writeChar('M', sb);
         }
 
         // Day
         if (dayTime >= DateTime.CHRONON_OF_DAY) {
-            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_DAY, 1, dOutInner);
-            FunctionHelper.writeChar('D', dOutInner);
+            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_DAY, 1, sb);
+            FunctionHelper.writeChar('D', sb);
             dayTime %= DateTime.CHRONON_OF_DAY;
         }
 
         if (dayTime > 0) {
-            FunctionHelper.writeChar('T', dOutInner);
+            FunctionHelper.writeChar('T', sb);
         }
 
         // Hour
         if (dayTime >= DateTime.CHRONON_OF_HOUR) {
-            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_HOUR, 1, dOutInner);
-            FunctionHelper.writeChar('H', dOutInner);
+            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_HOUR, 1, sb);
+            FunctionHelper.writeChar('H', sb);
             dayTime %= DateTime.CHRONON_OF_HOUR;
         }
 
         // Minute
         if (dayTime >= DateTime.CHRONON_OF_MINUTE) {
-            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_MINUTE, 1, dOutInner);
-            FunctionHelper.writeChar('M', dOutInner);
+            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_MINUTE, 1, sb);
+            FunctionHelper.writeChar('M', sb);
             dayTime %= DateTime.CHRONON_OF_MINUTE;
         }
 
         // Milliseconds
         if (dayTime > 0) {
-            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_SECOND, 1, dOutInner);
+            FunctionHelper.writeNumberWithPadding(dayTime / DateTime.CHRONON_OF_SECOND, 1, sb);
             if (dayTime % DateTime.CHRONON_OF_SECOND != 0) {
-                FunctionHelper.writeChar('.', dOutInner);
-                FunctionHelper.writeNumberWithPadding(dayTime % DateTime.CHRONON_OF_SECOND, 3, dOutInner);
+                FunctionHelper.writeChar('.', sb);
+                FunctionHelper.writeNumberWithPadding(dayTime % DateTime.CHRONON_OF_SECOND, 3, sb);
             }
-            FunctionHelper.writeChar('S', dOutInner);
+            FunctionHelper.writeChar('S', sb);
         }
 
         sendStringDataOutput(dOut);
@@ -321,9 +327,9 @@ public class CastToStringOperation extends AbstractCastToOperation {
             boolean negative = ((bits >> 31) == 0) ? false : true;
 
             if (negative) {
-                FunctionHelper.writeChar('-', dOutInner);
+                FunctionHelper.writeChar('-', sb);
             }
-            FunctionHelper.writeCharSequence("0", dOutInner);
+            FunctionHelper.writeCharSequence("0", sb);
             sendStringDataOutput(dOut);
         } else {
             convertFloatCanonical(floatp, dOut);
@@ -336,11 +342,11 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
         if (Float.isInfinite(value)) {
             if (value == Float.NEGATIVE_INFINITY) {
-                FunctionHelper.writeCharSequence("-", dOutInner);
+                FunctionHelper.writeCharSequence("-", sb);
             }
-            FunctionHelper.writeCharSequence("INF", dOutInner);
+            FunctionHelper.writeCharSequence("INF", sb);
         } else if (Float.isNaN(value)) {
-            FunctionHelper.writeCharSequence("NaN", dOutInner);
+            FunctionHelper.writeCharSequence("NaN", sb);
         } else {
             dOut.write(returnTag);
             dOut.writeUTF(Float.toString(value));
@@ -353,19 +359,19 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertGDay(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         // Default
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeChar('-', sb);
 
         // Year
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeChar('-', sb);
 
         // Month
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeChar('-', sb);
 
         // Day
-        FunctionHelper.writeNumberWithPadding(datep.getDay(), 2, dOutInner);
+        FunctionHelper.writeNumberWithPadding(datep.getDay(), 2, sb);
 
         // Timezone
-        FunctionHelper.writeTimezoneAsString(datep, dOutInner);
+        FunctionHelper.writeTimezoneAsString(datep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -374,16 +380,16 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertGMonth(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         // Default
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeChar('-', sb);
 
         // Year
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeChar('-', sb);
 
         // Month
-        FunctionHelper.writeNumberWithPadding(datep.getMonth(), 2, dOutInner);
+        FunctionHelper.writeNumberWithPadding(datep.getMonth(), 2, sb);
 
         // Timezone
-        FunctionHelper.writeTimezoneAsString(datep, dOutInner);
+        FunctionHelper.writeTimezoneAsString(datep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -392,20 +398,20 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertGMonthDay(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         // Default
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeChar('-', sb);
 
         // Year
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeChar('-', sb);
 
         // Month
-        FunctionHelper.writeNumberWithPadding(datep.getMonth(), 2, dOutInner);
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeNumberWithPadding(datep.getMonth(), 2, sb);
+        FunctionHelper.writeChar('-', sb);
 
         // Day
-        FunctionHelper.writeNumberWithPadding(datep.getDay(), 2, dOutInner);
+        FunctionHelper.writeNumberWithPadding(datep.getDay(), 2, sb);
 
         // Timezone
-        FunctionHelper.writeTimezoneAsString(datep, dOutInner);
+        FunctionHelper.writeTimezoneAsString(datep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -414,10 +420,10 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertGYear(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         // Year
-        FunctionHelper.writeNumberWithPadding(datep.getYear(), 4, dOutInner);
+        FunctionHelper.writeNumberWithPadding(datep.getYear(), 4, sb);
 
         // Timezone
-        FunctionHelper.writeTimezoneAsString(datep, dOutInner);
+        FunctionHelper.writeTimezoneAsString(datep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -426,14 +432,14 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertGYearMonth(XSDatePointable datep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
         // Year
-        FunctionHelper.writeNumberWithPadding(datep.getYear(), 4, dOutInner);
-        FunctionHelper.writeChar('-', dOutInner);
+        FunctionHelper.writeNumberWithPadding(datep.getYear(), 4, sb);
+        FunctionHelper.writeChar('-', sb);
 
         // Month
-        FunctionHelper.writeNumberWithPadding(datep.getMonth(), 2, dOutInner);
+        FunctionHelper.writeNumberWithPadding(datep.getMonth(), 2, sb);
 
         // Timezone
-        FunctionHelper.writeTimezoneAsString(datep, dOutInner);
+        FunctionHelper.writeTimezoneAsString(datep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -443,8 +449,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
         abvsInner.reset();
         for (int index = 0; index < binaryp.getBinaryLength(); ++index) {
             int bi = binaryp.getByteArray()[binaryp.getBinaryStart() + index] & 0xff;
-            FunctionHelper.writeChar(hex[(bi >> 4)], dOutInner);
-            FunctionHelper.writeChar(hex[(bi & 0xf)], dOutInner);
+            FunctionHelper.writeChar(hex[(bi >> 4)], sb);
+            FunctionHelper.writeChar(hex[(bi & 0xf)], sb);
         }
         sendStringDataOutput(dOut);
     }
@@ -452,7 +458,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.getLong(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.getLong(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
@@ -468,7 +474,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
         if (qnamep.getPrefixUTFLength() > 0) {
             dOutInner.write(qnamep.getByteArray(), qnamep.getStartOffset() + qnamep.getUriLength() + 2,
                     qnamep.getPrefixUTFLength());
-            FunctionHelper.writeChar(':', dOutInner);
+            FunctionHelper.writeChar(':', sb);
         }
         dOutInner.write(qnamep.getByteArray(),
                 qnamep.getStartOffset() + qnamep.getUriLength() + qnamep.getPrefixLength() + 2,
@@ -486,8 +492,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertTime(XSTimePointable timep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeTimeAsString(timep, dOutInner);
-        FunctionHelper.writeTimezoneAsString(timep, dOutInner);
+        FunctionHelper.writeTimeAsString(timep, sb);
+        FunctionHelper.writeTimezoneAsString(timep, sb);
 
         sendStringDataOutput(dOut);
     }
@@ -503,24 +509,24 @@ public class CastToStringOperation extends AbstractCastToOperation {
         int yearMonth = intp.getInteger();
 
         if (yearMonth == 0) {
-            FunctionHelper.writeCharSequence("P0M", dOutInner);
+            FunctionHelper.writeCharSequence("P0M", sb);
         } else {
             if (yearMonth < 0) {
-                FunctionHelper.writeChar('-', dOutInner);
+                FunctionHelper.writeChar('-', sb);
                 yearMonth *= -1;
             }
-            FunctionHelper.writeChar('P', dOutInner);
+            FunctionHelper.writeChar('P', sb);
 
             // Year
             if (yearMonth >= 12) {
-                FunctionHelper.writeNumberWithPadding(yearMonth / 12, 1, dOutInner);
-                FunctionHelper.writeChar('Y', dOutInner);
+                FunctionHelper.writeNumberWithPadding(yearMonth / 12, 1, sb);
+                FunctionHelper.writeChar('Y', sb);
             }
 
             // Month
             if (yearMonth % 12 > 0) {
-                FunctionHelper.writeNumberWithPadding(yearMonth % 12, 1, dOutInner);
-                FunctionHelper.writeChar('M', dOutInner);
+                FunctionHelper.writeNumberWithPadding(yearMonth % 12, 1, sb);
+                FunctionHelper.writeChar('M', sb);
             }
         }
         sendStringDataOutput(dOut);
@@ -531,73 +537,73 @@ public class CastToStringOperation extends AbstractCastToOperation {
      */
     public void convertByte(BytePointable bytep, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(bytep.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(bytep.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertInt(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(intp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(intp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertNonNegativeInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertNonPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertPositiveInteger(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertShort(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(shortp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(shortp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertUnsignedByte(ShortPointable shortp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(shortp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(shortp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertUnsignedInt(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertUnsignedLong(LongPointable longp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(longp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
     public void convertUnsignedShort(IntegerPointable intp, DataOutput dOut) throws SystemException, IOException {
         abvsInner.reset();
-        FunctionHelper.writeNumberWithPadding(intp.longValue(), 1, dOutInner);
+        FunctionHelper.writeNumberWithPadding(intp.longValue(), 1, sb);
         sendStringDataOutput(dOut);
     }
 
@@ -647,8 +653,8 @@ public class CastToStringOperation extends AbstractCastToOperation {
     }
 
     @Override
-    public void convertNormalizedString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException,
-            IOException {
+    public void convertNormalizedString(UTF8StringPointable stringp, DataOutput dOut)
+            throws SystemException, IOException {
         // TODO Add check to verify string consists of limited character set.
         convertString(stringp, dOut);
     }
@@ -674,21 +680,21 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
         if (!FunctionHelper.isNumberPostive(value)) {
             // Negative result, but the rest of the calculations can be based on a positive value.
-            FunctionHelper.writeChar('-', dOutInner);
+            FunctionHelper.writeChar('-', sb);
             value *= -1;
         }
 
         if (value == 0) {
-            FunctionHelper.writeChar('0', dOutInner);
+            FunctionHelper.writeChar('0', sb);
         } else {
             long pow10 = (long) Math.pow(10, nDigits - 1);
-            FunctionHelper.writeNumberWithPadding((value / pow10), 0, dOutInner);
-            FunctionHelper.writeChar('.', dOutInner);
+            FunctionHelper.writeNumberWithPadding((value / pow10), 0, sb);
+            FunctionHelper.writeChar('.', sb);
             long mod = value % pow10;
-            FunctionHelper.writeNumberWithPadding(mod, (nDigits - 1), dOutInner);
-            FunctionHelper.writeChar('E', dOutInner);
+            FunctionHelper.writeNumberWithPadding(mod, (nDigits - 1), sb);
+            FunctionHelper.writeChar('E', sb);
             long power = (nDigits - 1) - decimalPlace;
-            FunctionHelper.writeNumberWithPadding(power, 0, dOutInner);
+            FunctionHelper.writeNumberWithPadding(power, 0, sb);
         }
         sendStringDataOutput(dOut);
     }
@@ -697,6 +703,6 @@ public class CastToStringOperation extends AbstractCastToOperation {
     public void convertNull(DataOutput dOut) throws SystemException, IOException {
         StringValueBuilder svb = new StringValueBuilder();
         dOut.write(returnTag);
-        svb.write("null",dOut);
+        svb.write("null", dOut);
     }
 }

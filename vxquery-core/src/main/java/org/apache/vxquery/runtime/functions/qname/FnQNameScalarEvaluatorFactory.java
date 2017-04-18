@@ -25,6 +25,8 @@ import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -39,6 +41,7 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
+    private static final int STRING_EXPECTED_LENGTH = 300;
 
     public FnQNameScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -51,10 +54,10 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
         final UTF8StringPointable paramQName = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final DataOutput dOut = abvs.getDataOutput();
-        final ArrayBackedValueStorage abvsParamQName = new ArrayBackedValueStorage();
-        final DataOutput dOutParamQName = abvsParamQName.getDataOutput();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        final GrowableArray ga = new GrowableArray();
+        final UTF8StringBuilder sb = new UTF8StringBuilder();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -98,29 +101,39 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                     dOut.write(ValueTag.XS_QNAME_TAG);
                     dOut.write(paramURI.getByteArray(), paramURI.getStartOffset(), paramURI.getLength());
 
-                    // Separate the local name and prefix.
-                    abvsParamQName.reset();
+                    // Prefix and Local Name
                     ICharacterIterator charIterator = new UTF8StringCharacterIterator(paramQName);
                     charIterator.reset();
-                    int c = 0;
-                    int prefixLength = 0;
+                    int c;
+                    boolean prefixFound = false;
+                    ga.reset();
+                    sb.reset(ga, STRING_EXPECTED_LENGTH);
                     while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
                         if (c == Character.valueOf(':')) {
-                            prefixLength = abvsParamQName.getLength();
+                            prefixFound = true;
+                            break;
                         } else {
-                            FunctionHelper.writeChar((char) c, dOutParamQName);
+                            FunctionHelper.writeChar((char) c, sb);
                         }
                     }
+                    if (prefixFound) {
+                        // Finish Prefix
+                        sb.finish();
+                        dOut.write(ga.getByteArray());
 
-                    dOut.write((byte) ((prefixLength >>> 8) & 0xFF));
-                    dOut.write((byte) ((prefixLength >>> 0) & 0xFF));
-                    dOut.write(abvsParamQName.getByteArray(), abvsParamQName.getStartOffset(), prefixLength);
-
-                    int localNameLength = abvsParamQName.getLength() - prefixLength;
-                    dOut.write((byte) ((localNameLength >>> 8) & 0xFF));
-                    dOut.write((byte) ((localNameLength >>> 0) & 0xFF));
-                    dOut.write(abvsParamQName.getByteArray(), abvsParamQName.getStartOffset() + prefixLength,
-                            localNameLength);
+                        // Local Name
+                        ga.reset();
+                        sb.reset(ga, STRING_EXPECTED_LENGTH);
+                        while ((c = charIterator.next()) != ICharacterIterator.EOS_CHAR) {
+                            FunctionHelper.writeChar((char) c, sb);
+                        }
+                    } else {
+                        // No Prefix
+                        dOut.write((byte) 0);
+                        // Local Name is in ga variable
+                    }
+                    sb.finish();
+                    dOut.write(ga.getByteArray());
 
                     result.set(abvs);
                 } catch (Exception e) {

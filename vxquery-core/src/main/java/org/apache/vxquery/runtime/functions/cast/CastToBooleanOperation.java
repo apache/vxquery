@@ -19,6 +19,11 @@ package org.apache.vxquery.runtime.functions.cast;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.FloatPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDecimalPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -26,12 +31,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.strings.ICharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.LowerCaseCharacterIterator;
 import org.apache.vxquery.runtime.functions.strings.UTF8StringCharacterIterator;
-
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.FloatPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 
 public class CastToBooleanOperation extends AbstractCastToOperation {
 
@@ -82,7 +81,7 @@ public class CastToBooleanOperation extends AbstractCastToOperation {
     }
 
     @Override
-    public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
+    public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws IOException {
         byte result = 2;
         ICharacterIterator charIterator = new LowerCaseCharacterIterator(new UTF8StringCharacterIterator(stringp));
         charIterator.reset();

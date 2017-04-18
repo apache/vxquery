@@ -38,6 +38,7 @@ import org.apache.vxquery.datamodel.builders.nodes.ElementNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.PINodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeQNames;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.NameTest;
@@ -253,10 +254,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     }
 
     private GrowableArray stringToGrowableArray(String value) throws IOException {
-        textGAInternal.reset();
-        utf8bInternal.reset(textGAInternal, STRING_EXPECTED_LENGTH);
-        utf8bInternal.appendString(value);
-        utf8bInternal.finish();
+        FunctionHelper.stringToGrowableArray(value, textGAInternal, utf8bInternal, STRING_EXPECTED_LENGTH);
         return textGAInternal;
     }
 
