@@ -79,6 +79,8 @@ public class FnDataScalarEvaluatorFactory extends AbstractTaggedValueArgumentSca
                 }
                 sb.finish();
                 result.set(abvs);
+            } catch (SystemException e) {
+                throw e;
             } catch (IOException e) {
                 throw new SystemException(ErrorCode.SYSE0001);
             }

@@ -16,6 +16,8 @@
  */
 package org.apache.vxquery.runtime.functions.jsonitem;
 
+import java.io.IOException;
+
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
@@ -30,8 +32,6 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-
-import java.io.IOException;
 
 public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorScalarEvaluator {
     private IPointable vp;
@@ -51,7 +51,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
 
     @Override
     protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
-        TaggedValuePointable key, value, qmc, tvp;
+        TaggedValuePointable key, value, qmc;
         ArrayBackedValueStorage abvsResult = abvsPool.takeOne();
         ArrayBackedValueStorage abvsItem = abvsPool.takeOne();
         try {
@@ -62,7 +62,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
             for (int i = 0; i < len; i += 3) {
                 key = args[i];
                 value = args[i + 1];
-                qmc = args[i + 2];
+                qmc = args[i + 2]; 
                 if (!isDuplicateKeys(key, tvps)) {
                     tvps.add(key);
                     key.getValue(sp);

@@ -119,7 +119,7 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                     if (prefixFound) {
                         // Finish Prefix
                         sb.finish();
-                        dOut.write(ga.getByteArray());
+                        dOut.write(ga.getByteArray(), 0, ga.getLength());
 
                         // Local Name
                         ga.reset();
@@ -133,7 +133,7 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                         // Local Name is in ga variable
                     }
                     sb.finish();
-                    dOut.write(ga.getByteArray());
+                    dOut.write(ga.getByteArray(), 0, ga.getLength());
 
                     result.set(abvs);
                 } catch (Exception e) {

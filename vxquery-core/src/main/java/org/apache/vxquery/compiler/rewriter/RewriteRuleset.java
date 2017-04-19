@@ -56,7 +56,6 @@ import org.apache.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 import org.apache.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.EliminateSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.EliminateSubplanWithInputCardinalityOneRule;
-import org.apache.hyracks.algebricks.rewriter.rules.subplan.IntroduceGroupByForSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.NestedSubplanToJoinRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.PushSubplanIntoGroupByRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.SubplanOutOfGroupRule;
@@ -237,7 +236,7 @@ public class RewriteRuleset {
         xquery.add(new IntroJoinInsideSubplanRule());
         xquery.add(new PushMapOperatorDownThroughProductRule());
         xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
-        xquery.add(new IntroduceGroupByForSubplanRule());
+        //xquery.add(new IntroduceGroupByForSubplanRule());
         xquery.add(new SubplanOutOfGroupRule());
         //        xquery.add(new InsertOuterJoinRule());
         xquery.add(new ExtractFunctionsFromJoinConditionRule());

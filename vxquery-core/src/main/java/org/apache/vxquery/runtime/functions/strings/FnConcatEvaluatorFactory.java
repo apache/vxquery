@@ -214,7 +214,7 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                     // Add tag to string and write out.
                     DataOutput out = abvs.getDataOutput();
                     out.write(ValueTag.XS_STRING_TAG);
-                    out.write(ga.getByteArray());
+                    out.write(ga.getByteArray(), 0, ga.getLength());
                     result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);

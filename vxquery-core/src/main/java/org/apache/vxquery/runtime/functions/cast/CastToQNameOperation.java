@@ -71,7 +71,7 @@ public class CastToQNameOperation extends AbstractCastToOperation {
         if (prefixFound) {
             // Finish Prefix
             sb.finish();
-            dOut.write(ga.getByteArray());
+            dOut.write(ga.getByteArray(), 0, ga.getLength());
 
             // Local Name
             ga.reset();
@@ -85,7 +85,7 @@ public class CastToQNameOperation extends AbstractCastToOperation {
             // Local Name is in ga variable
         }
         sb.finish();
-        dOut.write(ga.getByteArray());
+        dOut.write(ga.getByteArray(), 0, ga.getLength());
     }
 
 }

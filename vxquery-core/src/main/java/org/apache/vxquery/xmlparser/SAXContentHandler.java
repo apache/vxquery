@@ -364,7 +364,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
                 tempABVS.reset();
                 DataOutput tempOut = tempABVS.getDataOutput();
                 tempOut.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
-                tempOut.write(stringToGrowableArray(aValue).getByteArray());
+                stringToGrowableArray(aValue);
+                tempOut.write(textGAInternal.getByteArray(), 0, textGAInternal.getLength());
                 enb.startAttribute(anb);
                 anb.setName(aUriCode, aLocalNameCode, aPrefixCode);
                 if (attachTypes) {

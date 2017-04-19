@@ -19,6 +19,7 @@ package org.apache.vxquery.metadata;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -280,7 +281,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     @Override
     public Map<String, String> getConfig() {
         // TODO Auto-generated method stub
-        return null;
+        return new HashMap<>();
     }
 
 }

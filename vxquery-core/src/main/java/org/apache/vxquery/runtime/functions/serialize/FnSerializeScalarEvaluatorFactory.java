@@ -25,7 +25,9 @@ import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
+import org.apache.hyracks.data.std.util.GrowableArray;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.atomic.VXQueryUTF8StringBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -34,7 +36,7 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.serializer.XMLSerializer;
 
 public class FnSerializeScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
-
+    private static final int STRING_EXPECTED_LENGTH = 300;
     private static final long serialVersionUID = 1L;
 
     public FnSerializeScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
@@ -48,20 +50,25 @@ public class FnSerializeScalarEvaluatorFactory extends AbstractTaggedValueArgume
         final ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
         final PrintStream ps = new PrintStream(baaos);
         final XMLSerializer printer = new XMLSerializer();
+        final GrowableArray ga = new GrowableArray();
         final DataOutput out = abvs.getDataOutput();
+
+        final VXQueryUTF8StringBuilder sb = new VXQueryUTF8StringBuilder();
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
 
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 baaos.reset();
                 TaggedValuePointable tvp = args[0];
-                printer.printTaggedValuePointable(ps, tvp);
                 abvs.reset();
                 try {
                     out.write(ValueTag.XS_STRING_TAG);
-                    out.write((byte) ((baaos.size() >>> 8) & 0xFF));
-                    out.write((byte) ((baaos.size() >>> 0) & 0xFF));
-                    out.write(baaos.getByteArray(), 0, baaos.size());
+                    ga.reset();
+                    sb.reset(ga, STRING_EXPECTED_LENGTH);
+                    printer.printTaggedValuePointable(ps, tvp);
+                    sb.appendUtf8Bytes(baaos.getByteArray(), 0, baaos.size());
+                    sb.finish();
+                    out.write(ga.getByteArray(), 0, ga.getLength());
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.XPTY0004);
                 }

@@ -124,6 +124,7 @@ public class DictionaryBuilder {
             }
         }
         out.write(dataBuffer.getByteArray(), 0, dataBuffer.size());
+        // TODO can this value be determined before writing. Could this be append only.
         IntegerPointable.setInteger(abvs.getByteArray(), sizeOffset, abvs.getLength() - sizeOffset);
     }
 

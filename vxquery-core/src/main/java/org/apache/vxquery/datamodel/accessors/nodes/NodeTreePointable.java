@@ -97,8 +97,8 @@ public class NodeTreePointable extends AbstractPointable {
         public int getStart(int index) {
             int dataAreaStart = getDictionaryDataAreaStartOffset();
             int sortedPtrArrayStart = getDictionarySortedPointerArrayOffset();
-            int sortedSlotValue = IntegerPointable
-                    .getInteger(bytes, sortedPtrArrayStart + index * SORTED_PTR_SLOT_SIZE);
+            int sortedSlotValue = IntegerPointable.getInteger(bytes,
+                    sortedPtrArrayStart + index * SORTED_PTR_SLOT_SIZE);
             return dataAreaStart + sortedSlotValue;
         }
 
@@ -131,16 +131,18 @@ public class NodeTreePointable extends AbstractPointable {
         return dictionaryExists() ? IntegerPointable.getInteger(bytes, getDictionaryEntryCountOffset()) : 0;
     }
 
-    public void getString(int idx, IPointable string) {
+    public void getString(int idx, UTF8StringPointable string) {
         int nEntries = getDictionaryEntryCount();
         if (idx < 0 || idx >= nEntries) {
             throw new IllegalArgumentException(idx + " not within [0, " + nEntries + ")");
         }
         int dataAreaStart = getDictionaryDataAreaStartOffset();
-        int idxSlotValue = idx == 0 ? 0 : IntegerPointable.getInteger(bytes, getDictionaryIndexPointerArrayOffset()
-                + (idx - 1) * IDX_PTR_SLOT_SIZE);
+        int idxSlotValue = idx == 0 ? 0
+                : IntegerPointable.getInteger(bytes,
+                        getDictionaryIndexPointerArrayOffset() + (idx - 1) * IDX_PTR_SLOT_SIZE);
         int strLen = UTF8StringUtil.getUTFLength(bytes, dataAreaStart + idxSlotValue);
-        string.set(bytes, dataAreaStart + idxSlotValue, strLen + 2);
+        int strMetaLen = UTF8StringUtil.getNumBytesToStoreLength(strLen);
+        string.set(bytes, dataAreaStart + idxSlotValue, strMetaLen + strLen);
     }
 
     public int lookupString(UTF8StringPointable key) {
@@ -198,8 +200,8 @@ public class NodeTreePointable extends AbstractPointable {
     }
 
     private int getDictionaryDataAreaStartOffset() {
-        return getDictionaryIndexPointerArrayOffset() + getDictionaryEntryCount()
-                * (IDX_PTR_SLOT_SIZE + SORTED_PTR_SLOT_SIZE);
+        return getDictionaryIndexPointerArrayOffset()
+                + getDictionaryEntryCount() * (IDX_PTR_SLOT_SIZE + SORTED_PTR_SLOT_SIZE);
     }
 
     private int getRootNodeOffset() {

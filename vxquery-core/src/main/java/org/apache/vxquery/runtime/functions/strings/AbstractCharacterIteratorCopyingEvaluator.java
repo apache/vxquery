@@ -63,7 +63,7 @@ public abstract class AbstractCharacterIteratorCopyingEvaluator extends Abstract
             }
 
             sb.finish();
-            out.write(ga.getByteArray());
+            out.write(ga.getByteArray(), 0, ga.getLength());
 
             result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
         } catch (IOException e) {

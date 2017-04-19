@@ -19,6 +19,12 @@ package org.apache.vxquery.runtime.functions.util;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -29,27 +35,27 @@ import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.PINodePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
-
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 
 public class AtomizeHelper {
-    AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY.createPointable();
-    DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
-    ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
-    NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
-    PINodePointable pnp = (PINodePointable) PINodePointable.FACTORY.createPointable();
-    SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
-    TextOrCommentNodePointable tcnp = (TextOrCommentNodePointable) TextOrCommentNodePointable.FACTORY.createPointable();
-    ArrayBackedValueStorage tempABVS = new ArrayBackedValueStorage();
-    TaggedValuePointable tempTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-    VoidPointable vp = (VoidPointable) VoidPointable.FACTORY.createPointable();
+    private static final int STRING_EXPECTED_LENGTH = 300;
+    private final GrowableArray ga = new GrowableArray();
+    private final UTF8StringBuilder sb = new UTF8StringBuilder();
+    private final AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY
+            .createPointable();
+    private final DocumentNodePointable dnp = (DocumentNodePointable) DocumentNodePointable.FACTORY.createPointable();
+    private final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
+    private final NodeTreePointable ntp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
+    private final PINodePointable pnp = (PINodePointable) PINodePointable.FACTORY.createPointable();
+    private final SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+    private final TextOrCommentNodePointable tcnp = (TextOrCommentNodePointable) TextOrCommentNodePointable.FACTORY
+            .createPointable();
+    private final ArrayBackedValueStorage tempABVS = new ArrayBackedValueStorage();
+    private final TaggedValuePointable tempTVP = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private final VoidPointable vp = (VoidPointable) VoidPointable.FACTORY.createPointable();
 
-    public void atomize(TaggedValuePointable tvp, PointablePool pp, IPointable result)
-            throws SystemException, IOException {
+    public void atomize(TaggedValuePointable tvp, PointablePool pp, IPointable result) throws SystemException, IOException {
         switch (tvp.getTag()) {
             case ValueTag.NODE_TREE_TAG:
                 tvp.getValue(ntp);
@@ -114,7 +120,7 @@ public class AtomizeHelper {
         }
     }
 
-    public static void buildConcatenationRec(SequencePointable sp, PointablePool pp, DataOutput out,
+    public static void buildConcatenationRec(SequencePointable sp, PointablePool pp, UTF8StringBuilder sb,
             NodeTreePointable ntp) throws IOException {
         TaggedValuePointable tempTVP2 = pp.takeOne(TaggedValuePointable.class);
         int nItems = sp.getEntryCount();
@@ -123,13 +129,13 @@ public class AtomizeHelper {
             switch (tempTVP2.getTag()) {
                 case ValueTag.TEXT_NODE_TAG: {
                     TextOrCommentNodePointable tcnp = pp.takeOne(TextOrCommentNodePointable.class);
-                    VoidPointable vp = pp.takeOne(VoidPointable.class);
+                    UTF8StringPointable utf8sp = pp.takeOne(UTF8StringPointable.class);
                     try {
                         tempTVP2.getValue(tcnp);
-                        tcnp.getValue(ntp, vp);
-                        out.write(vp.getByteArray(), vp.getStartOffset() + 2, vp.getLength() - 2);
+                        tcnp.getValue(ntp, utf8sp);
+                        sb.appendUtf8StringPointable(utf8sp);
                     } finally {
-                        pp.giveBack(vp);
+                        pp.giveBack(utf8sp);
                         pp.giveBack(tcnp);
                     }
                     break;
@@ -141,7 +147,7 @@ public class AtomizeHelper {
                         tempTVP2.getValue(enp);
                         if (enp.childrenChunkExists()) {
                             enp.getChildrenSequence(ntp, sp2);
-                            buildConcatenationRec(sp2, pp, out, ntp);
+                            buildConcatenationRec(sp2, pp, sb, ntp);
                         }
                     } finally {
                         pp.giveBack(sp2);
@@ -153,20 +159,17 @@ public class AtomizeHelper {
         pp.giveBack(tempTVP2);
     }
 
-    public static void buildStringConcatenation(SequencePointable sp, PointablePool pp,
-            ArrayBackedValueStorage tempABVS, NodeTreePointable ntp) throws IOException {
+    public void buildStringConcatenation(SequencePointable sp, PointablePool pp, ArrayBackedValueStorage tempABVS,
+            NodeTreePointable ntp) throws IOException {
         tempABVS.reset();
         DataOutput out = tempABVS.getDataOutput();
         out.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
+        ga.reset();
+        sb.reset(ga, STRING_EXPECTED_LENGTH);
         // Leave room for the utf-8 length
-        out.write(0);
-        out.write(0);
-        buildConcatenationRec(sp, pp, out, ntp);
-        int utflen = tempABVS.getLength() - 3;
-        byte[] bytes = tempABVS.getByteArray();
-        // Patch utf-8 length at bytes 1 and 2
-        bytes[1] = (byte) ((utflen >>> 8) & 0xFF);
-        bytes[2] = (byte) ((utflen >>> 0) & 0xFF);
+        buildConcatenationRec(sp, pp, sb, ntp);
+        sb.finish();
+        out.write(ga.getByteArray(), 0, ga.getLength());
     }
 
 }

@@ -94,7 +94,7 @@ public abstract class AbstractXQueryTest {
     public static void setup() throws IOException {
         cc = TestClusterUtil.startCC(getDefaultTestOptions());
         nc = TestClusterUtil.startNC();
-//        setupFS();
+        setupFS();
     }
 
     public static void setupFS() throws IOException {
@@ -103,24 +103,24 @@ public abstract class AbstractXQueryTest {
             FileUtils.deleteDirectory(tmp);
         }
         new File(TMP.concat("/indexFolder")).mkdirs();
-        String HDFSFolder = TMP.concat("/hdfsFolder");
-        new File(HDFSFolder).mkdirs();
-        dfs = new MiniDFS();
-        try {
-            dfs.startHDFS(HDFSFolder);
-        } catch (IOException e) {
-            throw new IOException(e);
-        }
+//        String HDFSFolder = TMP.concat("/hdfsFolder");
+//        new File(HDFSFolder).mkdirs();
+//        dfs = new MiniDFS();
+//        try {
+//            dfs.startHDFS(HDFSFolder);
+//        } catch (IOException e) {
+//            throw new IOException(e);
+//        }
     }
 
     @AfterClass
     public static void shutdown() throws IOException {
-//        removeFS();
+        removeFS();
         TestClusterUtil.stopCluster(cc, nc);
     }
 
     public static void removeFS() throws IOException {
-        dfs.shutdownHDFS();
+//        dfs.shutdownHDFS();
         File tmp = new File(TMP);
         if (tmp.exists()) {
             FileUtils.deleteDirectory(tmp);
