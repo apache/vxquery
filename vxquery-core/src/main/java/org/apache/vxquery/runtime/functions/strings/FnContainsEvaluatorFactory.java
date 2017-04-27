@@ -101,7 +101,7 @@ public class FnContainsEvaluatorFactory extends AbstractTaggedValueArgumentScala
                 // TODO use the third value as collation
 
                 // Only need to run comparisons if they both have a non empty string.
-                if (stringp1.getLength() > 2 && stringp2.getLength() > 2) {
+                if (stringp1.getUTF8Length() > 0 && stringp2.getUTF8Length() > 0) {
                     int c2 = charIterator2.next();
                     while (true) {
                         int c1 = charIterator1.next();
@@ -124,7 +124,7 @@ public class FnContainsEvaluatorFactory extends AbstractTaggedValueArgumentScala
                             break;
                         }
                     }
-                } else if (stringp2.getLength() == 2) {
+                } else if (stringp2.getUTF8Length() == 0) {
                     booleanResult[1] = 1;
                 }
 

@@ -31,8 +31,6 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 import org.apache.hyracks.data.std.util.GrowableArray;
-import org.apache.hyracks.data.std.util.UTF8StringBuilder;
-import org.apache.hyracks.util.string.UTF8StringUtil;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDatePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
@@ -41,6 +39,7 @@ import org.apache.vxquery.datamodel.accessors.atomic.XSDurationPointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSTimePointable;
 import org.apache.vxquery.datamodel.builders.atomic.StringValueBuilder;
+import org.apache.vxquery.datamodel.builders.atomic.VXQueryUTF8StringBuilder;
 import org.apache.vxquery.datamodel.util.DateTime;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
@@ -49,7 +48,7 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 public class CastToStringOperation extends AbstractCastToOperation {
     private static final int STRING_EXPECTED_LENGTH = 300;
     private final GrowableArray ga = new GrowableArray();
-    private final UTF8StringBuilder sb = new UTF8StringBuilder();
+    private final VXQueryUTF8StringBuilder sb = new VXQueryUTF8StringBuilder();
     private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
     private ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
     private DataOutput dOutInner = abvsInner.getDataOutput();
@@ -64,16 +63,14 @@ public class CastToStringOperation extends AbstractCastToOperation {
 
     @Override
     public void convertBase64Binary(XSBinaryPointable binaryp, DataOutput dOut) throws SystemException, IOException {
-        baaos.reset();
-        @SuppressWarnings("resource")
+        // Read binary
         Base64OutputStream b64os = new Base64OutputStream(baaos, true);
         b64os.write(binaryp.getByteArray(), binaryp.getStartOffset() + 2, binaryp.getLength() - 2);
 
-        dOut.write(returnTag);
-        UTF8StringUtil.getNumBytesToStoreLength(baaos.size());
-        dOut.write((byte) ((baaos.size() >>> 8) & 0xFF));
-        dOut.write((byte) ((baaos.size() >>> 0) & 0xFF));
-        dOut.write(baaos.getByteArray(), 0, baaos.size());
+        // Write string
+        startString();
+        sb.appendUtf8Bytes(baaos.getByteArray(), 0, baaos.size());
+        sendStringDataOutput(dOut);
     }
 
     @Override

@@ -74,7 +74,7 @@ public class FnStringToCodepointsEvaluatorFactory extends AbstractTaggedValueArg
                         throw new SystemException(ErrorCode.FORG0006);
                     }
                     tvp1.getValue(stringp);
-                    if (stringp.getLength() == 2) {
+                    if (stringp.getUTF8Length() == 0) {
                         XDMConstants.setEmptySequence(result);
                         return;
                     }
