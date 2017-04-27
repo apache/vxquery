@@ -103,14 +103,14 @@ public abstract class AbstractXQueryTest {
             FileUtils.deleteDirectory(tmp);
         }
         new File(TMP.concat("/indexFolder")).mkdirs();
-//        String HDFSFolder = TMP.concat("/hdfsFolder");
-//        new File(HDFSFolder).mkdirs();
-//        dfs = new MiniDFS();
-//        try {
-//            dfs.startHDFS(HDFSFolder);
-//        } catch (IOException e) {
-//            throw new IOException(e);
-//        }
+        String HDFSFolder = TMP.concat("/hdfsFolder");
+        new File(HDFSFolder).mkdirs();
+        dfs = new MiniDFS();
+        try {
+            dfs.startHDFS(HDFSFolder);
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
     }
 
     @AfterClass
@@ -120,7 +120,7 @@ public abstract class AbstractXQueryTest {
     }
 
     public static void removeFS() throws IOException {
-//        dfs.shutdownHDFS();
+        dfs.shutdownHDFS();
         File tmp = new File(TMP);
         if (tmp.exists()) {
             FileUtils.deleteDirectory(tmp);
