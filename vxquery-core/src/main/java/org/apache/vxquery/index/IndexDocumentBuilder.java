@@ -813,8 +813,8 @@ public class IndexDocumentBuilder extends XMLSerializer {
     }
 
     private String[] printString(UTF8StringPointable utf8sp, String path) {
-        int utfLen = utf8sp.getStringLength();
-        int offset = utf8sp.getCharStartOffset();
+        int utfLen = utf8sp.getUTF8Length();
+        int offset = utf8sp.getMetaDataLength();
         String[] result = { "", path };
         while (utfLen > 0) {
             char c = utf8sp.charAt(offset);
