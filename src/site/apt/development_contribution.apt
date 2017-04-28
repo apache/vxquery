@@ -111,6 +111,7 @@ Contributing Code
       are included below a blank line.
 
       Git rebase has a option of merging commits into a single commit that works nicely for squashing your changes.
+      (git ready has a nice example {{{http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html}}})
       Although, this will not work if you happened use merge when updated to the latest master branch.
 
 
@@ -140,6 +141,9 @@ Contributing Code
 
       A {{{https://asterix-jenkins.ics.uci.edu/job/vxquery-pr/}VXQuery Jenkins}} instance has been set up to
       check the last ten Pull Requests.
+      The Pull Request being reviewed should pass all tests.
+      Each commit to a Pull Request will trigger a new test run.
+      Confirm the last test run passes all the tests.
 
     * Double check the change.
 
@@ -149,6 +153,8 @@ Contributing Code
 
       When merging the change, do not ~rebase~.
       Instead do a single merge commit into Apache VXQuery master.
+      Since the Pull Request now has a single commit, yan alternative would be to cherry pick that commit 
+      from the given branch into master.
 
     * Push change to ASF remote.
 
