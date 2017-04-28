@@ -252,8 +252,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             LogicalVariable payLoadVar, List<LogicalVariable> additionalFilterKeyFields,
             List<LogicalVariable> additionalNonFilteringFields, RecordDescriptor recordDesc, JobGenContext context,
             JobSpecification jobSpec, boolean bulkload) throws AlgebricksException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -262,8 +261,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             LogicalVariable payLoadVar, List<LogicalVariable> additionalFilterFields,
             List<LogicalVariable> additionalNonFilteringFields, RecordDescriptor recordDesc, JobGenContext context,
             JobSpecification jobSpec) throws AlgebricksException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -274,13 +272,11 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             ILogicalExpression filterExpr, List<LogicalVariable> prevSecondaryKeys,
             LogicalVariable prevAdditionalFilteringKeys, RecordDescriptor inputDesc, JobGenContext context,
             JobSpecification spec) throws AlgebricksException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Map<String, String> getConfig() {
-        // TODO Auto-generated method stub
         return new HashMap<>();
     }
 

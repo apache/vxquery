@@ -45,6 +45,7 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
         super(args);
     }
 
+    @Override
     protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws HyracksDataException {
         final AbstractValueComparisonOperation aOpComparison = createValueComparisonOperation();
         final TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();

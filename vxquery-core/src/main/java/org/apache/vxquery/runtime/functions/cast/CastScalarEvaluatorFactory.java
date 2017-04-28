@@ -61,140 +61,117 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                         case ValueTag.XS_ANY_URI_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertAnyURI(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_BASE64_BINARY_TAG:
                             tvp.getValue(tp.binaryp);
                             aOp.convertBase64Binary(tp.binaryp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_BOOLEAN_TAG:
                             tvp.getValue(tp.boolp);
                             aOp.convertBoolean(tp.boolp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_DATE_TAG:
                             tvp.getValue(tp.datep);
                             aOp.convertDate(tp.datep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_DATETIME_TAG:
                             tvp.getValue(tp.datetimep);
                             aOp.convertDatetime(tp.datetimep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_DAY_TIME_DURATION_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertDTDuration(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_DECIMAL_TAG:
                             tvp.getValue(tp.decp);
                             aOp.convertDecimal(tp.decp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_DOUBLE_TAG:
                             tvp.getValue(tp.doublep);
                             aOp.convertDouble(tp.doublep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_DURATION_TAG:
                             tvp.getValue(tp.durationp);
                             aOp.convertDuration(tp.durationp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_FLOAT_TAG:
                             tvp.getValue(tp.floatp);
                             aOp.convertFloat(tp.floatp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_G_DAY_TAG:
                             tvp.getValue(tp.datep);
                             aOp.convertGDay(tp.datep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_G_MONTH_TAG:
                             tvp.getValue(tp.datep);
                             aOp.convertGMonth(tp.datep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_G_MONTH_DAY_TAG:
                             tvp.getValue(tp.datep);
                             aOp.convertGMonthDay(tp.datep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_G_YEAR_TAG:
                             tvp.getValue(tp.datep);
                             aOp.convertGYear(tp.datep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_G_YEAR_MONTH_TAG:
                             tvp.getValue(tp.datep);
                             aOp.convertGYearMonth(tp.datep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_HEX_BINARY_TAG:
                             tvp.getValue(tp.binaryp);
                             aOp.convertHexBinary(tp.binaryp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_INTEGER_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertInteger(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NOTATION_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertNotation(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_QNAME_TAG:
                             tvp.getValue(tp.qnamep);
                             aOp.convertQName(tp.qnamep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_STRING_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertString(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_TIME_TAG:
                             tvp.getValue(tp.timep);
                             aOp.convertTime(tp.timep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_UNTYPED_ATOMIC_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertUntypedAtomic(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_YEAR_MONTH_DURATION_TAG:
                             tvp.getValue(tp.intp);
                             aOp.convertYMDuration(tp.intp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         /**
                          * Derived Numeric Datatypes (Alphabetical)
@@ -202,74 +179,62 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                         case ValueTag.XS_BYTE_TAG:
                             tvp.getValue(tp.bytep);
                             aOp.convertByte(tp.bytep, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_INT_TAG:
                             tvp.getValue(tp.intp);
                             aOp.convertInt(tp.intp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_LONG_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertLong(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NEGATIVE_INTEGER_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertNegativeInteger(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NON_NEGATIVE_INTEGER_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertNonNegativeInteger(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NON_POSITIVE_INTEGER_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertNonPositiveInteger(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_POSITIVE_INTEGER_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertPositiveInteger(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_SHORT_TAG:
                             tvp.getValue(tp.shortp);
                             aOp.convertShort(tp.shortp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_UNSIGNED_BYTE_TAG:
                             tvp.getValue(tp.shortp);
                             aOp.convertUnsignedByte(tp.shortp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_UNSIGNED_INT_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertUnsignedInt(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_UNSIGNED_LONG_TAG:
                             tvp.getValue(tp.longp);
                             aOp.convertUnsignedLong(tp.longp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_UNSIGNED_SHORT_TAG:
                             tvp.getValue(tp.intp);
                             aOp.convertUnsignedShort(tp.intp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         /**
                          * Derived String Datatypes (Alphabetical)
@@ -277,71 +242,65 @@ public class CastScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFacto
                         case ValueTag.XS_ENTITY_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertEntity(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_ID_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertID(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_IDREF_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertIDREF(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_LANGUAGE_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertIDREF(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NAME_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertName(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NCNAME_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertNCName(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NMTOKEN_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertNMToken(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_NORMALIZED_STRING_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertNormalizedString(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         case ValueTag.XS_TOKEN_TAG:
                             tvp.getValue(tp.utf8sp);
                             aOp.convertToken(tp.utf8sp, dOut);
-                            result.set(abvs);
-                            return;
+                            break;
 
                         /**
                          * JSON null
                          */
                         case ValueTag.JS_NULL_TAG:
                             aOp.convertNull(dOut);
-                            result.set(abvs);
-                            return;
+                            break;
+
+                        default:
+                            throw new SystemException(ErrorCode.XPTY0004);
                     }
+                    result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (SystemException se) {
                     throw se;
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }
-                throw new SystemException(ErrorCode.XPTY0004);
+
             }
 
             @Override

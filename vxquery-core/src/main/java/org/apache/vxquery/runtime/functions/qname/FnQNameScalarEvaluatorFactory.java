@@ -135,7 +135,7 @@ public class FnQNameScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                     sb.finish();
                     dOut.write(ga.getByteArray(), 0, ga.getLength());
 
-                    result.set(abvs);
+                    result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }

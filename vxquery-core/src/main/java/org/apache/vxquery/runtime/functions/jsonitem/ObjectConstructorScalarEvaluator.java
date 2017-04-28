@@ -62,7 +62,7 @@ public class ObjectConstructorScalarEvaluator extends AbstractObjectConstructorS
             for (int i = 0; i < len; i += 3) {
                 key = args[i];
                 value = args[i + 1];
-                qmc = args[i + 2]; 
+                qmc = args[i + 2];
                 if (!isDuplicateKeys(key, tvps)) {
                     tvps.add(key);
                     key.getValue(sp);

@@ -26,8 +26,10 @@ import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.atomic.VXQueryUTF8StringBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
@@ -37,6 +39,7 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
+    private static final int STRING_EXPECTED_LENGTH = 300;
 
     public FnStringJoinEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -50,6 +53,8 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
         final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequencePointable seq = (SequencePointable) SequencePointable.FACTORY.createPointable();
+        final GrowableArray ga = new GrowableArray();
+        final VXQueryUTF8StringBuilder sb = new VXQueryUTF8StringBuilder();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -89,16 +94,15 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
                     out.write(ValueTag.XS_STRING_TAG);
 
                     // Default values for the length and update later
-                    out.write(0);
-                    out.write(0);
+                    ga.reset();
+                    sb.reset(ga, STRING_EXPECTED_LENGTH);
 
                     int seqLen = seq.getEntryCount();
                     if (seqLen != 0) {
                         for (int j = 0; j < seqLen; ++j) {
                             // Add separator if more than one value.
                             if (j > 0) {
-                                out.write(stringp2.getByteArray(), stringp2.getCharStartOffset(),
-                                        stringp2.getUTF8Length());
+                                sb.appendUtf8StringPointable(stringp2);
                             }
                             // Get string from sequence.
                             seq.getEntry(j, tvp);
@@ -106,13 +110,11 @@ public class FnStringJoinEvaluatorFactory extends AbstractTaggedValueArgumentSca
                                 throw new SystemException(ErrorCode.FORG0006);
                             }
                             tvp.getValue(stringp1);
-                            out.write(stringp1.getByteArray(), stringp1.getCharStartOffset(), stringp1.getUTF8Length());
+                            sb.appendUtf8StringPointable(stringp1);
                         }
-
-                        // Update the full length string in the byte array.
-                        abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-                        abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
                     }
+                    sb.finish();
+                    out.write(ga.getByteArray(), 0, ga.getLength());
 
                     result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (IOException e) {

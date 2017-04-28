@@ -54,6 +54,7 @@ public class CastToStringOperation extends AbstractCastToOperation {
     private DataOutput dOutInner = abvsInner.getDataOutput();
     protected int returnTag = ValueTag.XS_STRING_TAG;
     private final char[] hex = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    private final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
 
     @Override
     public void convertAnyURI(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
@@ -464,17 +465,13 @@ public class CastToStringOperation extends AbstractCastToOperation {
     @Override
     public void convertQName(XSQNamePointable qnamep, DataOutput dOut) throws SystemException, IOException {
         startString();
-        // TODO rewrite conversion
-        //        if (qnamep.getPrefixUTFLength() > 0) {
-        //            sb.appendUtf8StringPointable(qnamep,
-        //                    qnamep.getStartOffset() + qnamep.getUriLength() + qnamep.getUriLength(),
-        //                    qnamep.getPrefixUTFLength());
-        //            FunctionHelper.writeChar(':', sb);
-        //        }
-        //        dOutInner.write(qnamep.getByteArray(),
-        //                qnamep.getStartOffset() + qnamep.getUriLength() + qnamep.getPrefixLength() + 2,
-        //                qnamep.getLocalNameUTFLength());
-
+        if (qnamep.getPrefixUTFLength() > 0) {
+            qnamep.getPrefix(stringp);
+            sb.appendUtf8StringPointable(stringp);
+            FunctionHelper.writeChar(':', sb);
+        }
+        qnamep.getLocalName(stringp);
+        sb.appendUtf8StringPointable(stringp);
         sendStringDataOutput(dOut);
     }
 

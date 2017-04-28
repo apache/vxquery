@@ -64,6 +64,7 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
 
                 try {
                     // append each string to abvsBuilder
+                    ga.reset();
                     builder.reset(ga, 300);
 
                     for (int i = 0; i < args.length; i++) {
