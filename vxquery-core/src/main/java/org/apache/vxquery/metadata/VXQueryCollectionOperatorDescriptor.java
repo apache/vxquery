@@ -80,7 +80,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
     private HDFSFunctions hdfs;
     private String tag;
-    private final String START_TAG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+    private static final String START_TAG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
     private final String hdfsConf;
     private final Map<String, NodeControllerInfo> nodeControllerInfos;
 
@@ -277,7 +277,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             public void close() throws HyracksDataException {
                 // Check if needed?
                 if (appender.getTupleCount() > 0) {
-                    appender.flush(writer, true);
+                    appender.flush(writer);
                 }
                 writer.close();
             }

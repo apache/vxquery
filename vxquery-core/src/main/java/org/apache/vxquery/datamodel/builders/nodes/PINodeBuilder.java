@@ -19,6 +19,7 @@ package org.apache.vxquery.datamodel.builders.nodes;
 import java.io.IOException;
 
 import org.apache.hyracks.data.std.api.IValueReference;
+import org.apache.hyracks.data.std.util.GrowableArray;
 import org.apache.vxquery.datamodel.values.ValueTag;
 
 public class PINodeBuilder extends AbstractNodeBuilder {
@@ -42,5 +43,13 @@ public class PINodeBuilder extends AbstractNodeBuilder {
 
     public void setContent(IValueReference value) throws IOException {
         out.write(value.getByteArray(), value.getStartOffset(), value.getLength());
+    }
+
+    public void setTarget(GrowableArray value) throws IOException {
+        out.write(value.getByteArray(), 0, value.getLength());
+    }
+
+    public void setContent(GrowableArray value) throws IOException {
+        out.write(value.getByteArray(), 0, value.getLength());
     }
 }

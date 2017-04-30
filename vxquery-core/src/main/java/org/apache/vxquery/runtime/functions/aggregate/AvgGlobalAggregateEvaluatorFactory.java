@@ -18,6 +18,13 @@ package org.apache.vxquery.runtime.functions.aggregate;
 
 import java.io.DataOutput;
 
+import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -30,14 +37,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggr
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgumentAggregateEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -46,7 +45,7 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
     }
 
     @Override
-    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws HyracksDataException {
         final ArrayBackedValueStorage abvsCount = new ArrayBackedValueStorage();
         final DataOutput dOutCount = abvsCount.getDataOutput();
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
@@ -65,7 +64,7 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
             TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
             @Override
-            public void init() throws AlgebricksException {
+            public void init() throws HyracksDataException {
                 try {
                     abvsCount.reset();
                     dOutCount.write(ValueTag.XS_INTEGER_TAG);
@@ -76,17 +75,17 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
                     dOutSum.writeLong(0);
                     tvpSum.set(abvsSum);
                 } catch (Exception e) {
-                    throw new AlgebricksException(e);
+                    throw new HyracksDataException(e);
                 }
             }
 
             @Override
-            public void finishPartial(IPointable result) throws AlgebricksException {
+            public void finishPartial(IPointable result) throws HyracksDataException {
                 finish(result);
             }
 
             @Override
-            public void finish(IPointable result) throws AlgebricksException {
+            public void finish(IPointable result) throws HyracksDataException {
                 tvpCount.getValue(longp);
                 if (longp.getLong() == 0) {
                     XDMConstants.setEmptySequence(result);
@@ -96,13 +95,13 @@ public class AvgGlobalAggregateEvaluatorFactory extends AbstractTaggedValueArgum
                         divide.compute(tvpSum, tvpCount, tvpSum);
                         result.set(tvpSum);
                     } catch (Exception e) {
-                        throw new AlgebricksException(e);
+                        throw new HyracksDataException(e);
                     }
                 }
             }
 
             @Override
-            protected void step(TaggedValuePointable[] args) throws SystemException {
+            protected void step(TaggedValuePointable[] args) throws HyracksDataException {
                 TaggedValuePointable tvp = args[0];
                 if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
                     tvp.getValue(seq);

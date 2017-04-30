@@ -20,7 +20,7 @@ import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.data.std.api.AbstractPointable;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.api.IPointableFactory;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 
 /**
  * The XSQNamePointable holds three strings: URI, Prefix and Local Name.
@@ -59,7 +59,8 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public static int getUriLength(byte[] bytes, int start) {
-        return getUriUTFLength(bytes, start) + 2;
+        int utfLength = getUriUTFLength(bytes, start);
+        return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
     }
 
     public int getUriUTFLength() {
@@ -67,7 +68,7 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public static int getUriUTFLength(byte[] bytes, int start) {
-        return UTF8StringPointable.getUTFLength(bytes, start);
+        return UTF8StringUtil.getUTFLength(bytes, start);
     }
 
     public int getPrefixLength() {
@@ -75,7 +76,8 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public static int getPrefixLength(byte[] bytes, int start) {
-        return getPrefixUTFLength(bytes, start) + 2;
+        int utfLength = getPrefixUTFLength(bytes, start);
+        return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
     }
 
     public int getPrefixUTFLength() {
@@ -83,7 +85,7 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public static int getPrefixUTFLength(byte[] bytes, int start) {
-        return UTF8StringPointable.getUTFLength(bytes, start + getUriLength(bytes, start));
+        return UTF8StringUtil.getUTFLength(bytes, start + getUriLength(bytes, start));
     }
 
     public int getLocalNameLength() {
@@ -91,7 +93,8 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public static int getLocalNameLength(byte[] bytes, int start) {
-        return getLocalNameUTFLength(bytes, start) + 2;
+        int utfLength = getLocalNameUTFLength(bytes, start);
+        return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
     }
 
     public int getLocalNameUTFLength() {
@@ -99,7 +102,7 @@ public class XSQNamePointable extends AbstractPointable {
     }
 
     public static int getLocalNameUTFLength(byte[] bytes, int start) {
-        return UTF8StringPointable.getUTFLength(bytes,
+        return UTF8StringUtil.getUTFLength(bytes,
                 start + getUriLength(bytes, start) + getPrefixLength(bytes, start));
     }
 

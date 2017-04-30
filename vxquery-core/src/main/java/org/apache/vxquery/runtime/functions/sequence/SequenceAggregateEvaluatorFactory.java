@@ -19,6 +19,13 @@ package org.apache.vxquery.runtime.functions.sequence;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -28,14 +35,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggr
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
 import org.apache.vxquery.util.GrowableIntArray;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgumentAggregateEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -44,7 +43,7 @@ public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgume
     }
 
     @Override
-    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws HyracksDataException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final GrowableIntArray slots = new GrowableIntArray();
         final ArrayBackedValueStorage dataArea = new ArrayBackedValueStorage();
@@ -52,25 +51,21 @@ public class SequenceAggregateEvaluatorFactory extends AbstractTaggedValueArgume
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
         return new AbstractTaggedValueArgumentAggregateEvaluator(args) {
             @Override
-            public void init() throws AlgebricksException {
+            public void init() throws HyracksDataException {
                 abvs.reset();
                 slots.clear();
                 dataArea.reset();
             }
 
             @Override
-            public void finishPartial(IPointable result) throws AlgebricksException {
+            public void finishPartial(IPointable result) throws HyracksDataException {
                 finish(result);
             }
 
             @Override
-            public void finish(IPointable result) throws AlgebricksException {
+            public void finish(IPointable result) throws HyracksDataException {
                 if (slots.getSize() != 1) {
-                    try {
-                        assembleResult(abvs, slots, dataArea);
-                    } catch (SystemException e) {
-                        throw new AlgebricksException(e);
-                    }
+                    assembleResult(abvs, slots, dataArea);
                     result.set(abvs);
                 } else {
                     result.set(dataArea);

@@ -18,6 +18,12 @@ package org.apache.vxquery.runtime.functions.castable;
 
 import java.io.DataOutput;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -28,13 +34,6 @@ import org.apache.vxquery.runtime.functions.type.AbstractTypeScalarEvaluatorFact
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 import org.apache.vxquery.types.SequenceType;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -44,7 +43,7 @@ public class CastableScalarEvaluatorFactory extends AbstractTypeScalarEvaluatorF
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         return new AbstractTypeScalarEvaluator(args, ctx) {
             final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
             final DataOutput dOut = abvs.getDataOutput();

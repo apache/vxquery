@@ -22,8 +22,8 @@ public class VXQueryParseException extends VXQueryDataException {
 
     private static final long serialVersionUID = 1L;
 
-    public VXQueryParseException(Exception ex, File file) {
-        super("The file ([nodeId]:[path]) threw a SAXException during parsing.", ex, file);
+    public VXQueryParseException(Exception ex, File file, String nodeId) {
+        super("The file ([nodeId]:[path]) threw a SAXException during parsing.", ex, file, nodeId);
     }
 
 }

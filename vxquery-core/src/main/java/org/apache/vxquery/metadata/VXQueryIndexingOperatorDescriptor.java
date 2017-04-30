@@ -43,7 +43,6 @@ import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
-import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.XDMConstants;
@@ -87,11 +86,10 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
-        final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
         IndexCentralizerUtil indexCentralizerUtil = new IndexCentralizerUtil(
-                ctx.getIOManager().getIODevices().get(0).getPath());
+                ctx.getIOManager().getIODevices().get(0).getMount());
         indexCentralizerUtil.readIndexDirectory();
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
@@ -158,7 +156,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             XDMConstants.setTrue(result);
                             FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(),
                                     result.getStartOffset(), result.getLength());
-                        } catch (IOException | SystemException e) {
+                        } catch (IOException e) {
                             throw new HyracksDataException(
                                     "Could not update index in " + indexModifiedName + " " + e.getMessage());
                         }
@@ -174,7 +172,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
                             XDMConstants.setTrue(result);
                             FrameUtils.appendFieldToWriter(writer, appender, result.getByteArray(),
                                     result.getStartOffset(), result.getLength());
-                        } catch (SystemException | IOException e) {
+                        } catch (IOException e) {
                             throw new HyracksDataException(
                                     "Could not delete index in " + indexModifiedName + " " + e.getMessage());
                         }
@@ -208,7 +206,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
             public void close() throws HyracksDataException {
                 // Check if needed?
                 if (appender.getTupleCount() > 0) {
-                    appender.flush(writer, true);
+                    appender.flush(writer);
                 }
                 writer.close();
                 indexCentralizerUtil.writeIndexDirectory();

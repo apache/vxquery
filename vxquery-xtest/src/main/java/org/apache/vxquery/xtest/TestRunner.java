@@ -29,6 +29,7 @@ import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
 import org.apache.hyracks.api.comm.IFrameTupleAccessor;
 import org.apache.hyracks.api.comm.VSizeFrame;
+import org.apache.hyracks.api.dataset.DatasetJobRecord;
 import org.apache.hyracks.api.dataset.IHyracksDataset;
 import org.apache.hyracks.api.dataset.IHyracksDatasetReader;
 import org.apache.hyracks.api.dataset.ResultSetId;
@@ -36,7 +37,6 @@ import org.apache.hyracks.api.exceptions.HyracksException;
 import org.apache.hyracks.api.job.JobFlag;
 import org.apache.hyracks.api.job.JobId;
 import org.apache.hyracks.api.job.JobSpecification;
-import org.apache.hyracks.client.dataset.HyracksDataset;
 import org.apache.hyracks.control.nc.resources.memory.FrameManager;
 import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
 import org.apache.vxquery.compiler.CompilerControlBlock;
@@ -52,8 +52,7 @@ import org.apache.vxquery.xmlquery.query.VXQueryCompilationListener;
 import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
 public class TestRunner {
-    private static final Pattern EMBEDDED_SYSERROR_PATTERN = Pattern
-            .compile("org\\.apache\\.vxquery\\.exceptions\\.SystemException: (\\p{javaUpperCase}{4}\\d{4})");
+    private static final Pattern EMBEDDED_SYSERROR_PATTERN = Pattern.compile("(\\p{javaUpperCase}{4}\\d{4})");
 
     private XTestOptions opts;
     private IHyracksClientConnection hcc;
@@ -112,6 +111,10 @@ public class TestRunner {
                 FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
                 IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
                 IHyracksDatasetReader reader = hds.createReader(jobId, ccb.getResultSetId());
+                // TODO(tillw) remove this loop once the IHyracksDatasetReader reliably returns the correct exception
+                while (reader.getResultStatus() == DatasetJobRecord.Status.RUNNING) {
+                    Thread.sleep(1);
+                }
                 IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
                 res.result = "";
                 while (reader.read(frame) > 0) {
@@ -125,10 +128,13 @@ public class TestRunner {
                 while (t.getCause() != null) {
                     t = t.getCause();
                 }
-                Matcher m = EMBEDDED_SYSERROR_PATTERN.matcher(t.getMessage());
-                if (m.find()) {
-                    String eCode = m.group(1);
-                    throw new SystemException(ErrorCode.valueOf(eCode), e);
+                final String message = t.getMessage();
+                if (message != null) {
+                    Matcher m = EMBEDDED_SYSERROR_PATTERN.matcher(message);
+                    if (m.find()) {
+                        String eCode = m.group(1);
+                        throw new SystemException(ErrorCode.valueOf(eCode), e);
+                    }
                 }
                 throw e;
             }

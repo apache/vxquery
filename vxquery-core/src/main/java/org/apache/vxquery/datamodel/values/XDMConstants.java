@@ -54,10 +54,9 @@ public class XDMConstants {
         }
         EMPTY_SEQUENCE = Arrays.copyOf(abvs.getByteArray(), abvs.getLength());
 
-        EMPTY_STRING = new byte[3];
+        EMPTY_STRING = new byte[2];
         EMPTY_STRING[0] = ValueTag.XS_STRING_TAG;
         EMPTY_STRING[1] = 0;
-        EMPTY_STRING[2] = 0;
 
         JS_NULL_CONSTANT = new byte[1];
         JS_NULL_CONSTANT[0] = ValueTag.JS_NULL_TAG;

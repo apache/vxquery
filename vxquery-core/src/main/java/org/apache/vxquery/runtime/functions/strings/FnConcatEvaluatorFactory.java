@@ -19,6 +19,15 @@ package org.apache.vxquery.runtime.functions.strings;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -29,14 +38,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -46,13 +47,15 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final UTF8StringPointable stringp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final ArrayBackedValueStorage abvsInner = new ArrayBackedValueStorage();
         final DataOutput dOutInner = abvsInner.getDataOutput();
         final CastToStringOperation castToString = new CastToStringOperation();
         final TypedPointables tp = new TypedPointables();
+        final UTF8StringBuilder builder = new UTF8StringBuilder();
+        final GrowableArray ga = new GrowableArray();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -60,13 +63,9 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                 abvs.reset();
 
                 try {
-                    // Byte Format: Type (1 byte) + String Byte Length (2 bytes) + String.
-                    DataOutput out = abvs.getDataOutput();
-                    out.write(ValueTag.XS_STRING_TAG);
-
-                    // Default values for the length and update later
-                    out.write(0xFF);
-                    out.write(0xFF);
+                    // append each string to abvsBuilder
+                    ga.reset();
+                    builder.reset(ga, 300);
 
                     for (int i = 0; i < args.length; i++) {
                         TaggedValuePointable tvp = args[i];
@@ -196,6 +195,7 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                                         throw new SystemException(ErrorCode.XPTY0004);
                                 }
 
+                                // Remove tag.
                                 stringp.set(abvsInner.getByteArray(), abvsInner.getStartOffset() + 1,
                                         abvsInner.getLength() - 1);
                             } catch (IOException e) {
@@ -206,15 +206,16 @@ public class FnConcatEvaluatorFactory extends AbstractTaggedValueArgumentScalarE
                         }
 
                         // If its an empty string do nothing.
-                        if (stringp.getUTFLength() > 0) {
-                            out.write(stringp.getByteArray(), stringp.getStartOffset() + 2, stringp.getUTFLength());
+                        if (stringp.getStringLength() > 0) {
+                            builder.appendUtf8StringPointable(stringp);
                         }
                     }
+                    builder.finish();
 
-                    // Update the full length string in the byte array.
-                    abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-                    abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
-
+                    // Add tag to string and write out.
+                    DataOutput out = abvs.getDataOutput();
+                    out.write(ValueTag.XS_STRING_TAG);
+                    out.write(ga.getByteArray(), 0, ga.getLength());
                     result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);

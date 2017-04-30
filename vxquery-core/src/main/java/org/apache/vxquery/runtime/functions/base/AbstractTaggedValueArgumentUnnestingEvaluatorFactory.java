@@ -17,16 +17,16 @@
 package org.apache.vxquery.runtime.functions.base;
 
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.algebricks.runtime.base.IUnnestingEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 
 public abstract class AbstractTaggedValueArgumentUnnestingEvaluatorFactory implements IUnnestingEvaluatorFactory {
     private static final long serialVersionUID = 1L;
-    
+
     protected IHyracksTaskContext ctxview;
 
     private final IScalarEvaluatorFactory[] args;
@@ -36,7 +36,7 @@ public abstract class AbstractTaggedValueArgumentUnnestingEvaluatorFactory imple
     }
 
     @Override
-    public final IUnnestingEvaluator createUnnestingEvaluator(IHyracksTaskContext ctx) throws AlgebricksException {
+    public final IUnnestingEvaluator createUnnestingEvaluator(IHyracksTaskContext ctx) throws HyracksDataException {
     	ctxview = ctx;
         IScalarEvaluator[] es = new IScalarEvaluator[args.length];
         for (int i = 0; i < es.length; ++i) {
@@ -45,5 +45,5 @@ public abstract class AbstractTaggedValueArgumentUnnestingEvaluatorFactory imple
         return createEvaluator(ctx, es);
     }
 
-    protected abstract IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws AlgebricksException;
+    protected abstract IUnnestingEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) throws HyracksDataException;
 }

@@ -22,12 +22,13 @@ import java.util.List;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
 import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
-import org.apache.vxquery.datamodel.builders.atomic.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AbstractNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.AttributeNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.CommentNodeBuilder;
@@ -37,6 +38,7 @@ import org.apache.vxquery.datamodel.builders.nodes.ElementNodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.PINodeBuilder;
 import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
+import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeQNames;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.NameTest;
@@ -50,6 +52,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
 public class SAXContentHandler implements ContentHandler, LexicalHandler {
+    private static final int STRING_EXPECTED_LENGTH = 300;
+
     // XML node builders
     protected final AttributeNodeBuilder anb;
     protected final CommentNodeBuilder cnb;
@@ -58,6 +62,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     protected final PINodeBuilder pinb;
     protected final TextNodeBuilder tnb;
     protected final UTF8StringBuilder utf8b;
+    private final UTF8StringBuilder utf8bInternal;
     protected final List<ElementNodeBuilder> enbStack;
     protected final List<ElementNodeBuilder> freeENBList;
     protected boolean isIndexHandler;
@@ -83,7 +88,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     protected int nodeIdCounter;
     protected final ITreeNodeIdProvider nodeIdProvider;
     protected final ArrayBackedValueStorage tempABVS;
-    private final ArrayBackedValueStorage textABVS;
+    private final GrowableArray textGA;
+    private final GrowableArray textGAInternal;
 
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, boolean isIndexHandler) {
         // XML node builders
@@ -94,8 +100,9 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         pinb = new PINodeBuilder();
         tnb = new TextNodeBuilder();
         utf8b = new UTF8StringBuilder();
-        enbStack = new ArrayList<ElementNodeBuilder>();
-        freeENBList = new ArrayList<ElementNodeBuilder>();
+        utf8bInternal = new UTF8StringBuilder();
+        enbStack = new ArrayList<>();
+        freeENBList = new ArrayList<>();
 
         // Element writing and path step variables
         skipping = true;
@@ -110,7 +117,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         nodeIdCounter = 0;
         this.nodeIdProvider = nodeIdProvider;
         tempABVS = new ArrayBackedValueStorage();
-        textABVS = new ArrayBackedValueStorage();
+        textGA = new GrowableArray();
+        textGAInternal = new GrowableArray();
         this.isIndexHandler = isIndexHandler;
         if (isIndexHandler) {
             this.appender = null;
@@ -156,7 +164,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             return;
         }
         try {
-            utf8b.appendCharArray(ch, start, length);
+            appendCharArray(ch, start, length);
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
@@ -233,20 +241,21 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         try {
             flushText();
             startChildInParent(pinb);
-            tempABVS.reset();
-            tempABVS.getDataOutput().writeUTF(target);
             if (createNodeIds) {
                 pinb.setLocalNodeId(nodeIdCounter++);
             }
-            pinb.setTarget(tempABVS);
-            tempABVS.reset();
-            tempABVS.getDataOutput().writeUTF(data);
-            pinb.setContent(tempABVS);
+            pinb.setTarget(stringToGrowableArray(target));
+            pinb.setContent(stringToGrowableArray(data));
             endChildInParent(pinb);
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
         }
+    }
+
+    private GrowableArray stringToGrowableArray(String value) throws IOException {
+        FunctionHelper.stringToGrowableArray(value, textGAInternal, utf8bInternal, STRING_EXPECTED_LENGTH);
+        return textGAInternal;
     }
 
     @Override
@@ -264,8 +273,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
         }
         db.reset();
         try {
-            textABVS.reset();
-            utf8b.reset(textABVS);
+            textGA.reset();
+            utf8b.reset(textGA, STRING_EXPECTED_LENGTH);
         } catch (IOException e) {
             throw new SAXException(e);
         }
@@ -355,7 +364,8 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
                 tempABVS.reset();
                 DataOutput tempOut = tempABVS.getDataOutput();
                 tempOut.write(ValueTag.XS_UNTYPED_ATOMIC_TAG);
-                tempOut.writeUTF(aValue);
+                stringToGrowableArray(aValue);
+                tempOut.write(textGAInternal.getByteArray(), 0, textGAInternal.getLength());
                 enb.startAttribute(anb);
                 anb.setName(aUriCode, aLocalNameCode, aPrefixCode);
                 if (attachTypes) {
@@ -394,15 +404,21 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             if (createNodeIds) {
                 cnb.setLocalNodeId(nodeIdCounter++);
             }
-            utf8b.appendCharArray(ch, start, length);
+            appendCharArray(ch, start, length);
             utf8b.finish();
-            cnb.setValue(textABVS);
+            cnb.setValue(textGA);
             endChildInParent(cnb);
-            textABVS.reset();
-            utf8b.reset(textABVS);
+            textGA.reset();
+            utf8b.reset(textGA, STRING_EXPECTED_LENGTH);
         } catch (IOException e) {
             e.printStackTrace();
             throw new SAXException(e);
+        }
+    }
+
+    private void appendCharArray(char[] ch, int start, int length) throws IOException {
+        for (int i = 0; i < length; ++i) {
+            utf8b.appendChar(ch[i + start]);
         }
     }
 
@@ -413,10 +429,10 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
                 tnb.setLocalNodeId(nodeIdCounter++);
             }
             utf8b.finish();
-            tnb.setValue(textABVS);
+            tnb.setValue(textGA);
             peekENBStackTop().endChild(tnb);
-            textABVS.reset();
-            utf8b.reset(textABVS);
+            textGA.reset();
+            utf8b.reset(textGA, STRING_EXPECTED_LENGTH);
             pendingText = false;
         }
     }
@@ -559,7 +575,7 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        UTF8StringPointable.toString(sb, bytes, 0);
+        UTF8StringUtil.toString(sb, bytes, 0);
         return sb.toString();
     }
 

@@ -19,10 +19,10 @@ package org.apache.vxquery.exceptions;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.vxquery.util.SourceLocation;
 
-public class SystemException extends AlgebricksException {
+public class SystemException extends HyracksDataException {
     private static final long serialVersionUID = 1L;
 
     private final ErrorCode code;

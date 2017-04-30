@@ -19,7 +19,7 @@ package org.apache.vxquery.types;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 
 public final class NameTest implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -49,13 +49,13 @@ public final class NameTest implements Serializable {
         StringBuilder buffer = new StringBuilder();
         buffer.append("NameTest({");
         if (uri != null) {
-            UTF8StringPointable.toString(buffer, uri, 0);
+            UTF8StringUtil.toString(buffer, uri, 0);
         } else {
             buffer.append('*');
         }
         buffer.append('}');
         if (localName != null) {
-            UTF8StringPointable.toString(buffer, localName, 0);
+            UTF8StringUtil.toString(buffer, localName, 0);
         } else {
             buffer.append('*');
         }

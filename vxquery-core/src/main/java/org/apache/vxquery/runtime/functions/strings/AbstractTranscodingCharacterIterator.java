@@ -23,12 +23,14 @@ public abstract class AbstractTranscodingCharacterIterator implements ICharacter
         this.in = in;
     }
 
-    final public char next() {
+    @Override
+    public final char next() {
         int c = in.next();
-        return c != ICharacterIterator.EOS_CHAR ? transcodeCharacter((char) c) : (char) ICharacterIterator.EOS_CHAR;
+        return c != ICharacterIterator.EOS_CHAR ? transcodeCharacter((char) c) : ICharacterIterator.EOS_CHAR;
     }
 
-    final public void reset() {
+    @Override
+    public final void reset() {
         in.reset();
     }
 

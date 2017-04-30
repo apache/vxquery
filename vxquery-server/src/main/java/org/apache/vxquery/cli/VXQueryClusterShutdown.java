@@ -17,17 +17,16 @@ package org.apache.vxquery.cli;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hyracks.api.client.HyracksConnection;
+import org.apache.hyracks.api.client.IHyracksClientConnection;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import org.apache.hyracks.api.client.HyracksConnection;
-import org.apache.hyracks.api.client.IHyracksClientConnection;
-
 public class VXQueryClusterShutdown {
     /**
      * Main method to get command line options and execute query process.
-     * 
+     *
      * @param args
      * @throws Exception
      */
@@ -42,16 +41,16 @@ public class VXQueryClusterShutdown {
             parser.printUsage(System.err);
             return;
         }
-        
+
         // give error message if missing arguments
         if (opts.clientNetIpAddress == null) {
             parser.printUsage(System.err);
             return;
         }
-        
+
         try {
             IHyracksClientConnection hcc = new HyracksConnection(opts.clientNetIpAddress, opts.clientNetPort);
-            hcc.stopCluster();
+            hcc.stopCluster(true);
         } catch (Exception e) {
             System.err.println("Unable to connect and shutdown the Hyracks cluster.");
             System.err.println(e);

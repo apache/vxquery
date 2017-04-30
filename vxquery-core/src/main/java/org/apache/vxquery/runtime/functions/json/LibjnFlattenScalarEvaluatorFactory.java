@@ -18,10 +18,10 @@ package org.apache.vxquery.runtime.functions.json;
 
 import java.io.IOException;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
@@ -44,7 +44,7 @@ public class LibjnFlattenScalarEvaluatorFactory extends AbstractTaggedValueArgum
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final SequencePointable sp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final SequenceBuilder sb = new SequenceBuilder();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();

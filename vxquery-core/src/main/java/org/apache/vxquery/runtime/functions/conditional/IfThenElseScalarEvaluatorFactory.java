@@ -16,19 +16,18 @@
  */
 package org.apache.vxquery.runtime.functions.conditional;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import org.apache.hyracks.dataflow.common.data.accessors.IFrameTupleReference;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
-import org.apache.hyracks.dataflow.common.data.accessors.IFrameTupleReference;
 
 public class IfThenElseScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -42,28 +41,24 @@ public class IfThenElseScalarEvaluatorFactory extends AbstractTaggedValueArgumen
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, final IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final TaggedValuePointable conditionTvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
 
         return new IScalarEvaluator() {
             @Override
-            public void evaluate(IFrameTupleReference tuple, IPointable result) throws AlgebricksException {
+            public void evaluate(IFrameTupleReference tuple, IPointable result) throws HyracksDataException {
                 args[CONDITION].evaluate(tuple, conditionTvp);
 
-                try {
-                    if (conditionTvp.getTag() != ValueTag.XS_BOOLEAN_TAG) {
-                        throw new SystemException(ErrorCode.FORG0006);
-                    }
-                    conditionTvp.getValue(bp);
+                if (conditionTvp.getTag() != ValueTag.XS_BOOLEAN_TAG) {
+                    throw new SystemException(ErrorCode.FORG0006);
+                }
+                conditionTvp.getValue(bp);
 
-                    if (bp.getBoolean()) {
-                        args[TRUE_CONDITION].evaluate(tuple, result);
-                    } else {
-                        args[FALSE_CONDITION].evaluate(tuple, result);
-                    }
-                } catch (SystemException e) {
-                    throw new AlgebricksException(e);
+                if (bp.getBoolean()) {
+                    args[TRUE_CONDITION].evaluate(tuple, result);
+                } else {
+                    args[FALSE_CONDITION].evaluate(tuple, result);
                 }
             }
         };

@@ -18,7 +18,7 @@ package org.apache.vxquery.types;
 
 import java.util.Arrays;
 
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 
 public final class ProcessingInstructionType extends AbstractNodeType {
     private static final long serialVersionUID = 1L;
@@ -44,7 +44,7 @@ public final class ProcessingInstructionType extends AbstractNodeType {
     public String toString() {
         StringBuilder sb = new StringBuilder("processing-instruction(");
         if (target != null) {
-            UTF8StringPointable.toString(sb, target, 0);
+            UTF8StringUtil.toString(sb, target, 0);
         }
         return sb.append(")").toString();
     }

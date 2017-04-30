@@ -19,6 +19,16 @@ package org.apache.vxquery.runtime.functions.strings;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -28,17 +38,9 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public class FnCodepointsToStringEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
+    private static final int STRING_EXPECTED_LENGTH = 300;
 
     public FnCodepointsToStringEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -46,25 +48,26 @@ public class FnCodepointsToStringEvaluatorFactory extends AbstractTaggedValueArg
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final LongPointable longp = (LongPointable) LongPointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final VoidPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
+        final GrowableArray ga = new GrowableArray();
+        final UTF8StringBuilder sb = new UTF8StringBuilder();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
             protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
                 TaggedValuePointable tvp1 = args[0];
                 try {
-                    // Byte Format: Type (1 byte) + String Length (2 bytes) + String.
+                    // Byte Format: Type (1 byte) + String Length (X bytes) + String.
                     DataOutput out = abvs.getDataOutput();
                     out.write(ValueTag.XS_STRING_TAG);
 
-                    // Default values for the length and update later
-                    out.write(0);
-                    out.write(0);
+                    ga.reset();
+                    sb.reset(ga, STRING_EXPECTED_LENGTH);
 
                     // Only accept sequences of integers or an integer as input.
                     if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
@@ -76,21 +79,20 @@ public class FnCodepointsToStringEvaluatorFactory extends AbstractTaggedValueArg
                             if (!Character.isDefined(longp.intValue())) {
                                 throw new SystemException(ErrorCode.FOCH0001);
                             }
-                            FunctionHelper.writeChar((char) longp.intValue(), out);
+                            FunctionHelper.writeChar((char) longp.intValue(), sb);
                         }
                     } else if (tvp1.getTag() == ValueTag.XS_INTEGER_TAG) {
                         tvp1.getValue(longp);
                         if (!Character.isDefined(longp.intValue())) {
                             throw new SystemException(ErrorCode.FOCH0001);
                         }
-                        FunctionHelper.writeChar((char) longp.intValue(), out);
+                        FunctionHelper.writeChar((char) longp.intValue(), sb);
                     } else {
                         throw new SystemException(ErrorCode.FORG0006);
                     }
 
-                    // Update the full length string in the byte array.
-                    abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-                    abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
+                    sb.finish();
+                    out.write(ga.getByteArray(), 0, ga.getLength());
 
                     result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
                 } catch (IOException e) {

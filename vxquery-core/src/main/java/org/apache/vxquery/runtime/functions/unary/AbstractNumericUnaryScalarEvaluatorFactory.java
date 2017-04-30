@@ -18,6 +18,13 @@ package org.apache.vxquery.runtime.functions.unary;
 
 import java.io.DataOutput;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -27,14 +34,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
         AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -46,7 +45,7 @@ public abstract class AbstractNumericUnaryScalarEvaluatorFactory extends
 
     @Override
     protected AbstractTaggedValueArgumentScalarEvaluator createEvaluator(IHyracksTaskContext ctx,
-            IScalarEvaluator[] args) throws AlgebricksException {
+            IScalarEvaluator[] args) throws HyracksDataException {
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             final AbstractNumericUnaryOperation aOp = createNumericUnaryOperation();
             final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();

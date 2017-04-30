@@ -19,6 +19,12 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
@@ -31,13 +37,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggr
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
         AbstractTaggedValueArgumentAggregateEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -46,7 +45,8 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
         super(args);
     }
 
-    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    @Override
+    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws HyracksDataException {
         final AbstractValueComparisonOperation aOpComparison = createValueComparisonOperation();
         final TaggedValuePointable tvp2 = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
@@ -60,17 +60,17 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
             long count;
 
             @Override
-            public void init() throws AlgebricksException {
+            public void init() {
                 count = 0;
             }
 
             @Override
-            public void finishPartial(IPointable result) throws AlgebricksException {
+            public void finishPartial(IPointable result) {
                 finish(result);
             }
 
             @Override
-            public void finish(IPointable result) throws AlgebricksException {
+            public void finish(IPointable result) {
                 if (count == 0) {
                     XDMConstants.setEmptySequence(result);
                 } else {
@@ -79,7 +79,7 @@ public abstract class AbstractMaxMinAggregateEvaluatorFactory extends
             }
 
             @Override
-            protected void step(TaggedValuePointable[] args) throws SystemException {
+            protected void step(TaggedValuePointable[] args) throws HyracksDataException {
                 TaggedValuePointable tvp1 = args[0];
                 if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
                     // The local aggregate did not find a value so the global aggregate is receiving a empty sequence.

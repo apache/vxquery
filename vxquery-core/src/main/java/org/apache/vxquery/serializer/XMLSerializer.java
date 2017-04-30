@@ -20,6 +20,18 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.apache.hyracks.algebricks.data.IPrinter;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import org.apache.hyracks.data.std.primitive.BytePointable;
+import org.apache.hyracks.data.std.primitive.DoublePointable;
+import org.apache.hyracks.data.std.primitive.FloatPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.primitive.ShortPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.PointablePoolFactory;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
@@ -43,19 +55,6 @@ import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.data.IPrinter;
-import org.apache.hyracks.data.std.primitive.BooleanPointable;
-import org.apache.hyracks.data.std.primitive.BytePointable;
-import org.apache.hyracks.data.std.primitive.DoublePointable;
-import org.apache.hyracks.data.std.primitive.FloatPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.primitive.ShortPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class XMLSerializer implements IPrinter {
     private final PointablePool pp;
@@ -873,8 +872,8 @@ public class XMLSerializer implements IPrinter {
     }
 
     private void printString(PrintStream ps, UTF8StringPointable utf8sp) {
-        int utfLen = utf8sp.getUTFLength();
-        int offset = 2;
+        int utfLen = utf8sp.getUTF8Length();
+        int offset = utf8sp.getMetaDataLength();
         while (utfLen > 0) {
             char c = utf8sp.charAt(offset);
             switch (c) {
@@ -902,7 +901,7 @@ public class XMLSerializer implements IPrinter {
                     ps.append(c);
                     break;
             }
-            int cLen = UTF8StringPointable.getModifiedUTF8Len(c);
+            int cLen = utf8sp.charSize(offset);
             offset += cLen;
             utfLen -= cLen;
         }
@@ -941,7 +940,7 @@ public class XMLSerializer implements IPrinter {
     }
 
     @Override
-    public void init() throws AlgebricksException {
+    public void init() throws HyracksDataException {
 
     }
 }

@@ -19,6 +19,11 @@ package org.apache.vxquery.runtime.functions.strings;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.hyracks.data.std.util.GrowableArray;
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -26,11 +31,10 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public abstract class AbstractCharacterIteratorCopyingEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+    private static final int STRING_EXPECTED_LENGTH = 300;
+    private final GrowableArray ga = new GrowableArray();
+    private final UTF8StringBuilder sb = new UTF8StringBuilder();
     private final ICharacterIterator charIterator;
     private final ArrayBackedValueStorage abvs;
 
@@ -46,22 +50,20 @@ public abstract class AbstractCharacterIteratorCopyingEvaluator extends Abstract
         abvs.reset();
         charIterator.reset();
         try {
-            // Byte Format: Type (1 byte) + String Length (2 bytes) + String.
+            // Byte Format: Type (1 byte) + String Length (X bytes) + String.
             DataOutput out = abvs.getDataOutput();
             out.write(ValueTag.XS_STRING_TAG);
 
-            // Default values for the length and update later
-            out.write(0);
-            out.write(0);
+            ga.reset();
+            sb.reset(ga, STRING_EXPECTED_LENGTH);
 
             int c;
             while (ICharacterIterator.EOS_CHAR != (c = charIterator.next())) {
-                FunctionHelper.writeChar((char) c, out);
+                FunctionHelper.writeChar((char) c, sb);
             }
 
-            // Update the full length string in the byte array.
-            abvs.getByteArray()[1] = (byte) (((abvs.getLength() - 3) >>> 8) & 0xFF);
-            abvs.getByteArray()[2] = (byte) (((abvs.getLength() - 3) >>> 0) & 0xFF);
+            sb.finish();
+            out.write(ga.getByteArray(), 0, ga.getLength());
 
             result.set(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
         } catch (IOException e) {

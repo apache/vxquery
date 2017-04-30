@@ -16,24 +16,22 @@
  */
 package org.apache.vxquery.runtime.functions.aggregate;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.VoidPointable;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.comparison.AbstractValueComparisonOperation;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
 
 public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -44,7 +42,7 @@ public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTagge
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final AbstractValueComparisonOperation aOpComparison = createValueComparisonOperation();
@@ -56,7 +54,7 @@ public abstract class AbstractMaxMinScalarEvaluatorFactory extends AbstractTagge
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
-            protected void evaluate(TaggedValuePointable[] args, IPointable result) throws SystemException {
+            protected void evaluate(TaggedValuePointable[] args, IPointable result) throws HyracksDataException {
                 // TODO Update the results to be based on specs when different types in sequence.
                 TaggedValuePointable tvp = args[0];
                 if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {

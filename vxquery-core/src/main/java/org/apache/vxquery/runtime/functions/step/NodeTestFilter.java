@@ -16,6 +16,7 @@
  */
 package org.apache.vxquery.runtime.functions.step;
 
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.CodedQNamePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.AttributeNodePointable;
@@ -27,10 +28,6 @@ import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.NameTest;
 import org.apache.vxquery.types.NodeType;
 import org.apache.vxquery.types.SequenceType;
-
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.primitive.VoidPointable;
 
 public class NodeTestFilter {
 
@@ -53,7 +50,7 @@ public class NodeTestFilter {
                 if (localName != null) {
                     localp.set(localName, 0, localName.length);
                 }
-                final IPointable temp = VoidPointable.FACTORY.createPointable();
+                final UTF8StringPointable temp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
                 final AttributeNodePointable anp = (AttributeNodePointable) AttributeNodePointable.FACTORY
                         .createPointable();
                 final CodedQNamePointable cqp = (CodedQNamePointable) CodedQNamePointable.FACTORY.createPointable();
@@ -116,7 +113,7 @@ public class NodeTestFilter {
                 if (localName != null) {
                     localp.set(localName, 0, localName.length);
                 }
-                final IPointable temp = VoidPointable.FACTORY.createPointable();
+                final UTF8StringPointable temp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
                 final ElementNodePointable enp = (ElementNodePointable) ElementNodePointable.FACTORY.createPointable();
                 final CodedQNamePointable cqp = (CodedQNamePointable) CodedQNamePointable.FACTORY.createPointable();
                 filter = new INodeFilter() {
@@ -162,7 +159,7 @@ public class NodeTestFilter {
                     }
                 };
                 break;
-                
+
             case ANY:
             default:
                 filter = new INodeFilter() {
