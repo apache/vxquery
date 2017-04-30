@@ -117,7 +117,7 @@ public class IndexDocumentBuilder extends XMLSerializer {
         print(bstart, sstart, lstart, "0", "");
         for (int i = 1; i < results.size() - 1; i++) {
             //TODO: Since each doc is a file,
-            //we can only handle files 
+            //we can only handle files
             //small enough to fit in memory
             doc.add(results.get(i).sf);
         }
@@ -813,8 +813,8 @@ public class IndexDocumentBuilder extends XMLSerializer {
     }
 
     private String[] printString(UTF8StringPointable utf8sp, String path) {
-        int utfLen = utf8sp.getUTFLength();
-        int offset = 2;
+        int utfLen = utf8sp.getUTF8Length();
+        int offset = utf8sp.getMetaDataLength();
         String[] result = { "", path };
         while (utfLen > 0) {
             char c = utf8sp.charAt(offset);
@@ -843,7 +843,7 @@ public class IndexDocumentBuilder extends XMLSerializer {
                     result[0] += Character.toString(c);
                     break;
             }
-            int cLen = UTF8StringPointable.getModifiedUTF8Len(c);
+            int cLen = utf8sp.charSize(offset);
             offset += cLen;
             utfLen -= cLen;
 

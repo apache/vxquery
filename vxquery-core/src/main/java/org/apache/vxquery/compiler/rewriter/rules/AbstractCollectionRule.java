@@ -17,9 +17,6 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import java.io.DataInputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.commons.lang3.mutable.Mutable;
@@ -79,7 +76,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         AssignOperator assign = (AssignOperator) op2;
 
         // Check to see if the expression is a function and fn:Collection.
-        ILogicalExpression logicalExpression = (ILogicalExpression) assign.getExpressions().get(0).getValue();
+        ILogicalExpression logicalExpression = assign.getExpressions().get(0).getValue();
         if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
             return null;
         }
@@ -92,7 +89,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         // Get arguments
         int size = functionCall.getArguments().size();
         if (size > 0) {
-            String args[] = new String[size];
+            String[] args = new String[size];
             for (int i = 0; i < size; i++) {
                 args[i] = getArgument(functionCall, opRef, i);
             }
@@ -103,7 +100,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
 
     private String getArgument(AbstractFunctionCallExpression functionCall, Mutable<ILogicalOperator> opRef, int pos) {
         VXQueryConstantValue constantValue;
-        ILogicalExpression logicalExpression2 = (ILogicalExpression) functionCall.getArguments().get(pos).getValue();
+        ILogicalExpression logicalExpression2 = functionCall.getArguments().get(pos).getValue();
         if (logicalExpression2.getExpressionTag() != LogicalExpressionTag.VARIABLE) {
             return null;
         } else if (logicalExpression2 == null) {
@@ -118,7 +115,7 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
             AssignOperator assign2 = (AssignOperator) op3;
 
             // Check to see if the expression is a constant expression and type string.
-            ILogicalExpression logicalExpression3 = (ILogicalExpression) assign2.getExpressions().get(0).getValue();
+            ILogicalExpression logicalExpression3 = assign2.getExpressions().get(0).getValue();
             if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
                 return null;
             }
@@ -132,17 +129,9 @@ public abstract class AbstractCollectionRule implements IAlgebraicRewriteRule {
         }
         // Constant value is now in a TaggedValuePointable. Convert the value into a java String.
         tvp.set(constantValue.getValue(), 0, constantValue.getValue().length);
-        String collectionName = null;
         if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
             tvp.getValue(stringp);
-            try {
-                bbis.setByteBuffer(ByteBuffer.wrap(Arrays.copyOfRange(stringp.getByteArray(), stringp.getStartOffset(),
-                        stringp.getLength() + stringp.getStartOffset())), 0);
-                collectionName = di.readUTF();
-                return collectionName;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return stringp.toString();
         }
         return null;
     }

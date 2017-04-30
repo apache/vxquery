@@ -22,14 +22,15 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.vxquery.util.GrowableIntArray;
-
 import org.apache.hyracks.data.std.algorithms.BinarySearchAlgorithm;
 import org.apache.hyracks.data.std.collections.api.IValueReferenceVector;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
+import org.apache.hyracks.util.string.UTF8StringUtil;
+import org.apache.hyracks.util.string.UTF8StringWriter;
+import org.apache.vxquery.util.GrowableIntArray;
 
 public class DictionaryBuilder {
     private final GrowableIntArray stringEndOffsets;
@@ -46,6 +47,8 @@ public class DictionaryBuilder {
 
     private boolean cacheReady;
 
+    private final UTF8StringWriter UTF8Writer = new UTF8StringWriter();
+
     private final IValueReferenceVector sortedStringsVector = new IValueReferenceVector() {
         @Override
         public int getStart(int index) {
@@ -60,7 +63,8 @@ public class DictionaryBuilder {
 
         @Override
         public int getLength(int index) {
-            return UTF8StringPointable.getUTFLength(dataBuffer.getByteArray(), getStart(index)) + 2;
+            int utfLength = UTF8StringUtil.getUTFLength(dataBuffer.getByteArray(), getStart(index));
+            return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
         }
 
         @Override
@@ -77,7 +81,7 @@ public class DictionaryBuilder {
         dataBuffer = new ByteArrayAccessibleOutputStream();
         dataBufferOut = new DataOutputStream(dataBuffer);
         cache = new ArrayBackedValueStorage();
-        hashSlotIndexes = new TreeMap<String, Integer>();
+        hashSlotIndexes = new TreeMap<>();
         cacheReady = false;
     }
 
@@ -120,6 +124,7 @@ public class DictionaryBuilder {
             }
         }
         out.write(dataBuffer.getByteArray(), 0, dataBuffer.size());
+        // TODO can this value be determined before writing. Could this be append only.
         IntegerPointable.setInteger(abvs.getByteArray(), sizeOffset, abvs.getLength() - sizeOffset);
     }
 
@@ -127,7 +132,7 @@ public class DictionaryBuilder {
         Integer slotIndex = hashSlotIndexes.get(str);
         if (slotIndex == null) {
             try {
-                dataBufferOut.writeUTF(str);
+                UTF8Writer.writeUTF8(str, dataBufferOut);
                 slotIndex = stringEndOffsets.getSize();
                 dataBufferOut.writeInt(slotIndex);
             } catch (IOException e) {

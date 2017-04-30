@@ -16,13 +16,14 @@
  */
 package org.apache.vxquery.runtime.functions.jsonitem;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 
 public class SimpleObjectUnionScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+    private static final long serialVersionUID = 1L;
 
     public SimpleObjectUnionScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
@@ -30,7 +31,7 @@ public class SimpleObjectUnionScalarEvaluatorFactory extends AbstractTaggedValue
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         return new SimpleObjectUnionScalarEvaluator(ctx, args);
     }
 }

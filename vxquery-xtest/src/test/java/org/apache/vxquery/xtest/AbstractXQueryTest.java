@@ -117,15 +117,14 @@ public abstract class AbstractXQueryTest {
     public static void shutdown() throws IOException {
         removeFS();
         TestClusterUtil.stopCluster(cc, nc);
-
     }
 
     public static void removeFS() throws IOException {
+        dfs.shutdownHDFS();
         File tmp = new File(TMP);
         if (tmp.exists()) {
             FileUtils.deleteDirectory(tmp);
         }
-        dfs.shutdownHDFS();
     }
 
 }

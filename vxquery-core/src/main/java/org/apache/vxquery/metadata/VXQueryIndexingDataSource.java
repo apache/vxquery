@@ -16,21 +16,20 @@
 */
 package org.apache.vxquery.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalVariable;
-import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSource;
 import org.apache.hyracks.algebricks.core.algebra.metadata.IDataSourcePropertiesProvider;
 import org.apache.hyracks.algebricks.core.algebra.properties.IPhysicalPropertiesVector;
 import org.apache.hyracks.algebricks.core.algebra.properties.RandomPartitioningProperty;
 import org.apache.hyracks.algebricks.core.algebra.properties.StructuralPropertiesVector;
 import org.apache.vxquery.compiler.rewriter.rules.CollectionFileDomain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Datasource object for indexing.
  */
-public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource implements IDataSource<String> {
+public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
 
     protected Object[] types;
 

@@ -19,20 +19,18 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
-import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.arithmetic.AddOperation;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentAggregateEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -42,7 +40,7 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
     }
 
     @Override
-    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws HyracksDataException {
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
         final AddOperation aOpAdd = new AddOperation();
@@ -54,29 +52,29 @@ public class FnSumAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
             // TODO Check if the second argument is supplied as the zero value.
 
             @Override
-            public void init() throws AlgebricksException {
+            public void init() throws HyracksDataException {
                 try {
                     abvsSum.reset();
                     dOutSum.write(ValueTag.XS_INTEGER_TAG);
                     dOutSum.writeLong(0);
                     tvpSum.set(abvsSum);
                 } catch (IOException e) {
-                    throw new AlgebricksException(e.toString());
+                    throw new HyracksDataException(e.toString());
                 }
             }
 
             @Override
-            public void finishPartial(IPointable result) throws AlgebricksException {
+            public void finishPartial(IPointable result) throws HyracksDataException {
                 finish(result);
             }
 
             @Override
-            public void finish(IPointable result) throws AlgebricksException {
+            public void finish(IPointable result) throws HyracksDataException {
                 result.set(tvpSum);
             }
 
             @Override
-            protected void step(TaggedValuePointable[] args) throws SystemException {
+            protected void step(TaggedValuePointable[] args) throws HyracksDataException {
                 TaggedValuePointable tvp = args[0];
                 add.compute(tvp, tvpSum, tvpSum);
             }

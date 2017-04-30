@@ -23,9 +23,19 @@
       <query name="add" date="2014-08-18"/>
       <output-file compare="Text">add.txt</output-file>
    </test-case>
+   <test-case name="simple-data-types" FilePath="Simple/" Creator="Preston Carman">
+      <description>Adds two numbers.</description>
+      <query name="data_types" date="2017-04-17"/>
+      <output-file compare="Text">data_types.txt</output-file>
+   </test-case>
    <test-case name="simple-fn-doc" FilePath="Simple/" Creator="Preston Carman">
       <description>Adds two numbers.</description>
       <query name="fn_doc" date="2014-08-18"/>
       <output-file compare="Text">fn_doc.txt</output-file>
+   </test-case>
+   <test-case name="simple-list" FilePath="Simple/" Creator="Preston Carman">
+      <description>Adds two numbers.</description>
+      <query name="list" date="2017-04-17"/>
+      <output-file compare="Text">list.txt</output-file>
    </test-case>
 </test-group>

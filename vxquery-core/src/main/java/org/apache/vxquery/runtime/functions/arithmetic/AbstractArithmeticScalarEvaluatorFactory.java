@@ -16,6 +16,11 @@
 */
 package org.apache.vxquery.runtime.functions.arithmetic;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -25,12 +30,6 @@ import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
 
 public abstract class AbstractArithmeticScalarEvaluatorFactory extends
         AbstractTaggedValueArgumentScalarEvaluatorFactory {
@@ -42,7 +41,7 @@ public abstract class AbstractArithmeticScalarEvaluatorFactory extends
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final ArithmeticHelper aHelper = new ArithmeticHelper(createArithmeticOperation(), dCtx);
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();

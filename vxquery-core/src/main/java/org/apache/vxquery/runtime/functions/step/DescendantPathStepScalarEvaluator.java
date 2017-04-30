@@ -18,16 +18,14 @@ package org.apache.vxquery.runtime.functions.step;
 
 import java.io.IOException;
 
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
 
 public class DescendantPathStepScalarEvaluator extends AbstractDescendantPathStepScalarEvaluator {
     private final SequenceBuilder seqb = new SequenceBuilder();
@@ -49,12 +47,8 @@ public class DescendantPathStepScalarEvaluator extends AbstractDescendantPathSte
             descendentOrSelfPathStep.init(args);
             seqAbvs.reset();
             seqb.reset(seqAbvs);
-            try {
-                while (descendentOrSelfPathStep.step(itemTvp)) {
-                    seqb.addItem(itemTvp);
-                }
-            } catch (AlgebricksException e) {
-                throw new SystemException(ErrorCode.SYSE0001, e);
+            while (descendentOrSelfPathStep.step(itemTvp)) {
+                seqb.addItem(itemTvp);
             }
             seqb.finish();
             result.set(seqAbvs);

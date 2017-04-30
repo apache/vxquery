@@ -16,6 +16,12 @@
  */
 package org.apache.vxquery.runtime.functions.strings;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -26,13 +32,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-
 public class FnStartsWithEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -42,7 +41,7 @@ public class FnStartsWithEvaluatorFactory extends AbstractTaggedValueArgumentSca
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final UTF8StringPointable stringp1 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp2 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable stringp3 = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
@@ -105,7 +104,7 @@ public class FnStartsWithEvaluatorFactory extends AbstractTaggedValueArgumentSca
                 // TODO use the third value as collation
 
                 // Only need to run comparisons if they both have a non empty string.
-                if (stringp1.getLength() > 2 && stringp2.getLength() > 2) {
+                if (stringp1.getUTF8Length() > 0 && stringp2.getUTF8Length() > 0) {
                     int c1;
                     int c2;
                     while (true) {
@@ -121,7 +120,7 @@ public class FnStartsWithEvaluatorFactory extends AbstractTaggedValueArgumentSca
                             break;
                         }
                     }
-                } else if (stringp2.getLength() == 2) {
+                } else if (stringp2.getUTF8Length() == 0) {
                     booleanResult[1] = 1;
                 }
 

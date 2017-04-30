@@ -45,13 +45,7 @@ public class UTF8StringCharacterIterator implements ICharacterIterator {
                 LOGGER.finer("  UTF8StringCharacterIterator char[" + byteOffset + "] = " + c);
             }
             // Increment cursor
-            if ((c >= 0x0001) && (c <= 0x007F)) {
-                ++byteOffset;
-            } else if (c > 0x07FF) {
-                byteOffset += 3;
-            } else {
-                byteOffset += 2;
-            }
+            byteOffset += stringp.charSize(byteOffset);
         }
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.finer("  END UTF8StringCharacterIterator char[" + byteOffset + "] = " + c);
@@ -61,7 +55,7 @@ public class UTF8StringCharacterIterator implements ICharacterIterator {
 
     @Override
     public void reset() {
-        byteOffset = 2;
+        byteOffset = stringp.getMetaDataLength();
     }
 
     public void setByteOffset(int byteOffset) {

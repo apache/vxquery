@@ -137,7 +137,7 @@ public class SimpleXQueryTest {
     private static void runTestInternal(String testName, String query) throws Exception {
 
         Map<String, NodeControllerInfo> nodeControllerInfos = new HashMap<String, NodeControllerInfo>();
-        nodeControllerInfos.put("nc1", new NodeControllerInfo("nc1", null, new NetworkAddress("127.0.0.1", 0), null));
+        nodeControllerInfos.put("nc1", new NodeControllerInfo("nc1", null, new NetworkAddress("127.0.0.1", 0), null, null, 1));
 
         XMLQueryCompiler compiler = new XMLQueryCompiler(null, nodeControllerInfos, 65536);
         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),

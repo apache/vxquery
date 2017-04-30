@@ -14,18 +14,19 @@
  */
 package org.apache.vxquery.xmlquery.query;
 
-import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
-import org.apache.vxquery.xmlquery.ast.ModuleNode;
-import org.json.JSONException;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.io.IOException;
 
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.core.algebra.prettyprint.AlgebricksAppendable;
 import org.apache.hyracks.algebricks.core.algebra.prettyprint.LogicalOperatorPrettyPrintVisitor;
 import org.apache.hyracks.algebricks.core.algebra.prettyprint.PlanPrettyPrinter;
 import org.apache.hyracks.algebricks.core.algebra.visitors.ILogicalExpressionVisitor;
 import org.apache.hyracks.api.job.JobSpecification;
+import org.apache.vxquery.compiler.algebricks.prettyprint.VXQueryLogicalExpressionPrettyPrintVisitor;
+import org.apache.vxquery.xmlquery.ast.ModuleNode;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class VXQueryCompilationListener implements XQueryCompilationListener {
     boolean showTET, showRP, showOET, showAST;
@@ -39,7 +40,7 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
 
     /**
      * Outputs the query inputs, outputs and user constraints for each module as result of code generation.
-     * 
+     *
      * @param module
      */
     public void notifyCodegenResult(Module module) {
@@ -47,8 +48,8 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
             JobSpecification jobSpec = module.getHyracksJobSpecification();
             try {
                 System.err.println("***Runtime Plan: ");
-                System.err.println(jobSpec.toJSON().toString(2));
-            } catch (JSONException e) {
+                System.err.println(jobSpec.toJSON().toString());
+            } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println(jobSpec.toString());
             }
@@ -58,7 +59,7 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
     /**
      * Outputs the syntax translation tree for the module in the format: "-- logical operator(if exists) | execution mode |"
      * where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
-     * 
+     *
      * @param module
      */
     @Override
@@ -76,7 +77,7 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
     /**
      * Outputs the optimized expression tree for the module in the format:
      * "-- logical operator(if exists) | execution mode |" where execution mode can be one of: UNPARTITIONED,PARTITIONED,LOCAL
-     * 
+     *
      * @param module
      */
     @Override
@@ -90,7 +91,7 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
     /**
      * Outputs the abstract syntax tree obtained from parsing by serializing the DomDriver object to a pretty-printed XML
      * String.
-     * 
+     *
      * @param moduleNode
      */
     @Override
@@ -105,8 +106,10 @@ public class VXQueryCompilationListener implements XQueryCompilationListener {
         try {
             ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(
                     module.getModuleContext());
-            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(ev);
-            PlanPrettyPrinter.printPlan(module.getBody(), sb, v, 0);
+            AlgebricksAppendable buffer = new AlgebricksAppendable();
+            LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(buffer, ev);
+            PlanPrettyPrinter.printPlan(module.getBody(), v, 0);
+            sb.append(buffer.toString());
         } catch (AlgebricksException e) {
             e.printStackTrace();
         }

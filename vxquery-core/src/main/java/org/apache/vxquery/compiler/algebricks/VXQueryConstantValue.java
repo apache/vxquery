@@ -17,9 +17,8 @@
 package org.apache.vxquery.compiler.algebricks;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.vxquery.types.SequenceType;
-
 import org.apache.hyracks.algebricks.core.algebra.expressions.IAlgebricksConstantValue;
+import org.apache.vxquery.types.SequenceType;
 
 public class VXQueryConstantValue implements IAlgebricksConstantValue {
     private final SequenceType type;
@@ -60,5 +59,10 @@ public class VXQueryConstantValue implements IAlgebricksConstantValue {
         buffer.append(type).append(" (bytes[").append(value.length).append("] = [").append(Hex.encodeHexString(value))
                 .append("])");
         return buffer.toString();
+    }
+
+    @Override
+    public boolean isMissing() {
+        return false;
     }
 }

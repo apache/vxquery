@@ -16,10 +16,10 @@
 */
 package org.apache.vxquery.runtime.functions.trace;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -39,7 +39,7 @@ public class FnTraceScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
 
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
 
             @Override

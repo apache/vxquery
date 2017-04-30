@@ -19,10 +19,6 @@ package org.apache.vxquery.compiler.algebricks;
 import java.util.List;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.datamodel.values.XDMConstants;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.functions.Function;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.expressions.AggregateFunctionCallExpression;
@@ -37,15 +33,18 @@ import org.apache.hyracks.algebricks.core.algebra.expressions.VariableReferenceE
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.IOperatorSchema;
 import org.apache.hyracks.algebricks.core.jobgen.impl.JobGenContext;
 import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluatorFactory;
-import org.apache.hyracks.algebricks.runtime.base.ICopySerializableAggregateFunctionFactory;
 import org.apache.hyracks.algebricks.runtime.base.IRunningAggregateEvaluatorFactory;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.algebricks.runtime.base.ISerializedAggregateEvaluatorFactory;
 import org.apache.hyracks.algebricks.runtime.base.IUnnestingEvaluatorFactory;
-import org.apache.hyracks.algebricks.runtime.evaluators.ConstantEvaluatorFactory;
+import org.apache.hyracks.algebricks.runtime.evaluators.ConstantEvalFactory;
 import org.apache.hyracks.algebricks.runtime.evaluators.TupleFieldEvaluatorFactory;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.vxquery.datamodel.values.XDMConstants;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.functions.Function;
 
 public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvider {
     @Override
@@ -53,23 +52,23 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
             IOperatorSchema[] inputSchemas, JobGenContext context) throws AlgebricksException {
         switch (expr.getExpressionTag()) {
             case CONSTANT:
-                IAlgebricksConstantValue constantValue = (IAlgebricksConstantValue) ((ConstantExpression) expr)
+                IAlgebricksConstantValue constantValue = ((ConstantExpression) expr)
                         .getValue();
                 if (constantValue.isFalse()) {
                     IPointable p = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
                     XDMConstants.setFalse(p);
-                    return new ConstantEvaluatorFactory(p.getByteArray());
+                    return new ConstantEvalFactory(p.getByteArray());
                 } else if (constantValue.isNull()) {
                     IPointable p = (VoidPointable) VoidPointable.FACTORY.createPointable();
                     XDMConstants.setEmptySequence(p);
-                    return new ConstantEvaluatorFactory(p.getByteArray());
+                    return new ConstantEvalFactory(p.getByteArray());
                 } else if (constantValue.isTrue()) {
                     IPointable p = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
                     XDMConstants.setTrue(p);
-                    return new ConstantEvaluatorFactory(p.getByteArray());
+                    return new ConstantEvalFactory(p.getByteArray());
                 }
                 VXQueryConstantValue cv = (VXQueryConstantValue) ((ConstantExpression) expr).getValue();
-                return new ConstantEvaluatorFactory(cv.getValue());
+                return new ConstantEvalFactory(cv.getValue());
 
             case VARIABLE:
                 VariableReferenceExpression vrExpr = (VariableReferenceExpression) expr;
@@ -82,7 +81,11 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
 
                 IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
                         fcExpr.getArguments());
-                return fn.createScalarEvaluatorFactory(argFactories);
+                try {
+                    return fn.createScalarEvaluatorFactory(argFactories);
+                } catch (SystemException e) {
+                    throw new AlgebricksException(e);
+                }
         }
         throw new UnsupportedOperationException("Cannot create runtime for " + expr.getExpressionTag());
     }
@@ -106,11 +109,15 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
 
         IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
                 expr.getArguments());
-        return fn.createAggregateEvaluatorFactory(argFactories);
+        try {
+            return fn.createAggregateEvaluatorFactory(argFactories);
+        } catch (SystemException e) {
+            throw new AlgebricksException(e);
+        }
     }
 
     @Override
-    public ICopySerializableAggregateFunctionFactory createSerializableAggregateFunctionFactory(
+    public ISerializedAggregateEvaluatorFactory createSerializableAggregateFunctionFactory(
             AggregateFunctionCallExpression expr, IVariableTypeEnvironment env, IOperatorSchema[] inputSchemas,
             JobGenContext context) throws AlgebricksException {
         return null;
@@ -131,6 +138,10 @@ public class VXQueryExpressionRuntimeProvider implements IExpressionRuntimeProvi
 
         IScalarEvaluatorFactory[] argFactories = createArgumentEvaluatorFactories(env, inputSchemas, context,
                 expr.getArguments());
-        return fn.createUnnestingEvaluatorFactory(argFactories);
+        try {
+            return fn.createUnnestingEvaluatorFactory(argFactories);
+        } catch (SystemException e) {
+            throw new AlgebricksException(e);
+        }
     }
 }

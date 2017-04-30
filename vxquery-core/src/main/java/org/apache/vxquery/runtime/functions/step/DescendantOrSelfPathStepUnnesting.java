@@ -20,6 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.vxquery.datamodel.accessors.PointablePool;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
@@ -28,11 +33,6 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.step.NodeTestFilter.INodeFilter;
 import org.apache.vxquery.types.SequenceType;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
 
 public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathStep {
     private boolean testSelf;
@@ -86,13 +86,13 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
         }
     }
 
-    public boolean step(IPointable result) throws AlgebricksException {
+    public boolean step(IPointable result) throws HyracksDataException {
         if (seqArgsLength > 0) {
             while (indexSeqArgs < seqArgsLength) {
                 seqNtp.getEntry(indexSeqArgs, tvpNtp);
                 if (tvpNtp.getTag() != ValueTag.NODE_TREE_TAG) {
                     String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
-                    throw new AlgebricksException(description);
+                    throw new HyracksDataException(description);
                 }
                 tvpNtp.getValue(ntp);
                 ntp.getRootNode(tvpStep);
@@ -113,7 +113,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
         return false;
     }
 
-    private boolean processNodeTree(TaggedValuePointable rootTVP, IPointable result) throws AlgebricksException {
+    private boolean processNodeTree(TaggedValuePointable rootTVP, IPointable result) throws HyracksDataException {
         if (testSelf && returnSelf) {
             returnSelf = false;
             tvpItem.set(rootTVP);
@@ -124,7 +124,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
                 }
             } catch (IOException e) {
                 String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
-                throw new AlgebricksException(description);
+                throw new HyracksDataException(description);
             }
         }
         // Solve for descendants.
@@ -145,7 +145,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
      *             Could not save result.
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)
-            throws AlgebricksException {
+            throws HyracksDataException {
         // Set up next level tracking.
         if (level + 1 > indexSequence.size()) {
             indexSequence.add(0);
@@ -186,7 +186,7 @@ public class DescendantOrSelfPathStepUnnesting extends AbstractForwardAxisPathSt
             return false;
         } catch (IOException e) {
             String description = ErrorCode.SYSE0001 + ": " + ErrorCode.SYSE0001.getDescription();
-            throw new AlgebricksException(description);
+            throw new HyracksDataException(description);
         } finally {
             pp.giveBack(seqItem);
         }

@@ -19,6 +19,12 @@ package org.apache.vxquery.runtime.functions.aggregate;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.datamodel.values.XDMConstants;
@@ -30,13 +36,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggr
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentAggregateEvaluatorFactory;
 import org.apache.vxquery.runtime.functions.util.ArithmeticHelper;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IAggregateEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentAggregateEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +44,7 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
     }
 
     @Override
-    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws AlgebricksException {
+    protected IAggregateEvaluator createEvaluator(IScalarEvaluator[] args) throws HyracksDataException {
         final TaggedValuePointable tvpCount = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final ArrayBackedValueStorage abvsSum = new ArrayBackedValueStorage();
         final DataOutput dOutSum = abvsSum.getDataOutput();
@@ -61,17 +60,17 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
             TaggedValuePointable tvpSum = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
             @Override
-            public void init() throws AlgebricksException {
+            public void init() throws HyracksDataException {
                 count = 0;
             }
 
             @Override
-            public void finishPartial(IPointable result) throws AlgebricksException {
+            public void finishPartial(IPointable result) throws HyracksDataException {
                 finish(result);
             }
 
             @Override
-            public void finish(IPointable result) throws AlgebricksException {
+            public void finish(IPointable result) throws HyracksDataException {
                 if (count == 0) {
                     XDMConstants.setEmptySequence(result);
                 } else {
@@ -85,13 +84,13 @@ public class FnAvgAggregateEvaluatorFactory extends AbstractTaggedValueArgumentA
                         divide.compute(tvpSum, tvpCount, tvpSum);
                         result.set(tvpSum);
                     } catch (Exception e) {
-                        throw new AlgebricksException(e);
+                        throw new HyracksDataException(e);
                     }
                 }
             }
 
             @Override
-            protected void step(TaggedValuePointable[] args) throws SystemException {
+            protected void step(TaggedValuePointable[] args) throws HyracksDataException {
                 TaggedValuePointable tvp = args[0];
                 if (count == 0) {
                     // Init.

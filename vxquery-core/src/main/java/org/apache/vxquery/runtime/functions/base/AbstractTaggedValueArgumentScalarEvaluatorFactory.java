@@ -16,10 +16,10 @@
  */
 package org.apache.vxquery.runtime.functions.base;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 
 public abstract class AbstractTaggedValueArgumentScalarEvaluatorFactory implements IScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -31,7 +31,7 @@ public abstract class AbstractTaggedValueArgumentScalarEvaluatorFactory implemen
     }
 
     @Override
-    public final IScalarEvaluator createScalarEvaluator(IHyracksTaskContext ctx) throws AlgebricksException {
+    public final IScalarEvaluator createScalarEvaluator(IHyracksTaskContext ctx) throws HyracksDataException {
         IScalarEvaluator[] es = new IScalarEvaluator[args.length];
         for (int i = 0; i < es.length; ++i) {
             es[i] = args[i].createScalarEvaluator(ctx);
@@ -40,5 +40,5 @@ public abstract class AbstractTaggedValueArgumentScalarEvaluatorFactory implemen
     }
 
     protected abstract IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException;
+            throws HyracksDataException;
 }

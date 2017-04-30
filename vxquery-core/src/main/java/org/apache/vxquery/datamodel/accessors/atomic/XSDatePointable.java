@@ -16,23 +16,20 @@
  */
 package org.apache.vxquery.datamodel.accessors.atomic;
 
-import org.apache.vxquery.datamodel.api.IDate;
-import org.apache.vxquery.datamodel.api.ITimezone;
-
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.data.std.api.AbstractPointable;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.api.IPointableFactory;
 import org.apache.hyracks.data.std.primitive.BytePointable;
 import org.apache.hyracks.data.std.primitive.ShortPointable;
+import org.apache.vxquery.datamodel.api.IDate;
+import org.apache.vxquery.datamodel.api.ITimezone;
 
 /**
  * The date is split up into five sections. Due to leap year, we have decided to keep the
  * storage simple by saving each date section separately. For calculations you can access
  * YearMonth (months) and DayTime (milliseconds) values.
  * The date pointable is also used for GDay, GMonth, GYear, GDayMonth and GMonthYear.
- * 
- * @author prestoncarman
  */
 public class XSDatePointable extends AbstractPointable implements IDate, ITimezone {
     public final static int YEAR_OFFSET = 0;

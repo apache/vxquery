@@ -18,6 +18,13 @@ package org.apache.vxquery.runtime.functions.numeric;
 
 import java.io.DataOutput;
 
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
+import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
+import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
 import org.apache.vxquery.datamodel.values.ValueTag;
@@ -29,14 +36,6 @@ import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScal
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.BuiltinTypeRegistry;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
-import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
-import org.apache.hyracks.api.context.IHyracksTaskContext;
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.LongPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-
 public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
@@ -46,7 +45,7 @@ public abstract class AbstractNumericScalarEvaluatorFactory extends AbstractTagg
 
     @Override
     protected AbstractTaggedValueArgumentScalarEvaluator createEvaluator(IHyracksTaskContext ctx,
-            IScalarEvaluator[] args) throws AlgebricksException {
+            IScalarEvaluator[] args) throws HyracksDataException {
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             final AbstractNumericOperation aOp = createNumericOperation();
             final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();

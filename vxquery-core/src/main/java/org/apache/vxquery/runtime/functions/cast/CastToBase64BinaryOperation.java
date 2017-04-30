@@ -20,12 +20,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
+import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 import org.apache.vxquery.datamodel.accessors.atomic.XSBinaryPointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.SystemException;
-
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ByteArrayAccessibleOutputStream;
 
 public class CastToBase64BinaryOperation extends AbstractCastToOperation {
     private ByteArrayAccessibleOutputStream baaos = new ByteArrayAccessibleOutputStream();
@@ -46,13 +45,14 @@ public class CastToBase64BinaryOperation extends AbstractCastToOperation {
     public void convertString(UTF8StringPointable stringp, DataOutput dOut) throws SystemException, IOException {
         baaos.reset();
         Base64OutputStream b64os = new Base64OutputStream(baaos, false);
-        b64os.write(stringp.getByteArray(), stringp.getStartOffset() + 2, stringp.getLength() - 2);
-        b64os.close();
+        b64os.write(stringp.getByteArray(), stringp.getCharStartOffset(), stringp.getUTF8Length());
 
         dOut.write(ValueTag.XS_BASE64_BINARY_TAG);
         dOut.write((byte) ((baaos.size() >>> 8) & 0xFF));
         dOut.write((byte) ((baaos.size() >>> 0) & 0xFF));
         dOut.write(baaos.getByteArray(), 0, baaos.size());
+
+        b64os.close();
     }
 
     @Override

@@ -16,8 +16,6 @@
  */
 package org.apache.vxquery.datamodel.accessors.nodes;
 
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-
 import org.apache.hyracks.api.dataflow.value.ITypeTraits;
 import org.apache.hyracks.data.std.algorithms.BinarySearchAlgorithm;
 import org.apache.hyracks.data.std.api.AbstractPointable;
@@ -28,6 +26,8 @@ import org.apache.hyracks.data.std.primitive.BytePointable;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.primitive.VoidPointable;
+import org.apache.hyracks.util.string.UTF8StringUtil;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 
 /*
  * NodeTree {
@@ -36,17 +36,17 @@ import org.apache.hyracks.data.std.primitive.VoidPointable;
  *  Dictionary dictionary?;
  *  ElementNode rootNode;
  * }
- * 
+ *
  * ElementHeader (padded) {
  *  bit nodeIdExists;
  *  bit dictionaryExists;
  *  bit headerTypeExists;
  * }
- * 
+ *
  * NodeId {
  *  int32 id;
  * }
- * 
+ *
  * Dictionary {
  *  int32 numberOfItems
  *  int32[numberOfItems] lengthOfItem
@@ -97,14 +97,15 @@ public class NodeTreePointable extends AbstractPointable {
         public int getStart(int index) {
             int dataAreaStart = getDictionaryDataAreaStartOffset();
             int sortedPtrArrayStart = getDictionarySortedPointerArrayOffset();
-            int sortedSlotValue = IntegerPointable
-                    .getInteger(bytes, sortedPtrArrayStart + index * SORTED_PTR_SLOT_SIZE);
+            int sortedSlotValue = IntegerPointable.getInteger(bytes,
+                    sortedPtrArrayStart + index * SORTED_PTR_SLOT_SIZE);
             return dataAreaStart + sortedSlotValue;
         }
 
         @Override
         public int getLength(int index) {
-            return UTF8StringPointable.getUTFLength(bytes, getStart(index)) + 2;
+            int utfLength = UTF8StringUtil.getUTFLength(bytes, getStart(index));
+            return utfLength + UTF8StringUtil.getNumBytesToStoreLength(utfLength);
         }
     };
 
@@ -130,16 +131,18 @@ public class NodeTreePointable extends AbstractPointable {
         return dictionaryExists() ? IntegerPointable.getInteger(bytes, getDictionaryEntryCountOffset()) : 0;
     }
 
-    public void getString(int idx, IPointable string) {
+    public void getString(int idx, UTF8StringPointable string) {
         int nEntries = getDictionaryEntryCount();
         if (idx < 0 || idx >= nEntries) {
             throw new IllegalArgumentException(idx + " not within [0, " + nEntries + ")");
         }
         int dataAreaStart = getDictionaryDataAreaStartOffset();
-        int idxSlotValue = idx == 0 ? 0 : IntegerPointable.getInteger(bytes, getDictionaryIndexPointerArrayOffset()
-                + (idx - 1) * IDX_PTR_SLOT_SIZE);
-        int strLen = UTF8StringPointable.getUTFLength(bytes, dataAreaStart + idxSlotValue);
-        string.set(bytes, dataAreaStart + idxSlotValue, strLen + 2);
+        int idxSlotValue = idx == 0 ? 0
+                : IntegerPointable.getInteger(bytes,
+                        getDictionaryIndexPointerArrayOffset() + (idx - 1) * IDX_PTR_SLOT_SIZE);
+        int strLen = UTF8StringUtil.getUTFLength(bytes, dataAreaStart + idxSlotValue);
+        int strMetaLen = UTF8StringUtil.getNumBytesToStoreLength(strLen);
+        string.set(bytes, dataAreaStart + idxSlotValue, strMetaLen + strLen);
     }
 
     public int lookupString(UTF8StringPointable key) {
@@ -197,8 +200,8 @@ public class NodeTreePointable extends AbstractPointable {
     }
 
     private int getDictionaryDataAreaStartOffset() {
-        return getDictionaryIndexPointerArrayOffset() + getDictionaryEntryCount()
-                * (IDX_PTR_SLOT_SIZE + SORTED_PTR_SLOT_SIZE);
+        return getDictionaryIndexPointerArrayOffset()
+                + getDictionaryEntryCount() * (IDX_PTR_SLOT_SIZE + SORTED_PTR_SLOT_SIZE);
     }
 
     private int getRootNodeOffset() {

@@ -26,8 +26,8 @@ public class VXQueryDataException extends HyracksDataException {
 
     private File file;
 
-    public VXQueryDataException(String message, Exception ex, File file) {
-        super(message, ex);
+    public VXQueryDataException(String message, Exception ex, File file, String nodeId) {
+        super(message, ex, nodeId);
         this.file = file;
     }
 

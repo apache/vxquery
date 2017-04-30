@@ -14,18 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.compiler.algebricks;
+package org.apache.vxquery.datamodel.builders.atomic;
 
-import org.apache.hyracks.algebricks.data.IPrinterFactory;
-import org.apache.hyracks.algebricks.data.IPrinterFactoryProvider;
-import org.apache.hyracks.api.exceptions.HyracksDataException;
+import java.io.IOException;
 
-public class VXQueryPrinterFactoryProvider implements IPrinterFactoryProvider {
-    public static final IPrinterFactoryProvider INSTANCE = new VXQueryPrinterFactoryProvider();
+import org.apache.hyracks.data.std.util.UTF8StringBuilder;
 
-    @Override
-    public IPrinterFactory getPrinterFactory(Object type) throws HyracksDataException {
+public class VXQueryUTF8StringBuilder extends UTF8StringBuilder {
 
-        return new VXQueryPrinterFactory();
+    public void appendUtf8Bytes(byte[] bytes, int byteStartOffset, int byteLength) throws IOException {
+        out.write(bytes, byteStartOffset, byteLength);
     }
+
 }

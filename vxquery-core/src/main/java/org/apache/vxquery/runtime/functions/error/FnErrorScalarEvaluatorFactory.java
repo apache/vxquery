@@ -16,16 +16,12 @@
  */
 package org.apache.vxquery.runtime.functions.error;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
+import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.atomic.XSQNamePointable;
@@ -34,7 +30,6 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 
 public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
@@ -46,16 +41,13 @@ public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
     @SuppressWarnings("unused")
     @Override
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
-            throws AlgebricksException {
+            throws HyracksDataException {
         final XSQNamePointable qnamep = (XSQNamePointable) XSQNamePointable.FACTORY.createPointable();
         final SequencePointable seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final UTF8StringPointable urip = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable localnamep = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable prefixp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         final UTF8StringPointable descriptionp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
-
-        final ByteBufferInputStream bbis = new ByteBufferInputStream();
-        final DataInputStream di = new DataInputStream(bbis);
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -77,13 +69,8 @@ public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                     tvp1.getValue(qnamep);
                     qnamep.getUri(urip);
                     qnamep.getLocalName(localnamep);
-                    try {
-                        namespaceURI = FunctionHelper.getStringFromPointable(urip, bbis, di);
-
-                        localPart = FunctionHelper.getStringFromPointable(localnamep, bbis, di);
-                    } catch (IOException e) {
-                        throw new SystemException(ErrorCode.FOER0000);
-                    }
+                    namespaceURI = urip.toString();
+                    localPart = localnamep.toString();
                     // TODO Update to dynamic error.
                     throw new SystemException(ErrorCode.FOER0000);
                 }
@@ -103,13 +90,8 @@ public class FnErrorScalarEvaluatorFactory extends AbstractTaggedValueArgumentSc
                         tvp1.getValue(qnamep);
                         qnamep.getUri(urip);
                         qnamep.getLocalName(localnamep);
-                        try {
-                            namespaceURI = FunctionHelper.getStringFromPointable(urip, bbis, di);
-
-                            localPart = FunctionHelper.getStringFromPointable(localnamep, bbis, di);
-                        } catch (IOException e) {
-                            throw new SystemException(ErrorCode.FORG0006);
-                        }
+                        namespaceURI = urip.toString();
+                        localPart = localnamep.toString();
                     } else {
                         throw new SystemException(ErrorCode.FORG0006);
                     }

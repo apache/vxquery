@@ -2143,7 +2143,7 @@ public class XMLQueryTranslator {
 
     private List<LogicalVariable> translateExpressionList(List<ASTNode> expressions, TranslationContext tCtx)
             throws SystemException {
-        List<LogicalVariable> result = new ArrayList<LogicalVariable>();
+        List<LogicalVariable> result = new ArrayList<>();
         for (ASTNode e : expressions) {
             result.add(translateExpression(e, tCtx));
         }
@@ -2151,11 +2151,11 @@ public class XMLQueryTranslator {
     }
 
     private static Mutable<ILogicalExpression> mutable(ILogicalExpression expr) {
-        return new MutableObject<ILogicalExpression>(expr);
+        return new MutableObject<>(expr);
     }
 
     private static Mutable<ILogicalOperator> mutable(ILogicalOperator op) {
-        return new MutableObject<ILogicalOperator>(op);
+        return new MutableObject<>(op);
     }
 
     private LogicalVariable newLogicalVariable() {
