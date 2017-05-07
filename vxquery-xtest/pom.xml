@@ -144,6 +144,26 @@
         </dependency>
 
         <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-api</artifactId>
         </dependency>
@@ -151,6 +171,11 @@
         <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-control-common</artifactId>
         </dependency>
 
         <dependency>
@@ -170,6 +195,11 @@
 
         <dependency>
             <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-dataflow-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-hdfs-2.x</artifactId>
         </dependency>
 
@@ -179,8 +209,23 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-core</artifactId>
         </dependency>
 
         <dependency>
