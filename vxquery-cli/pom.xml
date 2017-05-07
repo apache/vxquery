@@ -88,6 +88,16 @@
         </dependency>
 
         <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-api</artifactId>
         </dependency>
@@ -124,17 +134,22 @@
 
         <dependency>
             <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-dataflow-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-dataflow-std</artifactId>
         </dependency>
 
         <dependency>
-                <groupId>org.apache.hyracks</groupId>
-                <artifactId>hyracks-hdfs-core</artifactId>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-hdfs-core</artifactId>
         </dependency>
 
         <dependency>
-                <groupId>org.apache.hyracks</groupId>
-                <artifactId>hyracks-hdfs-2.x</artifactId>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-hdfs-2.x</artifactId>
         </dependency>
     </dependencies>
 
