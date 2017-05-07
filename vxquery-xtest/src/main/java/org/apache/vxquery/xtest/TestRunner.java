@@ -158,7 +158,7 @@ public class TestRunner {
                 IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
                 IHyracksDatasetReader reader = hds.createReader(jobId, ccb.getResultSetId());
                 // TODO(tillw) remove this loop once the IHyracksDatasetReader reliably returns the correct exception
-                while (reader.getResultStatus() == DatasetJobRecord.Status.RUNNING) {
+                while (reader.getResultStatus().getState() == DatasetJobRecord.State.RUNNING) {
                     Thread.sleep(1);
                 }
                 IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();

@@ -80,7 +80,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         final IFrameFieldAppender appender = new FrameFixedFieldTupleAppender(fieldOutputCount);
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
-        final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
+        final String nodeId = ctx.getJobletContext().getServiceContext().getNodeId();
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         final String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
         IndexCentralizerUtil indexCentralizerUtil = new IndexCentralizerUtil(

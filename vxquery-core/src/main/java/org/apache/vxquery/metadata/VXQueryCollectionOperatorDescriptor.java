@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final IFrameFieldAppender appender = new FrameFixedFieldTupleAppender(fieldOutputCount);
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
-        final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
+        final String nodeId = ctx.getJobletContext().getServiceContext().getNodeId();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final ArrayBackedValueStorage jsonAbvs = new ArrayBackedValueStorage();
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
@@ -157,7 +157,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             try {
                                 hdfs.scheduleSplits();
                                 ArrayList<Integer> schedule = hdfs
-                                        .getScheduleForNode(InetAddress.getLocalHost().getHostAddress());
+                                        .getScheduleForNode(Inet4Address.getLoopbackAddress().getHostAddress());
                                 List<InputSplit> splits = hdfs.getSplits();
                                 List<FileSplit> fileSplits = new ArrayList<>();
                                 for (int i : schedule) {
