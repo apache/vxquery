@@ -71,7 +71,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         collectionPartitions = ds.getPartitions();
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
-        recordDescriptors[0] = rDesc;
+        outRecDescs[0] = rDesc;
         this.elementPath = ds.getElementPath();
     }
 
@@ -89,7 +89,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
         IndexCentralizerUtil indexCentralizerUtil = new IndexCentralizerUtil(
-                ctx.getIOManager().getIODevices().get(0).getMount());
+                ctx.getIoManager().getIODevices().get(0).getMount());
         indexCentralizerUtil.readIndexDirectory();
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {

@@ -93,7 +93,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         totalDataSources = (short) ds.getTotalDataSources();
         childSeq = ds.getChildSeq();
         valueSeq = ds.getValueSeq();
-        recordDescriptors[0] = rDesc;
+        outRecDescs[0] = rDesc;
         this.tag = ds.getTag();
         this.hdfsConf = hdfsConf;
         this.nodeControllerInfos = nodeControllerInfos;
