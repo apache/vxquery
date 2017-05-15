@@ -45,6 +45,7 @@ public class VXQueryIT extends AbstractXQueryTest {
         XTestOptions options = getDefaultTestOptions();
         options.catalog = XQTS_CATALOG;
         options.previousTestResults = StringUtils.join(new String[] { "results", "xqts.txt" }, File.separator);
+        options.verbose = true;
         return options;
     }
 
