@@ -146,7 +146,7 @@ public class RewriteRuleset {
         // TODO Replace consolidate with a new child function that takes multiple paths.
         //        normalization.add(new ConsolidateUnnestsRule());
         normalization.add(new RemoveUnusedUnnestIterateRule());
-       // normalization.add(new PushChildIntoDataScanRule());
+        normalization.add(new PushChildIntoDataScanRule());
 
         // Improvement for scalar child expressions
         normalization.add(new EliminateSubplanForSingleItemsRule());
@@ -239,7 +239,7 @@ public class RewriteRuleset {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<>();
 
         xquery.add(new PushSelectDownRule());
-        xquery.add(new SimpleUnnestToProductRule());
+        //xquery.add(new SimpleUnnestToProductRule());
         xquery.add(new ComplexUnnestToProductRule());
         xquery.add(new ComplexJoinInferenceRule());
         xquery.add(new PushSelectIntoJoinRule());
@@ -259,6 +259,7 @@ public class RewriteRuleset {
     public static final List<IAlgebraicRewriteRule> buildNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<>();
         normalization.add(new EliminateSubplanRule());
+        normalization.add(new SimpleUnnestToProductRule());
         normalization.add(new NestedSubplanToJoinRule());
         normalization.add(new EliminateSubplanWithInputCardinalityOneRule());
         normalization.add(new BreakSelectIntoConjunctsRule());
