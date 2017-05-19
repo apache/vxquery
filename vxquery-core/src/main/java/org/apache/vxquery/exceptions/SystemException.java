@@ -51,6 +51,11 @@ public class SystemException extends HyracksDataException {
         super(message(code, loc));
         this.code = code;
     }
+    
+    public SystemException(ErrorCode code, SourceLocation loc, Throwable cause) {
+        super(message(code, loc), cause);
+        this.code = code;
+    }
 
     public ErrorCode getCode() {
         return code;

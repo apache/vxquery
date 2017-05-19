@@ -37,8 +37,8 @@ public class XMLQueryParser {
             if (!exceptions.isEmpty()) {
                 throw exceptions.get(0);
             }
-            throw new SystemException(ErrorCode.XPST0003, new SourceLocation(sourceName, pe.currentToken.beginLine,
-                    pe.currentToken.beginColumn));
+            SourceLocation loc = new SourceLocation(sourceName, pe.currentToken.beginLine, pe.currentToken.beginColumn);
+            throw new SystemException(ErrorCode.XPST0003, loc, pe);
         }
     }
 

@@ -77,6 +77,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private short totalDataSources;
     private String[] collectionPartitions;
     private List<Integer> childSeq;
+    private List<Byte[]> valueSeq;
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
     private HDFSFunctions hdfs;
     private String tag;
@@ -84,13 +85,14 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private final String hdfsConf;
     private final Map<String, NodeControllerInfo> nodeControllerInfos;
 
-    public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryCollectionDataSource ds,
+    public VXQueryCollectionOperatorDescriptor(IOperatorDescriptorRegistry spec, AbstractVXQueryDataSource ds,
             RecordDescriptor rDesc, String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos) {
         super(spec, 1, 1);
         collectionPartitions = ds.getPartitions();
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
         childSeq = ds.getChildSeq();
+        valueSeq = ds.getValueSeq();
         recordDescriptors[0] = rDesc;
         this.tag = ds.getTag();
         this.hdfsConf = hdfsConf;
@@ -113,7 +115,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
                 dCtx.getStaticContext());
-        final JSONParser jparser = new JSONParser();
+        final JSONParser jparser = new JSONParser(valueSeq);
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -130,7 +132,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 Reader input;
                 if (!collectionModifiedName.contains("hdfs:/")) {
                     File collectionDirectory = new File(collectionModifiedName);
-                    //check if directory is in the local file system
+                    // check if directory is in the local file system
                     if (collectionDirectory.exists()) {
                         // Go through each tuple.
                         if (collectionDirectory.isDirectory()) {
@@ -152,9 +154,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                         try {
                                             jsonAbvs.reset();
                                             input = new InputStreamReader(new FileInputStream(file));
-                                            jparser.parse(input, jsonAbvs);
-                                            FrameUtils.appendFieldToWriter(writer, appender, jsonAbvs.getByteArray(),
-                                                    jsonAbvs.getStartOffset(), jsonAbvs.getLength());
+                                            jparser.parse(input, jsonAbvs, writer, appender);
                                         } catch (FileNotFoundException e) {
                                             throw new HyracksDataException(e.toString());
                                         }
@@ -197,14 +197,14 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                 RecordReader reader;
                                 TaskAttemptContext context;
                                 for (int i = 0; i < size; i++) {
-                                    //read split
+                                    // read split
                                     context = ctxFactory.createContext(job.getConfiguration(), i);
-
                                     reader = inputFormat.createRecordReader(inputSplits.get(i), context);
                                     reader.initialize(inputSplits.get(i), context);
                                     while (reader.nextKeyValue()) {
                                         value = reader.getCurrentValue().toString();
-                                        //Split value if it contains more than one item with the tag
+                                        // Split value if it contains more than
+                                        // one item with the tag
                                         if (StringUtils.countMatches(value, tag) > 1) {
                                             String[] items = value.split(tag);
                                             for (String item : items) {
@@ -218,7 +218,9 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                             }
                                         } else {
                                             value = START_TAG + value;
-                                            //create an input stream to the file currently reading and send it to parser
+                                            // create an input stream to the
+                                            // file currently reading and send
+                                            // it to parser
                                             stream = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
                                             parser.parseHDFSElements(stream, writer, fta, i);
                                             stream.close();
@@ -232,10 +234,10 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             }
                         } else {
                             try {
-                                //check if the path exists and is a directory
+                                // check if the path exists and is a directory
                                 if (fs.exists(directory) && fs.isDirectory(directory)) {
                                     for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-                                        //read every file in the directory
+                                        // read every file in the directory
                                         RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
                                         while (it.hasNext()) {
                                             xmlDocument = it.next().getPath();
@@ -244,7 +246,9 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                                     LOGGER.fine(
                                                             "Starting to read XML document: " + xmlDocument.getName());
                                                 }
-                                                //create an input stream to the file currently reading and send it to parser
+                                                // create an input stream to the
+                                                // file currently reading and
+                                                // send it to parser
                                                 InputStream in = fs.open(xmlDocument).getWrappedStream();
                                                 parser.parseHDFSElements(in, writer, fta, tupleIndex);
                                                 in.close();

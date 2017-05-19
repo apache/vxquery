@@ -35,7 +35,6 @@ import org.apache.hyracks.algebricks.rewriter.rules.FactorRedundantGroupAndDecor
 import org.apache.hyracks.algebricks.rewriter.rules.InferTypesRule;
 import org.apache.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRule;
 import org.apache.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
-//import org.apache.hyracks.algebricks.rewriter.rules.InsertOuterJoinRule;
 import org.apache.hyracks.algebricks.rewriter.rules.IntroJoinInsideSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
 import org.apache.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
@@ -59,8 +58,11 @@ import org.apache.hyracks.algebricks.rewriter.rules.subplan.EliminateSubplanWith
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.NestedSubplanToJoinRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.PushSubplanIntoGroupByRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.SubplanOutOfGroupRule;
+import org.apache.vxquery.compiler.rewriter.algebricks_new_version.NestGroupByRule;
+import org.apache.vxquery.compiler.rewriter.algebricks_new_version.PushGroupByThroughProduct;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateAssignAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConsolidateDescandantChild;
+import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertAssignToUnnestRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertFromAlgebricksExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.ConvertToAlgebricksExpressionsRule;
@@ -70,8 +72,11 @@ import org.apache.vxquery.compiler.rewriter.rules.EliminateUnnestAggregateSubpla
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceCollectionRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceIndexingRule;
 import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushAggregateIntoGroupbyRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
+import org.apache.vxquery.compiler.rewriter.rules.PushKeysOrMembersIntoDatascanRule;
+import org.apache.vxquery.compiler.rewriter.rules.PushValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantCastExpressionsRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantDataExpressionsRule;
@@ -98,7 +103,7 @@ public class RewriteRuleset {
     public static final List<IAlgebraicRewriteRule> buildPathStepNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<>();
         normalization.add(new SetVariableIdContextRule());
-
+        normalization.add(new InferTypesRule());
         // Remove unused functions.
         normalization.add(new RemoveUnusedSortDistinctNodesRule());
         normalization.add(new RemoveRedundantTreatExpressionsRule());
@@ -163,8 +168,6 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
 
         // Find assign for scalar aggregate function.
-        // normalization.add(new ConvertAssignToAggregateRule());
-
         // Use two step aggregate operators if possible.
         normalization.add(new IntroduceTwoStepAggregateRule());
 
@@ -190,8 +193,12 @@ public class RewriteRuleset {
         normalization.add(new ConvertToAlgebricksExpressionsRule());
         normalization.add(new RemoveRedundantBooleanExpressionsRule());
         // Clean up
+        normalization.add(new ConvertAssignToAggregateRule());
+        normalization.add(new IntroduceTwoStepAggregateRule());
         normalization.add(new RemoveRedundantVariablesRule());
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
+        normalization.add(new PushValueIntoDatascanRule());
+        normalization.add(new PushKeysOrMembersIntoDatascanRule());
         return normalization;
     }
 
@@ -206,8 +213,11 @@ public class RewriteRuleset {
         xquery.add(new SimpleUnnestToProductRule());
         xquery.add(new PushMapOperatorDownThroughProductRule());
         xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
+        xquery.add(new PushMapOperatorDownThroughProductRule());
+        xquery.add(new PushGroupByThroughProduct());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
+
         // Clean up
         xquery.add(new RemoveRedundantVariablesRule());
         xquery.add(new RemoveUnusedAssignAndAggregateRule());
@@ -229,7 +239,7 @@ public class RewriteRuleset {
         List<IAlgebraicRewriteRule> xquery = new LinkedList<>();
 
         xquery.add(new PushSelectDownRule());
-        xquery.add(new SimpleUnnestToProductRule());
+        //xquery.add(new SimpleUnnestToProductRule());
         xquery.add(new ComplexUnnestToProductRule());
         xquery.add(new ComplexJoinInferenceRule());
         xquery.add(new PushSelectIntoJoinRule());
@@ -240,23 +250,18 @@ public class RewriteRuleset {
         xquery.add(new SubplanOutOfGroupRule());
         //        xquery.add(new InsertOuterJoinRule());
         xquery.add(new ExtractFunctionsFromJoinConditionRule());
-
         xquery.add(new RemoveRedundantVariablesRule());
         xquery.add(new RemoveUnusedAssignAndAggregateRule());
-
         xquery.add(new FactorRedundantGroupAndDecorVarsRule());
-        xquery.add(new EliminateSubplanRule());
-        xquery.add(new EliminateGroupByEmptyKeyRule());
-        xquery.add(new PushSubplanIntoGroupByRule());
-        xquery.add(new NestedSubplanToJoinRule());
-        xquery.add(new EliminateSubplanWithInputCardinalityOneRule());
-
         return xquery;
     }
 
     public static final List<IAlgebraicRewriteRule> buildNormalizationRuleCollection() {
         List<IAlgebraicRewriteRule> normalization = new LinkedList<>();
         normalization.add(new EliminateSubplanRule());
+        normalization.add(new SimpleUnnestToProductRule());
+        normalization.add(new NestedSubplanToJoinRule());
+        normalization.add(new EliminateSubplanWithInputCardinalityOneRule());
         normalization.add(new BreakSelectIntoConjunctsRule());
         normalization.add(new PushSelectIntoJoinRule());
         normalization.add(new ExtractGbyExpressionsRule());
@@ -267,8 +272,17 @@ public class RewriteRuleset {
         List<IAlgebraicRewriteRule> condPushDown = new LinkedList<>();
         condPushDown.add(new PushSelectDownRule());
         condPushDown.add(new InlineVariablesRule());
+        condPushDown.add(new SubplanOutOfGroupRule());
+        condPushDown.add(new RemoveRedundantVariablesRule());
+        condPushDown.add(new RemoveUnusedAssignAndAggregateRule());
         condPushDown.add(new FactorRedundantGroupAndDecorVarsRule());
+        condPushDown.add(new PushAggregateIntoGroupbyRule());
         condPushDown.add(new EliminateSubplanRule());
+        condPushDown.add(new PushGroupByThroughProduct());
+        condPushDown.add(new NestGroupByRule());
+        condPushDown.add(new EliminateGroupByEmptyKeyRule());
+        condPushDown.add(new PushSubplanIntoGroupByRule());
+        condPushDown.add(new NestedSubplanToJoinRule());
         return condPushDown;
     }
 
