@@ -29,7 +29,7 @@ public class XTestOptions {
     @Option(name = "-catalog", required = true, usage = "Test catalog XML.")
     String catalog;
 
-    @Option(name = "-tz", required = true, usage = "Implicit timezone for test execution (default: JVM timezone).")
+    @Option(name = "-tz", required = false, usage = "Implicit timezone for test execution (default: JVM timezone).")
     String timezone;
 
     @Option(name = "-threads", required = false, usage = "Number of threads. (default: 1)")
