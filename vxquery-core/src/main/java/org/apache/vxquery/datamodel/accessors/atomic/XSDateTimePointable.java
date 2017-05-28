@@ -76,7 +76,10 @@ public class XSDateTimePointable extends AbstractPointable implements IDate, ITi
     };
 
     public void setCurrentDateTime() {
-        Calendar cal = Calendar.getInstance();
+        setCurrentDateTime(Calendar.getInstance());
+    }
+
+    public void setCurrentDateTime(Calendar cal) {
         TimeZone tz = cal.getTimeZone();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);

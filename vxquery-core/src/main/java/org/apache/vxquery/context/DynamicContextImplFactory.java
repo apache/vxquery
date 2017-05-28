@@ -69,12 +69,11 @@ class DynamicContextImplFactory implements IDynamicContextFactory {
     static IDynamicContextFactory createInstance(DynamicContextImpl dCtx) {
         IStaticContextFactory scFactory = dCtx.getStaticContext().createFactory();
 
-        final int dtLen = XSDateTimePointable.TYPE_TRAITS.getFixedLength();
-        byte[] currentDateTime = new byte[dtLen];
-        XSDateTimePointable datetimep = new XSDateTimePointable();
-        datetimep.set(currentDateTime, 0, dtLen);
-        datetimep.setCurrentDateTime();
-        
+        VoidPointable vp = new VoidPointable();
+        dCtx.getCurrentDateTime(vp);
+        byte[] currentDateTime = new byte[vp.getLength()];
+        vp.copyInto(currentDateTime);
+
         Map<QName, ArrayBackedValueStorage> vMap = dCtx.getVariableMap();
         int nVars = vMap.size();
         QName[] variableNames = new QName[nVars];
