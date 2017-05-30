@@ -30,12 +30,12 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluatorFactory;
-import org.apache.vxquery.runtime.functions.index.indexCentralizer.IndexCentralizerUtil;
+import org.apache.vxquery.runtime.functions.index.centralizer.IndexCentralizerUtil;
 
-public class ShowIndexScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
+public class ShowIndexesScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
-    public ShowIndexScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
+    public ShowIndexesScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
 

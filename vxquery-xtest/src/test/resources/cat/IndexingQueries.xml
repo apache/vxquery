@@ -35,6 +35,11 @@
       <query name="useIndex1" date="2016-05-26"/>
       <output-file compare="Text">useIndex1.txt</output-file>
    </test-case>
+   <test-case name="use-index-1-user" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex1_user" date="2016-05-26"/>
+      <output-file compare="Text">useIndex1_user.txt</output-file>
+   </test-case>
    <test-case name="use-index-2" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex2" date="2016-05-26"/>
@@ -95,6 +100,11 @@
       <query name="useIndex1" date="2016-05-26"/>
       <output-file compare="Text">useIndex1.txt</output-file>
    </test-case>
+   <test-case name="use-index-1-user" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex1_user" date="2016-05-26"/>
+      <output-file compare="Text">useIndex1_user.txt</output-file>
+   </test-case>
    <test-case name="use-index-2" FilePath="Indexing/Partition-2/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex2" date="2016-05-26"/>
@@ -144,6 +154,11 @@
       <description>Get Collection From Lucene Index</description>
       <query name="useIndex1" date="2016-05-26"/>
       <output-file compare="Text">useIndex1.txt</output-file>
+   </test-case>
+   <test-case name="use-index-1-user" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
+      <description>Get Collection From Lucene Index</description>
+      <query name="useIndex1_user" date="2016-05-26"/>
+      <output-file compare="Text">useIndex1_user.txt</output-file>
    </test-case>
    <test-case name="use-index-2" FilePath="Indexing/Partition-4/" Creator="Steven Jacobs">
       <description>Get Collection From Lucene Index</description>

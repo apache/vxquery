@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.vxquery.runtime.functions.index.updateIndex.MetaFileUtil;
-import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
+import org.apache.vxquery.runtime.functions.index.update.MetaFileUtil;
+import org.apache.vxquery.runtime.functions.index.update.XmlMetadata;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

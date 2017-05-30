@@ -353,7 +353,7 @@
          &LibrariesInJSONiq;
         </test-group>
     </test-group>
-   <test-group name="SerializationQueries" featureOwner="Christina Pavlopoulou">
+    <test-group name="SerializationQueries" featureOwner="Christina Pavlopoulou">
       <GroupInfo>
          <title>Serialize Function Queries</title>
          <description/>
@@ -365,7 +365,7 @@
          </GroupInfo>
          &SerializationQueries;
       </test-group>
-   </test-group>
+    </test-group>
     <test-group name="XMLInJSONQueries" featureOwner="Riyafa Abdul Hameed">
         <GroupInfo>
             <title>XML in JSON</title>

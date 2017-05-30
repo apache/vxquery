@@ -14,12 +14,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.vxquery.runtime.functions.index.updateIndex;
+package org.apache.vxquery.runtime.functions.index.update;
+
+import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 
 /**
  * Class to store metadata related to an XML file.
@@ -32,6 +33,7 @@ import java.io.Serializable;
 @XmlRootElement(name = "file")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class XmlMetadata implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String path;
     private String md5;

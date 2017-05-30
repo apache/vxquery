@@ -19,7 +19,7 @@
 (: Find the annual precipitation (PRCP) for a Seattle using the airport       :)
 (: station (US000000002) for 2002.                                            :)
 fn:sum(
-    for $r in collection-from-index("src/test/resources/TestSources/ghcnd/half_1/quarter_1|src/test/resources/TestSources/ghcnd/half_1/quarter_2|src/test/resources/TestSources/ghcnd/half_2/quarter_3|src/test/resources/TestSources/ghcnd/half_2/quarter_4", "/dataCollection/data")/data
+    for $r in collection("src/test/resources/TestSources/ghcnd/half_1/quarter_1|src/test/resources/TestSources/ghcnd/half_1/quarter_2|src/test/resources/TestSources/ghcnd/half_2/quarter_3|src/test/resources/TestSources/ghcnd/half_2/quarter_4")/dataCollection/data
     where $r/station eq "GHCND:US000000002" 
         and $r/dataType eq "PRCP" 
         and fn:year-from-dateTime(xs:dateTime(fn:data($r/date))) eq 2002

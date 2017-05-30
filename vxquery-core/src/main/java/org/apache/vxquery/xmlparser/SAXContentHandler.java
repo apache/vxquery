@@ -129,8 +129,6 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
     public SAXContentHandler(boolean attachTypes, ITreeNodeIdProvider nodeIdProvider, IFrameFieldAppender appender,
             List<SequenceType> childSequenceTypes) {
         this(attachTypes, nodeIdProvider, false);
-
-        // Frame writing variables
         this.appender = appender;
         setChildPathSteps(childSequenceTypes);
     }
@@ -297,10 +295,11 @@ public class SAXContentHandler implements ContentHandler, LexicalHandler {
 
     /**
      * The filter settings here are similar to one in the class linked below.
-     *
+     * 
+     * @throws SAXException
      * @see org.apache.vxquery.runtime.functions.step.NodeTestFilter.java
      */
-    private boolean startElementChildPathStep(String uri, String localName) {
+    private boolean startElementChildPathStep(String uri, String localName) throws SAXException {
         if (subElement != null && depth <= subElement.length) {
             // Check path step if it exists.
             subElement[depth - 1] = true;

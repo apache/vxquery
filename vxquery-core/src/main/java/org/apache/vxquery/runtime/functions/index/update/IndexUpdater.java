@@ -14,29 +14,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.vxquery.runtime.functions.index.updateIndex;
+package org.apache.vxquery.runtime.functions.index.update;
 
-import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
-import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
-import org.apache.vxquery.exceptions.ErrorCode;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.index.IndexDocumentBuilder;
-import org.apache.vxquery.runtime.functions.index.CaseSensitiveAnalyzer;
-import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
-import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
-
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,6 +25,23 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
+import org.apache.vxquery.exceptions.ErrorCode;
+import org.apache.vxquery.exceptions.SystemException;
+import org.apache.vxquery.index.IndexDocumentBuilder;
+import org.apache.vxquery.runtime.functions.index.CaseSensitiveAnalyzer;
+import org.apache.vxquery.runtime.functions.index.IndexConstructorUtil;
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+
 /**
  * Update the index if the source files are changed.
  */
@@ -53,48 +49,37 @@ public class IndexUpdater {
     private MetaFileUtil metaFileUtil;
     private ConcurrentHashMap<String, XmlMetadata> metadataMap;
     private IPointable result;
-    private ByteBufferInputStream bbis;
-    private DataInputStream di;
-    private SequenceBuilder sb;
+    private final SequenceBuilder sb = new SequenceBuilder();
     private ArrayBackedValueStorage abvs;
     private ITreeNodeIdProvider nodeIdProvider;
     private ArrayBackedValueStorage abvsFileNode;
-    private TaggedValuePointable nodep;
     private String nodeId;
     private IndexWriter indexWriter;
     private Set<String> pathsFromFileList;
     private String collectionFolder;
     private String indexFolder;
-    private Logger LOGGER = Logger.getLogger("Index Updater");
+    private final Logger LOGGER = Logger.getLogger("Index Updater");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private IndexConstructorUtil indexConstructorUtil = new IndexConstructorUtil();
 
-    public IndexUpdater(String indexFolder, IPointable result, UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs, ITreeNodeIdProvider nodeIdProvider,
-            ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep, String nodeId) {
+    public IndexUpdater(String indexFolder, IPointable result, ArrayBackedValueStorage abvs, ITreeNodeIdProvider nodeIdProvider,
+            ArrayBackedValueStorage abvsFileNode, String nodeId) {
         this.indexFolder = indexFolder;
         this.result = result;
-        this.bbis = bbis;
-        this.di = di;
-        this.sb = sb;
         this.abvs = abvs;
         this.nodeIdProvider = nodeIdProvider;
         this.abvsFileNode = abvsFileNode;
-        this.nodep = nodep;
         this.nodeId = nodeId;
         this.pathsFromFileList = new HashSet<>();
     }
 
     /**
      * Perform the initial configuration for index update/ delete processes.
-     * 
-     * @throws SystemException
-     *             : If getting the index folder generates {@link SystemException}
+     *
      * @throws IOException
      *             : If getting the index folder generates {@link IOException}
      */
-    public void setup() throws SystemException, IOException {
-
+    public void setup() throws IOException {
         // Read the metadata file and load the metadata map into memory.
         metaFileUtil = new MetaFileUtil(indexFolder);
         metaFileUtil.readMetadataFile();
@@ -114,14 +99,14 @@ public class IndexUpdater {
 
     /**
      * Wrapper for update index function.
-     * 
+     *
      * @throws IOException
      *             : If the directory doesn't exist
      */
     public void updateIndex() throws IOException {
         File collectionDirectory = new File(collectionFolder);
         if (!collectionDirectory.exists()) {
-            throw new RuntimeException("The collection directory (" + collectionFolder + ") does not exist.");
+            throw new IOException("The collection directory (" + collectionFolder + ") does not exist.");
         }
 
         //Execute update index process
@@ -134,7 +119,7 @@ public class IndexUpdater {
 
     /**
      * Close opened IndexWriter and terminate the index update/ delete process.
-     * 
+     *
      * @throws IOException
      *             : If exiting the index folder generates {@link IOException}
      */
@@ -149,7 +134,7 @@ public class IndexUpdater {
 
     /**
      * Functional wrapper to update Metadata file.
-     * 
+     *
      * @throws IOException
      *             : If updating metadata folder generates {@link IOException}
      */
@@ -190,8 +175,8 @@ public class IndexUpdater {
 
                         //Update index corresponding to the xml file.
                         indexWriter.deleteDocuments(new Term(Constants.FIELD_PATH, file.getCanonicalPath()));
-                        indexDocumentBuilder = indexConstructorUtil.getIndexBuilder(file, indexWriter, nodep,
-                                abvsFileNode, nodeIdProvider, bbis, di, nodeId);
+                        indexDocumentBuilder = indexConstructorUtil.getIndexBuilder(file, indexWriter, abvsFileNode,
+                                nodeIdProvider, nodeId);
                         indexDocumentBuilder.printStart();
 
                         if (LOGGER.isDebugEnabled()) {
@@ -207,8 +192,8 @@ public class IndexUpdater {
 
                     // In this case, the xml file has not added to the index. (It is a newly added file)
                     // Therefore generate a new index for this file and add it to the existing index.
-                    indexDocumentBuilder = indexConstructorUtil.getIndexBuilder(file, indexWriter, nodep, abvsFileNode,
-                            nodeIdProvider, bbis, di, nodeId);
+                    indexDocumentBuilder = indexConstructorUtil.getIndexBuilder(file, indexWriter, abvsFileNode, nodeIdProvider,
+                            nodeId);
                     indexDocumentBuilder.printStart();
 
                     if (LOGGER.isDebugEnabled()) {
@@ -235,8 +220,8 @@ public class IndexUpdater {
      * @throws IOException
      *             : If getting the file info generates {@link IOException}
      */
-    private XmlMetadata updateEntry(File file, XmlMetadata metadata) throws IOException {
-
+    private XmlMetadata updateEntry(File file, XmlMetadata metadataArg) throws IOException {
+        XmlMetadata metadata = metadataArg;
         if (metadata == null) {
             metadata = new XmlMetadata();
         }
@@ -286,7 +271,7 @@ public class IndexUpdater {
      * When deleting indexes, if any error occurred, the process will be rolled back and all the indexes will be
      * restored.
      * Otherwise the changes will be committed.
-     * 
+     *
      * @throws SystemException
      *             : An attempt to divide by zero
      */
@@ -310,7 +295,7 @@ public class IndexUpdater {
                 sb.finish();
                 result.set(abvs);
             } catch (IOException e1) {
-                throw new SystemException(ErrorCode.FOAR0001);
+                throw new SystemException(ErrorCode.FOAR0001, e1);
             }
         }
 

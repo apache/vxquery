@@ -142,6 +142,6 @@ public class SimpleXQueryTest {
         XMLQueryCompiler compiler = new XMLQueryCompiler(null, nodeControllerInfos, 65536);
         CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                 new ResultSetId(System.nanoTime()), null);
-        compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE);
+        compiler.compile(testName, new StringReader(query), ccb, Integer.MAX_VALUE, null);
     }
 }

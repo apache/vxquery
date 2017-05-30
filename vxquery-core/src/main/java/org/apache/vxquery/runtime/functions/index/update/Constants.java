@@ -14,12 +14,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.vxquery.runtime.functions.index.updateIndex;
+package org.apache.vxquery.runtime.functions.index.update;
 
 /**
  * Constants used in updating index
  */
 public class Constants {
-    public static String FIELD_PATH = "path";
-    public static String META_FILE_NAME = "vxquery_index.xml";
+    public static final String FIELD_PATH = "path";
+    public static final String META_FILE_NAME = "vxquery_index.xml";
+
+    private Constants() {
+    }
 }

@@ -16,7 +16,6 @@
  */
 package org.apache.vxquery.runtime.functions.util;
 
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,7 +36,7 @@ import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.data.std.util.GrowableArray;
 import org.apache.hyracks.data.std.util.UTF8StringBuilder;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
+import org.apache.hyracks.util.string.UTF8StringUtil;
 import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
@@ -483,6 +482,15 @@ public class FunctionHelper {
             }
         }
         return true;
+    }
+
+    public static String getStringFromBytes(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        UTF8StringUtil.toString(sb, bytes, 0);
+        return sb.toString();
     }
 
     public static boolean compareTaggedValues(AbstractValueComparisonOperation aOp, TaggedValuePointable tvp1,
@@ -1215,13 +1223,12 @@ public class FunctionHelper {
         System.err.println(" printUTF8String END");
     }
 
-    public static void readInDocFromPointable(UTF8StringPointable stringp, ByteBufferInputStream bbis,
-            DataInputStream di, ArrayBackedValueStorage abvs, IParser parser) throws IOException {
-        readInDocFromString(stringp.toString(), bbis, di, abvs, parser);
+    public static void readInDocFromPointable(UTF8StringPointable stringp, ArrayBackedValueStorage abvs,
+            IParser parser) throws IOException {
+        readInDocFromString(stringp.toString(), abvs, parser);
     }
 
-    public static void readInDocFromString(String fName, ByteBufferInputStream bbis, DataInputStream di,
-            ArrayBackedValueStorage abvs, IParser parser) throws IOException {
+    public static void readInDocFromString(String fName, ArrayBackedValueStorage abvs, IParser parser) throws IOException {
         Reader input;
         if (!fName.contains("hdfs:/")) {
             File file = new File(fName);

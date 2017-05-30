@@ -18,7 +18,7 @@
 (: Search Lucene Index :)
 (: Find the highest recorded temperature (TMAX) in Celsius.                   :)
 fn:max(
-    for $r in collection-from-index("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2", "/dataCollection/data")/data
+    for $r in collection("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2")/dataCollection/data
     where $r/dataType eq "TMAX"
     return $r/value
 ) div 10

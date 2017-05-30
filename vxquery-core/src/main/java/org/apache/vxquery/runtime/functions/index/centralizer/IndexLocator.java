@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.runtime.functions.index.indexCentralizer;
+package org.apache.vxquery.runtime.functions.index.centralizer;
+
+import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "Entry")
-public class IndexLocator implements Serializable{
+public class IndexLocator implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @XmlAttribute
     private String collection;

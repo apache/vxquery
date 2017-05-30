@@ -14,11 +14,12 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-
+   
 (: Search Lucene Index :)
-(: Find the highest recorded temperature (TMAX) in Celsius.                   :)
-fn:max(
-    for $r in collection("src/test/resources/TestSources/ghcnd")/dataCollection/data
-    where $r/dataType eq "TMAX"
-    return $r/value
-) div 10
+for $r in collection-from-index("src/test/resources/TestSources/ghcnd")/dataCollection/data
+let $datetime := xs:dateTime(fn:data($r/date))
+where $r/station eq "GHCND:AS000000003" 
+    and fn:year-from-dateTime($datetime) ge 2000
+    and fn:month-from-dateTime($datetime) eq 3 
+    and fn:day-from-dateTime($datetime) eq 3
+return $r

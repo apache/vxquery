@@ -222,7 +222,7 @@ public class XMLQueryCompiler {
         }
     }
 
-    public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel)
+    public void compile(String name, Reader query, CompilerControlBlock ccb, int optimizationLevel, List<String> collections)
             throws AlgebricksException, SystemException {
         moduleNode = XMLQueryParser.parse(name, query);
         listener.notifyParseResult(moduleNode);
@@ -230,7 +230,7 @@ public class XMLQueryCompiler {
         pprinter = new LogicalOperatorPrettyPrintVisitor(new AlgebricksAppendable(),
                 new VXQueryLogicalExpressionPrettyPrintVisitor(module.getModuleContext()));
         VXQueryMetadataProvider mdProvider = new VXQueryMetadataProvider(nodeList, ccb.getSourceFileMap(),
-                module.getModuleContext(), this.hdfsConf, nodeControllerInfos);
+                module.getModuleContext(), this.hdfsConf, nodeControllerInfos, collections);
         compiler = cFactory.createCompiler(module.getBody(), mdProvider, 0);
         listener.notifyTranslationResult(module);
         XMLQueryTypeChecker.typeCheckModule(module);

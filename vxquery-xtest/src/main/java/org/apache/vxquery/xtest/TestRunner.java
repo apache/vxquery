@@ -14,16 +14,22 @@
  */
 package org.apache.vxquery.xtest;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hyracks.api.client.IHyracksClientConnection;
 import org.apache.hyracks.api.client.NodeControllerInfo;
 import org.apache.hyracks.api.comm.IFrame;
@@ -53,13 +59,14 @@ import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
 
 public class TestRunner {
     private static final Pattern EMBEDDED_SYSERROR_PATTERN = Pattern.compile("(\\p{javaUpperCase}{4}\\d{4})");
-
+    private List<String> collectionList;
     private XTestOptions opts;
     private IHyracksClientConnection hcc;
     private IHyracksDataset hds;
 
     public TestRunner(XTestOptions opts) throws UnknownHostException {
         this.opts = opts;
+        this.collectionList = new ArrayList<String>();
     }
 
     public void open() throws Exception {
@@ -67,8 +74,46 @@ public class TestRunner {
         hds = TestClusterUtil.getDataset();
     }
 
+    protected static TestConfiguration getIndexConfiguration(TestCase testCase) {
+        XTestOptions opts = new XTestOptions();
+        opts.verbose = false;
+        opts.threads = 1;
+        opts.showQuery = true;
+        opts.showResult = true;
+        opts.hdfsConf = "src/test/resources/hadoop/conf";
+        opts.catalog = StringUtils.join(new String[] { "src", "test", "resources", "VXQueryCatalog.xml" },
+                File.separator);
+        TestConfiguration indexConf = new TestConfiguration();
+        indexConf.options = opts;
+        String baseDir = new File(opts.catalog).getParent();
+        try {
+            String root = new File(baseDir).getCanonicalPath();
+            indexConf.testRoot = new File(root + "/./");
+            indexConf.resultOffsetPath = new File(root + "/./ExpectedResults/");
+            indexConf.sourceFileMap = testCase.getSourceFileMap();
+            indexConf.xqueryFileExtension = ".xq";
+            indexConf.xqueryxFileExtension = "xqx";
+            indexConf.xqueryQueryOffsetPath = new File(root + "/./Queries/XQuery/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return indexConf;
+
+    }
+
     public TestCaseResult run(final TestCase testCase) {
         TestCaseResult res = new TestCaseResult(testCase);
+        TestCase testCaseIndex = new TestCase(getIndexConfiguration(testCase));
+        testCaseIndex.setFolder("Indexing/Partition-1/");
+        testCaseIndex.setName("showIndexes");
+        runQuery(testCaseIndex, res);
+        String[] collections = res.result.split("\n");
+        this.collectionList = Arrays.asList(collections);
+        runQueries(testCase, res);
+        return res;
+    }
+
+    public void runQuery(TestCase testCase, TestCaseResult res) {
         if (opts.verbose) {
             System.err.println("Starting " + testCase.getXQueryDisplayName());
         }
@@ -78,6 +123,7 @@ public class TestRunner {
         try {
             try {
                 if (opts.showQuery) {
+
                     FileInputStream query = new FileInputStream(testCase.getXQueryFile());
                     System.err.println("***Query for " + testCase.getXQueryDisplayName() + ": ");
                     System.err.println(IOUtils.toString(query, "UTF-8"));
@@ -98,7 +144,7 @@ public class TestRunner {
                 CompilerControlBlock ccb = new CompilerControlBlock(
                         new StaticContextImpl(RootStaticContextImpl.INSTANCE),
                         new ResultSetId(testCase.getXQueryDisplayName().hashCode()), testCase.getSourceFileMap());
-                compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel);
+                compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel, collectionList);
                 JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
                 in.close();
 
@@ -172,7 +218,11 @@ public class TestRunner {
                 System.err.println(res.result);
             }
         }
-        return res;
+
+    }
+
+    public void runQueries(TestCase testCase, TestCaseResult res) {
+        runQuery(testCase, res);
     }
 
     public void close() throws Exception {

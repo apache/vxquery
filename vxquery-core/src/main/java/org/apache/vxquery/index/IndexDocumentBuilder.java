@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.data.std.primitive.BytePointable;
 import org.apache.hyracks.data.std.primitive.DoublePointable;
@@ -56,12 +55,10 @@ import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.accessors.nodes.TextOrCommentNodePointable;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.runtime.functions.cast.CastToStringOperation;
-import org.apache.vxquery.runtime.functions.index.updateIndex.Constants;
+import org.apache.vxquery.runtime.functions.index.update.Constants;
 import org.apache.vxquery.serializer.XMLSerializer;
 
 public class IndexDocumentBuilder extends XMLSerializer {
-    private final IPointable treePointable;
-
     private final PointablePool pp;
     private NodeTreePointable ntp;
 
@@ -88,15 +85,10 @@ public class IndexDocumentBuilder extends XMLSerializer {
     }
 
     //TODO: Handle Processing Instructions, PrefixedNames, and Namepsace entries
-    public IndexDocumentBuilder(IPointable tree, IndexWriter inWriter, String file) {
-        this.treePointable = tree;
+    public IndexDocumentBuilder(TaggedValuePointable tvp, IndexWriter inWriter, String file) {
         writer = inWriter;
 
         this.filePath = file;
-
-        //convert to tagged value pointable
-        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        tvp.set(treePointable.getByteArray(), 0, treePointable.getLength());
 
         //get bytes and info from doc pointer
         bstart = tvp.getByteArray();
@@ -105,7 +97,7 @@ public class IndexDocumentBuilder extends XMLSerializer {
 
         doc = new Document();
 
-        results = new ArrayList<ComplexItem>();
+        results = new ArrayList<>();
 
         pp = PointablePoolFactory.INSTANCE.createPointablePool();
     }

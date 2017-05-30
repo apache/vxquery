@@ -14,6 +14,7 @@
  */
 package org.apache.vxquery.cli;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.io.StringReader;
 import java.net.InetAddress;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -66,12 +68,13 @@ import org.kohsuke.args4j.Option;
 
 public class VXQuery {
     private final CmdLineOptions opts;
+    private final CmdLineOptions indexOpts;
 
     private ClusterControllerService cc;
     private NodeControllerService[] ncs;
     private IHyracksClientConnection hcc;
     private IHyracksDataset hds;
-
+    private List<String> collectionList;
     private ResultSetId resultSetId;
     private static List<String> timingMessages = new ArrayList<>();
     private static long sumTiming;
@@ -87,6 +90,16 @@ public class VXQuery {
      */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
+        // The index query returns only the result, without any other information.
+        this.indexOpts = opts;
+        indexOpts.showAST = false;
+        indexOpts.showOET = false;
+        indexOpts.showQuery = false;
+        indexOpts.showRP = false;
+        indexOpts.showTET = false;
+        indexOpts.timing = false;
+        indexOpts.compileOnly = false;
+        this.collectionList = new ArrayList<String>();
     }
 
     /**
@@ -168,71 +181,87 @@ public class VXQuery {
      * @throws SystemException
      * @throws Exception
      */
+
     private void runQueries() throws Exception {
-        Date start;
-        Date end;
-        for (String query : opts.arguments) {
-            String qStr = slurp(query);
-            if (opts.showQuery) {
-                System.err.println(qStr);
-            }
+        List<String> queries = opts.arguments;
+        // Run the showIndexes query before executing any target query, to store the index metadata
+        List<String> queriesIndex = new ArrayList<String>();
+        queriesIndex.add("vxquery-xtest/src/test/resources/Queries/XQuery/Indexing/Partition-1/showIndexes.xq");
+        OutputStream resultStream = new ByteArrayOutputStream();
+        executeQuery(queriesIndex.get(0), 1, resultStream, indexOpts);
+        ByteArrayOutputStream bos = (ByteArrayOutputStream) resultStream;
+        String result = new String(bos.toByteArray());
+        String[] collections = result.split("\n");
+        this.collectionList = Arrays.asList(collections);
+        executeQueries(queries);
+    }
 
-            VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET,
-                    opts.showOET, opts.showRP);
-
-            start = opts.timing ? new Date() : null;
-
-            Map<String, NodeControllerInfo> nodeControllerInfos = null;
-            if (hcc != null) {
-                nodeControllerInfos = hcc.getNodeControllerInfos();
-            }
-            XMLQueryCompiler compiler = new XMLQueryCompiler(listener, nodeControllerInfos, opts.frameSize,
-                    opts.availableProcessors, opts.joinHashSize, opts.maximumDataSize, opts.hdfsConf);
-            resultSetId = createResultSetId();
-            CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
-                    resultSetId, null);
-            compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel);
-            // if -timing argument passed, show the starting and ending times
-            if (opts.timing) {
-                end = new Date();
-                timingMessage("Compile time: " + (end.getTime() - start.getTime()) + " ms");
-            }
-            if (opts.compileOnly) {
-                continue;
-            }
-
-            Module module = compiler.getModule();
-            JobSpecification js = module.getHyracksJobSpecification();
-
-            DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
-            js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
-
+    public void executeQueries(List<String> queries) throws Exception {
+        for (String query : queries) {
             OutputStream resultStream = System.out;
             if (opts.resultFile != null) {
                 resultStream = new FileOutputStream(new File(opts.resultFile));
             }
+            executeQuery(query, opts.repeatExec, resultStream, opts);
+        }
+    }
 
-            PrintWriter writer = new PrintWriter(resultStream, true);
-            // Repeat execution for number of times provided in -repeatexec argument
-            for (int i = 0; i < opts.repeatExec; ++i) {
-                start = opts.timing ? new Date() : null;
-                runJob(js, writer);
-                // if -timing argument passed, show the starting and ending times
-                if (opts.timing) {
-                    end = new Date();
-                    long currentRun = end.getTime() - start.getTime();
-                    if ((i + 1) > opts.timingIgnoreQueries) {
-                        sumTiming += currentRun;
-                        sumSquaredTiming += currentRun * currentRun;
-                        if (currentRun < minTiming) {
-                            minTiming = currentRun;
-                        }
-                        if (maxTiming < currentRun) {
-                            maxTiming = currentRun;
-                        }
+    public void executeQuery(String query, int repeatedExecution, OutputStream resultStream, CmdLineOptions options)
+            throws Exception {
+        PrintWriter writer = new PrintWriter(resultStream, true);
+        String qStr = slurp(query);
+        if (opts.showQuery) {
+            writer.println(qStr);
+        }
+        VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET, opts.showOET,
+                opts.showRP);
+
+        Date start = opts.timing ? new Date() : null;
+
+        Map<String, NodeControllerInfo> nodeControllerInfos = null;
+        if (hcc != null) {
+            nodeControllerInfos = hcc.getNodeControllerInfos();
+        }
+        XMLQueryCompiler compiler = new XMLQueryCompiler(listener, nodeControllerInfos, opts.frameSize,
+                opts.availableProcessors, opts.joinHashSize, opts.maximumDataSize, opts.hdfsConf);
+        resultSetId = createResultSetId();
+        CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
+                resultSetId, null);
+        compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel, this.collectionList);
+        // if -timing argument passed, show the starting and ending times
+        Date end = opts.timing ? new Date() : null;
+        if (opts.timing) {
+            timingMessage("Compile time: " + (end.getTime() - start.getTime()) + " ms");
+        }
+        if (opts.compileOnly) {
+            return;
+        }
+
+        Module module = compiler.getModule();
+        JobSpecification js = module.getHyracksJobSpecification();
+
+        DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
+        js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
+
+        // Repeat execution for number of times provided in -repeatexec argument
+        for (int i = 0; i < repeatedExecution; ++i) {
+            start = opts.timing ? new Date() : null;
+            runJob(js, writer);
+            // if -timing argument passed, show the starting and ending times
+            if (opts.timing) {
+                end = new Date();
+                long currentRun = end.getTime() - start.getTime();
+                if ((i + 1) > opts.timingIgnoreQueries) {
+                    sumTiming += currentRun;
+                    sumSquaredTiming += currentRun * currentRun;
+                    if (currentRun < minTiming) {
+                        minTiming = currentRun;
                     }
-                    timingMessage("Job (" + (i + 1) + ") execution time: " + currentRun + " ms");
+                    if (maxTiming < currentRun) {
+                        maxTiming = currentRun;
+                    }
                 }
+                timingMessage("Job (" + (i + 1) + ") execution time: " + currentRun + " ms");
             }
         }
     }

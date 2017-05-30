@@ -16,7 +16,7 @@
    under the License. :)
    
 (: Search Lucene Index :)
-for $r in collection-from-index("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2", "/dataCollection/data")/data
+for $r in collection("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2")/dataCollection/data
 let $datetime := xs:dateTime(fn:data($r/date))
 where $r/station eq "GHCND:AS000000003" 
     and fn:year-from-dateTime($datetime) ge 2000

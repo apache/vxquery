@@ -55,12 +55,9 @@ public class PushChildIntoDataScanRule extends AbstractPushExpressionIntoDatasca
 
     @Override
     boolean updateDataSource(IVXQueryDataSource datasource, Mutable<ILogicalExpression> expression) {
-        //TODO: indexing needs to be extended to support push child into datascan
-        if (datasource.usingIndex()) {
-            return false;
-        }
-        boolean added = false;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+        boolean added = false;
+
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.CHILD.getFunctionIdentifier(), finds);
         for (int i = finds.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(finds.get(i - 1));

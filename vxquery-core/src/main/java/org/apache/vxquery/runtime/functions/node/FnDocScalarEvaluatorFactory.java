@@ -79,7 +79,7 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 try {
                     // Only one document should be parsed so its ok to have a unique parser.
                     IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
-                    FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
+                    FunctionHelper.readInDocFromPointable(stringp, abvs, parser);
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }

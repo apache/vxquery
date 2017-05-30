@@ -18,6 +18,6 @@
 (: Search Lucene Index :)
 (: Find all the weather readings for Washington state for a specific day    :)
 (: 2002-2-2.                                                                  :)
-for $r in collection-from-index("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2", "/dataCollection/data")/data
+for $r in collection("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2")/dataCollection/data
 where xs:dateTime(fn:data($r/date)) eq xs:dateTime("2002-02-02T00:00:00.000")
 return $r

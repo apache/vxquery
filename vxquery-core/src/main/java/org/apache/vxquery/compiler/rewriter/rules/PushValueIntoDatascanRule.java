@@ -59,6 +59,9 @@ public class PushValueIntoDatascanRule extends AbstractPushExpressionIntoDatasca
 
     @Override
     boolean updateDataSource(IVXQueryDataSource datasource, Mutable<ILogicalExpression> expression) {
+        if (datasource.usingIndex()) {
+            return false;
+        }
         VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) datasource;
         boolean added = false;
         List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();

@@ -35,7 +35,8 @@ public class VXQueryCommons {
 
     static {
         indexingFunctions.add(BuiltinFunctions.FN_BUILD_INDEX_ON_COLLECTION_1.getFunctionIdentifier());
-        indexingFunctions.add(BuiltinFunctions.FN_COLLECTION_FROM_INDEX_2.getFunctionIdentifier());
+        indexingFunctions.add(BuiltinFunctions.FN_COLLECTION_1.getFunctionIdentifier());
+        indexingFunctions.add(BuiltinFunctions.FN_COLLECTION_FROM_INDEX_1.getFunctionIdentifier());
         indexingFunctions.add(BuiltinFunctions.FN_DELETE_INDEX_1.getFunctionIdentifier());
         indexingFunctions.add(BuiltinFunctions.FN_UPDATE_INDEX_1.getFunctionIdentifier());
     }

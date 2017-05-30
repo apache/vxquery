@@ -16,10 +16,14 @@
 */
 package org.apache.vxquery.runtime.functions.index;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
-import org.apache.hyracks.dataflow.common.comm.util.ByteBufferInputStream;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -31,38 +35,31 @@ import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexDocumentBuilder;
-import org.apache.vxquery.runtime.functions.index.updateIndex.MetaFileUtil;
-import org.apache.vxquery.runtime.functions.index.updateIndex.XmlMetadata;
+import org.apache.vxquery.runtime.functions.index.update.MetaFileUtil;
+import org.apache.vxquery.runtime.functions.index.update.XmlMetadata;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.xmlparser.IParser;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.XMLParser;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.concurrent.ConcurrentHashMap;
-
 public class IndexConstructorUtil {
-     boolean isMetaFilePresent = false;
-     MetaFileUtil metaFileUtil;
-     ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
+    private final TaggedValuePointable nodep = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+    private final SequenceBuilder sb = new SequenceBuilder();
+    private boolean isMetaFilePresent = false;
+    private MetaFileUtil metaFileUtil;
+    private ConcurrentHashMap<String, XmlMetadata> metadataMap = new ConcurrentHashMap<>();
 
-    public void evaluate(String collectioFolder, String indexFolder, IPointable result, UTF8StringPointable
-            stringp, ByteBufferInputStream bbis, DataInputStream di, SequenceBuilder sb, ArrayBackedValueStorage abvs,
-            ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, TaggedValuePointable nodep,
-            boolean isElementPath, String nodeId) throws SystemException {
+    public void evaluate(String collectioFolder, String indexFolder, IPointable result, ArrayBackedValueStorage abvs,
+            ITreeNodeIdProvider nodeIdProvider, ArrayBackedValueStorage abvsFileNode, boolean isElementPath,
+            String nodeId) throws IOException {
 
-            metaFileUtil = new MetaFileUtil(indexFolder);
-//            metaFileUtil = .create(indexFolder);
-            isMetaFilePresent = metaFileUtil.isMetaFilePresent();
-            metaFileUtil.setCollection(collectioFolder);
+        metaFileUtil = new MetaFileUtil(indexFolder);
+        isMetaFilePresent = metaFileUtil.isMetaFilePresent();
+        metaFileUtil.setCollection(collectioFolder);
 
         File collectionDirectory = new File(collectioFolder);
         if (!collectionDirectory.exists()) {
-            throw new RuntimeException("The collection directory (" + collectioFolder + ") does not exist.");
+            throw new IOException("The collection directory (" + collectioFolder + ") does not exist.");
         }
 
         try {
@@ -80,8 +77,7 @@ public class IndexConstructorUtil {
             IndexWriter writer = new IndexWriter(dir, iwc);
 
             //Add files to index
-            indexXmlFiles(collectionDirectory, writer, isElementPath, nodep, abvsFileNode, nodeIdProvider, sb, bbis, di,
-                    nodeId);
+            indexXmlFiles(collectionDirectory, writer, isElementPath, abvsFileNode, nodeIdProvider, sb, nodeId);
 
             if (!isMetaFilePresent) {
                 // Write metadata map to a file.
@@ -101,14 +97,13 @@ public class IndexConstructorUtil {
         }
     }
 
-    /*This function goes recursively one file at a time. First it turns the file into an ABVS document node, then
+    /*
+     * This function goes recursively one file at a time. First it turns the file into an ABVS document node, then
      * it indexes that document node.
      */
     public void indexXmlFiles(File collectionDirectory, IndexWriter writer, boolean isElementPath,
-            TaggedValuePointable nodep, ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider,
-            SequenceBuilder sb, ByteBufferInputStream bbis, DataInputStream di, String nodeId)
-            throws SystemException, IOException {
-
+            ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider, SequenceBuilder sb, String nodeId)
+            throws IOException {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy, HH:mm:ss");
 
         for (File file : collectionDirectory.listFiles()) {
@@ -116,8 +111,7 @@ public class IndexConstructorUtil {
             if (readableXmlFile(file.getPath())) {
                 abvsFileNode.reset();
 
-                IndexDocumentBuilder ibuilder = getIndexBuilder(file, writer, nodep, abvsFileNode, nodeIdProvider, bbis,
-                        di, nodeId);
+                IndexDocumentBuilder ibuilder = getIndexBuilder(file, writer, abvsFileNode, nodeIdProvider, nodeId);
 
                 ibuilder.printStart();
                 if (!isMetaFilePresent) {
@@ -131,22 +125,21 @@ public class IndexConstructorUtil {
 
             } else if (file.isDirectory()) {
                 // Consider all XML file in sub directories.
-                indexXmlFiles(file, writer, isElementPath, nodep, abvsFileNode, nodeIdProvider, sb, bbis, di, nodeId);
+                indexXmlFiles(file, writer, isElementPath, abvsFileNode, nodeIdProvider, sb, nodeId);
             }
         }
     }
 
     public boolean readableXmlFile(String path) {
-        return (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".xml.gz"));
+        return path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".xml.gz");
     }
 
-    public IndexDocumentBuilder getIndexBuilder(File file, IndexWriter writer, TaggedValuePointable nodep,
-            ArrayBackedValueStorage abvsFileNode, ITreeNodeIdProvider nodeIdProvider, ByteBufferInputStream bbis,
-            DataInputStream di, String nodeId) throws IOException {
+    public IndexDocumentBuilder getIndexBuilder(File file, IndexWriter writer, ArrayBackedValueStorage abvsFileNode,
+            ITreeNodeIdProvider nodeIdProvider, String nodeId) throws IOException {
 
         //Get the document node
         IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
-        FunctionHelper.readInDocFromString(file.getPath(), bbis, di, abvsFileNode, parser);
+        FunctionHelper.readInDocFromString(file.getPath(), abvsFileNode, parser);
 
         nodep.set(abvsFileNode.getByteArray(), abvsFileNode.getStartOffset(), abvsFileNode.getLength());
 

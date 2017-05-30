@@ -78,7 +78,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
                 tvp.getValue(stringp);
                 try {
                     IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
-                    FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
+                    FunctionHelper.readInDocFromPointable(stringp, abvs, parser);
                     XDMConstants.setTrue(result);
                 } catch (Exception e) {
                     XDMConstants.setFalse(result);

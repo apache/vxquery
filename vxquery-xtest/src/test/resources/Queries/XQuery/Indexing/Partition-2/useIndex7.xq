@@ -18,8 +18,8 @@
 (: Search Lucene Index :)
 (: Find all the weather readings for Washington state for a specific day    :)
 (: 2002-2-2.                                                                  :)
-for $s in collection-from-index("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2", "/stationCollection/station")/station
-for $r in collection-from-index("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2", "/dataCollection/data")/data
+for $s in collection("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2")/stationCollection/station
+for $r in collection("src/test/resources/TestSources/ghcnd/half_1|src/test/resources/TestSources/ghcnd/half_2")/dataCollection/data
     
 where $s/id eq $r/station 
     and (some $x in $s/locationLabels satisfies ($x/type eq "ST" and fn:upper-case(fn:data($x/displayName)) eq "STATE 1"))

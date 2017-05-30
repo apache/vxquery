@@ -33,19 +33,19 @@ import org.apache.vxquery.types.SequenceType;
 public class IntroduceIndexingRule extends AbstractCollectionRule {
 
     @Override
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
         String args[] = getFunctionalArguments(opRef, VXQueryCommons.indexingFunctions);
 
         if (args != null) {
 
             String collection = args[0];
-            String elementPath = args.length > 1?args[1]:null;
-
             // Build the new operator and update the query plan.
             int collectionId = vxqueryContext.newCollectionId();
-            VXQueryIndexingDataSource ids = VXQueryIndexingDataSource.create(collectionId, collection, elementPath,
-                    SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR), functionCall.getFunctionIdentifier().getName());
+            VXQueryIndexingDataSource ids = VXQueryIndexingDataSource.create(collectionId, collection,
+                    SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR),
+                    functionCall.getFunctionIdentifier().getName());
             if (ids != null) {
                 ids.setTotalDataSources(vxqueryContext.getTotalDataSources());
 

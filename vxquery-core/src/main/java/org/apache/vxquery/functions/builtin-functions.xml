@@ -152,7 +152,6 @@
     <!-- fn:collection-from-index($indexfolder  as xs:string?, $elementpath as xs:string?) as  node()* -->
     <function name="fn:collection-from-index">
         <param name="index-folder" type="xs:string?"/>
-        <param name="element-path" type="xs:string?"/>
         <return type="node()*"/>
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
@@ -166,7 +165,7 @@
     <!-- fn:show-indexes as node()* -->
     <function name="fn:show-indexes">
         <return type="node()*"/>
-        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.ShowIndexScalarEvaluatorFactory"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.index.ShowIndexesScalarEvaluatorFactory"/>
     </function>
 
     <!-- fn:collection-with-tag($arg1  as xs:string?, $arg2 as xs:string?) as  node()* -->

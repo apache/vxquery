@@ -31,14 +31,11 @@ import org.apache.vxquery.compiler.rewriter.rules.CollectionFileDomain;
  */
 public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
 
-    private String elementPath;
     private String function;
 
-    private VXQueryIndexingDataSource(int id, String collection, String elementPath, Object[] types,
-            String functionCall) {
+    private VXQueryIndexingDataSource(int id, String collection, Object[] types, String functionCall) {
         this.dataSourceId = id;
         this.collectionName = collection;
-        this.elementPath = elementPath;
         this.function = functionCall;
         this.collectionPartitions = collectionName.split(DELIMITER);
         this.types = types;
@@ -56,13 +53,8 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
         this.valueSeq = new ArrayList<>();
     }
 
-    public static VXQueryIndexingDataSource create(int id, String collection, String index, Object type,
-            String function) {
-        return new VXQueryIndexingDataSource(id, collection, index, new Object[] { type }, function);
-    }
-
-    public String getElementPath() {
-        return elementPath;
+    public static VXQueryIndexingDataSource create(int id, String collection, Object type, String function) {
+        return new VXQueryIndexingDataSource(id, collection, new Object[] { type }, function);
     }
 
     public String getFunctionCall() {
@@ -71,7 +63,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
 
     @Override
     public String toString() {
-        return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", elementPath=" + elementPath
+        return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", elementPath=" + this.childSeq
                 + ", function=" + function + "]";
     }
 

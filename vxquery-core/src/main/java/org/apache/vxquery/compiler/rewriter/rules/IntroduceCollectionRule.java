@@ -16,12 +16,16 @@
  */
 package org.apache.vxquery.compiler.rewriter.rules;
 
+import java.util.ArrayList;
+
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.IOptimizationContext;
 import org.apache.vxquery.common.VXQueryCommons;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
+import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
+import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.types.AnyItemType;
 import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
@@ -61,11 +65,35 @@ public class IntroduceCollectionRule extends AbstractCollectionRule {
     public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) {
         VXQueryOptimizationContext vxqueryContext = (VXQueryOptimizationContext) context;
         String[] args = getFunctionalArguments(opRef, VXQueryCommons.collectionFunctions);
-
+        VXQueryMetadataProvider metadata = (VXQueryMetadataProvider) context.getMetadataProvider();
         if (args != null) {
             String collectionName = args[0];
             // Build the new operator and update the query plan.
             int collectionId = vxqueryContext.newCollectionId();
+            ArrayList<String> collectionTempName = new ArrayList<String>();
+            collectionTempName.add(collectionName);
+            if (collectionName.contains("|")) {
+                collectionTempName.remove(0);
+                int index = collectionName.indexOf("|");
+                int start = 0;
+                while (index >= 0) {
+                    collectionTempName.add(collectionName.substring(start, index));
+                    start = index + 1;
+                    index = collectionName.indexOf("|", index + 1);
+                    if (index == -1) {
+                        collectionTempName.add(collectionName.substring(start));
+                    }
+                }
+            }
+            if (metadata.hasIndex(collectionTempName)) {
+                VXQueryIndexingDataSource ids = VXQueryIndexingDataSource.create(collectionId, collectionName,
+                        SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR),
+                        functionCall.getFunctionIdentifier().getName());
+                if (ids != null) {
+                    ids.setTotalDataSources(vxqueryContext.getTotalDataSources());
+                    return setDataSourceScan(ids, opRef);
+                }
+            }
             VXQueryCollectionDataSource ds = VXQueryCollectionDataSource.create(collectionId, collectionName,
                     SequenceType.create(AnyItemType.INSTANCE, Quantifier.QUANT_STAR));
             if (ds != null) {

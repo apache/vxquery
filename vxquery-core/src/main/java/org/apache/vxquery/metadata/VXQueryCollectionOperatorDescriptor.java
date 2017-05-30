@@ -59,7 +59,6 @@ import org.apache.hyracks.api.job.IOperatorDescriptorRegistry;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
 import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
-import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
 import org.apache.hyracks.dataflow.std.base.AbstractSingleActivityOperatorDescriptor;
 import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperatorNodePushable;
 import org.apache.hyracks.hdfs.ContextFactory;
@@ -129,38 +128,14 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             public void nextFrame(ByteBuffer buffer) throws HyracksDataException {
                 fta.reset(buffer);
                 String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
-                Reader input;
+
                 if (!collectionModifiedName.contains("hdfs:/")) {
                     File collectionDirectory = new File(collectionModifiedName);
                     // check if directory is in the local file system
                     if (collectionDirectory.exists()) {
                         // Go through each tuple.
                         if (collectionDirectory.isDirectory()) {
-                            for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-                                Iterator<File> it = FileUtils.iterateFiles(collectionDirectory,
-                                        new VXQueryIOFileFilter(), TrueFileFilter.INSTANCE);
-                                while (it.hasNext()) {
-                                    File file = it.next();
-                                    String fileName = file.getName().toLowerCase();
-                                    if (fileName.endsWith(".xml")) {
-                                        if (LOGGER.isLoggable(Level.FINE)) {
-                                            LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
-                                        }
-                                        parser.parseElements(file, writer, tupleIndex);
-                                    } else if (fileName.endsWith(".json")) {
-                                        if (LOGGER.isLoggable(Level.FINE)) {
-                                            LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());
-                                        }
-                                        try {
-                                            jsonAbvs.reset();
-                                            input = new InputStreamReader(new FileInputStream(file));
-                                            jparser.parse(input, jsonAbvs, writer, appender);
-                                        } catch (FileNotFoundException e) {
-                                            throw new HyracksDataException(e.toString());
-                                        }
-                                    }
-                                }
-                            }
+                            xmlAndJsonCollection(collectionDirectory);
                         } else {
                             throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
                                     + collectionDirectory.getAbsolutePath() + ") passed to collection.");
@@ -267,6 +242,35 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             fs.close();
                         } catch (Exception e) {
                             throw new HyracksDataException(e);
+                        }
+                    }
+                }
+            }
+
+            public void xmlAndJsonCollection(File directory) throws HyracksDataException {
+                Reader input;
+                for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
+                    Iterator<File> it = FileUtils.iterateFiles(directory, new VXQueryIOFileFilter(),
+                            TrueFileFilter.INSTANCE);
+                    while (it.hasNext()) {
+                        File file = it.next();
+                        String fileName = file.getName().toLowerCase();
+                        if (fileName.endsWith(".xml")) {
+                            if (LOGGER.isLoggable(Level.FINE)) {
+                                LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
+                            }
+                            parser.parseElements(file, writer, tupleIndex);
+                        } else if (fileName.endsWith(".json")) {
+                            if (LOGGER.isLoggable(Level.FINE)) {
+                                LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());
+                            }
+                            try {
+                                jsonAbvs.reset();
+                                input = new InputStreamReader(new FileInputStream(file));
+                                jparser.parse(input, jsonAbvs, writer, appender);
+                            } catch (FileNotFoundException e) {
+                                throw new HyracksDataException(e.toString());
+                            }
                         }
                     }
                 }

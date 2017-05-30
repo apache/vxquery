@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.vxquery.runtime.functions.index.indexCentralizer;
+package org.apache.vxquery.runtime.functions.index.centralizer;
 
 import java.io.DataOutput;
 import java.io.File;
@@ -49,46 +49,54 @@ import org.apache.vxquery.datamodel.values.ValueTag;
  */
 public class IndexCentralizerUtil {
 
-    private final String FILE_NAME = "VXQuery-Index-Directory.xml";
+    private static final String FILE_NAME = "VXQuery-Index-Directory.xml";
     private final List<String> collections = new ArrayList<>();
-    private final Logger LOGGER = Logger.getLogger("IndexCentralizerUtil");
-    private File XML_FILE;
-    private String INDEX_LOCATION;
-    private static ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
+    private static final Logger LOGGER = Logger.getLogger("IndexCentralizerUtil");
+    private File xmlFile;
+    private String indexPath;
+    public static ConcurrentHashMap<String, IndexLocator> indexCollectionMap = new ConcurrentHashMap<>();
+    private static final StringValueBuilder svb = new StringValueBuilder();
+    private final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
+    private final DataOutput output = abvs.getDataOutput();
 
     public IndexCentralizerUtil(File index) {
-        this.INDEX_LOCATION = index.getPath();
+        indexPath = index.getPath();
         if (!index.exists()) {
             try {
                 FileUtils.forceMkdir(index);
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Could not create the index directory for path: " + INDEX_LOCATION + " " + e);
+                LOGGER.log(Level.SEVERE, "Could not create the index directory for path: " + indexPath + " " + e);
             }
         }
-        XML_FILE = new File(index.getPath() + "/" + FILE_NAME);
+        xmlFile = new File(index.getPath() + "/" + FILE_NAME);
     }
 
     /**
      * Get the index directory containing index of the given collection
      *
-     * @param collection : Collection folder
+     * @param collection
+     *            : Collection folder
      * @return Index folder.
      */
     public String getIndexForCollection(String collection) {
-        return indexCollectionMap.get(collection).getIndex();
+        if (indexCollectionMap.size() > 0 && indexCollectionMap.containsKey(collection)) {
+            return indexCollectionMap.get(collection).getIndex();
+        }
+        return null;
     }
 
     /**
      * Put the index location corresponding to given collection.
      * Index location is created by using the last 100 characters of collection.
      *
-     * @param collection : Collection directory
+     * @param collection
+     *            : Collection directory
      * @return index
      */
     public String putIndexForCollection(String collection) {
         int length = collection.replaceAll("/", "").length();
         String index = collection.replaceAll("/", "");
-        index = INDEX_LOCATION + "/" + (length > 100 ? index.substring(length - 100) : index);
+        index = indexPath + "/" + (length > 100 ? index.substring(length - 100) : index);
         IndexLocator il = new IndexLocator();
         il.setCollection(collection);
         il.setIndex(index);
@@ -102,7 +110,8 @@ public class IndexCentralizerUtil {
     /**
      * Remove the entry for given collection directory.
      *
-     * @param collection : Collection directory
+     * @param collection
+     *            : Collection directory
      */
     public void deleteEntryForCollection(String collection) {
         indexCollectionMap.remove(collection);
@@ -110,14 +119,15 @@ public class IndexCentralizerUtil {
 
     /**
      * Prints all collections which have an index created.
-     * @param sb : The output is stored in a sequence
-     * @throws IOException : If writing the dataOutput generates {@link IOException}
+     *
+     * @param sb
+     *            : The output is stored in a sequence
+     * @throws IOException
+     *             : If writing the dataOutput generates {@link IOException}
      */
     public void getAllCollections(SequenceBuilder sb) throws IOException {
         for (String s : collections) {
-            StringValueBuilder svb = new StringValueBuilder();
-            ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-            DataOutput output = abvs.getDataOutput();
+            abvs.reset();
             output.write(ValueTag.XS_STRING_TAG);
             svb.write(s, output);
             sb.addItem(abvs);
@@ -128,11 +138,11 @@ public class IndexCentralizerUtil {
      * Read the collection, index directory file and populate the HashMap.
      */
     public void readIndexDirectory() {
-        if (this.XML_FILE.exists()) {
+        if (xmlFile.exists()) {
             try {
                 JAXBContext jaxbContext = JAXBContext.newInstance(IndexDirectory.class);
                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                IndexDirectory indexDirectory = (IndexDirectory) jaxbUnmarshaller.unmarshal(this.XML_FILE);
+                IndexDirectory indexDirectory = (IndexDirectory) jaxbUnmarshaller.unmarshal(xmlFile);
 
                 for (IndexLocator il : indexDirectory.getDirectory()) {
                     indexCollectionMap.put(il.getCollection(), il);
@@ -153,7 +163,7 @@ public class IndexCentralizerUtil {
         List<IndexLocator> indexLocators = new ArrayList<>(indexCollectionMap.values());
         id.setDirectory(indexLocators);
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(this.XML_FILE);
+            FileOutputStream fileOutputStream = new FileOutputStream(this.xmlFile);
             JAXBContext context = JAXBContext.newInstance(IndexDirectory.class);
             Marshaller jaxbMarshaller = context.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

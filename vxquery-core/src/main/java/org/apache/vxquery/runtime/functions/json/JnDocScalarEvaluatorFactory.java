@@ -64,7 +64,7 @@ public class JnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 tvp.getValue(stringp);
                 try {
                     IParser parser = new JSONParser();
-                    FunctionHelper.readInDocFromPointable(stringp, bbis, di, abvs, parser);
+                    FunctionHelper.readInDocFromPointable(stringp, abvs, parser);
                 } catch (IOException e) {
                     throw new SystemException(ErrorCode.FODC0002, e);
                 }

@@ -59,15 +59,17 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     private final Map<String, File> sourceFileMap;
     private final StaticContext staticCtx;
     private final String hdfsConf;
+    private final List<String> collections;
     private final Map<String, NodeControllerInfo> nodeControllerInfos;
 
     public VXQueryMetadataProvider(String[] nodeList, Map<String, File> sourceFileMap, StaticContext staticCtx,
-            String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos) {
+            String hdfsConf, Map<String, NodeControllerInfo> nodeControllerInfos, List<String> collections) {
         this.nodeList = nodeList;
         this.sourceFileMap = sourceFileMap;
         this.staticCtx = staticCtx;
         this.hdfsConf = hdfsConf;
         this.nodeControllerInfos = nodeControllerInfos;
+        this.collections = collections;
     }
 
     @Override
@@ -111,8 +113,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             constraint = getClusterLocations(nodeList, ds.getPartitionCount());
         } else {
             rDesc = new RecordDescriptor(new ISerializerDeserializer[opSchema.getSize()]);
-            scanner = new VXQueryIndexingOperatorDescriptor(jobSpec, (VXQueryIndexingDataSource) ds, rDesc,
-                    this.hdfsConf, this.nodeControllerInfos);
+            scanner = new VXQueryIndexingOperatorDescriptor(jobSpec, (VXQueryIndexingDataSource) ds, rDesc);
             constraint = getClusterLocations(nodeList, ds.getPartitionCount());
         }
 
@@ -142,7 +143,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
     @Override
     public Pair<IPushRuntimeFactory, AlgebricksPartitionConstraint> getWriteFileRuntime(IDataSink sink,
             int[] printColumns, IPrinterFactory[] printerFactories, RecordDescriptor inputDesc)
-            throws AlgebricksException {
+                    throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
 
@@ -168,7 +169,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             IOperatorSchema[] inputSchemas, IVariableTypeEnvironment typeEnv, List<LogicalVariable> primaryKeys,
             List<LogicalVariable> secondaryKeys, List<LogicalVariable> additionalNonKeyFields,
             ILogicalExpression filterExpr, RecordDescriptor recordDesc, JobGenContext context, JobSpecification spec)
-            throws AlgebricksException {
+                    throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
 
@@ -234,7 +235,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             JobGenContext context, JobSpecification spec, boolean bulkload) throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getInsertRuntime(IDataSource<String> dataSource,
             IOperatorSchema propagatedSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
@@ -243,7 +244,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             JobSpecification jobSpec, boolean bulkload) throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getUpsertRuntime(IDataSource<String> dataSource,
             IOperatorSchema inputSchema, IVariableTypeEnvironment typeEnv, List<LogicalVariable> keys,
@@ -252,7 +253,7 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             JobSpecification jobSpec) throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public Pair<IOperatorDescriptor, AlgebricksPartitionConstraint> getIndexUpsertRuntime(
             IDataSourceIndex<String, String> dataSourceIndex, IOperatorSchema propagatedSchema,
@@ -263,11 +264,26 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
             JobSpecification spec) throws AlgebricksException {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public Map<String, String> getConfig() {
         return new HashMap<>();
     }
 
+    public List<String> getIndexCollections() {
+        return collections;
+
+    }
+
+    public boolean hasIndex(ArrayList<String> collections) {
+        boolean indexExists = false;
+        for (String collection : collections) {
+            indexExists = getIndexCollections().contains(collection);
+            if (!indexExists) {
+                break;
+            }
+        }
+        return indexExists;
+    }
 
 }

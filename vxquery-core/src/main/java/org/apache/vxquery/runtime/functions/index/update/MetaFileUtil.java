@@ -14,16 +14,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.vxquery.runtime.functions.index.updateIndex;
+package org.apache.vxquery.runtime.functions.index.update;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,13 +29,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 /**
  * Utility class for writing, reading metadata file and generating checksum.
  */
 public class MetaFileUtil {
 
     private File metaFile;
-    private Logger LOGGER = Logger.getLogger("MetadataFileUtil");
+    private static final Logger LOGGER = Logger.getLogger("MetadataFileUtil");
     private String index;
     private String collection;
     private ConcurrentHashMap<String, XmlMetadata> indexMap = new ConcurrentHashMap<>();
@@ -65,8 +66,11 @@ public class MetaFileUtil {
      * Update the content of the metadata map.
      * If the current collection data is present, replace it.
      * Otherwise insert new.
-     * @param metadataMap : Set of XmlMetaData objects.
-     * @param index : The path to index location.
+     *
+     * @param metadataMap
+     *            : Set of XmlMetaData objects.
+     * @param index
+     *            : The path to index location.
      */
     public void updateMetadataMap(ConcurrentHashMap<String, XmlMetadata> metadataMap, String index) {
         this.indexMap = metadataMap;
@@ -109,22 +113,22 @@ public class MetaFileUtil {
      * Write the content of the ConcurrentHashMap to the xml metadata file.
      */
     public void writeMetadataToFile() {
-        XmlMetadataCollection collection = new XmlMetadataCollection();
+        XmlMetadataCollection xmlMetadataCollection = new XmlMetadataCollection();
         List<XmlMetadata> metadataList = new ArrayList<>();
 
         for (Map.Entry<String, XmlMetadata> entry : this.indexMap.entrySet()) {
             metadataList.add(entry.getValue());
         }
 
-        collection.setMetadataList(metadataList);
-        collection.setCollection(this.collection);
-        collection.setIndexLocation(this.index);
-        try{
+        xmlMetadataCollection.setMetadataList(metadataList);
+        xmlMetadataCollection.setCollection(collection);
+        xmlMetadataCollection.setIndexLocation(this.index);
+        try {
             FileOutputStream fileOutputStream = new FileOutputStream(this.metaFile);
             JAXBContext jaxbContext = JAXBContext.newInstance(VXQueryIndex.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.marshal(collection, fileOutputStream);
+            jaxbMarshaller.marshal(xmlMetadataCollection, fileOutputStream);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.log(Level.DEBUG, "Writing metadata file completed successfully!");
@@ -135,18 +139,18 @@ public class MetaFileUtil {
             }
         }
 
-
     }
-
 
     /**
      * Generate MD5 checksum string for a given file.
      *
-     * @param file : File which the checksum should be generated.
+     * @param file
+     *            : File which the checksum should be generated.
      * @return : Checksum String
-     * @throws IOException : The file is not available
+     * @throws IOException
+     *             : The file is not available
      */
-    public String generateMD5(File file) throws  IOException {
+    public String generateMD5(File file) throws IOException {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(Files.readAllBytes(file.toPath()));
@@ -168,12 +172,12 @@ public class MetaFileUtil {
     public boolean deleteMetaDataFile() {
         try {
             Files.delete(Paths.get(metaFile.getCanonicalPath()));
-            if (LOGGER.isDebugEnabled()){
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.log(Level.DEBUG, "Metadata file deleted!");
             }
             return true;
         } catch (IOException e) {
-            if (LOGGER.isTraceEnabled()){
+            if (LOGGER.isTraceEnabled()) {
                 LOGGER.log(Level.ERROR, "Metadata file could not be deleted!");
             }
             return false;
@@ -182,6 +186,7 @@ public class MetaFileUtil {
 
     /**
      * Get the collection for a given index location.
+     *
      * @return collection folder for a given index.
      */
     public String getCollection() {
@@ -190,7 +195,9 @@ public class MetaFileUtil {
 
     /**
      * Set the entry for given index and collection.
-     * @param collection : path to corresponding collection
+     *
+     * @param collection
+     *            : path to corresponding collection
      */
     public void setCollection(String collection) {
         this.collection = collection;
