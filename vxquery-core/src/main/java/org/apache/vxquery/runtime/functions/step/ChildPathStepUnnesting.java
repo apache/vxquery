@@ -18,7 +18,6 @@ package org.apache.vxquery.runtime.functions.step;
 
 import java.io.IOException;
 
-import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
@@ -109,7 +108,7 @@ public class ChildPathStepUnnesting extends AbstractForwardAxisPathStep {
      * @param result
      *            result
      * @return found result
-     * @throws AlgebricksException
+     * @throws HyracksDataException
      *             Could not save result.
      */
     protected boolean stepNodeTree(TaggedValuePointable tvpInput, int level, IPointable result)

@@ -16,8 +16,9 @@
 Apache VXQuery
 
   Apache VXQuery\x99 will be a standards compliant XML Query processor implemented in Java.
-  The focus is on the evaluation of queries on large amounts of XML data.
-  Specifically the goal is to evaluate queries on large collections of relatively small XML documents.
+  The XQuery processor supports the {{{http://www.jsoniq.org/}JSONiq}} extension to XQuery.
+  The focus is on the evaluation of queries on large amounts of JSON and XML data.
+  Specifically the goal is to evaluate queries on large collections of relatively small JSON or XML documents.
   To achieve this queries will be evaluated on a cluster of shared nothing machines.
 
   There are lots of large collections of relatively small documents like e.g. the {{{http://www.sec.gov/info/edgar/ednews/dissemin.htm}EDGAR dataset}} or the {{{http://wiki.openstreetmap.org/wiki/Download}OpenStreetMap dataset}}.

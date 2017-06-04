@@ -17,7 +17,7 @@ Contributing Code
 
   The following steps outline how to submit code to the VXQuery community for inclusion.
   Please read the Developer {{{http://vxquery.apache.org/developer_get_started.html}Get Started}} Guide
-  to answer question about getting start as a developer.
+  to answer questions about getting start as a developer.
   VXQuery community supports two methods for contributing code to the project.
 
   [[1]] <<Submit a patch file to an open VXQuery issue.>>
@@ -55,12 +55,18 @@ Contributing Code
       VXQuery uses the following convention when creating a branch: authors_username/topic_or_issue
       (examples: prestonc/vxquery_142 or tillw/group_by_clause).
       The following branch name helps keep branches separated and keeps it easy to determine the author and topic.
+      The authors_username is very important when reviewing a developers code on your own machine.
 
+---
+git checkout master
+git pull
+git branch prestonc/vxquery_142
+git checkout prestonc/vxquery_142
+---
 
     * Make the change.
 
       :-)
-
 
     * Add new tests. (optional)
 
@@ -82,12 +88,19 @@ Contributing Code
 
       Remove an extra debug code and verify the patch only includes code for the change.
 
+    * Commit and push code.
+
+      Commit changes to the branch and push to github.
+
 
     * Create a github Pull Request.
 
       Once the work has been tested, a pull request can be created for the change branch.
       Please use the Apache VXQuery master as branch to compare the change branch.
-      The branch should be up-to-date with the lastest Apache VXQuery master branch.
+      The branch should be up-to-date with the latest Apache VXQuery master branch.
+
+      Git rebase is a nice option for keeping your code up-to-date with master without messing up the Pull Request.
+      (Merge will show changes in master as your changes on your branch.)
 
 
     * Post your Pull Request.
@@ -96,15 +109,40 @@ Contributing Code
       At least one other member of the community should review the change.
       If there is any feedback, address this and repeat the posting process.
 
+    * Update your Pull Request.
+
+      Update your change to address any comments from reviewers.
+
+    * Prepare your change for merge.
+
+      Squash your changes into a single commit with a nice commit message.
+      The commit message's first line should be less than 50 character and any additional comments
+      are included below a blank line.
+
+---
+VXQUERY-142: fn:doc support for source files
+
+The fn:doc function now supports reading files defined in the test suite XML source tag.
+---
+
+      Git rebase has a option of merging commits into a single commit that works nicely for squashing your changes.
+      ({{{http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html}git ready}} has a nice example.)
+      Although, this will not work if you happened use merge when updated to the latest master branch.
+
+
 ** Code Reviewer
 
     * Review the Pull Request.
 
-      Post inline or global comments for the developer.
+      Post in-line or global comments for the developer.
       Be polite in your suggestions.
       Guide the developer to bring the code up to VXQuery's code standards.
 
     * Double check the VXQuery and XQTS tests.
+
+      Each Pull Request automatically triggers a {{{https://asterix-jenkins.ics.uci.edu/job/vxquery-pr/}VXQuery Jenkins}}
+      job that runs all the tests.
+
 
 
 ** VXQuery Committer (author or sponsor of the change)
@@ -114,9 +152,39 @@ Contributing Code
   they are pushing on to the repository.
   Often the committer will also be the reviewer for non-committer changes.
 
+    * Add ASF as a git remote (first time committers).
+
+      Create a git remote for ASF repository. {{{https://git-wip-us.apache.org/repos/asf/vxquery.git}}}
+
     * Double check the VXQuery and XQTS tests.
+
+      A {{{https://asterix-jenkins.ics.uci.edu/job/vxquery-pr/}VXQuery Jenkins}} instance has been set up to
+      check the last ten Pull Requests.
+      The Pull Request being reviewed should pass all tests.
+      Each commit to a Pull Request will trigger a new test run.
+      Confirm the last test run passes all the tests.
+
+    * Double check the change.
+
+      Confirm the change has a single commit and includes a nice commit message.
 
     * Merge the change with ASF master.
 
-      When merging the change, do not rebase.
+      When merging the change, do not <<rebase>> (we do not want to change the Apache commit history).
       Instead do a single merge commit into Apache VXQuery master.
+      Since the Pull Request now has a single commit, an alternative would be to cherry pick that commit
+      from the given branch into master.
+
+---
+git checkout master
+git merge prestonc/vxquery_142
+git log
+---
+
+      Review the log to confirm the history is correct.
+
+
+    * Push change to ASF remote.
+
+      Confirm the log is correct on your local master.
+      Push master to the ASF remote.

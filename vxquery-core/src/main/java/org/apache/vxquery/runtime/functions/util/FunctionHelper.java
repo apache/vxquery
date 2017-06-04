@@ -1359,15 +1359,16 @@ public class FunctionHelper {
     }
 
     /**
-     * Writes a number to the DataOutput with zeros as place holders if the number is too small to fill the padding.
+     * Writes a number to the string builder with zeros as place holders if the number is too small to fill the padding.
      *
      * @param valueArg
      *            value
      * @param paddingArg
      *            padding
-     * @param dOut
-     *            data output
+     * @param sb
+     *            string builder
      * @throws IOException
+     *             Could not save result.
      */
     public static void writeNumberWithPadding(long valueArg, int paddingArg, UTF8StringBuilder sb) throws IOException {
         long value = valueArg;
