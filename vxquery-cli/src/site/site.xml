@@ -15,34 +15,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <project name="VXQuery">
-  <bannerLeft>
-    <name>VXQuery</name>
-    <src>../images/VXQuery.png</src>
-    <href>../index.html</href>
-  </bannerLeft>
+    <bannerLeft>
+        <name>VXQuery</name>
+        <src>../images/VXQuery.png</src>
+        <href>../index.html</href>
+    </bannerLeft>
 
-  <bannerRight>
-    <name>Apache Software Foundation</name>
-    <src>../images/asf_logo_wide.png</src>
-    <href>http://www.apache.org/</href>
-  </bannerRight>
+    <bannerRight>
+        <name>Apache Software Foundation</name>
+        <src>../images/asf_logo_wide.png</src>
+        <href>http://www.apache.org/</href>
+    </bannerRight>
 
-  <skin>
-    <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-fluido-skin</artifactId>
-    <version>1.5</version>
-  </skin>
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.5</version>
+    </skin>
 
-  <body>
-    <menu ref="reports"/>
-    <footer><![CDATA[
-      <div class="row-fluid">Apache VXQuery, VXQuery, Apache, the Apache
-        feather logo, and the Apache VXQuery project logo are either
-        registered trademarks or trademarks of The Apache Software
-        Foundation in the United States and other countries.
-        All other marks mentioned may be trademarks or registered
-        trademarks of their respective owners.</div>
-    ]]></footer>
-  </body>
+    <body>
+        <menu name="VXQuery CLI">
+            <item name="Overview" href="index.html"/>
+        </menu>
+
+        <menu ref="reports"/>
+        <footer><![CDATA[
+            <div class="row-fluid">Apache VXQuery, VXQuery, Apache, the Apache
+                feather logo, and the Apache VXQuery project logo are either
+                registered trademarks or trademarks of The Apache Software
+                Foundation in the United States and other countries.
+                All other marks mentioned may be trademarks or registered
+                trademarks of their respective owners.
+            </div>]]>
+        </footer>
+    </body>
 </project>
 

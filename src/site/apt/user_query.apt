@@ -35,21 +35,26 @@ vxq "path-to"\test.xq
   Command line options for all systems.
 
 ----------------------------------------
--O N                       : Optimization Level. Default: Full Optimization
--available-processors N    : Number of available processors. (default java's available processors)
--client-net-ip-address VAL : IP Address of the ClusterController
--client-net-port N         : Port of the ClusterController (default 1098)
--compileonly               : Compile the query and stop
--frame-size N              : Frame size in bytes. (default 65536)
--local-node-controllers N  : Number of local node controllers (default 1)
--repeatexec N              : Number of times to repeat execution
--showast                   : Show abstract syntax tree
--showoet                   : Show optimized expression tree
--showquery                 : Show query string
--showrp                    : Show Runtime plan
--showtet                   : Show translated expression tree
--timing                    : Produce timing information
--hdfs-conf VAL             : The folder containing the HDFS configuration files
+ -O N                      : Optimization Level. (default: Full Optimization)
+ -available-processors N   : Number of available processors. (default: java's available processors)
+ -buffer-size N            : Disk read buffer size in bytes.
+ -compileonly              : Compile the query and stop.
+ -frame-size N             : Frame size in bytes. (default: 65,536)
+ -hdfs-conf VAL            : Directory path to Hadoop configuration files
+ -join-hash-size N         : Join hash size in bytes. (default: 67,108,864)
+ -local-node-controllers N : Number of local node controllers. (default: 1)
+ -maximum-data-size N      : Maximum possible data size in bytes. (default: 150,323,855,000)
+ -repeatexec N             : Number of times to repeat execution.
+ -rest-ip-address VAL      : IP Address of the REST Server.
+ -rest-port N              : Port of REST Server.
+ -result-file VAL          : File path to save the query result.
+ -showast                  : Show abstract syntax tree.
+ -showoet                  : Show optimized expression tree.
+ -showquery                : Show query string.
+ -showrp                   : Show Runtime plan.
+ -showtet                  : Show translated expression tree.
+ -timing                   : Produce timing information.
+ -timing-ignore-queries N  : Ignore the first X number of quereies.
 ----------------------------------------
 
 * Java Options

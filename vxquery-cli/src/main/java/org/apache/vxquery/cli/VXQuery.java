@@ -14,73 +14,57 @@
  */
 package org.apache.vxquery.cli;
 
-import java.io.ByteArrayOutputStream;
+import static org.apache.vxquery.rest.Constants.HttpHeaderValues.CONTENT_TYPE_JSON;
+
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.net.InetAddress;
-import java.nio.file.Files;
+import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.LogManager;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.hyracks.api.client.HyracksConnection;
-import org.apache.hyracks.api.client.IHyracksClientConnection;
-import org.apache.hyracks.api.client.NodeControllerInfo;
-import org.apache.hyracks.api.comm.IFrame;
-import org.apache.hyracks.api.comm.IFrameTupleAccessor;
-import org.apache.hyracks.api.comm.VSizeFrame;
-import org.apache.hyracks.api.dataset.IHyracksDataset;
-import org.apache.hyracks.api.dataset.IHyracksDatasetReader;
-import org.apache.hyracks.api.dataset.ResultSetId;
-import org.apache.hyracks.api.job.JobFlag;
-import org.apache.hyracks.api.job.JobId;
-import org.apache.hyracks.api.job.JobSpecification;
-import org.apache.hyracks.client.dataset.HyracksDataset;
-import org.apache.hyracks.control.cc.ClusterControllerService;
-import org.apache.hyracks.control.common.controllers.CCConfig;
-import org.apache.hyracks.control.common.controllers.NCConfig;
-import org.apache.hyracks.control.nc.NodeControllerService;
-import org.apache.hyracks.control.nc.resources.memory.FrameManager;
-import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
-import org.apache.vxquery.compiler.CompilerControlBlock;
-import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
-import org.apache.vxquery.context.DynamicContext;
-import org.apache.vxquery.context.DynamicContextImpl;
-import org.apache.vxquery.context.RootStaticContextImpl;
-import org.apache.vxquery.context.StaticContextImpl;
-import org.apache.vxquery.exceptions.SystemException;
-import org.apache.vxquery.result.ResultUtils;
-import org.apache.vxquery.xmlquery.query.Module;
-import org.apache.vxquery.xmlquery.query.VXQueryCompilationListener;
-import org.apache.vxquery.xmlquery.query.XMLQueryCompiler;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.vxquery.app.util.LocalClusterUtil;
+import org.apache.vxquery.app.util.RestUtils;
+import org.apache.vxquery.rest.request.QueryRequest;
+import org.apache.vxquery.rest.response.AsyncQueryResponse;
+import org.apache.vxquery.rest.response.Error;
+import org.apache.vxquery.rest.response.ErrorResponse;
+import org.apache.vxquery.rest.response.Metrics;
+import org.apache.vxquery.rest.response.SyncQueryResponse;
+import org.apache.vxquery.rest.service.VXQueryConfig;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+/**
+ * CLI for VXQuery. This class is using the REST API to execute statements given by the user.
+ *
+ * @author Erandi Ganepola
+ */
 public class VXQuery {
-    private final CmdLineOptions opts;
-    private final CmdLineOptions indexOpts;
 
-    private ClusterControllerService cc;
-    private NodeControllerService[] ncs;
-    private IHyracksClientConnection hcc;
-    private IHyracksDataset hds;
-    private List<String> collectionList;
-    private ResultSetId resultSetId;
-    private static List<String> timingMessages = new ArrayList<>();
-    private static long sumTiming;
-    private static long sumSquaredTiming;
-    private static long minTiming = Long.MAX_VALUE;
-    private static long maxTiming = Long.MIN_VALUE;
+    private final CmdLineOptions opts;
+
+    private static LocalClusterUtil localClusterUtil;
+    private String restIpAddress;
+    private int restPort;
+
+    private static List<Metrics> metricsList = new ArrayList<>();
+    private int executionIteration;
 
     /**
      * Constructor to use command line options passed.
@@ -90,26 +74,17 @@ public class VXQuery {
      */
     public VXQuery(CmdLineOptions opts) {
         this.opts = opts;
-        // The index query returns only the result, without any other information.
-        this.indexOpts = opts;
-        indexOpts.showAST = false;
-        indexOpts.showOET = false;
-        indexOpts.showQuery = false;
-        indexOpts.showRP = false;
-        indexOpts.showTET = false;
-        indexOpts.timing = false;
-        indexOpts.compileOnly = false;
-        this.collectionList = new ArrayList<String>();
     }
 
     /**
      * Main method to get command line options and execute query process.
      *
      * @param args
-     * @throws Exception
+     *            command line arguments
      */
-    public static void main(String[] args) throws Exception {
-        Date start = new Date();
+    public static void main(String[] args) {
+        LogManager.getLogManager().reset();
+
         final CmdLineOptions opts = new CmdLineOptions();
         CmdLineParser parser = new CmdLineParser(opts);
 
@@ -120,243 +95,249 @@ public class VXQuery {
             parser.printUsage(System.err);
             return;
         }
-        if (opts.arguments.isEmpty()) {
+
+        if (opts.xqFiles.isEmpty()) {
             parser.printUsage(System.err);
             return;
         }
+
         VXQuery vxq = new VXQuery(opts);
-        vxq.execute();
-        // if -timing argument passed, show the starting and ending times
-        if (opts.timing) {
-            Date end = new Date();
-            timingMessage("Execution time: " + (end.getTime() - start.getTime()) + " ms");
-            if (opts.repeatExec > opts.timingIgnoreQueries) {
-                Double mean = (double) (sumTiming) / (opts.repeatExec - opts.timingIgnoreQueries);
-                double sd = Math.sqrt(sumSquaredTiming / (opts.repeatExec - opts.timingIgnoreQueries) - mean * mean);
-                timingMessage("Average execution time: " + mean + " ms");
-                timingMessage("Standard deviation: " + String.format("%.4f", sd));
-                timingMessage("Coefficient of variation: " + String.format("%.4f", sd / mean));
-                timingMessage("Minimum execution time: " + minTiming + " ms");
-                timingMessage("Maximum execution time: " + maxTiming + " ms");
-            }
-            System.out.println("Timing Summary:");
-            for (String time : timingMessages) {
-                System.out.println("  " + time);
-            }
-        }
-
+        vxq.execute(opts.xqFiles);
     }
 
-    /**
-     * Creates a new Hyracks connection with: the client IP address and port provided, if IP address is provided in command line. Otherwise create a new virtual
-     * cluster with Hyracks nodes. Queries passed are run either way. After running queries, if a virtual cluster has been created, it is shut down.
-     *
-     * @throws Exception
-     */
-    private void execute() throws Exception {
-        System.setProperty("vxquery.buffer_size", Integer.toString(opts.bufferSize));
+    private void execute(List<String> xqFiles) {
+        if (opts.restIpAddress == null) {
+            System.out.println("No REST Ip address given. Creating a local hyracks cluster");
 
-        if (opts.clientNetIpAddress != null) {
-            hcc = new HyracksConnection(opts.clientNetIpAddress, opts.clientNetPort);
-            runQueries();
-        } else {
-            if (!opts.compileOnly) {
-                startLocalHyracks();
-            }
+            VXQueryConfig vxqConfig = new VXQueryConfig();
+            vxqConfig.setAvailableProcessors(opts.availableProcessors);
+            vxqConfig.setFrameSize(opts.frameSize);
+            vxqConfig.setHdfsConf(opts.hdfsConf);
+            vxqConfig.setJoinHashSize(opts.joinHashSize);
+            vxqConfig.setMaximumDataSize(opts.maximumDataSize);
+
+            localClusterUtil = new LocalClusterUtil();
             try {
-                runQueries();
-            } finally {
-                if (!opts.compileOnly) {
-                    stopLocalHyracks();
-                }
+                localClusterUtil.init(vxqConfig);
+                restIpAddress = localClusterUtil.getIpAddress();
+                restPort = localClusterUtil.getRestPort();
+            } catch (Exception e) {
+                System.err.println("Unable to start local hyracks cluster due to: " + e.getMessage());
+                e.printStackTrace();
+                return;
+            }
+        } else {
+            restIpAddress = opts.restIpAddress;
+            restPort = opts.restPort;
+        }
+
+        System.out.println("Running queries given in: " + Arrays.toString(xqFiles.toArray()));
+        runQueries(xqFiles);
+
+        if (localClusterUtil != null) {
+            try {
+                localClusterUtil.deinit();
+            } catch (Exception e) {
+                System.err.println("Error occurred when stopping local hyracks: " + e.getMessage());
             }
         }
     }
 
-    /**
-     * Reads the contents of the files passed in the list of arguments to a string. If -showquery argument is passed, output the query as string. Run the query
-     * for the string.
-     *
-     * @throws IOException
-     * @throws SystemException
-     * @throws Exception
-     */
-
-    private void runQueries() throws Exception {
-        List<String> queries = opts.arguments;
-        // Run the showIndexes query before executing any target query, to store the index metadata
-        List<String> queriesIndex = new ArrayList<String>();
-        queriesIndex.add("vxquery-xtest/src/test/resources/Queries/XQuery/Indexing/Partition-1/showIndexes.xq");
-        OutputStream resultStream = new ByteArrayOutputStream();
-        executeQuery(queriesIndex.get(0), 1, resultStream, indexOpts);
-        ByteArrayOutputStream bos = (ByteArrayOutputStream) resultStream;
-        String result = new String(bos.toByteArray());
-        String[] collections = result.split("\n");
-        this.collectionList = Arrays.asList(collections);
-        executeQueries(queries);
-    }
-
-    public void executeQueries(List<String> queries) throws Exception {
-        for (String query : queries) {
-            OutputStream resultStream = System.out;
-            if (opts.resultFile != null) {
-                resultStream = new FileOutputStream(new File(opts.resultFile));
+    public void runQueries(List<String> xqFiles) {
+        for (String xqFile : xqFiles) {
+            String query;
+            try {
+                query = slurp(xqFile);
+            } catch (IOException e) {
+                System.err.println(String.format("Error occurred when reading XQuery file %s with message: %s", xqFile,
+                        e.getMessage()));
+                continue;
             }
-            executeQuery(query, opts.repeatExec, resultStream, opts);
+
+            System.out.println();
+            System.out.println("====================================================");
+            System.out.println("\tQuery - '" + xqFile + "'");
+            System.out.println("====================================================");
+
+            QueryRequest request = createQueryRequest(opts, query);
+            metricsList.clear();
+
+            for (int i = 0; i < opts.repeatExec; i++) {
+                System.out.println("**** Repetition : " + (i + 1) + " ****");
+
+                executionIteration = i;
+                sendQueryRequest(xqFile, request, this);
+            }
+
+            if (opts.repeatExec > 1) {
+                showTimingSummary();
+            }
         }
     }
 
-    public void executeQuery(String query, int repeatedExecution, OutputStream resultStream, CmdLineOptions options)
-            throws Exception {
-        PrintWriter writer = new PrintWriter(resultStream, true);
-        String qStr = slurp(query);
-        if (opts.showQuery) {
-            writer.println(qStr);
-        }
-        VXQueryCompilationListener listener = new VXQueryCompilationListener(opts.showAST, opts.showTET, opts.showOET,
-                opts.showRP);
-
-        Date start = opts.timing ? new Date() : null;
-
-        Map<String, NodeControllerInfo> nodeControllerInfos = null;
-        if (hcc != null) {
-            nodeControllerInfos = hcc.getNodeControllerInfos();
-        }
-        XMLQueryCompiler compiler = new XMLQueryCompiler(listener, nodeControllerInfos, opts.frameSize,
-                opts.availableProcessors, opts.joinHashSize, opts.maximumDataSize, opts.hdfsConf);
-        resultSetId = createResultSetId();
-        CompilerControlBlock ccb = new CompilerControlBlock(new StaticContextImpl(RootStaticContextImpl.INSTANCE),
-                resultSetId, null);
-        compiler.compile(query, new StringReader(qStr), ccb, opts.optimizationLevel, this.collectionList);
-        // if -timing argument passed, show the starting and ending times
-        Date end = opts.timing ? new Date() : null;
-        if (opts.timing) {
-            timingMessage("Compile time: " + (end.getTime() - start.getTime()) + " ms");
-        }
-        if (opts.compileOnly) {
+    private void onSuccess(String xqFile, QueryRequest request, SyncQueryResponse response) {
+        if (response == null) {
+            System.err.println(String.format("Unable to execute query %s", request.getStatement()));
             return;
         }
 
-        Module module = compiler.getModule();
-        JobSpecification js = module.getHyracksJobSpecification();
+        if (opts.showQuery) {
+            printField("Query", response.getStatement());
+        }
 
-        DynamicContext dCtx = new DynamicContextImpl(module.getModuleContext());
-        js.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
+        if (request.isShowMetrics()) {
+            String metrics = String.format("Compile Time:\t%d\nElapsed Time:\t%d",
+                    response.getMetrics().getCompileTime(), response.getMetrics().getElapsedTime());
+            printField("Metrics", metrics);
+        }
 
-        // Repeat execution for number of times provided in -repeatexec argument
-        for (int i = 0; i < repeatedExecution; ++i) {
-            start = opts.timing ? new Date() : null;
-            runJob(js, writer);
-            // if -timing argument passed, show the starting and ending times
-            if (opts.timing) {
-                end = new Date();
-                long currentRun = end.getTime() - start.getTime();
-                if ((i + 1) > opts.timingIgnoreQueries) {
-                    sumTiming += currentRun;
-                    sumSquaredTiming += currentRun * currentRun;
-                    if (currentRun < minTiming) {
-                        minTiming = currentRun;
-                    }
-                    if (maxTiming < currentRun) {
-                        maxTiming = currentRun;
-                    }
+        if (request.isShowAbstractSyntaxTree()) {
+            printField("Abstract Syntax Tree", response.getAbstractSyntaxTree());
+        }
+
+        if (request.isShowTranslatedExpressionTree()) {
+            printField("Translated Expression Tree", response.getTranslatedExpressionTree());
+        }
+
+        if (request.isShowOptimizedExpressionTree()) {
+            printField("Optimized Expression Tree", response.getOptimizedExpressionTree());
+        }
+
+        if (request.isShowRuntimePlan()) {
+            printField("Runtime Plan", response.getRuntimePlan());
+        }
+
+        printField("Results", response.getResults());
+
+        if (executionIteration >= opts.timingIgnoreQueries) {
+            metricsList.add(response.getMetrics());
+        }
+    }
+
+    private void onFailure(String xqFile, ErrorResponse response) {
+        if (response == null) {
+            System.err.println(String.format("Unable to execute query in %s", xqFile));
+            return;
+        }
+
+        System.err.println();
+        System.err.println("------------------------ Errors ---------------------");
+
+        Error error = response.getError();
+        String errorMsg = String.format("Code:\t %d\nMessage:\t %s", error.getCode(), error.getMessage());
+        printField(System.err, String.format("Errors for '%s'", xqFile), errorMsg);
+    }
+
+    /**
+     * Submits a query to be executed by the REST API. Will call {@link #onFailure(String, ErrorResponse)} if any error
+     * occurs when submitting the query. Else will call {@link #onSuccess(String, QueryRequest, SyncQueryResponse)} with
+     * the {@link AsyncQueryResponse}
+     *
+     * @param xqFile
+     *            .xq file with the query to be executed
+     * @param request
+     *            {@link QueryRequest} instance to be submitted to REST API
+     * @param cli
+     *            cli class instance
+     */
+    private static void sendQueryRequest(String xqFile, QueryRequest request, VXQuery cli) {
+        URI uri = null;
+        try {
+            uri = RestUtils.buildQueryURI(request, cli.restIpAddress, cli.restPort);
+        } catch (URISyntaxException e) {
+            System.err.println(
+                    String.format("Unable to build URI to call REST API for query: %s", request.getStatement()));
+            cli.onFailure(xqFile, null);
+        }
+
+        CloseableHttpClient httpClient = HttpClients.custom().build();
+        try {
+            HttpGet httpGet = new HttpGet(uri);
+            httpGet.setHeader(HttpHeaders.ACCEPT, CONTENT_TYPE_JSON);
+
+            try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+                HttpEntity entity = httpResponse.getEntity();
+
+                String response = RestUtils.readEntity(entity);
+                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    cli.onSuccess(xqFile, request,
+                            RestUtils.mapEntity(response, SyncQueryResponse.class, CONTENT_TYPE_JSON));
+                } else {
+                    cli.onFailure(xqFile, RestUtils.mapEntity(response, ErrorResponse.class, CONTENT_TYPE_JSON));
                 }
-                timingMessage("Job (" + (i + 1) + ") execution time: " + currentRun + " ms");
+            } catch (IOException e) {
+                System.err.println("Error occurred when reading entity: " + e.getMessage());
+                cli.onFailure(xqFile, null);
+            } catch (JAXBException e) {
+                System.err.println("Error occurred when mapping query response: " + e.getMessage());
+                cli.onFailure(xqFile, null);
+            }
+        } finally {
+            HttpClientUtils.closeQuietly(httpClient);
+        }
+    }
+
+    /**
+     * Once the query in a given .xq file has been executed (with repeated executions as well), this method calculates
+     * mean, standard deviation, minimum and maximum execution times.
+     */
+    private void showTimingSummary() {
+        double sumTime = 0;
+        double sumSquaredTime = 0;
+        long minTime = Long.MAX_VALUE;
+        long maxTime = Long.MIN_VALUE;
+
+        for (int i = 0; i < metricsList.size(); i++) {
+            Metrics metrics = metricsList.get(i);
+            long totalTime = metrics.getCompileTime() + metrics.getElapsedTime();
+
+            sumTime += totalTime;
+            sumSquaredTime += totalTime * totalTime;
+
+            if (totalTime < minTime) {
+                minTime = totalTime;
+            }
+
+            if (totalTime > maxTime) {
+                maxTime = totalTime;
             }
         }
+
+        double mean = sumTime / (opts.repeatExec - opts.timingIgnoreQueries);
+        double sd = Math.sqrt(sumSquaredTime / (opts.repeatExec - opts.timingIgnoreQueries) - mean * mean);
+
+        System.out.println();
+        System.out.println("\t**** Timing Summary ****");
+        System.out.println("----------------------------------------------------");
+        System.out.println(String.format("Repetitions:\t%d, Timing Ignored Iterations:\t%d", opts.repeatExec,
+                opts.timingIgnoreQueries));
+        System.out.println("Average execution time:\t" + mean + " ms");
+        System.out.println("Standard deviation:\t" + String.format("%.4f", sd));
+        System.out.println("Coefficient of variation:\t" + String.format("%.4f", sd / mean));
+        System.out.println("Minimum execution time:\t" + minTime + " ms");
+        System.out.println("Maximum execution time:\t" + maxTime + " ms");
+        System.out.println();
+    }
+
+    private static QueryRequest createQueryRequest(CmdLineOptions opts, String query) {
+        QueryRequest request = new QueryRequest(query);
+        request.setCompileOnly(opts.compileOnly);
+        request.setOptimization(opts.optimizationLevel);
+        request.setFrameSize(opts.frameSize);
+        request.setRepeatExecutions(opts.repeatExec);
+        request.setShowMetrics(opts.timing);
+        request.setShowAbstractSyntaxTree(opts.showAST);
+        request.setShowTranslatedExpressionTree(opts.showTET);
+        request.setShowOptimizedExpressionTree(opts.showOET);
+        request.setShowRuntimePlan(opts.showRP);
+        request.setAsync(false);
+
+        return request;
     }
 
     /**
-     * Creates a Hyracks dataset, if not already existing with the job frame size, and 1 reader. Allocates a new buffer of size specified in the frame of Hyracks
-     * node. Creates new dataset reader with the current job ID and result set ID. Outputs the string in buffer for each frame.
-     *
-     * @param spec
-     *            JobSpecification object, containing frame size. Current specified job.
-     * @param writer
-     *            Writer for output of job.
-     * @throws Exception
-     */
-    private void runJob(JobSpecification spec, PrintWriter writer) throws Exception {
-        int nReaders = 1;
-        if (hds == null) {
-            hds = new HyracksDataset(hcc, spec.getFrameSize(), nReaders);
-        }
-
-        JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
-
-        FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
-        IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
-        IHyracksDatasetReader reader = hds.createReader(jobId, resultSetId);
-        IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
-
-        while (reader.read(frame) > 0) {
-            writer.print(ResultUtils.getStringFromBuffer(frame.getBuffer(), frameTupleAccessor));
-            writer.flush();
-            frame.getBuffer().clear();
-        }
-
-        hcc.waitForCompletion(jobId);
-    }
-
-    /**
-     * Create a unique result set id to get the correct query back from the cluster.
-     *
-     * @return Result Set id generated with current system time.
-     */
-    protected ResultSetId createResultSetId() {
-        return new ResultSetId(System.nanoTime());
-    }
-
-    /**
-     * Start local virtual cluster with cluster controller node and node controller nodes. IP address provided for node controller is localhost. Unassigned ports
-     * 39000 and 39001 are used for client and cluster port respectively. Creates a new Hyracks connection with the IP address and client ports.
-     *
-     * @throws Exception
-     */
-    public void startLocalHyracks() throws Exception {
-        String localAddress = InetAddress.getLocalHost().getHostAddress();
-        CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = localAddress;
-        ccConfig.clientNetPort = 39000;
-        ccConfig.clusterNetIpAddress = localAddress;
-        ccConfig.clusterNetPort = 39001;
-        ccConfig.httpPort = 39002;
-        ccConfig.profileDumpPeriod = 10000;
-        cc = new ClusterControllerService(ccConfig);
-        cc.start();
-
-        ncs = new NodeControllerService[opts.localNodeControllers];
-        for (int i = 0; i < ncs.length; i++) {
-            NCConfig ncConfig = new NCConfig();
-            ncConfig.ccHost = "localhost";
-            ncConfig.ccPort = 39001;
-            ncConfig.clusterNetIPAddress = localAddress;
-            ncConfig.dataIPAddress = localAddress;
-            ncConfig.resultIPAddress = localAddress;
-            ncConfig.nodeId = "nc" + (i + 1);
-            //TODO: enable index folder as a cli option for on-the-fly indexing queries
-            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
-            ncs[i] = new NodeControllerService(ncConfig);
-            ncs[i].start();
-        }
-
-        hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
-    }
-
-    /**
-     * Shuts down the virtual cluster, along with all nodes and node execution, network and queue managers.
-     *
-     * @throws Exception
-     */
-    public void stopLocalHyracks() throws Exception {
-        for (int i = 0; i < ncs.length; i++) {
-            ncs[i].stop();
-        }
-        cc.stop();
-    }
-
-    /**
-     * Reads the contents of file given in query into a String. The file is always closed. For XML files UTF-8 encoding is used.
+     * Reads the contents of file given in query into a String. The file is always closed. For XML files UTF-8 encoding
+     * is used.
      *
      * @param query
      *            The query with filename to be processed
@@ -367,46 +348,49 @@ public class VXQuery {
         return FileUtils.readFileToString(new File(query), "UTF-8");
     }
 
-    /**
-     * Save and print out the timing message.
-     *
-     * @param message
-     */
-    private static void timingMessage(String message) {
-        System.out.println(message);
-        timingMessages.add(message);
+    private static void printField(PrintStream out, String field, String value) {
+        out.println();
+        field = field + ":";
+        out.print(field);
+
+        String[] lines = value.split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            int margin = 4;
+            if (i != 0) {
+                margin += field.length();
+            }
+            System.out.print(String.format("%1$" + margin + "s%2$s\n", "", lines[i]));
+        }
+    }
+
+    private static void printField(String field, String value) {
+        printField(System.out, field, value);
     }
 
     /**
      * Helper class with fields and methods to handle all command line options
      */
     private static class CmdLineOptions {
-        @Option(name = "-available-processors", usage = "Number of available processors. (default: java's available processors)")
-        private int availableProcessors = -1;
+        @Option(name = "-rest-ip-address", usage = "IP Address of the REST Server")
+        private String restIpAddress = null;
 
-        @Option(name = "-client-net-ip-address", usage = "IP Address of the ClusterController.")
-        private String clientNetIpAddress = null;
+        @Option(name = "-rest-port", usage = "Port of REST Server")
+        private int restPort = 8085;
 
-        @Option(name = "-client-net-port", usage = "Port of the ClusterController. (default: 1098)")
-        private int clientNetPort = 1098;
+        @Option(name = "-compileonly", usage = "Compile the query and stop.")
+        private boolean compileOnly;
 
-        @Option(name = "-local-node-controllers", usage = "Number of local node controllers. (default: 1)")
-        private int localNodeControllers = 1;
+        @Option(name = "-O", usage = "Optimization Level. (default: Full Optimization)")
+        private int optimizationLevel = Integer.MAX_VALUE;
 
         @Option(name = "-frame-size", usage = "Frame size in bytes. (default: 65,536)")
         private int frameSize = 65536;
 
-        @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default: 67,108,864)")
-        private long joinHashSize = -1;
+        @Option(name = "-repeatexec", usage = "Number of times to repeat execution.")
+        private int repeatExec = 1;
 
-        @Option(name = "-maximum-data-size", usage = "Maximum possible data size in bytes. (default: 150,323,855,000)")
-        private long maximumDataSize = -1;
-
-        @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
-        private int bufferSize = -1;
-
-        @Option(name = "-O", usage = "Optimization Level. (default: Full Optimization)")
-        private int optimizationLevel = Integer.MAX_VALUE;
+        @Option(name = "-timing", usage = "Produce timing information.")
+        private boolean timing;
 
         @Option(name = "-showquery", usage = "Show query string.")
         private boolean showQuery;
@@ -423,29 +407,33 @@ public class VXQuery {
         @Option(name = "-showrp", usage = "Show Runtime plan.")
         private boolean showRP;
 
-        @Option(name = "-compileonly", usage = "Compile the query and stop.")
-        private boolean compileOnly;
+        // Optional (Not supported by REST API) parameters. Only used for creating a
+        // local hyracks cluster
+        @Option(name = "-join-hash-size", usage = "Join hash size in bytes. (default: 67,108,864)")
+        private long joinHashSize = -1;
 
-        @Option(name = "-repeatexec", usage = "Number of times to repeat execution.")
-        private int repeatExec = 1;
+        @Option(name = "-maximum-data-size", usage = "Maximum possible data size in bytes. (default: 150,323,855,000)")
+        private long maximumDataSize = -1;
+
+        @Option(name = "-buffer-size", usage = "Disk read buffer size in bytes.")
+        private int bufferSize = -1;
 
         @Option(name = "-result-file", usage = "File path to save the query result.")
         private String resultFile = null;
 
-        @Option(name = "-timing", usage = "Produce timing information.")
-        private boolean timing;
-
         @Option(name = "-timing-ignore-queries", usage = "Ignore the first X number of quereies.")
-        private int timingIgnoreQueries = 2;
-
-        @Option(name = "-x", usage = "Bind an external variable")
-        private Map<String, String> bindings = new HashMap<>();
+        private int timingIgnoreQueries = 0;
 
         @Option(name = "-hdfs-conf", usage = "Directory path to Hadoop configuration files")
         private String hdfsConf = null;
 
-        @Argument
-        private List<String> arguments = new ArrayList<>();
-    }
+        @Option(name = "-available-processors", usage = "Number of available processors. (default: java's available processors)")
+        private int availableProcessors = -1;
 
+        @Option(name = "-local-node-controllers", usage = "Number of local node controllers. (default: 1)")
+        private int localNodeControllers = 1;
+
+        @Argument
+        private List<String> xqFiles = new ArrayList<>();
+    }
 }

@@ -144,6 +144,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.vxquery</groupId>
+            <artifactId>apache-vxquery-rest</artifactId>
+            <version>0.7-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-api</artifactId>
         </dependency>

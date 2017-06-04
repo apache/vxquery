@@ -16,10 +16,6 @@
  */
 package org.apache.vxquery.xtest;
 
-import org.apache.hyracks.control.cc.ClusterControllerService;
-import org.apache.hyracks.control.nc.NodeControllerService;
-import org.mortbay.jetty.Server;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import org.mortbay.jetty.Server;
 
 public class XTest {
     private XTestOptions opts;
@@ -36,8 +34,6 @@ public class XTest {
     private TestRunnerFactory trf;
     private int count;
     private int finishCount;
-    private static NodeControllerService nc;
-    private static ClusterControllerService cc;
 
     XTest(XTestOptions opts) {
         this.opts = opts;
@@ -81,8 +77,7 @@ public class XTest {
                 }
             }
         });
-        cc = TestClusterUtil.startCC(opts);
-        nc = TestClusterUtil.startNC();
+        TestClusterUtil.startCluster(opts, TestClusterUtil.localClusterUtil);
         trf = new TestRunnerFactory(opts);
         trf.registerReporters(reporters);
         TestCaseFactory tcf = new TestCaseFactory(trf, eSvc, opts);
@@ -104,7 +99,7 @@ public class XTest {
             r.close();
         }
         try {
-            TestClusterUtil.stopCluster(cc, nc);
+            TestClusterUtil.stopCluster(TestClusterUtil.localClusterUtil);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -19,81 +19,45 @@ package org.apache.vxquery.xtest;
 
 import org.apache.hyracks.api.client.HyracksConnection;
 import org.apache.hyracks.client.dataset.HyracksDataset;
-import org.apache.hyracks.control.cc.ClusterControllerService;
-import org.apache.hyracks.control.common.controllers.CCConfig;
-import org.apache.hyracks.control.common.controllers.NCConfig;
-import org.apache.hyracks.control.nc.NodeControllerService;
+import org.apache.vxquery.app.util.LocalClusterUtil;
+import org.apache.vxquery.rest.service.VXQueryConfig;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class TestClusterUtil {
-
-    private static final int CLIENT_NET_PORT = 39000;
-    private static final int CLUSTER_NET_PORT = 39001;
-    private static final int PROFILE_DUMP_PERIOD = 10000;
-    private static final String CC_HOST = "localhost";
-    private static final String NODE_ID = "nc1";
-    private static final String IO_DEVICES = "target/tmp/indexFolder";
 
     private static HyracksConnection hcc;
     private static HyracksDataset hds;
 
+    public static final LocalClusterUtil localClusterUtil = new LocalClusterUtil();
+
     private TestClusterUtil() {
     }
 
-    public static CCConfig createCCConfig() throws UnknownHostException {
-        String publicAddress = InetAddress.getLocalHost().getHostAddress();
-        CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = publicAddress;
-        ccConfig.clientNetPort = CLIENT_NET_PORT;
-        ccConfig.clusterNetIpAddress = publicAddress;
-        ccConfig.clusterNetPort = CLUSTER_NET_PORT;
-        ccConfig.profileDumpPeriod = PROFILE_DUMP_PERIOD;
-        return ccConfig;
+    private static VXQueryConfig loadConfiguration(XTestOptions opts) {
+        VXQueryConfig vxqConfig = new VXQueryConfig();
+
+        vxqConfig.setAvailableProcessors(opts.threads);
+        vxqConfig.setFrameSize(opts.frameSize);
+        vxqConfig.setHdfsConf(opts.hdfsConf);
+
+        return vxqConfig;
     }
 
-    public static NCConfig createNCConfig() throws UnknownHostException {
-        String publicAddress = InetAddress.getLocalHost().getHostAddress();
-        NCConfig ncConfig1 = new NCConfig();
-        ncConfig1.ccHost = CC_HOST;
-        ncConfig1.ccPort = CLUSTER_NET_PORT;
-        ncConfig1.clusterNetIPAddress = publicAddress;
-        ncConfig1.dataIPAddress = publicAddress;
-        ncConfig1.resultIPAddress = publicAddress;
-        ncConfig1.nodeId = NODE_ID;
-        ncConfig1.ioDevices = IO_DEVICES;
-        return ncConfig1;
-    }
-
-    public static ClusterControllerService startCC(XTestOptions opts) throws IOException {
-        CCConfig ccConfig = createCCConfig();
-        File outDir = new File("target/ClusterController");
-        outDir.mkdirs();
-        File ccRoot = File.createTempFile(TestRunner.class.getName(), ".data", outDir);
-        ccRoot.delete();
-        ccRoot.mkdir();
-        ccConfig.ccRoot = ccRoot.getAbsolutePath();
+    public static void startCluster(XTestOptions opts, LocalClusterUtil localClusterUtil) throws IOException {
         try {
-            ClusterControllerService cc = new ClusterControllerService(ccConfig);
-            cc.start();
-            hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
-            hds = new HyracksDataset(hcc, opts.frameSize, opts.threads);
-            return cc;
+            VXQueryConfig config = loadConfiguration(opts);
+            localClusterUtil.init(config);
+            hcc = (HyracksConnection) localClusterUtil.getConnection();
+            hds = (HyracksDataset) localClusterUtil.getDataset();
         } catch (Exception e) {
             throw new IOException(e);
         }
-
     }
 
-    public static NodeControllerService startNC() throws IOException {
-        NCConfig ncConfig = createNCConfig();
+    public static void stopCluster(LocalClusterUtil localClusterUtil) throws IOException {
         try {
-            NodeControllerService nc = new NodeControllerService(ncConfig);
-            nc.start();
-            return nc;
+            localClusterUtil.deinit();
         } catch (Exception e) {
             throw new IOException(e);
         }
@@ -105,15 +69,6 @@ public class TestClusterUtil {
 
     public static HyracksDataset getDataset() {
         return hds;
-    }
-
-    public static void stopCluster(ClusterControllerService cc, NodeControllerService nc) throws IOException {
-        try {
-            nc.stop();
-            cc.stop();
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
     }
 
 }

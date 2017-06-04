@@ -1,0 +1,3 @@
+{"date":"2002-02-02T00:00:00.000","datatype":"TMIN","station":"GHCND:US000000002","attributes":",,","value":12.5}
+{"date":"2001-01-01T00:00:00.000","datatype":"TMIN","station":"GHCND:US000000001","attributes":",,","value":11.25}
+{"date":"2003-03-03T00:00:00.000","datatype":"TMIN","station":"GHCND:AS000000003","attributes":",,","value":13.75}

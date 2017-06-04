@@ -251,6 +251,18 @@
 
             <dependency>
                 <groupId>org.apache.hyracks</groupId>
+                <artifactId>hyracks-http</artifactId>
+                <version>${hyracks.fullstack.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.1.6.Final</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.apache.hyracks</groupId>
                 <artifactId>algebricks-compiler</artifactId>
                 <version>${hyracks.version}</version>
             </dependency>
@@ -670,6 +682,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <hyracks.version>0.2.17-incubating</hyracks.version>
+        <hyracks.fullstack.version>0.3.1</hyracks.fullstack.version>
         <hyracks.version>0.3.0</hyracks.version>
         <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
     </properties>
@@ -680,5 +694,6 @@
         <module>vxquery-cli</module>
         <module>vxquery-xtest</module>
         <module>vxquery-benchmark</module>
+        <module>vxquery-rest</module>
     </modules>
 </project>

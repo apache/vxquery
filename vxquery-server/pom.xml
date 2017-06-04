@@ -41,7 +41,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
-                <version>1.1.1</version>
+                <version>2.0.0</version>
                 <executions>
                     <execution>
                         <configuration>
@@ -53,6 +53,10 @@
                                 <program>
                                     <mainClass>org.apache.hyracks.control.cc.CCDriver</mainClass>
                                     <name>vxquerycc</name>
+                                    <commandLineArguments>
+                                        <commandLineArgument>-app-cc-main-class</commandLineArgument>
+                                        <commandLineArgument>org.apache.vxquery.app.VXQueryApplication</commandLineArgument>
+                                    </commandLineArguments>
                                 </program>
                                 <program>
                                     <mainClass>org.apache.hyracks.control.nc.NCDriver</mainClass>
@@ -139,15 +143,13 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.vxquery</groupId>
-            <artifactId>apache-vxquery-core</artifactId>
+            <artifactId>apache-vxquery-rest</artifactId>
             <version>0.7-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-control-cc</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.hyracks</groupId>
             <artifactId>hyracks-control-nc</artifactId>

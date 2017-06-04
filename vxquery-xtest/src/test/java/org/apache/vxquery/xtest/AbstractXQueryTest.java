@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.hyracks.control.cc.ClusterControllerService;
-import org.apache.hyracks.control.nc.NodeControllerService;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,8 +36,6 @@ public abstract class AbstractXQueryTest {
     private TestRunner tr;
     private static MiniDFS dfs;
     private final static String TMP = "target/tmp";
-    private static NodeControllerService nc;
-    private static ClusterControllerService cc;
 
     protected abstract XTestOptions getTestOptions();
 
@@ -92,8 +88,7 @@ public abstract class AbstractXQueryTest {
 
     @BeforeClass
     public static void setup() throws IOException {
-        cc = TestClusterUtil.startCC(getDefaultTestOptions());
-        nc = TestClusterUtil.startNC();
+        TestClusterUtil.startCluster(getDefaultTestOptions(), TestClusterUtil.localClusterUtil);
         setupFS();
     }
 
@@ -116,7 +111,7 @@ public abstract class AbstractXQueryTest {
     @AfterClass
     public static void shutdown() throws IOException {
         removeFS();
-        TestClusterUtil.stopCluster(cc, nc);
+        TestClusterUtil.stopCluster(TestClusterUtil.localClusterUtil);
     }
 
     public static void removeFS() throws IOException {

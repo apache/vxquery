@@ -285,5 +285,4 @@ public class VXQueryMetadataProvider implements IMetadataProvider<String, String
         }
         return indexExists;
     }
-
 }
