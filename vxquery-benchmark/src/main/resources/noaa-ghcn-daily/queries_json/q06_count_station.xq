@@ -23,5 +23,6 @@ Count all the stations.
 count(
     let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
     for $s in collection($station_collection)
-    return $s("stationCollection")("station")
+    for $i in $s("results")()
+    return $i
 )

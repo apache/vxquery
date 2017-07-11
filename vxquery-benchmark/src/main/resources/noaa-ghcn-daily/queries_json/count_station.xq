@@ -23,5 +23,7 @@ Count all the weather stations available.
 count(
     let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
     for $s in collection($station_collection)
-    return $s("stationCollection")("station")
+    let $x:=$s("results")()
+        for $i in $x
+        return $i
 )

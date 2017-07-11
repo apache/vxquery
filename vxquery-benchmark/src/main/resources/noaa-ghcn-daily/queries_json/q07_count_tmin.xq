@@ -23,7 +23,7 @@ Find the all the records for TMIN.
 count(
     let $sensor_collection_min := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r_min in collection($sensor_collection_min)
-    for $data_min in $r_min("dataCollection")("data")
+    for $data_min in $r_min("results")()
     where $data_min("dataType") eq "TMIN"
     return $data_min
 )

@@ -23,7 +23,7 @@ Find the all the records for TMAX.
 count(
     let $sensor_collection_max := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r_max in collection($sensor_collection_max)
-    for $data_max in $r_max("dataCollection")("data")
+    for $data_max in $r_max("results")()
     where $data_max("dataType") eq "TMAX"
     return $data_max
 )

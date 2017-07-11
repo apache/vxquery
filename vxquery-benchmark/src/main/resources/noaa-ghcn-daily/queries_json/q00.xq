@@ -23,7 +23,7 @@ station by selecting  the weather readings for December 25 over the last
 :)
 let $collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
 for $r in collection($collection)
-for $data in $r("dataCollection")("data")
+for $data in $r("results")()
 let $datetime := xs:dateTime(fn:data($data("date")))
 where $data("station") eq "GHCND:USW00012836" 
     and fn:year-from-dateTime($datetime) ge 2003

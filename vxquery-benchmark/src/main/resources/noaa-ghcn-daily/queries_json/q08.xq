@@ -16,12 +16,18 @@
    under the License. :)
 
 (:
-JSON Join Query
--------------------
-Count all the weather sensor readings available.
+Convert xml structure to json structure
 :)
-count(
-    let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
-    for $r in collection($sensor_collection)
-        return $r("dataCollection")("data")
-)
+let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
+for $d in collection($sensor_collection)/dataCollection/data
+let $date := xs:date(fn:substring(xs:string(fn:data($d/date)), 0, 11))
+where $date eq xs:date("2001-01-01") and $d/dataType eq "TMIN"
+return 
+{
+    "results":{
+        "date":data($d/date),
+        "dataType":data($d/dataType),
+        "station":data($d/station),
+        "value":data($d/value),
+    }
+}

@@ -23,7 +23,7 @@ Count all the weather sensor readings on 1976-07-04.
 count(
     let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($sensor_collection)
-    for $data in $r("dataCollection")("data")
+    for $data in $r("results")()
     let $date := xs:date(fn:substring(xs:string(fn:data($data("date"))), 0, 11))
     where $date eq xs:date("1976-07-04")
     return $data

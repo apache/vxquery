@@ -23,10 +23,10 @@ Find the lowest recorded temperature (TMIN) in the United States for 2001.
 fn:count(
     let $station_collection := "/tmp/1.0_partition_ghcnd_all_xml/stations"
     for $s in collection($station_collection)
-    for $station in $s("stationCollection")("station")
+    for $station in $s("results")()
     let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
     for $r in collection($sensor_collection)
-    for $data in $r("dataCollection")("data")   
+    for $data in $r("results")()   
     where $station("id") eq $data("station")
         and (some $x in $station("locationLabels") satisfies ($x("type") eq "CNTRY" and $x("id") eq "FIPS:US"))
         and $data("dataType") eq "TMIN" 

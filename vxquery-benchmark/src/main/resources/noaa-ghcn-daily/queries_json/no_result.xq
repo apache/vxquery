@@ -20,6 +20,6 @@ VXQuery used to only parse all files with out producing results.
 :)
 let $sensor_collection := "/tmp/1.0_partition_ghcnd_all_xml/sensors"
 for $r in collection($sensor_collection)
-for $data in $r("dataCollection")("data")
+for $data in $r("results")()
 where fn:false()
 return $data
