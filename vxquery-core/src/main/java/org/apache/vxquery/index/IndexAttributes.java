@@ -16,6 +16,7 @@
  */
 package org.apache.vxquery.index;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xml.sax.Attributes;
@@ -30,15 +31,48 @@ public class IndexAttributes implements Attributes {
     List<String> types;
     List<String> qnames;
 
-    public IndexAttributes(List<String> n, List<String> v, List<String> u, List<String> l, List<String> t,
-            List<String> q) {
-        length = n.size();
-        names = n;
-        values = v;
-        uris = u;
-        localnames = l;
-        types = t;
-        qnames = q;
+    public IndexAttributes() {
+        names = new ArrayList<>();
+        values = new ArrayList<>();
+        uris = new ArrayList<>();
+        localnames = new ArrayList<>();
+        types = new ArrayList<>();
+        qnames = new ArrayList<>();
+    }
+
+    public void reset() {
+        length = names.size();
+        names.clear();
+        values.clear();
+        uris.clear();
+        localnames.clear();
+        types.clear();
+        qnames.clear();
+    }
+
+    public void addNames(String name) {
+        names.add(name);
+        length = names.size();
+    }
+
+    public void addValues(String value) {
+        values.add(value);
+    }
+
+    public void addUris(String uri) {
+        uris.add(uri);
+    }
+
+    public void addLocalNames(String localname) {
+        localnames.add(localname);
+    }
+
+    public void addTypes(String type) {
+        types.add(type);
+    }
+
+    public void addqNames(String qname) {
+        qnames.add(qname);
     }
 
     /**

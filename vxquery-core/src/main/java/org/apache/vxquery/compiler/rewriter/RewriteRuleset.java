@@ -55,6 +55,7 @@ import org.apache.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 import org.apache.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.EliminateSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.EliminateSubplanWithInputCardinalityOneRule;
+import org.apache.hyracks.algebricks.rewriter.rules.subplan.IntroduceGroupByForSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.NestedSubplanToJoinRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.PushSubplanIntoGroupByRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.SubplanOutOfGroupRule;
@@ -75,6 +76,7 @@ import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushAggregateIntoGroupbyRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
+import org.apache.vxquery.compiler.rewriter.rules.PushIndexingIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushKeysOrMembersIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
@@ -199,6 +201,7 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
         normalization.add(new PushValueIntoDatascanRule());
         normalization.add(new PushKeysOrMembersIntoDatascanRule());
+        normalization.add(new EliminateSubplanForSingleItemsRule());
         return normalization;
     }
 
@@ -217,7 +220,6 @@ public class RewriteRuleset {
         xquery.add(new PushGroupByThroughProduct());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
-
         // Clean up
         xquery.add(new RemoveRedundantVariablesRule());
         xquery.add(new RemoveUnusedAssignAndAggregateRule());
@@ -245,7 +247,7 @@ public class RewriteRuleset {
         xquery.add(new IntroJoinInsideSubplanRule());
         xquery.add(new PushMapOperatorDownThroughProductRule());
         xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
-        //xquery.add(new IntroduceGroupByForSubplanRule());
+        xquery.add(new IntroduceGroupByForSubplanRule());
         xquery.add(new SubplanOutOfGroupRule());
         //        xquery.add(new InsertOuterJoinRule());
         xquery.add(new ExtractFunctionsFromJoinConditionRule());
@@ -314,6 +316,7 @@ public class RewriteRuleset {
     public static final List<IAlgebraicRewriteRule> buildConsolidationRuleCollection() {
         List<IAlgebraicRewriteRule> consolidation = new LinkedList<>();
         consolidation.add(new ConsolidateSelectsRule());
+        consolidation.add(new PushIndexingIntoDatascanRule());
         consolidation.add(new ConsolidateAssignsRule());
         consolidation.add(new InlineAssignIntoAggregateRule());
         consolidation.add(new IntroduceGroupByCombinerRule());

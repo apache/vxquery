@@ -20,6 +20,26 @@
       <title>Indexing</title>
       <description/>
    </GroupInfo>
+   <test-case name="create-index-atts" FilePath="Indexing/Students/" Creator="Christina Pavlopoulou">
+      <description>Create Lucene Index from Collection.</description>
+      <query name="createIndexAtts" date="2017-08-03"/>
+      <output-file compare="Text">createIndexAtts.txt</output-file>
+   </test-case>
+   <test-case name="use-index-atts" FilePath="Indexing/Students/" Creator="Christina Pavlopoulou">
+      <description>Get Collection From Lucene Index.</description>
+      <query name="useIndexAtts" date="2016-05-26"/>
+      <output-file compare="Text">useIndexAtts.txt</output-file>
+   </test-case>
+   <test-case name="use-index-atts-2" FilePath="Indexing/Students/" Creator="Christina Pavlopoulou">
+      <description>Get Collection From Lucene Index.</description>
+      <query name="useIndexAtts2" date="2017-08-25"/>
+      <output-file compare="Text">useIndexAtts2.txt</output-file>
+   </test-case>
+   <test-case name="select-atts" FilePath="Indexing/Students/" Creator="Christina Pavlopoulou">
+      <description>Get Collection From Lucene Index.</description>
+      <query name="selectAtts" date="2016-05-26"/>
+      <output-file compare="Text">selectAtts.txt</output-file>
+   </test-case>
    <test-case name="create-index" FilePath="Indexing/Partition-1/" Creator="Steven Jacobs">
       <description>Create Lucene Index from Collection.</description>
       <query name="createIndex" date="2016-05-26"/>

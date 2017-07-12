@@ -1,1 +1,1 @@
-<data><date>2001-01-01T00:00:00.000</date><dataType>AWND</dataType><station>GHCND:US000000001</station><value>1000</value><attributes><attribute/><attribute/><attribute>a</attribute></attributes></data>
+<data><date>2001-01-01T00:00:00.000</date><dataType>AWND</dataType><station>GHCND:US000000001</station><value>1000</value><attributes><attribute/><attribute/><attribute>a</attribute><attribute/></attributes></data>

@@ -1,1 +1,2 @@
+src/test/resources/TestSources/xml
 src/test/resources/TestSources/ghcnd
