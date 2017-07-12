@@ -50,6 +50,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
         };
         this.tag = null;
         this.childSeq = new ArrayList<>();
+        this.indexSeq = new ArrayList<>();
         this.valueSeq = new ArrayList<>();
     }
 
@@ -64,7 +65,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
     @Override
     public String toString() {
         return "VXQueryIndexingDataSource [collectionName=" + collectionName + ", elementPath=" + this.childSeq
-                + ", function=" + function + "]";
+                + ", searchPath=" + this.indexSeq + ", function=" + function + "]";
     }
 
     public boolean usingIndex() {

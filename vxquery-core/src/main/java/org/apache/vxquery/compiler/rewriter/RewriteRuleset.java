@@ -75,6 +75,7 @@ import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushAggregateIntoGroupbyRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
+import org.apache.vxquery.compiler.rewriter.rules.PushIndexingValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushKeysOrMembersIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
@@ -147,6 +148,7 @@ public class RewriteRuleset {
         //        normalization.add(new ConsolidateUnnestsRule());
         normalization.add(new RemoveUnusedUnnestIterateRule());
         normalization.add(new PushChildIntoDataScanRule());
+        normalization.add(new PushIndexingValueIntoDatascanRule());
 
         // Improvement for scalar child expressions
         normalization.add(new EliminateSubplanForSingleItemsRule());
@@ -199,6 +201,7 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
         normalization.add(new PushValueIntoDatascanRule());
         normalization.add(new PushKeysOrMembersIntoDatascanRule());
+//        normalization.add(new PushIndexingValueIntoDatascanRule());
         return normalization;
     }
 
@@ -226,7 +229,9 @@ public class RewriteRuleset {
 
     public static final List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
         List<IAlgebraicRewriteRule> typeInfer = new LinkedList<>();
+        typeInfer.add(new PushIndexingValueIntoDatascanRule());
         typeInfer.add(new InferTypesRule());
+        
         return typeInfer;
     }
 
