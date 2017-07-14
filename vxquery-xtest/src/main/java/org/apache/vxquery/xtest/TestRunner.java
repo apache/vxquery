@@ -22,9 +22,11 @@ import java.io.Reader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +53,7 @@ import org.apache.vxquery.context.DynamicContext;
 import org.apache.vxquery.context.DynamicContextImpl;
 import org.apache.vxquery.context.RootStaticContextImpl;
 import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.result.ResultUtils;
@@ -149,6 +152,16 @@ public class TestRunner {
                 in.close();
 
                 DynamicContext dCtx = new DynamicContextImpl(compiler.getModule().getModuleContext());
+
+                if (opts.timezone != null) {
+                    final int dtLen = XSDateTimePointable.TYPE_TRAITS.getFixedLength();
+                    byte[] currentDateTime = new byte[dtLen];
+                    XSDateTimePointable datetimep = new XSDateTimePointable();
+                    datetimep.set(currentDateTime, 0, dtLen);
+                    datetimep.setCurrentDateTime(Calendar.getInstance(TimeZone.getTimeZone(opts.timezone)));
+                    dCtx.setCurrentDateTime(datetimep);
+                }
+
                 spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
 
                 spec.setMaxReattempts(0);
@@ -158,7 +171,7 @@ public class TestRunner {
                 IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
                 IHyracksDatasetReader reader = hds.createReader(jobId, ccb.getResultSetId());
                 // TODO(tillw) remove this loop once the IHyracksDatasetReader reliably returns the correct exception
-                while (reader.getResultStatus() == DatasetJobRecord.Status.RUNNING) {
+                while (reader.getResultStatus().getState() == DatasetJobRecord.State.RUNNING) {
                     Thread.sleep(1);
                 }
                 IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();

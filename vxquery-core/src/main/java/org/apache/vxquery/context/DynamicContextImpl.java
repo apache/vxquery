@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.api.IValueReference;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
 
 public class DynamicContextImpl implements DynamicContext {
     private StaticContext sCtx;
@@ -56,6 +57,14 @@ public class DynamicContextImpl implements DynamicContext {
 
     @Override
     public void getCurrentDateTime(IPointable value) {
+        if (currentDateTime == null) {
+            // if not set, get it from the JVM
+            final int dtLen = XSDateTimePointable.TYPE_TRAITS.getFixedLength();
+            currentDateTime = new byte[dtLen];
+            XSDateTimePointable datetimep = new XSDateTimePointable();
+            datetimep.set(currentDateTime, 0, dtLen);
+            datetimep.setCurrentDateTime();
+        }
         value.set(currentDateTime, 0, currentDateTime.length);
     }
 

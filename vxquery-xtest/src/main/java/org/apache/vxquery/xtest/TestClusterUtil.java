@@ -26,6 +26,7 @@ import org.apache.hyracks.control.nc.NodeControllerService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -45,26 +46,25 @@ public class TestClusterUtil {
     }
 
     public static CCConfig createCCConfig() throws UnknownHostException {
-        String publicAddress = InetAddress.getLocalHost().getHostAddress();
+        String publicAddress = Inet4Address.getLoopbackAddress().getHostAddress();
         CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = publicAddress;
-        ccConfig.clientNetPort = CLIENT_NET_PORT;
-        ccConfig.clusterNetIpAddress = publicAddress;
-        ccConfig.clusterNetPort = CLUSTER_NET_PORT;
-        ccConfig.profileDumpPeriod = PROFILE_DUMP_PERIOD;
+        ccConfig.setClientListenAddress(publicAddress);
+        ccConfig.setClientListenPort(CLIENT_NET_PORT);
+        ccConfig.setClusterListenAddress(publicAddress);
+        ccConfig.setClusterListenPort(CLUSTER_NET_PORT);
+        ccConfig.setProfileDumpPeriod(PROFILE_DUMP_PERIOD);
         return ccConfig;
     }
 
     public static NCConfig createNCConfig() throws UnknownHostException {
-        String publicAddress = InetAddress.getLocalHost().getHostAddress();
-        NCConfig ncConfig1 = new NCConfig();
-        ncConfig1.ccHost = CC_HOST;
-        ncConfig1.ccPort = CLUSTER_NET_PORT;
-        ncConfig1.clusterNetIPAddress = publicAddress;
-        ncConfig1.dataIPAddress = publicAddress;
-        ncConfig1.resultIPAddress = publicAddress;
-        ncConfig1.nodeId = NODE_ID;
-        ncConfig1.ioDevices = IO_DEVICES;
+        String publicAddress = Inet4Address.getLoopbackAddress().getHostAddress();
+        NCConfig ncConfig1 = new NCConfig(NODE_ID);
+        ncConfig1.setClusterAddress(CC_HOST);
+        ncConfig1.setClusterPort(CLUSTER_NET_PORT);
+        ncConfig1.setClusterListenAddress(publicAddress);
+        ncConfig1.setDataPublicAddress(publicAddress);
+        ncConfig1.setResultPublicAddress(publicAddress);
+        ncConfig1.setIODevices(new String[] { IO_DEVICES });
         return ncConfig1;
     }
 
@@ -75,11 +75,11 @@ public class TestClusterUtil {
         File ccRoot = File.createTempFile(TestRunner.class.getName(), ".data", outDir);
         ccRoot.delete();
         ccRoot.mkdir();
-        ccConfig.ccRoot = ccRoot.getAbsolutePath();
+        ccConfig.setRootDir(ccRoot.getAbsolutePath());
         try {
             ClusterControllerService cc = new ClusterControllerService(ccConfig);
             cc.start();
-            hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
+            hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
             hds = new HyracksDataset(hcc, opts.frameSize, opts.threads);
             return cc;
         } catch (Exception e) {

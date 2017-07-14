@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -314,33 +314,32 @@ public class VXQuery {
      * @throws Exception
      */
     public void startLocalHyracks() throws Exception {
-        String localAddress = InetAddress.getLocalHost().getHostAddress();
+        String localAddress = Inet4Address.getLoopbackAddress().getHostAddress();
         CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = localAddress;
-        ccConfig.clientNetPort = 39000;
-        ccConfig.clusterNetIpAddress = localAddress;
-        ccConfig.clusterNetPort = 39001;
-        ccConfig.httpPort = 39002;
-        ccConfig.profileDumpPeriod = 10000;
+        ccConfig.setClientListenAddress(localAddress);
+        ccConfig.setClientListenPort(39000);
+        ccConfig.setClusterListenAddress(localAddress);
+        ccConfig.setClusterListenPort(39001);
+        ccConfig.setConsoleListenPort(39002);
+        ccConfig.setProfileDumpPeriod(10000);
         cc = new ClusterControllerService(ccConfig);
         cc.start();
 
         ncs = new NodeControllerService[opts.localNodeControllers];
         for (int i = 0; i < ncs.length; i++) {
-            NCConfig ncConfig = new NCConfig();
-            ncConfig.ccHost = "localhost";
-            ncConfig.ccPort = 39001;
-            ncConfig.clusterNetIPAddress = localAddress;
-            ncConfig.dataIPAddress = localAddress;
-            ncConfig.resultIPAddress = localAddress;
-            ncConfig.nodeId = "nc" + (i + 1);
+            NCConfig ncConfig = new NCConfig("nc" + (i + 1));
+            ncConfig.setClusterAddress("localhost");
+            ncConfig.setClusterPort(39001);
+            ncConfig.setClusterListenAddress(localAddress);
+            ncConfig.setDataListenAddress(localAddress);
+            ncConfig.setResultListenAddress(localAddress);
             //TODO: enable index folder as a cli option for on-the-fly indexing queries
-            ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
+            ncConfig.setIODevices(new String[] { Files.createTempDirectory(ncConfig.getNodeId()).toString() });
             ncs[i] = new NodeControllerService(ncConfig);
             ncs[i].start();
         }
 
-        hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
+        hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
     }
 
     /**
