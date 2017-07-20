@@ -55,6 +55,7 @@ import org.apache.hyracks.algebricks.rewriter.rules.SetExecutionModeRule;
 import org.apache.hyracks.algebricks.rewriter.rules.SimpleUnnestToProductRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.EliminateSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.EliminateSubplanWithInputCardinalityOneRule;
+import org.apache.hyracks.algebricks.rewriter.rules.subplan.IntroduceGroupByForSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.NestedSubplanToJoinRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.PushSubplanIntoGroupByRule;
 import org.apache.hyracks.algebricks.rewriter.rules.subplan.SubplanOutOfGroupRule;
@@ -75,7 +76,6 @@ import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushAggregateIntoGroupbyRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
-import org.apache.vxquery.compiler.rewriter.rules.PushIndexingValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushKeysOrMembersIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
@@ -148,7 +148,6 @@ public class RewriteRuleset {
         //        normalization.add(new ConsolidateUnnestsRule());
         normalization.add(new RemoveUnusedUnnestIterateRule());
         normalization.add(new PushChildIntoDataScanRule());
-        normalization.add(new PushIndexingValueIntoDatascanRule());
 
         // Improvement for scalar child expressions
         normalization.add(new EliminateSubplanForSingleItemsRule());
@@ -201,7 +200,8 @@ public class RewriteRuleset {
         normalization.add(new RemoveUnusedAssignAndAggregateRule());
         normalization.add(new PushValueIntoDatascanRule());
         normalization.add(new PushKeysOrMembersIntoDatascanRule());
-//        normalization.add(new PushIndexingValueIntoDatascanRule());
+        normalization.add(new EliminateSubplanForSingleItemsRule());
+        //normalization.add(new PushIndexingValueIntoDatascanRule());
         return normalization;
     }
 
@@ -229,7 +229,6 @@ public class RewriteRuleset {
 
     public static final List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
         List<IAlgebraicRewriteRule> typeInfer = new LinkedList<>();
-        typeInfer.add(new PushIndexingValueIntoDatascanRule());
         typeInfer.add(new InferTypesRule());
         
         return typeInfer;
@@ -250,7 +249,7 @@ public class RewriteRuleset {
         xquery.add(new IntroJoinInsideSubplanRule());
         xquery.add(new PushMapOperatorDownThroughProductRule());
         xquery.add(new PushSubplanWithAggregateDownThroughProductRule());
-        //xquery.add(new IntroduceGroupByForSubplanRule());
+        xquery.add(new IntroduceGroupByForSubplanRule());
         xquery.add(new SubplanOutOfGroupRule());
         //        xquery.add(new InsertOuterJoinRule());
         xquery.add(new ExtractFunctionsFromJoinConditionRule());
@@ -355,6 +354,7 @@ public class RewriteRuleset {
         // Re-infer all types, so that, e.g., the effect of not-is-null is
         // propagated.
         prepareForJobGenRewrites.add(new PushProjectIntoDataSourceScanRule());
+        //prepareForJobGenRewrites.add(new PushIndexingValueIntoDatascanRule());
         prepareForJobGenRewrites.add(new ReinferAllTypesRule());
         prepareForJobGenRewrites.add(new SetExecutionModeRule());
         return prepareForJobGenRewrites;

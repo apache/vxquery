@@ -58,6 +58,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
     private String[] collectionPartitions;
     private final String functionCall;
     private List<Integer> childSeq;
+    private List<Byte[]> indexSeq;
 
     public VXQueryIndexingOperatorDescriptor(IOperatorDescriptorRegistry spec, VXQueryIndexingDataSource ds,
             RecordDescriptor rDesc) {
@@ -68,6 +69,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         totalDataSources = (short) ds.getTotalDataSources();
         recordDescriptors[0] = rDesc;
         childSeq = ds.getChildSeq();
+        indexSeq=ds.getIndexSeq();
     }
 
     @Override
@@ -196,7 +198,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
 
             public void usingIndex(IPointable result) throws HyracksDataException {
                 String indexModifiedName = indexCentralizerUtil.getIndexForCollection(collectionModifiedName);
-                VXQueryIndexReader indexReader = new VXQueryIndexReader(ctx, indexModifiedName, childSeq, appender);
+                VXQueryIndexReader indexReader = new VXQueryIndexReader(ctx, indexModifiedName, childSeq, indexSeq, appender);
                 try {
                     indexReader.init();
                     for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {

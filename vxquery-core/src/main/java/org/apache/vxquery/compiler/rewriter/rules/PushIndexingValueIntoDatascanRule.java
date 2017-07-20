@@ -1,8 +1,25 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -13,11 +30,9 @@ import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
+import org.apache.hyracks.algebricks.core.algebra.operators.logical.ExchangeOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.SubplanOperator;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
 import org.apache.vxquery.context.StaticContext;
@@ -34,6 +49,9 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
     @Override
     protected boolean processOperator(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
             throws AlgebricksException {
+        if (context.checkIfInDontApplySet(this, opRef.getValue())) {
+            return false;
+        }
         AbstractLogicalOperator op2 = null;
         AbstractLogicalOperator op3 = null;
 
@@ -49,53 +67,56 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
 
         op2 = (AbstractLogicalOperator) select.getInputs().get(0).getValue();
 
-        if (op2.getOperatorTag() != LogicalOperatorTag.SUBPLAN) {
+        if (op2.getOperatorTag() != LogicalOperatorTag.EXCHANGE) {
             return false;
         }
-        SubplanOperator subplan = (SubplanOperator) op2;
+        ExchangeOperator exchange = (ExchangeOperator) op2;
+        op3 = (AbstractLogicalOperator) exchange.getInputs().get(0).getValue();
 
-        op3 = (AbstractLogicalOperator) subplan.getInputs().get(0).getValue();
         if (op3.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
             return false;
         }
+
         DataSourceScanOperator datascan = (DataSourceScanOperator) op3;
 
         if (!usedVariables.contains(datascan.getVariables())) {
 
             Mutable<ILogicalExpression> expressionRef = select.getCondition();
-            ILogicalOperator op = subplan.getNestedPlans().get(0).getRoots().get(0).getValue();
-            AggregateOperator aggregate = (AggregateOperator) op;
-            Mutable<ILogicalExpression> expressionRefSub = aggregate.getExpressions().get(0);
-            if (!(updateDataSource((IVXQueryDataSource) datascan.getDataSource(), expressionRef, expressionRefSub))) {
+            if (!(updateDataSource((IVXQueryDataSource) datascan.getDataSource(), expressionRef))) {
                 return false;
             }
-
+            context.addToDontApplySet(this, opRef.getValue());
             return true;
         }
+
         return false;
 
     }
 
-    private boolean updateDataSource(IVXQueryDataSource dataSource, Mutable<ILogicalExpression> expression,
-            Mutable<ILogicalExpression> subExpression) {
+    private boolean updateDataSource(IVXQueryDataSource dataSource, Mutable<ILogicalExpression> expression) {
         if (!dataSource.usingIndex()) {
             return false;
         }
         VXQueryIndexingDataSource ids = (VXQueryIndexingDataSource) dataSource;
         boolean added = false;
-        List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
         List<Mutable<ILogicalExpression>> children = new ArrayList<Mutable<ILogicalExpression>>();
-        ExpressionToolbox.findAllFunctionExpressions(subExpression, BuiltinOperators.CHILD.getFunctionIdentifier(),
-                children);
-        ILogicalExpression le = expression.getValue();
-        if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-            AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
-            ILogicalExpression le2 = afce.getArguments().get(1).getValue();
-            if (le2.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
-                AbstractFunctionCallExpression afce2 = (AbstractFunctionCallExpression) le2;
-                finds = afce2.getArguments();
-            }
+        ILogicalExpression selCond = expression.getValue();
+
+        if (selCond.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+            return false;
         }
+        AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) selCond;
+        ILogicalExpression arguments = afce.getArguments().get(0).getValue();
+        if (arguments.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+            return false;
+        }
+        AbstractFunctionCallExpression valueEq = (AbstractFunctionCallExpression) arguments;
+
+        if (!valueEq.getFunctionIdentifier().equals(BuiltinOperators.VALUE_EQ.getFunctionIdentifier())) {
+            return false;
+        }
+        ExpressionToolbox.findAllFunctionExpressions(valueEq.getArguments().get(0),
+                BuiltinOperators.CHILD.getFunctionIdentifier(), children);
         for (int i = children.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(children.get(i - 1));
             if (typeId > 0) {
@@ -103,29 +124,22 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
                 ElementType et = ElementType.ANYELEMENT;
 
                 if (it.getContentType().equals(et.getContentType())) {
-                    for (int child : ids.getChildSeq()) {
-                        ids.addIndexSeq(child);
-                    }
-                    ids.addIndexSeq(typeId);
+                    ids.addChildSeq(typeId);
                 }
             }
         }
-        int typeId2 = convertConstantToInteger(finds.get(0));
-        if (typeId2 > 0) {
-            ids.addIndexSeq(typeId2);
-            added = true;
-        }
+        Byte[] index = convertConstantToInteger(valueEq.getArguments().get(1));
+
+        ids.addIndexSeq(index);
+        added = true;
         return added;
     }
 
-    public int convertConstantToInteger(Mutable<ILogicalExpression> finds) {
+    public Byte[] convertConstantToInteger(Mutable<ILogicalExpression> finds) {
         TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         ExpressionToolbox.getConstantAsPointable((ConstantExpression) finds.getValue(), tvp);
 
-        IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        tvp.getValue(pTypeCode);
-        int typeId = pTypeCode.getInteger();
-        return typeId;
+        return ArrayUtils.toObject(tvp.getByteArray());
     }
 
 }

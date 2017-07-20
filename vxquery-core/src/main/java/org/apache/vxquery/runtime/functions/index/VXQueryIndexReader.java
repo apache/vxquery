@@ -45,8 +45,11 @@ import org.apache.vxquery.index.IndexAttributes;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.NameTest;
+import org.apache.vxquery.types.NodeKind;
 import org.apache.vxquery.types.NodeType;
+import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
+import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.SAXContentHandler;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
@@ -74,10 +77,12 @@ public class VXQueryIndexReader {
     private String[] childLocalName = null;
     private IFrameFieldAppender appender;
     private boolean firstElement;
+    private List<Byte[]> indexSeq;
 
     public VXQueryIndexReader(IHyracksTaskContext context, String indexPath, List<Integer> childSeq,
-            IFrameFieldAppender appender) {
+            List<Byte[]> indexSeq, IFrameFieldAppender appender) {
         this.ctx = context;
+        this.indexSeq = indexSeq;
         this.indexName = indexPath;
         this.appender = appender;
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
@@ -85,16 +90,36 @@ public class VXQueryIndexReader {
         for (int typeCode : childSeq) {
             childSequenceTypes.add(dCtx.getStaticContext().lookupSequenceType(typeCode));
         }
+        TextType tt = TextType.INSTANCE;
+        if (!indexSeq.isEmpty()) {
+            childSequenceTypes.add(SequenceType.create(tt, Quantifier.QUANT_ONE));
+        }
         childLocalName = new String[childSequenceTypes.size()];
         int index = 0;
         StringBuilder stb = new StringBuilder();
         stb.append("/");
         for (SequenceType sType : childSequenceTypes) {
-            NodeType nodeType = (NodeType) sType.getItemType();
-            ElementType eType = (ElementType) nodeType;
-            NameTest nameTest = eType.getNameTest();
-            childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
 
+            NodeType nodeType = (NodeType) sType.getItemType();
+            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
+                ElementType eType = (ElementType) nodeType;
+                NameTest nameTest = eType.getNameTest();
+                childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
+            } else {
+                if (!indexSeq.isEmpty()) {
+                    byte[] indexBytes = new byte[indexSeq.get(0).length];
+                    byte[] newIndexBytes = new byte[indexBytes.length - 1];
+                    int i = 0;
+                    for (Byte b : indexSeq.get(0)) {
+                        indexBytes[i++] = b.byteValue();
+
+                    }
+                    for (int j = 1; j < indexBytes.length; ++j) {
+                        newIndexBytes[j - 1] = indexBytes[j];
+                    }
+                    childLocalName[index] = FunctionHelper.getStringFromBytes(newIndexBytes);
+                }
+            }
             stb.append(childLocalName[index]);
             if (index != childSequenceTypes.size() - 1) {
                 stb.append("/");
@@ -134,7 +159,16 @@ public class VXQueryIndexReader {
 
         int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
         ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-        handler = new SAXContentHandler(false, nodeIdProvider, appender, childSequenceTypes);
+        int sTypes=-1;
+        List<SequenceType> newChildSequenceType=new ArrayList<SequenceType>();
+        for (SequenceType sType : childSequenceTypes) {
+            sTypes++;
+            NodeType nodeType = (NodeType) sType.getItemType();
+            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
+                newChildSequenceType.add(sType);
+            }
+        }
+        handler = new SAXContentHandler(false, nodeIdProvider, appender, newChildSequenceType);
 
         nodeAbvs.reset();
         indexPlace = 0;
@@ -153,12 +187,37 @@ public class VXQueryIndexReader {
 
         parser = new CaseSensitiveQueryParser("item", analyzer);
 
+        //        int elementLength = 0;
+        //        for (SequenceType sType : childSequenceTypes) {
+        //            NodeType nodeType = (NodeType) sType.getItemType();
+        //            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
+        //                elementLength++;
+        //            }
+        //        }
+        String type = "";
+        for (SequenceType sType : childSequenceTypes) {
+            NodeType nodeType = (NodeType) sType.getItemType();
+            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
+                type = ".element";
+            } else {
+                type = ".textnode";
+            }
+        }
+
         String queryString = elementPath.replaceAll("/", ".");
+        String prefixString="";
+        if (!indexSeq.isEmpty()) {
+            int lastdot = queryString.lastIndexOf('.');
+            
+            prefixString = queryString.substring(0, lastdot);
+            queryString=prefixString+"\\:"+queryString.substring(lastdot+1);
+        }
         queryString = "item:" + queryString + "*";
 
         int lastslash = elementPath.lastIndexOf('/');
+
         elementPath = elementPath.substring(0, lastslash) + ":" + elementPath.substring(lastslash + 1);
-        elementPath = elementPath.replaceAll("/", ".") + ".element";
+        elementPath = elementPath.replaceAll("/", ".") + type;
 
         TopDocs results = null;
         try {
@@ -201,25 +260,50 @@ public class VXQueryIndexReader {
         int lastDot = contents.lastIndexOf('.');
         String type = contents.substring(lastDot + 1);
         String lastBit = contents.substring(firstColon + 1, lastDot);
-
+        int dots = contents.indexOf(".");
+        int nextdot;
+        String element="";
+        int elements=0;
         if (this.firstElement) {
             this.firstElement = false;
-            firstFinish = whereIFinish - this.childSequenceTypes.size() + 1;
-            String firstBit = contents.substring(1, firstColon);
-            List<String> names = new ArrayList<>();
-            List<String> values = new ArrayList<>();
-            List<String> uris = new ArrayList<>();
-            List<String> localNames = new ArrayList<>();
-            List<String> types = new ArrayList<>();
-            List<String> qNames = new ArrayList<>();
-            firstFinish = findAttributeChildren(firstFinish, names, values, uris, localNames, types, qNames);
-            Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
-
-            handler.startElement(uri, firstBit, firstBit, atts);
-            buildElement(abvsFileNode, firstFinish + 1);
-            handler.endElement(uri, firstBit, firstBit);
-
+            while (dots <firstColon) {
+                nextdot = dots;
+                dots = contents.indexOf(".", dots + 1);
+                element = contents.substring(nextdot + 1, dots);
+                if (dots > firstColon) {
+                    element = contents.substring(nextdot + 1, firstColon);
+                }
+                List<String> names = new ArrayList<>();
+                List<String> values = new ArrayList<>();
+                List<String> uris = new ArrayList<>();
+                List<String> localNames = new ArrayList<>();
+                List<String> types = new ArrayList<>();
+                List<String> qNames = new ArrayList<>();
+                Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
+                handler.startElement(uri, element, element, atts);
+                elements++;
+//                buildElement(abvsFileNode, firstFinish + 1);
+//                            handler.endElement(uri, firstBit, firstBit);
+            }
         }
+        //        if (this.firstElement) {
+        //            this.firstElement = false;
+        //            firstFinish = whereIFinish - 1;
+        //            String firstBit = contents.substring(1, firstColon);
+        //            List<String> names = new ArrayList<>();
+        //            List<String> values = new ArrayList<>();
+        //            List<String> uris = new ArrayList<>();
+        //            List<String> localNames = new ArrayList<>();
+        //            List<String> types = new ArrayList<>();
+        //            List<String> qNames = new ArrayList<>();
+        //            firstFinish = findAttributeChildren(firstFinish, names, values, uris, localNames, types, qNames);
+        //            Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
+        //
+        //            handler.startElement(uri, firstBit, firstBit, atts);
+        //            buildElement(abvsFileNode, firstFinish + 1);
+        //            handler.endElement(uri, firstBit, firstBit);
+        //
+        //        }
 
         if ("textnode".equals(type)) {
             char[] charContents = lastBit.toCharArray();
@@ -250,6 +334,11 @@ public class VXQueryIndexReader {
 
             handler.endElement(uri, lastBit, lastBit);
 
+        }
+        
+        while(elements>0){
+            handler.endElement(uri, element, element);
+            elements--;
         }
         return whereIFinish;
     }

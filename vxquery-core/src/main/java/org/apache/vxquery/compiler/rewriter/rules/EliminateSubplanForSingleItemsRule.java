@@ -76,7 +76,8 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
         return false;
     }
 
-    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context) throws AlgebricksException {
+    public boolean rewritePre(Mutable<ILogicalOperator> opRef, IOptimizationContext context)
+            throws AlgebricksException {
         AbstractLogicalOperator op = (AbstractLogicalOperator) opRef.getValue();
         if (op.getOperatorTag() != LogicalOperatorTag.SUBPLAN) {
             return false;
@@ -84,8 +85,8 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
         SubplanOperator subplan = (SubplanOperator) op;
 
         // AGGREGATE($v2, sequence(%expression($v1)) )
-        AbstractLogicalOperator subplanOp1 = (AbstractLogicalOperator) subplan.getNestedPlans().get(0).getRoots()
-                .get(0).getValue();
+        AbstractLogicalOperator subplanOp1 = (AbstractLogicalOperator) subplan.getNestedPlans().get(0).getRoots().get(0)
+                .getValue();
         if (subplanOp1.getOperatorTag() != LogicalOperatorTag.AGGREGATE) {
             return false;
         }
@@ -141,43 +142,52 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
 
         // Ensure input is from a UNNEST operator.
         AbstractLogicalOperator subplanInput = (AbstractLogicalOperator) subplan.getInputs().get(0).getValue();
-        if (subplanInput.getOperatorTag() != LogicalOperatorTag.ASSIGN) {
+        if (!(subplanInput.getOperatorTag() == LogicalOperatorTag.ASSIGN
+                || subplanInput.getOperatorTag() == LogicalOperatorTag.DATASOURCESCAN)) {
             return false;
         }
-        AssignOperator assign = (AssignOperator) subplanInput;
-        if (!assign.getVariables().contains(vre2.getVariableReference())) {
-            return false;
+        ILogicalExpression logicalExpression3 = null;
+        if (subplanInput.getOperatorTag() == LogicalOperatorTag.ASSIGN) {
+            AssignOperator assign = (AssignOperator) subplanInput;
+            if (!assign.getVariables().contains(vre2.getVariableReference())) {
+                return false;
+            }
+            logicalExpression3 = (ILogicalExpression) assign.getExpressions().get(0).getValue();
+            if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+                return false;
+            }
+            AbstractFunctionCallExpression functionCall3 = (AbstractFunctionCallExpression) logicalExpression3;
+            if (!functionCall3.getFunctionIdentifier().equals(BuiltinOperators.TREAT.getFunctionIdentifier())) {
+                return false;
+            }
+
+            // Find the treat type.
+            ILogicalExpression argType = functionCall3.getArguments().get(ARG_TYPE).getValue();
+            if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
+                return false;
+            }
+            TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+            ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
+
+            IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
+            tvp.getValue(pTypeCode);
+            SequenceType sType = dCtx.lookupSequenceType(pTypeCode.getInteger());
+            if (sType.getQuantifier() != Quantifier.QUANT_ONE) {
+                return false;
+            }
         }
+
+        //        if (!assign.getVariables().contains(vre2.getVariableReference())) {
+        //            return false;
+        //        }
 
         // Check to see if the expression is the iterate operator.
-        ILogicalExpression logicalExpression3 = (ILogicalExpression) assign.getExpressions().get(0).getValue();
-        if (logicalExpression3.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
-        }
-        AbstractFunctionCallExpression functionCall3 = (AbstractFunctionCallExpression) logicalExpression3;
-        if (!functionCall3.getFunctionIdentifier().equals(BuiltinOperators.TREAT.getFunctionIdentifier())) {
-            return false;
-        }
-
-        // Find the treat type.
-        ILogicalExpression argType = functionCall3.getArguments().get(ARG_TYPE).getValue();
-        if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-            return false;
-        }
-        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
-
-        IntegerPointable pTypeCode = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
-        tvp.getValue(pTypeCode);
-        SequenceType sType = dCtx.lookupSequenceType(pTypeCode.getInteger());
-        if (sType.getQuantifier() != Quantifier.QUANT_ONE) {
-            return false;
-        }
+        //        ILogicalExpression logicalExpression3 = (ILogicalExpression) assign.getExpressions().get(0).getValue();
 
         // Create replacement assign operator.
         lvm1.setValue(vre2);
-        AssignOperator replacementAssign = new AssignOperator(aggregate.getVariables().get(0), functionCall1
-                .getArguments().get(0));
+        AssignOperator replacementAssign = new AssignOperator(aggregate.getVariables().get(0),
+                functionCall1.getArguments().get(0));
         replacementAssign.getInputs().addAll(subplan.getInputs());
         opRef.setValue(replacementAssign);
 
