@@ -17,6 +17,7 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,6 +44,31 @@ import org.apache.vxquery.metadata.VXQueryIndexingDataSource;
 import org.apache.vxquery.metadata.VXQueryMetadataProvider;
 import org.apache.vxquery.types.ElementType;
 
+/**
+ * The rule searches for a select operator with a value-eq expression, following an exchange
+ * operator and a data scan operator.
+ *
+ * <pre>
+ * Before
+ *
+ *   plan__parent
+ *   SELECT( value-eq ( $v1, constant )
+ *   EXCHANGE
+ *   DATASCAN( $source : $v1 )
+ *   plan__child
+ *
+ *   Where $v1 is not used in plan__parent.
+ *
+ * After
+ *
+ *   plan__parent
+ *   SELECT( value-eq ( $v1, constant )
+ *   EXCHANGE
+ *   DATASCAN( $source : $v1, constant )
+ *   plan__child
+ *
+ * </pre>
+ */
 public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProcessingRule {
     StaticContext dCtx = null;
 

@@ -159,10 +159,8 @@ public class VXQueryIndexReader {
 
         int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
         ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-        int sTypes=-1;
         List<SequenceType> newChildSequenceType=new ArrayList<SequenceType>();
         for (SequenceType sType : childSequenceTypes) {
-            sTypes++;
             NodeType nodeType = (NodeType) sType.getItemType();
             if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
                 newChildSequenceType.add(sType);
@@ -187,13 +185,6 @@ public class VXQueryIndexReader {
 
         parser = new CaseSensitiveQueryParser("item", analyzer);
 
-        //        int elementLength = 0;
-        //        for (SequenceType sType : childSequenceTypes) {
-        //            NodeType nodeType = (NodeType) sType.getItemType();
-        //            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
-        //                elementLength++;
-        //            }
-        //        }
         String type = "";
         for (SequenceType sType : childSequenceTypes) {
             NodeType nodeType = (NodeType) sType.getItemType();
@@ -251,7 +242,6 @@ public class VXQueryIndexReader {
 
     private int buildElement(ArrayBackedValueStorage abvsFileNode, int fieldNum) throws SAXException {
         int whereIFinish = fieldNum;
-        int firstFinish;
         IndexableField field = fields.get(fieldNum);
         String contents = field.stringValue();
         String uri = "";
@@ -282,28 +272,8 @@ public class VXQueryIndexReader {
                 Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
                 handler.startElement(uri, element, element, atts);
                 elements++;
-//                buildElement(abvsFileNode, firstFinish + 1);
-//                            handler.endElement(uri, firstBit, firstBit);
             }
         }
-        //        if (this.firstElement) {
-        //            this.firstElement = false;
-        //            firstFinish = whereIFinish - 1;
-        //            String firstBit = contents.substring(1, firstColon);
-        //            List<String> names = new ArrayList<>();
-        //            List<String> values = new ArrayList<>();
-        //            List<String> uris = new ArrayList<>();
-        //            List<String> localNames = new ArrayList<>();
-        //            List<String> types = new ArrayList<>();
-        //            List<String> qNames = new ArrayList<>();
-        //            firstFinish = findAttributeChildren(firstFinish, names, values, uris, localNames, types, qNames);
-        //            Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
-        //
-        //            handler.startElement(uri, firstBit, firstBit, atts);
-        //            buildElement(abvsFileNode, firstFinish + 1);
-        //            handler.endElement(uri, firstBit, firstBit);
-        //
-        //        }
 
         if ("textnode".equals(type)) {
             char[] charContents = lastBit.toCharArray();
