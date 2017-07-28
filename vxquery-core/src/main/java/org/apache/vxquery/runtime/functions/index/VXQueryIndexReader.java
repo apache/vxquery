@@ -28,7 +28,6 @@ import org.apache.hyracks.api.comm.IFrameFieldAppender;
 import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
-import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.primitive.LongPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.lucene.analysis.Analyzer;
@@ -144,7 +143,6 @@ public class VXQueryIndexReader {
             } else {
                 LongPointable intPoint = (LongPointable) LongPointable.FACTORY.createPointable();
                 intPoint.set(indexBytes, 1, indexBytes.length);
-                long ena=intPoint.longValue();
                 childLocalName[childLocalName.length - 1] = String.valueOf(intPoint.longValue());
             }
             stb.append(childLocalName[childLocalName.length - 1]);
