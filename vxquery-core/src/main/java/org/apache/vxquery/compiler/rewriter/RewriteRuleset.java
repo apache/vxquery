@@ -203,7 +203,6 @@ public class RewriteRuleset {
         normalization.add(new PushValueIntoDatascanRule());
         normalization.add(new PushKeysOrMembersIntoDatascanRule());
         normalization.add(new EliminateSubplanForSingleItemsRule());
-        //normalization.add(new PushIndexingValueIntoDatascanRule());
         return normalization;
     }
 

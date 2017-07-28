@@ -91,7 +91,9 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
             return false;
         }
         AggregateOperator aggregate = (AggregateOperator) subplanOp1;
-
+        if (aggregate.getExpressions().isEmpty()) {
+            return false;
+        }
         // Check to see if the expression is a function and op:sequence.
         ILogicalExpression logicalExpression1 = (ILogicalExpression) aggregate.getExpressions().get(0).getValue();
         if (logicalExpression1.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {

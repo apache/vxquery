@@ -29,6 +29,7 @@ import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -140,10 +141,11 @@ public class VXQueryIndexReader {
             if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
                 childLocalName[childLocalName.length - 1] = FunctionHelper
                         .getStringFromBytes(Arrays.copyOfRange(indexBytes, 1, indexBytes.length));
-            } else if (tvp.getTag() == ValueTag.XS_INT_TAG) {
-                IntegerPointable intPoint = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
+            } else {
+                LongPointable intPoint = (LongPointable) LongPointable.FACTORY.createPointable();
                 intPoint.set(indexBytes, 1, indexBytes.length);
-                childLocalName[childLocalName.length - 1] = String.valueOf(intPoint.intValue());
+                long ena=intPoint.longValue();
+                childLocalName[childLocalName.length - 1] = String.valueOf(intPoint.longValue());
             }
             stb.append(childLocalName[childLocalName.length - 1]);
             elementPath = stb.toString();
