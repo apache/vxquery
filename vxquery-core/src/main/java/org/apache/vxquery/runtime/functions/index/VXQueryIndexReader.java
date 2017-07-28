@@ -212,7 +212,6 @@ public class VXQueryIndexReader {
             valueString = valueString.replaceAll(":", "\\\\:");
             queryString = prefixString + "\\:" + valueString;
             queryString = "item:" + queryString + "*";
-
         }
         int lastreturnslash = returnPath.lastIndexOf('/');
 
@@ -263,6 +262,12 @@ public class VXQueryIndexReader {
     }
 
     private int buildElement(ArrayBackedValueStorage abvsFileNode, int fieldNum) throws SAXException {
+        List<String> names = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        List<String> uris = new ArrayList<>();
+        List<String> localNames = new ArrayList<>();
+        List<String> types = new ArrayList<>();
+        List<String> qNames = new ArrayList<>();
         int whereIFinish = fieldNum;
         IndexableField field = fields.get(fieldNum);
         String contents = field.stringValue();
@@ -285,12 +290,7 @@ public class VXQueryIndexReader {
                 if (dots > firstColon) {
                     element = contents.substring(nextdot + 1, firstColon);
                 }
-                List<String> names = new ArrayList<>();
-                List<String> values = new ArrayList<>();
-                List<String> uris = new ArrayList<>();
-                List<String> localNames = new ArrayList<>();
-                List<String> types = new ArrayList<>();
-                List<String> qNames = new ArrayList<>();
+                
                 Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
                 handler.startElement(uri, element, element, atts);
                 elements++;
@@ -303,12 +303,6 @@ public class VXQueryIndexReader {
 
         }
         if ("element".equals(type)) {
-            List<String> names = new ArrayList<>();
-            List<String> values = new ArrayList<>();
-            List<String> uris = new ArrayList<>();
-            List<String> localNames = new ArrayList<>();
-            List<String> types = new ArrayList<>();
-            List<String> qNames = new ArrayList<>();
             whereIFinish = findAttributeChildren(whereIFinish, names, values, uris, localNames, types, qNames);
             Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
 

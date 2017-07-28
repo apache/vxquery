@@ -32,6 +32,12 @@ public class IndexAttributes implements Attributes {
 
     public IndexAttributes(List<String> n, List<String> v, List<String> u, List<String> l, List<String> t,
             List<String> q) {
+        n.clear();
+        v.clear();
+        u.clear();
+        l.clear();
+        t.clear();
+        q.clear();
         length = n.size();
         names = n;
         values = v;

@@ -52,7 +52,6 @@ import org.apache.vxquery.types.ElementType;
  *
  *   plan__parent
  *   SELECT( value-eq ( $v1, constant )
- *   EXCHANGE
  *   DATASCAN( $source : $v1 )
  *   plan__child
  *
@@ -62,7 +61,6 @@ import org.apache.vxquery.types.ElementType;
  *
  *   plan__parent
  *   SELECT( value-eq ( $v1, constant )
- *   EXCHANGE
  *   DATASCAN( $source : $v1, constant )
  *   plan__child
  * </pre>
