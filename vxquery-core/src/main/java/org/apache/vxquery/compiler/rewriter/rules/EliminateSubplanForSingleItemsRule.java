@@ -141,6 +141,7 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
         }
 
         // Ensure input is from a UNNEST operator.
+        //TODO: Make it check the cardinality of DataScan
         AbstractLogicalOperator subplanInput = (AbstractLogicalOperator) subplan.getInputs().get(0).getValue();
         if (!(subplanInput.getOperatorTag() == LogicalOperatorTag.ASSIGN
                 || subplanInput.getOperatorTag() == LogicalOperatorTag.DATASOURCESCAN)) {

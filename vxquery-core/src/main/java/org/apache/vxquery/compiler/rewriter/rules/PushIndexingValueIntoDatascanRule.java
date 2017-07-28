@@ -17,7 +17,6 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -30,9 +29,9 @@ import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import org.apache.hyracks.algebricks.core.algebra.functions.AlgebricksBuiltinFunctions;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
-import org.apache.hyracks.algebricks.core.algebra.operators.logical.ExchangeOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
 import org.apache.vxquery.compiler.rewriter.VXQueryOptimizationContext;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
@@ -66,7 +65,6 @@ import org.apache.vxquery.types.ElementType;
  *   EXCHANGE
  *   DATASCAN( $source : $v1, constant )
  *   plan__child
- *
  * </pre>
  */
 public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProcessingRule {
@@ -79,7 +77,6 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
             return false;
         }
         AbstractLogicalOperator op2 = null;
-        AbstractLogicalOperator op3 = null;
 
         if (dCtx == null) {
             VXQueryOptimizationContext vxqueryCtx = (VXQueryOptimizationContext) context;
@@ -93,17 +90,11 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
 
         op2 = (AbstractLogicalOperator) select.getInputs().get(0).getValue();
 
-        if (op2.getOperatorTag() != LogicalOperatorTag.EXCHANGE) {
-            return false;
-        }
-        ExchangeOperator exchange = (ExchangeOperator) op2;
-        op3 = (AbstractLogicalOperator) exchange.getInputs().get(0).getValue();
-
-        if (op3.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
+        if (op2.getOperatorTag() != LogicalOperatorTag.DATASOURCESCAN) {
             return false;
         }
 
-        DataSourceScanOperator datascan = (DataSourceScanOperator) op3;
+        DataSourceScanOperator datascan = (DataSourceScanOperator) op2;
 
         if (!usedVariables.contains(datascan.getVariables())) {
 
@@ -126,22 +117,12 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
         VXQueryIndexingDataSource ids = (VXQueryIndexingDataSource) dataSource;
         boolean added = false;
         List<Mutable<ILogicalExpression>> children = new ArrayList<Mutable<ILogicalExpression>>();
-        ILogicalExpression selCond = expression.getValue();
-
-        if (selCond.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
+        List<Mutable<ILogicalExpression>> valueEqch = new ArrayList<Mutable<ILogicalExpression>>();
+        ExpressionToolbox.findAllFunctionExpressions(expression, AlgebricksBuiltinFunctions.EQ, valueEqch);
+        if (valueEqch.isEmpty()) {
             return false;
         }
-        AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) selCond;
-        ILogicalExpression arguments = afce.getArguments().get(0).getValue();
-        if (arguments.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
-        }
-        AbstractFunctionCallExpression valueEq = (AbstractFunctionCallExpression) arguments;
-
-        if (!valueEq.getFunctionIdentifier().equals(BuiltinOperators.VALUE_EQ.getFunctionIdentifier())) {
-            return false;
-        }
-        ExpressionToolbox.findAllFunctionExpressions(valueEq.getArguments().get(0),
+        ExpressionToolbox.findAllFunctionExpressions(valueEqch.get(valueEqch.size() - 1),
                 BuiltinOperators.CHILD.getFunctionIdentifier(), children);
         for (int i = children.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(children.get(i - 1));
@@ -150,12 +131,18 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
                 ElementType et = ElementType.ANYELEMENT;
 
                 if (it.getContentType().equals(et.getContentType())) {
-                    ids.addChildSeq(typeId);
+                    ids.addIndexChildSeq(typeId);
                 }
             }
         }
-        Byte[] index = convertConstantToInteger(valueEq.getArguments().get(1));
-
+        Byte[] index = null;
+        AbstractFunctionCallExpression valueEq = (AbstractFunctionCallExpression) valueEqch.get(valueEqch.size() - 1)
+                .getValue();
+        if (valueEq.getArguments().get(1).getValue().getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
+            index = ExpressionToolbox.getConstantArgument(valueEq.getArguments().get(1), 0);
+        } else {
+            index = convertConstantToInteger(valueEq.getArguments().get(1));
+        }
         ids.addIndexSeq(index);
         added = true;
         return added;

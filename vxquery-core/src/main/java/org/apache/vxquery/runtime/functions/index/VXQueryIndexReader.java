@@ -19,13 +19,16 @@ package org.apache.vxquery.runtime.functions.index;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
 import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IPointable;
+import org.apache.hyracks.data.std.primitive.IntegerPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -39,17 +42,16 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexAttributes;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.NameTest;
-import org.apache.vxquery.types.NodeKind;
 import org.apache.vxquery.types.NodeType;
-import org.apache.vxquery.types.Quantifier;
 import org.apache.vxquery.types.SequenceType;
-import org.apache.vxquery.types.TextType;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.SAXContentHandler;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
@@ -63,6 +65,7 @@ public class VXQueryIndexReader {
     private int indexPlace;
     private int indexLength;
     private String elementPath;
+    private String returnPath;
     private String indexName;
     private List<SequenceType> childSequenceTypes;
     private IndexReader reader;
@@ -80,53 +83,71 @@ public class VXQueryIndexReader {
     private List<Byte[]> indexSeq;
 
     public VXQueryIndexReader(IHyracksTaskContext context, String indexPath, List<Integer> childSeq,
-            List<Byte[]> indexSeq, IFrameFieldAppender appender) {
+            List<Integer> indexChildSeq, List<Byte[]> indexSeq, IFrameFieldAppender appender) {
         this.ctx = context;
         this.indexSeq = indexSeq;
         this.indexName = indexPath;
         this.appender = appender;
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         childSequenceTypes = new ArrayList<>();
+        int searchSize = 0;
         for (int typeCode : childSeq) {
             childSequenceTypes.add(dCtx.getStaticContext().lookupSequenceType(typeCode));
         }
-        TextType tt = TextType.INSTANCE;
         if (!indexSeq.isEmpty()) {
-            childSequenceTypes.add(SequenceType.create(tt, Quantifier.QUANT_ONE));
+            searchSize = indexSeq.size();
+            if (!indexChildSeq.isEmpty()) {
+                searchSize += indexChildSeq.size();
+            }
         }
-        childLocalName = new String[childSequenceTypes.size()];
+        childLocalName = new String[childSequenceTypes.size() + searchSize];
         int index = 0;
         StringBuilder stb = new StringBuilder();
         stb.append("/");
         for (SequenceType sType : childSequenceTypes) {
-
             NodeType nodeType = (NodeType) sType.getItemType();
-            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
-                ElementType eType = (ElementType) nodeType;
-                NameTest nameTest = eType.getNameTest();
-                childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
-            } else {
-                if (!indexSeq.isEmpty()) {
-                    byte[] indexBytes = new byte[indexSeq.get(0).length];
-                    byte[] newIndexBytes = new byte[indexBytes.length - 1];
-                    int i = 0;
-                    for (Byte b : indexSeq.get(0)) {
-                        indexBytes[i++] = b.byteValue();
-
-                    }
-                    for (int j = 1; j < indexBytes.length; ++j) {
-                        newIndexBytes[j - 1] = indexBytes[j];
-                    }
-                    childLocalName[index] = FunctionHelper.getStringFromBytes(newIndexBytes);
-                }
-            }
+            ElementType eType = (ElementType) nodeType;
+            NameTest nameTest = eType.getNameTest();
+            childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
             stb.append(childLocalName[index]);
             if (index != childSequenceTypes.size() - 1) {
                 stb.append("/");
             }
             ++index;
         }
-        elementPath = stb.toString();
+        returnPath = stb.toString();
+        stb.append("/");
+        if (!indexSeq.isEmpty()) {
+            for (Integer integer : indexChildSeq) {
+                SequenceType sType = dCtx.getStaticContext().lookupSequenceType(integer);
+                NodeType nodeType = (NodeType) sType.getItemType();
+                ElementType eType = (ElementType) nodeType;
+                NameTest nameTest = eType.getNameTest();
+                childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
+
+                stb.append(childLocalName[index]);
+                stb.append("/");
+                ++index;
+            }
+            byte[] indexBytes = new byte[indexSeq.get(0).length];
+            int i = 0;
+            for (Byte b : indexSeq.get(0)) {
+                indexBytes[i++] = b.byteValue();
+
+            }
+            TaggedValuePointable tvp = new TaggedValuePointable();
+            tvp.set(ArrayUtils.toPrimitive(indexSeq.get(0)), 0, ArrayUtils.toPrimitive(indexSeq.get(0)).length);
+            if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+                childLocalName[childLocalName.length - 1] = FunctionHelper
+                        .getStringFromBytes(Arrays.copyOfRange(indexBytes, 1, indexBytes.length));
+            } else if (tvp.getTag() == ValueTag.XS_INT_TAG) {
+                IntegerPointable intPoint = (IntegerPointable) IntegerPointable.FACTORY.createPointable();
+                intPoint.set(indexBytes, 1, indexBytes.length);
+                childLocalName[childLocalName.length - 1] = String.valueOf(intPoint.intValue());
+            }
+            stb.append(childLocalName[childLocalName.length - 1]);
+            elementPath = stb.toString();
+        }
     }
 
     public boolean step(IPointable result, IFrameWriter writer, int tupleIndex) throws AlgebricksException {
@@ -159,14 +180,7 @@ public class VXQueryIndexReader {
 
         int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
         ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-        List<SequenceType> newChildSequenceType=new ArrayList<SequenceType>();
-        for (SequenceType sType : childSequenceTypes) {
-            NodeType nodeType = (NodeType) sType.getItemType();
-            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
-                newChildSequenceType.add(sType);
-            }
-        }
-        handler = new SAXContentHandler(false, nodeIdProvider, appender, newChildSequenceType);
+        handler = new SAXContentHandler(false, nodeIdProvider, appender, childSequenceTypes);
 
         nodeAbvs.reset();
         indexPlace = 0;
@@ -185,31 +199,30 @@ public class VXQueryIndexReader {
 
         parser = new CaseSensitiveQueryParser("item", analyzer);
 
-        String type = "";
-        for (SequenceType sType : childSequenceTypes) {
-            NodeType nodeType = (NodeType) sType.getItemType();
-            if (nodeType.getNodeKind() == NodeKind.ELEMENT) {
-                type = ".element";
-            } else {
-                type = ".textnode";
-            }
-        }
-
-        String queryString = elementPath.replaceAll("/", ".");
-        String prefixString="";
-        if (!indexSeq.isEmpty()) {
-            int lastdot = queryString.lastIndexOf('.');
-            
-            prefixString = queryString.substring(0, lastdot);
-            queryString=prefixString+"\\:"+queryString.substring(lastdot+1);
-        }
+        String queryString = "";
+        queryString = returnPath.replaceAll("/", ".");
         queryString = "item:" + queryString + "*";
 
-        int lastslash = elementPath.lastIndexOf('/');
+        if (!indexSeq.isEmpty()) {
+            int lastSlash = elementPath.lastIndexOf('/');
+            queryString = elementPath.replaceAll("/", ".");
+            String prefixString = "";
+            prefixString = queryString.substring(0, lastSlash);
+            String valueString = queryString.substring(lastSlash + 1);
+            valueString = valueString.replaceAll(":", "\\\\:");
+            queryString = prefixString + "\\:" + valueString;
+            queryString = "item:" + queryString + "*";
 
-        elementPath = elementPath.substring(0, lastslash) + ":" + elementPath.substring(lastslash + 1);
-        elementPath = elementPath.replaceAll("/", ".") + type;
+        }
+        int lastreturnslash = returnPath.lastIndexOf('/');
 
+        returnPath = returnPath.substring(0, lastreturnslash) + ":" + returnPath.substring(lastreturnslash + 1);
+        returnPath = returnPath.replaceAll("/", ".") + ".element";
+        if (!indexSeq.isEmpty()) {
+            int lastslash = elementPath.lastIndexOf('/');
+            elementPath = elementPath.substring(0, lastslash) + ":" + elementPath.substring(lastslash + 1);
+            elementPath = elementPath.replaceAll("/", ".") + ".textnode";
+        }
         TopDocs results = null;
         try {
             query = parser.parse(queryString);
@@ -226,13 +239,22 @@ public class VXQueryIndexReader {
     }
 
     public void parse(ArrayBackedValueStorage abvsFileNode) throws IOException {
+        int iPath = 0;
         try {
             for (int i = 0; i < fields.size(); i++) {
                 String fieldValue = fields.get(i).stringValue();
-                if (fieldValue.equals(elementPath)) {
+                if (fieldValue.equals(returnPath)) {
+                    iPath = i;
+                    if (indexSeq.isEmpty()) {
+                        handler.startDocument();
+                        this.firstElement = true;
+                        buildElement(abvsFileNode, iPath);
+                    }
+                }
+                if (!indexSeq.isEmpty() && fieldValue.equals(elementPath)) {
                     handler.startDocument();
                     this.firstElement = true;
-                    buildElement(abvsFileNode, i);
+                    buildElement(abvsFileNode, iPath);
                 }
             }
         } catch (Exception e) {
@@ -252,11 +274,11 @@ public class VXQueryIndexReader {
         String lastBit = contents.substring(firstColon + 1, lastDot);
         int dots = contents.indexOf(".");
         int nextdot;
-        String element="";
-        int elements=0;
+        String element = "";
+        int elements = 0;
         if (this.firstElement) {
             this.firstElement = false;
-            while (dots <firstColon) {
+            while (dots < firstColon) {
                 nextdot = dots;
                 dots = contents.indexOf(".", dots + 1);
                 element = contents.substring(nextdot + 1, dots);
@@ -305,8 +327,8 @@ public class VXQueryIndexReader {
             handler.endElement(uri, lastBit, lastBit);
 
         }
-        
-        while(elements>0){
+
+        while (elements > 0) {
             handler.endElement(uri, element, element);
             elements--;
         }

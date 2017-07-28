@@ -30,6 +30,7 @@ public abstract class AbstractVXQueryDataSource implements IVXQueryDataSource {
     protected String[] collectionPartitions;
 
     protected List<Integer> childSeq;
+    protected List<Integer> indexChildSeq;
     protected List<Byte[]> indexSeq;
     protected List<Byte[]> valueSeq;
     protected int totalDataSources;
@@ -98,6 +99,14 @@ public abstract class AbstractVXQueryDataSource implements IVXQueryDataSource {
 
     public List<Integer> getChildSeq() {
         return childSeq;
+    }
+    
+    public void addIndexChildSeq(int integer) {
+        indexChildSeq.add(integer);
+    }
+
+    public List<Integer> getIndexChildSeq() {
+        return indexChildSeq;
     }
     
     public void addIndexSeq(Byte[] index) {

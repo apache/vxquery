@@ -76,6 +76,7 @@ import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushAggregateIntoGroupbyRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
+import org.apache.vxquery.compiler.rewriter.rules.PushIndexingValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushKeysOrMembersIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.RemoveRedundantBooleanExpressionsRule;
@@ -191,6 +192,7 @@ public class RewriteRuleset {
         normalization.add(new RemoveRedundantDataExpressionsRule());
         normalization.add(new RemoveRedundantPromoteExpressionsRule());
         normalization.add(new RemoveRedundantCastExpressionsRule());
+
         normalization.add(new ConvertToAlgebricksExpressionsRule());
         normalization.add(new RemoveRedundantBooleanExpressionsRule());
         // Clean up
@@ -230,7 +232,7 @@ public class RewriteRuleset {
     public static final List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
         List<IAlgebraicRewriteRule> typeInfer = new LinkedList<>();
         typeInfer.add(new InferTypesRule());
-        
+
         return typeInfer;
     }
 
@@ -318,6 +320,7 @@ public class RewriteRuleset {
     public static final List<IAlgebraicRewriteRule> buildConsolidationRuleCollection() {
         List<IAlgebraicRewriteRule> consolidation = new LinkedList<>();
         consolidation.add(new ConsolidateSelectsRule());
+        consolidation.add(new PushIndexingValueIntoDatascanRule());
         consolidation.add(new ConsolidateAssignsRule());
         consolidation.add(new InlineAssignIntoAggregateRule());
         consolidation.add(new IntroduceGroupByCombinerRule());
@@ -354,7 +357,6 @@ public class RewriteRuleset {
         // Re-infer all types, so that, e.g., the effect of not-is-null is
         // propagated.
         prepareForJobGenRewrites.add(new PushProjectIntoDataSourceScanRule());
-        //prepareForJobGenRewrites.add(new PushIndexingValueIntoDatascanRule());
         prepareForJobGenRewrites.add(new ReinferAllTypesRule());
         prepareForJobGenRewrites.add(new SetExecutionModeRule());
         return prepareForJobGenRewrites;

@@ -50,6 +50,7 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
         };
         this.tag = null;
         this.childSeq = new ArrayList<>();
+        this.indexChildSeq = new ArrayList<>();
         this.indexSeq = new ArrayList<>();
         this.valueSeq = new ArrayList<>();
     }
