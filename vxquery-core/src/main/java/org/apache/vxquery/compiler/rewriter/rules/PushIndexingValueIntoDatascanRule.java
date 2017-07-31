@@ -141,7 +141,7 @@ public class PushIndexingValueIntoDatascanRule extends AbstractUsedVariablesProc
         } else {
             index = convertConstantToInteger(valueEq.getArguments().get(1));
         }
-        ids.addIndexSeq(index);
+        ids.addIndexValueSeq(index);
         added = true;
         return added;
     }

@@ -192,7 +192,6 @@ public class RewriteRuleset {
         normalization.add(new RemoveRedundantDataExpressionsRule());
         normalization.add(new RemoveRedundantPromoteExpressionsRule());
         normalization.add(new RemoveRedundantCastExpressionsRule());
-
         normalization.add(new ConvertToAlgebricksExpressionsRule());
         normalization.add(new RemoveRedundantBooleanExpressionsRule());
         // Clean up
@@ -221,7 +220,6 @@ public class RewriteRuleset {
         xquery.add(new PushGroupByThroughProduct());
         xquery.add(new PushSelectDownRule());
         xquery.add(new PushSelectIntoJoinRule());
-
         // Clean up
         xquery.add(new RemoveRedundantVariablesRule());
         xquery.add(new RemoveUnusedAssignAndAggregateRule());
@@ -231,7 +229,6 @@ public class RewriteRuleset {
     public static final List<IAlgebraicRewriteRule> buildTypeInferenceRuleCollection() {
         List<IAlgebraicRewriteRule> typeInfer = new LinkedList<>();
         typeInfer.add(new InferTypesRule());
-
         return typeInfer;
     }
 

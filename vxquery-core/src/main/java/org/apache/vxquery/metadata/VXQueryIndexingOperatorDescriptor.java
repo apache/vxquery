@@ -71,7 +71,7 @@ public class VXQueryIndexingOperatorDescriptor extends AbstractSingleActivityOpe
         recordDescriptors[0] = rDesc;
         childSeq = ds.getChildSeq();
         indexChildSeq = ds.getIndexChildSeq();
-        indexSeq = ds.getIndexSeq();
+        indexSeq = ds.getIndexValueSeq();
     }
 
     @Override

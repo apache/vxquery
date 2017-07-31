@@ -55,7 +55,6 @@ import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.SAXContentHandler;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 public class VXQueryIndexReader {
@@ -262,17 +261,11 @@ public class VXQueryIndexReader {
     }
 
     private int buildElement(ArrayBackedValueStorage abvsFileNode, int fieldNum) throws SAXException {
-        List<String> names = new ArrayList<>();
-        List<String> values = new ArrayList<>();
-        List<String> uris = new ArrayList<>();
-        List<String> localNames = new ArrayList<>();
-        List<String> types = new ArrayList<>();
-        List<String> qNames = new ArrayList<>();
         int whereIFinish = fieldNum;
         IndexableField field = fields.get(fieldNum);
         String contents = field.stringValue();
         String uri = "";
-
+        IndexAttributes atts = new IndexAttributes();
         int firstColon = contents.indexOf(':');
         int lastDot = contents.lastIndexOf('.');
         String type = contents.substring(lastDot + 1);
@@ -290,8 +283,7 @@ public class VXQueryIndexReader {
                 if (dots > firstColon) {
                     element = contents.substring(nextdot + 1, firstColon);
                 }
-                
-                Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
+                atts.reset();
                 handler.startElement(uri, element, element, atts);
                 elements++;
             }
@@ -303,9 +295,8 @@ public class VXQueryIndexReader {
 
         }
         if ("element".equals(type)) {
-            whereIFinish = findAttributeChildren(whereIFinish, names, values, uris, localNames, types, qNames);
-            Attributes atts = new IndexAttributes(names, values, uris, localNames, types, qNames);
-
+            whereIFinish = findAttributeChildren(whereIFinish, atts);
+            atts.reset();
             handler.startElement(uri, lastBit, lastBit, atts);
 
             boolean noMoreChildren = false;
@@ -332,8 +323,7 @@ public class VXQueryIndexReader {
     /*This function creates the attribute children for an element node
      *
      */
-    int findAttributeChildren(int fieldnum, List<String> n, List<String> v, List<String> u, List<String> l,
-            List<String> t, List<String> q) {
+    int findAttributeChildren(int fieldnum, IndexAttributes atts) {
         int nextindex = fieldnum + 1;
         boolean foundattributes = false;
         if (nextindex < fields.size()) {
@@ -348,17 +338,17 @@ public class VXQueryIndexReader {
 
                 if (isDirectChildAttribute(nextguy, fields.get(fieldnum))) {
                     foundattributes = true;
-                    n.add(lastbit);
+                    atts.addNames(lastbit);
                     IndexableField nextnextguy = fields.get(nextindex + 1);
                     contents = nextnextguy.stringValue();
                     firstcolon = contents.indexOf(':');
                     lastdot = contents.lastIndexOf('.');
                     String nextlastbit = contents.substring(firstcolon + 1, lastdot);
-                    v.add(nextlastbit);
-                    u.add(lastbit);
-                    l.add(lastbit);
-                    t.add(lastbit);
-                    q.add(lastbit);
+                    atts.addValues(nextlastbit);
+                    atts.addUris(lastbit);
+                    atts.addLocalNames(lastbit);
+                    atts.addTypes(lastbit);
+                    atts.addqNames(lastbit);
                 } else {
                     break;
                 }

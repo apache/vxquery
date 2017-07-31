@@ -180,13 +180,6 @@ public class EliminateSubplanForSingleItemsRule implements IAlgebraicRewriteRule
             }
         }
 
-        //        if (!assign.getVariables().contains(vre2.getVariableReference())) {
-        //            return false;
-        //        }
-
-        // Check to see if the expression is the iterate operator.
-        //        ILogicalExpression logicalExpression3 = (ILogicalExpression) assign.getExpressions().get(0).getValue();
-
         // Create replacement assign operator.
         lvm1.setValue(vre2);
         AssignOperator replacementAssign = new AssignOperator(aggregate.getVariables().get(0),
