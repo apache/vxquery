@@ -295,8 +295,8 @@ public class VXQueryIndexReader {
 
         }
         if ("element".equals(type)) {
-            whereIFinish = findAttributeChildren(whereIFinish, atts);
             atts.reset();
+            whereIFinish = findAttributeChildren(whereIFinish, atts);
             handler.startElement(uri, lastBit, lastBit, atts);
 
             boolean noMoreChildren = false;
