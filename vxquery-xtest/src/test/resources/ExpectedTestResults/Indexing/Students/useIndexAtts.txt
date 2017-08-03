@@ -1,0 +1,1 @@
+<student id="22"><name>Charles</name><office>X</office><attendance>2004-01-01</attendance></student>

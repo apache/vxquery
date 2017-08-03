@@ -38,10 +38,10 @@ public class IndexAttributes implements Attributes {
         localnames = new ArrayList<>();
         types = new ArrayList<>();
         qnames = new ArrayList<>();
-        length = names.size();
     }
 
     public void reset() {
+        length = names.size();
         names.clear();
         values.clear();
         uris.clear();
@@ -52,6 +52,7 @@ public class IndexAttributes implements Attributes {
 
     public void addNames(String name) {
         names.add(name);
+        length = names.size();
     }
 
     public void addValues(String value) {
