@@ -119,19 +119,19 @@ public class JSONParser implements IParser {
             if (((TaggedValuePointable) valuePointables.get(i)).getTag() == ValueTag.XS_INTEGER_TAG) {
                 // access an item of an array
                 pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
-                        valuePointables.get(i).getLength());
+                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset());
                 this.arrayMatchLevel++;
                 this.keysOrMembers.add(Boolean.valueOf(true));
             } else if (((TaggedValuePointable) valuePointables.get(i)).getTag() == ValueTag.XS_BOOLEAN_TAG) {
                 // access all the items of an array or all the keys of an object
                 pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
-                        valuePointables.get(i).getLength());
+                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset());
                 this.arrayMatchLevel++;
                 this.keysOrMembers.add(Boolean.valueOf(false));
             } else {
                 //access an object
                 pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset() + 1,
-                        valuePointables.get(i).getLength() - 1);
+                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset() - 1);
             }
         }
     }
