@@ -66,7 +66,7 @@ public class TestRunner {
 
     public TestRunner(XTestOptions opts) throws UnknownHostException {
         this.opts = opts;
-        this.collectionList = new ArrayList<String>();
+        this.collectionList = new ArrayList<>();
     }
 
     public void open() throws Exception {

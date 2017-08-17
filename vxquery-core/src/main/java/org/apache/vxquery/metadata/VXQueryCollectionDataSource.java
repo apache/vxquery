@@ -44,8 +44,6 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource {
             }
         };
         this.tag = null;
-        this.childSeq = new ArrayList<>();
-        this.valueSeq = new ArrayList<>();
     }
 
     public static VXQueryCollectionDataSource create(int id, String collection, Object type) {
@@ -55,7 +53,7 @@ public class VXQueryCollectionDataSource extends AbstractVXQueryDataSource {
     @Override
     public String toString() {
         return "VXQueryCollectionDataSource [collectionName=" + collectionName + ", childSeq=" + childSeq
-                + ", valueSeq=" + valueSeq + "]";
+                + ", valuePointableCount=" + valueOffsets.size() + "]";
     }
 
     public boolean usingIndex() {

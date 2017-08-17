@@ -30,6 +30,7 @@ import org.apache.htrace.fasterxml.jackson.core.JsonToken;
 import org.apache.hyracks.api.comm.IFrameFieldAppender;
 import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
+import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
@@ -44,8 +45,8 @@ import org.apache.vxquery.datamodel.values.XDMConstants;
 import org.apache.vxquery.xmlparser.IParser;
 
 public class JSONParser implements IParser {
-    final JsonFactory factory;
-    final List<Byte[]> valueSeq;
+    private final JsonFactory factory;
+    private final List<IPointable> valuePointables;
     protected final ArrayBackedValueStorage atomic;
     private TaggedValuePointable tvp;
     private BooleanPointable bp;
@@ -58,12 +59,16 @@ public class JSONParser implements IParser {
     protected final SequenceBuilder sb;
     protected final DataOutput out;
     protected itemType checkItem;
-    protected int levelArray, levelObject;
+    protected int levelArray;
+    protected int levelObject;
     protected final List<Byte[]> allKeys;
-    protected ByteArrayOutputStream outputStream, prefixStream, pathStream;
+    protected ByteArrayOutputStream outputStream;
+    protected ByteArrayOutputStream prefixStream;
+    protected ByteArrayOutputStream pathStream;
     protected int objectMatchLevel;
     protected int arrayMatchLevel;
-    protected boolean matched, literal;
+    protected boolean matched;
+    protected boolean literal;
     protected ArrayBackedValueStorage tempABVS;
     protected List<Integer> arrayCounters;
     protected List<Boolean> keysOrMembers;
@@ -78,56 +83,55 @@ public class JSONParser implements IParser {
     protected final List<itemType> itemStack;
 
     public JSONParser() {
-        this(null);
+        this(new ArrayList<>());
     }
 
-    public JSONParser(List<Byte[]> valueSeq) {
+    public JSONParser(List<IPointable> valuePointables) {
         factory = new JsonFactory();
-        this.valueSeq = valueSeq;
+        this.valuePointables = valuePointables;
         atomic = new ArrayBackedValueStorage();
         tvp = new TaggedValuePointable();
-        abStack = new ArrayList<ArrayBuilder>();
-        obStack = new ArrayList<ObjectBuilder>();
-        abvsStack = new ArrayList<ArrayBackedValueStorage>();
-        keyStack = new ArrayList<ArrayBackedValueStorage>();
-        spStack = new ArrayList<UTF8StringPointable>();
-        itemStack = new ArrayList<itemType>();
+        abStack = new ArrayList<>();
+        obStack = new ArrayList<>();
+        abvsStack = new ArrayList<>();
+        keyStack = new ArrayList<>();
+        spStack = new ArrayList<>();
+        itemStack = new ArrayList<>();
         svb = new StringValueBuilder();
         sb = new SequenceBuilder();
         bp = new BooleanPointable();
-        allKeys = new ArrayList<Byte[]>();
+        allKeys = new ArrayList<>();
         abvsStack.add(atomic);
         out = abvsStack.get(abvsStack.size() - 1).getDataOutput();
         tempABVS = new ArrayBackedValueStorage();
-        this.objectMatchLevel = 1;
-        this.arrayMatchLevel = 0;
+        objectMatchLevel = 1;
+        arrayMatchLevel = 0;
         matched = false;
         literal = false;
-        arrayCounters = new ArrayList<Integer>();
+        arrayCounters = new ArrayList<>();
         outputStream = new ByteArrayOutputStream();
         prefixStream = new ByteArrayOutputStream();
         pathStream = new ByteArrayOutputStream();
-        this.keysOrMembers = new ArrayList<Boolean>();
+        keysOrMembers = new ArrayList<>();
         outputStream.reset();
         pathStream.reset();
-        if (valueSeq != null) {
-            for (int i = 0; i < this.valueSeq.size(); i++) {
-                tvp.set(ArrayUtils.toPrimitive(valueSeq.get(i)), 0, ArrayUtils.toPrimitive(valueSeq.get(i)).length);
-                //access an item of an array
-                if (tvp.getTag() == ValueTag.XS_INTEGER_TAG) {
-                    pathStream.write(tvp.getByteArray(), 0, tvp.getLength());
-                    this.arrayMatchLevel++;
-                    this.keysOrMembers.add(Boolean.valueOf(true));
-                    //access all the items of an array or
-                    //all the keys of an object
-                } else if (tvp.getTag() == ValueTag.XS_BOOLEAN_TAG) {
-                    pathStream.write(tvp.getByteArray(), 0, tvp.getLength());
-                    this.arrayMatchLevel++;
-                    this.keysOrMembers.add(Boolean.valueOf(false));
-                    //access an object 
-                } else {
-                    pathStream.write(tvp.getByteArray(), 1, tvp.getLength() - 1);
-                }
+        for (int i = 0; i < valuePointables.size(); i++) {
+            if (((TaggedValuePointable) valuePointables.get(i)).getTag() == ValueTag.XS_INTEGER_TAG) {
+                // access an item of an array
+                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
+                        valuePointables.get(i).getLength());
+                this.arrayMatchLevel++;
+                this.keysOrMembers.add(Boolean.valueOf(true));
+            } else if (((TaggedValuePointable) valuePointables.get(i)).getTag() == ValueTag.XS_BOOLEAN_TAG) {
+                // access all the items of an array or all the keys of an object
+                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
+                        valuePointables.get(i).getLength());
+                this.arrayMatchLevel++;
+                this.keysOrMembers.add(Boolean.valueOf(false));
+            } else {
+                //access an object
+                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset() + 1,
+                        valuePointables.get(i).getLength() - 1);
             }
         }
     }
@@ -142,7 +146,7 @@ public class JSONParser implements IParser {
             throws HyracksDataException {
         this.writer = writer;
         this.appender = appender;
-        if (this.valueSeq != null) {
+        if (!valuePointables.isEmpty()) {
             return parseElements(input, result);
         } else {
             return parse(input, result);
@@ -183,38 +187,10 @@ public class JSONParser implements IParser {
                         startAtomicValues(ValueTag.XS_DOUBLE_TAG, parser);
                         break;
                     case END_ARRAY:
-                        abStack.get(levelArray - 1).finish();
-                        if (itemStack.size() > 1) {
-                            if (checkItem == itemType.ARRAY) {
-                                abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
-                            } else if (checkItem == itemType.OBJECT) {
-                                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
-                                        abvsStack.get(levelArray + levelObject));
-                            }
-                        }
-                        itemStack.remove(itemStack.size() - 1);
-                        levelArray--;
-                        if (levelArray + levelObject == 0) {
-                            sb.addItem(abvsStack.get(1));
-                            items++;
-                        }
+                        items = endArray(items);
                         break;
                     case END_OBJECT:
-                        obStack.get(levelObject - 1).finish();
-                        if (itemStack.size() > 1) {
-                            if (checkItem == itemType.OBJECT) {
-                                obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
-                                        abvsStack.get(levelArray + levelObject));
-                            } else if (checkItem == itemType.ARRAY) {
-                                abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-                            }
-                        }
-                        itemStack.remove(itemStack.size() - 1);
-                        levelObject--;
-                        if (levelObject + levelArray == 0) {
-                            sb.addItem(abvsStack.get(1));
-                            items++;
-                        }
+                        items = endObject(items);
                         break;
                     default:
                         break;
@@ -225,6 +201,44 @@ public class JSONParser implements IParser {
             outResult.write(result.getByteArray());
         } catch (Exception e) {
             throw new HyracksDataException("Accessing or writing in out of bounds space", e);
+        }
+        return items;
+    }
+
+    private int endObject(int items) throws IOException {
+        obStack.get(levelObject - 1).finish();
+        if (itemStack.size() > 1) {
+            if (checkItem == itemType.OBJECT) {
+                obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
+                        abvsStack.get(levelArray + levelObject));
+            } else if (checkItem == itemType.ARRAY) {
+                abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+            }
+        }
+        itemStack.remove(itemStack.size() - 1);
+        levelObject--;
+        if (levelObject + levelArray == 0) {
+            sb.addItem(abvsStack.get(1));
+            items++;
+        }
+        return items;
+    }
+
+    private int endArray(int items) throws IOException {
+        abStack.get(levelArray - 1).finish();
+        if (itemStack.size() > 1) {
+            if (checkItem == itemType.ARRAY) {
+                abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
+            } else if (checkItem == itemType.OBJECT) {
+                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
+                        abvsStack.get(levelArray + levelObject));
+            }
+        }
+        itemStack.remove(itemStack.size() - 1);
+        levelArray--;
+        if (levelArray + levelObject == 0) {
+            sb.addItem(abvsStack.get(1));
+            items++;
         }
         return items;
     }
@@ -266,67 +280,10 @@ public class JSONParser implements IParser {
                         startAtomicValues(ValueTag.XS_DOUBLE_TAG, parser);
                         break;
                     case END_ARRAY:
-                        //if the query doesn't ask for an atomic value
-                        if (!this.literal && this.pathMatch()) {
-                            //check if the path asked from the query includes the current path 
-                            abStack.get(levelArray - 1).finish();
-                            if (itemStack.size() > 1) {
-                                if (checkItem == itemType.ARRAY) {
-                                    if (levelArray > this.arrayMatchLevel + 1) {
-                                        abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
-                                    } else if (this.matched) {
-                                        this.matched = false;
-                                        items++;
-                                        writeElement(abvsStack.get(levelArray + levelObject));
-                                    }
-                                } else if (checkItem == itemType.OBJECT) {
-                                    if (levelArray > this.arrayMatchLevel && !this.matched) {
-                                        obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
-                                                abvsStack.get(levelArray + levelObject));
-                                    } else if (this.matched) {
-                                        writeElement(abvsStack.get(levelArray + levelObject));
-                                        this.matched = false;
-                                        items++;
-                                    }
-                                }
-                            }
-                        }
-                        if (allKeys.size() - 1 >= 0) {
-                            allKeys.remove(allKeys.size() - 1);
-                        }
-                        this.arrayCounters.remove(levelArray - 1);
-                        itemStack.remove(itemStack.size() - 1);
-                        levelArray--;
+                        items = endArrayElements(items);
                         break;
                     case END_OBJECT:
-                        //if the query doesn't ask for an atomic value
-                        if (!this.literal && this.pathMatch()) {
-                            //check if the path asked from the query includes the current path 
-                            obStack.get(levelObject - 1).finish();
-                            if (itemStack.size() > 1) {
-                                if (checkItem == itemType.OBJECT) {
-                                    if (levelObject > this.objectMatchLevel) {
-                                        obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
-                                                abvsStack.get(levelArray + levelObject));
-                                    } else if (this.matched) {
-                                        this.matched = false;
-                                        items++;
-                                        writeElement(abvsStack.get(levelArray + levelObject));
-                                    }
-                                } else if (checkItem == itemType.ARRAY) {
-                                    abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-                                    if (this.matched) {
-                                        writeElement(abvsStack.get(levelArray + levelObject));
-                                        this.matched = false;
-                                    }
-                                }
-                            }
-                        }
-                        if (allKeys.size() - 1 >= 0) {
-                            allKeys.remove(allKeys.size() - 1);
-                        }
-                        itemStack.remove(itemStack.size() - 1);
-                        levelObject--;
+                        items = endObjectElements(items);
                         break;
                     default:
                         break;
@@ -340,12 +297,79 @@ public class JSONParser implements IParser {
         return items;
     }
 
+    private int endObjectElements(int items) throws IOException {
+        //if the query doesn't ask for an atomic value
+        if (!this.literal && this.pathMatch()) {
+            //check if the path asked from the query includes the current path
+            obStack.get(levelObject - 1).finish();
+            if (itemStack.size() > 1) {
+                if (checkItem == itemType.OBJECT) {
+                    if (levelObject > this.objectMatchLevel) {
+                        obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
+                                abvsStack.get(levelArray + levelObject));
+                    } else if (this.matched) {
+                        this.matched = false;
+                        items++;
+                        writeElement(abvsStack.get(levelArray + levelObject));
+                    }
+                } else if (checkItem == itemType.ARRAY) {
+                    abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+                    if (this.matched) {
+                        writeElement(abvsStack.get(levelArray + levelObject));
+                        this.matched = false;
+                    }
+                }
+            }
+        }
+        if (allKeys.size() - 1 >= 0) {
+            allKeys.remove(allKeys.size() - 1);
+        }
+        itemStack.remove(itemStack.size() - 1);
+        levelObject--;
+        return items;
+    }
+
+    private int endArrayElements(int items) throws IOException {
+        //if the query doesn't ask for an atomic value
+        if (!this.literal && this.pathMatch()) {
+            //check if the path asked from the query includes the current path
+            abStack.get(levelArray - 1).finish();
+            if (itemStack.size() > 1) {
+                if (checkItem == itemType.ARRAY) {
+                    if (levelArray > this.arrayMatchLevel + 1) {
+                        abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
+                    } else if (this.matched) {
+                        this.matched = false;
+                        items++;
+                        writeElement(abvsStack.get(levelArray + levelObject));
+                    }
+                } else if (checkItem == itemType.OBJECT) {
+                    if (levelArray > this.arrayMatchLevel && !this.matched) {
+                        obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
+                                abvsStack.get(levelArray + levelObject));
+                    } else if (this.matched) {
+                        writeElement(abvsStack.get(levelArray + levelObject));
+                        this.matched = false;
+                        items++;
+                    }
+                }
+            }
+        }
+        if (allKeys.size() - 1 >= 0) {
+            allKeys.remove(allKeys.size() - 1);
+        }
+        this.arrayCounters.remove(levelArray - 1);
+        itemStack.remove(itemStack.size() - 1);
+        levelArray--;
+        return items;
+    }
+
     private boolean pathMatch() {
         outputStream.reset();
         for (Byte[] bb : allKeys) {
             outputStream.write(ArrayUtils.toPrimitive(bb), 0, ArrayUtils.toPrimitive(bb).length);
         }
-        //the path of values created by parsing the file 
+        //the path of values created by parsing the file
         boolean contains = false;
         this.matched = false;
         prefixStream.reset();
@@ -392,14 +416,14 @@ public class JSONParser implements IParser {
         if (!itemStack.isEmpty()) {
             if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
                 abStack.get(levelArray - 1).addItem(abvsStack.get(0));
-                if (valueSeq != null && this.matched && levelArray == this.arrayMatchLevel) {
+                if (!valuePointables.isEmpty() && this.matched && levelArray == this.arrayMatchLevel) {
                     this.literal = true;
                     this.matched = false;
                     writeElement(abvsStack.get(0));
                 }
             } else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
                 obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
-                if (valueSeq != null && this.matched && levelObject == this.objectMatchLevel) {
+                if (!valuePointables.isEmpty() && this.matched && levelObject == this.objectMatchLevel) {
                     this.literal = true;
                     this.matched = false;
                     writeElement(abvsStack.get(0));
@@ -410,14 +434,14 @@ public class JSONParser implements IParser {
 
     public void writeElement(ArrayBackedValueStorage abvs) throws IOException {
         tempABVS.reset();
-        DataOutput out = tempABVS.getDataOutput();
-        out.write(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
+        DataOutput dOut = tempABVS.getDataOutput();
+        dOut.write(abvs.getByteArray(), abvs.getStartOffset(), abvs.getLength());
         FrameUtils.appendFieldToWriter(writer, appender, tempABVS.getByteArray(), tempABVS.getStartOffset(),
                 tempABVS.getLength());
     }
 
     public void startArrayOrObjects(int count) {
-        if (valueSeq != null && !this.arrayCounters.isEmpty()) {
+        if (!valuePointables.isEmpty() && !this.arrayCounters.isEmpty()) {
             boolean addCounter = levelArray - count < this.keysOrMembers.size()
                     ? this.keysOrMembers.get(levelArray - count) : true;
             if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
@@ -431,7 +455,7 @@ public class JSONParser implements IParser {
             }
 
         }
-        if (count == 2 && valueSeq != null) {
+        if (count == 2 && !valuePointables.isEmpty()) {
             this.arrayCounters.add(Integer.valueOf(0));
         }
     }
@@ -446,7 +470,7 @@ public class JSONParser implements IParser {
         }
         startArrayOrObjects(2);
         itemStack.add(itemType.ARRAY);
-        if (this.pathMatch() || this.valueSeq == null) {
+        if (this.pathMatch() || valuePointables.isEmpty()) {
             abvsStack.get(levelArray + levelObject).reset();
             try {
                 abStack.get(levelArray - 1).reset(abvsStack.get(levelArray + levelObject));
@@ -466,7 +490,7 @@ public class JSONParser implements IParser {
         }
         startArrayOrObjects(1);
         itemStack.add(itemType.OBJECT);
-        if (this.pathMatch() || this.valueSeq == null) {
+        if (this.pathMatch() || valuePointables.isEmpty()) {
             abvsStack.get(levelArray + levelObject).reset();
             try {
                 obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
@@ -486,7 +510,7 @@ public class JSONParser implements IParser {
         try {
             svb.write(parser.getText(), outk);
             spStack.get(levelObject - 1).set(keyStack.get(levelObject - 1));
-            if (this.valueSeq != null) {
+            if (!valuePointables.isEmpty()) {
                 int length = 0;
                 byte[] barr = spStack.get(levelObject - 1).getByteArray();
                 outputStream.reset();
@@ -496,7 +520,7 @@ public class JSONParser implements IParser {
                     tvp.set(ArrayUtils.toPrimitive(allKeys.get(i)), 0, ArrayUtils.toPrimitive(allKeys.get(i)).length);
                     length += ArrayUtils.toPrimitive(allKeys.get(i)).length;
                 }
-                //if the next two bytes represent a boolean (boolean has only two bytes), 
+                //if the next two bytes represent a boolean (boolean has only two bytes),
                 //it means that query asks for all the keys of the object
                 if (length <= pathStream.size() && (length + 2) <= pathStream.size()) {
                     tvp.set(pathStream.toByteArray(), length, length + 2);
@@ -515,7 +539,7 @@ public class JSONParser implements IParser {
 
     public void startAtomicValues(int tag, JsonParser parser) throws HyracksDataException {
         itemsInArray();
-        if (this.pathMatch() || this.valueSeq == null) {
+        if (this.pathMatch() || valuePointables.isEmpty()) {
             try {
                 atomicValues(tag, parser, out, svb, levelArray, levelObject);
             } catch (Exception e) {

@@ -25,6 +25,7 @@ import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import org.apache.vxquery.compiler.rewriter.rules.util.ExpressionToolbox;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.functions.BuiltinFunctions;
 import org.apache.vxquery.functions.BuiltinOperators;
 import org.apache.vxquery.metadata.IVXQueryDataSource;
@@ -56,6 +57,7 @@ import org.apache.vxquery.metadata.VXQueryCollectionDataSource;
  */
 
 public class PushValueIntoDatascanRule extends AbstractPushExpressionIntoDatascanRule {
+    TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
 
     @Override
     boolean updateDataSource(IVXQueryDataSource datasource, Mutable<ILogicalExpression> expression) {
@@ -64,7 +66,7 @@ public class PushValueIntoDatascanRule extends AbstractPushExpressionIntoDatasca
         }
         VXQueryCollectionDataSource ds = (VXQueryCollectionDataSource) datasource;
         boolean added = false;
-        List<Mutable<ILogicalExpression>> finds = new ArrayList<Mutable<ILogicalExpression>>();
+        List<Mutable<ILogicalExpression>> finds = new ArrayList<>();
         ILogicalExpression le = expression.getValue();
         if (le.getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
             AbstractFunctionCallExpression afce = (AbstractFunctionCallExpression) le;
@@ -75,11 +77,10 @@ public class PushValueIntoDatascanRule extends AbstractPushExpressionIntoDatasca
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.VALUE.getFunctionIdentifier(), finds);
 
         for (int i = finds.size(); i > 0; --i) {
-            Byte[] value = null;
             List<ILogicalExpression> values = ExpressionToolbox.getFullArguments(finds.get(i - 1));
             if (values.size() > 1) {
-                value = ExpressionToolbox.getConstantArgument(finds.get(i - 1), 1);
-                ds.addValueSeq(value);
+                ExpressionToolbox.getConstantArgument(finds.get(i - 1), 1, tvp);
+                ds.appendValueSequence(tvp);
                 added = true;
             }
         }

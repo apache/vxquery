@@ -49,8 +49,6 @@ public class VXQueryIndexingDataSource extends AbstractVXQueryDataSource {
             }
         };
         this.tag = null;
-        this.childSeq = new ArrayList<>();
-        this.valueSeq = new ArrayList<>();
     }
 
     public static VXQueryIndexingDataSource create(int id, String collection, Object type, String function) {
