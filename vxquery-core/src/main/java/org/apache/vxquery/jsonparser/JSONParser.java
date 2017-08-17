@@ -187,10 +187,38 @@ public class JSONParser implements IParser {
                         startAtomicValues(ValueTag.XS_DOUBLE_TAG, parser);
                         break;
                     case END_ARRAY:
-                        items = endArray(items);
+                        abStack.get(levelArray - 1).finish();
+                        if (itemStack.size() > 1) {
+                            if (checkItem == itemType.ARRAY) {
+                                abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
+                            } else if (checkItem == itemType.OBJECT) {
+                                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
+                                        abvsStack.get(levelArray + levelObject));
+                            }
+                        }
+                        itemStack.remove(itemStack.size() - 1);
+                        levelArray--;
+                        if (levelArray + levelObject == 0) {
+                            sb.addItem(abvsStack.get(1));
+                            items++;
+                        }
                         break;
                     case END_OBJECT:
-                        items = endObject(items);
+                        obStack.get(levelObject - 1).finish();
+                        if (itemStack.size() > 1) {
+                            if (checkItem == itemType.OBJECT) {
+                                obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
+                                        abvsStack.get(levelArray + levelObject));
+                            } else if (checkItem == itemType.ARRAY) {
+                                abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+                            }
+                        }
+                        itemStack.remove(itemStack.size() - 1);
+                        levelObject--;
+                        if (levelObject + levelArray == 0) {
+                            sb.addItem(abvsStack.get(1));
+                            items++;
+                        }
                         break;
                     default:
                         break;
@@ -201,44 +229,6 @@ public class JSONParser implements IParser {
             outResult.write(result.getByteArray());
         } catch (Exception e) {
             throw new HyracksDataException("Accessing or writing in out of bounds space", e);
-        }
-        return items;
-    }
-
-    private int endObject(int items) throws IOException {
-        obStack.get(levelObject - 1).finish();
-        if (itemStack.size() > 1) {
-            if (checkItem == itemType.OBJECT) {
-                obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
-                        abvsStack.get(levelArray + levelObject));
-            } else if (checkItem == itemType.ARRAY) {
-                abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-            }
-        }
-        itemStack.remove(itemStack.size() - 1);
-        levelObject--;
-        if (levelObject + levelArray == 0) {
-            sb.addItem(abvsStack.get(1));
-            items++;
-        }
-        return items;
-    }
-
-    private int endArray(int items) throws IOException {
-        abStack.get(levelArray - 1).finish();
-        if (itemStack.size() > 1) {
-            if (checkItem == itemType.ARRAY) {
-                abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
-            } else if (checkItem == itemType.OBJECT) {
-                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
-                        abvsStack.get(levelArray + levelObject));
-            }
-        }
-        itemStack.remove(itemStack.size() - 1);
-        levelArray--;
-        if (levelArray + levelObject == 0) {
-            sb.addItem(abvsStack.get(1));
-            items++;
         }
         return items;
     }
@@ -280,10 +270,67 @@ public class JSONParser implements IParser {
                         startAtomicValues(ValueTag.XS_DOUBLE_TAG, parser);
                         break;
                     case END_ARRAY:
-                        items = endArrayElements(items);
+                        //if the query doesn't ask for an atomic value
+                        if (!this.literal && this.pathMatch()) {
+                            //check if the path asked from the query includes the current path
+                            abStack.get(levelArray - 1).finish();
+                            if (itemStack.size() > 1) {
+                                if (checkItem == itemType.ARRAY) {
+                                    if (levelArray > this.arrayMatchLevel + 1) {
+                                        abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
+                                    } else if (this.matched) {
+                                        this.matched = false;
+                                        items++;
+                                        writeElement(abvsStack.get(levelArray + levelObject));
+                                    }
+                                } else if (checkItem == itemType.OBJECT) {
+                                    if (levelArray > this.arrayMatchLevel && !this.matched) {
+                                        obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
+                                                abvsStack.get(levelArray + levelObject));
+                                    } else if (this.matched) {
+                                        writeElement(abvsStack.get(levelArray + levelObject));
+                                        this.matched = false;
+                                        items++;
+                                    }
+                                }
+                            }
+                        }
+                        if (allKeys.size() - 1 >= 0) {
+                            allKeys.remove(allKeys.size() - 1);
+                        }
+                        this.arrayCounters.remove(levelArray - 1);
+                        itemStack.remove(itemStack.size() - 1);
+                        levelArray--;
                         break;
                     case END_OBJECT:
-                        items = endObjectElements(items);
+                        //if the query doesn't ask for an atomic value
+                        if (!this.literal && this.pathMatch()) {
+                            //check if the path asked from the query includes the current path
+                            obStack.get(levelObject - 1).finish();
+                            if (itemStack.size() > 1) {
+                                if (checkItem == itemType.OBJECT) {
+                                    if (levelObject > this.objectMatchLevel) {
+                                        obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
+                                                abvsStack.get(levelArray + levelObject));
+                                    } else if (this.matched) {
+                                        this.matched = false;
+                                        items++;
+                                        writeElement(abvsStack.get(levelArray + levelObject));
+                                    }
+                                } else if (checkItem == itemType.ARRAY) {
+                                    abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
+                                    if (this.matched) {
+                                        writeElement(abvsStack.get(levelArray + levelObject));
+                                        this.matched = false;
+                                    }
+                                }
+                            }
+                        }
+                        if (allKeys.size() - 1 >= 0) {
+                            allKeys.remove(allKeys.size() - 1);
+                        }
+                        itemStack.remove(itemStack.size() - 1);
+                        levelObject--;
                         break;
                     default:
                         break;
@@ -294,73 +341,6 @@ public class JSONParser implements IParser {
         } catch (Exception e) {
             throw new HyracksDataException("Accessing or writing in out of bounds space", e);
         }
-        return items;
-    }
-
-    private int endObjectElements(int items) throws IOException {
-        //if the query doesn't ask for an atomic value
-        if (!this.literal && this.pathMatch()) {
-            //check if the path asked from the query includes the current path
-            obStack.get(levelObject - 1).finish();
-            if (itemStack.size() > 1) {
-                if (checkItem == itemType.OBJECT) {
-                    if (levelObject > this.objectMatchLevel) {
-                        obStack.get(levelObject - 2).addItem(spStack.get(levelObject - 2),
-                                abvsStack.get(levelArray + levelObject));
-                    } else if (this.matched) {
-                        this.matched = false;
-                        items++;
-                        writeElement(abvsStack.get(levelArray + levelObject));
-                    }
-                } else if (checkItem == itemType.ARRAY) {
-                    abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-                    if (this.matched) {
-                        writeElement(abvsStack.get(levelArray + levelObject));
-                        this.matched = false;
-                    }
-                }
-            }
-        }
-        if (allKeys.size() - 1 >= 0) {
-            allKeys.remove(allKeys.size() - 1);
-        }
-        itemStack.remove(itemStack.size() - 1);
-        levelObject--;
-        return items;
-    }
-
-    private int endArrayElements(int items) throws IOException {
-        //if the query doesn't ask for an atomic value
-        if (!this.literal && this.pathMatch()) {
-            //check if the path asked from the query includes the current path
-            abStack.get(levelArray - 1).finish();
-            if (itemStack.size() > 1) {
-                if (checkItem == itemType.ARRAY) {
-                    if (levelArray > this.arrayMatchLevel + 1) {
-                        abStack.get(levelArray - 2).addItem(abvsStack.get(levelArray + levelObject));
-                    } else if (this.matched) {
-                        this.matched = false;
-                        items++;
-                        writeElement(abvsStack.get(levelArray + levelObject));
-                    }
-                } else if (checkItem == itemType.OBJECT) {
-                    if (levelArray > this.arrayMatchLevel && !this.matched) {
-                        obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
-                                abvsStack.get(levelArray + levelObject));
-                    } else if (this.matched) {
-                        writeElement(abvsStack.get(levelArray + levelObject));
-                        this.matched = false;
-                        items++;
-                    }
-                }
-            }
-        }
-        if (allKeys.size() - 1 >= 0) {
-            allKeys.remove(allKeys.size() - 1);
-        }
-        this.arrayCounters.remove(levelArray - 1);
-        itemStack.remove(itemStack.size() - 1);
-        levelArray--;
         return items;
     }
 
