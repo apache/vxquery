@@ -32,6 +32,7 @@ import org.apache.hyracks.api.comm.IFrameWriter;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.primitive.BooleanPointable;
+import org.apache.hyracks.data.std.primitive.LongPointable;
 import org.apache.hyracks.data.std.primitive.UTF8StringPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.util.FrameUtils;
@@ -61,7 +62,8 @@ public class JSONParser implements IParser {
     protected itemType checkItem;
     protected int levelArray;
     protected int levelObject;
-    protected final List<Byte[]> allKeys;
+    //protected final List<Byte[]> allKeys;
+    protected final List<Object> allKeys;
     protected ByteArrayOutputStream outputStream;
     protected ByteArrayOutputStream prefixStream;
     protected ByteArrayOutputStream pathStream;
@@ -74,6 +76,9 @@ public class JSONParser implements IParser {
     protected List<Boolean> keysOrMembers;
     protected IFrameWriter writer;
     protected IFrameFieldAppender appender;
+    protected boolean[] matchedKeys;
+    protected Object[] subelements;
+    protected boolean skipping;
 
     enum itemType {
         ARRAY,
@@ -115,23 +120,35 @@ public class JSONParser implements IParser {
         keysOrMembers = new ArrayList<>();
         outputStream.reset();
         pathStream.reset();
+        subelements = new Object[valuePointables.size()];
+        matchedKeys = new boolean[valuePointables.size()];
+        skipping = true;
         for (int i = 0; i < valuePointables.size(); i++) {
             if (((TaggedValuePointable) valuePointables.get(i)).getTag() == ValueTag.XS_INTEGER_TAG) {
                 // access an item of an array
-                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
-                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset());
+                //                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
+                //                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset());
+                LongPointable lp = new LongPointable();
+                lp.set(valuePointables.get(i).getByteArray(), 1, valuePointables.get(i).getLength());
+                subelements[i] = lp.getLong();
                 this.arrayMatchLevel++;
                 this.keysOrMembers.add(Boolean.valueOf(true));
             } else if (((TaggedValuePointable) valuePointables.get(i)).getTag() == ValueTag.XS_BOOLEAN_TAG) {
                 // access all the items of an array or all the keys of an object
-                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
-                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset());
+                //                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset(),
+                //                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset());
+
+                subelements[i] = Boolean.FALSE;
                 this.arrayMatchLevel++;
                 this.keysOrMembers.add(Boolean.valueOf(false));
             } else {
                 //access an object
-                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset() + 1,
-                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset() - 1);
+                //                pathStream.write(valuePointables.get(i).getByteArray(), valuePointables.get(i).getStartOffset() + 1,
+                //                        valuePointables.get(i).getLength() - valuePointables.get(i).getStartOffset() - 1);
+
+                UTF8StringPointable sp = new UTF8StringPointable();
+                sp.set(valuePointables.get(i).getByteArray(), 1, valuePointables.get(i).getLength() - 1);
+                subelements[i] = sp.toString();
             }
         }
     }
@@ -271,7 +288,8 @@ public class JSONParser implements IParser {
                         break;
                     case END_ARRAY:
                         //if the query doesn't ask for an atomic value
-                        if (!this.literal && this.pathMatch()) {
+//                        if (!this.literal && this.pathMatch()) {
+                        if (!this.literal && !skipping) {
                             //check if the path asked from the query includes the current path
                             abStack.get(levelArray - 1).finish();
                             if (itemStack.size() > 1) {
@@ -287,7 +305,8 @@ public class JSONParser implements IParser {
                                     if (levelArray > this.arrayMatchLevel && !this.matched) {
                                         obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1),
                                                 abvsStack.get(levelArray + levelObject));
-                                    } else if (this.matched) {
+                                        //                                    } else if (this.matched) {
+                                    } else if (!skipping) {
                                         writeElement(abvsStack.get(levelArray + levelObject));
                                         this.matched = false;
                                         items++;
@@ -304,7 +323,8 @@ public class JSONParser implements IParser {
                         break;
                     case END_OBJECT:
                         //if the query doesn't ask for an atomic value
-                        if (!this.literal && this.pathMatch()) {
+//                        if (!this.literal && this.pathMatch()) {
+                        if (!this.literal && !skipping) {
                             //check if the path asked from the query includes the current path
                             obStack.get(levelObject - 1).finish();
                             if (itemStack.size() > 1) {
@@ -319,9 +339,12 @@ public class JSONParser implements IParser {
                                     }
                                 } else if (checkItem == itemType.ARRAY) {
                                     abStack.get(levelArray - 1).addItem(abvsStack.get(levelArray + levelObject));
-                                    if (this.matched) {
+                                    // if (this.matched) {
+                                    if (!skipping) {
                                         writeElement(abvsStack.get(levelArray + levelObject));
                                         this.matched = false;
+                                        skipping = true;
+                                        // }
                                     }
                                 }
                             }
@@ -346,24 +369,42 @@ public class JSONParser implements IParser {
 
     private boolean pathMatch() {
         outputStream.reset();
-        for (Byte[] bb : allKeys) {
-            outputStream.write(ArrayUtils.toPrimitive(bb), 0, ArrayUtils.toPrimitive(bb).length);
-        }
+        //        for (Byte[] bb : allKeys) {
+        //            outputStream.write(ArrayUtils.toPrimitive(bb), 0, ArrayUtils.toPrimitive(bb).length);
+        //        }
         //the path of values created by parsing the file
         boolean contains = false;
         this.matched = false;
         prefixStream.reset();
-        if (pathStream.size() < outputStream.size()) {
-            prefixStream.write(outputStream.toByteArray(), 0, pathStream.size());
-            contains = Arrays.equals(prefixStream.toByteArray(), pathStream.toByteArray());
-        } else {
-            prefixStream.write(pathStream.toByteArray(), 0, outputStream.size());
-            contains = Arrays.equals(prefixStream.toByteArray(), outputStream.toByteArray());
+        //        if (pathStream.size() < outputStream.size()) {
+        //            prefixStream.write(outputStream.toByteArray(), 0, pathStream.size());
+        //            contains = Arrays.equals(prefixStream.toByteArray(), pathStream.toByteArray());
+        //        } else {
+        //            prefixStream.write(pathStream.toByteArray(), 0, outputStream.size());
+        //            contains = Arrays.equals(prefixStream.toByteArray(), outputStream.toByteArray());
+        //        }
+        //        if (pathStream.size() == outputStream.size() && contains) {
+        //            this.objectMatchLevel = this.levelObject;
+        //            this.matched = true;
+        //            this.literal = false;
+        //        }
+        if (!allKeys.isEmpty()) {
+            if (allKeys.size() <= valuePointables.size()) {
+                //for(int i=0; i<allKeys.size(); i++){
+                if (allKeys.get(allKeys.size() - 1).equals(subelements[allKeys.size() - 1])) {
+                    matchedKeys[allKeys.size() - 1] = true;
+                }
+            }
         }
-        if (pathStream.size() == outputStream.size() && contains) {
-            this.objectMatchLevel = this.levelObject;
-            this.matched = true;
-            this.literal = false;
+        for (boolean b : matchedKeys) {
+            if (!b) {
+                contains = false;
+            } else {
+                contains = true;
+            }
+        }
+        if (contains) {
+            skipping = false;
         }
         return contains;
     }
@@ -374,10 +415,12 @@ public class JSONParser implements IParser {
                     : true;
             if (addCounter) {
                 this.arrayCounters.set(levelArray - 1, this.arrayCounters.get(levelArray - 1) + 1);
-                this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - 1)));
+                //this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - 1)));
+                this.allKeys.add(this.arrayCounters.get(levelArray - 1));
             } else {
                 Byte[] bool = { (byte) 0x2B, 0x01 };
-                this.allKeys.add(bool);
+                //this.allKeys.add(bool);
+                this.allKeys.add(Boolean.FALSE);
             }
         }
     }
@@ -427,10 +470,12 @@ public class JSONParser implements IParser {
             if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
                 if (addCounter) {
                     this.arrayCounters.set(levelArray - count, this.arrayCounters.get(levelArray - count) + 1);
-                    this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - count)));
+                    // this.allKeys.add(this.toBytes(this.arrayCounters.get(levelArray - count)));
+                    this.allKeys.add(this.arrayCounters.get(levelArray - count));
                 } else {
                     XDMConstants.setTrue(bp);
-                    this.allKeys.add(ArrayUtils.toObject(bp.getByteArray()));
+                    //this.allKeys.add(ArrayUtils.toObject(bp.getByteArray()));
+                    this.allKeys.add(Boolean.FALSE);
                 }
             }
 
@@ -495,20 +540,27 @@ public class JSONParser implements IParser {
                 byte[] barr = spStack.get(levelObject - 1).getByteArray();
                 outputStream.reset();
                 outputStream.write(barr, 0, spStack.get(levelObject - 1).getLength());
-                allKeys.add(ArrayUtils.toObject(outputStream.toByteArray()));
+                //allKeys.add(ArrayUtils.toObject(outputStream.toByteArray()));
+                allKeys.add(spStack.get(levelObject - 1).toString());
                 for (int i = 0; i < allKeys.size() - 1; i++) {
-                    tvp.set(ArrayUtils.toPrimitive(allKeys.get(i)), 0, ArrayUtils.toPrimitive(allKeys.get(i)).length);
-                    length += ArrayUtils.toPrimitive(allKeys.get(i)).length;
+                    //  tvp.set(ArrayUtils.toPrimitive(allKeys.get(i)), 0, ArrayUtils.toPrimitive(allKeys.get(i)).length);
+                    //length += ArrayUtils.toPrimitive(allKeys.get(i)).length;
                 }
                 //if the next two bytes represent a boolean (boolean has only two bytes),
                 //it means that query asks for all the keys of the object
-                if (length <= pathStream.size() && (length + 2) <= pathStream.size()) {
-                    tvp.set(pathStream.toByteArray(), length, length + 2);
-                    if (tvp.getTag() == ValueTag.XS_BOOLEAN_TAG) {
-                        abvsStack.get(0).reset();
-                        out.write(ValueTag.XS_STRING_TAG);
-                        svb.write(parser.getText(), out);
-                        writeElement(abvsStack.get(0));
+                //                if (length <= pathStream.size() && (length + 2) <= pathStream.size()) {
+                //                    tvp.set(pathStream.toByteArray(), length, length + 2);
+                //if (tvp.getTag() == ValueTag.XS_BOOLEAN_TAG) {
+                if (allKeys.size() < valuePointables.size()) {
+                    if (allKeys.get(allKeys.size() - 1) == valuePointables.get(allKeys.size() - 1).toString()) {
+                        tvp.set(valuePointables.get(allKeys.size()));
+                        if (tvp.getTag() == ValueTag.XS_BOOLEAN_TAG) {
+                            abvsStack.get(0).reset();
+                            out.write(ValueTag.XS_STRING_TAG);
+                            svb.write(parser.getText(), out);
+                            writeElement(abvsStack.get(0));
+                        }
+                        //                }
                     }
                 }
             }
