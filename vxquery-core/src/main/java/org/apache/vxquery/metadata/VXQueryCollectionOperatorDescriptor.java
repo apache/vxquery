@@ -126,7 +126,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 if (i == 0) {
                     tvp.set(valueBytes, 0, valueOffsets.get(i));
                 } else {
-                    tvp.set(valueBytes, valueOffsets.get(i - 1), valueOffsets.get(i));
+                    tvp.set(valueBytes, valueOffsets.get(i - 1), valueOffsets.get(i) - valueOffsets.get(i - 1));
                 }
                 valuePointables.add(tvp);
             }
