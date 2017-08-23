@@ -55,6 +55,7 @@ import org.apache.vxquery.types.SequenceType;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
 import org.apache.vxquery.xmlparser.SAXContentHandler;
 import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 public class VXQueryIndexReader {
@@ -284,7 +285,7 @@ public class VXQueryIndexReader {
                     element = contents.substring(nextdot + 1, firstColon);
                 }
                 atts.reset();
-                handler.startElement(uri, element, element, atts);
+                handler.startElement(uri, element, element, (Attributes) atts);
                 elements++;
             }
         }
@@ -297,7 +298,7 @@ public class VXQueryIndexReader {
         if ("element".equals(type)) {
             atts.reset();
             whereIFinish = findAttributeChildren(whereIFinish, atts);
-            handler.startElement(uri, lastBit, lastBit, atts);
+            handler.startElement(uri, lastBit, lastBit, (Attributes) atts);
 
             boolean noMoreChildren = false;
 
@@ -345,7 +346,7 @@ public class VXQueryIndexReader {
                     lastdot = contents.lastIndexOf('.');
                     String nextlastbit = contents.substring(firstcolon + 1, lastdot);
                     atts.addValues(nextlastbit);
-                    atts.addUris(lastbit);
+                    atts.addUris("");
                     atts.addLocalNames(lastbit);
                     atts.addTypes(lastbit);
                     atts.addqNames(lastbit);
