@@ -19,7 +19,6 @@ package org.apache.vxquery.compiler.rewriter.rules;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
@@ -47,7 +46,7 @@ import org.apache.vxquery.metadata.IVXQueryDataSource;
  * After
  *
  *   plan__parent
- *   ASSIGN( $v2 : $v1 ) 
+ *   ASSIGN( $v2 : $v1 )
  *   DATASCAN( $source : $v1 )
  *   plan__child
  *
@@ -61,12 +60,12 @@ public class PushKeysOrMembersIntoDatascanRule extends AbstractPushExpressionInt
         AbstractVXQueryDataSource ds = (AbstractVXQueryDataSource) datasource;
         boolean added = false;
         BooleanPointable bp = (BooleanPointable) BooleanPointable.FACTORY.createPointable();
-        List<Mutable<ILogicalExpression>> findkeys = new ArrayList<Mutable<ILogicalExpression>>();
+        List<Mutable<ILogicalExpression>> findkeys = new ArrayList<>();
         ExpressionToolbox.findAllFunctionExpressions(expression,
                 BuiltinOperators.KEYS_OR_MEMBERS.getFunctionIdentifier(), findkeys);
         for (int i = findkeys.size(); i > 0; --i) {
             XDMConstants.setTrue(bp);
-            ds.addValueSeq(ArrayUtils.toObject(bp.getByteArray()));
+            ds.appendValueSequence(bp);
             added = true;
         }
         return added;

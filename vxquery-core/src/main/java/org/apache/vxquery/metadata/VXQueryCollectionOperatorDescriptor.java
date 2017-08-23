@@ -56,6 +56,7 @@ import org.apache.hyracks.api.dataflow.value.IRecordDescriptorProvider;
 import org.apache.hyracks.api.dataflow.value.RecordDescriptor;
 import org.apache.hyracks.api.exceptions.HyracksDataException;
 import org.apache.hyracks.api.job.IOperatorDescriptorRegistry;
+import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.hyracks.dataflow.common.comm.io.FrameFixedFieldTupleAppender;
 import org.apache.hyracks.dataflow.common.comm.io.FrameTupleAccessor;
@@ -64,6 +65,7 @@ import org.apache.hyracks.dataflow.std.base.AbstractUnaryInputUnaryOutputOperato
 import org.apache.hyracks.hdfs.ContextFactory;
 import org.apache.hyracks.hdfs2.dataflow.FileSplitsFactory;
 import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.hdfs2.HDFSFunctions;
 import org.apache.vxquery.jsonparser.JSONParser;
 import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
@@ -76,7 +78,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private short totalDataSources;
     private String[] collectionPartitions;
     private List<Integer> childSeq;
-    private List<Byte[]> valueSeq;
+    private List<Integer> valueOffsets;
+    private byte[] valueBytes;
     protected static final Logger LOGGER = Logger.getLogger(VXQueryCollectionOperatorDescriptor.class.getName());
     private HDFSFunctions hdfs;
     private String tag;
@@ -91,7 +94,8 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
         childSeq = ds.getChildSeq();
-        valueSeq = ds.getValueSeq();
+        valueBytes = ds.getValueBytes();
+        valueOffsets = ds.getValueOffsets();
         recordDescriptors[0] = rDesc;
         this.tag = ds.getTag();
         this.hdfsConf = hdfsConf;
@@ -114,7 +118,22 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final String collectionName = collectionPartitions[partition % collectionPartitions.length];
         final XMLParser parser = new XMLParser(false, nodeIdProvider, nodeId, appender, childSeq,
                 dCtx.getStaticContext());
-        final JSONParser jparser = new JSONParser(valueSeq);
+
+        List<IPointable> valuePointables = new ArrayList<>();
+        {
+            for (int i = 0; i < valueOffsets.size(); ++i) {
+                TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+                if (i == 0) {
+                    tvp.set(valueBytes, 0, valueOffsets.get(i));
+                } else {
+                    tvp.set(valueBytes, valueOffsets.get(i - 1), valueOffsets.get(i) - valueOffsets.get(i - 1));
+                }
+                valuePointables.add(tvp);
+            }
+        }
+        final JSONParser jparser = new JSONParser(valuePointables);
+        final String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
+        final boolean hdfsQuery = collectionModifiedName.contains("hdfs:/");
 
         return new AbstractUnaryInputUnaryOutputOperatorNodePushable() {
             @Override
@@ -127,116 +146,19 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
             @Override
             public void nextFrame(ByteBuffer buffer) throws HyracksDataException {
                 fta.reset(buffer);
-                String collectionModifiedName = collectionName.replace("${nodeId}", nodeId);
 
-                if (!collectionModifiedName.contains("hdfs:/")) {
-                    File collectionDirectory = new File(collectionModifiedName);
-                    // check if directory is in the local file system
-                    if (collectionDirectory.exists()) {
-                        // Go through each tuple.
-                        if (collectionDirectory.isDirectory()) {
-                            xmlAndJsonCollection(collectionDirectory);
-                        } else {
-                            throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
-                                    + collectionDirectory.getAbsolutePath() + ") passed to collection.");
-                        }
-                    }
+                if (!hdfsQuery) {
+                    processLocalFiles(collectionModifiedName);
                 } else {
                     // Else check in HDFS file system
                     // Get instance of the HDFS filesystem
                     FileSystem fs = hdfs.getFileSystem();
                     if (fs != null) {
-                        collectionModifiedName = collectionModifiedName.replaceAll("hdfs:/", "");
-                        Path directory = new Path(collectionModifiedName);
-                        Path xmlDocument;
+                        Path directory = new Path(collectionModifiedName.replaceAll("hdfs:/", ""));
                         if (tag != null) {
-                            hdfs.setJob(directory.toString(), tag);
-                            tag = "<" + tag + ">";
-                            Job job = hdfs.getJob();
-                            InputFormat inputFormat = hdfs.getinputFormat();
-                            try {
-                                hdfs.scheduleSplits();
-                                ArrayList<Integer> schedule = hdfs
-                                        .getScheduleForNode(InetAddress.getLocalHost().getHostAddress());
-                                List<InputSplit> splits = hdfs.getSplits();
-                                List<FileSplit> fileSplits = new ArrayList<>();
-                                for (int i : schedule) {
-                                    fileSplits.add((FileSplit) splits.get(i));
-                                }
-                                FileSplitsFactory splitsFactory = new FileSplitsFactory(fileSplits);
-                                List<FileSplit> inputSplits = splitsFactory.getSplits();
-                                ContextFactory ctxFactory = new ContextFactory();
-                                int size = inputSplits.size();
-                                InputStream stream;
-                                String value;
-                                RecordReader reader;
-                                TaskAttemptContext context;
-                                for (int i = 0; i < size; i++) {
-                                    // read split
-                                    context = ctxFactory.createContext(job.getConfiguration(), i);
-                                    reader = inputFormat.createRecordReader(inputSplits.get(i), context);
-                                    reader.initialize(inputSplits.get(i), context);
-                                    while (reader.nextKeyValue()) {
-                                        value = reader.getCurrentValue().toString();
-                                        // Split value if it contains more than
-                                        // one item with the tag
-                                        if (StringUtils.countMatches(value, tag) > 1) {
-                                            String[] items = value.split(tag);
-                                            for (String item : items) {
-                                                if (item.length() > 0) {
-                                                    item = START_TAG + tag + item;
-                                                    stream = new ByteArrayInputStream(
-                                                            item.getBytes(StandardCharsets.UTF_8));
-                                                    parser.parseHDFSElements(stream, writer, fta, i);
-                                                    stream.close();
-                                                }
-                                            }
-                                        } else {
-                                            value = START_TAG + value;
-                                            // create an input stream to the
-                                            // file currently reading and send
-                                            // it to parser
-                                            stream = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
-                                            parser.parseHDFSElements(stream, writer, fta, i);
-                                            stream.close();
-                                        }
-                                    }
-                                    reader.close();
-                                }
-
-                            } catch (Exception e) {
-                                throw new HyracksDataException(e);
-                            }
+                            processHdfsTag(fta, parser, directory);
                         } else {
-                            try {
-                                // check if the path exists and is a directory
-                                if (fs.exists(directory) && fs.isDirectory(directory)) {
-                                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-                                        // read every file in the directory
-                                        RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
-                                        while (it.hasNext()) {
-                                            xmlDocument = it.next().getPath();
-                                            if (fs.isFile(xmlDocument)) {
-                                                if (LOGGER.isLoggable(Level.FINE)) {
-                                                    LOGGER.fine(
-                                                            "Starting to read XML document: " + xmlDocument.getName());
-                                                }
-                                                // create an input stream to the
-                                                // file currently reading and
-                                                // send it to parser
-                                                InputStream in = fs.open(xmlDocument).getWrappedStream();
-                                                parser.parseHDFSElements(in, writer, fta, tupleIndex);
-                                                in.close();
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    throw new HyracksDataException("Invalid HDFS directory parameter (" + nodeId + ":"
-                                            + directory + ") passed to collection.");
-                                }
-                            } catch (Exception e) {
-                                throw new HyracksDataException(e);
-                            }
+                            processHdfsFiles(fta, nodeId, parser, fs, directory);
                         }
                         try {
                             fs.close();
@@ -247,29 +169,129 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                 }
             }
 
-            public void xmlAndJsonCollection(File directory) throws HyracksDataException {
+            private void processHdfsTag(final FrameTupleAccessor fta, final XMLParser parser, Path directory)
+                    throws HyracksDataException {
+                hdfs.setJob(directory.toString(), tag);
+                tag = "<" + tag + ">";
+                Job job = hdfs.getJob();
+                InputFormat inputFormat = hdfs.getinputFormat();
+                try {
+                    hdfs.scheduleSplits();
+                    ArrayList<Integer> schedule = hdfs.getScheduleForNode(InetAddress.getLocalHost().getHostAddress());
+                    List<InputSplit> splits = hdfs.getSplits();
+                    List<FileSplit> fileSplits = new ArrayList<>();
+                    for (int i : schedule) {
+                        fileSplits.add((FileSplit) splits.get(i));
+                    }
+                    FileSplitsFactory splitsFactory = new FileSplitsFactory(fileSplits);
+                    List<FileSplit> inputSplits = splitsFactory.getSplits();
+                    ContextFactory ctxFactory = new ContextFactory();
+                    int size = inputSplits.size();
+                    InputStream stream;
+                    String value;
+                    RecordReader reader;
+                    TaskAttemptContext context;
+                    for (int i = 0; i < size; i++) {
+                        // read split
+                        context = ctxFactory.createContext(job.getConfiguration(), i);
+                        reader = inputFormat.createRecordReader(inputSplits.get(i), context);
+                        reader.initialize(inputSplits.get(i), context);
+                        while (reader.nextKeyValue()) {
+                            value = reader.getCurrentValue().toString();
+                            // Split value if it contains more than
+                            // one item with the tag
+                            if (StringUtils.countMatches(value, tag) > 1) {
+                                String[] items = value.split(tag);
+                                for (String item : items) {
+                                    if (item.length() > 0) {
+                                        item = START_TAG + tag + item;
+                                        stream = new ByteArrayInputStream(item.getBytes(StandardCharsets.UTF_8));
+                                        parser.parseHDFSElements(stream, writer, fta, i);
+                                        stream.close();
+                                    }
+                                }
+                            } else {
+                                value = START_TAG + value;
+                                // create an input stream to the
+                                // file currently reading and send
+                                // it to parser
+                                stream = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
+                                parser.parseHDFSElements(stream, writer, fta, i);
+                                stream.close();
+                            }
+                        }
+                        reader.close();
+                    }
+
+                } catch (Exception e) {
+                    throw new HyracksDataException(e);
+                }
+            }
+
+            private void processHdfsFiles(final FrameTupleAccessor fta, final String nodeId, final XMLParser parser,
+                    FileSystem fs, Path directory) throws HyracksDataException {
+                Path xmlDocument;
+                try {
+                    // check if the path exists and is a directory
+                    if (!fs.exists(directory) || !fs.isDirectory(directory)) {
+                        throw new HyracksDataException("Invalid HDFS directory parameter (" + nodeId + ":" + directory
+                                + ") passed to collection.");
+                    }
+                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
+                        // read every file in the directory
+                        RemoteIterator<LocatedFileStatus> it = fs.listFiles(directory, true);
+                        while (it.hasNext()) {
+                            xmlDocument = it.next().getPath();
+                            if (fs.isFile(xmlDocument)) {
+                                if (LOGGER.isLoggable(Level.FINE)) {
+                                    LOGGER.fine("Starting to read XML document: " + xmlDocument.getName());
+                                }
+                                // create an input stream to the
+                                // file currently reading and
+                                // send it to parser
+                                InputStream in = fs.open(xmlDocument).getWrappedStream();
+                                parser.parseHDFSElements(in, writer, fta, tupleIndex);
+                                in.close();
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new HyracksDataException(e);
+                }
+            }
+
+            private void processLocalFiles(String collectionModifiedName) throws HyracksDataException {
                 Reader input;
-                for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
-                    Iterator<File> it = FileUtils.iterateFiles(directory, new VXQueryIOFileFilter(),
-                            TrueFileFilter.INSTANCE);
-                    while (it.hasNext()) {
-                        File file = it.next();
-                        String fileName = file.getName().toLowerCase();
-                        if (fileName.endsWith(".xml")) {
-                            if (LOGGER.isLoggable(Level.FINE)) {
-                                LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
-                            }
-                            parser.parseElements(file, writer, tupleIndex);
-                        } else if (fileName.endsWith(".json")) {
-                            if (LOGGER.isLoggable(Level.FINE)) {
-                                LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());
-                            }
-                            try {
-                                jsonAbvs.reset();
-                                input = new InputStreamReader(new FileInputStream(file));
-                                jparser.parse(input, jsonAbvs, writer, appender);
-                            } catch (FileNotFoundException e) {
-                                throw new HyracksDataException(e.toString());
+                File collectionDirectory = new File(collectionModifiedName);
+                // check if directory is in the local file system
+                if (collectionDirectory.exists()) {
+                    // Go through each tuple.
+                    if (!collectionDirectory.isDirectory()) {
+                        throw new HyracksDataException("Invalid directory parameter (" + nodeId + ":"
+                                + collectionDirectory.getAbsolutePath() + ") passed to collection.");
+                    }
+                    for (int tupleIndex = 0; tupleIndex < fta.getTupleCount(); ++tupleIndex) {
+                        Iterator<File> it = FileUtils.iterateFiles(collectionDirectory, new VXQueryIOFileFilter(),
+                                TrueFileFilter.INSTANCE);
+                        while (it.hasNext()) {
+                            File file = it.next();
+                            String fileName = file.getName().toLowerCase();
+                            if (fileName.endsWith(".xml")) {
+                                if (LOGGER.isLoggable(Level.FINE)) {
+                                    LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
+                                }
+                                parser.parseElements(file, writer, tupleIndex);
+                            } else if (fileName.endsWith(".json")) {
+                                if (LOGGER.isLoggable(Level.FINE)) {
+                                    LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());
+                                }
+                                try {
+                                    jsonAbvs.reset();
+                                    input = new InputStreamReader(new FileInputStream(file));
+                                    jparser.parse(input, jsonAbvs, writer, appender);
+                                } catch (FileNotFoundException e) {
+                                    throw new HyracksDataException(e);
+                                }
                             }
                         }
                     }

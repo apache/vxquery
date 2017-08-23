@@ -19,18 +19,7 @@ package org.apache.vxquery.compiler.rewriter.rules.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
-import org.apache.vxquery.context.StaticContext;
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-import org.apache.vxquery.functions.BuiltinFunctions;
-import org.apache.vxquery.functions.BuiltinOperators;
-import org.apache.vxquery.functions.Function;
-import org.apache.vxquery.types.AnyNodeType;
-import org.apache.vxquery.types.Quantifier;
-import org.apache.vxquery.types.SequenceType;
-
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
@@ -43,6 +32,15 @@ import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractAssi
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.UnnestOperator;
 import org.apache.hyracks.data.std.primitive.IntegerPointable;
+import org.apache.vxquery.compiler.algebricks.VXQueryConstantValue;
+import org.apache.vxquery.context.StaticContext;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
+import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.functions.BuiltinOperators;
+import org.apache.vxquery.functions.Function;
+import org.apache.vxquery.types.AnyNodeType;
+import org.apache.vxquery.types.Quantifier;
+import org.apache.vxquery.types.SequenceType;
 
 public class ExpressionToolbox {
     public static Mutable<ILogicalExpression> findVariableExpression(Mutable<ILogicalExpression> mutableLe,
@@ -213,16 +211,14 @@ public class ExpressionToolbox {
         return pTypeCode.getInteger();
     }
 
-    public static Byte[] getConstantArgument(Mutable<ILogicalExpression> searchM, int arg) {
+    public static void getConstantArgument(Mutable<ILogicalExpression> searchM, int arg, TaggedValuePointable tvp) {
         AbstractFunctionCallExpression searchFunction = (AbstractFunctionCallExpression) searchM.getValue();
         ILogicalExpression argType = searchFunction.getArguments().get(arg).getValue();
         searchFunction.getArguments().size();
         if (argType.getExpressionTag() != LogicalExpressionTag.CONSTANT) {
-            return null;
+            return;
         }
-        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         ExpressionToolbox.getConstantAsPointable((ConstantExpression) argType, tvp);
-        return ArrayUtils.toObject(tvp.getByteArray());
     }
 
     public static List<ILogicalExpression> getFullArguments(Mutable<ILogicalExpression> searchM) {
