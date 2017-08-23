@@ -107,7 +107,7 @@ public class IndexDocumentBuilder extends XMLSerializer {
 
         doc.add(new StringField(Constants.FIELD_PATH, filePath, Field.Store.YES));
         print(bstart, sstart, lstart, "0", "");
-        for (int i = 1; i < results.size() - 1; i++) {
+        for (int i = 1; i < results.size(); i++) {
             //TODO: Since each doc is a file,
             //we can only handle files
             //small enough to fit in memory
