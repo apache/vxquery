@@ -215,7 +215,7 @@ public class JSONParser implements IParser {
             checkItem = null;
 
             this.matched = false;
-
+            matchedKeys = new boolean[valuePointables.size()];
             levelArray = 0;
             levelObject = 0;
             sb.reset(result);
@@ -268,9 +268,13 @@ public class JSONParser implements IParser {
                         if (allKeys.size() - 1 >= 0) {
                             allKeys.remove(allKeys.size() - 1);
                         }
-                        this.arrayCounters.remove(levelArray - 1);
+                        if (levelArray > 0) {
+                            this.arrayCounters.remove(levelArray - 1);
+                        }
                         itemStack.remove(itemStack.size() - 1);
-                        levelArray--;
+                        if (levelArray > 0) {
+                            levelArray--;
+                        }
                         break;
                     case END_OBJECT:
                         //if the query doesn't ask for an atomic value
@@ -291,6 +295,7 @@ public class JSONParser implements IParser {
                                     if (!matched) {
                                         writeElement(abvsStack.get(levelArray + levelObject));
                                         skipping = true;
+                                        items++;
                                     }
                                 }
                             }
@@ -299,7 +304,9 @@ public class JSONParser implements IParser {
                             allKeys.remove(allKeys.size() - 1);
                         }
                         itemStack.remove(itemStack.size() - 1);
-                        levelObject--;
+                        if (levelObject > 0) {
+                            levelObject--;
+                        }
                         break;
                     default:
                         break;
@@ -314,7 +321,7 @@ public class JSONParser implements IParser {
     }
 
     private boolean pathMatch() {
-        boolean contains = false;
+        boolean contains = true;
         if (!allKeys.isEmpty() && allKeys.size() <= valuePointables.size()) {
             if (allKeys.get(allKeys.size() - 1).equals(subelements[allKeys.size() - 1])) {
                 matchedKeys[allKeys.size() - 1] = true;
@@ -325,8 +332,6 @@ public class JSONParser implements IParser {
         for (boolean b : matchedKeys) {
             if (!b) {
                 contains = false;
-            } else {
-                contains = true;
             }
         }
         if (contains) {
@@ -336,7 +341,8 @@ public class JSONParser implements IParser {
     }
 
     public void itemsInArray() {
-        if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY && !this.arrayCounters.isEmpty()) {
+        if (!itemStack.isEmpty() && itemStack.get(itemStack.size() - 1) == itemType.ARRAY
+                && !this.arrayCounters.isEmpty()) {
             boolean addCounter = subelements[allKeys.size()].equals(Boolean.TRUE) ? false : true;
             if (addCounter) {
                 this.arrayCounters.set(levelArray - 1, this.arrayCounters.get(levelArray - 1) + 1);
@@ -360,18 +366,24 @@ public class JSONParser implements IParser {
         }
         if (!itemStack.isEmpty()) {
             if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
-                abStack.get(levelArray - 1).addItem(abvsStack.get(0));
+                if (levelArray > 0) {
+                    abStack.get(levelArray - 1).addItem(abvsStack.get(0));
+                }
                 if (!valuePointables.isEmpty()
                         && allKeys.get(allKeys.size() - 1).equals(subelements[subelements.length - 1])) {
                     writeElement(abvsStack.get(0));
                     matched = true;
+                    skipping = true;
                 }
             } else if (itemStack.get(itemStack.size() - 1) == itemType.OBJECT) {
-                obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
+                if (levelObject > 0) {
+                    obStack.get(levelObject - 1).addItem(spStack.get(levelObject - 1), abvsStack.get(0));
+                }
                 if (!valuePointables.isEmpty()
                         && allKeys.get(allKeys.size() - 1).equals(subelements[subelements.length - 1])) {
                     writeElement(abvsStack.get(0));
                     matched = true;
+                    skipping = true;
                 }
             }
         }
@@ -386,7 +398,7 @@ public class JSONParser implements IParser {
     }
 
     public void startArrayOrObjects(int count) {
-        if (!valuePointables.isEmpty() && !this.arrayCounters.isEmpty()) {
+        if (!valuePointables.isEmpty() && !this.arrayCounters.isEmpty() && levelArray > 0) {
             boolean addCounter = subelements[allKeys.size()].equals(Boolean.TRUE) ? false : true;
             if (itemStack.get(itemStack.size() - 1) == itemType.ARRAY) {
                 if (addCounter) {
@@ -404,16 +416,17 @@ public class JSONParser implements IParser {
     }
 
     public void startArray() throws HyracksDataException {
-        levelArray++;
-        if (levelArray > abStack.size()) {
-            abStack.add(new ArrayBuilder());
-        }
-        if (levelArray + levelObject > abvsStack.size() - 1) {
-            abvsStack.add(new ArrayBackedValueStorage());
-        }
         startArrayOrObjects(2);
         itemStack.add(itemType.ARRAY);
-        if (this.pathMatch() || valuePointables.isEmpty()) {
+        if (this.pathMatch() || valuePointables.isEmpty() || subelements[allKeys.size()].equals(Boolean.TRUE)
+                || subelements[allKeys.size()] instanceof Long) {
+            levelArray++;
+            if (levelArray > abStack.size()) {
+                abStack.add(new ArrayBuilder());
+            }
+            if (levelArray + levelObject > abvsStack.size() - 1) {
+                abvsStack.add(new ArrayBackedValueStorage());
+            }
             abvsStack.get(levelArray + levelObject).reset();
             try {
                 abStack.get(levelArray - 1).reset(abvsStack.get(levelArray + levelObject));
@@ -424,16 +437,16 @@ public class JSONParser implements IParser {
     }
 
     public void startObject() throws HyracksDataException {
-        levelObject++;
-        if (levelObject > obStack.size()) {
-            obStack.add(new ObjectBuilder());
-        }
-        if (levelArray + levelObject > abvsStack.size() - 1) {
-            abvsStack.add(new ArrayBackedValueStorage());
-        }
         startArrayOrObjects(1);
         itemStack.add(itemType.OBJECT);
         if (this.pathMatch() || valuePointables.isEmpty()) {
+            levelObject++;
+            if (levelObject > obStack.size()) {
+                obStack.add(new ObjectBuilder());
+            }
+            if (levelArray + levelObject > abvsStack.size() - 1) {
+                abvsStack.add(new ArrayBackedValueStorage());
+            }
             abvsStack.get(levelArray + levelObject).reset();
             try {
                 obStack.get(levelObject - 1).reset(abvsStack.get(levelArray + levelObject));
@@ -444,27 +457,38 @@ public class JSONParser implements IParser {
     }
 
     public void startFieldName(JsonParser parser) throws HyracksDataException {
-        if (levelObject > spStack.size()) {
+        if (levelObject > spStack.size() || spStack.isEmpty()) {
             keyStack.add(new ArrayBackedValueStorage());
             spStack.add(new UTF8StringPointable());
         }
-        keyStack.get(levelObject - 1).reset();
-        DataOutput outk = keyStack.get(levelObject - 1).getDataOutput();
+        try {
+            allKeys.add(parser.getText());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        int keyaccess;
+        if (valuePointables.isEmpty()) {
+            keyaccess = levelObject;
+        } else {
+            keyaccess = keyStack.size();
+        }
+        keyStack.get(keyaccess - 1).reset();
+        DataOutput outk = keyStack.get(keyaccess - 1).getDataOutput();
         try {
             svb.write(parser.getText(), outk);
-            spStack.get(levelObject - 1).set(keyStack.get(levelObject - 1));
+            spStack.get(keyaccess - 1).set(keyStack.get(keyaccess - 1));
             if (!valuePointables.isEmpty()) {
-                allKeys.add(spStack.get(levelObject - 1).toString());
                 //if the next two bytes represent a boolean (boolean has only two bytes),
                 //it means that query asks for all the keys of the object
-                if (allKeys.size() < valuePointables.size()) {
-                    if (allKeys.get(allKeys.size() - 1) == valuePointables.get(allKeys.size() - 1).toString()) {
-                        tvp.set(valuePointables.get(allKeys.size()));
+                if (allKeys.size() == valuePointables.size()) {
+                    if (allKeys.get(allKeys.size() - 2).equals(subelements[allKeys.size() - 2])) {
+                        tvp.set(valuePointables.get(allKeys.size() - 1));
                         if (tvp.getTag() == ValueTag.XS_BOOLEAN_TAG) {
                             abvsStack.get(0).reset();
                             out.write(ValueTag.XS_STRING_TAG);
                             svb.write(parser.getText(), out);
                             writeElement(abvsStack.get(0));
+                            matchedKeys[allKeys.size() - 2] = false;
                         }
                     }
                 }
