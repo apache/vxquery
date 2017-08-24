@@ -48,6 +48,7 @@ import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.index.IndexAttributes;
 import org.apache.vxquery.runtime.functions.util.FunctionHelper;
+import org.apache.vxquery.types.AttributeType;
 import org.apache.vxquery.types.ElementType;
 import org.apache.vxquery.types.NameTest;
 import org.apache.vxquery.types.NodeType;
@@ -81,11 +82,14 @@ public class VXQueryIndexReader {
     private IFrameFieldAppender appender;
     private boolean firstElement;
     private List<Byte[]> indexSeq;
+    private List<Integer> indexAttsSeq;
 
     public VXQueryIndexReader(IHyracksTaskContext context, String indexPath, List<Integer> childSeq,
-            List<Integer> indexChildSeq, List<Byte[]> indexSeq, IFrameFieldAppender appender) {
+            List<Integer> indexChildSeq, List<Integer> indexAttsSeq, List<Byte[]> indexSeq,
+            IFrameFieldAppender appender) {
         this.ctx = context;
         this.indexSeq = indexSeq;
+        this.indexAttsSeq = indexAttsSeq;
         this.indexName = indexPath;
         this.appender = appender;
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
@@ -98,6 +102,9 @@ public class VXQueryIndexReader {
             searchSize = indexSeq.size();
             if (!indexChildSeq.isEmpty()) {
                 searchSize += indexChildSeq.size();
+            }
+            if (!indexAttsSeq.isEmpty()) {
+                searchSize += indexAttsSeq.size();
             }
         }
         childLocalName = new String[childSequenceTypes.size() + searchSize];
@@ -129,6 +136,18 @@ public class VXQueryIndexReader {
                 stb.append("/");
                 ++index;
             }
+            for (Integer integer : indexAttsSeq) {
+                SequenceType sType = dCtx.getStaticContext().lookupSequenceType(integer);
+                NodeType nodeType = (NodeType) sType.getItemType();
+                AttributeType eType = (AttributeType) nodeType;
+                NameTest nameTest = eType.getNameTest();
+                childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
+
+                stb.append(childLocalName[index]);
+                stb.append("/");
+                ++index;
+            }
+
             byte[] indexBytes = new byte[indexSeq.get(0).length];
             int i = 0;
             for (Byte b : indexSeq.get(0)) {
@@ -218,9 +237,13 @@ public class VXQueryIndexReader {
         returnPath = returnPath.substring(0, lastreturnslash) + ":" + returnPath.substring(lastreturnslash + 1);
         returnPath = returnPath.replaceAll("/", ".") + ".element";
         if (!indexSeq.isEmpty()) {
+            String type = ".textnode";
+            if (!indexAttsSeq.isEmpty()) {
+                type = ".text";
+            }
             int lastslash = elementPath.lastIndexOf('/');
             elementPath = elementPath.substring(0, lastslash) + ":" + elementPath.substring(lastslash + 1);
-            elementPath = elementPath.replaceAll("/", ".") + ".textnode";
+            elementPath = elementPath.replaceAll("/", ".") + type;
         }
         TopDocs results = null;
         try {

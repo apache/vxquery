@@ -16,5 +16,5 @@
    under the License. :)
    
 for $i in collection("src/test/resources/TestSources/xml")/students/student
-
-return $i/@id
+where $i/@id = 22
+return $i

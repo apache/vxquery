@@ -76,6 +76,7 @@ import org.apache.vxquery.compiler.rewriter.rules.IntroduceTwoStepAggregateRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushAggregateIntoGroupbyRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushChildIntoDataScanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushFunctionsOntoEqJoinBranches;
+import org.apache.vxquery.compiler.rewriter.rules.PushIndexingAttributeIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushIndexingValueIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushKeysOrMembersIntoDatascanRule;
 import org.apache.vxquery.compiler.rewriter.rules.PushValueIntoDatascanRule;
@@ -317,6 +318,7 @@ public class RewriteRuleset {
         List<IAlgebraicRewriteRule> consolidation = new LinkedList<>();
         consolidation.add(new ConsolidateSelectsRule());
         consolidation.add(new PushIndexingValueIntoDatascanRule());
+        consolidation.add(new PushIndexingAttributeIntoDatascanRule());
         consolidation.add(new ConsolidateAssignsRule());
         consolidation.add(new InlineAssignIntoAggregateRule());
         consolidation.add(new IntroduceGroupByCombinerRule());
