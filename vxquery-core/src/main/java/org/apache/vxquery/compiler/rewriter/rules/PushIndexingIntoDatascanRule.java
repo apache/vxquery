@@ -29,6 +29,7 @@ import org.apache.hyracks.algebricks.core.algebra.base.LogicalExpressionTag;
 import org.apache.hyracks.algebricks.core.algebra.base.LogicalOperatorTag;
 import org.apache.hyracks.algebricks.core.algebra.expressions.AbstractFunctionCallExpression;
 import org.apache.hyracks.algebricks.core.algebra.expressions.ConstantExpression;
+import org.apache.hyracks.algebricks.core.algebra.functions.AlgebricksBuiltinFunctions;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.DataSourceScanOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.SelectOperator;
@@ -65,7 +66,7 @@ import org.apache.vxquery.types.ElementType;
  *   plan__child
  * </pre>
  */
-public class PushIndexingAttributeIntoDatascanRule extends AbstractUsedVariablesProcessingRule {
+public class PushIndexingIntoDatascanRule extends AbstractUsedVariablesProcessingRule {
     StaticContext dCtx = null;
 
     @Override
@@ -120,7 +121,10 @@ public class PushIndexingAttributeIntoDatascanRule extends AbstractUsedVariables
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.GENERAL_EQ.getFunctionIdentifier(),
                 valueEqch);
         if (valueEqch.isEmpty()) {
-            return false;
+            ExpressionToolbox.findAllFunctionExpressions(expression, AlgebricksBuiltinFunctions.EQ, valueEqch);
+            if (valueEqch.isEmpty()) {
+                return false;
+            }
         }
         ExpressionToolbox.findAllFunctionExpressions(valueEqch.get(valueEqch.size() - 1),
                 BuiltinOperators.CHILD.getFunctionIdentifier(), children);
