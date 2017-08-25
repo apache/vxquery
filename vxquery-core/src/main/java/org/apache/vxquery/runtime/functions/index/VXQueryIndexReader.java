@@ -125,48 +125,59 @@ public class VXQueryIndexReader {
         returnPath = stb.toString();
         stb.append("/");
         if (!indexSeq.isEmpty()) {
-            for (Integer integer : indexChildSeq) {
-                SequenceType sType = dCtx.getStaticContext().lookupSequenceType(integer);
-                NodeType nodeType = (NodeType) sType.getItemType();
-                ElementType eType = (ElementType) nodeType;
-                NameTest nameTest = eType.getNameTest();
-                childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
-
-                stb.append(childLocalName[index]);
-                stb.append("/");
-                ++index;
-            }
-            for (Integer integer : indexAttsSeq) {
-                SequenceType sType = dCtx.getStaticContext().lookupSequenceType(integer);
-                NodeType nodeType = (NodeType) sType.getItemType();
-                AttributeType eType = (AttributeType) nodeType;
-                NameTest nameTest = eType.getNameTest();
-                childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
-
-                stb.append(childLocalName[index]);
-                stb.append("/");
-                ++index;
-            }
-
-            byte[] indexBytes = new byte[indexSeq.get(0).length];
-            int i = 0;
-            for (Byte b : indexSeq.get(0)) {
-                indexBytes[i++] = b.byteValue();
-
-            }
-            TaggedValuePointable tvp = new TaggedValuePointable();
-            tvp.set(ArrayUtils.toPrimitive(indexSeq.get(0)), 0, ArrayUtils.toPrimitive(indexSeq.get(0)).length);
-            if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
-                childLocalName[childLocalName.length - 1] = FunctionHelper
-                        .getStringFromBytes(Arrays.copyOfRange(indexBytes, 1, indexBytes.length));
-            } else {
-                LongPointable intPoint = (LongPointable) LongPointable.FACTORY.createPointable();
-                intPoint.set(indexBytes, 1, indexBytes.length);
-                childLocalName[childLocalName.length - 1] = String.valueOf(intPoint.longValue());
-            }
-            stb.append(childLocalName[childLocalName.length - 1]);
+            addChildren(indexChildSeq, dCtx, index, stb);
+            addAtts(dCtx, index, stb);
+            addValue(stb);
             elementPath = stb.toString();
         }
+    }
+
+    public void addChildren(List<Integer> indexChildSeq, DynamicContext dCtx, int index, StringBuilder stb) {
+        for (Integer integer : indexChildSeq) {
+            SequenceType sType = dCtx.getStaticContext().lookupSequenceType(integer);
+            NodeType nodeType = (NodeType) sType.getItemType();
+            ElementType eType = (ElementType) nodeType;
+            NameTest nameTest = eType.getNameTest();
+            childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
+
+            stb.append(childLocalName[index]);
+            stb.append("/");
+            ++index;
+        }
+    }
+
+    public void addAtts(DynamicContext dCtx, int index, StringBuilder stb) {
+        for (Integer integer : indexAttsSeq) {
+            SequenceType sType = dCtx.getStaticContext().lookupSequenceType(integer);
+            NodeType nodeType = (NodeType) sType.getItemType();
+            AttributeType eType = (AttributeType) nodeType;
+            NameTest nameTest = eType.getNameTest();
+            childLocalName[index] = FunctionHelper.getStringFromBytes(nameTest.getLocalName());
+
+            stb.append(childLocalName[index]);
+            stb.append("/");
+            ++index;
+        }
+    }
+
+    public void addValue(StringBuilder stb) {
+        byte[] indexBytes = new byte[indexSeq.get(0).length];
+        int i = 0;
+        for (Byte b : indexSeq.get(0)) {
+            indexBytes[i++] = b.byteValue();
+
+        }
+        TaggedValuePointable tvp = new TaggedValuePointable();
+        tvp.set(ArrayUtils.toPrimitive(indexSeq.get(0)), 0, ArrayUtils.toPrimitive(indexSeq.get(0)).length);
+        if (tvp.getTag() == ValueTag.XS_STRING_TAG) {
+            childLocalName[childLocalName.length - 1] = FunctionHelper
+                    .getStringFromBytes(Arrays.copyOfRange(indexBytes, 1, indexBytes.length));
+        } else {
+            LongPointable intPoint = (LongPointable) LongPointable.FACTORY.createPointable();
+            intPoint.set(indexBytes, 1, indexBytes.length);
+            childLocalName[childLocalName.length - 1] = String.valueOf(intPoint.longValue());
+        }
+        stb.append(childLocalName[childLocalName.length - 1]);
     }
 
     public boolean step(IPointable result, IFrameWriter writer, int tupleIndex) throws AlgebricksException {

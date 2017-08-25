@@ -115,15 +115,27 @@ public class PushIndexingIntoDatascanRule extends AbstractUsedVariablesProcessin
         }
         VXQueryIndexingDataSource ids = (VXQueryIndexingDataSource) dataSource;
         boolean added = false;
+        findChildren(ids, expression);
+        added = true;
+        return added;
+    }
+
+    public Byte[] convertConstantToInteger(Mutable<ILogicalExpression> finds) {
+        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
+        ExpressionToolbox.getConstantAsPointable((ConstantExpression) finds.getValue(), tvp);
+
+        return ArrayUtils.toObject(tvp.getByteArray());
+    }
+
+    public void findChildren(VXQueryIndexingDataSource ids, Mutable<ILogicalExpression> expression) {
         List<Mutable<ILogicalExpression>> children = new ArrayList<>();
         List<Mutable<ILogicalExpression>> valueEqch = new ArrayList<>();
-        List<Mutable<ILogicalExpression>> attsEqch = new ArrayList<>();
         ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.GENERAL_EQ.getFunctionIdentifier(),
                 valueEqch);
         if (valueEqch.isEmpty()) {
             ExpressionToolbox.findAllFunctionExpressions(expression, AlgebricksBuiltinFunctions.EQ, valueEqch);
             if (valueEqch.isEmpty()) {
-                return false;
+                return;
             }
         }
         ExpressionToolbox.findAllFunctionExpressions(valueEqch.get(valueEqch.size() - 1),
@@ -139,8 +151,13 @@ public class PushIndexingIntoDatascanRule extends AbstractUsedVariablesProcessin
                 }
             }
         }
-        ExpressionToolbox.findAllFunctionExpressions(valueEqch.get(valueEqch.size() - 1),
-                BuiltinOperators.ATTRIBUTE.getFunctionIdentifier(), attsEqch);
+        findAttributes(ids, valueEqch.get(valueEqch.size() - 1));
+    }
+
+    public void findAttributes(VXQueryIndexingDataSource ids, Mutable<ILogicalExpression> expression) {
+        List<Mutable<ILogicalExpression>> attsEqch = new ArrayList<>();
+        ExpressionToolbox.findAllFunctionExpressions(expression, BuiltinOperators.ATTRIBUTE.getFunctionIdentifier(),
+                attsEqch);
         for (int i = attsEqch.size(); i > 0; --i) {
             int typeId = ExpressionToolbox.getTypeExpressionTypeArgument(attsEqch.get(i - 1));
             if (typeId > 0) {
@@ -152,24 +169,18 @@ public class PushIndexingIntoDatascanRule extends AbstractUsedVariablesProcessin
                 }
             }
         }
+        findValues(ids, expression);
+    }
+
+    public void findValues(VXQueryIndexingDataSource ids, Mutable<ILogicalExpression> expression) {
         Byte[] index = null;
-        AbstractFunctionCallExpression valueEq = (AbstractFunctionCallExpression) valueEqch.get(valueEqch.size() - 1)
-                .getValue();
+        AbstractFunctionCallExpression valueEq = (AbstractFunctionCallExpression) expression.getValue();
         if (valueEq.getArguments().get(1).getValue().getExpressionTag() == LogicalExpressionTag.FUNCTION_CALL) {
             index = ExpressionToolbox.getConstantArgument(valueEq.getArguments().get(1), 0);
         } else {
             index = convertConstantToInteger(valueEq.getArguments().get(1));
         }
         ids.addIndexValueSeq(index);
-        added = true;
-        return added;
-    }
-
-    public Byte[] convertConstantToInteger(Mutable<ILogicalExpression> finds) {
-        TaggedValuePointable tvp = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        ExpressionToolbox.getConstantAsPointable((ConstantExpression) finds.getValue(), tvp);
-
-        return ArrayUtils.toObject(tvp.getByteArray());
     }
 
 }
