@@ -57,12 +57,11 @@ public class LocalClusterUtil {
     public static final int DEFAULT_HYRACKS_CC_HTTP_PORT = 39002;
     public static final int DEFAULT_VXQUERY_REST_PORT = 39003;
 
-    // TODO review variable scope after XTest is updated to use the REST service.
-    public ClusterControllerService clusterControllerService;
-    public NodeControllerService nodeControllerSerivce;
-    public IHyracksClientConnection hcc;
-    public IHyracksDataset hds;
-    public VXQueryService vxQueryService;
+    private ClusterControllerService clusterControllerService;
+    private NodeControllerService nodeControllerSerivce;
+    private IHyracksClientConnection hcc;
+    private IHyracksDataset hds;
+    private VXQueryService vxQueryService;
 
     public void init(VXQueryConfig config) throws Exception {
         // Following properties are needed by the app to setup
