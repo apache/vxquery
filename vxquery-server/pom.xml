@@ -143,6 +143,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.vxquery</groupId>
+            <artifactId>apache-vxquery-rest</artifactId>
+            <version>0.7-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>args4j</groupId>
             <artifactId>args4j</artifactId>
         </dependency>
