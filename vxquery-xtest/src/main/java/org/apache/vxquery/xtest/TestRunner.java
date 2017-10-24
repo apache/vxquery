@@ -21,11 +21,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+//<<<<<<< HEAD
 import java.nio.charset.StandardCharsets;
+//=======
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.EnumSet;
+import java.util.List;
+//>>>>>>> tillw/hyracks0.3.2
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//<<<<<<< HEAD
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -39,6 +49,32 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.vxquery.app.util.RestUtils;
+//=======
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hyracks.api.client.IHyracksClientConnection;
+import org.apache.hyracks.api.client.NodeControllerInfo;
+import org.apache.hyracks.api.comm.IFrame;
+import org.apache.hyracks.api.comm.IFrameTupleAccessor;
+import org.apache.hyracks.api.comm.VSizeFrame;
+import org.apache.hyracks.api.dataset.DatasetJobRecord;
+import org.apache.hyracks.api.dataset.IHyracksDataset;
+import org.apache.hyracks.api.dataset.IHyracksDatasetReader;
+import org.apache.hyracks.api.dataset.ResultSetId;
+import org.apache.hyracks.api.exceptions.HyracksException;
+import org.apache.hyracks.api.job.JobFlag;
+import org.apache.hyracks.api.job.JobId;
+import org.apache.hyracks.api.job.JobSpecification;
+import org.apache.hyracks.control.nc.resources.memory.FrameManager;
+import org.apache.hyracks.dataflow.common.comm.io.ResultFrameTupleAccessor;
+import org.apache.vxquery.compiler.CompilerControlBlock;
+import org.apache.vxquery.compiler.algebricks.VXQueryGlobalDataFactory;
+import org.apache.vxquery.context.DynamicContext;
+import org.apache.vxquery.context.DynamicContextImpl;
+import org.apache.vxquery.context.RootStaticContextImpl;
+import org.apache.vxquery.context.StaticContextImpl;
+import org.apache.vxquery.datamodel.accessors.atomic.XSDateTimePointable;
+//>>>>>>> tillw/hyracks0.3.2
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.rest.request.QueryRequest;
@@ -81,6 +117,7 @@ public class TestRunner {
                 System.err.println(query);
             }
 
+//<<<<<<< HEAD
             QueryRequest request = createQueryRequest(opts, query);
             APIResponse response = sendQueryRequest(request, testCase.getSourceFileMap());
             if (response instanceof SyncQueryResponse) {
@@ -96,6 +133,61 @@ public class TestRunner {
                     throw new SystemException(ErrorCode.valueOf(eCode), e);
                 } else {
                     throw e;
+//=======
+                XMLQueryCompiler compiler = new XMLQueryCompiler(listener, nodeControllerInfos, opts.frameSize,
+                        opts.hdfsConf);
+                Reader in = new InputStreamReader(new FileInputStream(testCase.getXQueryFile()), "UTF-8");
+                CompilerControlBlock ccb = new CompilerControlBlock(
+                        new StaticContextImpl(RootStaticContextImpl.INSTANCE),
+                        new ResultSetId(testCase.getXQueryDisplayName().hashCode()), testCase.getSourceFileMap());
+                compiler.compile(testCase.getXQueryDisplayName(), in, ccb, opts.optimizationLevel, collectionList);
+                JobSpecification spec = compiler.getModule().getHyracksJobSpecification();
+                in.close();
+
+                DynamicContext dCtx = new DynamicContextImpl(compiler.getModule().getModuleContext());
+
+                if (opts.timezone != null) {
+                    final int dtLen = XSDateTimePointable.TYPE_TRAITS.getFixedLength();
+                    byte[] currentDateTime = new byte[dtLen];
+                    XSDateTimePointable datetimep = new XSDateTimePointable();
+                    datetimep.set(currentDateTime, 0, dtLen);
+                    datetimep.setCurrentDateTime(Calendar.getInstance(TimeZone.getTimeZone(opts.timezone)));
+                    dCtx.setCurrentDateTime(datetimep);
+                }
+
+                spec.setGlobalJobDataFactory(new VXQueryGlobalDataFactory(dCtx.createFactory()));
+
+                spec.setMaxReattempts(0);
+                JobId jobId = hcc.startJob(spec, EnumSet.of(JobFlag.PROFILE_RUNTIME));
+
+                FrameManager resultDisplayFrameMgr = new FrameManager(spec.getFrameSize());
+                IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
+                IHyracksDatasetReader reader = hds.createReader(jobId, ccb.getResultSetId());
+                // TODO(tillw) remove this loop once the IHyracksDatasetReader reliably returns the correct exception
+                while (reader.getResultStatus().getState() == DatasetJobRecord.State.RUNNING) {
+                    Thread.sleep(1);
+                }
+                IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
+                res.result = "";
+                while (reader.read(frame) > 0) {
+                    res.result += ResultUtils.getStringFromBuffer(frame.getBuffer(), frameTupleAccessor);
+                    frame.getBuffer().clear();
+                }
+                res.result.trim();
+                hcc.waitForCompletion(jobId);
+            } catch (HyracksException e) {
+                Throwable t = e;
+                while (t.getCause() != null) {
+                    t = t.getCause();
+                }
+                final String message = t.getMessage();
+                if (message != null) {
+                    Matcher m = EMBEDDED_SYSERROR_PATTERN.matcher(message);
+                    if (m.find()) {
+                        String eCode = m.group(1);
+                        throw new SystemException(ErrorCode.valueOf(eCode), e);
+                    }
+//>>>>>>> tillw/hyracks0.3.2
                 }
             }
         } catch (Throwable e) {

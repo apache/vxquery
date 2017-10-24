@@ -30,6 +30,12 @@ public class VXQueryComparatorFactoryProvider implements IBinaryComparatorFactor
         return new BinaryComparatorFactory(type, ascending);
     }
 
+    @Override
+    public IBinaryComparatorFactory getBinaryComparatorFactory(Object type, boolean ascending, boolean ignoreCase)
+            throws AlgebricksException {
+        throw new UnsupportedOperationException();
+    }
+
     private static class BinaryComparatorFactory implements IBinaryComparatorFactory {
         private static final long serialVersionUID = 1L;
 

@@ -79,6 +79,72 @@
             <groupId>org.apache.vxquery</groupId>
             <artifactId>apache-vxquery-rest</artifactId>
             <version>0.7-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-control-cc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-control-nc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>algebricks-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>algebricks-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-control-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-dataflow-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-dataflow-std</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-hdfs-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hyracks</groupId>
+            <artifactId>hyracks-hdfs-2.x</artifactId>
         </dependency>
     </dependencies>
 

@@ -18,9 +18,17 @@ import static org.apache.vxquery.rest.Constants.HttpHeaderValues.CONTENT_TYPE_JS
 
 import java.io.File;
 import java.io.IOException;
+//<<<<<<< HEAD
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+//=======
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.net.Inet4Address;
+import java.nio.file.Files;
+//>>>>>>> tillw/hyracks0.3.2
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -240,6 +248,7 @@ public class VXQuery {
      * @param cli
      *            cli class instance
      */
+//<<<<<<< HEAD
     private static void sendQueryRequest(String xqFile, QueryRequest request, VXQuery cli) {
         URI uri = null;
         try {
@@ -275,6 +284,35 @@ public class VXQuery {
         } finally {
             HttpClientUtils.closeQuietly(httpClient);
         }
+//=======
+    public void startLocalHyracks() throws Exception {
+        String localAddress = Inet4Address.getLoopbackAddress().getHostAddress();
+        CCConfig ccConfig = new CCConfig();
+        ccConfig.setClientListenAddress(localAddress);
+        ccConfig.setClientListenPort(39000);
+        ccConfig.setClusterListenAddress(localAddress);
+        ccConfig.setClusterListenPort(39001);
+        ccConfig.setConsoleListenPort(39002);
+        ccConfig.setProfileDumpPeriod(10000);
+        cc = new ClusterControllerService(ccConfig);
+        cc.start();
+
+        ncs = new NodeControllerService[opts.localNodeControllers];
+        for (int i = 0; i < ncs.length; i++) {
+            NCConfig ncConfig = new NCConfig("nc" + (i + 1));
+            ncConfig.setClusterAddress("localhost");
+            ncConfig.setClusterPort(39001);
+            ncConfig.setClusterListenAddress(localAddress);
+            ncConfig.setDataListenAddress(localAddress);
+            ncConfig.setResultListenAddress(localAddress);
+            //TODO: enable index folder as a cli option for on-the-fly indexing queries
+            ncConfig.setIODevices(new String[] { Files.createTempDirectory(ncConfig.getNodeId()).toString() });
+            ncs[i] = new NodeControllerService(ncConfig);
+            ncs[i].start();
+        }
+
+        hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
+//>>>>>>> tillw/hyracks0.3.2
     }
 
     /**
