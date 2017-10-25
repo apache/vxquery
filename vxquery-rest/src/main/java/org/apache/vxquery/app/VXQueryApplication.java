@@ -108,22 +108,22 @@ public class VXQueryApplication implements ICCApplication {
 
     /**
      * Loads properties from
-     * 
+     *
      * <pre>
      * -appConfig foo/bar.properties
      * </pre>
-     * 
+     *
      * file if specified in the app arguments.
      *
      * @param clusterControllerInfo
      *            cluster controller information
      * @param propertiesFile
      *            vxquery configuration properties file, given by
-     * 
+     *
      *            <pre>
      *            -appConfig
      *            </pre>
-     * 
+     *
      *            option in app argument
      * @return A new {@link VXQueryConfig} instance with either default properties
      *         or properties loaded from the properties file given.
