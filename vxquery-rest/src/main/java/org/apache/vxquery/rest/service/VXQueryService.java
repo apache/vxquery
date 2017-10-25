@@ -360,7 +360,7 @@ public class VXQueryService {
 
         // This loop is required for XTests to reliably identify the error code of
         // SystemException.
-        while (reader.getResultStatus() == DatasetJobRecord.Status.RUNNING) {
+        while (reader.getResultStatus().getState() == DatasetJobRecord.State.RUNNING) {
             Thread.sleep(100);
         }
 
