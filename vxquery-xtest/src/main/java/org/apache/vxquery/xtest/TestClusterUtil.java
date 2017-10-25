@@ -17,18 +17,12 @@
 
 package org.apache.vxquery.xtest;
 
+import java.io.IOException;
+
 import org.apache.hyracks.api.client.HyracksConnection;
 import org.apache.hyracks.client.dataset.HyracksDataset;
 import org.apache.vxquery.app.util.LocalClusterUtil;
 import org.apache.vxquery.rest.service.VXQueryConfig;
-
-import java.io.IOException;
-//<<<<<<< HEAD
-//=======
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-//>>>>>>> tillw/hyracks0.3.2
 
 public class TestClusterUtil {
 
@@ -40,7 +34,6 @@ public class TestClusterUtil {
     private TestClusterUtil() {
     }
 
-//<<<<<<< HEAD
     private static VXQueryConfig loadConfiguration(XTestOptions opts) {
         VXQueryConfig vxqConfig = new VXQueryConfig();
 
@@ -57,45 +50,6 @@ public class TestClusterUtil {
             localClusterUtil.init(config);
             hcc = (HyracksConnection) localClusterUtil.getConnection();
             hds = (HyracksDataset) localClusterUtil.getDataset();
-//=======
-    public static CCConfig createCCConfig() throws UnknownHostException {
-        String publicAddress = Inet4Address.getLoopbackAddress().getHostAddress();
-        CCConfig ccConfig = new CCConfig();
-        ccConfig.setClientListenAddress(publicAddress);
-        ccConfig.setClientListenPort(CLIENT_NET_PORT);
-        ccConfig.setClusterListenAddress(publicAddress);
-        ccConfig.setClusterListenPort(CLUSTER_NET_PORT);
-        ccConfig.setProfileDumpPeriod(PROFILE_DUMP_PERIOD);
-        return ccConfig;
-    }
-
-    public static NCConfig createNCConfig() throws UnknownHostException {
-        String publicAddress = Inet4Address.getLoopbackAddress().getHostAddress();
-        NCConfig ncConfig1 = new NCConfig(NODE_ID);
-        ncConfig1.setClusterAddress(CC_HOST);
-        ncConfig1.setClusterPort(CLUSTER_NET_PORT);
-        ncConfig1.setClusterListenAddress(publicAddress);
-        ncConfig1.setDataPublicAddress(publicAddress);
-        ncConfig1.setResultPublicAddress(publicAddress);
-        ncConfig1.setIODevices(new String[] { IO_DEVICES });
-        return ncConfig1;
-    }
-
-    public static ClusterControllerService startCC(XTestOptions opts) throws IOException {
-        CCConfig ccConfig = createCCConfig();
-        File outDir = new File("target/ClusterController");
-        outDir.mkdirs();
-        File ccRoot = File.createTempFile(TestRunner.class.getName(), ".data", outDir);
-        ccRoot.delete();
-        ccRoot.mkdir();
-        ccConfig.setRootDir(ccRoot.getAbsolutePath());
-        try {
-            ClusterControllerService cc = new ClusterControllerService(ccConfig);
-            cc.start();
-            hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
-            hds = new HyracksDataset(hcc, opts.frameSize, opts.threads);
-            return cc;
-//>>>>>>> tillw/hyracks0.3.2
         } catch (Exception e) {
             throw new IOException(e);
         }

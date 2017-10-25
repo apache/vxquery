@@ -748,13 +748,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-<!--  
-        <hyracks.version>0.2.17-incubating</hyracks.version>
-        <hyracks.fullstack.version>0.3.1</hyracks.fullstack.version>
-        <hyracks.version>0.3.0</hyracks.version>
-======= -->
         <hyracks.version>0.3.2</hyracks.version>
-<!--  >>>>>>> tillw/hyracks0.3.2-->
         <apache-rat-plugin.version>0.11</apache-rat-plugin.version>
     </properties>
 
