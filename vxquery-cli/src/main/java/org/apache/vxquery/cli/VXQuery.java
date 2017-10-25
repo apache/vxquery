@@ -19,6 +19,7 @@ import static org.apache.vxquery.rest.Constants.HttpHeaderValues.CONTENT_TYPE_JS
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;

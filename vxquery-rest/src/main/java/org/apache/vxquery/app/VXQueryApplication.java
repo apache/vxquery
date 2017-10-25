@@ -28,9 +28,16 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.hyracks.api.application.ICCApplicationContext;
-import org.apache.hyracks.api.application.ICCApplicationEntryPoint;
+import org.apache.hyracks.api.application.ICCApplication;
+import org.apache.hyracks.api.application.IServiceContext;
 import org.apache.hyracks.api.client.ClusterControllerInfo;
+import org.apache.hyracks.api.config.IConfigManager;
+import org.apache.hyracks.api.config.Section;
+import org.apache.hyracks.api.job.resource.DefaultJobCapacityController;
+import org.apache.hyracks.api.job.resource.IJobCapacityController;
+import org.apache.hyracks.control.common.controllers.CCConfig;
+import org.apache.hyracks.control.common.controllers.ControllerConfig;
+import org.apache.hyracks.control.common.controllers.NCConfig;
 import org.apache.vxquery.exceptions.VXQueryRuntimeException;
 import org.apache.vxquery.rest.RestServer;
 import org.apache.vxquery.rest.service.VXQueryConfig;
@@ -44,7 +51,7 @@ import org.kohsuke.args4j.Option;
  *
  * @author Erandi Ganepola
  */
-public class VXQueryApplication implements ICCApplicationEntryPoint {
+public class VXQueryApplication implements ICCApplication {
 
     private static final Logger LOGGER = Logger.getLogger(VXQueryApplication.class.getName());
 
@@ -52,7 +59,7 @@ public class VXQueryApplication implements ICCApplicationEntryPoint {
     private RestServer restServer;
 
     @Override
-    public void start(ICCApplicationContext ccAppCtx, String[] args) throws Exception {
+    public void start(IServiceContext ccAppCtx, String[] args) throws Exception {
         AppArgs appArgs = new AppArgs();
         if (args != null) {
             CmdLineParser parser = new CmdLineParser(appArgs);
@@ -64,8 +71,8 @@ public class VXQueryApplication implements ICCApplicationEntryPoint {
             }
         }
 
-        VXQueryConfig config =
-                loadConfiguration(ccAppCtx.getCCContext().getClusterControllerInfo(), appArgs.getVxqueryConfig());
+        VXQueryConfig config = loadConfiguration(ccAppCtx.getCCContext().getClusterControllerInfo(),
+                appArgs.getVxqueryConfig());
         vxQueryService = new VXQueryService(config);
         restServer = new RestServer(vxQueryService, appArgs.getRestPort());
     }
@@ -100,22 +107,22 @@ public class VXQueryApplication implements ICCApplicationEntryPoint {
 
     /**
      * Loads properties from
-     * 
+     *
      * <pre>
      * -appConfig foo/bar.properties
      * </pre>
-     * 
+     *
      * file if specified in the app arguments.
      *
      * @param clusterControllerInfo
      *            cluster controller information
      * @param propertiesFile
      *            vxquery configuration properties file, given by
-     * 
+     *
      *            <pre>
      *            -appConfig
      *            </pre>
-     * 
+     *
      *            option in app argument
      * @return A new {@link VXQueryConfig} instance with either default properties
      *         or properties loaded from the properties file given.
@@ -175,5 +182,23 @@ public class VXQueryApplication implements ICCApplicationEntryPoint {
         public void setRestPort(int restPort) {
             this.restPort = restPort;
         }
+    }
+
+    @Override
+    public Object getApplicationContext() {
+        return null;
+    }
+
+    @Override
+    public void registerConfig(IConfigManager configManager) {
+        configManager.addIniParamOptions(ControllerConfig.Option.CONFIG_FILE, ControllerConfig.Option.CONFIG_FILE_URL);
+        configManager.addCmdLineSections(Section.CC, Section.COMMON);
+        configManager.setUsageFilter(getUsageFilter());
+        configManager.register(ControllerConfig.Option.class, CCConfig.Option.class, NCConfig.Option.class);
+    }
+
+    @Override
+    public IJobCapacityController getJobCapacityController() {
+        return DefaultJobCapacityController.INSTANCE;
     }
 }
