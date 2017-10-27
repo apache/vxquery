@@ -44,6 +44,7 @@ public class QueryRequest {
     private boolean showTranslatedExpressionTree = false;
     private boolean showOptimizedExpressionTree = false;
     private boolean showRuntimePlan = false;
+    private boolean useIndexing = false;
     /** A unique UUID to uniquely identify a given request */
     private String requestId;
 
@@ -73,6 +74,14 @@ public class QueryRequest {
 
     public void setCompileOnly(boolean compileOnly) {
         this.compileOnly = compileOnly;
+    }
+    
+    public boolean useIndexing() {
+        return useIndexing;
+    }
+
+    public void setUseIndexing(boolean useIndexing) {
+        this.useIndexing=useIndexing;
     }
 
     public int getOptimization() {

@@ -55,7 +55,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
  *
  * @author Erandi Ganepola
  */
-public class AbstractRestServerTest {
+public abstract class AbstractRestServerTest {
 
     protected static LocalClusterUtil vxqueryLocalCluster = new LocalClusterUtil();
     protected static String restIpAddress;
@@ -161,11 +161,11 @@ public class AbstractRestServerTest {
      *            {@link QueryResultRequest}
      * @param accepts
      *            expected
-     * 
+     *
      *            <pre>
      *            Accepts
      *            </pre>
-     * 
+     *
      *            header in responses
      * @param method
      *            Http Method to be used to send the request

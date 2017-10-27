@@ -34,6 +34,7 @@ public class Constants {
         public static final String SHOW_TET = "showTranslatedExpressionTree";
         public static final String SHOW_OET = "showOptimizedExpressionTree";
         public static final String SHOW_RP = "showRuntimePlan";
+        public static final String USE_INDEX = "useIndexing";
         public static final String MODE = "mode";
     }
 

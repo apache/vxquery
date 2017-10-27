@@ -17,12 +17,12 @@
 
 package org.apache.vxquery.xtest;
 
+import java.io.IOException;
+
 import org.apache.hyracks.api.client.HyracksConnection;
 import org.apache.hyracks.client.dataset.HyracksDataset;
 import org.apache.vxquery.app.util.LocalClusterUtil;
 import org.apache.vxquery.rest.service.VXQueryConfig;
-
-import java.io.IOException;
 
 public class TestClusterUtil {
 
