@@ -34,6 +34,7 @@ import static org.apache.vxquery.rest.Constants.Parameters.SHOW_TET;
 import static org.apache.vxquery.rest.Constants.Parameters.STATEMENT;
 import static org.apache.vxquery.rest.Constants.URLs.QUERY_ENDPOINT;
 import static org.apache.vxquery.rest.Constants.URLs.QUERY_RESULT_ENDPOINT;
+import static org.apache.vxquery.rest.Constants.Parameters.USE_INDEX;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -114,6 +115,9 @@ public class RestUtils {
         }
         if (!request.isAsync()) {
             builder.addParameter(MODE, request.isAsync() ? MODE_ASYNC : MODE_SYNC);
+        }
+        if (request.useIndexing()) {
+            builder.addParameter(USE_INDEX, String.valueOf(request.useIndexing()));
         }
 
         return builder.build();

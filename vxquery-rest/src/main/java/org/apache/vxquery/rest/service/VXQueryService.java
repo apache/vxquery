@@ -127,8 +127,8 @@ public class VXQueryService {
         setState(State.STARTING);
 
         try {
-            hyracksClientConnection =
-                    new HyracksConnection(vxQueryConfig.getHyracksClientIp(), vxQueryConfig.getHyracksClientPort());
+            hyracksClientConnection = new HyracksConnection(vxQueryConfig.getHyracksClientIp(),
+                    vxQueryConfig.getHyracksClientPort());
         } catch (Exception e) {
             LOGGER.log(SEVERE, String.format("Unable to create a hyracks client connection to %s:%d",
                     vxQueryConfig.getHyracksClientIp(), vxQueryConfig.getHyracksClientPort()));
@@ -157,12 +157,15 @@ public class VXQueryService {
      * @return AsyncQueryResponse if no error occurs | ErrorResponse else
      */
     public APIResponse execute(final QueryRequest request) {
-        QueryRequest indexingRequest = new QueryRequest("show-indexes()");
-        indexingRequest.setAsync(false);
-        SyncQueryResponse indexingResponse = (SyncQueryResponse) execute(indexingRequest, new ArrayList<>());
-        LOGGER.log(Level.FINE, String.format("Found indexes: %s", indexingResponse.getResults()));
+        List<String> collections = new ArrayList<>();
+        if (request.useIndexing()) {
+            QueryRequest indexingRequest = new QueryRequest("show-indexes()");
+            indexingRequest.setAsync(false);
+            SyncQueryResponse indexingResponse = (SyncQueryResponse) execute(indexingRequest, new ArrayList<>());
+            LOGGER.log(Level.FINE, String.format("Found indexes: %s", indexingResponse.getResults()));
 
-        List<String> collections = Arrays.asList(indexingResponse.getResults().split("\n"));
+            collections = Arrays.asList(indexingResponse.getResults().split("\n"));
+        }
         return execute(request, collections);
     }
 
@@ -467,8 +470,8 @@ public class VXQueryService {
         @SuppressWarnings("Duplicates")
         private StringBuilder appendPrettyPlan(StringBuilder sb, Module module) {
             try {
-                ILogicalExpressionVisitor<String, Integer> ev =
-                        new VXQueryLogicalExpressionPrettyPrintVisitor(module.getModuleContext());
+                ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(
+                        module.getModuleContext());
                 AlgebricksAppendable buffer = new AlgebricksAppendable();
                 LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(buffer, ev);
                 PlanPrettyPrinter.printPlan(module.getBody(), v, 0);
