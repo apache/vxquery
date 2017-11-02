@@ -58,6 +58,7 @@ public class VXQueryApplication implements ICCApplication {
 
     private VXQueryService vxQueryService;
     private RestServer restServer;
+    protected ICCServiceContext ccServiceCtx;
 
     @Override
     public void start(IServiceContext ccAppCtx, String[] args) throws Exception {
@@ -71,13 +72,15 @@ public class VXQueryApplication implements ICCApplication {
                 throw new VXQueryRuntimeException("Unable to parse app arguments", e);
             }
         }
+        ccServiceCtx = (ICCServiceContext) ccAppCtx;
 
-        VXQueryConfig config = loadConfiguration(
-                ((ICCServiceContext) ccAppCtx).getCCContext().getClusterControllerInfo(), appArgs.getVxqueryConfig());
+        VXQueryConfig config = loadConfiguration(ccServiceCtx.getCCContext().getClusterControllerInfo(),
+                appArgs.getVxqueryConfig());
         vxQueryService = new VXQueryService(config);
         restServer = new RestServer(vxQueryService, appArgs.getRestPort());
     }
 
+    @Override
     public synchronized void stop() {
         try {
             LOGGER.log(Level.INFO, "Stopping REST server");
@@ -196,6 +199,7 @@ public class VXQueryApplication implements ICCApplication {
         configManager.addCmdLineSections(Section.CC, Section.COMMON);
         configManager.setUsageFilter(getUsageFilter());
         configManager.register(ControllerConfig.Option.class, CCConfig.Option.class, NCConfig.Option.class);
+        CCConfig.Option.APP_CLASS.setDefaultValue(VXQueryApplication.class.getName());
     }
 
     @Override

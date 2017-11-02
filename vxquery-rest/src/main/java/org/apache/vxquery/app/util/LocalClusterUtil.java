@@ -27,13 +27,17 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.util.List;
 
+import org.apache.hyracks.api.application.ICCApplication;
 import org.apache.hyracks.api.client.HyracksConnection;
 import org.apache.hyracks.api.client.IHyracksClientConnection;
 import org.apache.hyracks.api.dataset.IHyracksDataset;
 import org.apache.hyracks.client.dataset.HyracksDataset;
 import org.apache.hyracks.control.cc.ClusterControllerService;
+import org.apache.hyracks.control.common.config.ConfigManager;
 import org.apache.hyracks.control.common.controllers.CCConfig;
+import org.apache.hyracks.control.common.controllers.ControllerConfig;
 import org.apache.hyracks.control.common.controllers.NCConfig;
 import org.apache.hyracks.control.nc.NodeControllerService;
 import org.apache.vxquery.app.VXQueryApplication;
@@ -61,9 +65,14 @@ public class LocalClusterUtil {
     private NodeControllerService nodeControllerSerivce;
     private IHyracksClientConnection hcc;
     private IHyracksDataset hds;
+    private ConfigManager configManager;
     private VXQueryService vxQueryService;
+    private List<String> nodeNames;
 
     public void init(VXQueryConfig config) throws Exception {
+        final ICCApplication ccApplication = createCCApplication();
+        configManager = new ConfigManager();
+        ccApplication.registerConfig(configManager);
         // Following properties are needed by the app to setup
         System.setProperty(AVAILABLE_PROCESSORS, String.valueOf(config.getAvailableProcessors()));
         System.setProperty(JOIN_HASH_SIZE, String.valueOf(config.getJoinHashSize()));
@@ -73,11 +82,18 @@ public class LocalClusterUtil {
         }
 
         // Cluster controller
-        CCConfig ccConfig = createCCConfig();
-        clusterControllerService = new ClusterControllerService(ccConfig);
+        CCConfig ccConfig = createCCConfig(configManager);
+        clusterControllerService = new ClusterControllerService(ccConfig, ccApplication);
+        nodeNames = ccConfig.getConfigManager().getNodeNames();
+        for (String nodeId : nodeNames) {
+            // mark this NC as virtual in the CC's config manager, so he doesn't try to contact NCService...
+            configManager.set(nodeId, NCConfig.Option.NCSERVICE_PORT, NCConfig.NCSERVICE_PORT_DISABLED);
+        }
         clusterControllerService.start();
 
-        hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
+        // hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
+        hcc = new HyracksConnection(clusterControllerService.getConfig().getClientListenAddress(),
+                clusterControllerService.getConfig().getClientListenPort());
         hds = new HyracksDataset(hcc, config.getFrameSize(), config.getAvailableProcessors());
 
         // Node controller
@@ -94,16 +110,21 @@ public class LocalClusterUtil {
         vxQueryService.start();
     }
 
-    protected CCConfig createCCConfig() throws IOException {
+    protected ICCApplication createCCApplication() {
+        return new VXQueryApplication();
+    }
+
+    protected CCConfig createCCConfig(ConfigManager configManager) throws IOException {
         String localAddress = getIpAddress();
-        CCConfig ccConfig = new CCConfig();
+        CCConfig ccConfig = new CCConfig(configManager);
         ccConfig.setClientListenAddress(localAddress);
         ccConfig.setClientListenPort(DEFAULT_HYRACKS_CC_CLIENT_PORT);
         ccConfig.setClusterListenAddress(localAddress);
         ccConfig.setClusterListenPort(DEFAULT_HYRACKS_CC_CLUSTER_PORT);
         ccConfig.setConsoleListenPort(DEFAULT_HYRACKS_CC_HTTP_PORT);
         ccConfig.setProfileDumpPeriod(10000);
-        ccConfig.setAppClass(VXQueryApplication.class.getName());
+       // configManager.set(ControllerConfig.Option.DEFAULT_DIR, joinPath(getDefaultStoragePath(), "asterixdb"));
+        // ccConfig.setAppClass(VXQueryApplication.class.getName());
         //ccConfig.appArgs = Arrays.asList("-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT));
 
         return ccConfig;
