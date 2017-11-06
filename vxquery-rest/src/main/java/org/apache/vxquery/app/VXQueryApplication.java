@@ -199,7 +199,7 @@ public class VXQueryApplication implements ICCApplication {
         configManager.addCmdLineSections(Section.CC, Section.COMMON);
         configManager.setUsageFilter(getUsageFilter());
         configManager.register(ControllerConfig.Option.class, CCConfig.Option.class, NCConfig.Option.class);
-        CCConfig.Option.APP_CLASS.setDefaultValue(VXQueryApplication.class.getName());
+        //CCConfig.Option.APP_CLASS.setDefaultValue(VXQueryApplication.class.getName());
     }
 
     @Override
