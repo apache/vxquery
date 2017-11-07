@@ -59,7 +59,7 @@ public class LocalClusterUtil {
     public static final int DEFAULT_HYRACKS_CC_CLIENT_PORT = 39000;
     public static final int DEFAULT_HYRACKS_CC_CLUSTER_PORT = 39001;
     public static final int DEFAULT_HYRACKS_CC_HTTP_PORT = 39002;
-    public static final int DEFAULT_VXQUERY_REST_PORT = 8080;
+    public static final int DEFAULT_VXQUERY_REST_PORT = 39003;
 
     // TODO review variable scope after XTest is updated to use the REST service.
     private ClusterControllerService clusterControllerService;
@@ -125,7 +125,7 @@ public class LocalClusterUtil {
         ccConfig.setConsoleListenPort(DEFAULT_HYRACKS_CC_HTTP_PORT);
         ccConfig.setProfileDumpPeriod(10000);
        // configManager.set(ControllerConfig.Option.DEFAULT_DIR, joinPath(getDefaultStoragePath(), "asterixdb"));
-        // ccConfig.setAppClass(VXQueryApplication.class.getName());
+        //ccConfig.setAppClass(VXQueryApplication.class.getName());
         //ccConfig.appArgs = Arrays.asList("-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT));
 
         return ccConfig;
