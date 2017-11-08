@@ -37,8 +37,10 @@ public class VXQueryConfig {
     /** Directory path to Hadoop configuration files */
     private String hdfsConf = null;
 
+
     private String hyracksClientIp;
     private int hyracksClientPort;
+    private int restApiPort = 39003;
 
     public int getAvailableProcessors() {
         return availableProcessors;
@@ -90,6 +92,14 @@ public class VXQueryConfig {
         this.hyracksClientIp = hyracksClientIp;
     }
 
+    public int getRestApiPort() {
+        return restApiPort;
+    }
+
+    public void setRestApiPort(int port) {
+        this.restApiPort = port;
+    }
+
     public int getFrameSize() {
         return frameSize;
     }
@@ -97,4 +107,5 @@ public class VXQueryConfig {
     public void setFrameSize(int frameSize) {
         this.frameSize = frameSize;
     }
+
 }

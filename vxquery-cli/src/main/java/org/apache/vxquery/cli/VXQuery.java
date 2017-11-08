@@ -120,7 +120,7 @@ public class VXQuery {
             try {
                 localClusterUtil.init(vxqConfig);
                 restIpAddress = localClusterUtil.getIpAddress();
-                restPort = localClusterUtil.getRestPort();
+                restPort = vxqConfig.getRestApiPort();
             } catch (Exception e) {
                 System.err.println("Unable to start local hyracks cluster due to: " + e.getMessage());
                 e.printStackTrace();

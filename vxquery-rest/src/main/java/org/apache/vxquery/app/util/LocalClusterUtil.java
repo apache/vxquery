@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.hyracks.api.application.ICCApplication;
@@ -38,7 +37,6 @@ import org.apache.hyracks.client.dataset.HyracksDataset;
 import org.apache.hyracks.control.cc.ClusterControllerService;
 import org.apache.hyracks.control.common.config.ConfigManager;
 import org.apache.hyracks.control.common.controllers.CCConfig;
-import org.apache.hyracks.control.common.controllers.ControllerConfig;
 import org.apache.hyracks.control.common.controllers.NCConfig;
 import org.apache.hyracks.control.nc.NodeControllerService;
 import org.apache.vxquery.app.VXQueryApplication;
@@ -59,7 +57,7 @@ public class LocalClusterUtil {
     public static final int DEFAULT_HYRACKS_CC_CLIENT_PORT = 39000;
     public static final int DEFAULT_HYRACKS_CC_CLUSTER_PORT = 39001;
     public static final int DEFAULT_HYRACKS_CC_HTTP_PORT = 39002;
-    public static final int DEFAULT_VXQUERY_REST_PORT = 8080;
+    public static final int DEFAULT_VXQUERY_REST_PORT = 39003;
 
     // TODO review variable scope after XTest is updated to use the REST service.
     private ClusterControllerService clusterControllerService;
@@ -72,7 +70,7 @@ public class LocalClusterUtil {
 
     public void init(VXQueryConfig config) throws Exception {
         final ICCApplication ccApplication = createCCApplication();
-        configManager = new ConfigManager(new String[]{"-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT)});
+        configManager = new ConfigManager();
         ccApplication.registerConfig(configManager);
         // Following properties are needed by the app to setup
         System.setProperty(AVAILABLE_PROCESSORS, String.valueOf(config.getAvailableProcessors()));
