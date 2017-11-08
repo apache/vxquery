@@ -21,6 +21,7 @@ import static org.apache.vxquery.rest.Constants.Properties.AVAILABLE_PROCESSORS;
 import static org.apache.vxquery.rest.Constants.Properties.HDFS_CONFIG;
 import static org.apache.vxquery.rest.Constants.Properties.JOIN_HASH_SIZE;
 import static org.apache.vxquery.rest.Constants.Properties.MAXIMUM_DATA_SIZE;
+import static org.apache.vxquery.rest.Constants.Properties.REST_API_PORT;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,6 +40,7 @@ import org.apache.hyracks.api.job.resource.IJobCapacityController;
 import org.apache.hyracks.control.common.controllers.CCConfig;
 import org.apache.hyracks.control.common.controllers.ControllerConfig;
 import org.apache.hyracks.control.common.controllers.NCConfig;
+import org.apache.vxquery.app.util.LocalClusterUtil;
 import org.apache.vxquery.exceptions.VXQueryRuntimeException;
 import org.apache.vxquery.rest.RestServer;
 import org.apache.vxquery.rest.service.VXQueryConfig;
@@ -77,7 +79,7 @@ public class VXQueryApplication implements ICCApplication {
         VXQueryConfig config = loadConfiguration(ccServiceCtx.getCCContext().getClusterControllerInfo(),
                 appArgs.getVxqueryConfig());
         vxQueryService = new VXQueryService(config);
-        restServer = new RestServer(vxQueryService, appArgs.getRestPort());
+        restServer = new RestServer(vxQueryService, config.getRestApiPort());
     }
 
     @Override
@@ -150,6 +152,8 @@ public class VXQueryApplication implements ICCApplication {
         vxqConfig.setHyracksClientIp(clusterControllerInfo.getClientNetAddress());
         vxqConfig.setHyracksClientPort(clusterControllerInfo.getClientNetPort());
 
+        vxqConfig.setRestApiPort(Integer.getInteger(REST_API_PORT, LocalClusterUtil.DEFAULT_VXQUERY_REST_PORT));
+
         return vxqConfig;
     }
 
@@ -165,9 +169,6 @@ public class VXQueryApplication implements ICCApplication {
      * Application Arguments bean class
      */
     private class AppArgs {
-        @Option(name = "-restPort", usage = "The port on which REST server starts")
-        private int restPort = 8080;
-
         @Option(name = "-appConfig", usage = "Properties file location which includes VXQueryService Application additional configuration")
         private String vxqueryConfig = null;
 
@@ -177,14 +178,6 @@ public class VXQueryApplication implements ICCApplication {
 
         public void setVxqueryConfig(String vxqueryConfig) {
             this.vxqueryConfig = vxqueryConfig;
-        }
-
-        public int getRestPort() {
-            return restPort;
-        }
-
-        public void setRestPort(int restPort) {
-            this.restPort = restPort;
         }
     }
 

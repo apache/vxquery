@@ -51,6 +51,7 @@ public class Constants {
         public static final String JOIN_HASH_SIZE = "org.apache.vxquery.join_hash";
         public static final String MAXIMUM_DATA_SIZE = "org.apache.vxquery.data_size";
         public static final String HDFS_CONFIG = "org.apache.vxquery.hdfs_config";
+        public static final String REST_API_PORT = "org.apache.vxquery.rest_api_port";
     }
 
     public class HttpHeaderValues {
