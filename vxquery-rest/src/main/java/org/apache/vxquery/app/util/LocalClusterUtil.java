@@ -72,7 +72,7 @@ public class LocalClusterUtil {
 
     public void init(VXQueryConfig config) throws Exception {
         final ICCApplication ccApplication = createCCApplication();
-        configManager = new ConfigManager(new String[]{"-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT)});
+        configManager = new ConfigManager(/*new String[]{"-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT)}*/);
         ccApplication.registerConfig(configManager);
         // Following properties are needed by the app to setup
         System.setProperty(AVAILABLE_PROCESSORS, String.valueOf(config.getAvailableProcessors()));
