@@ -265,10 +265,13 @@ public class SuccessAsyncResponseTest extends AbstractRestServerTest {
         resultRequest.setShowMetrics(true);
 
         if (request.isCompileOnly()) {
-            APIResponse resultResponse = vxQueryService.getResult(resultRequest);
+            APIResponse resultResponse = (APIResponse) vxQueryService.getResult(resultRequest);
             Assert.assertTrue(resultResponse instanceof ErrorResponse);
         } else {
-            QueryResultResponse expectedResultResponse = (QueryResultResponse) vxQueryService.getResult(resultRequest);
+            APIResponse resultResponse =vxQueryService.getResult(resultRequest);
+            APIResponse resultResponse1= (APIResponse) resultResponse;
+//            QueryResultResponse expectedResultResponse = (QueryResultResponse) vxQueryService.getResult(resultRequest);
+            QueryResultResponse expectedResultResponse = (QueryResultResponse) resultResponse1;
             Assert.assertEquals(expectedResultResponse.getStatus(), Status.SUCCESS.toString());
             Assert.assertNotNull(expectedResultResponse.getResults());
 

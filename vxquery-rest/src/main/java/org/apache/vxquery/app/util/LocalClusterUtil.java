@@ -83,11 +83,6 @@ public class LocalClusterUtil {
         // Cluster controller
         CCConfig ccConfig = createCCConfig(configManager);
         clusterControllerService = new ClusterControllerService(ccConfig, ccApplication);
-//        nodeNames = ccConfig.getConfigManager().getNodeNames();
-//        for (String nodeId : nodeNames) {
-//            // mark this NC as virtual in the CC's config manager, so he doesn't try to contact NCService...
-//            configManager.set(nodeId, NCConfig.Option.NCSERVICE_PORT, NCConfig.NCSERVICE_PORT_DISABLED);
-//        }
         clusterControllerService.start();
 
         // hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
