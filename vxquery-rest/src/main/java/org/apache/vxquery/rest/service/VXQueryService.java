@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -158,12 +159,12 @@ public class VXQueryService {
     public APIResponse execute(final QueryRequest request) {
         List<String> collections = new ArrayList<>();
 //        if (request.useIndexing()) {
-//            QueryRequest indexingRequest = new QueryRequest("show-indexes()");
-//            indexingRequest.setAsync(false);
-//            SyncQueryResponse indexingResponse = (SyncQueryResponse) execute(indexingRequest, new ArrayList<>());
-//            LOGGER.log(Level.FINE, String.format("Found indexes: %s", indexingResponse.getResults()));
-//
-//            collections = Arrays.asList(indexingResponse.getResults().split("\n"));
+            QueryRequest indexingRequest = new QueryRequest("show-indexes()");
+            indexingRequest.setAsync(false);
+            SyncQueryResponse indexingResponse = (SyncQueryResponse) execute(indexingRequest, new ArrayList<>());
+            LOGGER.log(Level.FINE, String.format("Found indexes: %s", indexingResponse.getResults()));
+
+            collections = Arrays.asList(indexingResponse.getResults().split("\n"));
 //        }
         return execute(request, collections);
     }
