@@ -47,6 +47,7 @@ public class QueryResultAPIServlet extends RestAPIServlet {
     @Override
     protected APIResponse doHandle(IServletRequest request) {
         String uri = request.getHttpRequest().uri();
+        System.out.println("uri request:"+uri);
         long resultId;
         try {
             String pathParam = uri.substring(uri.lastIndexOf("/") + 1);

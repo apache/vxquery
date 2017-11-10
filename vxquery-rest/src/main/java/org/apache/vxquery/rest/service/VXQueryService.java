@@ -366,6 +366,7 @@ public class VXQueryService {
         while (reader.getResultStatus().getState() == DatasetJobRecord.State.RUNNING) {
             Thread.sleep(100);
         }
+        
 
         IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
         try (PrintWriter writer = new PrintWriter(resultStream, true)) {
@@ -374,6 +375,9 @@ public class VXQueryService {
                 writer.flush();
                 frame.getBuffer().clear();
             }
+        }catch (Exception e){
+            //Thread.sleep(5000);
+            e.printStackTrace();
         }
 
         hyracksClientConnection.waitForCompletion(jobContext.getJobId());

@@ -197,7 +197,8 @@ public class SuccessAsyncResponseTest extends AbstractRestServerTest {
 
     private void runTest(String contentType, QueryRequest request, String httpMethod) throws Exception {
         URI queryEndpointUri = RestUtils.buildQueryURI(request, restIpAddress, restPort);
-
+        System.out.println("<<<<<"+restIpAddress+":"+String.valueOf(restPort));
+        //Thread.sleep(1000);
         /*
          * ========== Query Response Testing ==========
          */
@@ -269,6 +270,7 @@ public class SuccessAsyncResponseTest extends AbstractRestServerTest {
             Assert.assertTrue(resultResponse instanceof ErrorResponse);
         } else {
             APIResponse resultResponse =vxQueryService.getResult(resultRequest);
+            
             APIResponse resultResponse1= (APIResponse) resultResponse;
 //            QueryResultResponse expectedResultResponse = (QueryResultResponse) vxQueryService.getResult(resultRequest);
             QueryResultResponse expectedResultResponse = (QueryResultResponse) resultResponse1;

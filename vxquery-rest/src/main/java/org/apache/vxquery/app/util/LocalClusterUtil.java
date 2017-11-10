@@ -85,9 +85,9 @@ public class LocalClusterUtil {
         clusterControllerService = new ClusterControllerService(ccConfig, ccApplication);
         clusterControllerService.start();
 
-        // hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
-        hcc = new HyracksConnection(clusterControllerService.getConfig().getClientListenAddress(),
-                clusterControllerService.getConfig().getClientListenPort());
+         hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
+//        hcc = new HyracksConnection(clusterControllerService.getConfig().getClientListenAddress(),
+//                clusterControllerService.getConfig().getClientListenPort());
         hds = new HyracksDataset(hcc, config.getFrameSize(), config.getAvailableProcessors());
 
         // Node controller
