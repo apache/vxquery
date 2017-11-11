@@ -375,7 +375,8 @@ public class VXQueryService {
                 writer.flush();
                 frame.getBuffer().clear();
             }
-        }catch (Exception e){
+        }
+        catch (Exception e){
             //Thread.sleep(5000);
             e.printStackTrace();
         }
