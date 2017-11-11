@@ -495,13 +495,6 @@
             </dependency>
 
             <dependency>
-                <groupId>ant</groupId>
-                <artifactId>ant-trax</artifactId>
-                <version>1.6.5</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.hyracks</groupId>
                 <artifactId>hyracks-dataflow-common</artifactId>
                 <version>${hyracks.version}</version>
