@@ -127,8 +127,8 @@ public class VXQueryService {
         setState(State.STARTING);
 
         try {
-            hyracksClientConnection = new HyracksConnection(vxQueryConfig.getHyracksClientIp(),
-                    vxQueryConfig.getHyracksClientPort());
+            hyracksClientConnection =
+                    new HyracksConnection(vxQueryConfig.getHyracksClientIp(), vxQueryConfig.getHyracksClientPort());
         } catch (Exception e) {
             LOGGER.log(SEVERE, String.format("Unable to create a hyracks client connection to %s:%d",
                     vxQueryConfig.getHyracksClientIp(), vxQueryConfig.getHyracksClientPort()));
@@ -158,14 +158,14 @@ public class VXQueryService {
      */
     public APIResponse execute(final QueryRequest request) {
         List<String> collections = new ArrayList<>();
-//        if (request.useIndexing()) {
-            QueryRequest indexingRequest = new QueryRequest("show-indexes()");
-            indexingRequest.setAsync(false);
-            SyncQueryResponse indexingResponse = (SyncQueryResponse) execute(indexingRequest, new ArrayList<>());
-            LOGGER.log(Level.FINE, String.format("Found indexes: %s", indexingResponse.getResults()));
+        // if (request.useIndexing()) {
+        QueryRequest indexingRequest = new QueryRequest("show-indexes()");
+        indexingRequest.setAsync(false);
+        SyncQueryResponse indexingResponse = (SyncQueryResponse) execute(indexingRequest, new ArrayList<>());
+        LOGGER.log(Level.FINE, String.format("Found indexes: %s", indexingResponse.getResults()));
 
-            collections = Arrays.asList(indexingResponse.getResults().split("\n"));
-//        }
+        collections = Arrays.asList(indexingResponse.getResults().split("\n"));
+        // }
         return execute(request, collections);
     }
 
@@ -359,23 +359,23 @@ public class VXQueryService {
         FrameManager resultDisplayFrameMgr = new FrameManager(jobContext.getFrameSize());
         IFrame frame = new VSizeFrame(resultDisplayFrameMgr);
         IHyracksDatasetReader reader = hyracksDataset.createReader(jobContext.getJobId(), jobContext.getResultSetId());
-        OutputStream resultStream = new ByteArrayOutputStream();
 
         // This loop is required for XTests to reliably identify the error code of
         // SystemException.
         while (reader.getResultStatus().getState() == DatasetJobRecord.State.RUNNING) {
             Thread.sleep(100);
         }
-        
 
+        OutputStream resultStream = new ByteArrayOutputStream();
         IFrameTupleAccessor frameTupleAccessor = new ResultFrameTupleAccessor();
-        try (PrintWriter writer = new PrintWriter(resultStream, true)) {
+        try {
+            PrintWriter writer = new PrintWriter(resultStream, true);
             while (reader.read(frame) > 0) {
                 writer.print(ResultUtils.getStringFromBuffer(frame.getBuffer(), frameTupleAccessor));
                 writer.flush();
                 frame.getBuffer().clear();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             //Thread.sleep(5000);
             e.printStackTrace();
         }
@@ -474,8 +474,8 @@ public class VXQueryService {
         @SuppressWarnings("Duplicates")
         private StringBuilder appendPrettyPlan(StringBuilder sb, Module module) {
             try {
-                ILogicalExpressionVisitor<String, Integer> ev = new VXQueryLogicalExpressionPrettyPrintVisitor(
-                        module.getModuleContext());
+                ILogicalExpressionVisitor<String, Integer> ev =
+                        new VXQueryLogicalExpressionPrettyPrintVisitor(module.getModuleContext());
                 AlgebricksAppendable buffer = new AlgebricksAppendable();
                 LogicalOperatorPrettyPrintVisitor v = new LogicalOperatorPrettyPrintVisitor(buffer, ev);
                 PlanPrettyPrinter.printPlan(module.getBody(), v, 0);
