@@ -62,8 +62,6 @@ public class LocalClusterUtil {
     // TODO review variable scope after XTest is updated to use the REST service.
     private ClusterControllerService clusterControllerService;
     private NodeControllerService nodeControllerSerivce;
-    private IHyracksClientConnection hcc;
-    private IHyracksDataset hds;
     private ConfigManager configManager;
     private VXQueryService vxQueryService;
     private List<String> nodeNames;
@@ -85,23 +83,13 @@ public class LocalClusterUtil {
         clusterControllerService = new ClusterControllerService(ccConfig, ccApplication);
         clusterControllerService.start();
 
-         hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
-//        hcc = new HyracksConnection(clusterControllerService.getConfig().getClientListenAddress(),
-//                clusterControllerService.getConfig().getClientListenPort());
-        hds = new HyracksDataset(hcc, config.getFrameSize(), config.getAvailableProcessors());
-
         // Node controller
         NCConfig ncConfig = createNCConfig();
         nodeControllerSerivce = new NodeControllerService(ncConfig);
         nodeControllerSerivce.start();
 
-        hcc = new HyracksConnection(ccConfig.getClientListenAddress(), ccConfig.getClientListenPort());
-
         // REST controller
-        config.setHyracksClientIp(ccConfig.getClientListenAddress());
-        config.setHyracksClientPort(ccConfig.getClientListenPort());
-        vxQueryService = new VXQueryService(config);
-        vxQueryService.start();
+        vxQueryService = ((VXQueryApplication) ccApplication).getVxQueryService();
     }
 
     protected ICCApplication createCCApplication() {
@@ -117,10 +105,6 @@ public class LocalClusterUtil {
         ccConfig.setClusterListenPort(DEFAULT_HYRACKS_CC_CLUSTER_PORT);
         ccConfig.setConsoleListenPort(DEFAULT_HYRACKS_CC_HTTP_PORT);
         ccConfig.setProfileDumpPeriod(10000);
-       // configManager.set(ControllerConfig.Option.DEFAULT_DIR, joinPath(getDefaultStoragePath(), "asterixdb"));
-        //ccConfig.setAppClass(VXQueryApplication.class.getName());
-        //ccConfig.appArgs = Arrays.asList("-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT));
-
         return ccConfig;
     }
 
@@ -137,16 +121,11 @@ public class LocalClusterUtil {
         return ncConfig;
     }
 
-    public IHyracksClientConnection getHyracksClientConnection() {
-        return hcc;
-    }
-
     public VXQueryService getVxQueryService() {
         return vxQueryService;
     }
 
     public void deinit() throws Exception {
-        vxQueryService.stop();
         nodeControllerSerivce.stop();
         clusterControllerService.stop();
     }
@@ -186,16 +165,6 @@ public class LocalClusterUtil {
 
     public int getRestPort() {
         return DEFAULT_VXQUERY_REST_PORT;
-    }
-
-    @Deprecated
-    public IHyracksClientConnection getConnection() {
-        return hcc;
-    }
-
-    @Deprecated
-    public IHyracksDataset getDataset() {
-        return hds;
     }
 
 }

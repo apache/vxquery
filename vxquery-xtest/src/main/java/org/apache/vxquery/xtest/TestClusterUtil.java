@@ -19,15 +19,10 @@ package org.apache.vxquery.xtest;
 
 import java.io.IOException;
 
-import org.apache.hyracks.api.client.HyracksConnection;
-import org.apache.hyracks.client.dataset.HyracksDataset;
 import org.apache.vxquery.app.util.LocalClusterUtil;
 import org.apache.vxquery.rest.service.VXQueryConfig;
 
 public class TestClusterUtil {
-
-    private static HyracksConnection hcc;
-    private static HyracksDataset hds;
 
     public static final LocalClusterUtil localClusterUtil = new LocalClusterUtil();
 
@@ -48,8 +43,6 @@ public class TestClusterUtil {
         try {
             VXQueryConfig config = loadConfiguration(opts);
             localClusterUtil.init(config);
-            hcc = (HyracksConnection) localClusterUtil.getConnection();
-            hds = (HyracksDataset) localClusterUtil.getDataset();
         } catch (Exception e) {
             throw new IOException(e);
         }
@@ -61,14 +54,6 @@ public class TestClusterUtil {
         } catch (Exception e) {
             throw new IOException(e);
         }
-    }
-
-    public static HyracksConnection getConnection() {
-        return hcc;
-    }
-
-    public static HyracksDataset getDataset() {
-        return hds;
     }
 
 }
