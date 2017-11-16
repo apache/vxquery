@@ -24,6 +24,7 @@ import static org.apache.vxquery.rest.Constants.Properties.JOIN_HASH_SIZE;
 import static org.apache.vxquery.rest.Constants.Properties.MAXIMUM_DATA_SIZE;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
@@ -64,7 +65,7 @@ public class LocalClusterUtil {
     private NodeControllerService nodeControllerSerivce;
     private ConfigManager configManager;
     private VXQueryService vxQueryService;
-    private List<String> nodeNames;
+    private IHyracksClientConnection hcc;
 
     public void init(VXQueryConfig config) throws Exception {
         final ICCApplication ccApplication = createCCApplication();
@@ -82,11 +83,15 @@ public class LocalClusterUtil {
         CCConfig ccConfig = createCCConfig(configManager);
         clusterControllerService = new ClusterControllerService(ccConfig, ccApplication);
         clusterControllerService.start();
+        
 
         // Node controller
         NCConfig ncConfig = createNCConfig();
         nodeControllerSerivce = new NodeControllerService(ncConfig);
         nodeControllerSerivce.start();
+        
+        config.setHyracksClientIp(ccConfig.getClientListenAddress());
+        config.setHyracksClientPort(ccConfig.getClientListenPort());
 
         // REST controller
         vxQueryService = ((VXQueryApplication) ccApplication).getVxQueryService();
@@ -160,7 +165,7 @@ public class LocalClusterUtil {
     }
 
     public String getIpAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost().getHostAddress();
+        return Inet4Address.getLoopbackAddress().getHostAddress();
     }
 
     public int getRestPort() {
