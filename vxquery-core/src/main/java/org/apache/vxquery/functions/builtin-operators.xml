@@ -252,6 +252,7 @@
         <param name="parameter1" type="node()*"/>
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.OpIntersectScalarEvaluatorFactory"/>
         <!-- implementation assumes input in document order -->
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
             <argument value="0"/>
