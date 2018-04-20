@@ -56,15 +56,11 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
             	try {
             		TaggedValuePointable tvp1 = args[0];
                     TaggedValuePointable tvp2 = args[1];
-                    if (!ValueTag.isNode(tvp1.getTag()) || !ValueTag.isNode(tvp2.getTag())) {
+                    if (tvp1.getTag() != ValueTag.SEQUENCE_TAG) {
                     	throw new SystemException(ErrorCode.XPTY0004);
                     }
                     
-                    abvs.reset();
-                    sb.reset(abvs); 
-                    //TODO
-                    sb.finish();
-                    result.set(abvs);
+                    result.set(tvp1);
             	} catch (IOException e) {
                     throw new SystemException(ErrorCode.SYSE0001);
             	}

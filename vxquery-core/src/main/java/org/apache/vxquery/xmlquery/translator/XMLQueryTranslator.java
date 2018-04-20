@@ -1538,10 +1538,12 @@ public class XMLQueryTranslator {
         LogicalVariable varRight = translateExpression(ie.getRightExpr(), tCtx);
         ILogicalExpression arg1 = normalize(vre(varLeft), sign.getParameterType(0));
         ILogicalExpression arg2 = normalize(vre(varRight), sign.getParameterType(1));
+        /*
         if (BuiltinOperators.EXCEPT.equals(operator) || BuiltinOperators.INTERSECT.equals(operator)) {
             arg1 = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg1);
             arg2 = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, arg2);
         }
+        */
         ILogicalExpression result = sfce(operator, arg1, arg2);
         if (BuiltinOperators.UNION.equals(operator)) {
             result = sfce(BuiltinOperators.SORT_DISTINCT_NODES_ASC, result);
