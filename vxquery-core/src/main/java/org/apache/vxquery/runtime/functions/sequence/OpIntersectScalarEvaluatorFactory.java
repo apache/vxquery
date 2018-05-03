@@ -18,8 +18,8 @@ package org.apache.vxquery.runtime.functions.sequence;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -60,24 +60,16 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
     protected IScalarEvaluator createEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args)
             throws HyracksDataException {
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
-        final DataOutput dOut = abvs.getDataOutput();
-        final AbstractValueComparisonOperation aOp = new ValueEqComparisonOperation();
-        final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
-        
-        final NodeTreePointable ntp1 = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
-        final NodeTreePointable ntp2 = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
-        
-        
+        final SequenceBuilder sb = new SequenceBuilder();
+       
         final SequencePointable seqleft = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final SequencePointable seqright = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpleft = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpright = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final TypedPointables tp1 = new TypedPointables();
-        final TypedPointables tp2 = new TypedPointables();
-        
-        final SequenceBuilder sb = new SequenceBuilder();
-        
-        Set<Integer> nodeIDs = new HashSet<Integer>();
+        final TypedPointables tpleft = new TypedPointables();
+        final TypedPointables tpright = new TypedPointables();
+       
+        Map<Integer, TaggedValuePointable> nodes = new HashMap<Integer, TaggedValuePointable>();
         
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -88,50 +80,78 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
             		TaggedValuePointable tvp1 = args[0];
                     TaggedValuePointable tvp2 = args[1];
                     
-                    // If either operand only has one item in it then the tag is a node_tree_tag
-                    // TODO: handle if either operand is empty or only has one item
-                    if (tvp1.getTag() != ValueTag.SEQUENCE_TAG) {
-                    	System.out.println("Not a Sequence: " + tvp1.getTag());
-                    	throw new SystemException(ErrorCode.FORG0006);
-                    }
-                    if (tvp2.getTag() != ValueTag.SEQUENCE_TAG) {
-                    	System.out.println("Not a Sequence: " + tvp2.getTag());
-                    	throw new SystemException(ErrorCode.FORG0006);
-                    }              
-                    tvp1.getValue(seqleft);
-                    tvp2.getValue(seqright);
+                    // If an operand has one item then it is a node tree
+                    // If an operand has more than one item then it is a sequence
                     
-                    // naive implementation
-                    int seqllen = seqleft.getEntryCount();
-                    int seqrlen = seqright.getEntryCount();
-                    for (int i = 0 ; i < seqllen; ++i) {
-                    	seqleft.getEntry(i, tvpleft);
-                    	if (tvpleft.getTag() != ValueTag.NODE_TREE_TAG) {
-                    		throw new SystemException(ErrorCode.XPTY0004);
-                    	}                  
-                    	int lNodeId = FunctionHelper.getLocalNodeId(tvpleft, tp1);
-                    	if (lNodeId == -1) {
-                    		//TODO
-                    		
+
+                    // Add items from the left operand into the hash map
+                    if (tvp1.getTag() != ValueTag.SEQUENCE_TAG) {
+                    	if (tvp1.getTag() != ValueTag.NODE_TREE_TAG) {
+                    		System.out.println("Not a Sequence: " + tvp1.getTag());
+                    		throw new SystemException(ErrorCode.FORG0006);
                     	}
-                    	
-                    	for (int j = 0; j < seqrlen; ++j) {
-                    		seqright.getEntry(j, tvpright);
+                    	else {
+                    		// Is only one item
+                    		int nodeId = FunctionHelper.getLocalNodeId(tvp1, tpleft);
+                    		if (nodeId == -1) {
+                    			//TODO
+                    		}
+                    		nodes.put(nodeId, tvp1);
+                    	}
+                    }
+                    else {
+                    	// Is a sequence, so add all the items
+                        tvp1.getValue(seqleft);
+                        int seqleftlen = seqleft.getEntryCount();
+                        for (int i = 0; i < seqleftlen; ++i) {
+                        	seqleft.getEntry(i, tvpleft);
+                        	if (tvpleft.getTag() != ValueTag.NODE_TREE_TAG) {
+                        		throw new SystemException(ErrorCode.XPTY0004);
+                        	}
+                        	int nodeId = FunctionHelper.getLocalNodeId(tvpleft, tpleft);
+                        	if (nodeId == -1) {
+                        		//TODO
+                        	}
+                        	nodes.put(nodeId, tvpleft);                       	
+                        }
+                    }
+                    
+                    // Check if node IDs from right operand is in the hash map
+                    if (tvp2.getTag() != ValueTag.SEQUENCE_TAG) {
+                    	if (tvp2.getTag() != ValueTag.NODE_TREE_TAG) {
+                    		System.out.println("Not a Sequence: " + tvp2.getTag());
+                    		throw new SystemException(ErrorCode.FORG0006);
+                    	}
+                    	else {
+                    		// Is only one item
+                        	int nodeId = FunctionHelper.getLocalNodeId(tvp2, tpright);
+                        	if (nodeId == -1) {
+                        		//TODO
+                        	}
+                        	if (nodes.containsKey(nodeId)) {
+                        		sb.addItem(tvp2);
+                        	}
+                    	}
+                    }
+                    else {
+                    	// Is a sequence, so check all the items
+                        tvp2.getValue(seqright);	
+                        int seqrightlen = seqright.getEntryCount();
+                        for (int i = 0; i < seqrightlen; ++i) {
+                        	seqright.getEntry(i, tvpright);
                         	if (tvpright.getTag() != ValueTag.NODE_TREE_TAG) {
                         		throw new SystemException(ErrorCode.XPTY0004);
                         	}
-                        	int rNodeId = FunctionHelper.getLocalNodeId(tvpright, tp1);
-                        	if (rNodeId == -1) {
+                        	int nodeId = FunctionHelper.getLocalNodeId(tvpright, tpright);
+                        	if (nodeId == -1) {
                         		//TODO
-                        	
                         	}
-                                               	
-                        	if (lNodeId == rNodeId) {
-                        		sb.addItem(tvpleft);
-                        		break;
+                        	if (nodes.containsKey(nodeId)) {
+                        		sb.addItem(tvpright);
                         	}
-                    	}
+                        }
                     }
+
                     sb.finish();
                     result.set(abvs);
             	} catch (IOException e) {
