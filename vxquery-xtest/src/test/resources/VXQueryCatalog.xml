@@ -58,6 +58,8 @@
 
 <!ENTITY SerializationQueries SYSTEM "cat/SerializationQueries.xml">
 
+<!ENTITY SetOperatorQueries SYSTEM "cat/SetOperatorQueries.xml">
+
 ]>
 <test-suite xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CatalogDesignDate="2014-04-01" version="0.0.1" SourceOffsetPath="./" ResultOffsetPath="ExpectedTestResults/" XQueryQueryOffsetPath="Queries/XQuery/" XQueryXQueryOffsetPath="Queries/XQueryX/" XQueryFileExtension=".xq" XQueryXFileExtension=".xqx" xsi:schemaLocation="http://www.w3.org/2005/02/query-test-XQTSCatalog XQTSCatalog.xsd">
     <test-suite-info>
@@ -144,6 +146,9 @@
         </source>
         <source ID="xmlCollection" FileName="TestSources/xml" Creator="Christina Pavlopoulou">
             <description last-mod="2017-08-03">File</description>
+        </source>
+        <source ID="catalog" FileName="TestSources/xml/catalog.xml" Creator="Brandon Gutzmann">
+            <description last-mod="2018-04-26">File</description>
         </source>
     </sources>
     <test-group name="SingleQuery" featureOwner="Preston Carman">
@@ -379,6 +384,18 @@
                 <title>Tests for XML in JSON</title>
             </GroupInfo>
             &XMLInJSONQueries;
+        </test-group>
+    </test-group>
+        <test-group name="SetOperatorTests" featureOwner="Brandon Gutzmann">
+        <GroupInfo>
+            <title>Set Operators</title>
+            <description>Set Operators: Intersect and Union</description>
+        </GroupInfo>
+        <test-group name="SetOperatorTests" featureOwner="Brandon Gutzmann">
+            <GroupInfo>
+                <title>Tests for Set Operators</title>
+            </GroupInfo>
+            &SetOperatorQueries;
         </test-group>
     </test-group>
 </test-suite>
