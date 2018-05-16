@@ -494,6 +494,7 @@
         <param name="parameter1" type="node()*"/>
         <param name="parameter2" type="node()*"/>
         <return type="node()*"/>
+        <runtime type="scalar" class="org.apache.vxquery.runtime.functions.sequence.OpUnionScalarEvaluatorFactory"/>
         <!-- as we do the doc-order-sort and the duplicate elimination -->
         <!-- after the concatenation, we can reuse the concat iterator -->
         <property type="DocumentOrder" class="org.apache.vxquery.compiler.rewriter.rules.propagationpolicies.InputPropertyPropagationPolicy">
