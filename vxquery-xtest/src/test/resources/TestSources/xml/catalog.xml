@@ -37,21 +37,9 @@
         <author>Nagata, Suanne</author>
         <title>Becoming Somebody</title>
         <genre>Biography</genre>
-	<price>39</price>
+        <price>39</price>
         <review>A masterpiece of the fine art of gossiping.</review>
     </book>
-    <library>
-      <name>happy</name>
-      <book>
-	<author>Ted</author>
-      </book>
-      <catalog>
-	<book>
-	  <author>Nye, Bill</author>
-	  <title>Science</title>
-	</book>
-      </catalog>
-    </library>
 </catalog>
 
 

@@ -18,9 +18,24 @@
       <title>Set Operator Test</title>
       <description/>
    </GroupInfo>
-   <test-case name="intersect" FilePath="Intersect" Creator="Brandon Gutzmann">
+   <test-case name="intersect01" FilePath="Intersect" Creator="Brandon Gutzmann">
       <description>Intersects two sets both with more than 1 item</description>
-      <query name="intersect" date="2018-04-26"/>
-      <output-file compare="Text">intersect.txt</output-file>
+      <query name="intersect01" date="2018-04-26"/>
+      <output-file compare="Text">intersect01.txt</output-file>
+   </test-case>
+      <test-case name="intersect02" FilePath="Intersect" Creator="Brandon Gutzmann">
+      <description>Left operand has 1 item, right operand has many</description>
+      <query name="intersect02" date="2018-04-26"/>
+      <output-file compare="Text">intersect02.txt</output-file>
+   </test-case>
+      <test-case name="intersect03" FilePath="Intersect" Creator="Brandon Gutzmann">
+      <description>Testing reverse of test 2</description>
+      <query name="intersect03" date="2018-04-26"/>
+      <output-file compare="Text">intersect03.txt</output-file>
+   </test-case>
+      <test-case name="intersect04" FilePath="Intersect" Creator="Brandon Gutzmann">
+      <description>Left operand has 1 item, right operand has many</description>
+      <query name="intersect04" date="2018-04-26"/>
+      <output-file compare="Text">intersect04.txt</output-file>
    </test-case>
 </test-group>

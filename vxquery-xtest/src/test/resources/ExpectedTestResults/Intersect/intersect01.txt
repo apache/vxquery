@@ -1,0 +1,14 @@
+<book id="bk002">
+        <author>Oberg, Bruce</author>
+        <title>The Poet&apos;s First Poem</title>
+        <genre>Poem</genre>
+        <price>24.95</price>
+        <review>The least poetic poems of the decade.</review>
+    </book>
+<book id="bk003">
+        <author>Nagata, Suanne</author>
+        <title>Becoming Somebody</title>
+        <genre>Biography</genre>
+        <price>39</price>
+        <review>A masterpiece of the fine art of gossiping.</review>
+    </book>

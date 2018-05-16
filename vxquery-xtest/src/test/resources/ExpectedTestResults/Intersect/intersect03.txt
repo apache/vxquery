@@ -1,0 +1,7 @@
+<book id="bk002">
+        <author>Oberg, Bruce</author>
+        <title>The Poet&apos;s First Poem</title>
+        <genre>Poem</genre>
+        <price>24.95</price>
+        <review>The least poetic poems of the decade.</review>
+    </book>
