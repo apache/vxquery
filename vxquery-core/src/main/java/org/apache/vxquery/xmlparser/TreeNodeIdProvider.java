@@ -69,7 +69,6 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         int p = partitionDataSource;
         int dssi = dataSouceScanId;
         int f = fileId;
-        System.out.println("File ID: " + fileId);
         return (f << 24) | (p << 16) | (dssi << (16 - dataSourceBits)) | currentId++;
     }
 

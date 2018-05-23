@@ -82,7 +82,6 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                     ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition, stringp.toString());
                     IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
                     FunctionHelper.readInDocFromPointable(stringp, abvs, parser);
-                    System.out.println("Reading from: " + stringp.toString());
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }

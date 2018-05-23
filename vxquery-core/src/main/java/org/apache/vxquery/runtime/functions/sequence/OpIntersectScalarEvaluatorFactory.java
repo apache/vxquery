@@ -168,7 +168,6 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
     private boolean addItem(TaggedValuePointable tvp, TypedPointables tp, Set<Pair> nodes) {
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
         int rootNodeId = tp.ntp.getRootNodeId();
-        System.out.println("Left Node ID: " + nodeId + " root node id: " + rootNodeId);
         if (nodeId == -1) {
             //TODO
             return false;
@@ -187,12 +186,10 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
         int rootNodeId = tp.ntp.getRootNodeId();
 
-        System.out.println("Right Node ID: " + nodeId + " root node id: " + rootNodeId);
         if (nodeId == -1) {
             // TODO
             return false;
         } else if (nodes.contains(new Pair(rootNodeId, nodeId))) {
-            System.out.println("Node Found!");
             return true;
         }
         return false;
