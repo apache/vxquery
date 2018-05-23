@@ -17,6 +17,8 @@
 package org.apache.vxquery.runtime.functions.node;
 
 import java.io.DataInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -56,7 +58,6 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
         final ByteBufferInputStream bbis = new ByteBufferInputStream();
         final DataInputStream di = new DataInputStream(bbis);
         final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
-        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
@@ -78,8 +79,10 @@ public class FnDocScalarEvaluatorFactory extends AbstractTaggedValueArgumentScal
                 tvp.getValue(stringp);
                 try {
                     // Only one document should be parsed so its ok to have a unique parser.
+                    ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition, stringp.toString());
                     IParser parser = new XMLParser(false, nodeIdProvider, nodeId);
                     FunctionHelper.readInDocFromPointable(stringp, abvs, parser);
+                    System.out.println("Reading from: " + stringp.toString());
                 } catch (Exception e) {
                     throw new SystemException(ErrorCode.SYSE0001, e);
                 }

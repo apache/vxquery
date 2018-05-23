@@ -17,9 +17,8 @@
 package org.apache.vxquery.runtime.functions.sequence;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluatorFactory;
@@ -30,7 +29,6 @@ import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 import org.apache.vxquery.datamodel.accessors.SequencePointable;
 import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 import org.apache.vxquery.datamodel.accessors.TypedPointables;
-import org.apache.vxquery.datamodel.accessors.nodes.NodeTreePointable;
 import org.apache.vxquery.datamodel.builders.sequence.SequenceBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
@@ -42,6 +40,40 @@ import org.apache.vxquery.runtime.functions.util.FunctionHelper;
 public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgumentScalarEvaluatorFactory {
     private static final long serialVersionUID = 1L;
 
+    class Pair {
+        private int rootId, localId;
+
+        Pair(int r, int l) {
+            rootId = r;
+            localId = l;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + localId;
+            result = prime * result + rootId;
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Pair other = (Pair) obj;
+            if (localId != other.localId)
+                return false;
+            if (rootId != other.rootId)
+                return false;
+            return true;
+        }
+    }
+
     public OpIntersectScalarEvaluatorFactory(IScalarEvaluatorFactory[] args) {
         super(args);
     }
@@ -52,7 +84,6 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         final ArrayBackedValueStorage abvs = new ArrayBackedValueStorage();
         final SequenceBuilder sb = new SequenceBuilder();
 
-        final NodeTreePointable temp = (NodeTreePointable) NodeTreePointable.FACTORY.createPointable();
         final SequencePointable seqleft = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final SequencePointable seqright = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpleft = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
@@ -60,7 +91,8 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         final TypedPointables tpleft = new TypedPointables();
         final TypedPointables tpright = new TypedPointables();
 
-        Map<Integer, TaggedValuePointable> nodes = new HashMap<Integer, TaggedValuePointable>();
+        // a set of unique root node ids and local node ids
+        Set<Pair> nodes = new HashSet<Pair>();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -77,7 +109,8 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
                     }
 
                     // If an operand has one item then it is a node tree
-                    // If an operand has more than one item then it is a sequence               
+                    // If an operand has more than one item then it is a sequence  
+                    // IF an operand has 0 items then it is an empty sequence
 
                     // Add items from the left operand into the hash map
                     if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
@@ -87,21 +120,13 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
                             if (tvpleft.getTag() != ValueTag.NODE_TREE_TAG) {
                                 throw new SystemException(ErrorCode.XPTY0004);
                             }
-                            if (addItem(tvpleft, tpleft, nodes)) {
-                                byte data[] = tvpleft.getByteArray();
-                                tvpleft.getValue(temp);
-                                byte data2[] = temp.getByteArray();
-                                if (Arrays.equals(data, data2)) {
-                                    System.out.println("true");
-                                }
-                                else {
-                                    System.out.println("false");
-                                }
+                            if (!addItem(tvpleft, tpleft, nodes)) {
+                                // TODO: What happens when local node id is -1
                             }
                         }
                     } else {
                         if (!addItem(tvp1, tpleft, nodes)) {
-
+                            // TODO: What happens when local node id is -1
                         }
                     }
 
@@ -115,12 +140,14 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
                             }
                             if (checkItem(tvpright, tpright, nodes)) {
                                 sb.addItem(tvpright);
+                                // TODO
                             }
 
                         }
                     } else {
                         if (checkItem(tvp2, tpright, nodes)) {
                             sb.addItem(tvp2);
+                            // TODO
                         }
                     }
 
@@ -138,30 +165,36 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
      * Returns: False if local node id doesn't exist
      *          True if item added successfully
      */
-    private boolean addItem(TaggedValuePointable tvp, TypedPointables tp, Map<Integer, TaggedValuePointable> nodes) {
+    private boolean addItem(TaggedValuePointable tvp, TypedPointables tp, Set<Pair> nodes) {
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
-        System.out.println("Node ID: " + nodeId);
+        int rootNodeId = tp.ntp.getRootNodeId();
+        System.out.println("Left Node ID: " + nodeId + " root node id: " + rootNodeId);
         if (nodeId == -1) {
-            System.out.println(new String(tvp.getByteArray()));
+            //TODO
             return false;
         }
-        nodes.put(nodeId, tvp);
+        nodes.add(new Pair(rootNodeId, nodeId));
         return true;
     }
 
-    private boolean checkItem(TaggedValuePointable tvp, TypedPointables tp, Map<Integer, TaggedValuePointable> nodes) {
+    /*
+     * Checks if node is in hash map
+     * Returns: False if local node id doesn't exist
+     *          False if node isn't in hash map
+     *          True if node is in hash map
+     */
+    private boolean checkItem(TaggedValuePointable tvp, TypedPointables tp, Set<Pair> nodes) {
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
+        int rootNodeId = tp.ntp.getRootNodeId();
+
+        System.out.println("Right Node ID: " + nodeId + " root node id: " + rootNodeId);
         if (nodeId == -1) {
+            // TODO
             return false;
-        } else if (nodes.containsKey(nodeId)) {
+        } else if (nodes.contains(new Pair(rootNodeId, nodeId))) {
+            System.out.println("Node Found!");
             return true;
         }
         return false;
     }
 }
-
-/*
-    $a := <a>5</a> union <a>6</a>
-    $b := a
-    $a intersect $b
-*/

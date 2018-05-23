@@ -38,4 +38,9 @@
       <query name="intersect04" date="2018-04-26"/>
       <output-file compare="Text">intersect04.txt</output-file>
    </test-case>
+         <test-case name="intersect05" FilePath="Intersect" Creator="Brandon Gutzmann">
+      <description>Collection</description>
+      <query name="intersect05" date="2018-04-26"/>
+      <output-file compare="Text">intersect05.txt</output-file>
+   </test-case>
 </test-group>

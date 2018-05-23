@@ -1223,12 +1223,13 @@ public class FunctionHelper {
         System.err.println(" printUTF8String END");
     }
 
-    public static void readInDocFromPointable(UTF8StringPointable stringp, ArrayBackedValueStorage abvs,
-            IParser parser) throws IOException {
+    public static void readInDocFromPointable(UTF8StringPointable stringp, ArrayBackedValueStorage abvs, IParser parser)
+            throws IOException {
         readInDocFromString(stringp.toString(), abvs, parser);
     }
 
-    public static void readInDocFromString(String fName, ArrayBackedValueStorage abvs, IParser parser) throws IOException {
+    public static void readInDocFromString(String fName, ArrayBackedValueStorage abvs, IParser parser)
+            throws IOException {
         Reader input;
         if (!fName.contains("hdfs:/")) {
             File file = new File(fName);
