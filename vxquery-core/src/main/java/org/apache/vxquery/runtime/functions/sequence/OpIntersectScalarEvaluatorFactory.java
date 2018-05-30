@@ -41,10 +41,11 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
     private static final long serialVersionUID = 1L;
 
     class Pair {
-        private int rootId, localId;
+        private int localId;
+        private byte fileId;
 
-        Pair(int r, int l) {
-            rootId = r;
+        Pair(int l, byte f) {
+            fileId = f;
             localId = l;
         }
 
@@ -53,7 +54,7 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
             final int prime = 31;
             int result = 1;
             result = prime * result + localId;
-            result = prime * result + rootId;
+            result = prime * result + fileId;
             return result;
         }
 
@@ -68,7 +69,7 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
             Pair other = (Pair) obj;
             if (localId != other.localId)
                 return false;
-            if (rootId != other.rootId)
+            if (fileId != other.fileId)
                 return false;
             return true;
         }
@@ -168,11 +169,15 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
     private boolean addItem(TaggedValuePointable tvp, TypedPointables tp, Set<Pair> nodes) {
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
         int rootNodeId = tp.ntp.getRootNodeId();
+        byte fileId = (byte) (rootNodeId >> 24); // TODO: Magic number
         if (nodeId == -1) {
-            //TODO
+            // TODO
+            return false;
+        } else if (rootNodeId == -1) {
+            // TODO
             return false;
         }
-        nodes.add(new Pair(rootNodeId, nodeId));
+        nodes.add(new Pair(nodeId, fileId));
         return true;
     }
 
@@ -185,11 +190,13 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
     private boolean checkItem(TaggedValuePointable tvp, TypedPointables tp, Set<Pair> nodes) {
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
         int rootNodeId = tp.ntp.getRootNodeId();
-
+        byte fileId = (byte) (rootNodeId >> 24); // TODO: Magic number
         if (nodeId == -1) {
             // TODO
             return false;
-        } else if (nodes.contains(new Pair(rootNodeId, nodeId))) {
+        } else if (rootNodeId == -1) {
+
+        } else if (nodes.contains(new Pair(nodeId, fileId))) {
             return true;
         }
         return false;

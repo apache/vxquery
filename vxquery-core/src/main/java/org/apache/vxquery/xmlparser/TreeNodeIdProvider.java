@@ -36,7 +36,15 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         this.dataSouceScanId = dataSouceScanId;
         this.dataSourceBits = getBitsNeeded(totalDataSources);
         currentId = 0;
-        fileId = 0;
+        fileId = nextFileId++;
+    }
+    
+    public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId, short totalDataSources, String collectionId) {
+        this.partitionDataSource = partitionDataSource;
+        this.dataSouceScanId = dataSouceScanId;
+        this.dataSourceBits = getBitsNeeded(totalDataSources);
+        currentId = 0;
+        fileId = getFileId(collectionId);
     }
 
     public TreeNodeIdProvider(short partition) {
@@ -44,7 +52,7 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         dataSouceScanId = 0;
         dataSourceBits = 0;
         currentId = 0;
-        fileId = 0;
+        fileId = nextFileId++;
     }
 
     public TreeNodeIdProvider(short partition, String uri) {

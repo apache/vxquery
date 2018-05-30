@@ -74,6 +74,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
     private static final long serialVersionUID = 1L;
     private short dataSourceId;
     private short totalDataSources;
+    private final String collectionId;
     private String[] collectionPartitions;
     private List<Integer> childSeq;
     private List<Byte[]> valueSeq;
@@ -90,6 +91,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         collectionPartitions = ds.getPartitions();
         dataSourceId = (short) ds.getDataSourceId();
         totalDataSources = (short) ds.getTotalDataSources();
+        collectionId = ds.getId();
         childSeq = ds.getChildSeq();
         valueSeq = ds.getValueSeq();
         recordDescriptors[0] = rDesc;
@@ -107,7 +109,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
         final IFrame frame = new VSizeFrame(ctx);
         final IFrameFieldAppender appender = new FrameFixedFieldTupleAppender(fieldOutputCount);
         final short partitionId = (short) ctx.getTaskAttemptId().getTaskId().getPartition();
-        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources);
+        final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources, collectionId);
         final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
         final DynamicContext dCtx = (DynamicContext) ctx.getJobletContext().getGlobalJobData();
         final ArrayBackedValueStorage jsonAbvs = new ArrayBackedValueStorage();

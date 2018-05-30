@@ -15,18 +15,17 @@
    specific language governing permissions and limitations
    under the License. :)
    
-let $collection := "ghcnd"
-let $a:=(for $i in collection($collection)/dataCollection/data 
-return $i)
-
-where $j/value le 20
-return $j)
+let $a := "ghcnd"
+for $i in collection($a)/dataCollection/data 
 
 
+let $b := "ghcnd"
+for $j in collection($b)/dataCollection/data 
 
+where $i/value < 10
+and $j/value < 20
 
+return $i intersect $j
 
-
-return $a
 
 
