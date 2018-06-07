@@ -39,12 +39,12 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         fileId = nextFileId++;
     }
     
-    public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId, short totalDataSources, String collectionId) {
+    public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId, short totalDataSources, String uri) {
         this.partitionDataSource = partitionDataSource;
         this.dataSouceScanId = dataSouceScanId;
         this.dataSourceBits = getBitsNeeded(totalDataSources);
         currentId = 0;
-        fileId = getFileId(collectionId);
+        fileId = getFileId(uri);
     }
 
     public TreeNodeIdProvider(short partition) {

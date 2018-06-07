@@ -45,8 +45,8 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         private byte fileId;
 
         Pair(int l, byte f) {
-            fileId = f;
             localId = l;
+            fileId = f;
         }
 
         @Override
@@ -71,6 +71,8 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
                 return false;
             if (fileId != other.fileId)
                 return false;
+            System.out.println("My Equals");
+            System.out.flush();
             return true;
         }
     }
@@ -170,11 +172,12 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
         int rootNodeId = tp.ntp.getRootNodeId();
         byte fileId = (byte) (rootNodeId >> 24); // TODO: Magic number
+        System.out.println("Left Node ID: " + nodeId + " root node id: " + rootNodeId + " file id: " + fileId);
         if (nodeId == -1) {
             // TODO
             return false;
         } else if (rootNodeId == -1) {
-            // TODO
+            // TODO If rootNodeID is -1 is nodeId also -1?
             return false;
         }
         nodes.add(new Pair(nodeId, fileId));
@@ -191,11 +194,12 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
         int rootNodeId = tp.ntp.getRootNodeId();
         byte fileId = (byte) (rootNodeId >> 24); // TODO: Magic number
+        System.out.println("Right Node ID: " + nodeId + " root node id: " + rootNodeId + " file id: " + fileId);
         if (nodeId == -1) {
             // TODO
             return false;
         } else if (rootNodeId == -1) {
-
+            // TODO
         } else if (nodes.contains(new Pair(nodeId, fileId))) {
             return true;
         }
