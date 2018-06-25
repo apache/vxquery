@@ -38,7 +38,7 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         currentId = 0;
         fileId = nextFileId++;
     }
-    
+
     public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId, short totalDataSources, String uri) {
         this.partitionDataSource = partitionDataSource;
         this.dataSouceScanId = dataSouceScanId;

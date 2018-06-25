@@ -14,7 +14,8 @@
    KIND, either express or implied.  See the License for the
    specific language governing permissions and limitations
    under the License. :)
-   
+  
+  (:
 let $a := "ghcnd"
 for $i in collection($a)/dataCollection/data 
 
@@ -26,6 +27,12 @@ where $i/value < 10
 and $j/value < 20
 
 return $i intersect $j
+:)
+
+let $a := <a>5</a>
+return $a intersect $a
+
+
 
 
 

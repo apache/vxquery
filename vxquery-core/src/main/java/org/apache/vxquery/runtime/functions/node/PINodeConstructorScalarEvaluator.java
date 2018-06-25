@@ -56,4 +56,9 @@ public class PINodeConstructorScalarEvaluator extends AbstractNodeConstructorSca
     protected boolean createsDictionary() {
         return false;
     }
+
+    @Override
+    protected boolean createsNodeId() {
+        return false;
+    }
 }

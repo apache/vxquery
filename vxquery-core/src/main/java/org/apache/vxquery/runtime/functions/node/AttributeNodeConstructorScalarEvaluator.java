@@ -70,4 +70,9 @@ public class AttributeNodeConstructorScalarEvaluator extends AbstractNodeConstru
     protected boolean createsDictionary() {
         return true;
     }
+
+    @Override
+    protected boolean createsNodeId() {
+        return false;
+    }
 }
