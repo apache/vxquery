@@ -34,7 +34,6 @@ import org.apache.hyracks.algebricks.rewriter.rules.ExtractGbyExpressionsRule;
 import org.apache.hyracks.algebricks.rewriter.rules.FactorRedundantGroupAndDecorVarsRule;
 import org.apache.hyracks.algebricks.rewriter.rules.InferTypesRule;
 import org.apache.hyracks.algebricks.rewriter.rules.InlineAssignIntoAggregateRule;
-import org.apache.hyracks.algebricks.rewriter.rules.InlineVariablesRule;
 import org.apache.hyracks.algebricks.rewriter.rules.IntroJoinInsideSubplanRule;
 import org.apache.hyracks.algebricks.rewriter.rules.IntroduceAggregateCombinerRule;
 import org.apache.hyracks.algebricks.rewriter.rules.IntroduceGroupByCombinerRule;
@@ -92,6 +91,7 @@ import org.apache.vxquery.compiler.rewriter.rules.SetVariableIdContextRule;
 import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.ExtractFunctionsFromJoinConditionRule;
 import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.InlineNestedVariablesRule;
 import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.MoveFreeVariableOperatorOutOfSubplanRule;
+import org.apache.vxquery.compiler.rewriter.rules.algebricksalternatives.VXQueryInlineVariablesRule;
 
 public class RewriteRuleset {
     RewriteRuleset() {
@@ -272,7 +272,7 @@ public class RewriteRuleset {
     public static final List<IAlgebraicRewriteRule> buildCondPushDownRuleCollection() {
         List<IAlgebraicRewriteRule> condPushDown = new LinkedList<>();
         condPushDown.add(new PushSelectDownRule());
-        condPushDown.add(new InlineVariablesRule());
+        condPushDown.add(new VXQueryInlineVariablesRule());
         condPushDown.add(new SubplanOutOfGroupRule());
         condPushDown.add(new RemoveRedundantVariablesRule());
         condPushDown.add(new RemoveUnusedAssignAndAggregateRule());
@@ -289,7 +289,7 @@ public class RewriteRuleset {
 
     public static final List<IAlgebraicRewriteRule> buildJoinInferenceRuleCollection() {
         List<IAlgebraicRewriteRule> joinInference = new LinkedList<>();
-        joinInference.add(new InlineVariablesRule());
+        joinInference.add(new VXQueryInlineVariablesRule());
         joinInference.add(new ComplexJoinInferenceRule());
         return joinInference;
     }
