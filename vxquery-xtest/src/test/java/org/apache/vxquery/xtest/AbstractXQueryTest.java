@@ -87,7 +87,7 @@ public abstract class AbstractXQueryTest {
     }
 
     @BeforeClass
-    public static void setup() throws IOException {
+    public static void setup() throws Exception {
         TestClusterUtil.startCluster(getDefaultTestOptions(), TestClusterUtil.localClusterUtil);
         setupFS();
     }
@@ -109,7 +109,7 @@ public abstract class AbstractXQueryTest {
     }
 
     @AfterClass
-    public static void shutdown() throws IOException {
+    public static void shutdown() throws Exception {
         removeFS();
         TestClusterUtil.stopCluster(TestClusterUtil.localClusterUtil);
     }

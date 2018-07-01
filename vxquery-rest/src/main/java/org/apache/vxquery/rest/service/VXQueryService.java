@@ -186,6 +186,10 @@ public class VXQueryService {
             return APIResponse.newErrorResponse(request.getRequestId(), Error.builder().withCode(UNFORSEEN_PROBLEM)
                     .withMessage("Hyracks connection problem: " + e.getMessage()).build());
         }
+        if (nodeControllerInfos.isEmpty()) {
+            return APIResponse.newErrorResponse(request.getRequestId(), Error.builder().withCode(UNFORSEEN_PROBLEM)
+                    .withMessage("No NodeControllers available").build());
+        }
 
         // Adding a query compilation listener
         VXQueryCompilationListener listener = new VXQueryCompilationListener(response,
@@ -360,7 +364,7 @@ public class VXQueryService {
 
         // This loop is required for XTests to reliably identify the error code of
         // SystemException.
-        while (reader.getResultStatus() == DatasetJobRecord.Status.RUNNING) {
+        while (reader.getResultStatus().getState() == DatasetJobRecord.State.RUNNING) {
             Thread.sleep(100);
         }
 

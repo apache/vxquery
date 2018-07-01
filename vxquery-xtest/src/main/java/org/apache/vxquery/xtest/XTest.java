@@ -100,7 +100,7 @@ public class XTest {
         }
         try {
             TestClusterUtil.stopCluster(TestClusterUtil.localClusterUtil);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         try {

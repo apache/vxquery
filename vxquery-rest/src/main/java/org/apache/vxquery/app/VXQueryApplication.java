@@ -28,9 +28,13 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.hyracks.api.application.ICCApplicationContext;
-import org.apache.hyracks.api.application.ICCApplicationEntryPoint;
+import org.apache.hyracks.api.application.ICCApplication;
+import org.apache.hyracks.api.application.ICCServiceContext;
+import org.apache.hyracks.api.application.IServiceContext;
 import org.apache.hyracks.api.client.ClusterControllerInfo;
+import org.apache.hyracks.api.config.IConfigManager;
+import org.apache.hyracks.api.job.resource.DefaultJobCapacityController;
+import org.apache.hyracks.api.job.resource.IJobCapacityController;
 import org.apache.vxquery.exceptions.VXQueryRuntimeException;
 import org.apache.vxquery.rest.RestServer;
 import org.apache.vxquery.rest.service.VXQueryConfig;
@@ -44,15 +48,20 @@ import org.kohsuke.args4j.Option;
  *
  * @author Erandi Ganepola
  */
-public class VXQueryApplication implements ICCApplicationEntryPoint {
+public class VXQueryApplication implements ICCApplication {
 
     private static final Logger LOGGER = Logger.getLogger(VXQueryApplication.class.getName());
 
     private VXQueryService vxQueryService;
     private RestServer restServer;
+    private ICCServiceContext ccAppCtx;
+
+    public void init(IServiceContext serviceCtx) throws Exception {
+        ccAppCtx = (ICCServiceContext)serviceCtx;
+    }
 
     @Override
-    public void start(ICCApplicationContext ccAppCtx, String[] args) throws Exception {
+    public void start(String[] args) throws Exception {
         AppArgs appArgs = new AppArgs();
         if (args != null) {
             CmdLineParser parser = new CmdLineParser(appArgs);
@@ -96,6 +105,22 @@ public class VXQueryApplication implements ICCApplicationEntryPoint {
             stop();
             throw new VXQueryRuntimeException("Error occurred when starting application", e);
         }
+    }
+
+
+    @Override
+    public Object getApplicationContext() {
+        return ccAppCtx;
+    }
+
+    @Override
+    public void registerConfig(IConfigManager configManager) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IJobCapacityController getJobCapacityController() {
+        return DefaultJobCapacityController.INSTANCE;
     }
 
     /**

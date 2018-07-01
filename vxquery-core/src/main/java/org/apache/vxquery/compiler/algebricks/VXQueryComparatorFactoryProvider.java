@@ -16,18 +16,24 @@
  */
 package org.apache.vxquery.compiler.algebricks;
 
-import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
+import org.apache.hyracks.algebricks.common.exceptions.NotImplementedException;
 import org.apache.hyracks.algebricks.data.IBinaryComparatorFactoryProvider;
 import org.apache.hyracks.api.dataflow.value.IBinaryComparator;
 import org.apache.hyracks.api.dataflow.value.IBinaryComparatorFactory;
+import org.apache.vxquery.datamodel.accessors.TaggedValuePointable;
 
 public class VXQueryComparatorFactoryProvider implements IBinaryComparatorFactoryProvider {
     @Override
     public IBinaryComparatorFactory getBinaryComparatorFactory(Object type, boolean ascending)
             throws AlgebricksException {
         return new BinaryComparatorFactory(type, ascending);
+    }
+
+    @Override
+    public IBinaryComparatorFactory getBinaryComparatorFactory(Object type, boolean ascending, boolean ignoreCase)
+            throws AlgebricksException {
+        throw new NotImplementedException();
     }
 
     private static class BinaryComparatorFactory implements IBinaryComparatorFactory {
