@@ -140,7 +140,7 @@ public class QueryRequest {
     }
 
     public String toString() {
-        return String.format("{ statement : %s }", statement);
+        return String.format("{ statement : \"%s\" }", statement);
     }
 
     public String getRequestId() {

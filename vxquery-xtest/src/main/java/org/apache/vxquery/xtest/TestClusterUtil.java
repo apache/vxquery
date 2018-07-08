@@ -17,17 +17,10 @@
 
 package org.apache.vxquery.xtest;
 
-import org.apache.hyracks.api.client.HyracksConnection;
-import org.apache.hyracks.client.dataset.HyracksDataset;
 import org.apache.vxquery.app.util.LocalClusterUtil;
 import org.apache.vxquery.rest.service.VXQueryConfig;
 
-import java.io.IOException;
-
 public class TestClusterUtil {
-
-    private static HyracksConnection hcc;
-    private static HyracksDataset hds;
 
     public static final LocalClusterUtil localClusterUtil = new LocalClusterUtil();
 
@@ -44,31 +37,12 @@ public class TestClusterUtil {
         return vxqConfig;
     }
 
-    public static void startCluster(XTestOptions opts, LocalClusterUtil localClusterUtil) throws IOException {
-        try {
-            VXQueryConfig config = loadConfiguration(opts);
-            localClusterUtil.init(config);
-            hcc = (HyracksConnection) localClusterUtil.getConnection();
-            hds = (HyracksDataset) localClusterUtil.getDataset();
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
+    public static void startCluster(XTestOptions opts, LocalClusterUtil localClusterUtil) throws Exception {
+        VXQueryConfig config = loadConfiguration(opts);
+        localClusterUtil.init(config);
     }
 
-    public static void stopCluster(LocalClusterUtil localClusterUtil) throws IOException {
-        try {
-            localClusterUtil.deinit();
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
+    public static void stopCluster(LocalClusterUtil localClusterUtil) throws Exception {
+        localClusterUtil.deinit();
     }
-
-    public static HyracksConnection getConnection() {
-        return hcc;
-    }
-
-    public static HyracksDataset getDataset() {
-        return hds;
-    }
-
 }
