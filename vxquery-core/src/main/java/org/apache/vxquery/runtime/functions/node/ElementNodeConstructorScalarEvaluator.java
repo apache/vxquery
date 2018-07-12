@@ -74,6 +74,8 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
 
     private final boolean createNodeIds;
 
+    private static int nodeIdCounter = 0;
+
     public ElementNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
         anb = new AttributeNodeBuilder();
@@ -184,13 +186,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
             anb.setName(newURICode, newLocalCode, newPrefixCode);
 
             if (createNodeIds) {
-                int localId = -1;
-                if (ntp.nodeIdExists()) {
-                    localId = anp.getLocalNodeId(ntp);
-                } else {
-                    localId = nodeIdCounter++;
-                }
-                anb.setLocalNodeId(localId);
+                anb.setLocalNodeId(nodeIdCounter++);
             }
 
             anp.getValue(ntp, vp);
@@ -220,13 +216,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
             tempEnb.setName(newURICode, newLocalCode, newPrefixCode);
 
             if (createNodeIds) {
-                int localId = -1;
-                if (ntp.nodeIdExists()) {
-                    localId = enp.getLocalNodeId(ntp);
-                } else {
-                    localId = nodeIdCounter++;
-                }
-                tempEnb.setLocalNodeId(localId);
+                tempEnb.setLocalNodeId(nodeIdCounter++);
             }
 
             tempEnb.startAttributeChunk();
@@ -426,13 +416,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         cnb.reset(mvs);
 
         if (createNodeIds) {
-            int localId = -1;
-            if (ntp.nodeIdExists()) {
-                localId = tcnp.getLocalNodeId(ntp);
-            } else {
-                localId = nodeIdCounter++;
-            }
-            cnb.setLocalNodeId(localId);
+            cnb.setLocalNodeId(nodeIdCounter++);
         }
 
         cnb.setValue(vp);
@@ -453,13 +437,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         pnb.reset(mvs);
 
         if (createNodeIds) {
-            int localId = -1;
-            if (ntp.nodeIdExists()) {
-                localId = pnp.getLocalNodeId(ntp);
-            } else {
-                localId = nodeIdCounter++;
-            }
-            pnb.setLocalNodeId(localId);
+            pnb.setLocalNodeId(nodeIdCounter++);
         }
 
         pnb.setContent(vp2);
@@ -480,13 +458,7 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         tnb.reset(mvs);
 
         if (createNodeIds) {
-            int localId = -1;
-            if (ntp.nodeIdExists()) {
-                localId = tcnp.getLocalNodeId(ntp);
-            } else {
-                localId = nodeIdCounter++;
-            }
-            tnb.setLocalNodeId(localId);
+            tnb.setLocalNodeId(nodeIdCounter++);
         }
 
         tnb.setValue(vp);

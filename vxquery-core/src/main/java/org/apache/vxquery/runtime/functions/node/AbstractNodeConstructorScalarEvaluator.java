@@ -35,6 +35,8 @@ import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+    protected final static ITreeNodeIdProvider NodeConstructorIdProvider = new TreeNodeIdProvider((short) 0, true);
+
     protected final IHyracksTaskContext ctx;
 
     private final ArrayBackedValueStorage abvs;
@@ -44,7 +46,6 @@ public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTag
     private final ArrayBackedValueStorage contentAbvs;
 
     protected final ITreeNodeIdProvider nodeIdProvider;
-    protected int nodeIdCounter;
 
     public AbstractNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
@@ -53,11 +54,10 @@ public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTag
         db = createsDictionary() ? new DictionaryBuilder() : null;
         contentAbvs = createsDictionary() ? new ArrayBackedValueStorage() : abvs;
         if (createsNodeId()) {
-            nodeIdProvider = new TreeNodeIdProvider((short) 0);
+            nodeIdProvider = NodeConstructorIdProvider;
         } else {
             nodeIdProvider = null;
         }
-        nodeIdCounter = 0;
     }
 
     @Override
@@ -69,7 +69,7 @@ public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTag
             mainOut.write(ValueTag.NODE_TREE_TAG);
             byte header = (byte) (createsDictionary() ? NodeTreePointable.HEADER_DICTIONARY_EXISTS_MASK : 0);
 
-            header |= (byte) (createsNodeId() ? NodeTreePointable.HEADER_NODEID_EXISTS_MASK : 0);
+            header |= (byte) (nodeIdProvider != null ? NodeTreePointable.HEADER_NODEID_EXISTS_MASK : 0);
             mainOut.write(header);
 
             if (nodeIdProvider != null) {

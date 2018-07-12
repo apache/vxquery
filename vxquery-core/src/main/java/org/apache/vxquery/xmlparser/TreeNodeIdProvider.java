@@ -29,6 +29,7 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
     private short currentId;
     private byte fileId;
     private static Map<String, Byte> Files = new HashMap<String, Byte>();
+    // File ID 0 is reserved for element constructor
     private static byte nextFileId = 1;
 
     public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId, short totalDataSources) {
@@ -61,6 +62,18 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         dataSourceBits = 0;
         currentId = 0;
         fileId = getFileId(uri);
+    }
+
+    public TreeNodeIdProvider(short partition, boolean isElementConstructor) {
+        this.partitionDataSource = partition;
+        dataSouceScanId = 0;
+        dataSourceBits = 0;
+        currentId = 0;
+        if (isElementConstructor) {
+            fileId = 0;
+        } else {
+            fileId = nextFileId++;
+        }
     }
 
     public byte getFileId(String uri) {

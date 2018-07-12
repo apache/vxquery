@@ -71,8 +71,6 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
                 return false;
             if (fileId != other.fileId)
                 return false;
-            System.out.println("My Equals");
-            System.out.flush();
             return true;
         }
     }
@@ -91,11 +89,11 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         final SequencePointable seqright = (SequencePointable) SequencePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpleft = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
         final TaggedValuePointable tvpright = (TaggedValuePointable) TaggedValuePointable.FACTORY.createPointable();
-        final TypedPointables tpleft = new TypedPointables();
-        final TypedPointables tpright = new TypedPointables();
 
-        // a set of unique root node ids and local node ids
+        // a set of node ids in the left operand
         Set<Pair> nodes = new HashSet<Pair>();
+        // a set of node ids that will appear in the final result
+        Set<Pair> resultNodes = new HashSet<Pair>();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override
@@ -115,42 +113,44 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
                     // If an operand has more than one item then it is a sequence  
                     // IF an operand has 0 items then it is an empty sequence
 
-                    // Add items from the left operand into the hash map
+                    // Add items from the left operand into the hash set; this removes duplicates
                     if (tvp1.getTag() == ValueTag.SEQUENCE_TAG) {
                         tvp1.getValue(seqleft);
                         for (int i = 0; i < seqleft.getEntryCount(); ++i) {
                             seqleft.getEntry(i, tvpleft);
-                            if (tvpleft.getTag() != ValueTag.NODE_TREE_TAG) {
+                            if (tvpleft.getTag() != ValueTag.NODE_TREE_TAG)
                                 throw new SystemException(ErrorCode.XPTY0004);
-                            }
-                            if (!addItem(tvpleft, tpleft, nodes)) {
-                                // TODO: What happens when local node id is -1
-                            }
+                            Pair id = getId(tvpleft);
+                            nodes.add(id);
                         }
                     } else {
-                        if (!addItem(tvp1, tpleft, nodes)) {
-                            // TODO: What happens when local node id is -1
-                        }
+                        Pair id = getId(tvp1);
+                        nodes.add(id);
                     }
 
-                    // Check if node IDs from right operand are in the hash map
+                    // Check if node IDs from right operand are in the hash set
                     if (tvp2.getTag() == ValueTag.SEQUENCE_TAG) {
                         tvp2.getValue(seqright);
                         for (int i = 0; i < seqright.getEntryCount(); ++i) {
                             seqright.getEntry(i, tvpright);
-                            if (tvpright.getTag() != ValueTag.NODE_TREE_TAG) {
+                            if (tvpright.getTag() != ValueTag.NODE_TREE_TAG)
                                 throw new SystemException(ErrorCode.XPTY0004);
-                            }
-                            if (checkItem(tvpright, tpright, nodes)) {
-                                sb.addItem(tvpright);
-                                // TODO
-                            }
 
+                            Pair temp = getId(tvpright);
+                            if (nodes.contains(temp)) {
+                                if (!resultNodes.contains(temp)) {
+                                    resultNodes.add(temp);
+                                    sb.addItem(tvpright);
+                                }
+                            }
                         }
                     } else {
-                        if (checkItem(tvp2, tpright, nodes)) {
-                            sb.addItem(tvp2);
-                            // TODO
+                        Pair temp = getId(tvp2);
+                        if (nodes.contains(temp)) {
+                            if (!resultNodes.contains(temp)) {
+                                resultNodes.add(temp);
+                                sb.addItem(tvp2);
+                            }
                         }
                     }
 
@@ -163,46 +163,18 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
         };
     }
 
-    /*
-     * Adds item to nodes (hash map)
-     * Returns: False if local node id doesn't exist
-     *          True if item added successfully
-     */
-    private boolean addItem(TaggedValuePointable tvp, TypedPointables tp, Set<Pair> nodes) {
+    // Summary: Gets the id of a Node Tree
+    // Parameter tvp: The Node Tree we want to get the id of
+    // Return: The local node id, file id pait of tvp
+    // Error: if the local node id is -1
+    private Pair getId(TaggedValuePointable tvp) {
+        TypedPointables tp = new TypedPointables();
         int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
-        int rootNodeId = tp.ntp.getRootNodeId();
-        byte fileId = (byte) (rootNodeId >> 24); // TODO: Magic number
-        System.out.println("Left Node ID: " + nodeId + " root node id: " + rootNodeId + " file id: " + fileId);
         if (nodeId == -1) {
             // TODO
-            return false;
-        } else if (rootNodeId == -1) {
-            // TODO If rootNodeID is -1 is nodeId also -1?
-            return false;
         }
-        nodes.add(new Pair(nodeId, fileId));
-        return true;
-    }
-
-    /*
-     * Checks if node is in hash map
-     * Returns: False if local node id doesn't exist
-     *          False if node isn't in hash map
-     *          True if node is in hash map
-     */
-    private boolean checkItem(TaggedValuePointable tvp, TypedPointables tp, Set<Pair> nodes) {
-        int nodeId = FunctionHelper.getLocalNodeId(tvp, tp);
         int rootNodeId = tp.ntp.getRootNodeId();
         byte fileId = (byte) (rootNodeId >> 24); // TODO: Magic number
-        System.out.println("Right Node ID: " + nodeId + " root node id: " + rootNodeId + " file id: " + fileId);
-        if (nodeId == -1) {
-            // TODO
-            return false;
-        } else if (rootNodeId == -1) {
-            // TODO
-        } else if (nodes.contains(new Pair(nodeId, fileId))) {
-            return true;
-        }
-        return false;
+        return new Pair(nodeId, fileId);
     }
 }
