@@ -226,6 +226,7 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                                                 // file currently reading and
                                                 // send it to parser
                                                 InputStream in = fs.open(xmlDocument).getWrappedStream();
+                                                
                                                 parser.parseHDFSElements(in, writer, fta, tupleIndex);
                                                 in.close();
                                             }
@@ -260,7 +261,10 @@ public class VXQueryCollectionOperatorDescriptor extends AbstractSingleActivityO
                             if (LOGGER.isLoggable(Level.FINE)) {
                                 LOGGER.fine("Starting to read XML document: " + file.getAbsolutePath());
                             }
-                            parser.parseElements(file, writer, tupleIndex);
+                            ITreeNodeIdProvider myNodeIdProvider = new TreeNodeIdProvider(partitionId, dataSourceId, totalDataSources, file.getAbsolutePath());
+                            XMLParser myparser = new XMLParser(false, myNodeIdProvider, nodeId, appender, childSeq,
+                                    dCtx.getStaticContext());
+                            myparser.parseElements(file, writer, tupleIndex);
                         } else if (fileName.endsWith(".json")) {
                             if (LOGGER.isLoggable(Level.FINE)) {
                                 LOGGER.fine("Starting to read JSON document: " + file.getAbsolutePath());

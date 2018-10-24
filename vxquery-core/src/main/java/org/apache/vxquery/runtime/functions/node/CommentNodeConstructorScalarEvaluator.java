@@ -58,4 +58,9 @@ public class CommentNodeConstructorScalarEvaluator extends AbstractNodeConstruct
     protected boolean createsDictionary() {
         return false;
     }
+
+    @Override
+    protected boolean createsNodeId() {
+        return false;
+    }
 }

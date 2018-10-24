@@ -39,7 +39,8 @@ import org.apache.vxquery.datamodel.builders.nodes.TextNodeBuilder;
 import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
-
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
@@ -71,6 +72,10 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
 
     private final IMutableValueStorage abvs;
 
+    private final boolean createNodeIds;
+
+    private static int nodeIdCounter = 0;
+
     public ElementNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(ctx, args);
         anb = new AttributeNodeBuilder();
@@ -84,6 +89,8 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         cqp = (CodedQNamePointable) CodedQNamePointable.FACTORY.createPointable();
         strp = (UTF8StringPointable) UTF8StringPointable.FACTORY.createPointable();
         seqp = (SequencePointable) SequencePointable.FACTORY.createPointable();
+
+        createNodeIds = nodeIdProvider != null;
     }
 
     @Override
@@ -102,6 +109,10 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         namep.getLocalName(strp);
         int localCode = db.lookup(strp);
         enb.setName(uriCode, localCode, prefixCode);
+
+        if (createNodeIds)
+            enb.setLocalNodeId(nodeIdCounter++);
+
         TaggedValuePointable valueArg = args[1];
         enb.startAttributeChunk();
         int index = processAttributes(valueArg, db);
@@ -173,6 +184,11 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
             int newPrefixCode = recode(cqp.getPrefixCode(), ntp, db, strp);
             int newLocalCode = recode(cqp.getLocalCode(), ntp, db, strp);
             anb.setName(newURICode, newLocalCode, newPrefixCode);
+
+            if (createNodeIds) {
+                anb.setLocalNodeId(nodeIdCounter++);
+            }
+
             anp.getValue(ntp, vp);
             anb.setValue(vp);
             enb.endAttribute(anb);
@@ -198,6 +214,11 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
             int newPrefixCode = recode(cqp.getPrefixCode(), ntp, db, strp);
             int newLocalCode = recode(cqp.getLocalCode(), ntp, db, strp);
             tempEnb.setName(newURICode, newLocalCode, newPrefixCode);
+
+            if (createNodeIds) {
+                tempEnb.setLocalNodeId(nodeIdCounter++);
+            }
+
             tempEnb.startAttributeChunk();
             if (enp.attributesChunkExists()) {
                 enp.getAttributeSequence(ntp, seqp);
@@ -286,8 +307,8 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         return db.lookup(tempStrp);
     }
 
-    private void processChildren(TaggedValuePointable tvp, int start, DictionaryBuilder db) throws IOException,
-            SystemException {
+    private void processChildren(TaggedValuePointable tvp, int start, DictionaryBuilder db)
+            throws IOException, SystemException {
         if (tvp.getTag() == ValueTag.SEQUENCE_TAG) {
             tvp.getValue(seqp);
             TaggedValuePointable tempTvp = ppool.takeOne(TaggedValuePointable.class);
@@ -379,6 +400,11 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         return true;
     }
 
+    @Override
+    protected boolean createsNodeId() {
+        return true;
+    }
+
     private void copyComment(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs)
             throws IOException {
         VoidPointable vp = ppool.takeOne(VoidPointable.class);
@@ -388,6 +414,11 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         tcnp.getValue(ntp, vp);
 
         cnb.reset(mvs);
+
+        if (createNodeIds) {
+            cnb.setLocalNodeId(nodeIdCounter++);
+        }
+
         cnb.setValue(vp);
 
         ppool.giveBack(vp);
@@ -404,6 +435,11 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         pnp.getTarget(ntp, vp2);
 
         pnb.reset(mvs);
+
+        if (createNodeIds) {
+            pnb.setLocalNodeId(nodeIdCounter++);
+        }
+
         pnb.setContent(vp2);
         pnb.setTarget(vp1);
 
@@ -412,13 +448,19 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         ppool.giveBack(vp2);
     }
 
-    private void copyText(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs) throws IOException {
+    private void copyText(TaggedValuePointable tvp, NodeTreePointable ntp, IMutableValueStorage mvs)
+            throws IOException {
         VoidPointable vp = ppool.takeOne(VoidPointable.class);
         TextOrCommentNodePointable tcnp = ppool.takeOne(TextOrCommentNodePointable.class);
         tvp.getValue(tcnp);
         tcnp.getValue(ntp, vp);
 
         tnb.reset(mvs);
+
+        if (createNodeIds) {
+            tnb.setLocalNodeId(nodeIdCounter++);
+        }
+
         tnb.setValue(vp);
 
         ppool.giveBack(vp);
@@ -431,6 +473,11 @@ public class ElementNodeConstructorScalarEvaluator extends AbstractNodeConstruct
         TextNodeBuilder tnb = new TextNodeBuilder();
         tvp.getValue(vp);
         tnb.reset(mvs);
+
+        if (createNodeIds) {
+            tnb.setLocalNodeId(nodeIdCounter++);
+        }
+
         tnb.setValue(vp);
 
         ppool.giveBack(vp);

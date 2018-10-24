@@ -58,4 +58,9 @@ public class TextNodeConstructorScalarEvaluator extends AbstractNodeConstructorS
     protected boolean createsDictionary() {
         return false;
     }
+
+    @Override
+    protected boolean createsNodeId() {
+        return false;
+    }
 }

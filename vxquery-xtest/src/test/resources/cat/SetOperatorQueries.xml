@@ -1,0 +1,52 @@
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	You under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+
+<test-group
+	xmlns="http://www.w3.org/2005/02/query-test-XQTSCatalog"
+	name="SetOperatorQueries" featureOwner="VXQuery">
+	<GroupInfo>
+		<title>Set Operator Test</title>
+		<description />
+	</GroupInfo>
+	<test-case name="intersect01" FilePath="Intersect"
+		Creator="Brandon Gutzmann">
+		<description>Intersects two sets both with more than 1 item
+		</description>
+		<query name="intersect01" date="2018-04-26" />
+		<output-file compare="Text">intersect01.txt</output-file>
+	</test-case>
+	<test-case name="intersect02" FilePath="Intersect"
+		Creator="Brandon Gutzmann">
+		<description>Left operand has 1 item, right operand has many
+		</description>
+		<query name="intersect02" date="2018-04-26" />
+		<output-file compare="Text">intersect02.txt</output-file>
+	</test-case>
+	<test-case name="intersect03" FilePath="Intersect"
+		Creator="Brandon Gutzmann">
+		<description>Testing reverse of test 2</description>
+		<query name="intersect03" date="2018-04-26" />
+		<output-file compare="Text">intersect03.txt</output-file>
+	</test-case>
+	<test-case name="intersect04" FilePath="Intersect"
+		Creator="Brandon Gutzmann">
+		<description>Left and right operand have items that don't intersect
+		</description>
+		<query name="intersect04" date="2018-04-26" />
+		<output-file compare="Text">intersect04.txt</output-file>
+	</test-case>
+	<test-case name="intersect05" FilePath="Intersect"
+		Creator="Brandon Gutzmann">
+		<description>Text inline xml nodes</description>
+		<query name="intersect05" date="2018-04-26" />
+		<output-file compare="Text">intersect05.txt</output-file>
+	</test-case>
+</test-group>

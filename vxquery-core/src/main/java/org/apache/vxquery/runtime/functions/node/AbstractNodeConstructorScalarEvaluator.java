@@ -26,7 +26,8 @@ import org.apache.vxquery.datamodel.values.ValueTag;
 import org.apache.vxquery.exceptions.ErrorCode;
 import org.apache.vxquery.exceptions.SystemException;
 import org.apache.vxquery.runtime.functions.base.AbstractTaggedValueArgumentScalarEvaluator;
-
+import org.apache.vxquery.xmlparser.ITreeNodeIdProvider;
+import org.apache.vxquery.xmlparser.TreeNodeIdProvider;
 import org.apache.hyracks.algebricks.runtime.base.IScalarEvaluator;
 import org.apache.hyracks.api.context.IHyracksTaskContext;
 import org.apache.hyracks.data.std.api.IMutableValueStorage;
@@ -34,6 +35,8 @@ import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
+    protected final static ITreeNodeIdProvider NodeConstructorIdProvider = new TreeNodeIdProvider((short) 0);
+
     protected final IHyracksTaskContext ctx;
 
     private final ArrayBackedValueStorage abvs;
@@ -42,12 +45,19 @@ public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTag
 
     private final ArrayBackedValueStorage contentAbvs;
 
+    protected final ITreeNodeIdProvider nodeIdProvider;
+
     public AbstractNodeConstructorScalarEvaluator(IHyracksTaskContext ctx, IScalarEvaluator[] args) {
         super(args);
         this.ctx = ctx;
         abvs = new ArrayBackedValueStorage();
         db = createsDictionary() ? new DictionaryBuilder() : null;
         contentAbvs = createsDictionary() ? new ArrayBackedValueStorage() : abvs;
+        if (createsNodeId()) {
+            nodeIdProvider = NodeConstructorIdProvider;
+        } else {
+            nodeIdProvider = null;
+        }
     }
 
     @Override
@@ -58,7 +68,13 @@ public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTag
             DataOutput mainOut = abvs.getDataOutput();
             mainOut.write(ValueTag.NODE_TREE_TAG);
             byte header = (byte) (createsDictionary() ? NodeTreePointable.HEADER_DICTIONARY_EXISTS_MASK : 0);
+
+            header |= (byte) (nodeIdProvider != null ? NodeTreePointable.HEADER_NODEID_EXISTS_MASK : 0);
             mainOut.write(header);
+
+            if (nodeIdProvider != null) {
+                mainOut.writeInt(nodeIdProvider.getId());
+            }
             constructNode(db, args, contentAbvs);
             if (createsDictionary()) {
                 db.write(abvs);
@@ -74,4 +90,6 @@ public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTag
             throws IOException, SystemException;
 
     protected abstract boolean createsDictionary();
+
+    protected abstract boolean createsNodeId();
 }
