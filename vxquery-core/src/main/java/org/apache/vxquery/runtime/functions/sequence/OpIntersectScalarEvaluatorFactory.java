@@ -174,7 +174,7 @@ public class OpIntersectScalarEvaluatorFactory extends AbstractTaggedValueArgume
             // TODO
         }
         int rootNodeId = tp.ntp.getRootNodeId();
-        byte fileId = (byte) (rootNodeId >> 24); // TODO: Magic number
+        byte fileId = (byte) (rootNodeId >> 24);
         return new Pair(nodeId, fileId);
     }
 }

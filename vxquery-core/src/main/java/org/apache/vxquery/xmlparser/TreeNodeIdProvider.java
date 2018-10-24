@@ -16,6 +16,7 @@
  */
 package org.apache.vxquery.xmlparser;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         this.dataSouceScanId = dataSouceScanId;
         this.dataSourceBits = getBitsNeeded(totalDataSources);
         currentId = 0;
-        fileId = nextFileId++;
+        fileId = 0;
     }
 
     public TreeNodeIdProvider(short partitionDataSource, short dataSouceScanId, short totalDataSources, String uri) {
@@ -53,7 +54,7 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         dataSouceScanId = 0;
         dataSourceBits = 0;
         currentId = 0;
-        fileId = nextFileId++;
+        fileId = 0;
     }
 
     public TreeNodeIdProvider(short partition, String uri) {
@@ -64,29 +65,23 @@ public class TreeNodeIdProvider implements ITreeNodeIdProvider {
         fileId = getFileId(uri);
     }
 
-    public TreeNodeIdProvider(short partition, boolean isElementConstructor) {
-        this.partitionDataSource = partition;
-        dataSouceScanId = 0;
-        dataSourceBits = 0;
-        currentId = 0;
-        if (isElementConstructor) {
-            fileId = 0;
-        } else {
-            fileId = nextFileId++;
-        }
-    }
-
     public byte getFileId(String uri) {
-        if (Files.containsKey(uri)) {
-            return Files.get(uri);
+        // Try to get canonical path
+        String path = null;
+        try {
+            path = new File(uri).getCanonicalPath();
+        } catch (Exception e) {
+            path = uri;
+        }
+        if (Files.containsKey(path)) {
+            return Files.get(path);
         } else {
-            Files.put(uri, nextFileId);
+            Files.put(path, nextFileId);
             return nextFileId++;
         }
     }
 
     public int getId() {
-        // TODO: We only have 8 bytes for partition and datasourcescanid
         int p = partitionDataSource;
         int dssi = dataSouceScanId;
         int f = fileId;

@@ -16,6 +16,6 @@
    under the License. :)
    
 let $c := "catalog"
-let $a := doc($c)/catalog/book[price<0]
-let $b := doc($c)/catalog/book[price<50]
+let $a := doc($c)/catalog/book[price<40]
+let $b := doc($c)/catalog/book[price>40]
 return $a intersect $b

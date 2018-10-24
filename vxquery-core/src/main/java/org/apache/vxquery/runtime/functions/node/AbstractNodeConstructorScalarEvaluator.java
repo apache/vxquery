@@ -35,7 +35,7 @@ import org.apache.hyracks.data.std.api.IPointable;
 import org.apache.hyracks.data.std.util.ArrayBackedValueStorage;
 
 public abstract class AbstractNodeConstructorScalarEvaluator extends AbstractTaggedValueArgumentScalarEvaluator {
-    protected final static ITreeNodeIdProvider NodeConstructorIdProvider = new TreeNodeIdProvider((short) 0, true);
+    protected final static ITreeNodeIdProvider NodeConstructorIdProvider = new TreeNodeIdProvider((short) 0);
 
     protected final IHyracksTaskContext ctx;
 
