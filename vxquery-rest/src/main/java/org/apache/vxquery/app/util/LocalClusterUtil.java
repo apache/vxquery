@@ -24,7 +24,7 @@ import static org.apache.vxquery.rest.Constants.Properties.JOIN_HASH_SIZE;
 import static org.apache.vxquery.rest.Constants.Properties.MAXIMUM_DATA_SIZE;
 
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -59,8 +59,6 @@ public class LocalClusterUtil {
 
     private ClusterControllerService clusterControllerService;
     private NodeControllerService nodeControllerSerivce;
-    private IHyracksClientConnection hcc;
-    private IHyracksDataset hds;
     private VXQueryService vxQueryService;
 
     public void init(VXQueryConfig config) throws Exception {
@@ -77,19 +75,14 @@ public class LocalClusterUtil {
         clusterControllerService = new ClusterControllerService(ccConfig);
         clusterControllerService.start();
 
-        hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
-        hds = new HyracksDataset(hcc, config.getFrameSize(), config.getAvailableProcessors());
-
         // Node controller
         NCConfig ncConfig = createNCConfig();
         nodeControllerSerivce = new NodeControllerService(ncConfig);
         nodeControllerSerivce.start();
 
-        hcc = new HyracksConnection(ccConfig.clientNetIpAddress, ccConfig.clientNetPort);
-
         // REST controller
-        config.setHyracksClientIp(ccConfig.clientNetIpAddress);
-        config.setHyracksClientPort(ccConfig.clientNetPort);
+        config.setHyracksClientIp(ccConfig.getClientListenAddress());
+        config.setHyracksClientPort(ccConfig.getClientListenPort());
         vxQueryService = new VXQueryService(config);
         vxQueryService.start();
     }
@@ -97,35 +90,30 @@ public class LocalClusterUtil {
     protected CCConfig createCCConfig() throws IOException {
         String localAddress = getIpAddress();
         CCConfig ccConfig = new CCConfig();
-        ccConfig.clientNetIpAddress = localAddress;
-        ccConfig.clientNetPort = DEFAULT_HYRACKS_CC_CLIENT_PORT;
-        ccConfig.clusterNetIpAddress = localAddress;
-        ccConfig.clusterNetPort = DEFAULT_HYRACKS_CC_CLUSTER_PORT;
-        ccConfig.httpPort = DEFAULT_HYRACKS_CC_HTTP_PORT;
-        ccConfig.profileDumpPeriod = 10000;
-        ccConfig.appCCMainClass = VXQueryApplication.class.getName();
-        ccConfig.appArgs = Arrays.asList("-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT));
-
+        ccConfig.setClientListenAddress(localAddress);
+        ccConfig.setClientListenPort(DEFAULT_HYRACKS_CC_CLIENT_PORT);
+        ccConfig.setClusterListenAddress(localAddress);
+        ccConfig.setClusterListenPort(DEFAULT_HYRACKS_CC_CLUSTER_PORT);
+        ccConfig.setConsoleListenPort(DEFAULT_HYRACKS_CC_HTTP_PORT);
+        ccConfig.setProfileDumpPeriod(10000);
+        ccConfig.setAppClass(VXQueryApplication.class.getName());
+        ccConfig.getAppArgs().addAll(Arrays.asList("-restPort", String.valueOf(DEFAULT_VXQUERY_REST_PORT)));
         return ccConfig;
     }
 
     protected NCConfig createNCConfig() throws IOException {
         String localAddress = getIpAddress();
-        NCConfig ncConfig = new NCConfig();
-        ncConfig.ccHost = "localhost";
-        ncConfig.ccPort = DEFAULT_HYRACKS_CC_CLUSTER_PORT;
-        ncConfig.clusterNetIPAddress = localAddress;
-        ncConfig.dataIPAddress = localAddress;
-        ncConfig.resultIPAddress = localAddress;
-        ncConfig.nodeId = "test_node";
-        ncConfig.ioDevices = Files.createTempDirectory(ncConfig.nodeId).toString();
+        String nodeId = "test_node";
+        NCConfig ncConfig = new NCConfig(nodeId);
+        ncConfig.setClusterAddress("localhost");
+        ncConfig.setClusterPort(DEFAULT_HYRACKS_CC_CLUSTER_PORT);
+        ncConfig.setClusterListenAddress(localAddress);
+        ncConfig.setDataListenAddress(localAddress);
+        ncConfig.setResultListenAddress(localAddress);
+        ncConfig.setIODevices(new String[] { Files.createTempDirectory(nodeId).toString() });
+        ncConfig.setVirtualNC();
         return ncConfig;
     }
-
-    public IHyracksClientConnection getHyracksClientConnection() {
-        return hcc;
-    }
-
     public VXQueryService getVxQueryService() {
         return vxQueryService;
     }
@@ -166,21 +154,10 @@ public class LocalClusterUtil {
     }
 
     public String getIpAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost().getHostAddress();
+        return Inet4Address.getLoopbackAddress().getHostAddress();
     }
 
     public int getRestPort() {
         return DEFAULT_VXQUERY_REST_PORT;
     }
-
-    @Deprecated
-    public IHyracksClientConnection getConnection() {
-        return hcc;
-    }
-
-    @Deprecated
-    public IHyracksDataset getDataset() {
-        return hds;
-    }
-
 }

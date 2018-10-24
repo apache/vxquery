@@ -57,7 +57,7 @@ public class FnDocAvailableScalarEvaluatorFactory extends AbstractTaggedValueArg
         final DataInputStream di = new DataInputStream(bbis);
         final int partition = ctx.getTaskAttemptId().getTaskId().getPartition();
         final ITreeNodeIdProvider nodeIdProvider = new TreeNodeIdProvider((short) partition);
-        final String nodeId = ctx.getJobletContext().getApplicationContext().getNodeId();
+        final String nodeId = ctx.getJobletContext().getServiceContext().getNodeId();
 
         return new AbstractTaggedValueArgumentScalarEvaluator(args) {
             @Override

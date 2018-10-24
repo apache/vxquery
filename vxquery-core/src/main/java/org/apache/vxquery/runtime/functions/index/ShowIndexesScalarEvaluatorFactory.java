@@ -52,7 +52,7 @@ public class ShowIndexesScalarEvaluatorFactory extends AbstractTaggedValueArgume
                     abvs.reset();
                     sb.reset(abvs);
                     IndexCentralizerUtil indexCentralizerUtil = new IndexCentralizerUtil(
-                            ctx.getIOManager().getIODevices().get(0).getMount());
+                            ctx.getIoManager().getIODevices().get(0).getMount());
                     indexCentralizerUtil.readIndexDirectory();
                     indexCentralizerUtil.getAllCollections(sb);
                     sb.finish();

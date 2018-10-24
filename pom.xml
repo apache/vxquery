@@ -236,7 +236,7 @@
             <dependency>
                 <groupId>args4j</groupId>
                 <artifactId>args4j</artifactId>
-                <version>2.0.9</version>
+                <version>2.33</version>
             </dependency>
 
             <dependency>
@@ -762,7 +762,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <hyracks.fullstack.version>0.3.1</hyracks.fullstack.version>
-        <hyracks.version>0.3.0</hyracks.version>
+        <hyracks.version>0.3.3</hyracks.version>
         <lucene.version>5.5.1</lucene.version>
         <hadoop.version>2.7.0</hadoop.version>
         <apache-rat-plugin.version>0.11</apache-rat-plugin.version>

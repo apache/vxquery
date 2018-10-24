@@ -17,12 +17,10 @@
 package org.apache.vxquery.compiler.rewriter.rules;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.vxquery.functions.BuiltinFunctions;
-import org.apache.vxquery.functions.BuiltinOperators;
-
 import org.apache.hyracks.algebricks.common.exceptions.AlgebricksException;
 import org.apache.hyracks.algebricks.common.utils.Pair;
 import org.apache.hyracks.algebricks.core.algebra.base.ILogicalExpression;
@@ -37,6 +35,8 @@ import org.apache.hyracks.algebricks.core.algebra.functions.IFunctionInfo;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AbstractLogicalOperator;
 import org.apache.hyracks.algebricks.core.algebra.operators.logical.AggregateOperator;
 import org.apache.hyracks.algebricks.core.rewriter.base.IAlgebraicRewriteRule;
+import org.apache.vxquery.functions.BuiltinFunctions;
+import org.apache.vxquery.functions.BuiltinOperators;
 
 /**
  * The rule searches for aggregate operators with an aggregate function
@@ -91,28 +91,37 @@ public class IntroduceTwoStepAggregateRule implements IAlgebraicRewriteRule {
         if (op.getOperatorTag() != LogicalOperatorTag.AGGREGATE) {
             return false;
         }
-        AggregateOperator aggregate = (AggregateOperator) op;
-        if (aggregate.getExpressions().size() == 0) {
+        final AggregateOperator aggregate = (AggregateOperator) op;
+        AggregateFunctionCallExpression aggregateFunctionCall = getAggregateFunctionCall(aggregate);
+        if (aggregateFunctionCall == null || aggregateFunctionCall.isTwoStep()) {
             return false;
         }
-        Mutable<ILogicalExpression> mutableLogicalExpression = aggregate.getExpressions().get(0);
-        ILogicalExpression logicalExpression = mutableLogicalExpression.getValue();
+        // Replace single step aggregate function with two step function call
+        final IFunctionInfo functionInfo = aggregateFunctionCall.getFunctionInfo();
+        final List<Mutable<ILogicalExpression>> arguments = aggregateFunctionCall.getArguments();
+        AggregateFunctionCallExpression twoStepCall =
+                new AggregateFunctionCallExpression(functionInfo, true, arguments);
+        final Pair<IFunctionInfo, IFunctionInfo> functionInfoPair =
+                AGGREGATE_MAP.get(aggregateFunctionCall.getFunctionIdentifier());
+        twoStepCall.setStepOneAggregate(functionInfoPair.first);
+        twoStepCall.setStepTwoAggregate(functionInfoPair.second);
+        aggregate.getExpressions().get(0).setValue(twoStepCall);
+        return true;
+    }
+
+    private AggregateFunctionCallExpression getAggregateFunctionCall(AggregateOperator aggregate) {
+        if (aggregate.getExpressions().size() == 0) {
+            return null;
+        }
+        ILogicalExpression logicalExpression = aggregate.getExpressions().get(0).getValue();
         if (logicalExpression.getExpressionTag() != LogicalExpressionTag.FUNCTION_CALL) {
-            return false;
+            return null;
         }
         AbstractFunctionCallExpression functionCall = (AbstractFunctionCallExpression) logicalExpression;
-
         if (AGGREGATE_MAP.containsKey(functionCall.getFunctionIdentifier())) {
-            AggregateFunctionCallExpression aggregateFunctionCall = (AggregateFunctionCallExpression) functionCall;
-            if (aggregateFunctionCall.isTwoStep()) {
-                return false;
-            }
-            aggregateFunctionCall.setTwoStep(true);
-            aggregateFunctionCall.setStepOneAggregate(AGGREGATE_MAP.get(functionCall.getFunctionIdentifier()).first);
-            aggregateFunctionCall.setStepTwoAggregate(AGGREGATE_MAP.get(functionCall.getFunctionIdentifier()).second);
-            return true;
+            return (AggregateFunctionCallExpression) functionCall;
         }
-        return false;
+        return null;
     }
 
     @Override
