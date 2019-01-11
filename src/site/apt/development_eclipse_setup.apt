@@ -75,7 +75,7 @@ $ cd ..
     installation, VXQuery needs to be downloaded from Apache's git repository.
 
 ----------------------------------------
-$ git clone https://git-wip-us.apache.org/repos/asf/vxquery.git apache-vxquery
+$ git clone https://gitbox.apache.org/repos/asf/vxquery.git apache-vxquery
 (Accept the certificate information for *.apache.org.)
 $ cd apache-vxquery
 $ mvn package

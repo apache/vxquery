@@ -47,9 +47,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</connection>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
-        <url>https://git-wip-us.apache.org/repos/asf/vxquery.git</url>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/vxquery.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/vxquery.git</developerConnection>
+        <url>https://gitbox.apache.org/repos/asf/vxquery.git</url>
         <tag>apache-vxquery-0.6</tag>
     </scm>
 
@@ -579,7 +579,7 @@
                 <configuration>
                     <linkOnly>true</linkOnly>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/vxquery.git</developerConnection>
+                    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/vxquery.git</developerConnection>
                 </configuration>
             </plugin>
             <plugin>
