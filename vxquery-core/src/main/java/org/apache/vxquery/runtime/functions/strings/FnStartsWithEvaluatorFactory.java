@@ -104,23 +104,7 @@ public class FnStartsWithEvaluatorFactory extends AbstractTaggedValueArgumentSca
                 // TODO use the third value as collation
 
                 // Only need to run comparisons if they both have a non empty string.
-                if (stringp1.getUTF8Length() > 0 && stringp2.getUTF8Length() > 0) {
-                    int c1;
-                    int c2;
-                    while (true) {
-                        c1 = charIterator1.next();
-                        c2 = charIterator2.next();
-                        if (ICharacterIterator.EOS_CHAR == c2) {
-                            // Checked the full length of search string.
-                            booleanResult[1] = 1;
-                            break;
-                        }
-                        if (c1 != c2) {
-                            // Characters do not match
-                            break;
-                        }
-                    }
-                } else if (stringp2.getUTF8Length() == 0) {
+                if (stringp1.startsWith(stringp2, false)) {
                     booleanResult[1] = 1;
                 }
 

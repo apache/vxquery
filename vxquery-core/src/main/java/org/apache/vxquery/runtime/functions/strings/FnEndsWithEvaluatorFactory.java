@@ -90,8 +90,6 @@ public class FnEndsWithEvaluatorFactory extends AbstractTaggedValueArgumentScala
                     }
                     tvp2.getValue(stringp2);
                 }
-                int stringLength1 = stringp1.getStringLength();
-                int stringLength2 = stringp2.getStringLength();
                 charIterator1.reset();
                 charIterator2.reset();
 
@@ -105,34 +103,8 @@ public class FnEndsWithEvaluatorFactory extends AbstractTaggedValueArgumentScala
                 }
                 // TODO use the third value as collation
 
-                int stringCharOffset = stringLength1 - stringLength2;
-
-                // Only check if stringp2 can fit into stringp1.
-                if (stringCharOffset >= 0) {
-                    // Only need to run comparisons if they both have a non empty string.
-                    if (stringLength1 > 0 && stringLength2 > 0) {
-                        // Move string one's cursor for comparison
-                        for (; stringCharOffset > 0; --stringCharOffset) {
-                            charIterator1.next();
-                        }
-                        int c1;
-                        int c2;
-                        while (true) {
-                            c1 = charIterator1.next();
-                            c2 = charIterator2.next();
-                            if (c1 != c2) {
-                                // Characters do not match
-                                break;
-                            }
-                            if (c1 == ICharacterIterator.EOS_CHAR && c2 == ICharacterIterator.EOS_CHAR) {
-                                // Checked the full length of search string.
-                                booleanResult[1] = 1;
-                                break;
-                            }
-                        }
-                    } else if (stringLength2 == 0) {
-                        booleanResult[1] = 1;
-                    }
+                if (stringp1.endsWith(stringp2, false)) {
+                    booleanResult[1] = 1;
                 }
 
                 result.set(booleanResult, 0, 2);

@@ -101,50 +101,11 @@ public class FnContainsEvaluatorFactory extends AbstractTaggedValueArgumentScala
                 // TODO use the third value as collation
 
                 // Only need to run comparisons if they both have a non empty string.
-                if (stringp1.getUTF8Length() > 0 && stringp2.getUTF8Length() > 0) {
-                    int c2 = charIterator2.next();
-                    while (true) {
-                        int c1 = charIterator1.next();
-                        if (c1 == c2) {
-                            int offset1 = charIterator1.getByteOffset();
-
-                            // Check substring.
-                            if (checkSubString(charIterator1, charIterator2)) {
-                                booleanResult[1] = 1;
-                                break;
-                            }
-
-                            // Reset for strings for continuation.
-                            charIterator2.reset();
-                            c2 = charIterator2.next();
-                            charIterator1.setByteOffset(offset1);
-                        }
-                        if (c1 == ICharacterIterator.EOS_CHAR) {
-                            // End of string and no match found.
-                            break;
-                        }
-                    }
-                } else if (stringp2.getUTF8Length() == 0) {
+                if (stringp1.contains(stringp2, false)) {
                     booleanResult[1] = 1;
                 }
 
                 result.set(booleanResult, 0, 2);
-            }
-
-            private boolean checkSubString(ICharacterIterator charIterator1, ICharacterIterator charIterator2) {
-                while (true) {
-                    int c1 = charIterator1.next();
-                    int c2 = charIterator2.next();
-                    if (c2 == ICharacterIterator.EOS_CHAR) {
-                        // End of string.
-                        return true;
-                    }
-                    if (c1 != c2) {
-                        // No match found.
-                        break;
-                    }
-                }
-                return false;
             }
         };
     }
